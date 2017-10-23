@@ -1,57 +1,30 @@
-13 April 2006, XAMPP 1.5.2 Beta5
-- Update ZendOptimizer 3.0.0
+28 Mai 2006, XAMPP Release
+- Delete eAccelarator PHP 4 (because instabil)
+ 
+22 Mai 2006, XAMPP 1.5.3 Beta 5
+- UPDATE  Control Panel 2.3
+- UPDATE  phpMyAdmin 2.8.1
+- Changings in the httpd.conf:
+	EnableMMAP off
+	EnableSendfile off
 
-07 April 2006, XAMPP 1.5.2 Beta4
-- ADD Mercury/32 Security patches for MercuryW and MercuryH (Jan 2006, 120Kb)
-- Update ZendOptimizer 2.6.2
-- Update FileZilla FTP Server 0.9.14a
-- Update eAccelerator 
-- Update PEAR & PECL
-- Update phpMyAdmin 2.8.0.3
-- Update ADODB 4.80
-- ADD Spreadsheet Excel Reader
-- Fix security problem in xamppsecurity.php 
-- Fix Java Addon problem in status.php
-- Update MySQL 5.0.20
-- Update PHP 5.1.2 + PHP 4.4.2
-- Update XAMPP Control Version 2.2
-- Changes in navi.php (include .modell for XAMPP Lite or Not)
-- Remove go-pear.bat
+12 Mai 2006, XAMPP 1.5.3 Beta 4
+- Fix Bug in my.cnf
+- UPDATE  cds.php
+- UPDATE lang
 
+09 Mai 2006, XAMPP 1.5.3 Beta 3
+- UPDATE Apache 2.2.2
+- UPDATE OpenSSL 0.9.8b
+- UPDATE FileZilla Server 0.9.16c
 
-08 Jan 2006, XAMPP 1.5.1
-- UPDATE MySQL 5.0.18 (without ssl support)
-- CHANGE (Activate) PHP gettext module as default
-- CHANGE httpd_webdav.conf 
-- CHANGE httpd.conf + httpd_xampp.conf
+Fix problems:
+[1] Priviledge Escaltation to SYSTEM due to FileZilla Service Path specification 
+[2] Priviledge Escaltation to SYSTEM due to MySQLadmin Path specification 
+[3] Priviledge Escaltation to SYSTEM due to CGI Path specification
+[4] Rogue Autostart due to unsecure File execution (only Installer) 
+See also: http://secdev.zoller.lu/research/xamp1.htm
 
-28 Dec 2005, XAMPP 1.5.1-beta3
-- CHANGE install.php for addon compatibility
-
-26 Dec 2005, XAMPP 1.5.1-beta2
-- CHANGE httpd.conf structure (with extra folder for all include files)
-- CHANGE install.php (xamppbasic.inc) and php-switch.php for new conf-structure 
-- CHANGE navi.php e.g to the linux xampp (with langsettings.php include) 
-- ADD brazilian language
-- UPDATE phpMyAdmin 2.7.0 pl1
-- UPDATE MySQL 5.0.17 (here only for testing)
-
-02 Dec 2005, XAMPP 1.5.1-beta1
-- UPDATE Apache 2.2.0 (wiedmann compilation)
-- UPDATE MySQL 5.0.16 (wiedmann compilation)
-- UPDATE PHP 5.1.1 (wiedmann compilation)
-- UPDATE eAccelerator 0.9.4-rc1  (wiedmann compilation)
-- UPDATE PHP Extension PDFLib Lite 6.0.2  (wiedmann compilation)
-- UPDATE PHP Extension IMAP 2004g / with SSL (wiedmann compilation)
-- UPDATE FileZilla FTP Server 0.9.11
-- UPDATE phpMyAdmin 2.7.0
-- UPDATE PEAR (v1.4.5)
-- UPDATE ADOdb 4.68
-- ADD FPDF 1.5.3
-- ADD Portuguese lang file (from Marcio)
-- some code cleanup (HTML: valid HTML4.01 / PHP: "register_globals = Off")
-
-Known issues:
-- no Zend Optimizer for PHP5.1.1
-- eAccelerator is not working correkt with PHP5.1.1
-- mod_auth_remote is not working
+06 Mai 2006, XAMPP 1.5.3 Beta 1 
+- UPDATE MySQL 5.0.21 (without ssl support)
+- UPDATE PHP 5.1.4 with PECL 

@@ -249,7 +249,8 @@
 	// CD COLLECTION DEMO
 	// ---------------------------------------------------------------------
 
-	$TEXT['cds-head'] = "CD Collection (Example for PHP+MySQL+FPDF Class)";
+	$TEXT['cds-head'] = "CD Collection (Example for PHP+MySQL+PDF Class)";
+	$TEXT['cds-head-fpdf'] = "CD Collection (Example for PHP+MySQL+FPDF)";
 
 	$TEXT['cds-text1'] = "A very simple CD programm.";
 

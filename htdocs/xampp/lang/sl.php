@@ -246,7 +246,8 @@
 	// CD COLLECTION DEMO
 	// ---------------------------------------------------------------------
 
-	$TEXT['cds-head'] = "CD zbirka (Primeri za PHP+MySQL+FPDF Class)";
+	$TEXT['cds-head'] = "CD zbirka (Primeri za PHP+MySQL+PDF Class)";
+	$TEXT['cds-head-fpdf'] = "CD zbirka (Primeri za PHP+MySQL+FPDF)";
 
 	$TEXT['cds-text1'] = "Zelo enostaven CD program.";
 

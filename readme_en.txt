@@ -1,18 +1,17 @@
- ApacheFriends XAMPP (basic package) version 1.5.2
+ ApacheFriends XAMPP (basic package) version 1.5.3
 
-  + Apache 2.2.0
-  + MySQL 5.0.20
-  + PHP 5.1.2 + PHP 4.4.2-pl1 + PEAR
-  + eAccelerator 0.9.4-rc1 (not stabil with PHP 5.1.2)
-  + PHP-Switch win32 1.0 (von Apachefriends, man nehme die "php-switch.bat") 
-  + XAMPP Control Version 2.2 from www.nat32.com	
+  + Apache 2.2.2
+  + MySQL 5.0.21
+  + PHP 5.1.4 + PHP 4.4.2-pl1 + PEAR
+  + PHP-Switch win32 1.0 (use the "php-switch.bat") 
+  + XAMPP Control Version 2.3 from www.nat32.com	
   + XAMPP Security 1.0	
   + SQLite 2.8.15
-  + OpenSSL 0.9.8a
-  + phpMyAdmin 2.8.0.3
+  + OpenSSL 0.9.8b
+  + phpMyAdmin 2.8.1
   + ADOdb 4.80
   + Mercury Mail Transport System v4.01b
-  + FileZilla FTP Server 0.9.14a
+  + FileZilla FTP Server 0.9.16c
   + Webalizer 2.01-10
   + Zend Optimizer 3.0.0
  
@@ -73,7 +72,7 @@ password: some@mail.net
 3) Mercury: 
 Postmaster: postmaster (postmaster@localhost) und Admin (Admin@localhost)
 
-Testuser: newsuser  
+Testuser: newuser  
 password: wampp
 
 4) WEBDAV: 

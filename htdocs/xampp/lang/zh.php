@@ -250,6 +250,7 @@
 	// ---------------------------------------------------------------------
 
 	$TEXT['cds-head'] = "CD集(PHP+MySQL+PDF类)";
+	$TEXT['cds-head-fpdf'] = "CD集(PHP+MySQL+FPDF)";
 
 	$TEXT['cds-text1'] = "一个很简单的CD程序.";
 

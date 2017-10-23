@@ -18,7 +18,7 @@
 					<img src="img/blank.gif" alt="" width="145" height="15"><br>
 					<span class="nh">&nbsp;<?php 
 					include ".modell"; 
-					?><br>[PHP: <?php echo phpversion(); ?>]</span><br>
+					?></span><br><span class="navi">[PHP: <?php echo phpversion(); ?>]</span><br>
 				</td>
 			</tr>
 			<tr>

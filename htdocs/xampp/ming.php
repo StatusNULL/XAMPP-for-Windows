@@ -27,7 +27,7 @@
 		</object>
 
 		<p class="small">
-		<?php echo $TEXT['flash-text1']; ?>
+	<A HREF="http://ming.sourceforge.net" target="new">http://ming.sourceforge.net</A>
 		<p>
 		<form name="ff" action="ming.php" method="get">
 			<input type="text" name="text" value="<?php echo $_GET['text']; ?>" size="30">

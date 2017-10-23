@@ -4,7 +4,7 @@
 # Script to create a Windows src package
 #
 
-version=5.0.19
+version=5.0.21
 export version
 CP="cp -p"
 
@@ -158,7 +158,7 @@ vreplace()
 {
   for arg do
     unix_to_dos $arg
-    cat $arg | sed -e 's!@''VERSION''@!5.0.19!' > $arg.tmp
+    cat $arg | sed -e 's!@''VERSION''@!5.0.21!' > $arg.tmp
     rm -f $arg
     mv $arg.tmp $arg
   done

@@ -244,6 +244,7 @@
 	// ---------------------------------------------------------------------
 
 	$TEXT['cds-head'] = "Collezione CD (Esempio della classe PHP+MySQL+PDF class)";
+	$TEXT['cds-head-fpdf'] = "Collezione CD (Esempio della classe PHP+MySQL+FPDF)";
 
 	$TEXT['cds-text1'] = "Un programma CD molto semplice.";
 

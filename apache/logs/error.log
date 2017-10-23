@@ -1,0 +1,13 @@
+[Mon May 08 17:02:39 2006] [crit] (22)Invalid argument: unable to replace stderr with error_log
+[Mon May 08 17:02:39 2006] [crit] (2)No such file or directory: unable to replace stderr with /dev/null
+[Mon May 08 17:02:39 2006] [crit] (22)Invalid argument: unable to replace stderr with error_log
+[Mon May 08 17:02:39 2006] [crit] (2)No such file or directory: unable to replace stderr with /dev/null
+[Mon May 08 17:02:41 2006] [notice] Apache/2.2.0 (Win32) DAV/2 mod_ssl/2.2.0 OpenSSL/0.9.8a mod_autoindex_color PHP/5.1.4 configured -- resuming normal operations
+[Mon May 08 17:02:41 2006] [notice] Server built: Dec  1 2005 18:36:53
+[Mon May 08 17:02:41 2006] [notice] Parent: Created child process 1692
+[Mon May 08 17:02:42 2006] [notice] Child 1692: Child process is running
+[Mon May 08 17:02:43 2006] [notice] Child 1692: Acquired the start mutex.
+[Mon May 08 17:02:43 2006] [notice] Child 1692: Starting 250 worker threads.
+[Mon May 08 17:02:43 2006] [notice] Child 1692: Starting thread to listen on port 443.
+[Mon May 08 17:02:43 2006] [notice] Child 1692: Starting thread to listen on port 80.
+[Mon May 08 17:03:04 2006] [error] [client 127.0.0.1] File does not exist: D:/xampp/htdocs/cgi

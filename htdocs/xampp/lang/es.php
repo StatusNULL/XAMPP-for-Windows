@@ -246,7 +246,8 @@
 	// CD COLLECTION DEMO
 	// ---------------------------------------------------------------------
 
-	$TEXT['cds-head'] = "Administración del CD (Ejemplo de una clase PHP+MySQL+FPDFClass)";
+	$TEXT['cds-head'] = "Administración del CD (Ejemplo de una clase PHP+MySQL+PDF Class)";
+	$TEXT['cds-head-fpdf'] = "Administración del CD (Ejemplo de una clase PHP+MySQL+FPDF)";
 
 	$TEXT['cds-text1'] = "Una administración de CD muy sencilla. Ya que no se pueden corregir entradas, cuando te equivocas, se aconseja phpMyAdmin (abajo a la izquierda en la navegación).";
 

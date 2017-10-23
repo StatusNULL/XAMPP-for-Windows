@@ -243,7 +243,8 @@
 	// CD SAMLING EKSEMPEL
 	// ---------------------------------------------------------------------
 
-	$TEXT['cds-head'] = "CD Samling (Eksempel for PHP+MySQL+FPDF Class)";
+	$TEXT['cds-head'] = "CD Samling (Eksempel for PHP+MySQL+PDF Class)";
+	$TEXT['cds-head-fpdf'] = "CD Samling (Eksempel for PHP+MySQL+FPDF)";
 
 	$TEXT['cds-text1'] = "Et veldig enkelt cd program.";
 

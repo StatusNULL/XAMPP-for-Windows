@@ -16,11 +16,7 @@
 		<b><?php echo $TEXT['start-subhead']; ?></b><p>
 
 		<?php echo $TEXT['start-text1']; ?><p>
-		<?php
-			if ($TEXT['start-text-newest']) {
-				echo "<p>".$TEXT['start-text-newest'];
-			}
-		?>
+		
 		<?php echo $TEXT['start-text2']; ?><p>
 		<?php echo $TEXT['start-text3']; ?><p>
 		<?php echo $TEXT['start-text4']; ?><p>
@@ -28,12 +24,6 @@
 		<?php echo $TEXT['start-text6']; ?>
 
 		<?php echo "<p>&nbsp;<br><i>".getenv("SERVER_SOFTWARE")."</i><br>"; ?>
-		<?php
-			if ($lang == "de") {
-				include "lang/wisdoms-de.php";
-				$zufall = mt_rand(0, 45);
-				echo "<br>&nbsp;<h3><font size='2'>Eine ganz kleine Weisheit:<br><cite>".$WISDOM[$zufall]."</cite></font></h3>";
-			}
-		?>
+		
 	</body>
 </html>
