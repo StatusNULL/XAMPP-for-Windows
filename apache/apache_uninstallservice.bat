@@ -9,10 +9,10 @@ goto exit
 
 :WinNT
 echo Are you sure you wan't this?
-echo now stopping Apache2 when it runs
+echo now stopping Apache2.2 when it runs
 net stop Apache2
 echo Time to say good bye to Apache2 :(
-bin\apache -k uninstall
+bin\apache -n Apache2 -k uninstall
 
 :exit
 pause

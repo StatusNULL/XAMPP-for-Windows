@@ -52,8 +52,8 @@
 	// ---------------------------------------------------------------------
 
 	$TEXT['status-head'] = "XAMPP Status";
-	$TEXT['status-text1'] = "This page offers you on one view all information about what's running and working and what's not.";
-	$TEXT['status-text2'] = "Some changes to the configuration sometime may cause false negative status reports. With SSL (https://localhost) all these reports do not function!";
+	$TEXT['status-text1'] = "This page offers you one page to view all information about what's running and working, and what isn't working.";
+	$TEXT['status-text2'] = "Some changes to the configuration may sometimes cause false negatives. All reports viewed with SSL (https://localhost) do not function!";
 
 	$TEXT['status-mysql'] = "MySQL database";
 	$TEXT['status-ssl'] = "HTTPS (SSL)";
@@ -84,15 +84,15 @@
 	// ---------------------------------------------------------------------
 
 	$TEXT['security-head'] = "XAMPP SECURITY";
-	$TEXT['security-text1'] = "This page gives you a quick overview about the security status of your XAMPP installation. (Please continue reading after the table.)";
+	$TEXT['security-text1'] = "This page gives you a quick overview of the security status of your XAMPP installation. (Please continue reading after the table.)";
 	$TEXT['security-text2'] = "The green marked points are secure; the red marked points are definitively unsecure and the yellow marked points couldn't be checked (for example because the sofware to check isn't running).<p>To fix the problems for mysql, phpmyadmin and the xampp directory simply use</b><p>=> <a href=\"/security/xamppsecurity.php\"><b>http://localhost/security/xamppsecurity.php</b></a> <= &nbsp;&nbsp;[allowed only for localhost]<br>&nbsp;<br>&nbsp;<br>
 	Some other important notes:<ul>
-	<li>All these test are made ONLY for host \"localhost\" (127.0.0.1).</li>
+	<li>All these test are made available ONLY to the host \"localhost\" (127.0.0.1).</li>
 	<li><i><b>For FileZilla FTP und Mercury Mail, you must fix all security problems by yourself! Sorry. </b></i></li>
-	<li>If your computer is not online or blocked by a firewall, your servers are SECURE against outside attacks.</li>
-	<li>If servers are not running, these servers are although SECURE!</li></ul>";
+	<li>If your computer is blocked by a firewall or not online, your servers are SECURE against outside attacks.</li>
+	<li>If servers are not running, they are also SECURE!</li></ul>";
 	$TEXT['security-text3'] = "<b>Please consider this:
-	With more XAMPP security some examples will NOT execute error free. If you use PHP in \"safe mode\" for example some functions of this security frontend will not working anymore. Often even more security means less functionality at the same time.</b>";
+	With more XAMPP security, some examples will NOT execute error free. If you use PHP in \"safe mode\" for example, some functions of this security frontend will not work anymore. Often more security means less functionality.</b>";
 	$TEXT['security-text4'] = "The XAMPP default ports:";
 
 	$TEXT['security-ok'] = "SECURE";
@@ -102,25 +102,25 @@
 	$TEXT['security-tab1'] = "Subject";
 	$TEXT['security-tab2'] = "Status";
 
-	$TEXT['security-checkapache-nok'] = "These XAMPP pages are accessible by network for everyone";
-	$TEXT['security-checkapache-ok'] = "These XAMPP pages are no longer accessible by network for everyone";
-	$TEXT['security-checkapache-text'] = "Every XAMPP demo page you are right now looking at is accessible for everyone over network. Everyone who knows your IP address can see these pages.";
+	$TEXT['security-checkapache-nok'] = "These XAMPP pages are accessible through the network by anyone";
+	$TEXT['security-checkapache-ok'] = "These XAMPP pages are not accessible through the network by anyone";
+	$TEXT['security-checkapache-text'] = "Every XAMPP demo page you are looking at right now is accessible by everyone over the network. Everyone who knows your IP address can see these pages.";
 
-	$TEXT['security-checkmysqlport-nok'] = "MySQL is accessible by the network";
+	$TEXT['security-checkmysqlport-nok'] = "MySQL is accessible through the network";
 	$TEXT['security-checkmysqlport-ok'] = "MySQL is no longer accessible over the network";
-	$TEXT['security-checkmysqlport-text'] = "This is a potential or at least theoretical security leak. And if you're mad about security you should disable the network interface of MySQL.";
+	$TEXT['security-checkmysqlport-text'] = "This is a potential or at least theoretical security leak; If you're mad about security you should disable the network interface of MySQL.";
 
 	$TEXT['security-checkpmamysqluser-nok'] = "The phpMyAdmin user pma has no password";
-	$TEXT['security-checkpmamysqluser-ok'] = "The phpMyAdmin user pma has no longer no password";
-	$TEXT['security-checkpmamysqluser-text'] = "phpMyAdmin saves your preferences in an extra MySQL database. To access this data phpMyAdmin uses the special user pma. This user has in the default installation no password set and to avoid any security problems you should give him a passwort.";
+	$TEXT['security-checkpmamysqluser-ok'] = "The phpMyAdmin user pma has a password.";
+	$TEXT['security-checkpmamysqluser-text'] = "phpMyAdmin saves your preferences in an extra MySQL database. To access this data phpMyAdmin uses the special user pma. In the default installation, this user has no password set and to avoid security problems you should provide a password.";
 
 	$TEXT['security-checkmysql-nok'] = "The MySQL admin user root has NO password";
-	$TEXT['security-checkmysql-ok'] = "The MySQL admin user root has no longer no password";
-	$TEXT['security-checkmysql-out'] = "A MySQL server is not running  or is blocked by a firewall!";
-	$TEXT['security-checkmysql-text'] = "Every local user on Windows box can access your MySQL database with administrator rights. You should set a password.";
+	$TEXT['security-checkmysql-ok'] = "The MySQL admin user root has a password";
+	$TEXT['security-checkmysql-out'] = "The MySQL server is not running or is blocked by a firewall!";
+	$TEXT['security-checkmysql-text'] = "Every local user on this Windows machine can access your MySQL database with administrator rights. You should set a password.";
 
-	$TEXT['security-pop-nok'] = "The test user (newuser) for Mercury Mail server (POP3) have an old password (wampp)";
-	$TEXT['security-pop-ok'] = "The test user \"newuser\" for the POP3 server (Mercury Mail?) does not exists anymore or have a new password";
+	$TEXT['security-pop-nok'] = "The test user (newuser) for Mercury Mail server (POP3) has an old password (wampp)";
+	$TEXT['security-pop-ok'] = "The test user \"newuser\" for the POP3 server (Mercury Mail?) does not exist anymore or has a new password";
 	$TEXT['security-pop-out'] = "A POP3 server like Mercury Mail is not running or is blocked by a firewall!";
 	$TEXT['security-pop-notload'] = "<i>The necessary IMAP extension for this secure test is not loading (php.ini)!</i><br>";
 	$TEXT['security-pop-text'] = "Please check and perhaps edit all users and passwords in the the Mercury Mail server configuration!";
@@ -130,15 +130,15 @@
 	$TEXT['security-checkftppassword-out'] = "A FTP server is not running  or is blocked by a firewall!";
 	$TEXT['security-checkftppassword-text'] = "If the FileZilla FTP server was started, the default user 'newuser' with password 'wampp' can upload and change files for your XAMPP webserver. So if you enabled FileZilla FTP you should set a new password for user 'newuser'.";
 
-	$TEXT['security-phpmyadmin-nok'] = "PhpMyAdmin is free accessible by network";
+	$TEXT['security-phpmyadmin-nok'] = "PhpMyAdmin is freely accessible by network";
 	$TEXT['security-phpmyadmin-ok'] = "PhpMyAdmin password login is enabled.";
 	$TEXT['security-phpmyadmin-out'] = "PhpMyAdmin: Could not find the 'config.inc.php' ...";
-	$TEXT['security-phpmyadmin-text'] = "PhpMyAdmin is accessible by network without password. The configuration 'httpd' or 'cookie' in the \"config.inc.php\" can help.";
+	$TEXT['security-phpmyadmin-text'] = "PhpMyAdmin is accessible by network without a password. The configuration 'httpd' or 'cookie' in the \"config.inc.php\" can help.";
 
 	$TEXT['security-checkphp-nok'] = "PHP is NOT running in \"safe mode\"";
 	$TEXT['security-checkphp-ok'] = "PHP is running in \"safe mode\"";
 	$TEXT['security-checkphp-out'] = "Unable to control the setting of PHP!";
-	$TEXT['security-checkphp-text'] = "If do you want to offer PHP executions for outside persons, please think about a \"safe mode\" configuration. But for standalone developer we recommend NOT the \"safe mode\" configuration because some important functions will not working then. <a href=\"http://www.php.net/features.safe-mode\" target=\"_new\"><font size=1>More Info</font></a>";
+	$TEXT['security-checkphp-text'] = "If you do not want to offer PHP execution for users outside of this server, please think about a \"safe mode\" configuration. But for the  standalone developer we recommend NOT turning on \"safe mode\" configuration because some important functions will not work. <a href=\"http://www.php.net/features.safe-mode\" target=\"_new\"><font size=1>More Info</font></a>";
 
 
 	// ---------------------------------------------------------------------
@@ -149,25 +149,25 @@
 	$TEXT['mysql-rootsetup-head'] = "MYSQL SECTION: \"ROOT\" PASSWORD";
 	$TEXT['mysql-rootsetup-text1'] = "";
 	$TEXT['mysql-rootsetup-notrunning'] = "The MySQL server is not running or is blocked by a firewall! Please check this problem first ...";
-	$TEXT['mysql-rootsetup-passwdnotok'] = "The new password is identical with the repeat password. Please enter both passwords for new!";
-	$TEXT['mysql-rootsetup-passwdnull'] = "Zero passwords ('') will not accepted!";
+	$TEXT['mysql-rootsetup-passwdnotok'] = "The new password is identical with the repeat password. Please enter both passwords again!";
+	$TEXT['mysql-rootsetup-passwdnull'] = "Blank passwords ('') will not be accepted!";
 	$TEXT['mysql-rootsetup-passwdsuccess'] = "SUCCESS: The password for the SuperUser 'root' was set or updated!
 	But note: The initialization of the new password for \"root\" needs a RESTART OF MYSQL !!!! The data with the new password was safed in the following file:";
-	$TEXT['mysql-rootsetup-passwdnosuccess'] = "ERROR: The root password is perhaps wrong. MySQL decline the login with these current root password.";
-	$TEXT['mysql-rootsetup-passwdold'] = "Current passwort:";
+	$TEXT['mysql-rootsetup-passwdnosuccess'] = "ERROR: The root password is wrong. MySQL declined the login with the current root password.";
+	$TEXT['mysql-rootsetup-passwdold'] = "Current password:";
 	$TEXT['mysql-rootsetup-passwd'] = "New password:";
 	$TEXT['mysql-rootsetup-passwdrepeat'] = "Repeat the new password:";
 	$TEXT['mysql-rootsetup-passwdchange'] = "Password changing";
-	$TEXT['mysql-rootsetup-phpmyadmin'] = "PhpMyAdmin authentification:";
+	$TEXT['mysql-rootsetup-phpmyadmin'] = "PhpMyAdmin authentication:";
 
 	$TEXT['xampp-setup-head'] = "XAMPP DIRECTORY PROTECTION (.htaccess)";
 	$TEXT['xampp-setup-user'] = "User:";
 	$TEXT['xampp-setup-passwd'] = "Password:";
-	$TEXT['xampp-setup-start'] = "Make safe the XAMPP directory";
-	$TEXT['xampp-setup-notok'] = "<br><br>ERROR: The string for the user name and password must have at least three  characters and not more then 15 characters. Special characters like <öäü (usw.) and empty characters are not allowed!<br><br>";
-	$TEXT['xampp-setup-ok'] = "<br><br>The root password was successfully changed. Please restart MYSQL for loading these changes!<br><br>";
-	$TEXT['xampp-config-ok'] = "<br><br>SUCCESS: The XAMPP directory is protected now! All personal data was safed in the following file:<br>";
-	$TEXT['xampp-config-notok'] = "<br><br>ERROR: Your system could NOT activate the directory protection with the \".htaccess\" and the \"htpasswd.exe\". Perhaps PHP is in the \"Safe Mode\". <br><br>";
+	$TEXT['xampp-setup-start'] = "Secure the XAMPP directory";
+	$TEXT['xampp-setup-notok'] = "<br><br>ERROR: The string for the user name and password must be 3 to 15 characters long. Special characters like <öäü (usw.) and empty characters are not allowed!<br><br>";
+	$TEXT['xampp-setup-ok'] = "<br><br>The root password was successfully changed. Please restart MYSQL to enable these changes!<br><br>";
+	$TEXT['xampp-config-ok'] = "<br><br>SUCCESS: The XAMPP directory is protected now! All personal data was saved in the following file:<br>";
+	$TEXT['xampp-config-notok'] = "<br><br>ERROR: Your system could NOT activate directory protection with the \".htaccess\" and \"htpasswd.exe\". Perhaps PHP is in \"Safe Mode\". <br><br>";
 
 	// ---------------------------------------------------------------------
 	// START
@@ -175,9 +175,9 @@
 
 	$TEXT['start-head'] = "Welcome to XAMPP for Windows";
 
-	$TEXT['start-subhead'] = "Congratulations:<br>You successfully installed XAMPP on this system!";
+	$TEXT['start-subhead'] = "Congratulations:<br>You have successfully installed XAMPP on this system!";
 
-	$TEXT['start-text1'] = "Now you can start using Apache and Co. Firstly you should try »Status« on the left navigation to make sure everything works fine.";
+	$TEXT['start-text1'] = "Now you can start using Apache and Co. You should first try »Status« on the left navigation to make sure everything works fine.";
 
 	$TEXT['start-text2'] = "";
 
@@ -185,7 +185,7 @@
 
 	$TEXT['start-text4'] = "For OpenSSL support please use the test certificate with <a href='https://127.0.0.1' target='_top'>https://127.0.0.1</a> or <a href='https://localhost' target='_top'>https://localhost</a>";
 
-	$TEXT['start-text5'] = "And very important! Big thanks for help and support to Carsten, Nemesis, KriS, Boppy, Pc-Dummy and all other friends of XAMPP!";
+	$TEXT['start-text5'] = "And most importantly, a big thanks for help and support to Carsten, Nemesis, KriS, Boppy, Pc-Dummy and all other friends of XAMPP!";
 
 	$TEXT['start-text6'] = "Good luck, Kay Vogelgesang + Kai 'Oswald' Seidler";
 
@@ -195,7 +195,7 @@
 
 	$TEXT['manuals-head'] = "Online documentation";
 
-	$TEXT['manuals-text1'] = "XAMPP combines many different sofware packages into one packet. Here's a list of standard and reference documentation of the most important packages.";
+	$TEXT['manuals-text1'] = "XAMPP combines many different sofware packages into one package. Here's a list of standard and reference documentation of the most important packages.";
 
 
 	$TEXT['manuals-list1'] = "
@@ -227,7 +227,7 @@
 
 	$TEXT['components-head'] = "XAMPP components";
 
-	$TEXT['components-text1'] = "XAMPP combines many different sofware packages into one packet. Here's an overview over all packages.";
+	$TEXT['components-text1'] = "XAMPP combines many different sofware packages into one package. Here's an overview of all packages.";
 
 	$TEXT['components-text2'] = "Many thanks to the developers of these programs.";
 
@@ -422,11 +422,11 @@
 	// ---------------------------------------------------------------------
 
 	$TEXT['switch-head'] = "PHP Switch 1.0 win32 for XAMPP";
-	$TEXT['switch-phpversion'] = "<i><b>Current in THIS XAMPP is ";
-	$TEXT['switch-whatis'] = "<b>What make the PHP switch?</b><br>The apachefriends PHP Switch for XAMPP switching between the PHP version 4 to version 5 AND (!) back. So you can test your scripts with PHP 4 or PHP 5.<p>";
+	$TEXT['switch-phpversion'] = "<i><b>Current PHP version in THIS XAMPP is ";
+	$TEXT['switch-whatis'] = "<b>What is the PHP switch?</b><br>The apachefriends PHP Switch is for switching XAMPP between the PHP version 4, version 5, AND (!) back. So you can test your scripts with PHP 4 or PHP 5.<p>";
 	$TEXT['switch-find'] = "<b>Where is the PHP Switch?</b><br>PHP Switch for XAMPP will execute a PHP file (XAMPP install folder) with the name \"php-switch.php\". You should use this batch file for executing: ";
-	$TEXT['switch-care'] = "<b>What can be difficult?</b><br>PHP Switch will not change your PHP version, when a) the Apache HTTPD is running or/and b) the \".phpversion\" file in the install folder is vacant or have a bug. In the \".phpversion\", there was written the XAMPP current main PHP version number like \"4\" or \"5\". Please beginn with a \"shutdown\" for the Apache HTTPD and THEN execute the  \"php-switch.bat\".<p>";
-	$TEXT['switch-where4'] = "<b>After That! Where are my (old) config files?</b><br><br>For PHP 4:<br>";
+	$TEXT['switch-care'] = "<b>What can go wrong?</b><br>PHP Switch will not change your PHP version, when a) the Apache HTTPD is running or/and b) the \".phpversion\" file in the install folder is vacant or has a bug. In the \".phpversion\", there was written the XAMPP current main PHP version number like \"4\" or \"5\". Please beginn with a \"shutdown\" for the Apache HTTPD and THEN execute the  \"php-switch.bat\".<p>";
+	$TEXT['switch-where4'] = "<b>After that, where can I locate my (old) config files?</b><br><br>For PHP 4:<br>";
 	$TEXT['switch-where5'] = "<br><br>For PHP 5:<br>";
 	$TEXT['switch-make1'] = "<b>What is with changes in my config files?</b><br><br>There lives! For PHP4 or PHP5 in the<br>";
 	$TEXT['switch-make2'] = "<br><br> .. secured for PHP4 ...<br>";

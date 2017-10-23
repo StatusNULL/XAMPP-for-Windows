@@ -1,104 +1,12 @@
-20. Feb 2007 XAMPP 1.6.0a
-- Add mysqld-nt, mysqld-max, mysqld-max-nt
+31. March 2007, XAMPP 1.6.1
+- Vista Bugfix: Change Installer Default Installation Path to c:\apachefriends
 
-
-15. Feb 2007 XAMPP 1.6.0
-- UPDATE PHP 4.4.5
-- UPDATE PEAR
-- Bugfix PEAR install in XAMPP
-- UPDATE eAccelerator PHP 5.2.1
-
-09. Feb 2007 XAMPP 1.6 beta 2
-- UPDATE PHP 5.2.1
-- UPDATE Zend Optimizer 3.2.2
-
-08. Feb 2007 XAMPP 1.6 beta 1
-- UPDATE Apache 2.2.4
-- UPDATE MySQL 5.0.33
-- UPDATE phpMyAdmin 2.9.2
-- UPDATE FileZilla FTP Server 0.9.22
-- UPDATE ADOdb 4.93a
-- UPDATE Apache & MySQL Modules for PHP
-- UPDATE Control Panel from from www.nat32.com
-
-20. Nov 2006 XAMPP 1.5.5 beta 2
-- UPDATE FileZilla FTP Server 0.9.20
-- UPDATE XAMPP Web Style 
-- UPDATE Zend Optimizer 3.0.2
-
-11. Nov. 2006 XAMPP 1.5.5 beta 1
-- UPDATE phpMyAdmin 2.9.1.0
-- UPDATE PHP 5.2.0
-
-30 Okt. 2006 XAMPP 1.5.5 beta 0
-- UPDATE phpMyAdmin 2.9.0.2
-- UPDATE MySQL 5.0.27
-- UPDATE FileZilla FTP Server 0.9.19
-- UPDATE ADOdb 4.93
-
-30 Sept. 2006 XAMPP  1.5.4a
-
-- UPDATE OpenSSL 0.9.8d
-- UPDATE phpMyAdmin 2.9.0.1
-- Modify navi.php (pt)
-
-09 Sept. 2006 XAMPP  1.5.4 Release
-
-- UPDATE MySQL 5.0.24a
-- UPDATE OpenSSL 0.9.8c
-
-25 August 2006 XAMPP  1.5.4 Beta 3
-
-- UPDATE PHP 5.1.6 (plus PECL)
-
-24 August 2006 XAMPP  1.5.4 Beta 2
-
-- UPDATE PHP 5.1.5 (plus PECL)
-- UPDATE PHP 4.4.4
-- UPDATE phpMyAdmin 2.8.2.4
-
-14 August 2006 XAMPP  1.5.4 Beta 1
-- UPDATE Apache 2.2.3
-- UPDATE MySQL 5.0.24
-- UPDATE PHP 4.4.3
-- UPDATE phpMyAdmin 2.8.2.1
-- UPDATE FileZilla FTP Server 0.9.18
-- UPDATE Zend Optimizer 3.0.1
-- Upgrade PHP 5.1.4 apache2handler for Apache 2.2.3
-- Upgrade PHP 4.4.3 apache2handler for Apache 2.2.3
-- Upgrade PHP mysql(i) extension for MySQL 5.0.24
-- ADD eAccelerator 0.9.6-svn260-dev (not active)
-
-31 Mai 2006 XAMPP Release 1.5.3a Release
-- Fix problem for ssi support in httpd.conf
-
-28 Mai 2006, XAMPP Release
-- Delete eAccelarator PHP 4 (because instabil)
- 
-22 Mai 2006, XAMPP 1.5.3 Beta 5
-- UPDATE  Control Panel 2.3
-- UPDATE  phpMyAdmin 2.8.1
-- Changings in the httpd.conf:
-	EnableMMAP off
-	EnableSendfile off
-
-12 Mai 2006, XAMPP 1.5.3 Beta 4
-- Fix Bug in my.cnf
-- UPDATE  cds.php
-- UPDATE lang
-
-09 Mai 2006, XAMPP 1.5.3 Beta 3
-- UPDATE Apache 2.2.2
-- UPDATE OpenSSL 0.9.8b
-- UPDATE FileZilla Server 0.9.16c
-
-Fix problems:
-[1] Priviledge Escaltation to SYSTEM due to FileZilla Service Path specification 
-[2] Priviledge Escaltation to SYSTEM due to MySQLadmin Path specification 
-[3] Priviledge Escaltation to SYSTEM due to CGI Path specification
-[4] Rogue Autostart due to unsecure File execution (only Installer) 
-See also: http://secdev.zoller.lu/research/xamp1.htm
-
-06 Mai 2006, XAMPP 1.5.3 Beta 1 
-- UPDATE MySQL 5.0.21 (without ssl support)
-- UPDATE PHP 5.1.4 with PECL 
+13. March 2007 XAMPP 1.6.1 Beta 1
+- UPDATE MySQL 5.0.37
+- UPDATE PHP 4.4.6
+- UPDATE OpenSSL 0.9.8e
+- UPDATE phpMyAdmin 2.10.02
+- UPDATE FileZilla FTP Server 0.9.23
+- UPDATE ADOdb 4.94
+- UPDATE Fake Sendmail
+- UPDATE ZEND Optimizer 3.2.4

@@ -9,7 +9,7 @@ goto exit
 
 :WinNT
 echo Installing Apache2 as an Service
-bin\apache -k install
+bin\apache -n Apache2 -D Apache2 -k install
 echo Now we Start Apache2 :)
 net start Apache2
 

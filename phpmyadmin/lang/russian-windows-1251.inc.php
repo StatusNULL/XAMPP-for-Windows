@@ -1,5 +1,5 @@
 <?php
-/* $Id: russian-windows-1251.inc.php 9268 2006-08-10 11:41:33Z lem9 $ */
+/* $Id: russian-windows-1251.inc.php 9853 2007-01-19 18:14:44Z lem9 $ */
 
 /**
  * Translated by Gosha Sakovich <gt2 at users.sourceforge.net>
@@ -24,7 +24,6 @@ $datefmt = '%B %d %Y г., %H:%M';
 $timespanfmt = '%s дней, %s часов, %s минут и %s секунд';
 
 $strAbortedClients = 'Отменены';
-$strAbsolutePathToDocSqlDir = 'Введите абсолютный путь на сервере к директории docSQL, пожалуйста';
 $strAccessDenied = 'В доступе отказано';
 $strAccessDeniedCreateConfig = 'Возможная причина - отсутствие файла конфигурации. Для его создания вы можете воспользоваться %1$sсценарием установки%2$s.';
 $strAccessDeniedExplanation = 'phpMyAdmin попытался соединиться с сервером MySQL, но сервер отверг соединение. Проверьте имя хоста, пользователя и пароль в config.inc.php.';
@@ -34,8 +33,6 @@ $strAddClause = 'Добавить %s';
 $strAddConstraints = 'Добавить ограничения';
 $strAddDeleteColumn = 'Добавить/удалить столбец критерия';
 $strAddDeleteRow = 'Добавить/удалить ряд критерия';
-$strAddedColumnComment = 'Добавленный комментарий для столбца';
-$strAddedColumnRelation = 'Добавленная связь для столбца';
 $strAddFields = 'Добавить %s поле(я)';
 $strAddHeaderComment = 'Добавить собственный комментарий в заголовок (перевод строки: \\n)';
 $strAddIntoComments = 'Добавить в комментарии';
@@ -190,12 +187,6 @@ $strDataOnly = 'Только данные';
 $strDataPages = 'Страниц с данными';
 $strDBComment = 'Комментарий БД: ';
 $strDBCopy = 'Скопировать БД в';
-$strDBGContext = 'Контекст';
-$strDBGContextID = 'Контекст ID';
-$strDBGMaxTimeMs = 'Максимальное время, ms';
-$strDBGMinTimeMs = 'Минимальное время, ms';
-$strDBGModule = 'Модуль';
-$strDBGTotalTimeMs = 'Итоговое время, ms';
 $strDbPrivileges = ' Привилегии, специфичные для базы данных';
 $strDBRename = 'Переименовать базу данных в';
 $strDbSpecific = 'специфично для БД';
@@ -324,9 +315,7 @@ $strIdxFulltext = 'ПолнТекст';
 $strIgnore = 'Игнорировать';
 $strIgnoreDuplicates = 'Игнорировать повторяющиеся строки';
 $strIgnoreInserts = 'Игнорировать вставки';
-$strIgnoringFile = 'Игнорирую файл %s';
 $strImport = 'Импорт';
-$strImportDocSQL = 'Импорт docSQL файлов';
 $strImportFiles = 'Импорт файлов';
 $strImportFormat = 'Формат импортируемого файла';
 $strImportSuccessfullyFinished = 'Импорт успешно завершен, запросов выполнено: %d.';
@@ -413,7 +402,7 @@ $strMIME_nodescription = 'Нет доступных описаний для этой трансформации.<br />По
 $strMIME_transformation = 'Трансформация браузера';
 $strMIME_transformation_note = 'Для списка доступных опций трансформации и трансформаций их MIME-типов кликните на %sописание трансформаций%s';
 $strMIME_transformation_options = 'Параметры трансформации';
-$strMIME_transformation_options_note = 'Пожалуйсиа, введите значения для трансформации, используя этот формат: \'a\',\'b\',\'c\'...<br />Если вам нужно поставить бэкслэш("\") или кавычку("\'"), экранируйте их (например \'\\\\xyz\' or \'a\\\'b\').';
+$strMIME_transformation_options_note = 'Пожалуйсиа, введите значения для трансформации, используя этот формат: \'a\', 100, b,\'c\'...<br />Если вам нужно поставить бэкслэш("\") или кавычку("\'"), экранируйте их (например \'\\\\xyz\' or \'a\\\'b\').';
 $strMIME_without = 'MIME-типы, выделенные курсивом, не имеют отдельной функции трансформации';
 $strMIMETypesForTable = 'MIME-типы таблицы';
 $strModifications = 'Модификации были сохранены';
@@ -775,7 +764,6 @@ $strThemeDefaultNotFound = 'Тема по-умолчанию %s не найдена!';
 $strThemeNoPreviewAvailable = 'Предпросмотр не доступен.';
 $strThemeNotFound = 'Тема %s не найдена!';
 $strThisHost = 'Этот хост';
-$strThisNotDirectory = 'Это была не директория';
 $strThreads = 'Потоки';
 $strThreadSuccessfullyKilled = 'Thread %s был удален.';
 $strTime = 'Время';
@@ -789,7 +777,6 @@ $strTransformation_application_octetstream__download = 'Показать линк к загрузке
 $strTransformation_image_jpeg__inline = 'Отображает предпросмотр, на который можно кликнуть; опции: ширина,высота в пикселах (сохраняет исходный масштаб)';
 $strTransformation_image_jpeg__link = 'Отображает ссылку на это изображение (direct blob download, i.e.).';
 $strTransformation_image_png__inline = 'См. image/jpeg: inline';
-$strTransformation_text_plain__dateformat = 'Берёт поле TIME, TIMESTAMP или DATETIME и форматирует его в соответствии с вашим локальным форматом даты. Первая опция - это сдвиг (в часах), который будет добавлен к timestamp (По умолчанию: 0). Вторая опция - это другой формат даты в соответствии с параметрами, доступными для функции PHP strftime().';
 $strTransformation_text_plain__external = 'ТОЛЬКО LINUX: Запускает внешнее приложение и запоняет поля через стандартный ввод. Возвращает стандартный вывод приложения. По умолчанию Tidy, для форматирования HTML кода. По соображениям безопасности, вы должны вручную отредактировать файл libraries/transformations/text_plain__external.inc.php и вписать программы, которые вы хотите запускать. Первая опция - это номер программы, которую вы хотите использовать, вторая - параметры для программы. Третий параметр при значении 1 будет конвертировать вывод, используя htmlspecialchars() (По умолчанию 1). Четвёртый параметр при значении 1 выставит NOWRAP, так что весь вывод будет отображён без переформатирования (По умолчанию 1)';
 $strTransformation_text_plain__formatted = 'Сохраняет исходное форматирование поля. Экранирование не производится.';
 $strTransformation_text_plain__imagelink = 'Показывает изображение и ссылку, поле содержит имя файла; первая опция - это префикс вроде "http://domain.com/", вторая - ширина в пикселах, третья - высота.';
@@ -841,8 +828,6 @@ $strWestEuropean = 'Западно-Европейский';
 $strWildcard = 'шаблон';
 $strWindowNotFound = 'Целевое окно браузера не может быть обновлено. Возможно, вы закрыли родительское окно или ваш браузер блокирует межоконные обновления из-за настроек безопасности';
 $strWithChecked = 'С отмеченными:';
-$strWritingCommentNotPossible = 'Написание комментария невозможно';
-$strWritingRelationNotPossible = 'Добавление связи невозможно';
 $strWrongUser = 'Ошибочный логин/пароль. В доступе отказано.';
 
 $strXML = 'XML';
@@ -874,9 +859,6 @@ $strBusyPages = 'Busy pages';  //to translate
 $strCanNotLoadExportPlugins = 'Could not load export plugins, please check your installation!';  //to translate
 $strCanNotLoadImportPlugins = 'Could not load import plugins, please check your installation!';  //to translate
 
-$strDBGHits = 'Hits';  //to translate
-$strDBGLine = 'Line';  //to translate
-$strDBGTimePerHitMs = 'Time/Hit, ms';  //to translate
 $strDefaultEngine = '%s is the default storage engine on this MySQL server.';  //to translate
 
 $strEngineAvailable = '%s is available on this MySQL server.';  //to translate
@@ -1018,4 +1000,52 @@ $strViewMaxExactCount = 'This view has more than %s rows. Please refer to %sdocu
 
 $strWriteRequests = 'Write requests';  //to translate
 
+$strPmaWiki = 'phpMyAdmin wiki';  //to translate
+$strTransformation_text_plain__dateformat = 'Displays a TIME, TIMESTAMP, DATETIME or numeric unix timestamp field as formatted date. The first option is the offset (in hours) which will be added to the timestamp (Default: 0). Use second option to specify a different date/time format string. Third option determines whether you want to see local date or UTC one (use "local" or "utc" strings) for that. According to that, date format has different value - for "local" see the documentation for PHP\'s strftime() function and for "utc" it is done using gmdate() function.';  //to translate
+$strDocSQL = 'DocSQL';  //to translate
+$strDocSQLOptions = 'DocSQL options';  //to translate
+$strTableName = 'Table name';  //to translate
+$strTableIsEmpty = 'Table seems to be empty!';  //to translate
+$strDbIsEmpty = 'Database seems to be empty!';  //to translate
+$strShowingPhp = 'Showing as PHP code';  //to translate
+$strShowingSQL = 'Showing SQL query';  //to translate
+$strDesigner = 'Designer';  //to translate
+$strNumberOfTables = 'Number of tables';  //to translate
+$strCreateTable  = 'Create table';  //to translate
+$strCreateRelation = 'Create relation';  //to translate
+$strSavePosition = 'Save position';  //to translate
+$strSelectForeignKey = 'Select Foreign Key';  //to translate
+$strHide         = 'Hide';  //to translate
+$strShowHideLeftMenu = 'Show/Hide left menu';  //to translate
+$strReload = 'Reload';  //to translate
+$strSmallBigAll = 'Small/Big All';  //to translate
+$strImportExportCoords = 'Import/Export coordinates for PDF schema';  //to translate
+$strMoveMenu = 'Move Menu';  //to translate
+$strAngularLinks = 'Angular links';  //to translate
+$strDirectLinks = 'Direct links';  //to translate
+$strHideShowAll = 'Hide/Show all';  //to translate
+$strHideShowNoRelation = 'Hide/Show Tables with no relation';  //to translate
+$strInternalRelationAdded = 'Internal relation added';  //to translate
+$strInnoDBRelationAdded = 'InnoDB relation added';  //to translate
+$strRelationDeleted = 'Relation deleted';  //to translate
+$strToSelectRelation = 'To select relation, click :';  //to translate
+$strExportImportToScale = 'Export/Import to scale';  //to translate
+$strRecommended = 'recommended';  //to translate
+$strToFromPage = 'to/from page';  //to translate
+$strSelectReferencedKey = 'Select referenced key';  //to translate
+$strPleaseSelectPrimaryOrUniqueKey = 'Please select the primary key or a unique key';  //to translate
+$strForeignKeyError = 'Error creating foreign key (check data types)';  //to translate
+$strHelp = 'Help';  //to translate
+$strCancel = 'Cancel';  //to translate
+$strDeleteRelation = 'Delete relation';  //to translate
+$strKnownExternalBug = 'The %s functionality is affected by a known bug, see %s';  //to translate
+$strStructureForView = 'Structure for view';  //to translate
+$strStandInStructureForView = 'Stand-in structure for view';  //to translate
+$strToggleSmallBig = 'Toggle small/big';  //to translate
+$strIEUnsupported = 'Internet Explorer does not support this function.';  //to translate
+$strErrorRelationAdded = 'Error: Relation not added.';  //to translate
+$strErrorRelationExists = 'Error: relation already exists.';  //to translate
+$strErrorSaveTable = 'Error saving coordinates for Designer.';  //to translate
+$strSnapToGrid = 'Snap to grid';  //to translate
+$strDesignerHelpDisplayField = 'The display field is shown in pink. To set/unset a field as the display field, click the "Choose field to display" icon, then click on the appropriate field name.';  //to translate
 ?>
