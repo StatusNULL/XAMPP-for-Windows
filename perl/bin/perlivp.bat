@@ -15,7 +15,7 @@ goto endofperl
     eval 'exec \xampp\perl\bin\perl.exe -S $0 ${1+"$@"}'
         if $running_under_some_shell;
 
-# perlivp v5.10.0
+# perlivp v5.10.1
 
 sub usage {
     warn "@_\n" if @_;
@@ -77,7 +77,7 @@ $tests_total++;
 
 print "## Checking Perl version via variable `\$]'.\n" if $opt{'p'};
 
-my $ivp_VERSION = "5.010000";
+my $ivp_VERSION = "5.010001";
 
 if ($ivp_VERSION eq $]) {
     print "## Perl version `$]' appears installed as expected.\n" if $opt{'v'};
@@ -164,12 +164,12 @@ if (defined($Config{'extensions'})) {
             next if ($_ eq 'threads');
             next if ($_ eq 'threads/shared');
         }
-	# that's a distribution name, not a module name
-	next if /^IO_Compress_(?:Zlib|Base)$/;
+        # that's a distribution name, not a module name
+        next if $_ eq 'IO/Compress';
         next if $_ eq 'Devel/DProf'; 
-	# test modules
-	next if $_ eq 'XS/APItest';
-	next if $_ eq 'XS/Typemap';
+        # test modules
+        next if $_ eq 'XS/APItest';
+        next if $_ eq 'XS/Typemap';
            # VMS$ perl  -e "eval ""require \""Devel/DProf.pm\"";"" print $@"
            # \NT> perl  -e "eval \"require 'Devel/DProf.pm'\"; print $@"
            # DProf: run perl with -d to use DProf.

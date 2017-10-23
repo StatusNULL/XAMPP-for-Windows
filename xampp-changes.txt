@@ -1,11 +1,11 @@
-06. August 2009 1.7.2
+20. December 2009 1.7.3
 
-- Add Uninstall
+- Upgrade   phpMyAdmin 3.2.3
+- Upgrade   Zend Framework 1.9.6 Minimal Package (via PEAR)
+- Fix       fix php_gd2 (wrong jpeglib was used for the build)
+- Change    using Randy Kobes (unauthorized) PPM release
 
 Known problems:
-- IPv6 detection (all all) and statuspage (IPv6 only Apache) is not working, because of a bug in PHP5.3.0
-  (please fill a bugreport at php.net)
-
 - Apache IPv6 is not working with Windows 2000. Additionally, if you have installed the Microsoft IPv6 Technology Preview
   in W2K, you must copy "libapr-1.dll-noipv6" to "libapr-1.dll"
 
@@ -14,197 +14,42 @@ Known problems:
 
 - If you want use the Perl cpan/cpanp shell, the path to XAMPP must not contain a space.
 
-01. August 2009 1.7.2 Beta4
 
-- Upgrade   MySQL 5.1.37 (Community Server)
-- Upgrade   Zend Framework 1.9 Minimal Package (via PEAR)
+21. November 2009 1.7.3-beta2
 
-30. Juli 2009 1.7.2 Beta3
+- Upgrade   PHP 5.3.1
+- Upgrade   MySQL 5.1.41 (Community Server)
+- Upgrade   SQLite 3.6.20
+- Upgrade   ADOdb v5.10
+- Fix       fix php_xdebug. Should now (hopefully) better work on Vista. Please test.
+- Change    IPv6 detection in statuspage is working again (thanks PHP)
 
-- Upgrade   Apache 2.2.12 (IPV6 enabled)
-- Upgrade   XAMPP Control Version 2.5.8 (ApacheFriends Edition)
-- Upgrade   jpeg library v7.0 (php_gd.dll)
-- Add       Zend Framework 1.8.4 Minimal Package (via PEAR)
-- Add       dbase PECL extension
-- Add       msql PECL extension
+11. November 2009 1.7.3-beta1
 
-21. Juli 2009 1.7.2 Beta2
-
-- Upgrade   PBXT 1.0.08-rc for MySQL
-- Upgrade   eAccelerator 0.9.6-rc1 for PHP
-- Upgrade   XAMPP Control Version 2.5.7 (ApacheFriends Edition)
-- Change    Perl guestbook example was not working with mod_perl, only as CGI
-- Change    use trouchelle as default PPM repo (BdP is down)
-- Change    load xdebug/eaccelerator with "zend_extension=", not with "extension="
-- Change    fix FileZilla security status
-- Change    fix security. Print out an error, if old MySQL password is wrong.
-- Change    fix status page if .htaccess is enabled
-- Add       add Tomcat to the security page
-- Add       add msmtp 1.4.17 (a sendmail compatible SMTP client)
-- Remove    fake sendmail for windows (TLS/SSL not really working)
-
-12. Juli 2009 1.7.2 Beta1
-
-- Upgrade   PHP 5.3.0
-- Upgrade   Mysql 5.1.36
-- Upgrade   FileZilla FTP Server 0.9.32
-- Upgrade   fake sendmail for windows version 26
-- Upgrade   PDF with pdflib lite v7.0.4p4 for PHP
-- Upgrade   Xdebug 2.0.5 for PHP
+- Upgrade   Apache 2.2.14 (IPV6 enabled)
+- Upgrade   MySQL 5.1.40 (Community Server) with PBXT engine 1.0.09-rc
+- Upgrade   Mercury Mail Transport System v4.72
+- Upgrade   FileZilla FTP Server 0.9.33
+- Upgrade   Perl 5.10.1
+- Upgrade   OpenSSL 0.9.8l
+- Upgrade   SQLite 3.6.19
+- Upgrade   msmtp 1.4.19 (a sendmail compatible SMTP client)
+- Upgrade   phpMyAdmin 3.2.3
+- Upgrade   Zend Framework 1.9.5 Minimal Package (via PEAR)
+- Upgrade   Ming 0.4.3 for PHP
+- Upgrade   XAMPP Port Check 1.5
+- Upgrade   Xdebug 2.0.6-dev for PHP
 - Upgrade   eAccelerator 0.9.6-dev for PHP
-- Upgrade   SQLite 3.6.16
-- Upgrade   phpMyAdmin 3.2.0.1
-- Upgrade   ADOdb v5.09a
-- Upgrade   fpdf 1.6
-- Change    mysql, mysqli, pdo_mysql build against libmysql. mysqlnd builds also available
-- Add       mysqlnd PHP extension
-- Add       fileinfo PHP extension
-- Add       intl PHP extension
-- Add       phar PHP extension
-- Add       sqlite3 PHP extension
-- Remove    Zend Optimizer PHP extension
-- Remove    dbase PHP extension
-- Remove    fdf PHP extension
-- Remove    mhash PHP extension (alias functions via hash extension available)
-- Remove    msql PHP extension
-- Remove    oracle PHP extension
-
-03. May 2009 1.7.2 Dev5
-
-- Change    Adjust Mercury configuration
-
-27. April 2009 1.7.2 Dev4
-
-- Upgrade   ADOdb v5.08a
-- Upgrade   phpMyAdmin 3.1.4
-- Upgrade   XAMPP Security 1.1 (set a random pma user password)
-
-24. April 2009 1.7.2 Dev3-Patch1
-
-- Upgrade   XAMPP Control Version 2.5.6 (ApacheFriends Edition)
-- Upgrade   XAMPP CLI Bundle 1.6
-- Upgrade   XAMPP Port Check 1.4
-- Change    minor adjustments to the demopage
-
-19. April 2009 1.7.2 Dev3
-
-- Upgrade   MySQL 5.1.34 with PBXT engine
-- Change    updated iconv and gettext libs for PHP
-- Change    the status page now also work, even if the dns server
-            is wrong configured for an IPv4 only webserver
-
-16. April 2009 1.7.2 Dev2
-
-- Remove    removed support for Win9x/NT4
-- Change    completely new setup script
-- Add       xampp_shell (to work with the command line tools like pear, perl, mysql)
-- Change    Apache 2.2.11 (IPV6 enabled)
-- Change    Mysql 5.1.33 with PBXT engine
-- Change    PHP 5.2.9 (newer libs for build, without PECL, PEAR only basis package)
-- Add       Perl 5.10.0 (only standard modules)
-- Upgrade   XAMPP Control Version 2.5.5 (ApacheFriends Edition)
-- Upgrade   XAMPP CLI Bundle 1.5
-- Upgrade   XAMPP Port Check 1.3
-- Upgrade   SQLite 2.8.17
-- Upgrade   SQLite 3.6.11
-- Upgrade   OpenSSL 0.9.8k
-- Upgrade   phpMyAdmin 3.1.3.2
-- Upgrade   ADOdb v5.07
-- Upgrade   Webalizer 2.21-02 (with GeoIP lite)
-- Change    Xdebug 2.0.4 for PHP (with Vista support)
-- Upgrade   Ming 0.4.2 for PHP
-- Upgrade   PDF with pdflib lite v7.0.3 for PHP
-
-08. April 2009 1.7.1 Beta5
-- Upgrade Mysql 5.1.33
-- Upgrade phpMyAdmin 3.1.3.1
-
-08. April 2009 1.7.1 Beta5
-- Upgrade Mysql 5.1.33
-- Upgrade phpMyAdmin 3.1.3.1
-
-21. March 2009 1.7.1 Beta4
-- Fix PHP PostScript bug: http://www.apachefriends.org/f/viewtopic.php?f=16&t=33742
-- Upgrade FileZilla FTP Server 0.9.31
-- Change php_ssh2.dll
-    => Original: SSH-2.0-libssh2_0.11
-    => Now:      SSH-2.0-libssh2_1.0
-
-06. March 2009 1.7.1 Beta3
-- Upgrade phpMyAdmin 3.1.3
-- Upgrade Mysql 5.1.32
-- Upgrade eAccelerator for PHP 5.2.9
-
-27. Feb 2009 1.7.1 Beta2
-- Upgrade PHP 5.2.9
-
-25. Feb 2009 1.7.1 Beta1
-- Upgrade FileZilla FTP Server 0.9.30
-- Recompile php_mysql.dll, php_mysqli.dll for Mysql 5.1.31
-
-18. Feb 2009 1.7.0 pl1 Beta7
-- Upgrade xampp_cli bundle from version 1.2 to 1.3
-- Upgrade phpMyAdmin from version 3.1.1 to 3.1.2
-- Upgrade Mysql from version 5.1.30 to 5.1.31
-
-
-05. Feb 2009 1.7.0 pl1 beta6
-- Upgrade xampp_cli bundle from version 1.0 to 1.1
-- Changing file name from my.cnf to my.ini
-- httpd-xampp.conf: Add PHPINIDir "/xampp/php"
-- httpd-xampp.conf: Add FilesMatch for PHP
-- Add fribidi.dll, iconv.dll, jpeg62.dll, libiconv2.dll, libintl3.dll, libmysql_5.0.51a.dll,
-  libswish-e.dll, yaz.dll to apache\bin
-- Add oci.dll, ociw32.dll, orannzsbb10.dll, zlib1.dll to the php directory
-- Remove comerr32.dll, gssapi32.dll, k5sprt32.dll, krb5_32.dll, libdb43.dll
-- Make safe the httpd-info.conf
-
-04. Feb 2009 1.7.0 pl1 beta5
-
-- Add XAMPP CLI Bundle from Carsten Wiedmann:
-xampp_cli.exe, xampp_start.exe,xampp_stop.exe,xampp_restart.exe,xampp_chkdll.exe
-- xampp-control.exe: Changing mysql stop routine
-- makecert.bat: Test certificate hold "-days 3650" by default
-- MySQL: pma user have no privilges anymore
-
-29. Jan 2009 1.7.0 pl1 beta4
-
-- Modify httpd-xampp.conf/httpd-userdir.conf
-- Add pdo_oci 1.0.1 from Carsten Wiedmann
-- Add postgresql staticclient 8.1.15 from Carsten Wiedmann
-- Clean some bin directories
-- Make a new openssl test certificate
-- Move Subversion from here to the devel package
-- Add shutdown privilege for pma user on localhost
-
-
-23. Jan 2009 1.7.0 pl1 beta3
-- Delete php\ext\php_svn.dll
-- Delete php\php5.ini
-- Delete mysql-gui-tools-noinstall-5.0-r15
-- New build xampp-control.exe
-- Patching phpMyAdmin\main.php (305-318)
-
-21. Jan 2009 1.7.0 pl1 beta2
-- Rollback all self compilations, only official binaries used
-- Delete shutdown/refresh privileges for user pma (mysql)
-- Add timetables in mysql
-- Changing Shutdown Method for MySQl in
-    mysql_stop.bat
-    xampp-control.exe
-- Changing apache default executable from apache.exe to httpd.exe in
-    xampp-control.exe
-    apache_start.bat
-    apache_stop.bat
-    apache_installservice.bat
-    apache_uninstallservice.bat
-- Delete winmysqladmin.exe, add mysql-gui-tools-noinstall-5.0-r15 therefore
-- Replace mysql-gui-tools for winmysqladmin in xampp-control.exe
-- Replace php_xdebug.dll with the latest official binary
-- Using the official libmysql.dll from PHP and NOT the official from Mysql because it crashing.
-  Perhaps the libmysql.dll for 5.0.51a make problems with  MySQL 5.1.30
-
-14. Jan 2009 1.7.0 pl1
-- Include Patch 1 & Patch 2
-- Update Mercury to version 4.62
-- Update ADODB to 5.06a
+- Add       libapreq2 v2.12 (mod_apreq2 + Apache2::Request)
+- Add       apc 3.1.3p1 for PHP
+- Add       rar 1.0.1-dev for PHP
+- Add       php_dblib.dll and php_pdo_dblib.dll PHP extension
+- Change    rename php_pdf.dll PHP extension to php_pdflib.dll
+- Change    enable taint mode for mod_perl (disable usage of PERL5LIB)
+- Remove    php_mime_magic.dll extension. It's now part of php_fileinfo.dll
+- Remove    php_pdo_oci8.dll. (was the same then php_pdo_oci.dll)
+- Fix       fix MySQL status if the "pma" user have a password
+- Fix       fix a warning in the security console while writing the ".htaccess".
+- Fix       fix text phrase in security console.
+- Fix       fix a problem with DBD::mysql and Perl CGI
+- Fix       fix a problem with creation of the shortcuts and some Windows codepages

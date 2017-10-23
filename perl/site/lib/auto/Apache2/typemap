@@ -5,12 +5,12 @@
 #  * Any changes made here will be lost
 #  * ***********************************
 #  * 01: lib/ModPerl/Code.pm:709
-#  * 02: lib/ModPerl/WrapXS.pm:666
-#  * 03: lib/ModPerl/WrapXS.pm:1157
-#  * 04: C:\perl\bin\.cpanplus\5.10.0\build\mod_perl-2.0.4\Makefile.PL:423
-#  * 05: C:\perl\bin\.cpanplus\5.10.0\build\mod_perl-2.0.4\Makefile.PL:325
-#  * 06: C:\perl\bin\.cpanplus\5.10.0\build\mod_perl-2.0.4\Makefile.PL:56
-#  * 07: C:\perl\bin\cpanp-run-perl.bat:21
+#  * 02: C:\xampp\perl\bin\.cpanplus\5.10.1\build\mod_perl-2.0.4\blib\lib/ModPerl/WrapXS.pm:666
+#  * 03: C:\xampp\perl\bin\.cpanplus\5.10.1\build\mod_perl-2.0.4\blib\lib/ModPerl/WrapXS.pm:1157
+#  * 04: C:\xampp\perl\bin\.cpanplus\5.10.1\build\mod_perl-2.0.4\Makefile.PL:423
+#  * 05: C:\xampp\perl\bin\.cpanplus\5.10.1\build\mod_perl-2.0.4\Makefile.PL:325
+#  * 06: C:\xampp\perl\bin\.cpanplus\5.10.1\build\mod_perl-2.0.4\Makefile.PL:56
+#  * 07: \xampp\perl\bin\cpanp-run-perl.bat:21
 #  */
 # 
 

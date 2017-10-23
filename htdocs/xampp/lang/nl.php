@@ -101,7 +101,7 @@
 
     $TEXT['security-head'] = "XAMPP beveiliging";
     $TEXT['security-text1'] = "Deze bladzijde geeft een overzicht van de beveiligingsstatus van uw XAMPP installatie. (Ga verder met lezen na de tabel.)";
-    $TEXT['security-text2'] = "De groen aangegeven onderdelen zijn veilig; de rood aangegeven onderdelen zijn absoluut onveilig en de geel gemarkeerde onderdelen konden niet worden gecontroleerd (bijv. omdat de software om dit na te lopen niet actief is).<p>Om de problemen voor mysql, phpmyadmin en de xampp directory op te lossen kunt u eenvoudigweg gebruik maken van: </b><p>=> <a href=\"/security/xamppsecurity.php\"><b>http://localhost/security/xamppsecurity.php</b></a> <= &nbsp;&nbsp;[alleen mogelijk op de localhost]<br>&nbsp;<br>&nbsp;<br>
+    $TEXT['security-text2'] = "De groen aangegeven onderdelen zijn veilig; de rood aangegeven onderdelen zijn absoluut onveilig en de geel gemarkeerde onderdelen konden niet worden gecontroleerd (bijv. omdat de software om dit na te lopen niet actief is).<p>Om de problemen voor mysql, phpmyadmin en de xampp directory op te lossen kunt u eenvoudigweg gebruik maken van: </b><p>=> <a href=\"/security/xamppsecurity.php\"><b>http://localhost/security/xamppsecurity.php</b></a> <=<br>&nbsp;<br>&nbsp;<br>
     Nog enkele belangrijke opmerkingen:<ul>
     <li>Al deze test zijn ALLEEN voor de host op \"localhost\" (127.0.0.1).</li>
     <li><i><b>Voor FileZilla FTP en Mercury Mail moet u alle beveiliging zelf instellen! Sorry. </b></i></li>

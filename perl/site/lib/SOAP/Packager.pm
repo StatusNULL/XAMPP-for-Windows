@@ -4,7 +4,7 @@
 # SOAP::Lite is free software; you can redistribute it
 # and/or modify it under the same terms as Perl itself.
 #
-# $Id: Packager.pm 265 2008-06-09 07:06:53Z kutterma $
+# $Id: Packager.pm 341 2009-09-30 18:34:58Z kutterma $
 #
 # ======================================================================
 
@@ -14,7 +14,7 @@ use strict;
 use vars;
 
 use vars qw($VERSION $SUPPORTED_TYPES);
-use version; $VERSION = qv('0.710.05');
+use version; $VERSION = qv('0.710.10');
 $SUPPORTED_TYPES = { };
 
 sub BEGIN {
@@ -499,7 +499,7 @@ The following code shows how to use attachments within the context of a CGI
 script. It shows how to read incoming attachments, and to return attachments to
 the client.
 
-  #!/usr/bin/perl -w
+  #!/xampp/perl/bin/perl.exe -w
   use SOAP::Transport::HTTP;
   use MIME::Entity;
   SOAP::Transport::HTTP::CGI

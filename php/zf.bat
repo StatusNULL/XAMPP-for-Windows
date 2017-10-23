@@ -12,7 +12,7 @@ REM obtain it through the world-wide-web, please send an email
 REM to license@zend.com so we can send you a copy immediately.
 REM
 REM Zend
-REM Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
+REM Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com)
 REM http://framework.zend.com/license/new-bsd     New BSD License
 
 
@@ -27,8 +27,8 @@ GOTO PEAR_INSTALLED
 :NON_PEAR_INSTALLED
 REM Assume php.exe is executable, and that zf.php will reside in the
 REM same file as this one
-SET "PHP_BIN=php.exe"
-SET "PHP_DIR=%~dp0"
+SET PHP_BIN=php.exe
+SET PHP_DIR=%~dp0
 GOTO RUN
 
 :PEAR_INSTALLED
@@ -38,7 +38,7 @@ SET "PHP_DIR=\xampp\php"
 GOTO RUN
 
 :RUN
-SET "ZF_SCRIPT=%PHP_DIR%\zf.php"
+SET ZF_SCRIPT=%PHP_DIR%\zf.php
 "%PHP_BIN%" -d safe_mode=Off -f "%ZF_SCRIPT%" -- %*
 
 

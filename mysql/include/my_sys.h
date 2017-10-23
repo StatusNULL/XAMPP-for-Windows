@@ -67,6 +67,7 @@ extern int NEAR my_errno;		/* Last error in mysys */
 #define MY_HOLD_ON_ERROR 256	/* my_realloc() ; Return old ptr on error */
 #define MY_DONT_OVERWRITE_FILE 1024	/* my_copy: Don't overwrite file */
 #define MY_THREADSAFE 2048      /* my_seek(): lock fd mutex */
+#define MY_SYNC       4096      /* my_copy(): sync dst file */
 
 #define MY_CHECK_ERROR	1	/* Params to my_end; Check open-close */
 #define MY_GIVE_INFO	2	/* Give time info about process*/
@@ -171,6 +172,16 @@ extern char *my_strndup(const char *from, size_t length,
 #define TRASH(A,B) /* nothing */
 #endif
 
+#if defined(ENABLED_DEBUG_SYNC)
+extern void (*debug_sync_C_callback_ptr)(const char *, size_t);
+#define DEBUG_SYNC_C(_sync_point_name_) do {                            \
+    if (debug_sync_C_callback_ptr != NULL)                              \
+      (*debug_sync_C_callback_ptr)(STRING_WITH_LEN(_sync_point_name_)); } \
+  while(0)
+#else
+#define DEBUG_SYNC_C(_sync_point_name_)
+#endif /* defined(ENABLED_DEBUG_SYNC) */
+
 #ifdef HAVE_LARGE_PAGES
 extern uint my_get_large_page_size(void);
 extern uchar * my_large_malloc(size_t size, myf my_flags);
@@ -221,8 +232,8 @@ extern uint    my_large_page_size;
 #endif
 
 /* charsets */
-extern CHARSET_INFO *default_charset_info;
-extern CHARSET_INFO *all_charsets[256];
+extern MYSQL_PLUGIN_IMPORT CHARSET_INFO *default_charset_info;
+extern MYSQL_PLUGIN_IMPORT CHARSET_INFO *all_charsets[256];
 extern CHARSET_INFO compiled_charsets[];
 
 /* statistics */
@@ -237,8 +248,8 @@ extern void (*my_sigtstp_cleanup)(void),
 	    (*my_sigtstp_restart)(void),
 	    (*my_abort_hook)(int);
 					/* Executed when comming from shell */
-extern int NEAR my_umask,		/* Default creation mask  */
-	   NEAR my_umask_dir,
+extern MYSQL_PLUGIN_IMPORT int NEAR my_umask;		/* Default creation mask  */
+extern int NEAR my_umask_dir,
 	   NEAR my_recived_signals,	/* Signals we have got */
 	   NEAR my_safe_to_handle_signal, /* Set when allowed to SIGTSTP */
 	   NEAR my_dont_interrupt;	/* call remember_intr when set */
@@ -709,7 +720,6 @@ extern int wild_compare(const char *str,const char *wildstr,
 extern WF_PACK *wf_comp(char * str);
 extern int wf_test(struct wild_file_pack *wf_pack,const char *name);
 extern void wf_end(struct wild_file_pack *buffer);
-extern size_t strip_sp(char * str);
 extern my_bool array_append_string_unique(const char *str,
                                           const char **array, size_t size);
 extern void get_date(char * to,int timeflag,time_t use_time);

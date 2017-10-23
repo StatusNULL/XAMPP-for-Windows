@@ -502,7 +502,7 @@ The following code shows how to use attachments within the context of a CGI
 script. It shows how to read incoming attachments, and to return attachments to
 the client.
 
-  #!/usr/bin/perl -w
+  #!/xampp/perl/bin/perl.exe -w
   use SOAP::Transport::HTTP;
   use MIME::Entity;
   SOAP::Transport::HTTP::CGI

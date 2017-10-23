@@ -96,7 +96,7 @@
 
     $TEXT['security-head'] = "Bezpiecze&#324;stwo XAMPP";
     $TEXT['security-text1'] = "Na tej stronie znajduj&#261; si&#281; informacje og&oacute;lne o stanie bezpiecze&#324;stwa twojej instalacji XAMPP. (Ci&#261;g dalszy tekstu znajduje si&#281; pod tabelk&#261;.)";
-    $TEXT['security-text2'] = "The green marked points are secure; the red marked points are definitively unsecure and the yellow marked points couldn't be checked (for example because the sofware to check isn't running).<p>To fix the problems for mysql, phpmyadmin and the xampp directory simply use</b><p>=> <a href=\"/security/xamppsecurity.php\"><b>http://localhost/security/xamppsecurity.php</b></a> <= &nbsp;&nbsp;[allowed only for localhost]<br>&nbsp;<br>&nbsp;<br>
+    $TEXT['security-text2'] = "The green marked points are secure; the red marked points are definitively unsecure and the yellow marked points couldn't be checked (for example because the sofware to check isn't running).<p>To fix the problems for mysql, phpmyadmin and the xampp directory simply use</b><p>=> <a href=\"/security/xamppsecurity.php\"><b>http://localhost/security/xamppsecurity.php</b></a> <=<br>&nbsp;<br>&nbsp;<br>
     Some other important notes:<ul>
     <li>All these test are made ONLY for host \"localhost\" (127.0.0.1).</li>
     <li><i><b>For FileZilla FTP und Mercury Mail, you must fix all security problems by yourself! Sorry. </b></i></li>

@@ -1425,7 +1425,7 @@ Examples:
       CPAN_FILE    B/BO/BOOK/Acme-MetaSyntactic-0.99.tar.gz
       UPLOAD_DATE  2006-11-06
       MANPAGE      Acme::MetaSyntactic - Themed metasyntactic variables names
-      INST_FILE    /usr/local/lib/perl/5.10.0/Acme/MetaSyntactic.pm
+      INST_FILE    /xampp/lib/perl/5.10.0/Acme/MetaSyntactic.pm
       INST_VERSION 0.99
   cpan> a BOOK
   Author id = BOOK
@@ -2224,7 +2224,7 @@ C<expect>.
     module: "Dancing::Queen"
     distribution: "^CHACHACHA/Dancing-"
     not_distribution: "\.zip$"
-    perl: "/usr/local/cariba-perl/bin/perl"
+    perl: "/xampp/cariba-perl/bin/perl"
     perlconfig:
       archname: "freebsd"
       not_cc: "gcc"
@@ -3360,11 +3360,11 @@ ftp_passive to a true value.
 If you can go through your firewall with e.g. lynx, presumably with a
 command such as
 
-    /usr/local/bin/lynx -pscott:tiger
+    /xampp/bin/lynx -pscott:tiger
 
 then you would configure CPAN.pm with the command
 
-    o conf lynx "/usr/local/bin/lynx -pscott:tiger"
+    o conf lynx "/xampp/bin/lynx -pscott:tiger"
 
 That's all. Similarly for ncftp or ftp, you would configure something
 like
@@ -3409,7 +3409,7 @@ Run the autobundle command for your old perl and optionally rename the
 resulting bundle file (e.g. Bundle/mybundle.pm), install the new perl
 with the Configure option prefix, e.g.
 
-    ./Configure -Dprefix=/usr/local/perl-5.6.78.9
+    ./Configure -Dprefix=/xampp/perl-5.6.78.9
 
 Install the bundle file you produced in the first step with something like
 

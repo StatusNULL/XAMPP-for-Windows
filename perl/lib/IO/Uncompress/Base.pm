@@ -9,12 +9,12 @@ our (@ISA, $VERSION, @EXPORT_OK, %EXPORT_TAGS);
 @ISA    = qw(Exporter IO::File);
 
 
-$VERSION = '2.020';
+$VERSION = '2.023';
 
 use constant G_EOF => 0 ;
 use constant G_ERR => -1 ;
 
-use IO::Compress::Base::Common 2.020 ;
+use IO::Compress::Base::Common 2.023 ;
 #use Parse::Parameters ;
 
 use IO::File ;
@@ -69,7 +69,7 @@ sub smartRead
             # because the filehandle may not support the offset parameter
             # An example is Net::FTP
             my $tmp = '';
-            *$self->{FH}->read($tmp, $get_size) > 0 &&
+            *$self->{FH}->read($tmp, $get_size) &&
                 (substr($$out, $offset) = $tmp);
         }
         else
@@ -1328,7 +1328,17 @@ sub seek
     }
 
     # short circuit if seeking to current offset
-    return 1 if $target == $here ;    
+    if ($target == $here) {
+        # On ordinary filehandles, seeking to the current
+        # position also clears the EOF condition, so we
+        # emulate this behavior locally while simultaneously
+        # cascading it to the underlying filehandle
+        if (*$self->{Plain}) {
+            *$self->{EndStream} = 0;
+            seek(*$self->{FH},0,1) if *$self->{FH};
+        }
+        return 1;
+    }
 
     # Outlaw any attempt to seek backwards
     $self->croakError( *$self->{ClassName} ."::seek: cannot seek backwards")
@@ -1439,7 +1449,7 @@ purpose if to to be sub-classed by IO::Unompress modules.
 
 =head1 SEE ALSO
 
-L<Compress::Zlib>, L<IO::Compress::Gzip>, L<IO::Uncompress::Gunzip>, L<IO::Compress::Deflate>, L<IO::Uncompress::Inflate>, L<IO::Compress::RawDeflate>, L<IO::Uncompress::RawInflate>, L<IO::Compress::Bzip2>, L<IO::Uncompress::Bunzip2>, L<IO::Compress::Lzop>, L<IO::Uncompress::UnLzop>, L<IO::Compress::Lzf>, L<IO::Uncompress::UnLzf>, L<IO::Uncompress::AnyInflate>, L<IO::Uncompress::AnyUncompress>
+L<Compress::Zlib>, L<IO::Compress::Gzip>, L<IO::Uncompress::Gunzip>, L<IO::Compress::Deflate>, L<IO::Uncompress::Inflate>, L<IO::Compress::RawDeflate>, L<IO::Uncompress::RawInflate>, L<IO::Compress::Bzip2>, L<IO::Uncompress::Bunzip2>, L<IO::Compress::Lzma>, L<IO::Uncompress::UnLzma>, L<IO::Compress::Xz>, L<IO::Uncompress::UnXz>, L<IO::Compress::Lzop>, L<IO::Uncompress::UnLzop>, L<IO::Compress::Lzf>, L<IO::Uncompress::UnLzf>, L<IO::Uncompress::AnyInflate>, L<IO::Uncompress::AnyUncompress>
 
 L<Compress::Zlib::FAQ|Compress::Zlib::FAQ>
 

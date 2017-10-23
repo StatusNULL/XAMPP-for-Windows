@@ -331,7 +331,7 @@ ExtUtils::Installed - Inventory management of installed modules
    my (@modules) = $inst->modules();
    my (@missing) = $inst->validate("DBI");
    my $all_files = $inst->files("DBI");
-   my $files_below_usr_local = $inst->files("DBI", "all", "/usr/local");
+   my $files_below_usr_local = $inst->files("DBI", "all", "/xampp");
    my $all_dirs = $inst->directories("DBI");
    my $dirs_below_usr_local = $inst->directory_tree("DBI", "prog");
    my $packlist = $inst->packlist("DBI");

@@ -99,7 +99,7 @@
 
     $TEXT['security-head'] = "XAMPP-Seguridad";
     $TEXT['security-text1'] = "Por medio de este resumen puede verse que puntos de la instalación aún son inseguros y tendrían que ser controlados.(Siga leyendo debajo de la tabla.)";
-    $TEXT['security-text2'] = "Los puntos marcados en verde estan seguros; los puntos en rojo son definitivamente inseguros y en los amarillos no se pudo comprobar la seguridad (por ejemplo porque el programa a comprobar no estaba en marcha).<p>Para solucionar estos agujeros en la seguridad llame simplemente al siguiente comando:<p>=> <a href=\"/security/xamppsecurity.php\"><b>http://localhost/security/xamppsecurity.php</b></a> <= &nbsp;&nbsp;[allowed only for localhost]<p>De esta manera se inicia un programa interactivo, que cerrará todos estos agujeros de seguridad.";
+    $TEXT['security-text2'] = "Los puntos marcados en verde estan seguros; los puntos en rojo son definitivamente inseguros y en los amarillos no se pudo comprobar la seguridad (por ejemplo porque el programa a comprobar no estaba en marcha).<p>Para solucionar estos agujeros en la seguridad llame simplemente al siguiente comando:<p>=> <a href=\"/security/xamppsecurity.php\"><b>http://localhost/security/xamppsecurity.php</b></a> <=<p>De esta manera se inicia un programa interactivo, que cerrará todos estos agujeros de seguridad.";
 
     $TEXT['security-text3'] = "<b>Please consider this:
     With more XAMPP security some examples will NOT execute error free. If you use PHP in \"safe mode\" for example some functions of this security frontend will not working anymore. Often even more security means less functionality at the same time.</b>";

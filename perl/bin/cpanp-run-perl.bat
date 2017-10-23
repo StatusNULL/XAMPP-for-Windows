@@ -10,8 +10,10 @@ if %errorlevel% == 9009 echo You do not have Perl in your PATH.
 if errorlevel 1 goto script_failed_so_exit_with_non_zero_val 2>nul
 goto endofperl
 @rem ';
-#!\xampp\perl\bin\perl.exe
+#!perl
 #line 15
+    eval 'exec \xampp\perl\bin\perl.exe -S $0 ${1+"$@"}'
+	if $running_under_some_shell;
 use strict;
 my $old = select STDERR; $|++;  # turn on autoflush
 select $old;             $|++;  # turn on autoflush

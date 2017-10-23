@@ -12,7 +12,7 @@
 \xampp\perl\site\lib\APR\Finfo.pm
 \xampp\perl\site\lib\APR\IpSubnet.pm
 \xampp\perl\site\lib\APR\OS.pm
-\xampp\perl\site\lib\APR\xampp\perlIO.pm
+\xampp\perl\site\lib\APR\PerlIO.pm
 \xampp\perl\site\lib\APR\Pool.pm
 \xampp\perl\site\lib\APR\SockAddr.pm
 \xampp\perl\site\lib\APR\Socket.pm
@@ -41,8 +41,8 @@
 \xampp\perl\site\lib\Apache2\MPM.pm
 \xampp\perl\site\lib\Apache2\Module.pm
 \xampp\perl\site\lib\Apache2\ParseSource.pm
-\xampp\perl\site\lib\Apache2\xampp\perlSections.pm
-\xampp\perl\site\lib\Apache2\xampp\perlSections\Dump.pm
+\xampp\perl\site\lib\Apache2\PerlSections.pm
+\xampp\perl\site\lib\Apache2\PerlSections\Dump.pm
 \xampp\perl\site\lib\Apache2\Process.pm
 \xampp\perl\site\lib\Apache2\RequestIO.pm
 \xampp\perl\site\lib\Apache2\RequestRec.pm
@@ -69,6 +69,7 @@
 \xampp\perl\site\lib\Apache\TestCommonPost.pm
 \xampp\perl\site\lib\Apache\TestConfig.pm
 \xampp\perl\site\lib\Apache\TestConfigC.pm
+\xampp\perl\site\lib\Apache\TestConfigData.pm
 \xampp\perl\site\lib\Apache\TestConfigPHP.pm
 \xampp\perl\site\lib\Apache\TestConfigParrot.pm
 \xampp\perl\site\lib\Apache\TestConfigParse.pm
@@ -108,8 +109,8 @@
 \xampp\perl\site\lib\ModPerl\MapUtil.pm
 \xampp\perl\site\lib\ModPerl\MethodLookup.pm
 \xampp\perl\site\lib\ModPerl\ParseSource.pm
-\xampp\perl\site\lib\ModPerl\xampp\perlRun.pm
-\xampp\perl\site\lib\ModPerl\xampp\perlRunPrefork.pm
+\xampp\perl\site\lib\ModPerl\PerlRun.pm
+\xampp\perl\site\lib\ModPerl\PerlRunPrefork.pm
 \xampp\perl\site\lib\ModPerl\Registry.pm
 \xampp\perl\site\lib\ModPerl\RegistryBB.pm
 \xampp\perl\site\lib\ModPerl\RegistryCooker.pm
@@ -181,11 +182,11 @@
 \xampp\perl\site\lib\auto\APR\OS\OS.exp
 \xampp\perl\site\lib\auto\APR\OS\OS.lib
 \xampp\perl\site\lib\auto\APR\OS\OS.pdb
-\xampp\perl\site\lib\auto\APR\xampp\perlIO\xampp\perlIO.bs
-\xampp\perl\site\lib\auto\APR\xampp\perlIO\xampp\perlIO.dll
-\xampp\perl\site\lib\auto\APR\xampp\perlIO\xampp\perlIO.exp
-\xampp\perl\site\lib\auto\APR\xampp\perlIO\xampp\perlIO.lib
-\xampp\perl\site\lib\auto\APR\xampp\perlIO\xampp\perlIO.pdb
+\xampp\perl\site\lib\auto\APR\PerlIO\PerlIO.bs
+\xampp\perl\site\lib\auto\APR\PerlIO\PerlIO.dll
+\xampp\perl\site\lib\auto\APR\PerlIO\PerlIO.exp
+\xampp\perl\site\lib\auto\APR\PerlIO\PerlIO.lib
+\xampp\perl\site\lib\auto\APR\PerlIO\PerlIO.pdb
 \xampp\perl\site\lib\auto\APR\Pool\Pool.bs
 \xampp\perl\site\lib\auto\APR\Pool\Pool.dll
 \xampp\perl\site\lib\auto\APR\Pool\Pool.exp

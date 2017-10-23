@@ -72,8 +72,8 @@ class setup_apache extends setup_XAMPP
         )
     );
 
-    private static $httpdconf   = 'C:\apache\conf\httpd.conf';
-    private static $sslconf     = 'C:\apache\conf\extra\httpd-ssl.conf';
+    private static $httpdconf   = 'C:\xampp\apache\conf\httpd.conf';
+    private static $sslconf     = 'C:\xampp\apache\conf\extra\httpd-ssl.conf';
     private static $mod_ssl     = null;
     private static $mod_include = null;
     private static $ip          = null;

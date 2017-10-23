@@ -1,6 +1,6 @@
 package HTML::Parser;
 
-# Copyright 1996-2008, Gisle Aas.
+# Copyright 1996-2009, Gisle Aas.
 # Copyright 1999-2000, Michael A. Chase.
 #
 # This library is free software; you can redistribute it and/or
@@ -9,7 +9,7 @@ package HTML::Parser;
 use strict;
 use vars qw($VERSION @ISA);
 
-$VERSION = "3.61";
+$VERSION = "3.64";
 
 require HTML::Entities;
 
@@ -92,7 +92,7 @@ sub parse_file
     if (!ref($file) && ref(\$file) ne "GLOB") {
         # Assume $file is a filename
         local(*F);
-        open(F, $file) || return undef;
+        open(F, "<", $file) || return undef;
 	binmode(F);  # should we? good for byte counts
         $opened++;
         $file = *F;
@@ -240,13 +240,12 @@ to the C<HTML::Parser> object:
 
 =item $p->parse( $string )
 
-Parse $string as the next chunk of the HTML document.  The return
-value is normally a reference to the parser object (i.e. $p).
-Handlers invoked should not attempt to modify the $string in-place until
-$p->parse returns.
+Parse $string as the next chunk of the HTML document.  Handlers invoked should
+not attempt to modify the $string in-place until $p->parse returns.
 
-If an invoked event handler aborts parsing by calling $p->eof, then
-$p->parse() will return a FALSE value.
+If an invoked event handler aborts parsing by calling $p->eof, then $p->parse()
+will return a FALSE value.  Otherwise the return value is a reference to the
+parser object ($p).
 
 =item $p->parse( $code_ref )
 

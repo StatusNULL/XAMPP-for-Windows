@@ -136,7 +136,7 @@ sub new {
     Apache::TestTrace->import;
 
     my $self = bless {
-        prefix => '/usr/local/apache',
+        prefix => '/xampp/apache',
         cwd => Cwd::cwd(),
         cvsroot => 'cvs.apache.org:/home/cvs',
         cvs => \@cvs,

@@ -79,7 +79,7 @@ my $recipes
       includeDirs =>  { prerequisites => ['filedir'],
                         output => sub {
                           my $data = shift;
-                          [ $data->{filedir}, '/usr/local/include', '.'];
+                          [ $data->{filedir}, '/xampp/include', '.'];
                         } },
       Cpp => { prerequisites => [qw(cppminus add_cppflags cppflags cppstdin)],
                output => sub {
@@ -936,7 +936,7 @@ sub new {
       = (shift, shift, shift, shift, shift);
     $Cpp ||= \%Config::Config;
     my $filedir = dirname $filename || '.';
-    $Includes ||= [$filedir, '/usr/local/include', '.'];
+    $Includes ||= [$filedir, '/xampp/include', '.'];
     my $addincludes = "";
     $addincludes = "-I" . join(" -I", @$Includes)
       if defined $Includes and @$Includes;

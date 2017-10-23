@@ -299,7 +299,7 @@ This returns the name of the associated .packlist file
 
 Here's C<modrm>, a little utility to cleanly remove an installed module.
 
-    #!/usr/local/bin/perl -w
+    #!/xampp/perl/bin/perl.exe -w
 
     use strict;
     use IO::Dir;

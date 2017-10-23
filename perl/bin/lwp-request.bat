@@ -10,7 +10,7 @@ if %errorlevel% == 9009 echo You do not have Perl in your PATH.
 if errorlevel 1 goto script_failed_so_exit_with_non_zero_val 2>nul
 goto endofperl
 @rem ';
-#!/usr/bin/perl -w
+#!/xampp/perl/bin/perl.exe -w
 #line 15
 
 # Simple user agent using LWP library.
@@ -193,7 +193,7 @@ $progname = $0;
 $progname =~ s,.*[\\/],,;  # use basename only
 $progname =~ s/\.\w*$//;   # strip extension, if any
 
-$VERSION = "5.827";
+$VERSION = "5.834";
 
 
 require LWP;
@@ -244,15 +244,15 @@ use HTTP::Date qw(time2str str2time);
 	}
 	elsif (-t) {
 	    my $netloc = $uri->host_port;
-	    print "Enter username for $realm at $netloc: ";
+	    print STDERR "Enter username for $realm at $netloc: ";
 	    my $user = <STDIN>;
 	    chomp($user);
 	    return (undef, undef) unless length $user;
-	    print "Password: ";
+	    print STDERR "Password: ";
 	    system("stty -echo");
 	    my $password = <STDIN>;
 	    system("stty echo");
-	    print "\n";  # because we disabled echo
+	    print STDERR "\n";  # because we disabled echo
 	    chomp($password);
 	    return ($user, $password);
 	}
@@ -375,7 +375,7 @@ if ($allowed_methods{$method} eq "C") {
         die "$progname: Illegal Content-type format\n"
             unless $options{'c'} =~ m,^[\w\-]+/[\w\-.+]+(?:\s*;.*)?$,
     }
-    print "Please enter content ($options{'c'}) to be ${method}ed:\n"
+    print STDERR "Please enter content ($options{'c'}) to be ${method}ed:\n"
         if -t;
     binmode STDIN unless -t or $options{'a'};
     $content = join("", <STDIN>);

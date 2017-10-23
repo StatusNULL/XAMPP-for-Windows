@@ -2412,10 +2412,10 @@ directory only allows sharing between scripts in an application.
 Also, multiple includes directories may be set by creating
 a directory list separated by a semicolon ';' as in
 
-  PerlSetVar IncludesDir ../shared;/usr/local/asp/shared
+  PerlSetVar IncludesDir ../shared;/xampp/asp/shared
 
 Using IncludesDir in this way creates an includes search
-path that would look like ., Global, ../shared, /usr/local/asp/shared
+path that would look like ., Global, ../shared, /xampp/asp/shared
 The current directory of the executing script is checked first
 whenever an include is specified, then the Global directory
 in which the global.asa resides, and finally the IncludesDir 
@@ -5201,12 +5201,12 @@ or Win32 operating systems without further development.
 
 To run the ./site/eg scripts as CGI scripts, you copy the 
 ./site directory to some location accessible by your web
-server, in this example its /usr/local/apache/htdocs/aspcgi, 
+server, in this example its /xampp/apache/htdocs/aspcgi, 
 then in your httpd.conf activate Apache::ASP cgi
 scripts like so:
 
- Alias /aspcgi/ /usr/local/apache/htdocs/aspcgi/
- <Directory /usr/local/apache/htdocs/aspcgi/eg/ >
+ Alias /aspcgi/ /xampp/apache/htdocs/aspcgi/
+ <Directory /xampp/apache/htdocs/aspcgi/eg/ >
    AddType application/x-httpd-cgi .htm
    AddType application/x-httpd-cgi .html
    AddType application/x-httpd-cgi .asp
@@ -5221,7 +5221,7 @@ into /usr/bin, or some other directory.  This is
 so the CGI execution line at the top of those scripts
 will invoke the asp-perl wrapper like so:
 
- #!/usr/bin/perl /usr/bin/asp-perl
+ #!/xampp/perl/bin/perl.exe /usr/bin/asp-perl
 
 The asp-perl script is a cgi wrapper that sets up the 
 Apache::ASP environment in lieu of the normal mod_perl
@@ -5544,7 +5544,7 @@ this for you, with the --disable-rule=EXPAT in particular:
  cd ../$APACHE
  echo "Building apache =============================="
  ./configure \
-    --prefix=/usr/local/apache \
+    --prefix=/xampp/apache \
     --activate-module=src/modules/perl/libperl.a \
     --enable-module=ssl \
     --enable-module=proxy \
@@ -5897,7 +5897,7 @@ Here is an example of use in a *.conf file:
 
  <Perl> 
  Apache::ASP->Loader(
-	'/usr/local/proj/site', "(asp|htm)\$", 
+	'/xampp/proj/site', "(asp|htm)\$", 
 	'Global' => '/proj/perllib',
 	'Debug' => -3, # see system output when starting apache
 

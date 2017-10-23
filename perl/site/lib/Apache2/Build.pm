@@ -133,7 +133,7 @@ sub find_apxs_util {
         # XXX: this may pick a wrong apxs version!
         push @trys,
         Apache::TestConfig::which('apxs'),
-        '/usr/local/apache/bin/apxs';
+        '/xampp/apache/bin/apxs';
     }
 
     my $apxs_try;

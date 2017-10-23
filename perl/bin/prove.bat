@@ -10,8 +10,11 @@ if %errorlevel% == 9009 echo You do not have Perl in your PATH.
 if errorlevel 1 goto script_failed_so_exit_with_non_zero_val 2>nul
 goto endofperl
 @rem ';
-#!/usr/bin/perl -w
+#!perl
 #line 15
+    eval 'exec \xampp\perl\bin\perl.exe -S $0 ${1+"$@"}'
+	if $running_under_some_shell;
+#!/xampp/perl/bin/perl.exe -w
 
 use strict;
 use App::Prove;
@@ -143,7 +146,7 @@ want all tests invoked exactly the same way, use the C<-e>, or C<--exec>
 switch:
 
  prove --exec '/usr/bin/ruby -w' t/
- prove --exec '/usr/bin/perl -Tw -mstrict -Ilib' t/
+ prove --exec '/xampp/perl/bin/perl.exe -Tw -mstrict -Ilib' t/
  prove --exec '/path/to/my/customer/exec'
 
 =head2 C<--merge>

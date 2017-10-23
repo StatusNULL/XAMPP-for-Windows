@@ -96,7 +96,7 @@
 
     $TEXT['security-head'] = "XAMPP 安全";
     $TEXT['security-text1'] = "本页提供关于XAMPP安装后安全状态的快速概述. (请不要忘记阅读状态表后面的内容)";
-    $TEXT['security-text2'] = "绿色标记的部分表示安全；红色标记的部分表示确实不安全；黄色标记的部分表示无法检查其状态(譬如, 所检查的软件没有运行)<p>要解决对于mysql, phpmyadmin以及xampp目录的问题, 您只需简单的执行</b><p>=> <a href=\"/security/xamppsecurity.php\"><b>http://localhost/security/xamppsecurity.php</b></a> <= &nbsp;&nbsp;[只允许localhost]<br>&nbsp;<br>&nbsp;<br>
+    $TEXT['security-text2'] = "绿色标记的部分表示安全；红色标记的部分表示确实不安全；黄色标记的部分表示无法检查其状态(譬如, 所检查的软件没有运行)<p>要解决对于mysql, phpmyadmin以及xampp目录的问题, 您只需简单的执行</b><p>=> <a href=\"/security/xamppsecurity.php\"><b>http://localhost/security/xamppsecurity.php</b></a> <=<br>&nbsp;<br>&nbsp;<br>
     其他一些重要提示:<ul>
     <li>所有这些测试都只限于主机\"localhost\" (127.0.0.1)</li>
     <li><i><b>对于FileZilla FTP以及Mercury Mail, 您必须自己修复所有的安全问题!对此我们表示抱歉. </b></i></li>

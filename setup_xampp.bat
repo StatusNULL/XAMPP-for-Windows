@@ -4,7 +4,7 @@
 :: author     Kay Vogelgesang <kvo@apachefriends.org>
 :: copyright  2009 Carsten Wiedmann
 :: license    http://www.freebsd.org/copyright/freebsd-license.html FreeBSD License
-:: version    2.5
+:: version    2.7
 @ECHO OFF & SETLOCAL
 PUSHD %~dp0
 
@@ -260,60 +260,71 @@ class setup_XAMPP extends XAMPP
             break;
         }
 
-        $WshShell   = new COM('WScript.Shell');
+        $WshShell   = new COM('WScript.Shell', null, CP_UTF8);
+        $FSO        = new COM('Scripting.FileSystemObject', null, CP_UTF8);
+
         $desktop    = $WshShell->SpecialFolders('Desktop');
         $startmenu  = $WshShell->SpecialFolders('Programs');
-        $startmenu .= DIRECTORY_SEPARATOR.'XAMPP for Windows';
+        $startmenu  = $FSO->BuildPath($startmenu, utf8_encode('XAMPP for Windows'));
+        $xampppath  = utf8_encode(self::$xampppath);
 
         $links = array();
-        $links[$desktop.DIRECTORY_SEPARATOR.'XAMPP Control Panel.lnk'] = array(
-            'TargetPath'       => self::$xampppath.DIRECTORY_SEPARATOR.'xampp-control.exe',
-            'WorkingDirectory' => self::$xampppath,
+        $links[$FSO->BuildPath($desktop, utf8_encode('XAMPP Control Panel.lnk'))] = array(
+            'TargetPath'       => $FSO->BuildPath($xampppath, utf8_encode('xampp-control.exe')),
+            'WorkingDirectory' => $xampppath,
             'WindowStyle'      => 1,
-            'IconLocation'     => self::$xampppath.DIRECTORY_SEPARATOR.'xampp-control.exe',
-            'Description'      => 'XAMPP Control Panel'
+            'IconLocation'     => $FSO->BuildPath($xampppath, utf8_encode('xampp-control.exe')),
+            'Description'      => utf8_encode('XAMPP Control Panel')
         );
-        $links[$startmenu.DIRECTORY_SEPARATOR.'XAMPP Control Panel.lnk'] = array(
-            'TargetPath'       => self::$xampppath.DIRECTORY_SEPARATOR.'xampp-control.exe',
-            'WorkingDirectory' => self::$xampppath,
+        $links[$FSO->BuildPath($startmenu, utf8_encode('XAMPP Control Panel.lnk'))] = array(
+            'TargetPath'       => $FSO->BuildPath($xampppath, utf8_encode('xampp-control.exe')),
+            'WorkingDirectory' => $xampppath,
             'WindowStyle'      => 1,
-            'IconLocation'     => self::$xampppath.DIRECTORY_SEPARATOR.'xampp-control.exe',
-            'Description'      => 'XAMPP Control Panel'
+            'IconLocation'     => $FSO->BuildPath($xampppath, utf8_encode('xampp-control.exe')),
+            'Description'      => utf8_encode('XAMPP Control Panel')
         );
-        $links[$startmenu.DIRECTORY_SEPARATOR.'XAMPP Setup.lnk'] = array(
-            'TargetPath'       => self::$xampppath.DIRECTORY_SEPARATOR.'xampp_setup.bat',
-            'WorkingDirectory' => self::$xampppath,
+        $links[$FSO->BuildPath($startmenu, utf8_encode('XAMPP Setup.lnk'))] = array(
+            'TargetPath'       => $FSO->BuildPath($xampppath, utf8_encode('xampp_setup.bat')),
+            'WorkingDirectory' => $xampppath,
             'WindowStyle'      => 1,
-            'IconLocation'     => self::$xampppath.DIRECTORY_SEPARATOR.'xampp_cli.exe',
-            'Description'      => 'XAMPP Setup'
+            'IconLocation'     => $FSO->BuildPath($xampppath, utf8_encode('xampp_cli.exe')),
+            'Description'      => utf8_encode('XAMPP Setup')
         );
-        $links[$startmenu.DIRECTORY_SEPARATOR.'XAMPP Shell.lnk'] = array(
-            'TargetPath'       => self::$xampppath.DIRECTORY_SEPARATOR.'xampp_shell.bat',
-            'WorkingDirectory' => self::$xampppath,
+        $links[$FSO->BuildPath($startmenu, utf8_encode('XAMPP Shell.lnk'))] = array(
+            'TargetPath'       => $FSO->BuildPath($xampppath, utf8_encode('xampp_shell.bat')),
+            'WorkingDirectory' => $xampppath,
             'WindowStyle'      => 1,
-            'IconLocation'     => self::$xampppath.DIRECTORY_SEPARATOR.'xampp_cli.exe',
-            'Description'      => 'XAMPP Shell'
+            'IconLocation'     => $FSO->BuildPath($xampppath, utf8_encode('xampp_cli.exe')),
+            'Description'      => utf8_encode('XAMPP Shell')
         );
-        $links[$startmenu.DIRECTORY_SEPARATOR.'XAMPP Uninstall.lnk'] = array(
-            'TargetPath'       => self::$xampppath.DIRECTORY_SEPARATOR.'uninstall_xampp.bat',
-            'WorkingDirectory' => self::$xampppath,
+        $links[$FSO->BuildPath($startmenu, utf8_encode('XAMPP Uninstall.lnk'))] = array(
+            'TargetPath'       => $FSO->BuildPath($xampppath, utf8_encode('uninstall_xampp.bat')),
+            'WorkingDirectory' => $xampppath,
             'WindowStyle'      => 1,
-            'IconLocation'     => self::$xampppath.DIRECTORY_SEPARATOR.'xampp_cli.exe',
-            'Description'      => 'XAMPP Uninstall'
+            'IconLocation'     => $FSO->BuildPath($xampppath, utf8_encode('xampp_cli.exe')),
+            'Description'      => utf8_encode('XAMPP Uninstall')
         );
 
-        if (!file_exists($desktop)) {
-            mkdir($desktop, 0666, true);
+        if (!$FSO->FolderExists($desktop)) {
+            $FSO->CreateFolder($desktop);
         }
-        if (!file_exists($startmenu)) {
-            mkdir($startmenu, 0666, true);
+        if (!$FSO->FolderExists($startmenu)) {
+            $FSO->CreateFolder($startmenu);
         }
 
         foreach ($links as $shortcut => $value) {
-            touch($shortcut);
-            $oldfileperm = fileperms($shortcut);
-            if (!chmod($shortcut, 0666) && !is_writable($shortcut)) {
-                throw new XAMPPException('File \''.$shortcut.'\' is not writable.');
+            try {
+                if (!$FSO->FileExists($shortcut)) {
+                    $FSO->CreateTextFile($shortcut);
+                }
+                $shortcut_file = $FSO->GetFile($shortcut);
+                $oldfileperm = $shortcut_file->attributes;
+
+                if (($oldfileperm & 1) == 1) {
+                    $shortcut_file->attributes += -1;
+                }
+            } catch (Exception $e) {
+                throw new XAMPPException('File \''.utf8_decode($shortcut).'\' is not writable.');
             }
 
             $ShellLink                   = $WshShell->CreateShortcut($shortcut);
@@ -325,11 +336,12 @@ class setup_XAMPP extends XAMPP
             $ShellLink->Save();
             $ShellLink = null;
 
-            chmod($shortcut, $oldfileperm);
-
+            $shortcut_file->attributes = $oldfileperm;
+            $shortcut_file = null;
         }
-        $WshShell = null;
 
+        $FSO      = null;
+        $WshShell = null;
         return;
     }
 
@@ -342,7 +354,7 @@ class setup_XAMPP extends XAMPP
             echo '  I have found some updates.'.PHP_EOL;
             echo PHP_EOL;
             echo '  Should I install them now?'.PHP_EOL;
-            echo '  (Please stop XAMPP before you proceed.)'.PHP_EOL;
+            echo '  (Please make sure that all XAMPP components are stopped!)'.PHP_EOL;
             echo PHP_EOL;
             echo '                                 y'.chr(13).'  Your choice? (y/x=exit setup): ';
 
@@ -418,6 +430,7 @@ class setup_XAMPP extends XAMPP
 
         if (!empty(self::$updates)) {
             self::doUpdates();
+            self::$firstrun = array();
         }
 
         if (!empty(self::$firstrun)) {

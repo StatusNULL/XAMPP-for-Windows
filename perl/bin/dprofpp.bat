@@ -17,7 +17,7 @@ goto endofperl
 
 require 5.003;
 
-my $VERSION = '20050603.00';
+my $VERSION = '20080331.00';
 my $stty    = undef;
 
 =head1 NAME
@@ -298,13 +298,13 @@ sub shortusage {
     print <<'EOF';
 dprofpp [options] [profile]
 
-    -A          Count autoloaded to *AUTOLOAD
+    -A          Count autoloaded to *AUTOLOAD.
     -a          Sort by alphabetic name of subroutines.
-    -d          Reverse sort
+    -d          Reverse sort.
     -E          Sub times are reported exclusive of child times. (default)
-    -f          Filter all calls mathcing the pattern.
+    -f          Filter all calls matching the pattern.
     -G          Group all calls matching the pattern together.
-    -g subr     Count only those who are SUBR or called from SUBR
+    -g subr     Count only subs who are SUBR or called from SUBR.
     -H          Display long manual page.
     -h          Display this short usage message.
     -I          Sub times are reported inclusive of child times.
@@ -312,12 +312,12 @@ dprofpp [options] [profile]
     -O cnt      Specifies maximum number of subroutines to display.
     -P          Used with -G to pull all other calls together.
     -p script   Specifies name of script to be profiled.
-    -Q          Used with -p to indicate the dprofpp should quit
+    -Q          Used with -p to indicate that dprofpp should quit
                 after profiling the script, without interpreting the data.
     -q          Do not print column headers.
-    -R          Count anonyms separately even if from the same package
+    -R          Count anonymous subs separately even if from the same package.
     -r          Use real elapsed time rather than user+system time.
-    -S          Create statistics for all the depths
+    -S          Create statistics for all the depths.
     -s          Use system time rather than user+system time.
     -T          Show call tree.
     -t          Show call tree, compressed.

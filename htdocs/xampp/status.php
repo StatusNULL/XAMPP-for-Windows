@@ -138,6 +138,12 @@
                 line($TEXT['status-tomcat'], $tomcat);
             }
 
+            if (file_exists("$partwampp\\apache\\bin\\python.exe")) {
+                $a = @file("http://{$hostauth}{$host}/xampp/python.py");
+                $python = $a[0];
+
+                line($TEXT['status-python'], $python);
+            }
 
             echo "<tr valign='bottom'>";
             echo "<td bgcolor='#fb7922'></td>";

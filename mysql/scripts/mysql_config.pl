@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!"\xampp\perl\bin\perl.exe"
 # -*- cperl -*-
 #
 # Copyright (C) 2007 MySQL AB
@@ -54,7 +54,7 @@ my $cwd = cwd();
 my $basedir;
 
 my $socket  = 'MySQL';
-my $version = '5.1.36';
+my $version = '5.1.41';
 
 sub which
 {
@@ -150,9 +150,9 @@ sub quote_options {
 my $me = get_full_path($0);
 $basedir = dirname(dirname($me)); # Remove "/bin/mysql_config" part
 
-my $ldata   = 'C:/Program Files/MySql/MySQL Server 5.1/data';
-my $execdir = 'C:/Program Files/MySql/MySQL Server 5.1/bin';
-my $bindir  = 'C:/Program Files/MySql/MySQL Server 5.1/bin';
+my $ldata   = '/usr/local/mysql/MySQL Server 5.1/data';
+my $execdir = '/usr/local/mysql/MySQL Server 5.1/bin';
+my $bindir  = '/usr/local/mysql/MySQL Server 5.1/bin';
 
 # ----------------------------------------------------------------------
 # If installed, search for the compiled in directory first (might be "lib64")

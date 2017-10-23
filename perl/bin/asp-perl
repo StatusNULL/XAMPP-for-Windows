@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/xampp/perl/bin/perl.exe
 
 # for more accurate per request time accounting
 BEGIN {

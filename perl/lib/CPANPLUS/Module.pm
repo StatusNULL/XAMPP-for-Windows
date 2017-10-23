@@ -1298,7 +1298,7 @@ this:
     Author                  Jarkko Hietaniemi (jhi@iki.fi)
     Description             High resolution time, sleep, and alarm
     Development Stage       Released
-    Installed File          /usr/local/perl/lib/Time/Hires.pm
+    Installed File          /xampp/perl/lib/Time/Hires.pm
     Interface Style         plain Functions, no references used
     Language Used           C and perl, a C compiler will be needed
     Package                 Time-HiRes-1.65.tar.gz

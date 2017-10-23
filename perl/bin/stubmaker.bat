@@ -12,7 +12,7 @@ goto endofperl
 @rem ';
 #!/usr/bin/env perl 
 #line 15
-#!\xampp\perl\bin\perl.exe 
+#!d:\perl\bin\perl.exe 
 #
 # Filename: stubmaker.pl
 # Authors: Byrne Reese <byrne at majordojo dot com>

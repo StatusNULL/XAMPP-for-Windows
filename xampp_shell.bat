@@ -10,6 +10,7 @@ SET "OPENSSL_CONF=%OPENSSL_CONF:\=/%"
 SET "PHP_PEAR_SYSCONF_DIR=%~dp0php"
 SET "PHPRC=%~dp0php"
 SET "TMP=%~dp0tmp"
+SET "PERL5LIB="
 SET "Path=%~dp0;%~dp0php;%~dp0perl\site\bin;%~dp0perl\bin;%~dp0apache\bin;%~dp0mysql\bin;%~dp0FileZillaFTP;%~dp0MercuryMail;%~dp0sendmail;%~dp0webalizer;%~dp0tomcat\bin;%Path%"
 GOTO :EOF
 :weiter

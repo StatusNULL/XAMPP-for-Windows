@@ -11,7 +11,7 @@
 \xampp\perl\site\lib\Apache\ASP\Date.pm
 \xampp\perl\site\lib\Apache\ASP\Error.pm
 \xampp\perl\site\lib\Apache\ASP\GlobalASA.pm
-\xampp\perl\site\lib\Apache\ASP\Lang\xampp\perlScript.pm
+\xampp\perl\site\lib\Apache\ASP\Lang\PerlScript.pm
 \xampp\perl\site\lib\Apache\ASP\Load.pm
 \xampp\perl\site\lib\Apache\ASP\Request.pm
 \xampp\perl\site\lib\Apache\ASP\Response.pm

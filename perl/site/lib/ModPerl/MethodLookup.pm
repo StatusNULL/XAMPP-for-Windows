@@ -5,12 +5,12 @@
 #  * Any changes made here will be lost
 #  * ***********************************
 #  * 01: lib/ModPerl/Code.pm:709
-#  * 02: lib/ModPerl/WrapXS.pm:755
-#  * 03: lib/ModPerl/WrapXS.pm:1178
-#  * 04: C:\perl\bin\.cpanplus\5.10.0\build\mod_perl-2.0.4\Makefile.PL:423
-#  * 05: C:\perl\bin\.cpanplus\5.10.0\build\mod_perl-2.0.4\Makefile.PL:325
-#  * 06: C:\perl\bin\.cpanplus\5.10.0\build\mod_perl-2.0.4\Makefile.PL:56
-#  * 07: C:\perl\bin\cpanp-run-perl.bat:21
+#  * 02: \xampp\perl\bin\.cpanplus\5.10.1\build\mod_perl-2.0.4\blib\lib/ModPerl/WrapXS.pm:755
+#  * 03: \xampp\perl\bin\.cpanplus\5.10.1\build\mod_perl-2.0.4\blib\lib/ModPerl/WrapXS.pm:1178
+#  * 04: \xampp\perl\bin\.cpanplus\5.10.1\build\mod_perl-2.0.4\Makefile.PL:423
+#  * 05: \xampp\perl\bin\.cpanplus\5.10.1\build\mod_perl-2.0.4\Makefile.PL:325
+#  * 06: \xampp\perl\bin\.cpanplus\5.10.1\build\mod_perl-2.0.4\Makefile.PL:56
+#  * 07: \xampp\perl\bin\cpanp-run-perl.bat:21
 #  */
 # 
 
@@ -2547,7 +2547,7 @@ use base qw(Exporter);
 use mod_perl2;
 
 our @EXPORT = qw(print_method print_module print_object);
-our $VERSION = '2.000004';
+our $VERSION = "2.000004";
 use constant MODULE => 0;
 use constant OBJECT  => 1;
 

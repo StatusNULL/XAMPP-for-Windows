@@ -1,37 +1,40 @@
-###### Apache Friends XAMPP (Basis Package) version 1.7.2 ######
+###### Apache Friends XAMPP (Basis Package) version 1.7.3 ######
 
-  + Apache 2.2.12 (IPV6 enabled)
-  + MySQL 5.1.37 (Community Server) with PBXT engine 1.0.08-rc
-  + PHP 5.3.0 + PEAR (PEAR, Mail_Mime, MDB2, Zend)
-  + Perl 5.10.0 (Bundle::Apache2, Bundle::Apache::ASP, Bundle::Email, Bundle::DBD::mysql, DBD::SQlite)
+  + Apache 2.2.14 (IPV6 enabled)
+  + MySQL 5.1.41 (Community Server) with PBXT engine 1.0.09-rc
+  + PHP 5.3.1 (PEAR, Mail_Mime, MDB2, Zend)
+  + Perl 5.10.1 (Bundle::Apache2, Apache2::Request, Bundle::Apache::ASP, Bundle::Email, Bundle::DBD::mysql, DBD::SQlite, Randy Kobes PPM)
   + XAMPP Control Version 2.5.8 (ApacheFriends Edition)
   + XAMPP CLI Bundle 1.6
-  + XAMPP Port Check 1.4
+  + XAMPP Port Check 1.5
   + XAMPP Security 1.1
   + SQLite 2.8.17
-  + SQLite 3.6.16
-  + OpenSSL 0.9.8k
-  + phpMyAdmin 3.2.0.1
-  + ADOdb v5.09a
+  + SQLite 3.6.20
+  + OpenSSL 0.9.8l
+  + phpMyAdmin 3.2.4
+  + ADOdb v5.10
   + FPDF v1.6
-  + Zend Framework 1.9 Minimal Package (via PEAR)
-  + Mercury Mail Transport System v4.62
-  + msmtp 1.4.17 (a sendmail compatible SMTP client)
-  + FileZilla FTP Server 0.9.32
+  + Zend Framework 1.9.6 Minimal Package (via PEAR)
+  + Mercury Mail Transport System v4.72
+  + msmtp 1.4.19 (a sendmail compatible SMTP client)
+  + FileZilla FTP Server 0.9.33
   + Webalizer 2.21-02 (with GeoIP lite)
-  + Xdebug 2.0.5 for PHP
+  + apc 3.1.3p1 for PHP
   + eAccelerator 0.9.6-rc1 for PHP
-  + Ming 0.4.2 for PHP
+  + Ming 0.4.3 for PHP
   + PDF with pdflib lite v7.0.4p4 for PHP
+  + rar 2.0.0-dev for PHP
+  + Xdebug 2.0.6-dev for PHP
+  + libapreq2 v2.12 (mod_apreq2) for Apache
 
 ---------------------------------------------------------------
 
 * System Requirements:
 
   + 128 MB RAM
-  + 256 MB free fixed disk
-  + Windows 2000, XP (Server 2003), Vista (Server 2008)
-  + all systems 32 bit (64 bit not tested)
+  + 320 MB free fixed disk
+  + Windows 2000, XP (Server 2003), Vista (Server 2008), 7
+  + all systems 32 bit (64 bit should also work)
 
 ---------------------------------------------------------------
 

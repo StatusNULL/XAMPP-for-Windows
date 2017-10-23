@@ -67,10 +67,10 @@ my %internal_vars = map {$_ => 1}
     qw(TARGET CC CFLAGS CFLAGS_SHLIB LD_SHLIB LDFLAGS_SHLIB LIBS_SHLIB
        PREFIX SBINDIR INCLUDEDIR LIBEXECDIR SYSCONFDIR SYSCONF);
 
-my $CP    = '\xampp\perl\bin\perl.exe -MExtUtils::Command -e cp';
-my $CHMOD = '\xampp\perl\bin\perl.exe -MExtUtils::Command -e chmod';
-my $RM_F  = '\xampp\perl\bin\perl.exe -MExtUtils::Command -e rm_f';
-my $TOUCH = '\xampp\perl\bin\perl.exe -MExtUtils::Command -e touch';
+my $CP    = '"\xampp\perl\bin\perl.exe" -MExtUtils::Command -e cp';
+my $CHMOD = '"\xampp\perl\bin\perl.exe" -MExtUtils::Command -e chmod';
+my $RM_F  = '"\xampp\perl\bin\perl.exe" -MExtUtils::Command -e rm_f';
+my $TOUCH = '"\xampp\perl\bin\perl.exe" -MExtUtils::Command -e touch';
 
 ##
 ##  parse argument line
@@ -94,7 +94,6 @@ my $opt_A = 0;
 my $opt_q = 0;
 my $opt_h = 0;
 my $opt_p = 0;
-my $opt_v = 0;
 my $opt_d = 0;
 
 #   this subroutine is derived from Perl's getopts.pl with the enhancement of
@@ -164,7 +163,7 @@ sub Getopts {
 sub usage {
     print STDERR <<'END';
 Usage: apxs -g [-S <var>=<val>] -n <modname>
-       apxs -q [-v] [-S <var>=<val>] <query> ...
+       apxs -q [-S <var>=<val>] <query> ...
        apxs -c [-S <var>=<val>] [-o <dsofile>] [-D <name>[=<value>]]
                [-I <incdir>] [-L <libdir>] [-l <libname>] [-Wc,<flags>]
                [-Wl,<flags>] [-p] <files> ...
@@ -177,9 +176,9 @@ END
 
 #   option handling
 my $rc;
-($rc, @ARGV) = &Getopts("qn:gco:I+D+L+l+W+S+eiaApvd", @ARGV);
+($rc, @ARGV) = &Getopts("qn:gco:I+D+L+l+W+S+eiaApd", @ARGV);
 &usage if ($rc == 0);
-&usage if ($#ARGV == -1 and not $opt_g and not $opt_q);
+&usage if ($#ARGV == -1 and not $opt_g);
 &usage if (not $opt_q and not ($opt_g and $opt_n) 
            and not $opt_i and not $opt_c and not $opt_e);
 
@@ -332,35 +331,8 @@ if ($opt_q) {
     ##
     ##  QUERY INFORMATION 
     ##
-    my $result;
-    if ($#args >= 0) { 
-        $result = get_vars(@args);
-        print "$result\n";
-    } else {
-        # -q without var name prints all variables and their values
-        
-        # Additional -v pretty-prints output
-        if ($opt_v) {
-            # Variable names in alphabetic order
-            my @vars = sort {uc($a) cmp uc($b)} keys %config_vars;
-            
-            # Make the left column as wide as the longest variable name
-            my $width = 0;
-            foreach (@vars) {
-                my $l = length $_; 
-                $width = $l unless ($l <= $width);
-            }
-    
-            foreach (@vars) {
-                printf "%-${width}s = %s\n", $_, $config_vars{$_};
-            }
-        } else {
-            # Unprettified name=value list
-            foreach (keys %config_vars) {
-                print "$_=$config_vars{$_}\n";
-            }
-        }
-    }
+    my $result = get_vars(@args);
+    print "$result\n";
 }
 
 my $apr_bindir = get_vars("APR_BINDIR");
@@ -475,9 +447,6 @@ if ($opt_c) {
         $ldflags .= ' /debug';
     }
     push(@cmds, "$CFG_LD $ldflags /out:$dso_file $opt $lo");
-
-    my $manifest = $dso_file . '.manifest';
-    push(@cmds, "if exist $manifest mt.exe /manifest $manifest /outputresource:$dso_file;#2");
 
     #   execute the commands
     &execute_cmds(@cmds);

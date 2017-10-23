@@ -129,9 +129,9 @@ you don't need the headers any more.
 
 When installing openssl make sure your config looks like:
 
-  ./config --openssldir=/usr/local/openssl
+  ./config --openssldir=/xampp/openssl
  or
-  ./config --openssldir=/usr/local/ssl
+  ./config --openssldir=/xampp/ssl
 
 If you are planning on upgrading the default OpenSSL libraries on
 a system like RedHat, (not recommended), then try something like:
@@ -148,9 +148,9 @@ followed by:
 
 This way Crypt::SSLeay will pick up the includes and 
 libraries automatically. If your includes end up
-going into a separate directory like /usr/local/include,
-then you may need to symlink /usr/local/openssl/include
-to /usr/local/include
+going into a separate directory like /xampp/include,
+then you may need to symlink /xampp/openssl/include
+to /xampp/include
 
 =head2 Crypt::SSLeay
 
@@ -284,7 +284,7 @@ directory in the distribution?)
 To create simple test certificates with OpenSSL, you may
 run the following command:
 
-  openssl req -config /usr/local/openssl/openssl.cnf \
+  openssl req -config /xampp/openssl/openssl.cnf \
     -new -days 365 -newkey rsa:1024 -x509 \
     -keyout notacakey.pem -out notacacert.pem 
 

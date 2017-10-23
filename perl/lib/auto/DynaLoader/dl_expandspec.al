@@ -3,7 +3,7 @@
 # See AutoSplit.pm.
 package DynaLoader;
 
-#line 321 "../LIB\DynaLoader.pm (autosplit into ..\lib\auto\DynaLoader\dl_expandspec.al)"
+#line 318 "../LIB\DynaLoader.pm (autosplit into ..\lib\auto\DynaLoader\dl_expandspec.al)"
 sub dl_expandspec {
     my($spec) = @_;
     # Optional function invoked if DynaLoader.pm sets $do_expand.

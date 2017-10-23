@@ -8,16 +8,6 @@
 \xampp\perl\site\lib\Apache\XMLRPC\Lite.pm
 \xampp\perl\site\lib\IO\SessionData.pm
 \xampp\perl\site\lib\IO\SessionSet.pm
-\xampp\perl\site\lib\OldDocs\SOAP\Lite.pm
-\xampp\perl\site\lib\OldDocs\SOAP\Transport\FTP.pm
-\xampp\perl\site\lib\OldDocs\SOAP\Transport\HTTP.pm
-\xampp\perl\site\lib\OldDocs\SOAP\Transport\IO.pm
-\xampp\perl\site\lib\OldDocs\SOAP\Transport\JABBER.pm
-\xampp\perl\site\lib\OldDocs\SOAP\Transport\LOCAL.pm
-\xampp\perl\site\lib\OldDocs\SOAP\Transport\MAILTO.pm
-\xampp\perl\site\lib\OldDocs\SOAP\Transport\MQ.pm
-\xampp\perl\site\lib\OldDocs\SOAP\Transport\POP3.pm
-\xampp\perl\site\lib\OldDocs\SOAP\Transport\TCP.pm
 \xampp\perl\site\lib\SOAP\Client.pod
 \xampp\perl\site\lib\SOAP\Constants.pm
 \xampp\perl\site\lib\SOAP\Data.pod

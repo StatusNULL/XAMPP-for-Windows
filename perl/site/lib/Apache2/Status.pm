@@ -735,7 +735,7 @@ sub B::Graph::TIEHANDLE {
         die "TAINTED data in THING=> ($file)";
     }
 
-    $ENV{PATH} = join ":", qw{/usr/bin /usr/local/bin};
+    $ENV{PATH} = join ":", qw{/usr/bin /xampp/bin};
     my $dot = $r->dir_config("Dot") || "dot";
 
     require IO::File;
@@ -1078,7 +1078,7 @@ produce no image if C<B::Graph>'s output is incorrect.
 =head2 C<Dot>
 
 Location of the dot program for C<StatusGraph>,
-if other than I</usr/bin> or I</usr/local/bin>
+if other than I</usr/bin> or I</xampp/bin>
 
 =head2 C<GraphDir>
 

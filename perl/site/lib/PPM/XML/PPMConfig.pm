@@ -6,13 +6,13 @@
 #
 ###############################################################################
 
-$PPM::XML::PPMConfig::revision = '$Id: PPMConfig.pm,v 1.1.1.1 2000/01/26 17:39:19 graham Exp $';
-$PPM::XML::PPMConfig::VERSION  = '0.01';
-
 ###############################################################################
 # Import everything from PPM::XML::PPD into our own namespace.
 ###############################################################################
 package PPM::XML::PPMConfig;
+use vars qw( $VERSION );
+$VERSION = '0.01_01';
+
 use PPM::XML::PPD ':elements';
 
 ###############################################################################
@@ -373,8 +373,8 @@ current description of this module and is for sample purposes only.
      <PPMPRECIOUS>PPM;libnet;Archive-Tar;Compress-Zlib;libwww-perl</PPMPRECIOUS>
      <PACKAGE NAME="AtExit">
          <LOCATION>g:/packages</LOCATION>
-         <INSTPACKLIST>C:/perl/site/lib/auto/AtExit/.packlist</INSTPACKLIST>
-         <INSTROOT>C:/perl</INSTROOT>
+         <INSTPACKLIST>c:/perllib/lib/site/MSWin32-x86/auto/AtExit/.packlist</INSTPACKLIST>
+         <INSTROOT>c:/perllib</INSTROOT>
          <INSTDATE>Sun Mar  8 02:56:31 1998</INSTDATE>
          <INSTPPD>
              <SOFTPKG NAME="AtExit" VERSION="1,02,0,0">

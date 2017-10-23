@@ -77,8 +77,8 @@ exetype - Change executable subsystem type between "Console" and "Windows"
 
 =head1 SYNOPSIS
 
-	\xampp\perl\bin> copy perl.exe guiperl.exe
-	\xampp\perl\bin> exetype guiperl.exe windows
+	C:\perl\bin> copy perl.exe guiperl.exe
+	C:\perl\bin> exetype guiperl.exe windows
 
 =head1 DESCRIPTION
 

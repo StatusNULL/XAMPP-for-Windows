@@ -933,14 +933,14 @@ directory in the form "DBI:CSV:f_dir=$dirname".
 If you want to read the subdirectories of another directory, use
 
     my ($drh) = DBI->install_driver ("CSV");
-    my (@list) = $drh->data_sources (f_dir => "/usr/local/csv_data" );
+    my (@list) = $drh->data_sources (f_dir => "/xampp/csv_data" );
 
 =item list_tables
 
 This method returns a list of file names inside $dbh->{f_dir}.
 Example:
 
-    my ($dbh) = DBI->connect ("DBI:CSV:f_dir=/usr/local/csv_data");
+    my ($dbh) = DBI->connect ("DBI:CSV:f_dir=/xampp/csv_data");
     my (@list) = $dbh->func ("list_tables");
 
 Note that the list includes all files contained in the directory, even

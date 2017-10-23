@@ -5,12 +5,12 @@
 #  * Any changes made here will be lost
 #  * ***********************************
 #  * 01: lib/ModPerl/Code.pm:709
-#  * 02: lib/ModPerl/WrapXS.pm:626
-#  * 03: lib/ModPerl/WrapXS.pm:1175
-#  * 04: C:\perl\bin\.cpanplus\5.10.0\build\mod_perl-2.0.4\Makefile.PL:423
-#  * 05: C:\perl\bin\.cpanplus\5.10.0\build\mod_perl-2.0.4\Makefile.PL:325
-#  * 06: C:\perl\bin\.cpanplus\5.10.0\build\mod_perl-2.0.4\Makefile.PL:56
-#  * 07: C:\perl\bin\cpanp-run-perl.bat:21
+#  * 02: \xampp\perl\bin\.cpanplus\5.10.1\build\mod_perl-2.0.4\blib\lib/ModPerl/WrapXS.pm:626
+#  * 03: \xampp\perl\bin\.cpanplus\5.10.1\build\mod_perl-2.0.4\blib\lib/ModPerl/WrapXS.pm:1175
+#  * 04: \xampp\perl\bin\.cpanplus\5.10.1\build\mod_perl-2.0.4\Makefile.PL:423
+#  * 05: \xampp\perl\bin\.cpanplus\5.10.1\build\mod_perl-2.0.4\Makefile.PL:325
+#  * 06: \xampp\perl\bin\.cpanplus\5.10.1\build\mod_perl-2.0.4\Makefile.PL:56
+#  * 07: \xampp\perl\bin\cpanp-run-perl.bat:21
 #  */
 # 
 
@@ -121,7 +121,7 @@ Arguments are separated by a whitespace in the string.
 
 For example, in F<httpd.conf>:
 
-  PerlSwitches -M/opt/lib -M/usr/local/lib -wT
+  PerlSwitches -M/opt/lib -M/xampp/lib -wT
 
 And later:
 
@@ -129,7 +129,7 @@ And later:
   my $node = $tree->lookup('PerlSwitches');
   my $args = $node->args;
 
-C<$args> now contains the string "-M/opt/lib -M/usr/local/lib -wT"
+C<$args> now contains the string "-M/opt/lib -M/xampp/lib -wT"
 
 
 

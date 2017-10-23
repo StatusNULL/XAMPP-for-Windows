@@ -1,6 +1,6 @@
 /*
 	Build Configuration Template for Win32.
-	$Id: config.w32.h.in,v 1.7.2.4.2.3.2.14 2009/06/23 06:56:45 kalle Exp $
+	$Id: config.w32.h.in 282624 2009-06-23 06:56:45Z kalle $
 */
 
 /* Define the minimum supported version */
@@ -81,8 +81,6 @@
 #define HAVE_UTIME_NULL 1
 #define HAVE_VPRINTF 1
 #define STDC_HEADERS 1
-#define REGEX 1
-#define HSREGEX 1
 #define HAVE_GCVT 1
 #define HAVE_GETLOGIN 1
 #define HAVE_GETTIMEOFDAY 1
@@ -177,7 +175,7 @@
 /* values determined by configure.js */
 
 /* Configure line */
-#define CONFIGURE_COMMAND "cscript /nologo configure.js --with-layout=XAMPP"
+#define CONFIGURE_COMMAND "cscript /nologo configure.js \"--enable-snapshot-build\""
 
 /* Detected compiler version */
 #define COMPILER "MSVC6 (Visual C++ 6.0)"
@@ -239,11 +237,8 @@
 /* DBA support */
 #define HAVE_DBA 1
 
-/* Bundled regex */
-#define REGEX 1
-
-/* Bundled regex */
-#define HSREGEX 1
+/* System regex */
+#define REGEX 0
 
 /* Have FTP support */
 #define HAVE_FTP 1
@@ -325,8 +320,6 @@
 
 #define HAVE_LIBMCRYPT 1
 
-#define HAVE_LIBMCRYPT24 1
-
 /* Have MSSQL support */
 #define HAVE_MSSQL 1
 
@@ -346,14 +339,95 @@
 
 #define HAVE_DSA_DEFAULT_METHOD 1
 
-/* Using bundled PCRE library */
-#define HAVE_BUNDLED_PCRE 1
-
 /* Have PCRE library */
 #define HAVE_PCRE 1
 
+/* Whether to have pg_config.h */
+#define HAVE_PG_CONFIG_H 1
+
 /* Have PostgreSQL library */
 #define HAVE_PGSQL 1
+
+/* PostgreSQL 7.2.0 or later */
+#define HAVE_PQESCAPE 1
+
+/* PostgreSQL 7.3.0 or later */
+#define HAVE_PQUNESCAPEBYTEA 1
+
+/* PostgreSQL 7.0.x or later */
+#define HAVE_PQSETNONBLOCKING 1
+
+/* Broken libpq under windows */
+#define HAVE_PQCMDTUPLES 1
+
+/* Older PostgreSQL */
+#define HAVE_PQOIDVALUE 1
+
+/* PostgreSQL 7.0.x or later */
+#define HAVE_PQCLIENTENCODING 1
+
+/* PostgreSQL 7.4 or later */
+#define HAVE_PQPARAMETERSTATUS 1
+
+/* PostgreSQL 7.4 or later */
+#define HAVE_PQPROTOCOLVERSION 1
+
+/* PostgreSQL 7.4 or later */
+#define HAVE_PGTRANSACTIONSTATUS 1
+
+/* PostgreSQL 7.4 or later */
+#define HAVE_PQEXECPARAMS 1
+
+/* PostgreSQL 7.4 or later */
+#define HAVE_PQPREPARE 1
+
+/* PostgreSQL 7.4 or later */
+#define HAVE_PQEXECPREPARED 1
+
+/* PostgreSQL 7.4 or later */
+#define HAVE_PQRESULTERRORFIELD 1
+
+/* PostgreSQL 7.4 or later */
+#define HAVE_PQSENDQUERYPARAMS 1
+
+/* PostgreSQL 7.4 or later */
+#define HAVE_PQSENDPREPARE 1
+
+/* PostgreSQL 7.4 or later */
+#define HAVE_PQSENDQUERYPREPARED 1
+
+/* PostgreSQL 7.4 or later */
+#define HAVE_PQPUTCOPYDATA 1
+
+/* PostgreSQL 7.4 or later */
+#define HAVE_PQPUTCOPYEND 1
+
+/* PostgreSQL 7.4 or later */
+#define HAVE_PQGETCOPYDATA 1
+
+/* PostgreSQL 7.4 or later */
+#define HAVE_PQFREEMEM 1
+
+/* PostgreSQL 7.4 or later */
+#define HAVE_PQSETERRORVERBOSITY 1
+
+/* PostgreSQL 7.4 or later */
+#define HAVE_PQFTABLE 1
+
+/* PostgreSQL 8.1.4 or later */
+#define HAVE_PQESCAPE_CONN 1
+
+/* PostgreSQL 8.1.4 or later */
+#define HAVE_PQESCAPE_BYTEA_CONN 1
+
+/* Whether libpq is compiled with --enable-multibyte */
+#define HAVE_PGSQL_WITH_MULTIBYTE_SUPPORT 1
+
+/* PostgreSQL 8.1 or later */
+#define HAVE_PG_LO_CREATE 1
+
+/* PostgreSQL 8.4 or later */
+#define HAVE_PG_LO_IMPORT_WITH_OID 1
 
 #define HAVE_PSPELL 1
 
@@ -368,12 +442,15 @@
 
 #define HAVE_SNMP 1
 
+#define HAVE_NET_SNMP 1
+
+#define HAVE_SNMP_PARSE_OID 1
+
+#define MSVC_PERL 1
+
 #define HAVE_SOCKETS 1
 
 #define HAVE_SPL 1
-
-/* have the sqlite3.h header file */
-#define HAVE_SQLITE3_H 1
 
 /* SQLite support */
 #define HAVE_SQLITE3 1
@@ -392,32 +469,52 @@
 
 #define HAVE_ZIP 1
 
-/* have the zlib.h header file */
-#define HAVE_ZLIB_H 1
-
 /* ZLIB support */
 #define HAVE_ZLIB 1
+
+#define APC_FCNTL_LOCKS 1
+
+#define HAVE_APC 1
+
+/* dbase support */
+#define HAVE_DBASE 1
+
+/* Define if you like to use eAccelerator */
+#define HAVE_EACCELERATOR 1
+
+/* Define if you have the <ext/session/php_session.h> header file. */
+#define HAVE_EXT_SESSION_PHP_SESSION_H 1
 
 /* Have FrontBase support */
 #define HAVE_FBSQL 1
 
+#define HAVE_DESTROY_SWF_BLOCK 1
+
 #define HAVE_NEW_MING 1
 
-#define HAVE_DESTROY_SWF_BLOCK 1
+#define HAVE_SWFVIDEOSTREAM_SETFRAMEMODE 1
+
+#define HAVE_SWFVIDEOSTREAM_NEXTFRAME 1
+
+#define HAVE_SWFVIDEOSTREAM_SEEK 1
 
 #define HAVE_MING_MOVIE_LEVEL 1
 
 #define HAVE_MING_ZLIB 1
 
-#define HAVE_SWFVIDEOSTREAM_NEXTFRAME 1
-
-#define HAVE_SWFVIDEOSTREAM_SETFRAMEMODE 1
-
-#define HAVE_SWFVIDEOSTREAM_SEEK 1
-
 #define HAVE_MING 1
 
+#define HAVE_MSQL 1
+
 #define HAVE_PDFLIB 1
+
+/* Rar support */
+#define HAVE_RAR 1
+
+/* Xdebug support */
+#define HAVE_XDEBUG 1
+
+#define HAVE_EXECUTE_DATA_PTR 1
 
 /* LibXML support */
 #define HAVE_LIBXML 1
@@ -428,14 +525,8 @@
 /* Have exif */
 #define HAVE_EXIF 1
 
-/* Using MySQL native driver */
-#define MYSQL_USE_MYSQLND 1
-
 /* Have MySQL library */
 #define HAVE_MYSQL 1
-
-/* Using MySQL native driver */
-#define MYSQLI_USE_MYSQLND 1
 
 /* Have MySQLi library */
 #define HAVE_MYSQLILIB 1
@@ -446,15 +537,6 @@
 /* Have PostgreSQL library */
 #define HAVE_PDO_PGSQL 1
 
-/* Have PQescapeByteaConn */
-#define HAVE_PQESCAPE_BYTEA_CONN 1
-
-/* Have PQescapeConn */
-#define HAVE_PQESCAPE_CONN 1
-
-/* Have PQprepare */
-#define HAVE_PQPREPARE 1
-
 #define PHAR_HAVE_OPENSSL 1
 
 #define PHAR_HASH_OK 1
@@ -464,9 +546,6 @@
 
 /* SOAP support */
 #define HAVE_PHP_SOAP 1
-
-/* have the sqlite.h header file */
-#define HAVE_SQLITE_H 1
 
 /* SQLite support */
 #define HAVE_SQLITE 1
@@ -479,9 +558,6 @@
 
 /* XMLReader support */
 #define HAVE_XMLREADER 1
-
-/* have the iconv.h header file */
-#define HAVE_ICONV_H 1
 
 /* XMLWriter support */
 #define HAVE_XMLWRITER 1

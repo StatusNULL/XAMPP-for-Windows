@@ -1,4 +1,4 @@
-#!C:\xampp\perl\bin\perl.exe
+#!\xampp\perl\bin\perl.exe
 use strict;
 use warnings;
 use Getopt::Long;
@@ -23,19 +23,19 @@ use Getopt::Long;
 # when using the MySQL client library.
 
 
-my $basedir = q{C:\xampp\mysql};
-my $ldata = q{C:\xampp\mysql\data};
-my $execdir = q{C:\xampp\mysql\bin};
-my $bindir = q{C:\xampp\mysql\bin};
-my $pkglibdir = q{C:\xampp\mysql\lib\opt};
-my $pkgincludedir = q{C:\xampp\mysql\include};
+my $basedir = q{\xampp\mysql};
+my $ldata = q{\xampp\mysql\data};
+my $execdir = q{\xampp\mysql\bin};
+my $bindir = q{\xampp\mysql\bin};
+my $pkglibdir = q{\xampp\mysql\lib\opt};
+my $pkgincludedir = q{\xampp\mysql\include};
 my $ldflags = q{};
-my $client_libs = q{-lmysqlclient -lzlib};
-my $version = q{5.1.36};
+my $client_libs = q{-llibmysql -lzlib};
+my $version = q{5.1.41};
 my $port = q{};
-my $libs = q{ -L"C:\xampp\mysql\lib\opt" -lmysqlclient -lzlib};
-my $cflags = q{-I"C:\xampp\mysql\include"};
-my $embedded_libs = q{ -L"C:\xampp\mysql\lib\opt"};
+my $libs = q{ -L"\xampp\mysql\lib\opt" -llibmysql -lzlib};
+my $cflags = q{-I"\xampp\mysql\include"};
+my $embedded_libs = q{ -L"\xampp\mysql\lib\opt"};
 
 my %opts = ();
 GetOptions(\%opts,

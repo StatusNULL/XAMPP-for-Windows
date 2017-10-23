@@ -99,7 +99,7 @@
     $TEXT['security-head'] = "SEGURANÇA XAMPP";
     $TEXT['security-text1'] = "Esta página lhe dá uma visão geral rápida sobre o status da segurança de sua instalação de XAMPP. (Por favor, continue lendo após a tabela.)";
     $TEXT['security-text2'] = "
-    Os pontos marcados em verde são seguros; os pontos marcados em vermelho são definitivamente inseguros e os pontos marcados em amarelo não foram possíveis de serem verificados (Por exemplo: O sofware que deseja verificar não está funcionando).<p>Para simplesmente reparar problemas para o mysql, o phpmyadmin e o diretório do xampp use</b><p>=> <a href=\"/security/xamppsecurity.php\"><b>http://localhost/security/xamppsecurity.php</b></a> <= &nbsp;&nbsp;[permitido somente para localhost (servidor local)]<br>&nbsp;<br>&nbsp;<br>
+    Os pontos marcados em verde são seguros; os pontos marcados em vermelho são definitivamente inseguros e os pontos marcados em amarelo não foram possíveis de serem verificados (Por exemplo: O sofware que deseja verificar não está funcionando).<p>Para simplesmente reparar problemas para o mysql, o phpmyadmin e o diretório do xampp use</b><p>=> <a href=\"/security/xamppsecurity.php\"><b>http://localhost/security/xamppsecurity.php</b></a> <=<br>&nbsp;<br>&nbsp;<br>
     Algumas notas inportantes:<ul>
     <li>Todos estes testes são feitos UNICAMENTE no \"localhost\" (servidor local) (127.0.0.1).</li>
     <li><i><b>Para o FileZilla FTP e Mercury Mail, você necessita corrigir todos os problemas de segurança por você mesmo! Desculpe. </b></i></li>

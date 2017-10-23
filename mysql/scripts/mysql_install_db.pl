@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!"\xampp\perl\bin\perl.exe"
 # -*- cperl -*-
 #
 # Copyright (C) 2007 MySQL AB
@@ -261,7 +261,7 @@ elsif ( $opt->{basedir} )
 }
 else
 {
-  $print_defaults='C:/Program Files/MySql/MySQL Server 5.1/bin/my_print_defaults';
+  $print_defaults='/usr/local/mysql/MySQL Server 5.1/bin/my_print_defaults';
 }
 
 -x $print_defaults or -f "$print_defaults.exe"
@@ -318,17 +318,17 @@ elsif ( $opt->{basedir} )
 }
 else
 {
-  $opt->{basedir} = 'C:/Program Files/MySql/MySQL Server 5.1';
-  $bindir         = 'C:/Program Files/MySql/MySQL Server 5.1/bin';
+  $opt->{basedir} = '/usr/local/mysql/MySQL Server 5.1';
+  $bindir         = '/usr/local/mysql/MySQL Server 5.1/bin';
   $extra_bindir   = $bindir;
-  $mysqld         = 'C:/Program Files/MySql/MySQL Server 5.1/bin/mysqld';
-  $pkgdatadir     = 'C:/Program Files/MySql/MySQL Server 5.1/share';
-  $scriptdir      = 'C:/Program Files/MySql/MySQL Server 5.1/bin';
+  $mysqld         = '/usr/local/mysql/MySQL Server 5.1/bin/mysqld';
+  $pkgdatadir     = '/usr/local/mysql/MySQL Server 5.1/share';
+  $scriptdir      = '/usr/local/mysql/MySQL Server 5.1/bin';
 }
 
 unless ( $opt->{ldata} )
 {
-  $opt->{ldata} = 'C:/Program Files/MySql/MySQL Server 5.1/data';
+  $opt->{ldata} = '/usr/local/mysql/MySQL Server 5.1/data';
 }
 
 if ( $opt->{srcdir} )
@@ -510,14 +510,14 @@ if ( open(PIPE, "| $mysqld_install_cmd_line") )
       report($opt,
              "You can start the MySQL daemon with:",
              "",
-             "  cd " . 'C:/Program Files/MySql/MySQL Server 5.1' . " ; $bindir/mysqld_safe &",
+             "  cd " . '/usr/local/mysql/MySQL Server 5.1' . " ; $bindir/mysqld_safe &",
              "",
              "You can test the MySQL daemon with mysql-test-run.pl",
              "",
              "  cd mysql-test ; perl mysql-test-run.pl");
     }
     report($opt,
-           "Please report any problems with the " . 'C:/Program Files/MySql/MySQL Server 5.1/bin' . "/mysqlbug script!",
+           "Please report any problems with the " . '/usr/local/mysql/MySQL Server 5.1/bin' . "/mysqlbug script!",
            "",
            "The latest information about MySQL is available on the web at",
            "",
@@ -551,7 +551,7 @@ else
         "and the manual section that describes problems on your OS.",
         "Another information source is the MySQL email archive.",
         "Please check all of the above before mailing us!",
-        "And if you do mail us, you MUST use the " . 'C:/Program Files/MySql/MySQL Server 5.1/bin' . "/mysqlbug script!")
+        "And if you do mail us, you MUST use the " . '/usr/local/mysql/MySQL Server 5.1/bin' . "/mysqlbug script!")
 }
 
 ##############################################################################

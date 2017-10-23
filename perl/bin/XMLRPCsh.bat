@@ -12,7 +12,7 @@ goto endofperl
 @rem ';
 #!/bin/env perl 
 #line 15
-#!\xampp\perl\bin\perl.exe 
+#!d:\perl\bin\perl.exe 
 
 # -- XMLRPC::Lite -- soaplite.com -- Copyright (C) 2001 Paul Kulchenko --
 

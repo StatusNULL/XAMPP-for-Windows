@@ -2,6 +2,10 @@
 # This file is built by mktables from e.g. UnicodeData.txt.
 # Any changes made here will be lost!
 
+# This file is for internal use by the Perl program only.  The format and even
+# name or existence of this file are subject to change without notice.  Don't
+# use it directly.
+
 #
 # DecompositionType category 'Super'
 #
@@ -22,6 +26,8 @@ return <<'END';
 2074	207F	
 2120		
 2122		
+2C7D		
 2D6F		
 3192	319F	
+A770		
 END

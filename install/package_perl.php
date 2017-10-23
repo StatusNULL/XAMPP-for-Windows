@@ -71,9 +71,9 @@ class setup_perl extends setup_XAMPP
         )
     );
 
-    private static $httpdconf = 'C:\apache\conf\httpd.conf';
-    private static $perlconf  = 'C:\apache\conf\extra\perl.conf';
-    private static $startup   = 'C:\apache\conf\extra\startup.pl';
+    private static $httpdconf = 'C:\xampp\apache\conf\httpd.conf';
+    private static $perlconf  = 'C:\xampp\apache\conf\extra\perl.conf';
+    private static $startup   = 'C:\xampp\apache\conf\extra\startup.pl';
 
     private static $mod_perl  = null;
     private static $asp       = null;

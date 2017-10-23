@@ -353,7 +353,7 @@ The entire upgrading/downgrading is still experimental and might not work
 as you expect or may even have bugs. You might get errors like this:
 
         Can't use an undefined value as an ARRAY reference at
-        /usr/local/lib/perl5/5.8.0/Math/BigInt/Calc.pm line 864
+        /xampp/lib/perl5/5.8.0/Math/BigInt/Calc.pm line 864
 
 This means somewhere a routine got a BigFloat/Lite but expected a BigInt (or
 vice versa) and the upgrade/downgrad path was missing. This is a bug, please
@@ -419,13 +419,13 @@ This will be hopefully fixed soon ;)
 
 =item hex
 
-Override the build-in hex() method with a version that can handle big
+Override the built-in hex() method with a version that can handle big
 integers. Note that under Perl older than v5.9.4, this will be global
 and cannot be disabled with "no bigint;".
 
 =item oct
 
-Override the build-in oct() method with a version that can handle big
+Override the built-in oct() method with a version that can handle big
 integers. Note that under Perl older than v5.9.4, this will be global
 and cannot be disabled with "no bigint;".
 

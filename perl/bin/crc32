@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/xampp/perl/bin/perl.exe
 
 # Computes and prints to stdout the CRC-32 values of the given files
 

@@ -18,7 +18,7 @@ our @Overridable;
 my @Prepend_parent;
 my %Recognized_Att_Keys;
 
-our $VERSION = '6.54';
+our $VERSION = '6.55_02';
 
 # Emulate something resembling CVS $Revision$
 (our $Revision = $VERSION) =~ s{_}{};
@@ -88,6 +88,7 @@ my %Special_Sigs = (
  PMLIBDIRS          => 'ARRAY',
  PMLIBPARENTDIRS    => 'ARRAY',
  PREREQ_PM          => 'HASH',
+ BUILD_REQUIRES     => 'HASH',
  CONFIGURE_REQUIRES => 'HASH',
  SKIP               => 'ARRAY',
  TYPEMAPS           => 'ARRAY',
@@ -255,7 +256,7 @@ sub full_setup {
 
     INC INCLUDE_EXT LDFROM LIB LIBPERL_A LIBS LICENSE
     LINKTYPE MAKE MAKEAPERL MAKEFILE MAKEFILE_OLD MAN1PODS MAN3PODS MAP_TARGET
-    META_ADD META_MERGE MIN_PERL_VERSION CONFIGURE_REQUIRES
+    META_ADD META_MERGE MIN_PERL_VERSION BUILD_REQUIRES CONFIGURE_REQUIRES
     MYEXTLIB NAME NEEDS_LINKING NOECHO NO_META NORECURS NO_VC OBJECT OPTIMIZE 
     PERL_MALLOC_OK PERL PERLMAINCC PERLRUN PERLRUNINST PERL_CORE
     PERL_SRC PERM_DIR PERM_RW PERM_RWX
@@ -389,33 +390,28 @@ sub new {
         $self->{ARGS}{$k} = $self->{$k};
     }
 
+    $self = {} unless defined $self;
+
+    $self->{PREREQ_PM}      ||= {};
+    $self->{BUILD_REQUIRES} ||= {};
+
+    # Temporarily bless it into MM so it can be used as an
+    # object.  It will be blessed into a temp package later.
+    bless $self, "MM";
+
     if ("@ARGV" =~ /\bPREREQ_PRINT\b/) {
-        require Data::Dumper;
-        my @what = ('PREREQ_PM');
-        push @what, 'MIN_PERL_VERSION' if $self->{MIN_PERL_VERSION};
-        print Data::Dumper->Dump([@{$self}{@what}], \@what);
-        exit 0;
+        $self->_PREREQ_PRINT;
     }
 
     # PRINT_PREREQ is RedHatism.
     if ("@ARGV" =~ /\bPRINT_PREREQ\b/) {
-        my @prereq =
-            map { [$_, $self->{PREREQ_PM}{$_}] } keys %{$self->{PREREQ_PM}};
-        if ( $self->{MIN_PERL_VERSION} ) {
-            push @prereq, ['perl' => $self->{MIN_PERL_VERSION}];
-        }
-
-        print join(" ", map { "perl($_->[0])>=$_->[1] " }
-                        sort { $a->[0] cmp $b->[0] } @prereq), "\n";
-        exit 0;
+        $self->_PRINT_PREREQ;
    }
 
     print STDOUT "MakeMaker (v$VERSION)\n" if $Verbose;
     if (-f "MANIFEST" && ! -f "Makefile"){
         check_manifest();
     }
-
-    $self = {} unless (defined $self);
 
     check_hints($self);
 
@@ -456,7 +452,10 @@ END
     my(%initial_att) = %$self; # record initial attributes
 
     my(%unsatisfied) = ();
-    foreach my $prereq (sort keys %{$self->{PREREQ_PM}}) {
+    my $prereqs = $self->_all_prereqs;
+    foreach my $prereq (sort keys %$prereqs) {
+        my $required_version = $prereqs->{$prereq};
+
         my $installed_file = MM->_installed_file_for_module($prereq);
         my $pr_version = 0;
         $pr_version = MM->parse_version($installed_file) if $installed_file;
@@ -467,20 +466,21 @@ END
 
         if (!$installed_file) {
             warn sprintf "Warning: prerequisite %s %s not found.\n", 
-              $prereq, $self->{PREREQ_PM}{$prereq} 
+              $prereq, $required_version
                    unless $self->{PREREQ_FATAL};
+
             $unsatisfied{$prereq} = 'not installed';
-        } elsif ($pr_version < $self->{PREREQ_PM}->{$prereq} ){
+        }
+        elsif ($pr_version < $required_version ){
             warn sprintf "Warning: prerequisite %s %s not found. We have %s.\n",
-              $prereq, $self->{PREREQ_PM}{$prereq}, 
-                ($pr_version || 'unknown version') 
+              $prereq, $required_version, ($pr_version || 'unknown version') 
                   unless $self->{PREREQ_FATAL};
-            $unsatisfied{$prereq} = $self->{PREREQ_PM}->{$prereq} ? 
-              $self->{PREREQ_PM}->{$prereq} : 'unknown version' ;
+
+            $unsatisfied{$prereq} = $required_version ? $required_version : 'unknown version' ;
         }
     }
-    
-     if (%unsatisfied && $self->{PREREQ_FATAL}){
+
+    if (%unsatisfied && $self->{PREREQ_FATAL}){
         my $failedprereqs = join "\n", map {"    $_ $unsatisfied{$_}"} 
                             sort { $a cmp $b } keys %unsatisfied;
         die <<"END";
@@ -605,18 +605,9 @@ END
 #
 #   MakeMaker ARGV: $argv
 #
-#   MakeMaker Parameters:
 END
 
-    foreach my $key (sort keys %initial_att){
-        next if $key eq 'ARGS';
-
-        my($v) = neatvalue($initial_att{$key});
-        $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/;
-        $v =~ tr/\n/ /s;
-        push @{$self->{RESULT}}, "#     $key => $v";
-    }
-    undef %initial_att;        # free memory
+    push @{$self->{RESULT}}, $self->_MakeMaker_Parameters_section(\%initial_att);
 
     if (defined $self->{CONFIGURE}) {
        push @{$self->{RESULT}}, <<END;
@@ -744,6 +735,34 @@ sub _installed_file_for_module {
     }
 
     return $path;
+}
+
+
+# Extracted from MakeMaker->new so we can test it
+sub _MakeMaker_Parameters_section {
+    my $self = shift;
+    my $att  = shift;
+
+    my @result = <<'END';
+#   MakeMaker Parameters:
+END
+
+    # CPAN.pm takes prereqs from this field in 'Makefile'
+    # and does not know about BUILD_REQUIRES
+    if( $att->{PREREQ_PM} || $att->{BUILD_REQUIRES} ) {
+        %{$att->{'PREREQ_PM'}} = (%{$att->{'PREREQ_PM'}||{}}, %{$att->{'BUILD_REQUIRES'}||{}});
+    }
+
+    foreach my $key (sort keys %$att){
+        next if $key eq 'ARGS';
+
+        my($v) = neatvalue($att->{$key});
+        $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/;
+        $v =~ tr/\n/ /s;
+        push @result, "#     $key => $v";
+    }
+
+    return @result;
 }
 
 
@@ -1459,6 +1478,14 @@ architecture.  For example:
 builds a PPD package that references a binary of the C<Agent> package,
 located in the C<x86> directory relative to the PPD itself.
 
+=item BUILD_REQUIRES
+
+A hash of modules that are needed to build your module but not run it.
+
+This will go into the C<build_requires> field of your F<META.yml>.
+
+The format is the same as PREREQ_PM.
+
 =item C
 
 Ref to array of *.c file names. Initialised from a directory scan
@@ -1516,8 +1543,8 @@ Something like C<"-DHAVE_UNISTD_H">
 
 This is the root directory into which the code will be installed.  It
 I<prepends itself to the normal prefix>.  For example, if your code
-would normally go into F</usr/local/lib/perl> you could set DESTDIR=~/tmp/
-and installation would go into F<~/tmp/usr/local/lib/perl>.
+would normally go into F</xampp/lib/perl> you could set DESTDIR=~/tmp/
+and installation would go into F<~/tmp/xampp/lib/perl>.
 
 This is primarily of use for people who repackage Perl modules.
 
@@ -1591,7 +1618,7 @@ INST_SCRIPT directory. Make realclean will delete them from there
 again.
 
 If your executables start with something like #!perl or
-#!/usr/bin/perl MakeMaker will change this to the path of the perl
+#!/xampp/perl/bin/perl.exe MakeMaker will change this to the path of the perl
 'Makefile.PL' was invoked with so the programs will be sure to run
 properly even if perl is not in /usr/bin/perl.
 
@@ -1747,7 +1774,7 @@ If set to 'none', no man pages will be installed.
 =item INSTALLVENDORSCRIPT
 
 Used by 'make install' which copies files from INST_SCRIPT to this
-directory if INSTALLDIRS is set to is set to vendor.
+directory if INSTALLDIRS is set to vendor.
 
 =item INST_ARCHLIB
 
@@ -2242,6 +2269,8 @@ If a distribution defines a minimal required perl version, this is
 added to the output as an additional line of the form:
 
   $MIN_PERL_VERSION = '5.008001';
+
+If BUILD_REQUIRES is not empty, it will be dumped as $BUILD_REQUIRES hasref.
 
 =item PRINT_PREREQ
 

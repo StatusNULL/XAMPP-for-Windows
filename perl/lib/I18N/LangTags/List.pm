@@ -1736,7 +1736,7 @@ Sean M. Burke, sburkeE<64>cpan.org
 
 # To generate a list of just the two and three-letter codes:
 
-#!/usr/local/bin/perl -w
+#!/xampp/perl/bin/perl.exe -w
 
 require 5; # Time-stamp: "2001-03-13 21:53:39 MST"
  # Sean M. Burke, sburke@cpan.org

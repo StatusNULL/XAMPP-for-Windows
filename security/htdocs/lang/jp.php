@@ -97,7 +97,7 @@
 
     $TEXT['security-head'] = "XAMPP セキュリティ";
     $TEXT['security-text1'] = "ここでは、XAMPPインストールにおけるセキュリティ・ステータスについて、簡単なご説明をしています。(テーブルの後も続けてお読みください。)";
-    $TEXT['security-text2'] = "緑のハイライトの表示は「安全」です。赤のハイライトの表示は、決定的に「要注意」、黄色のハイライトは「確認不能」(例えば、確認したいソフトウェアが稼動していないなど)です。<p>そのような問題をすべて修正するには、単純に次のツールを使ってください。</b><p>=> <a href=\"/security/xamppsecurity.php\"><b>http://localhost/security/xamppsecurity.php</b></a> <= &nbsp;&nbsp;[localhostからのみアクセスできます。]<br>&nbsp;<br>&nbsp;<br>
+    $TEXT['security-text2'] = "緑のハイライトの表示は「安全」です。赤のハイライトの表示は、決定的に「要注意」、黄色のハイライトは「確認不能」(例えば、確認したいソフトウェアが稼動していないなど)です。<p>そのような問題をすべて修正するには、単純に次のツールを使ってください。</b><p>=> <a href=\"/security/xamppsecurity.php\"><b>http://localhost/security/xamppsecurity.php</b></a> <=<br>&nbsp;<br>&nbsp;<br>
     そのほかの重要なメモ:<ul>
     <li>全てのテストページはlocalhost(127.0.0.1)のためだけに作成されています。</li>
     <li><i><b>FileZilla FTPとMercury Mailは、自分自身でセキュリティの問題点を解決してください。</b></i></li>

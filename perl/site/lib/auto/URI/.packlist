@@ -1,14 +1,17 @@
 \xampp\perl\site\lib\URI.pm
 \xampp\perl\site\lib\URI\Escape.pm
 \xampp\perl\site\lib\URI\Heuristic.pm
+\xampp\perl\site\lib\URI\IRI.pm
 \xampp\perl\site\lib\URI\QueryParam.pm
 \xampp\perl\site\lib\URI\Split.pm
 \xampp\perl\site\lib\URI\URL.pm
 \xampp\perl\site\lib\URI\WithBase.pm
 \xampp\perl\site\lib\URI\_foreign.pm
 \xampp\perl\site\lib\URI\_generic.pm
+\xampp\perl\site\lib\URI\_idna.pm
 \xampp\perl\site\lib\URI\_ldap.pm
 \xampp\perl\site\lib\URI\_login.pm
+\xampp\perl\site\lib\URI\_punycode.pm
 \xampp\perl\site\lib\URI\_query.pm
 \xampp\perl\site\lib\URI\_segment.pm
 \xampp\perl\site\lib\URI\_server.pm

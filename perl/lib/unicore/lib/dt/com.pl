@@ -2,6 +2,10 @@
 # This file is built by mktables from e.g. UnicodeData.txt.
 # Any changes made here will be lost!
 
+# This file is for internal use by the Perl program only.  The format and even
+# name or existence of this file are subject to change without notice.  Don't
+# use it directly.
+
 #
 # DecompositionType category 'Compat'
 #
@@ -285,6 +289,7 @@ return <<'END';
 2A74	2A75	
 2A75	2A76	
 2A76		
+2C7C	2C7D	
 2D6F		
 2E9F		
 2E9F		
@@ -753,6 +758,7 @@ return <<'END';
 33FC	33FD	
 33FD	33FE	
 33FE	33FF	
+A770		
 FB00		
 FB00	FB01	
 FB01	FB02	

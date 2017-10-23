@@ -94,7 +94,7 @@
     // ---------------------------------------------------------------------
     $TEXT['security-head'] = "XAMPP varnost";
     $TEXT['security-text1'] = "Ta stran nudi hitri pregled o statusu varnosti va&#353;e XAMPP namestitve. (Prosim nadaljujte z branjem v tabeli.)";
-    $TEXT['security-text2'] = "Zeleno ozna&#269;ene to&#269;ke so varne; rde&#269;e obarvane to&#269;ke pa so nepreklicno nevarne, rumeno obarvane to&#269;ke pa ozna&#269;ujejo varnost, ki je ni mo&#382;no definirati (primer: programska oprema, ki se preverja ne te&#269;e).<p>Da bi odpravili napake za mysql, phpmyadmin v xampp mapi, enostavno uporabite</b><p>=> <a href=\"/security/xamppsecurity.php\"><b>http://localhost/security/xamppsecurity.php</b></a> <= &nbsp;&nbsp;[dovoljeno samo za localhost]<br>&nbsp;<br>&nbsp;<br>
+    $TEXT['security-text2'] = "Zeleno ozna&#269;ene to&#269;ke so varne; rde&#269;e obarvane to&#269;ke pa so nepreklicno nevarne, rumeno obarvane to&#269;ke pa ozna&#269;ujejo varnost, ki je ni mo&#382;no definirati (primer: programska oprema, ki se preverja ne te&#269;e).<p>Da bi odpravili napake za mysql, phpmyadmin v xampp mapi, enostavno uporabite</b><p>=> <a href=\"/security/xamppsecurity.php\"><b>http://localhost/security/xamppsecurity.php</b></a> <=<br>&nbsp;<br>&nbsp;<br>
     Nekaj ostalih popmembnih podatkov:<ul>
         <li>Vsi ti testi so narejeni samo za \"localhost\" (127.0.0.1).</li>
         <li><i><b>Za FileZilla FTP und Mercury Po&#353;tni stre&#382;nik, morate sami nastaviti varnostno politiko! Oprostite. </b></i></li>

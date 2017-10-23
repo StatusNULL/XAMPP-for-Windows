@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/xampp/perl/bin/perl.exe
 
 require 5;
 BEGIN { $^W = 1 if $ENV{'PERLDOCDEBUG'} }

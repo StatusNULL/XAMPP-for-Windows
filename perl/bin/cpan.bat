@@ -10,8 +10,11 @@ if %errorlevel% == 9009 echo You do not have Perl in your PATH.
 if errorlevel 1 goto script_failed_so_exit_with_non_zero_val 2>nul
 goto endofperl
 @rem ';
-#!/usr/bin/perl
+#!perl
 #line 15
+    eval 'exec \xampp\perl\bin\perl.exe -S $0 ${1+"$@"}'
+	if $running_under_some_shell;
+#!/usr/bin/perl
 # $Id: cpan,v 1.9 2006/11/01 21:49:31 comdog Exp $
 use strict;
 
@@ -238,7 +241,7 @@ my %Method_table = (
 	O => [ \&_show_out_of_date,  0, 0, 'Showing Out of date'    ],
 	L => [ \&_show_author_mods,  1, 0, 'Showing author mods'    ],
 	a => [ \&_create_autobundle, 0, 0, 'Creating autobundle'    ],
-	r => [ \&_recompile,         0, 0, 'Recompiling'            ],
+	r => [ \&_recompiling,       0, 0, 'Recompiling'            ],
 
 	c => [ \&_default,           1, 0, 'Running `make clean`'   ],
 	f => [ \&_default,           1, 0, 'Installing with force'  ],

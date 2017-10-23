@@ -12,7 +12,10 @@ class relocate_mysql extends relocate_XAMPP
 {
     private static $relocfiles = array(
         'normal' => array(
-            'mysql\bin\my.ini'
+            'mysql\bin\my.ini',
+            'mysql\bin\*.bat',
+            'mysql\bin\*.pl',
+            'mysql\scripts\*.pl'
         )
     );
 

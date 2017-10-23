@@ -10,6 +10,7 @@ use strict;
 
 our $summary = <<'!END!';
 Summary of my $package (revision $revision $version_patchlevel_string) configuration:
+  $git_commit_id_title $git_commit_id$git_ancestor_line
   Platform:
     osname=$osname, osvers=$osvers, archname=$archname
     uname='$myuname'
@@ -45,20 +46,31 @@ my $summary_expanded;
 sub myconfig {
     return $summary_expanded if $summary_expanded;
     ($summary_expanded = $summary) =~ s{\$(\w+)}
-		 { my $c = $Config::Config{$1}; defined($c) ? $c : 'undef' }ge;
+		 { 
+			my $c;
+			if ($1 eq 'git_ancestor_line') {
+				if ($Config::Config{git_ancestor}) {
+					$c= "\n  Ancestor: $Config::Config{git_ancestor}";
+				} else {
+					$c= "";
+				}
+			} else {
+                     		$c = $Config::Config{$1}; 
+			}
+			defined($c) ? $c : 'undef' 
+		}ge;
     $summary_expanded;
 }
 
 local *_ = \my $a;
 $_ = <<'!END!';
-Author=''
+Author='Carsten Wiedmann'
 CONFIG='true'
 Date='$Date'
 Header=''
 Id='$Id'
 Locker=''
 Log='$Log'
-Mcc='Mcc'
 PATCHLEVEL='10'
 PERL_API_REVISION='5'
 PERL_API_SUBVERSION='0'
@@ -66,11 +78,11 @@ PERL_API_VERSION='10'
 PERL_CONFIG_SH='true'
 PERL_PATCHLEVEL=''
 PERL_REVISION='5'
-PERL_SUBVERSION='0'
+PERL_SUBVERSION='1'
 PERL_VERSION='10'
 RCSfile='$RCSfile'
 Revision='$Revision'
-SUBVERSION='0'
+SUBVERSION='1'
 Source=''
 State=''
 _a='.lib'
@@ -112,8 +124,8 @@ ccname='cl'
 ccsymbols=''
 ccversion='12.00.8804'
 cf_by='Carsten Wiedmann'
-cf_email='carsten_sttgt@gmx.de'
-cf_time='Fri Mar 13 17:37:08 2009'
+cf_email='Carsten Wiedmann@carsten-1.wiedmann-online.local'
+cf_time='Sun Nov  1 04:35:02 2009'
 chgrp=''
 chmod=''
 chown=''
@@ -157,9 +169,11 @@ d_accessx='undef'
 d_aintl='undef'
 d_alarm='define'
 d_archlib='define'
+d_asctime64='undef'
 d_asctime_r='undef'
 d_atolf='undef'
 d_atoll='undef'
+d_attribute_deprecated='undef'
 d_attribute_format='undef'
 d_attribute_malloc='undef'
 d_attribute_nonnull='undef'
@@ -194,10 +208,12 @@ d_crypt_r='undef'
 d_csh='undef'
 d_ctermid='undef'
 d_ctermid_r='undef'
+d_ctime64='undef'
 d_ctime_r='undef'
 d_cuserid='undef'
 d_dbl_dig='define'
 d_dbminitproto='undef'
+d_difftime64='undef'
 d_difftime='define'
 d_dir_dd_fd='undef'
 d_dirfd='undef'
@@ -256,6 +272,9 @@ d_fsync='undef'
 d_ftello='undef'
 d_ftime='define'
 d_futimes='undef'
+d_gdbm_ndbm_h_uses_prototypes='undef'
+d_gdbmndbm_h_uses_prototypes='undef'
+d_getaddrinfo='undef'
 d_getcwd='define'
 d_getespwnam='undef'
 d_getfsstat='undef'
@@ -277,6 +296,7 @@ d_getlogin='define'
 d_getlogin_r='undef'
 d_getmnt='undef'
 d_getmntent='undef'
+d_getnameinfo='undef'
 d_getnbyaddr='undef'
 d_getnbyname='undef'
 d_getnent='undef'
@@ -312,6 +332,7 @@ d_getservprotos='define'
 d_getspnam='undef'
 d_getspnam_r='undef'
 d_gettimeod='define'
+d_gmtime64='undef'
 d_gmtime_r='undef'
 d_gnulibc='undef'
 d_grpasswd='undef'
@@ -321,6 +342,8 @@ d_ilogbl='undef'
 d_inc_version_list='undef'
 d_index='undef'
 d_inetaton='undef'
+d_inetntop='undef'
+d_inetpton='undef'
 d_int64_t='undef'
 d_isascii='define'
 d_isfinite='undef'
@@ -332,6 +355,7 @@ d_lchown='undef'
 d_ldbl_dig='define'
 d_libm_lib_version='undef'
 d_link='define'
+d_localtime64='undef'
 d_localtime_r='undef'
 d_localtime_r_needs_tzset='undef'
 d_locconv='define'
@@ -356,6 +380,7 @@ d_mkdtemp='undef'
 d_mkfifo='undef'
 d_mkstemp='undef'
 d_mkstemps='undef'
+d_mktime64='undef'
 d_mktime='define'
 d_mmap='undef'
 d_modfl='undef'
@@ -376,6 +401,8 @@ d_msgsnd='undef'
 d_msync='undef'
 d_munmap='undef'
 d_mymalloc='undef'
+d_ndbm='undef'
+d_ndbm_h_uses_prototypes='undef'
 d_nice='undef'
 d_nl_langinfo='undef'
 d_nv_preserves_uv='define'
@@ -407,7 +434,7 @@ d_pwgecos='undef'
 d_pwpasswd='undef'
 d_pwquota='undef'
 d_qgcvt='undef'
-d_quad='undef'
+d_quad='define'
 d_random_r='undef'
 d_readdir64_r='undef'
 d_readdir='define'
@@ -533,6 +560,7 @@ d_tcsetpgrp='undef'
 d_telldir='define'
 d_telldirproto='define'
 d_time='define'
+d_timegm='undef'
 d_times='define'
 d_tm_tm_gmtoff='undef'
 d_tm_tm_zone='undef'
@@ -580,7 +608,8 @@ dlsrc='dl_win32.xs'
 doublesize='8'
 drand01='(rand()/(double)((unsigned)1<<RANDBITS))'
 drand48_r_proto='0'
-dynamic_ext='B Compress/Raw/Zlib Cwd Data/Dumper Devel/DProf Devel/PPPort Devel/Peek Digest/MD5 Digest/SHA Encode Fcntl File/Glob Filter/Util/Call Hash/Util Hash/Util/FieldHash IO List/Util MIME/Base64 Math/BigInt/FastCalc Opcode POSIX PerlIO/encoding PerlIO/scalar PerlIO/via SDBM_File Socket Storable Sys/Hostname Text/Soundex Time/HiRes Time/Piece Unicode/Normalize Win32 Win32API/File XS/APItest XS/Typemap attrs re threads threads/shared'
+dtrace=''
+dynamic_ext='B Compress/Raw/Bzip2 Compress/Raw/Zlib Cwd Data/Dumper Devel/DProf Devel/PPPort Devel/Peek Digest/MD5 Digest/SHA Encode Fcntl File/Glob Filter/Util/Call Hash/Util Hash/Util/FieldHash IO MIME/Base64 Math/BigInt/FastCalc Opcode POSIX PerlIO/encoding PerlIO/scalar PerlIO/via SDBM_File Socket Storable Sys/Hostname Text/Soundex Time/HiRes Time/Piece Unicode/Normalize Win32 Win32API/File XS/APItest XS/Typemap attrs mro re threads threads/shared'
 eagain='EAGAIN'
 ebcdic='undef'
 echo='echo'
@@ -595,7 +624,8 @@ endservent_r_proto='0'
 eunicefix=':'
 exe_ext='.exe'
 expr='expr'
-extensions='B Compress/Raw/Zlib Compress/Zlib Cwd Data/Dumper Devel/DProf Devel/PPPort Devel/Peek Digest/MD5 Digest/SHA Encode Errno Fcntl File/Glob Filter/Util/Call Hash/Util Hash/Util/FieldHash IO IO_Compress_Base IO_Compress_Zlib List/Util MIME/Base64 Math/BigInt/FastCalc Opcode POSIX PerlIO/encoding PerlIO/scalar PerlIO/via SDBM_File Socket Storable Sys/Hostname Text/Soundex Time/HiRes Time/Piece Unicode/Normalize Win32 Win32API/File Win32CORE XS/APItest XS/Typemap attrs re threads threads/shared'
+extensions='Attribute/Handlers B Compress/Raw/Bzip2 Compress/Raw/Zlib Cwd Data/Dumper Devel/DProf Devel/PPPort Devel/Peek Digest/MD5 Digest/SHA Encode Errno Fcntl File/Glob Filter/Util/Call Hash/Util Hash/Util/FieldHash IO IO/Compress List/Util MIME/Base64 Math/BigInt/FastCalc Module/Pluggable Opcode POSIX PerlIO/encoding PerlIO/scalar PerlIO/via SDBM_File Safe Socket Storable Sys/Hostname Test/Harness Text/Soundex Time/HiRes Time/Piece Unicode/Normalize Win32 Win32API/File Win32CORE XS/APItest XS/Typemap attrs mro re threads threads/shared'
+extern_C='extern'
 extras=''
 fflushNULL='define'
 fflushall='undef'
@@ -661,6 +691,7 @@ i64type='__int64'
 i8size='1'
 i8type='char'
 i_arpainet='define'
+i_assert='define'
 i_bsdioctl=''
 i_crypt='undef'
 i_db='undef'
@@ -673,6 +704,8 @@ i_float='define'
 i_fp='undef'
 i_fp_class='undef'
 i_gdbm='undef'
+i_gdbm_ndbm='undef'
+i_gdbmndbm='undef'
 i_grp='undef'
 i_ieeefp='undef'
 i_inttypes='undef'
@@ -682,6 +715,7 @@ i_limits='define'
 i_locale='define'
 i_machcthr='undef'
 i_malloc='define'
+i_mallocmalloc='undef'
 i_math='define'
 i_memory='undef'
 i_mntent='undef'
@@ -716,6 +750,7 @@ i_sysmode='undef'
 i_sysmount='undef'
 i_sysndir='undef'
 i_sysparam='undef'
+i_syspoll='undef'
 i_sysresrc='undef'
 i_syssecrt='undef'
 i_sysselct='undef'
@@ -783,7 +818,7 @@ issymlink=''
 ivdformat='"ld"'
 ivsize='4'
 ivtype='long'
-known_extensions='B Compress/Raw/Zlib Cwd DB_File Data/Dumper Devel/DProf Devel/PPPort Devel/Peek Digest/MD5 Digest/SHA Encode Fcntl File/Glob Filter/Util/Call GDBM_File Hash/Util Hash/Util/FieldHash I18N/Langinfo IO IPC/SysV List/Util MIME/Base64 Math/BigInt/FastCalc NDBM_File ODBM_File Opcode POSIX PerlIO/encoding PerlIO/scalar PerlIO/via SDBM_File Socket Storable Sys/Hostname Sys/Syslog Text/Soundex Time/HiRes Time/Piece Unicode/Normalize Win32 Win32API/File Win32CORE XS/APItest XS/Typemap attrs re threads threads/shared'
+known_extensions='B Compress/Raw/Bzip2 Compress/Raw/Zlib Cwd DB_File Data/Dumper Devel/DProf Devel/PPPort Devel/Peek Digest/MD5 Digest/SHA Encode Fcntl File/Glob Filter/Util/Call GDBM_File Hash/Util Hash/Util/FieldHash I18N/Langinfo IO IPC/SysV MIME/Base64 Math/BigInt/FastCalc NDBM_File ODBM_File Opcode POSIX PerlIO/encoding PerlIO/scalar PerlIO/via SDBM_File Socket Storable Sys/Hostname Sys/Syslog Text/Soundex Time/HiRes Time/Piece Unicode/Normalize Win32 Win32API/File Win32CORE XS/APItest XS/Typemap attrs mro re threads threads/shared'
 ksh=''
 ld='link'
 lddlflags='-dll -nologo -nodefaultlib -debug -opt:ref,icf  -libpath:"\xampp\perl\lib\CORE"  -machine:x86'
@@ -808,9 +843,9 @@ lkflags=''
 ln=''
 lns='copy'
 localtime_r_proto='0'
-locincpth='/usr/local/include /opt/local/include /usr/gnu/include /opt/gnu/include /usr/GNU/include /opt/GNU/include'
-loclibpth='/usr/local/lib /opt/local/lib /usr/gnu/lib /opt/gnu/lib /usr/GNU/lib /opt/GNU/lib'
-longdblsize='10'
+locincpth='/xampp/include /opt/local/include /usr/gnu/include /opt/gnu/include /usr/GNU/include /opt/GNU/include'
+loclibpth='/xampp/lib /opt/local/lib /usr/gnu/lib /opt/gnu/lib /usr/GNU/lib /opt/GNU/lib'
+longdblsize='8'
 longlongsize='8'
 longsize='4'
 lp=''
@@ -824,7 +859,7 @@ madlyobj=''
 madlysrc=''
 mail=''
 mailx=''
-make='nmake.exe'
+make='nmake'
 make_set_make='#'
 mallocobj='malloc.o'
 mallocsrc='malloc.c'
@@ -845,7 +880,7 @@ multiarch='undef'
 mv=''
 myarchname='MSWin32'
 mydomain=''
-myhostname=''
+myhostname='localhost'
 myuname=''
 n='-n'
 need_va_copy='undef'
@@ -856,11 +891,12 @@ netdb_net_type='long'
 nm=''
 nm_opt=''
 nm_so_opt=''
-nonxs_ext='Compress/Zlib Errno IO_Compress_Base IO_Compress_Zlib'
+nonxs_ext='Attribute/Handlers Errno IO/Compress List/Util Module/Pluggable Safe Test/Harness'
 nroff=''
 nvEUformat='"E"'
 nvFUformat='"F"'
 nvGUformat='"G"'
+nv_overflows_integers_at='256.0*256.0*256.0*256.0*256.0*256.0*2.0*2.0*2.0*2.0*2.0'
 nv_preserves_uv_bits='32'
 nveformat='"e"'
 nvfformat='"f"'
@@ -911,9 +947,14 @@ readdir64_r_proto='0'
 readdir_r_proto='0'
 revision='5'
 rm='del'
+rm_try=''
 rmail=''
 run=''
 runnm='true'
+sGMTIME_max="2147483647"
+sGMTIME_min="0"
+sLOCALTIME_max="2147483647"
+sLOCALTIME_min="0"
 sPRIEUldbl='"E"'
 sPRIFUldbl='"F"'
 sPRIGUldbl='"G"'
@@ -934,7 +975,7 @@ sed='sed'
 seedfunc='srand'
 selectminbits='32'
 selecttype='Perl_fd_set *'
-sendmail='sendmail.exe'
+sendmail='\xampp\sendmail\sendmail.exe'
 setgrent_r_proto='0'
 sethostent_r_proto='0'
 setlocale_r_proto='0'
@@ -942,7 +983,7 @@ setnetent_r_proto='0'
 setprotoent_r_proto='0'
 setpwent_r_proto='0'
 setservent_r_proto='0'
-sh='cmd.exe /x /c'
+sh='cmd /x /c'
 shar=''
 sharpbang='#!'
 shmattype='void *'
@@ -990,8 +1031,8 @@ srand48_r_proto='0'
 srandom_r_proto='0'
 src=''
 ssizetype='int'
-startperl='#!\xampp\perl\bin\perl.exe'
-startsh='#!cmd.exe /x /c'
+startperl='#!perl'
+startsh='#!/bin/sh'
 static_ext='Win32CORE'
 stdchar='char'
 stdio_base='((fp)->_base)'
@@ -1039,7 +1080,9 @@ use5005threads='undef'
 use64bitall='undef'
 use64bitint='undef'
 usecrosscompile='undef'
+usedevel='undef'
 usedl='define'
+usedtrace='undef'
 usefaststdio='undef'
 useithreads='define'
 uselargefiles='define'
@@ -1088,8 +1131,8 @@ vendorprefix=''
 vendorprefixexp=''
 vendorscript=''
 vendorscriptexp=''
-version='5.10.0'
-version_patchlevel_string='version 10 subversion 0'
+version='5.10.1'
+version_patchlevel_string='version 10 subversion 1'
 versiononly='undef'
 vi=''
 voidflags='15'
@@ -1114,13 +1157,27 @@ ldflags_nolargefiles='-nologo -nodefaultlib -debug -opt:ref,icf  -libpath:"\xamp
 libs_nolargefiles=''
 libswanted_nolargefiles=''
 EOVIRTUAL
+eval {
+	# do not have hairy conniptions if this isnt available
+	require 'Config_git.pl';
+	$Config_SH_expanded .= $Config::Git_Data;
+	1;
+} or warn "Warning: failed to load Config_git.pl, something strange about this perl...\n";
 
 # Search for it in the big string
 sub fetch_string {
     my($self, $key) = @_;
 
-    # We only have ' delimted.
-    my $start = index($Config_SH_expanded, "\n$key=\'");
+    my $quote_type = "'";
+    my $marker = "$key=";
+
+    # Check for the common case, ' delimited
+    my $start = index($Config_SH_expanded, "\n$marker$quote_type");
+    # If that failed, check for " delimited
+    if ($start == -1) {
+        $quote_type = '"';
+        $start = index($Config_SH_expanded, "\n$marker$quote_type");
+    }
     # Start can never be -1 now, as we've rigged the long string we're
     # searching with an initial dummy newline.
     return undef if $start == -1;
@@ -1128,8 +1185,18 @@ sub fetch_string {
     $start += length($key) + 3;
 
     my $value = substr($Config_SH_expanded, $start,
-                       index($Config_SH_expanded, "'\n", $start)
+                       index($Config_SH_expanded, "$quote_type\n", $start)
 		       - $start);
+
+    # If we had a double-quote, we'd better eval it so escape
+    # sequences and such can be interpolated. Since the incoming
+    # value is supposed to follow shell rules and not perl rules,
+    # we escape any perl variable markers
+    if ($quote_type eq '"') {
+	$value =~ s/\$/\\\$/g;
+	$value =~ s/\@/\\\@/g;
+	eval "\$value = \"$value\"";
+    }
     # So we can say "if $Config{'foo'}".
     $value = undef if $value eq 'undef';
     $self->{$key} = $value; # cache it
@@ -1143,7 +1210,10 @@ sub FIRSTKEY {
 }
 
 sub NEXTKEY {
-    my $pos = index($Config_SH_expanded, qq('\n), $prevpos) + 2;
+    # Find out how the current key's quoted so we can skip to its end.
+    my $quote = substr($Config_SH_expanded,
+		       index($Config_SH_expanded, "=", $prevpos)+1, 1);
+    my $pos = index($Config_SH_expanded, qq($quote\n), $prevpos) + 2;
     my $len = index($Config_SH_expanded, "=", $pos) - $pos;
     $prevpos = $pos;
     $len > 0 ? substr($Config_SH_expanded, $pos, $len) : undef;
@@ -1153,6 +1223,7 @@ sub EXISTS {
     return 1 if exists($_[0]->{$_[1]});
 
     return(index($Config_SH_expanded, "\n$_[1]='") != -1
+           or index($Config_SH_expanded, "\n$_[1]=\"") != -1
           );
 }
 

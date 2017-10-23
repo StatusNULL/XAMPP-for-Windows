@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!"\xampp\perl\bin\perl.exe"
 # -*- cperl -*-
 #
 # Copyright (C) 2002 MySQL AB and Jeremy Cole

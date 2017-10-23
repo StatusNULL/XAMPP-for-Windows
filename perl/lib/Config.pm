@@ -1,6 +1,10 @@
 # This file was created by configpm when Perl was built. Any changes
 # made to this file will be lost the next time perl is built.
 
+# for a description of the variables, please have a look at the
+# Glossary file, as written in the Porting folder, or use the url:
+# http://perl5.git.perl.org/perl.git/blob/HEAD:/Porting/Glossary
+
 package Config;
 use strict;
 # use warnings; Pulls in Carp
@@ -40,11 +44,11 @@ sub import {
     return;
 }
 
-die "Perl lib version (5.10.0) doesn't match executable version ($])"
+die "Perl lib version (5.10.1) doesn't match executable version ($])"
     unless $^V;
 
-$^V eq 5.10.0
-    or die "Perl lib version (5.10.0) doesn't match executable version (" .
+$^V eq 5.10.1
+    or die "Perl lib version (5.10.1) doesn't match executable version (" .
 	sprintf("v%vd",$^V) . ")";
 
 
@@ -91,5 +95,5 @@ tie %Config, 'Config', {
     sitelibexp => '\\xampp\\perl\\site\\lib',
     useithreads => 'define',
     usevendorprefix => undef,
-    version => '5.10.0',
+    version => '5.10.1',
 };

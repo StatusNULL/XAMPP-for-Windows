@@ -98,7 +98,7 @@
 
     $TEXT['security-head'] = "SICUREZZA DI XAMPP";
     $TEXT['security-text1'] = "Questa pagina offre una panoramica sulla sicurezza della tua installazione XAMPP. (Cortesemente, continua a leggere dopo la tabella.)";
-    $TEXT['security-text2'] = "Le voci contrassegnate in verde sono sicure; quelle in rosso sono assolutamente non sicure e quelle in giallo non sono state valutate (ad esempio perchè il software di verifica non è in esecuzione).<p><p>To fix the problems for mysql, phpmyadmin and the xampp directory simply use</b><p>=> <a href=\"/security/xamppsecurity.php\"><b>http://localhost/security/xamppsecurity.php</b></a> <= &nbsp;&nbsp;[allowed only for localhost]";
+    $TEXT['security-text2'] = "Le voci contrassegnate in verde sono sicure; quelle in rosso sono assolutamente non sicure e quelle in giallo non sono state valutate (ad esempio perchè il software di verifica non è in esecuzione).<p><p>To fix the problems for mysql, phpmyadmin and the xampp directory simply use</b><p>=> <a href=\"/security/xamppsecurity.php\"><b>http://localhost/security/xamppsecurity.php</b></a> <=";
     $TEXT['security-text3'] = "";
     $TEXT['security-text4'] = "";
 

@@ -61,7 +61,7 @@ foreach(@path) { $_ = "." if $_ eq '' }
 # throw in a few more paths for good measure
 push @path, qw(
 	/usr/bin
-	/usr/local/bin
+	/xampp/bin
 	/opt/gnu/bin
 	/usr/ccs/bin
 	/

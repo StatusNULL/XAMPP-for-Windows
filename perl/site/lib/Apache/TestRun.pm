@@ -1562,7 +1562,7 @@ present. An example of such a configuration file is
       'group' => 'me',
       'user' => 'myself',
       'port' => '8529',
-      'httpd' => '/usr/local/apache/bin/httpd',
+      'httpd' => '/xampp/apache/bin/httpd',
 
   };
   1;

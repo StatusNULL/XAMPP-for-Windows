@@ -98,7 +98,7 @@
 
     $TEXT['security-head'] = "XAMPP SICHERHEIT";
     $TEXT['security-text1'] = "Anhand dieser Übersicht kann man sehen welche Punkte an der XAMPP-Installation noch unsicher sind und noch überprüft werden müssten. (Bitte unter der Tabelle weiterlesen.)";
-    $TEXT['security-text2'] = "Die grün markierten Punkte sind sicher; die rot marktierten Punkte sind definitiv unsicher und bei den gelb martierten Punkten konnte die Sicherheit nicht überprüft werden (zum Beispiel weil das zu testende Programm gar nicht läuft).<br>&nbsp;<br><b>Diese Sicherheitslücken im XAMPP Verzeichnis, dem ROOT Passwort für MySQL und der Sicherung von PHPMyAdmin können nun einfach über den folgenden Link geschlossen werden:</b><p>=> <a href=\"/security/xamppsecurity.php\"><b>http://localhost/security/xamppsecurity.php</b></a> <= &nbsp;&nbsp;[nur über localhost möglich]<br>&nbsp;<br>&nbsp;<br>
+    $TEXT['security-text2'] = "Die grün markierten Punkte sind sicher; die rot marktierten Punkte sind definitiv unsicher und bei den gelb martierten Punkten konnte die Sicherheit nicht überprüft werden (zum Beispiel weil das zu testende Programm gar nicht läuft).<br>&nbsp;<br><b>Diese Sicherheitslücken im XAMPP Verzeichnis, dem ROOT Passwort für MySQL und der Sicherung von PHPMyAdmin können nun einfach über den folgenden Link geschlossen werden:</b><p>=> <a href=\"/security/xamppsecurity.php\"><b>http://localhost/security/xamppsecurity.php</b></a> <=<br>&nbsp;<br>&nbsp;<br>
     Weitere wichtige Hinweise:<ul>
     <li>Alle XAMPP Prüfungen beziehen sich nur auf den Host \"localhost\" (127.0.0.1).</li>
     <li><i><b>Der FileZilla FTP und der Mercury Mail Server müsst ihr selbst absichern !!</b></i></li>

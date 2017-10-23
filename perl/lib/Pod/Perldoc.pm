@@ -1509,7 +1509,7 @@ sub containspod {
     return 1 if !$readit && $file =~ /\.pod\z/i;
 
 
-    #  Under cygwin the /usr/bin/perl is legal executable, but
+    #  Under cygwin the /xampp/perl/bin/perl.exe is legal executable, but
     #  you cannot open a file with that name. It must be spelled
     #  out as "/usr/bin/perl.exe".
     #

@@ -111,11 +111,11 @@ would.  Stop the webserver when your tests are complete.  Profile data
 files will be produced when Apache exits and you'll see something like
 this in your error_log:
 
-  DBI::ProfileDumper::Apache writing to /usr/local/apache/logs/dbi.prof.2604.2619
+  DBI::ProfileDumper::Apache writing to /xampp/apache/logs/dbi.prof.2604.2619
 
 Now you can use dbiprof to examine the data:
 
-  dbiprof /usr/local/apache/logs/dbi.prof.2604.*
+  dbiprof /xampp/apache/logs/dbi.prof.2604.*
 
 By passing dbiprof a list of all generated files, dbiprof will
 automatically merge them into one result set.  You can also pass
@@ -126,7 +126,7 @@ dbiprof sorting and querying options, see L<dbiprof> for details.
 Once you've made some code changes, you're ready to start again.
 First, delete the old profile data files:
 
-  rm /usr/local/apache/logs/dbi.prof.*
+  rm /xampp/apache/logs/dbi.prof.*
 
 Then restart your server and get back to work.
 

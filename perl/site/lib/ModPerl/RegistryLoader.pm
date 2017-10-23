@@ -263,8 +263,8 @@ C<ServerRoot> configuration directive.  For example:
 
   httpd.conf:
   -----------
-  ServerRoot /usr/local/apache
-  Alias /registry/ /usr/local/apache/cgi-bin/
+  ServerRoot /xampp/apache
+  Alias /registry/ /xampp/apache/cgi-bin/
 
   startup.pl:
   -----------
@@ -272,7 +272,7 @@ C<ServerRoot> configuration directive.  For example:
   my $rl = ModPerl::RegistryLoader->new(
       package => 'ModPerl::Registry',
   );
-  # preload /usr/local/apache/cgi-bin/test.pl
+  # preload /xampp/apache/cgi-bin/test.pl
   $rl->handler(/registry/test.pl);
 
 To make the loader smarter about the URI-E<gt>filename translation,
@@ -284,8 +284,8 @@ the I<cgi-bin> directory relative to C<ServerRoot>.
 
   httpd.conf:
   -----------
-  ServerRoot /usr/local/apache
-  Alias /registry/ /usr/local/apache/cgi-bin/
+  ServerRoot /xampp/apache
+  Alias /registry/ /xampp/apache/cgi-bin/
 
   startup.pl:
   -----------

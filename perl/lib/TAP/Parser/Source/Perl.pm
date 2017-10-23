@@ -234,7 +234,7 @@ May be called as a class method
 Decode any taint switches from a Perl shebang line.
 
   # $taint will be 't'
-  my $taint = TAP::Parser::Source::Perl->get_taint( '#!/usr/bin/perl -t' );
+  my $taint = TAP::Parser::Source::Perl->get_taint( '#!/xampp/perl/bin/perl.exe -t' );
 
   # $untaint will be undefined
   my $untaint = TAP::Parser::Source::Perl->get_taint( '#!/usr/bin/perl' );

@@ -198,17 +198,17 @@
             fputs($datei,$insert);
             fclose($datei);
 
+            $curdir=getcwd();
             chdir($partwampp."\security"); // Fix by Wiedmann
             $htpassrealm = "start /b \"\" \"$htpasswdexe\" -c -m -b .\\xampp.users $xauser $xapasswd";
             $handle = popen($htpassrealm, 'w');
             pclose($handle);
             chdir($curdir);
-            if ($xapfile=="yes")
-            {
-            $datei = fopen($xapasswdtxtdir, 'w+');
-            $put = "XAMPP user = $xauser\r\nXAMPP password = $xapasswd";
-            fputs($datei, $put);
-            fclose($datei);
+            if ($xapfile=="yes")    {
+                $datei = fopen($xapasswdtxtdir, 'w+');
+                $put = "XAMPP user = $xauser\r\nXAMPP password = $xapasswd";
+                fputs($datei, $put);
+                fclose($datei);
             }
             $hdir = $dir.'htdocs\\';
             copy($htxampp, $dir.'htdocs\\.htaccess');
