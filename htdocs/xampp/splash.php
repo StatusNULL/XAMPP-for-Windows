@@ -1,5 +1,6 @@
 <html>
 <head><title>XAMPP</title>
+<link REL="icon" HREF="img/xampp.ico">
 <link href="xampp.css" rel="stylesheet" type="text/css">
 </head>
 

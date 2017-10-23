@@ -7,6 +7,7 @@
 ?>
 <html>
 <head>
+<link REL="icon" HREF="img/xampp.ico">
 <meta name="author" content="Kai Oswald Seidler, Kay Vogelgesang">
 <?include("lang/".file_get_contents("lang.tmp").".php"); ?>
 <title><?=$TEXT['global-xampp']?> <?include('.version');?></title>
