@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_addfield.php,v 2.11 2005/01/07 14:33:20 lem9 Exp $ */
+/* $Id: tbl_addfield.php,v 2.11.2.1 2005/02/03 19:56:54 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -62,8 +62,10 @@ if (isset($submit_num_fields)) {
         }
         if ($field_attribute[$i] != '') {
             $query .= ' ' . $field_attribute[$i];
-        } else if (PMA_MYSQL_INT_VERSION >= 40100 && isset($field_charset[$i]) && $field_charset[$i] != '') {
-            $query .= ' CHARACTER SET ' . $field_charset[$i];
+        } else if (PMA_MYSQL_INT_VERSION >= 40100 && isset($field_collation[$i]) && $field_collation[$i] != '') {
+            list($tmp_charset) = explode('_', $field_collation[$i]);
+            $query .= ' CHARACTER SET ' . $tmp_charset . ' COLLATE ' . $field_collation[$i];
+            unset($tmp_charset);
         }
         if ($field_default[$i] != '') {
             if (strtoupper($field_default[$i]) == 'NULL') {

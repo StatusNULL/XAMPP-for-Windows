@@ -3,7 +3,7 @@
 // GLOBAL
 // ---------------------------------------------------------------------
 
-$TEXT['global-xampp']="XAMPP 1.4.11 voor Windows";
+$TEXT['global-xampp']="XAMPP for Windows";
 $TEXT['global-showcode']="Toon de broncode";
 $TEXT['global-sourcecode']="Broncode";
 
@@ -54,6 +54,8 @@ $TEXT['navi-french']="Francais";
 $TEXT['navi-dutch']="Nederlands";
 $TEXT['navi-polish']="Polski";
 $TEXT['navi-spanish']="Español";
+$TEXT['navi-norwegian']="Norsk";
+$TEXT['navi-italian']="Italiano";
 $TEXT['navi-chinese']="&#20013;&#25991;";
 
 // ---------------------------------------------------------------------

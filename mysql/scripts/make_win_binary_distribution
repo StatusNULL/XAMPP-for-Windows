@@ -6,7 +6,7 @@
 # This is intended to be used under Cygwin, and will generate
 # an archive named in the form mysql<suffix>-<version>-noinstall.zip
 
-version=4.1.10
+version=4.1.11
 
 DEBUG=0
 SUFFIX=""
@@ -109,6 +109,10 @@ cp -fr tests $DIRNAME/examples
 print_debug "Copying sql-bench to $DIRNAME/bench"
 mkdir $DIRNAME/bench
 cp -fr sql-bench/* $DIRNAME/bench
+
+print_debug "Copying mysql-test to $DIRNAME/mysql-test"
+mkdir $DIRNAME/mysql-test
+cp -fr mysql-test/* $DIRNAME/mysql-test
 
 print_debug "Copying support-files to $DIRNAME"
 cp support-files/* $DIRNAME

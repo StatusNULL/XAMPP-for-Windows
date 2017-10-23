@@ -50,6 +50,8 @@ $TEXT['navi-german']="Deutsch";
 $TEXT['navi-french']="Francais";
 $TEXT['navi-dutch']="Nederlands";
 $TEXT['navi-spanish']="Spanish";
+$TEXT['navi-norwegian']="Norsk";
+$TEXT['navi-italian']="Italiano";
 
 // ---------------------------------------------------------------------
 // STATUS

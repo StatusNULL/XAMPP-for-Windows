@@ -1,7 +1,7 @@
 This snapshot was automatically generated on
-Wed,  8 Dec 2004 10:42:56 +0100
+Thu, 31 Mar 2005 02:52:16 +0200
 
-Version: 5.0.3RC2-dev
+Version: 5.0.4
 Branch: HEAD
 Build: Release_TS
 

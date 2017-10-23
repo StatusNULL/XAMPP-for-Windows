@@ -1,4 +1,4 @@
-<p align="center"><b><u>FileZilla Server version 0.9.4e beta</u></b></p>
+<p align="center"><b><u>FileZilla Server version 0.9.6a beta</u></b></p>
 <p align="center">Copyright 2001-2004<br>
 by <a href="mailto:Tim.Kosse@gmx.de">Tim Kosse</a><a href="http://sourceforge.net/projects/filezilla/"><br>
 http://sourceforge.net/projects/filezilla/</a></p>
@@ -67,6 +67,41 @@ as restoring it to normal size.</p>
   </tr>
 </table>
 <p align="left"><b><u>Version History:</u></b></p>
+<p><b>Version 0.9.6a</b></p>
+<blockquote>
+  <u>fixed bugs:</u>
+  <ul>
+    <li>Sockets for admin interface or transfer connections could not be created on all systems</li>
+    <li>Input box for the listen ports did not accept separator characters.</li>
+    <li>reserved MSDOS device name did not work properly</li>
+  </ul>
+</blockquote>
+<p><b>Version 0.9.6</b></p>
+<blockquote>
+  <u>New features:</u>
+  <ul>
+    <li>SSL/TLS encryption. This feature is still experimental, use at your own risk.</li>
+  </ul>
+  <u>Fixed bugs:</u>
+  <ul>
+    <li>Infinite loop on file uploads or directory listings if using zlib compression</li>
+    <li>Sending commands with filenames as arguments which did contain reserved MSDOS device names (such as NUL, CON, COM1, LPT1) could freeze FileZilla Server on older systems. Those filenames are now considered invalid</li>
+    <li>Fixed crash if taking server offline</li>
+    <li>Connection limits for users did not work as intended</li>
+    <li>The /reload-config command line switch has been fixed</li>
+  </ul>
+</blockquote>
+<p><b>Version 0.9.5</b></p>
+<blockquote>
+  <u>fixed bugs:</u>
+  <ul>
+    <li>Typo in anti-hammering code, delayed connections were never unstalled</li>
+    <li>Aliases for directories containing :u did not work if username did contain uppercase chars</li>
+    <li>If renaming groups, adjust user accounts accordingly</li>
+    <li>If deleting groups which are in use, ask what to do with the affected users</li>
+    <li>Use same network interface for transfer connection as for the control connection to solve some firewall issues, patch by dartonw</li>
+  </ul>
+</blockquote>
 <p><b>Version 0.9.4e</b></p>
 <blockquote>
   <u>fixed bugs:</u>

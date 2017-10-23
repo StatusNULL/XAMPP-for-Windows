@@ -1,5 +1,5 @@
 <?php
-/* $Id: mysql_charsets.lib.php,v 2.24 2004/11/19 14:04:02 garvinhicking Exp $ */
+/* $Id: mysql_charsets.lib.php,v 2.24.2.1 2005/02/23 13:53:55 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 if (PMA_MYSQL_INT_VERSION >= 40100){
@@ -197,6 +197,8 @@ if (PMA_MYSQL_INT_VERSION >= 40100){
                     // Japanese charsets
                     case 'sjis':
                     case 'ujis':
+                    case 'cp932':
+                    case 'eucjpms':
                         $descr = $GLOBALS['strJapanese'];
                         break;
                     // Baltic charsets

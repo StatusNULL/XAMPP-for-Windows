@@ -1,5 +1,5 @@
 <?php
-/* $Id: grab_globals.lib.php,v 2.5 2004/05/20 16:14:11 nijel Exp $ */
+/* $Id: grab_globals.lib.php,v 2.5.4.5 2005/03/03 20:39:28 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -12,18 +12,38 @@
  * loic1 - 2001/25/11: use the new globals arrays defined with php 4.1+
  */
 
-function PMA_gpc_extract($array, &$target) {
+function PMA_gpc_extract($array, &$target, $sanitize = TRUE) {
     if (!is_array($array)) {
         return FALSE;
     }
     $is_magic_quotes = get_magic_quotes_gpc();
     foreach ($array AS $key => $value) {
+        /**
+         * 2005-02-22, rabus:
+         *
+         * This is just an ugly hotfix to avoid changing internal config
+         * parameters.
+         *
+         * Currently, the following variable names are rejected when found in
+         * $_GET or $_POST: cfg, GLOBALS, str* and _*
+         *
+         * Warning: this also affects array keys:
+         * Variables like $_GET['harmless']['cfg'] will also be rejected!
+         */
+        if ($sanitize && is_string($key) && (
+            $key == 'cfg'
+            || $key == 'GLOBALS'
+            || substr($key, 0, 3) == 'str'
+            || $key{0} == '_')) {
+            continue;
+        }
+
         if (is_array($value)) {
             // there could be a variable coming from a cookie of
             // another application, with the same name as this array
             unset($target[$key]);
 
-            PMA_gpc_extract($value, $target[$key]);
+            PMA_gpc_extract($value, $target[$key], FALSE);
         } else if ($is_magic_quotes) {
             $target[$key] = stripslashes($value);
         } else {

@@ -1,12 +1,12 @@
 <?php
-/* $Id: japanese-utf-8.inc.php,v 2.57 2005/01/09 20:59:49 lem9 Exp $ */
+/* $Id: japanese-utf-8.inc.php,v 2.57.2.1 2005/01/29 21:17:13 rabus Exp $ */
 
 /**
  * Translated by Yukihiro Kawada <kawada at den.fujifilm.co.jp>
  *               Tadashi Jokagi <elf2000 at users.sourceforge.net>
  */
 
-$charset = 'UTF-8';
+$charset = 'utf-8';
 $allow_recoding = TRUE;
 $text_dir = 'ltr';
 $left_font_family = 'verdana, arial, helvetica, geneva, sans-serif';

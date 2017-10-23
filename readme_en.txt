@@ -1,25 +1,25 @@
-  ApacheFriends XAMPP (basic package) version 1.4.12
+  ApacheFriends XAMPP (basic package) version 1.4.13
 
   + Apache 2.0.53
-  + MySQL 4.1.9
-  + PHP 5.0.3 + PHP 4.3.10 + PEAR
+  + MySQL 4.1.11
+  + PHP 5.0.4 + PHP 4.3.11 + PEAR
   + eAccelerator 0.9.2a
   + PHP-Switch win32 1.0 (von Apachefriends, man nehme die "php-switch.bat") 
   + XAMPP Control Version 1.0	
   + XAMPP Security 1.0	
   + SQLite 2.8.15
-  + OpenSSL 0.9.7e
-  + PHPMyAdmin 2.6.1
+  + OpenSSL 0.9.7f
+  + phpMyAdmin 2.6.1-pl3
   + ADODB 4.60
   + Mercury Mail Transport System for Win32 and NetWare Systems v4.01a
-  + FileZilla FTP Server 0.9.4e
+  + FileZilla FTP Server 0.9.6a
   + Webalizer 2.01-10
   + Zend Optimizer 2.5.7
  
 * System Requirements:
  
   + 64 MB RAM (recommended)
-  + 115 MB free Fixed Disk 
+  + 160 MB free Fixed Disk 
   + Windows 98, ME, XP Home
   + Windows NT, 2000, XP Professional (Recommended)
 
@@ -165,5 +165,4 @@ MYSQL NOTES:
   	    	
 ---------------------------------------------------------------    
 Have a lot of fun! Viel Spaﬂ! Bonne Chance!
-Last revised version 28.12.2004 Kay Vogelgesang
      

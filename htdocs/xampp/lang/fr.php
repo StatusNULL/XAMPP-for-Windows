@@ -46,12 +46,14 @@ $TEXT['navi-specialguest']="Invité";
 $TEXT['navi-guest1']="FCKeditor";
 
 $TEXT['navi-languages']="Langues";
+$TEXT['navi-french']="Francais";
 $TEXT['navi-english']="English";
 $TEXT['navi-german']="Deutsch";
-$TEXT['navi-french']="Francais";
 $TEXT['navi-dutch']="Nederlands";
 $TEXT['navi-polish']="Polski";
 $TEXT['navi-spanish']="Español";
+$TEXT['navi-norwegian']="Norsk";
+$TEXT['navi-italian']="Italiano";
 $TEXT['navi-chinese']="&#20013;&#25991;";
 
 // ---------------------------------------------------------------------

@@ -64,7 +64,9 @@
 <a target=_parent class=n href="lang.php?nl"><?=$TEXT['navi-dutch']?></a><br>
 <a target=_parent class=n href="lang.php?pl"><?=$TEXT['navi-polish']?></a><br>
 <a target=_parent class=n href="lang.php?es"><?=$TEXT['navi-spanish']?></a><br>
-<a target=_parent class=n href="lang.php?zh"><?=$TEXT['navi-chinese']?></a><p>
+<a target=_parent class=n href="lang.php?zh"><?=$TEXT['navi-chinese']?></a><br>
+<a target=_parent class=n href="lang.php?it"><?=$TEXT['navi-italian']?></a><br>
+<a target=_parent class=n href="lang.php?no"><?=$TEXT['navi-norwegian']?></a><p>
 
 
 <p class=navi>&copy;2002/2005<br>

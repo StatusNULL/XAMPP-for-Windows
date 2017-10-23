@@ -78,7 +78,7 @@ pkglibdir='/usr/local/lib/mysql'
 fix_path pkglibdir lib/mysql lib
 pkgincludedir='/usr/local/include/mysql'
 fix_path pkgincludedir include/mysql include
-version='4.1.10'
+version='4.1.11'
 socket='/tmp/mysql.sock'
 port='3306'
 ldflags=''

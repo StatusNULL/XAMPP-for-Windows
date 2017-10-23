@@ -1,5 +1,5 @@
 <html>
-<head><title>XAMPP</title>
+<head><title>XAMPP 1.4 WIN32</title>
 <link href="xampp.css" rel="stylesheet" type="text/css">
 </head>
 
@@ -19,7 +19,9 @@
 <a href="/xampp/lang.php?nl">Nederlands</a> / 
 <a href="/xampp/lang.php?es">Spanish</a> /
 <a href="/xampp/lang.php?pl">Polish</a> / 
-<a href="/xampp/lang.php?zh">Chinese</a>
+<a href="/xampp/lang.php?zh">Chinese</a> /
+<a href="/xampp/lang.php?it">Italiano</a> /
+<a href="/xampp/lang.php?no">Norsk</a> 
 </center>
 </body>
 </html>

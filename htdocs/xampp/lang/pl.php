@@ -51,6 +51,8 @@ $TEXT['navi-dutch']="Nederlands";
 $TEXT['navi-spanish']="Spanish";
 $TEXT['navi-polish']="Polski";
 $TEXT['navi-spanish']="Español";
+$TEXT['navi-norwegian']="Norsk";
+$TEXT['navi-italian']="Italiano";
 $TEXT['navi-chinese']="&#20013;&#25991;";
 
 // ---------------------------------------------------------------------

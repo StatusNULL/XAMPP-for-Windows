@@ -1,5 +1,5 @@
 <?php
-/* $Id: cookie.auth.lib.php,v 2.23 2004/11/30 16:12:39 lem9 Exp $ */
+/* $Id: cookie.auth.lib.php,v 2.23.2.1 2005/02/23 18:07:19 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 // +--------------------------------------------------------------------------+
@@ -406,6 +406,11 @@ function PMA_auth_check()
     global $PHP_AUTH_USER, $PHP_AUTH_PW, $pma_auth_server;
     global $pma_servername, $pma_username, $pma_password, $old_usr, $server;
     global $from_cookie;
+
+    // avoid an error in mcrypt
+    if ($GLOBALS['cfg']['blowfish_secret']=='') {
+        return FALSE;
+    }
 
     // Initialization
     $PHP_AUTH_USER = $PHP_AUTH_PW = '';
