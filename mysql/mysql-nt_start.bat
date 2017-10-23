@@ -1,0 +1,1 @@
+bin\mysqld-nt --defaults-file=mysql\bin\my.nt-cnf

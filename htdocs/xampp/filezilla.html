@@ -1,0 +1,47 @@
+<!doctype html public "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; Charset=iso-8859-1">
+<title>FileZilla FTP</title>
+<meta name="author" content="Kay Vogelgesang">
+<link href="xampp.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<br>
+<table width=600 cellpadding=0 cellspacing=0 border=0>
+<tr>
+  <td>
+<h1>FileZilla FTP Server</h1><p>
+ <h2>Also der Apache ist kein FTP-Server ...  </h2>
+  <h2></h2>
+<p>
+  ... da er nun einmal das Protokoll HTTP (Hypertext Transfer Protocol) und eben nicht noch FTP (File Transfer Protocol)  verwaltet. Also muss einer her!<p>
+Ab dir Version 0.9 wird im xampp der freie und über sourceforge.net vertriebene FTP Server "FileZilla FTP" mit geliefert. Die Benutzung von "FileZilla FTP" ist denkbar einfach.<br><br>
+
+
+Schritt 1: Einfach die Datei "FileZillaFTP_start.bat" im Hauptverzeichnis des xampp starten. Beim ersten Start wird automatisch eine Beispiel Konfiguration in dem Filezilla Verzeichnis namens "FileZilla Server.xml" erstellt. Der Server wird dann gestartet. Über die "FileZilla Server_example.xml" könnt ihr auch selbst Hand anlegen, sollte etwas schief laufen, vorher umbenennen in "FileZilla Server.xml". Nur wenn was nicht so klappt ..<br><br>
+
+Schritt 2: Nun könnt ihr "FileZilla FTP" konfigurieren. Nutzt dazu das FileZilla Interface namens "FileZilla Server Interface.exe" im FileZilla-Verzeichnis. Natürlich könnt ihr euch an der Beispielkonfiguration orientieren. Zwei Nutzer wurde in dem Beispiel angelegt:<br><br>
+A: Ein Standardnutzer namens "xampp", Kennwort "wampp". Das Heimatverzeichnis ist \xampp\htdocs.<br> 
+B: Ein Anonymous User namens "anonymous", kein Kennwort. Das Heimatverzeichnis ist \xampp\anonymous. Kann via Browser mit <A HREF="ftp://127.0.0.1" target="_new">ftp://127.0.0.1</A> angesprochen werden. Aber vorher FileZilla starten!<br><br>
+Der FileZilla ist hier erst einmal nur über die Loopback Adresse 127.0.0.1 gebunden, ihr könnt den zu nutzenden IP Addressbereich aber noch über das FileZilla Interface ändern. 
+<br><br>  
+Schritt 3: Den FTP Server stoppen mit "FileZillaFTP_stop.bat". Wer den Server als Dienst starten möchte, sollte die Exekute-Datei mal mit Doppelklick auf "FileZillaServer.exe" starten. Dieser fragt dann nach den ganzen Startoptionen. 
+
+<p><p>
+Bilder:<p>
+<img border="0" src="img/FileZilla1.gif" width="457" height="364"><br>
+Die Konfigurationskonsole &quot;FileZilla Server Interface.exe&quot;<p>
+<img border="0" src="img/FileZilla3.gif" width="465" height="348"><br>
+Anonymous FTP über den Browser<p>
+<img border="0" src="img/FileZilla2.gif" width="609" height="441"><br>
+Mit dem xampp User und WS FTP auf dem Server anmelden (Passwort: wampp)&nbsp; <p>
+
+
+   
+   </td>
+  </tr>
+  </table>
+
+</body>
+</html>
