@@ -1,3 +1,7 @@
+<?php
+	$webalizer = "webalizer.bat";
+	system($webalizer);
+?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 	"http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -8,23 +12,11 @@
 	</head>
 
 	<body>
+		&nbsp;<p>
 		<pre>
-
-<?php
-    set_time_limit(0);
-    while (@ob_end_flush());
-	system('webalizer.bat');
-?>
+			<script language="JavaScript" type="text/javascript">
+				document.location = "/webalizer/";
+			</script>
 		</pre>
-		<script type="text/javascript">
-	    <!--
-	        window.setTimeout("window.location.replace('/webalizer/');", 5000);
-		//-->
-		</script>
-        <noscript>
-            <br>
-            <a href="/webalizer/">Click here to view the statistics.</a>
-        </noscript>
-
 	</body>
 </html>

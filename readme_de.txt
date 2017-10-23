@@ -1,60 +1,56 @@
-###### Apache Friends XAMPP (Basispaket) version 1.7.3 ######
+###### ApacheFriends XAMPP (Basispaket) version 1.7.4 ######
 
-  + Apache 2.2.14 (IPV6 enabled)
-  + MySQL 5.1.41 (Community Server) mit PBXT engine 1.0.09-rc
-  + PHP 5.3.1 (PEAR, Mail_Mime, MDB2, Zend)
-  + Perl 5.10.1 (Bundle::Apache2, Apache2::Request, Bundle::Apache::ASP, Bundle::Email, Bundle::DBD::mysql, DBD::SQlite, Randy Kobes PPM)
-  + XAMPP Control Version 2.5.8 (ApacheFriends Edition)
-  + XAMPP CLI Bundle 1.6
-  + XAMPP Port Check 1.5
-  + XAMPP Security 1.1
-  + SQLite 2.8.17
-  + SQLite 3.6.20
-  + OpenSSL 0.9.8l
-  + phpMyAdmin 3.2.4
-  + ADOdb v5.10
-  + FPDF v1.6
-  + Zend Framework 1.9.6 Minimal Package (via PEAR)
-  + Mercury Mail Transport System v4.72
-  + msmtp 1.4.19 (ein sendmail kompatibler SMTP client)
-  + FileZilla FTP Server 0.9.33
-  + Webalizer 2.21-02 (mit GeoIP lite)
-  + apc 3.1.3p1 für PHP
-  + eAccelerator 0.9.6-rc1 für PHP
-  + Ming 0.4.3 für PHP
-  + PDF mit pdflib lite v7.0.4p4 für PHP
-  + rar 2.0.0-dev für PHP
-  + Xdebug 2.0.6-dev für PHP
-  + libapreq2 v2.12 (mod_apreq2) für Apache
+  + Apache 2.2.17
+  + MySQL 5.5.8 (Community Server)
+  + PHP 5.3.5 (VC6 X86 32bit) + PEAR 
+  + XAMPP Control Version 2.5 from www.nat32.com
+  + XAMPP Security
+  + SQLite 2.8.15
+  + OpenSSL 0.9.8o
+  + phpMyAdmin 3.3.9
+  + ADOdb 5.11
+  + Mercury Mail Transport System v4.62
+  + FileZilla FTP Server 0.9.37
+  + Webalizer 2.01-10
+  + Zend Optimizer 3.3.0 
+  + Perl 5.10.1
+  + Mod_perl 2.0.4
+  + Tomcat 7.0.3 
 
----------------------------------------------------------------
+--------------------------------------------------------------- 
 
 * System-Voraussetzungen:
+  
+  + 64 MB RAM (EMPFOHLEN)
+  + 350 MB freier Speicherplatz
+  + Windows NT, 2000, 2003, XP (EMPFOHLEN), VISTA
+  + 32 Bit Systeme (NICHT 64 bit) 
+  
+* ACHTUNG!!!!
 
-  + 128 MB RAM
-  + 320 MB freier Speicherplatz
-  + Windows 2000, XP (Server 2003), Vista (Server 2008), 7
-  + alle Systeme 32 bit (64 bit sollte auch funktionieren)
+Wenn ihr Probleme mit der mysql Verbindung via php bzw. phpMyAdmin (pber die mysqlnd API) habt dann schaut bitte unbedingt hier: 
+http://localhost/xampp/index.php
+
 
 * SCHNELLINSTALLATION:
 
-[HINWEIS: Auf die obersten Hirachie eines beliebigen Laufwerks bzw. auf dem Wechseldatenträger des USB-Sticks entpacken => E:\ oder W:\. Es entsteht E:\xampp oder W:\xampp.]
+[HINWEIS: Auf die obersten Hirachie eines beliebigen Laufwerks bzw. auf dem Wechseldatenträger des USB-Sticks entpacken => E:\ oder W:\. Es entsteht E:\xampp oder W:\xampp. Für den USB-Stick nicht die "setup_xampp.bat" nutzen, um ihn auch transportabel nutzen zu können!]
 
 Schritt 1: Das Setup mit der Datei "setup_xampp.bat" im XAMPP-Verzeichnis starten. Bemerkung: XAMPP macht selbst keine Einträge in die Windows Registry und setzt auch keine Systemvariablen.
 
-Schritt 2: Starten Sie den Apache mit dem Control Panel (xampp-control.exe) oder wahlweise mit => \xampp\apache_start.bat.
-           Stoppen Sie den Apache mit dem Control Panel (xampp-control.exe) oder wahlweise mit => \xampp\apache_stop.bat.
+Schritt 2: Starten Sie den Apache2 mit PHP5.x mit dem Control Panel (xampp-control.exe) oder wahlweise mit => \xampp\apache_start.bat. 
+Stoppen Sie den Apache2 mit PHP5.x mit dem Control Panel (xampp-control.exe) oder wahlweise mit => \xampp\apache_stop.bat. 
 
 Schritt 3: Starten Sie MySQL mit dem Control Panel (xampp-control.exe) oder wahlweise mit => \xampp\mysql_start.bat.
-           Stoppen Sie MySQL mit dem Control Panel (xampp-control.exe) oder wahlweise mit => \xampp\mysql_stop.bat.
+Stoppen Sie MySQL mit dem Control Panel (xampp-control.exe) oder wahlweise mit => \xampp\mysql_stop.bat.
 
-Schritt 4: Öffne deinen Browser und gebe http://127.0.0.1/ oder http://localhost/ ein. Danach gelangst du zu den zahlreichen ApacheFriends-Beispielen auf dem lokalen Server.
+Schritt 4: Öffne deinen Browser und gebe http://127.0.0.1 oder http://localhost ein. Danach gelangst du zu den zahlreichen ApacheFriends-Beispielen auf Ihrem lokalen Server.
 
-Schritt 5: Das Root-Verzeichnis (Hauptdokumente) für HTTP(S) ist => \xampp\htdocs. PHP hat die Endung *.php, SSI *.shtml , CGI *.cgi (z.B. auch für Perlskripte), Perl *.pl und ASP *.asp
+Schritt 5: Das Root-Verzeichnis (Hauptdokumente) für HTTP (oft HTML) ist => C:\xampp\htdocs. PHP kann die Endungen  *.php, *.php3, *.php4, *.php5, *.phtml haben, *.shtml für SSI, *.cgi für CGI (z. B.: Perl).
 
 Schritt 6: XAMPP DEINSTALLIEREN?
-           Einfach das "XAMPP"-Verzeichnis löschen. Vorher aber alle Server stoppen bzw. als Dienste deinstallieren.
-           Alternativ die Datei "uninstall_xampp.bat" ausführen.
+Einfach das "XAMPP"-Verzeichnis löschen. Vorher aber alle Server stoppen 
+bzw. als Dienste deinstallieren.
 
 ---------------------------------------------------------------
 
@@ -69,59 +65,47 @@ Schritt 6: XAMPP DEINSTALLIEREN?
 2) FileZilla FTP:
 
    Benutzer: newuser
-   Passwort: wampp
+   Passwort: wampp 
 
    Benutzer: anonymous
    Passwort: some@mail.net
 
-3) Mercury:
+3) Mercury: 
 
    Postmaster: Postmaster (postmaster@localhost)
    Administrator: Admin (admin@localhost)
 
-   TestUser: newuser
-   Passwort: wampp
+   TestUser: newuser  
+   Passwort: wampp 
 
-4) WEBDAV:
+4) WEBDAV: 
 
    Benutzer: wampp
-   Password: xampp
+   Password: xampp 
 
 ---------------------------------------------------------------
 
-* WINDOWS DIENSTE:
+* NUR FÜR NT-SYSTEME! (NT4 | Windows 2000 | Windows XP | Windows 2003):
 
-- \xampp\apache\apache_installservice.bat
-  ===> Installiert den Apache als Dienst
+- \xampp\apache\apache_installservice.bat 
+  ===> Installiert den Apache 2 als Dienst
 
-- \xampp\apache\apache_uninstallservice.bat
-  ===> Deinstalliert den Apache als Dienst
+- \xampp\apache\apache_uninstallservice.bat 
+  ===> Deinstalliert den Apache 2 als Dienst
 
-- \xampp\mysql\mysql_installservice.bat
+- \xampp\mysql\mysql_installservice.bat 
   ===> Installiert MySQL als Dienst
 
-- \xampp\mysql\mysql_uninstallservice.bat
+- \xampp\mysql\mysql_uninstallservice.bat 
   ===> Deinstalliert MySQL als Dienst
 
-- \xampp\filezilla\filezilla_installservice.bat
-  ===> Installiert FileZilla als Dienst
-
-- \xampp\filezilla\filezilla_uninstallservice.bat
-  ===> Deinstalliert FileZilla als Dienst
-
-- \xampp\mercury\mercury_installservice.bat
-  ===> Installiert Mercury als Dienst
-
-- \xampp\mercury\mercury_uninstallservice.bat
-  ===> Deinstalliert Mercury als Dienst
-
-Oder benutze einfach im Control Panel die Klickbox "Svc" dazu.
+==> Nach allen De- / Installationen der Dienste, System unbedingt neustarten! 
 
 ---------------------------------------------------------------
 
 * DAS THEMA SICHERHEIT:
 
-Wie schon an anderer Stelle erwähnt ist XAMPP nicht für den Produktionseinsatz gedacht, sondern nur für Entwickler in Entwicklungsumgebungen. Das hat zur Folge, dass XAMPP absichtlich nicht restriktiv, sondern im Gegenteil sehr offen vorkonfiguriert ist. Für einen Entwickler ist das ideal, da er so keine Grenzen vom System vorgeschrieben bekommt.
+Wie schon an anderer Stelle erwähnt ist XAMPP nicht für den Produktionseinsatz gedacht, sondern nur für Entwickler in Entwicklungsumgebungen. Das hat zur Folge, dass XAMPP absichtlich nicht restriktiv sondern im Gegenteil sehr offen vorkonfiguriert ist. Für einen Entwickler ist das ideal, da er so keine Grenzen vom System vorgeschrieben bekommt.
 Für einen Produktionseinsatz ist das allerdings überhaupt nicht geeignet!
 Hier eine Liste, der Dinge, die an XAMPP absichtlich (!) unsicher sind:
 
@@ -131,44 +115,40 @@ Hier eine Liste, der Dinge, die an XAMPP absichtlich (!) unsicher sind:
 - In dem XAMPP-Demo-Seiten (die man unter http://localhost/ findet) gibt es den Punkt "Sicherheitscheck".
   Dort kann man sich den aktuellen Sicherheitszustand seiner XAMPP-Installation anzeigen lassen.
 
-Will man XAMPP in einem Netzwerk betreiben, so dass der XAMPP-Server auch von anderen erreichbar ist, dann sollte man unbedingt die folgende URI aufrufen, mit dem man diese Unsicherheiten einschränken kann:
+Will man XAMPP in einem Netzwerk betreiben, so dass der XAMPP-Server auch von anderen erreichbar ist, dann sollte man unbedingt die folgende URL aufrufen, mit dem man diese Unsicherheiten einschränken kann:
 
-    http://localhost/security/
+	http://localhost/security/
 
-Hier kann das Root-Passwort für MySQL und phpMyAdmin und auch ein Verzeichnisschutz für die
+Hier kann das Root-Passwort für MySQL und phpMyAdmin und auch ein Verzeichnisschutz für die 
 XAMPP-Seiten eingerichtet werden.
 
 ---------------------------------------------------------------
 
 * MYSQL-Hinweise:
 
-Der MySQL-Server startet ohne Passwort für MySQl-Administrator "root".
+(1) Um den MySQL-Daemon zu starten bitte Doppelklick auf \xampp\mysql_start.bat.
+Der MySQL Server startet dann im Konsolen-Modus. Das dazu gehörige Konsolenfenster muss offen bleiben (!!) Zum Stop bitte die mysql_stop.bat benutzen!
+
+(2) Wer MySQL als Dienst unter NT / 2000 / XP benutzen möchte, muss unbedingt (!) vorher die "my" bzw."my.ini unter C:\ (also C:\my.ini) implementieren. Danach die "mysql_installservice.bat" im Ordner "mysql" aktivieren. Dienste funktionieren generell NICHT unter Windows Home-Versionen. 
+
+(3) Der MySQL-Server startet ohne Passwort für MySQl-Administrator "root".
 Für eine Zugriff in PHP sähe das also aus:
 
-    mysql_connect("localhost", "root", "");
+	mysql_connect("localhost", "root", "");
 
-Ein Passwort für "root" könnt ihr über den MySQL-Admin in der Eingabeaufforderung setzen. Z.B.:
+Ein Passwort für "root" könnt ihr über den MySQL-Admin in der Eingabeaufforderung
+setzen. Z. B.: 
 
-    \xampp\mysql\bin\mysqladmin.exe -u root -pgeheim
+	C:\xampp\mysql\bin\mysqladmin.exe -u root -p geheim
 
-Wichtig: Nach dem Einsetzen eines neuen Passwortes für Root muss auch phpMyAdmin informiert werden! Das geschieht über die Datei "config.inc.php"; zu finden als C:\xampp\phpmyadmin\config.inc.php. Dort also folgenden Zeilen editieren:
+Wichtig: Nach dem Einsetzen eines neuen Passwortes für Root muss auch phpMyAdmin informiert werden! Das geschieht über die Datei "config.inc.php"; zu finden als C:\xampp\phpmyadmin\config.inc.php. Dort also folgenden 
+Zeilen editieren:
+   
+	$cfg['Servers'][$i]['user']            = 'root';   // MySQL User
+	$cfg['Servers'][$i]['auth_type']       = 'http';   // HTTP-Authentifzierung
 
-    $cfg['Servers'][$i]['user']            = 'root';   // MySQL User
-    $cfg['Servers'][$i]['auth_type']       = 'cookie';   // HTTP-Authentifzierung
-
-So wird zuerst das "root"-Passwort vom MySQL-Server abgefragt, bevor man auf phpMyAdmin zugreifen darf.
-
----------------------------------------------------------------
-
-* CPAN/PEAR:
-
-CPAN und PEAR wird nur mit einer Basisinstallation ausgeliefert. Wenn du weitere Pakete benötigst,
-kannst du diese in der XAMPP Shell (xampp_shell.bat) mit den Kommandozeilentools installieren:
-- cpanp i Foo
-- pear install Foo
-
-Solltest du keinen VC6 Kompiler installiert haben, kannst du anstatt "cpanp" auch "ppm" zum Installieren von Binärpaketen benutzen.
-
----------------------------------------------------------------
-
-        Have a lot of fun! | Viel Spaß! | Bonne Chance!
+So wird zuerst das "root"-Passwort vom MySQL-Server abgefragt, bevor phpMyAdmin zugreifen darf.
+    
+---------------------------------------------------------------	
+    
+		Have a lot of fun! | Viel Spaß! | Bonne Chance!

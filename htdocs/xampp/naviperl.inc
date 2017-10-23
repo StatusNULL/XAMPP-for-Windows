@@ -1,1 +1,2 @@
-<br><a class="n" target="content" onclick="h(this);" href="guestbook-<?php echo file_get_contents("../../install/xampp_language.txt"); ?>.pl"><?php echo $TEXT['navi-guest']; ?></a>
+<a class=n target=content onClick="h(this);" href=perlinfo.pl>perlinfo()</a><br>
+<a class=n target=content onClick="h(this);" href=guestbook-<?=file_get_contents("lang.tmp")?>.pl><?=$TEXT['navi-guest']?></a>

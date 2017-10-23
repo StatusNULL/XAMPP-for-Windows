@@ -1,20 +1,24 @@
 <?php
-/**
- * PEAR, the PHP Extension and Application Repository
- *
- * Command line interface
- *
- * PHP versions 4 and 5
- *
- * @category   pear
- * @package    PEAR
- * @author     Stig Bakken <ssb@php.net>
- * @author     Tomas V.V.Cox <cox@idecnet.com>
- * @copyright  1997-2009 The Authors
- * @license    http://opensource.org/licenses/bsd-license.php New BSD License
- * @version    CVS: $Id: pearcmd.php 286487 2009-07-29 05:57:28Z dufuz $
- * @link       http://pear.php.net/package/PEAR
- */
+//
+// +----------------------------------------------------------------------+
+// | PHP Version 5                                                        |
+// +----------------------------------------------------------------------+
+// | Copyright (c) 1997-2004 The PHP Group                                |
+// +----------------------------------------------------------------------+
+// | This source file is subject to version 3.0 of the PHP license,       |
+// | that is bundled with this package in the file LICENSE, and is        |
+// | available through the world-wide-web at the following url:           |
+// | http://www.php.net/license/3_0.txt.                                  |
+// | If you did not receive a copy of the PHP license and are unable to   |
+// | obtain it through the world-wide-web, please send a note to          |
+// | license@php.net so we can mail you a copy immediately.               |
+// +----------------------------------------------------------------------+
+// | Authors: Stig Bakken <ssb@php.net>                                   |
+// |          Tomas V.V.Cox <cox@idecnet.com>                             |
+// |                                                                      |
+// +----------------------------------------------------------------------+
+//
+// $Id: pearcmd.php,v 1.39 2008/03/25 04:58:42 cellog Exp $
 
 ob_end_clean();
 if (!defined('PEAR_RUNTYPE')) {
@@ -25,8 +29,8 @@ define('PEAR_IGNORE_BACKTRACE', 1);
 /**
  * @nodep Gtk
  */
-if ('\xampp\php\PEAR' != '@'.'include_path'.'@') {
-    ini_set('include_path', '\xampp\php\PEAR');
+if ('\xampp\php\pear' != '@'.'include_path'.'@') {
+    ini_set('include_path', '\xampp\php\pear');
     $raw = false;
 } else {
     // this is a raw, uninstalled pear, either a cvs checkout, or php distro
@@ -43,7 +47,7 @@ ob_implicit_flush(true);
 $_PEAR_PHPDIR = '#$%^&*';
 set_error_handler('error_handler');
 
-$pear_package_version = "1.9.0";
+$pear_package_version = "1.7.2";
 
 require_once 'PEAR.php';
 require_once 'PEAR/Frontend.php';
@@ -60,7 +64,6 @@ if (!isset($_SERVER['argv']) && !isset($argv) && !isset($HTTP_SERVER_VARS['argv'
     echo 'ERROR: either use the CLI php executable, or set register_argc_argv=On in php.ini';
     exit(1);
 }
-
 $argv = Console_Getopt::readPHPArgv();
 // fix CGI sapi oddity - the -- in pear.bat/pear is not removed
 if (php_sapi_name() != 'cli' && isset($argv[1]) && $argv[1] == '--') {
@@ -68,8 +71,12 @@ if (php_sapi_name() != 'cli' && isset($argv[1]) && $argv[1] == '--') {
     $argv = array_values($argv);
 }
 $progname = PEAR_RUNTYPE;
-array_shift($argv);
-$options = Console_Getopt::getopt2($argv, "c:C:d:D:Gh?sSqu:vV");
+if (in_array('getopt2', get_class_methods('Console_Getopt'))) {
+    array_shift($argv);
+    $options = Console_Getopt::getopt2($argv, "c:C:d:D:Gh?sSqu:vV");
+} else {
+    $options = Console_Getopt::getopt($argv, "c:C:d:D:Gh?sSqu:vV");
+}
 if (PEAR::isError($options)) {
     usage($options);
 }
@@ -242,6 +249,7 @@ if ($store_user_config) {
 }
 
 $command = (isset($options[1][0])) ? $options[1][0] : null;
+
 if (empty($command) && ($store_user_config || $store_system_config)) {
     exit;
 }
@@ -257,7 +265,6 @@ if ($fetype == 'Gtk' || $fetype == 'Gtk2') {
     if ($command == 'help') {
         usage(null, @$options[1][1]);
     }
-
     if (!$config->validConfiguration()) {
         PEAR::raiseError('CRITICAL ERROR: no existing valid configuration files found in files ' .
             "'$pear_user_config' or '$pear_system_config', please copy an existing configuration" .
@@ -273,13 +280,15 @@ if ($fetype == 'Gtk' || $fetype == 'Gtk2') {
 
     $short_args = $long_args = null;
     PEAR_Command::getGetoptArgs($command, $short_args, $long_args);
-    array_shift($options[1]);
-    $tmp = Console_Getopt::getopt2($options[1], $short_args, $long_args);
-
+    if (in_array('getopt2', get_class_methods('Console_Getopt'))) {
+        array_shift($options[1]);
+        $tmp = Console_Getopt::getopt2($options[1], $short_args, $long_args);
+    } else {
+        $tmp = Console_Getopt::getopt($options[1], $short_args, $long_args);
+    }
     if (PEAR::isError($tmp)) {
         break;
     }
-
     list($tmpopt, $params) = $tmp;
     $opts = array();
     foreach ($tmpopt as $foo => $tmp2) {
@@ -287,11 +296,10 @@ if ($fetype == 'Gtk' || $fetype == 'Gtk2') {
         if ($value === null) {
             $value = true; // options without args
         }
-
         if (strlen($opt) == 1) {
             $cmdoptions = $cmd->getOptions($command);
             foreach ($cmdoptions as $o => $d) {
-                if (isset($d['shortopt']) && $d['shortopt'] == $opt) {
+                if (@$d['shortopt'] == $opt) {
                     $opts[$o] = $value;
                 }
             }
@@ -301,12 +309,10 @@ if ($fetype == 'Gtk' || $fetype == 'Gtk2') {
             }
         }
     }
-
     $ok = $cmd->run($command, $opts, $params);
     if ($ok === false) {
         PEAR::raiseError("unknown command `$command'");
     }
-
     if (PEAR::isError($ok)) {
         PEAR::setErrorHandling(PEAR_ERROR_CALLBACK, array($ui, "displayFatalError"));
         PEAR::raiseError($ok);
@@ -324,7 +330,6 @@ function usage($error = null, $helpsubject = null)
     } elseif ($error !== null) {
         fputs($stderr, "$error\n");
     }
-
     if ($helpsubject != null) {
         $put = cmdHelp($helpsubject);
     } else {
@@ -383,14 +388,12 @@ function cmdHelp($command)
         if (is_string($help)) {
             return "$progname $command [options] $help\n";
         }
-
         if ($help[1] === null) {
             return "$progname $command $help[0]";
+        } else {
+            return "$progname $command [options] $help[0]\n$help[1]";
         }
-
-        return "$progname $command [options] $help[0]\n$help[1]";
     }
-
     return "Command '$command' is not valid, try '$progname help'";
 }
 
@@ -443,3 +446,5 @@ function error_handler($errno, $errmsg, $file, $line, $vars) {
  * End:
  */
 // vim600:syn=php
+
+?>

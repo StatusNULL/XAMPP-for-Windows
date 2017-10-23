@@ -4,12 +4,18 @@
  *
  * PHP versions 4 and 5
  *
+ * LICENSE: This source file is subject to version 3.0 of the PHP license
+ * that is available through the world-wide-web at the following URI:
+ * http://www.php.net/license/3_0.txt.  If you did not receive a copy of
+ * the PHP License and are unable to obtain it through the web, please
+ * send a note to license@php.net so we can mail you a copy immediately.
+ *
  * @category   pear
  * @package    PEAR
  * @author     Greg Beaver <cellog@php.net>
- * @copyright  1997-2009 The Authors
- * @license    http://opensource.org/licenses/bsd-license.php New BSD License
- * @version    CVS: $Id: Validate.php 276383 2009-02-24 23:39:37Z dufuz $
+ * @copyright  1997-2008 The PHP Group
+ * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
+ * @version    CVS: $Id: Validate.php,v 1.52 2008/01/03 20:26:36 cellog Exp $
  * @link       http://pear.php.net/package/PEAR
  * @since      File available since Release 1.4.0a1
  */
@@ -30,9 +36,9 @@ require_once 'PEAR/Validator/PECL.php';
  * @category   pear
  * @package    PEAR
  * @author     Greg Beaver <cellog@php.net>
- * @copyright  1997-2009 The Authors
- * @license    http://opensource.org/licenses/bsd-license.php New BSD License
- * @version    Release: 1.9.0
+ * @copyright  1997-2008 The PHP Group
+ * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
+ * @version    Release: 1.7.2
  * @link       http://pear.php.net/package/PEAR
  * @since      Class available since Release 1.4.0a1
  */
@@ -452,6 +458,7 @@ class PEAR_Validate
                 return false;
             }
 
+
             if ($this->_state == PEAR_VALIDATE_PACKAGING &&
                   $this->_packagexml->getDate() != date('Y-m-d')) {
                 $this->_addWarning('date', 'Release Date "' .
@@ -470,8 +477,8 @@ class PEAR_Validate
             // default of no time value set
             return true;
         }
-
-        // packager automatically sets time, so only validate if pear validate is called
+        // packager automatically sets time, so only validate if
+        // pear validate is called
         if ($this->_state = PEAR_VALIDATE_NORMAL) {
             if (!preg_match('/\d\d:\d\d:\d\d/',
                   $this->_packagexml->getTime())) {
@@ -479,15 +486,12 @@ class PEAR_Validate
                     $this->_packagexml->getTime() . '"');
                 return false;
             }
-
-            $result = preg_match('|\d{2}\:\d{2}\:\d{2}|', $this->_packagexml->getTime(), $matches);
-            if ($result === false || empty($matches)) {
+            if (strtotime($this->_packagexml->getTime()) == -1) {
                 $this->_addFailure('time', 'invalid release time "' .
                     $this->_packagexml->getTime() . '"');
                 return false;
             }
         }
-
         return true;
     }
 
@@ -627,3 +631,4 @@ class PEAR_Validate
         return true;
     }
 }
+?>

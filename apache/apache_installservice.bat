@@ -1,14 +1,17 @@
-@ECHO OFF & SETLOCAL
-PUSHD %~dp0
-CD ..
+@echo off
 
-ECHO Installing Apache as a service
-xampp_cli.exe installservice apache
+if "%OS%" == "Windows_NT" goto WinNT
 
-IF NOT ERRORLEVEL 1 (
-    ECHO Now we start Apache :)
-    xampp_cli.exe startservice apache
-)
+:Win9X
+echo Don't be stupid! Win9x don't know Services
+echo Please use apache_start.bat instead
+goto exit
 
-POPD
-PAUSE
+:WinNT
+echo Installing Apache2.2 as an Service
+bin\httpd -k install
+echo Now we Start Apache2.2 :)
+net start Apache2.2
+
+:exit
+pause

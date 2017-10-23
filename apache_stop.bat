@@ -1,8 +1,6 @@
-@ECHO OFF & SETLOCAL
-PUSHD %~dp0
+@echo off
+apache\bin\pv -f -k httpd.exe -q
+if not exist apache\logs\httpd.pid GOTO exit
+del apache\logs\httpd.pid
 
-ECHO Now we stop Apache
-xampp_cli.exe stop apache
-
-POPD
-PAUSE
+:exit

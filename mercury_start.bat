@@ -1,8 +1,5 @@
-@ECHO OFF & SETLOCAL
-PUSHD %~dp0
-
-ECHO Now we start Mercury
-xampp_cli.exe start mercury
-
-POPD
-PAUSE
+@echo off
+echo Mercury Mail Server is starting ... 
+echo Starte Mercury Mail Server ... 
+MercuryMail\mercury.exe
+exit

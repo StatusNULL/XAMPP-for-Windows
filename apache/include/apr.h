@@ -99,7 +99,6 @@
 #ifndef _WIN32_WCE
 #include <winsock2.h>
 #include <ws2tcpip.h>
-#include <wspiapi.h>
 #include <mswsock.h>
 #else
 #include <winsock.h>
@@ -277,7 +276,7 @@ extern "C" {
 #define APR_HAVE_IN_ADDR        1
 #define APR_HAVE_INET_ADDR      1
 #define APR_HAVE_INET_NETWORK   0
-#define APR_HAVE_IPV6           1
+#define APR_HAVE_IPV6           0
 #define APR_HAVE_MEMMOVE        1
 #define APR_HAVE_SETRLIMIT      0
 #define APR_HAVE_SIGACTION      0

@@ -1,36 +1,24 @@
 <?php
-    if (@file_get_contents("../../install/xampp_language.txt") == "") {
-        if (!empty($_SERVER['HTTPS']) && ('on' == $_SERVER['HTTPS'])) {
-            $uri = 'https://';
-        } else {
-            $uri = 'http://';
-        }
-        $uri .= $_SERVER['HTTP_HOST'];
-        header('Location: '.$uri.'/security/splash.php');
-        exit;
-    }
-
-    include "langsettings.php";
+	if (file_get_contents("lang.tmp") == "") {
+		header("Location: splash.php");
+		exit;
+	}
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN"
-    "http://www.w3.org/TR/html4/frameset.dtd">
+	"http://www.w3.org/TR/html4/frameset.dtd">
 <html>
-    <head>
-        <meta name="author" content="Kai Oswald Seidler, Kay Vogelgesang, Carsten Wiedmann">
-        <meta http-equiv="cache-control" content="no-cache">
-        <link href="xampp.css" rel="stylesheet" type="text/css">
-        <link href="img/xampp.ico" rel="shortcut icon" type="image/x-icon">
-        <title>
-            <?php echo trim(@file_get_contents('../../install/xampp_modell.txt')); ?>
-            <?php echo trim(@file_get_contents('../../install/xampp_version.txt')); ?>
-        </title>
-    </head>
+	<head>
+		<meta name="author" content="Kai Oswald Seidler, Kay Vogelgesang, Carsten Wiedmann">
+		<link rel="icon" href="img/xampp.ico">
+		<?php include "lang/".file_get_contents("lang.tmp").".php"; ?>
+		<title><?php echo $TEXT['global-xampp']; ?> | Security Section</title>
+	</head>
 
-    <frameset rows="68,*" frameborder="0" framespacing="0" border="0">
-        <frame name="head" src="head.php" scrolling="no" marginwidth="0" marginheight="0">
-        <frameset cols="170,*" frameborder="0" framespacing="0" border="0">
-            <frame name="navi" src="navi.php" scrolling="no" marginwidth="0" marginheight="0">
-            <frame name="content" src="security.php" marginwidth="20" marginheight="0">
-        </frameset>
-    </frameset>
+	<frameset rows="68,*" border="0" framespacing="0">
+		<frame name="head" src="head.php" frameborder="0" scrolling="no">
+		<frameset cols="170,*" border="0" framespacing="0">
+			<frame name="navi" src="navi.php" frameborder="0" scrolling="auto">
+			<frame name="content" src="security.php" frameborder="0" marginwidth="20">
+		</frameset>
+	</frameset>
 </html>

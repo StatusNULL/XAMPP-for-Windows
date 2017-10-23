@@ -1,8 +1,9 @@
-@ECHO OFF & SETLOCAL
-PUSHD %~dp0
+@echo off
+echo Mysql shutdowm ...
+apache\bin\pv -f -k mysqld.exe -q
 
-ECHO Now we stop MySQL
-xampp_cli.exe stop mysql
+if not exist mysql\data\%computername%.pid GOTO exit
+echo Delete %computername%.pid ...
+del mysql\data\%computername%.pid
 
-POPD
-PAUSE
+:exit

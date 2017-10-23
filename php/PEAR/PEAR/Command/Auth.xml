@@ -1,13 +1,11 @@
 <commands version="1.0">
  <login>
-  <summary>Connects and authenticates to remote server [Deprecated in favor of channel-login]</summary>
-  <function>doLogin</function>
+  <summary>Connects and authenticates to remote server</summary>
   <shortcut>li</shortcut>
+  <function>doLogin</function>
   <options />
   <doc>&lt;channel name&gt;
-WARNING: This function is deprecated in favor of using channel-login
-
-Log in to a remote channel server.  If &lt;channel name&gt; is not supplied,
+Log in to a remote channel server.  &lt;channel name&gt; is not supplied, 
 the default channel is used. To use remote functions in the installer
 that require any kind of privileges, you need to log in first.  The
 username and password you enter here will be stored in your per-user
@@ -16,13 +14,11 @@ in, your username and password will be sent along in subsequent
 operations on the remote server.</doc>
  </login>
  <logout>
-  <summary>Logs out from the remote server [Deprecated in favor of channel-logout]</summary>
-  <function>doLogout</function>
+  <summary>Logs out from the remote server</summary>
   <shortcut>lo</shortcut>
+  <function>doLogout</function>
   <options />
   <doc>
-WARNING: This function is deprecated in favor of using channel-logout
-
 Logs out from the remote server.  This command does not actually
 connect to the remote server, it only deletes the stored username and
 password from your user configuration.</doc>
