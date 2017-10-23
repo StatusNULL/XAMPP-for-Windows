@@ -1,12 +1,12 @@
-  ApacheFriends XAMPP (basic package) version 1.4.5 (win32)
+  ApacheFriends XAMPP (basic package) version 1.4.6 (win32)
 
   + Apache 2.0.50
   + MySQL 4.0.20
-  + PHP 5.0.0 + PHP 4.3.8 + PEAR
+  + PHP 5.0.1 + PHP 4.3.8 + PEAR
   + PHP-Switch win32 1.0 (by Apachefriends, use the "php-switch.bat")   	
   + mod_php 4.3.7
   + MiniPerl 5.8.3
-  + SQLite 3.0.1
+  + SQLite 3.0.4
   + PHPMyAdmin 2.5.7 pl1
   + ADODB 4.21
   + Mercury Mail Transport System for Win32 and NetWare Systems v4.01a
@@ -163,5 +163,5 @@ MYSQL NOTES:
   	    	
 ---------------------------------------------------------------    
 Have a lot of fun! Viel Spaﬂ! Bonne Chance!
-Last revised version 06.07.2004 Kay Vogelgesang
+Last revised version 16.08.2004 Kay Vogelgesang
      

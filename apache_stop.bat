@@ -1,5 +1,5 @@
 @echo off
-apache\bin\kill.exe /f apache.exe
+apache\bin\pv -f -k apache.exe -q
 if not exist apache\logs\httpd.pid GOTO exit
 del apache\logs\httpd.pid
 

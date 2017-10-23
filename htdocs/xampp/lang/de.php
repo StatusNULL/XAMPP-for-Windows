@@ -10,7 +10,7 @@ $TEXT['global-xampp']="XAMPP für Windows";
 // NAVIGATION
 // ---------------------------------------------------------------------
 
-$TEXT['navi-xampp']="XAMPP 1.4.5";
+$TEXT['navi-xampp']="XAMPP 1.4.6";
 $TEXT['navi-welcome']="Willkommen";
 $TEXT['navi-status']="Status";
 $TEXT['navi-security']="Sicherheitscheck";
@@ -122,7 +122,7 @@ $TEXT['start-subhead']="Herzlichen Glückwunsch:<br>XAMPP wurde erfolgreich auf d
 
 $TEXT['start-text1']="Nun kann es losgehen. :) Als erstes bitte einmal auf der linken Seite auf »Status« klicken. Damit bekommt man einen Überblick was alles schon funktioniert. Ein paar Funktionen werden ausgeschaltet sein. Das ist Absicht so. Es sind Funktionen, die nicht überall funktionieren oder evtl. Probleme bereiten könnten.";
 
-$TEXT['start-text2']="Achtung: Der XAMPP wurde ab Version 1.4.5 auf eine Einzelpaketverwaltung umgestellt. Es gibt nun die folgenden Pakete/Addons: <UL><LI>XAMPP Basis Paket</LI><LI>XAMPP Perl addon</LI><LI>XAMPP Python addon<LI></LI>XAMPP Utility addon (Zubehör aber noch inaktiv)</LI><LI>XAMPP Server addon (weitere Server aber noch inaktiv)</LI><LI>XAMPP Other addon (weitere nützliche Sachen aber noch inaktiv)</LI></UL>";
+$TEXT['start-text2']="Achtung: Der XAMPP wurde ab Version 1.4.x auf eine Einzelpaketverwaltung umgestellt. Es gibt nun die folgenden Pakete/Addons: <UL><LI>XAMPP Basis Paket</LI><LI>XAMPP Perl addon</LI><LI>XAMPP Python addon<LI></LI>XAMPP Utility addon (Zubehör aber noch inaktiv)</LI><LI>XAMPP Server addon (weitere Server aber noch inaktiv)</LI><LI>XAMPP Other addon (weitere nützliche Sachen aber noch inaktiv)</LI></UL>";
 
 $TEXT['start-text3']="Bitte \"installiert\" die Zusatzpakete, die ihr noch benötigt, einfach hinterher. Nach dem erfolgreichen raufspielen bitte immer die \"setup_xampp.bat\" betätigen, um den XAMPP neu zu initialisieren. Ach so, die Installerversionen der einzelnen Addons funktionieren nur wenn das XAMPP Basispaket ebenfalls über eine Installerversion eingerichtet wurde.";
 

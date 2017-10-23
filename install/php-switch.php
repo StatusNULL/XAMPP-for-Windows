@@ -302,7 +302,7 @@ echo "  Write the new PHP main version in $phpversionfileroot\r\n";
 
 echo "\r\n  OKAY ... PHP SWITCHING WAS SUCCESSFUL";
 echo "\r\n\r\n  Now you can start the Apache with PHP $CS !";
-echo "\r\n  Nun kannst du den Apache mir PHP $CS starten!";
+echo "\r\n  Nun kannst du den Apache mit PHP $CS starten!";
 sleep(1);
 
 echo "\r\n\r\n  :-) Kay Vogelgesang (www.apachefriends.org)\r\n\r\n";
