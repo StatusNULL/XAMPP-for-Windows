@@ -1,7 +1,7 @@
 <?php
 
 /**
-  V4.60 24 Jan 2005  (c) 2000-2005 John Lim (jlim@natsoft.com.my). All rights reserved.
+  V4.63 17 May 2005  (c) 2000-2005 John Lim (jlim@natsoft.com.my). All rights reserved.
   Released under both BSD license and Lesser GPL library license. 
   Whenever there is any discrepancy between the two licenses, 
   the BSD license will take precedence.
@@ -49,9 +49,8 @@ class ADODB2_mssql extends ADODB_DataDict {
 		switch(strtoupper($meta)) {
 
 		case 'C': return 'VARCHAR';
-		case 'XL':
-		case 'X': return 'TEXT';
-		
+		case 'XL': return 'TEXT';
+		case 'X': return 'VARCHAR(4000)'; ## could be varchar(8000), but we want compat with oracle
 		case 'C2': return 'NVARCHAR';
 		case 'X2': return 'NTEXT';
 		

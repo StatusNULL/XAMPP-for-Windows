@@ -76,7 +76,7 @@ EOU
 my ${CC} = q[cl];
 my ${LIBS} = q[];
 my ${APR_SO_EXT} = q[dll];
-my ${APR_DOTTED_VERSION} = q[0.9.5];
+my ${APR_DOTTED_VERSION} = q[0.9.6];
 my ${installbuilddir} = q[O:\apache\build];
 my ${APR_MAJOR_VERSION} = q[0];
 my ${bindir} = q[O:\apache\bin];

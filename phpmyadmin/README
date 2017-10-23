@@ -1,11 +1,11 @@
-$Id: README,v 2.24.2.4 2005/02/24 19:31:25 lem9 Exp $
+$Id: README,v 2.28.2.3 2005/04/16 17:37:13 lem9 Exp $
 
 phpMyAdmin - Readme
 ===================
 
   A set of PHP-scripts to manage MySQL over the web.
 
-  Version 2.6.1-pl3
+  Version 2.6.2-pl1
   -----------------
   http://www.phpmyadmin.net/
 
@@ -49,7 +49,7 @@ phpMyAdmin - Readme
       - create and read dumps of tables
       - export and import CSV data
       - administer one single database as well as a whole database server
-      - communicate in 47 different languages
+      - communicate in 48 different languages
 
   Download:
     You can get the newest version at http://www.phpmyadmin.net/.

@@ -1,6 +1,6 @@
 <?php
 /*
-V4.60 24 Jan 2005  (c) 2000-2005 John Lim (jlim@natsoft.com.my). All rights reserved.
+V4.63 17 May 2005  (c) 2000-2005 John Lim (jlim@natsoft.com.my). All rights reserved.
   Released under both BSD license and Lesser GPL library license. 
   Whenever there is any discrepancy between the two licenses, 
   the BSD license will take precedence.
@@ -304,7 +304,13 @@ class ADODB_mysql extends ADOConnection {
 				$s .= '%p';
 				break;
 				
-
+			case 'w':
+				$s .= '%w';
+				break;
+				
+			case 'l':
+				$s .= '%W';
+				break;
 			}
 		}
 		$s.="')";
@@ -397,6 +403,12 @@ class ADODB_mysql extends ADOConnection {
 			} elseif (preg_match("/^(.+)\((\d+)/", $type, $query_array)) {
 				$fld->type = $query_array[1];
 				$fld->max_length = is_numeric($query_array[2]) ? $query_array[2] : -1;
+			} elseif (preg_match("/^(enum)\((.*)\)$/i", $type, $query_array)) {
+				$fld->type = $query_array[1];
+				$arr = explode(",",$query_array[2]);
+				$fld->enums = $arr;
+				$zlen = max(array_map("strlen",$arr)) - 2; // PHP >= 4.0.6
+				$fld->max_length = ($zlen > 0) ? $zlen : 1;
 			} else {
 				$fld->type = $type;
 				$fld->max_length = -1;

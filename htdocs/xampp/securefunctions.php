@@ -204,13 +204,13 @@ function htaccess($xauser, $xapasswd)
 	$insert="AuthName \"xampp user\"\r\nAuthType Basic\r\nAuthUserFile $htpasswddir\r\nrequire valid-user"; 
 	fputs($datei,$insert); 
 	fclose($datei);
-	$htpassrealm = "\"$htpasswdexe\" -c -m -b c:\\xampp.users $xauser $xapasswd";
+	$htpassrealm = "\"$htpasswdexe\" -c -m -b .\\xampp.users $xauser $xapasswd";
 	shell_exec("$htpassrealm");
 	
 	/// Better this way agains problems with "c:\program files" directories \\\\
-	if (@copy("c:\\xampp.users", $htpasswddirectory)) 
+	if (@copy(".\\xampp.users", $htpasswddirectory)) 
 		{
-		unlink ("c:\\xampp.users");
+		unlink (".\\xampp.users");
 		}
 		
 	$datei = fopen($xapasswdtxtdir,'w+');

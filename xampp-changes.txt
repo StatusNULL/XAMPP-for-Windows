@@ -1,10 +1,10 @@
 
-08 Apr 2005, XAMPP 1.4.13
+12 Jun 2005, XAMPP 1.4.14
 
-- Update PHP (PHP 5.0.4 + PHP 4.3.11)
-- Update phpMyAdmin (phpMyAdmin 2.6.1-pl3)
-- Update MySQL (MySQL 4.1.11)
-- Update FileZilla FTP Server (FileZilla FTP Server 0.9.6a)
-- Update OpenSSL (OpenSSL 0.9.7f)
-- ADD libmcrypt.dll
-- ADD Languages (it + no)
+- Update eAccelerator 0.9.3
+- Update Apache HTTPD 2.0.54
+- Update MySQL 4.1.12
+- Update OpenSSL 0.9.7g
+- Update ADODB 4.63
+- Update FileZilla FTP Server 0.9.8a
+- Update phpMyAdmin 2.6.2-pl1

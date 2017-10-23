@@ -1,6 +1,6 @@
 <?php
 /* 
-V4.60 24 Jan 2005  (c) 2000-2005 John Lim (jlim@natsoft.com.my). All rights reserved.
+V4.63 17 May 2005  (c) 2000-2005 John Lim (jlim@natsoft.com.my). All rights reserved.
   Released under both BSD license and Lesser GPL library license. 
   Whenever there is any discrepancy between the two licenses, 
   the BSD license will take precedence. 
@@ -15,10 +15,10 @@ error_reporting(E_ALL);
 include_once('../adodb.inc.php');
 include_once('../adodb-pager.inc.php');
 
-$driver = 'oci8';
+$driver = 'postgres';
 $sql = 'select  ID, firstname as "First Name", lastname as "Last Name" from adoxyz  order  by  id';
 //$sql = 'select count(*),firstname from adoxyz group by firstname order by 2 ';
-$sql = 'select distinct firstname, lastname from adoxyz  order  by  firstname';
+//$sql = 'select distinct firstname, lastname from adoxyz  order  by  firstname';
 
 if ($driver == 'postgres') {
 	$db = NewADOConnection('postgres');
@@ -52,7 +52,7 @@ if ($driver == 'access') {
 
 if (empty($driver) or $driver == 'mysql') {
 	$db = NewADOConnection('mysql');
-	$db->Connect('localhost','root','','xphplens');
+	$db->Connect('localhost','root','','test');
 }
 
 //$db->pageExecuteCountRows = false;
@@ -77,7 +77,7 @@ print "</pre>";
 
 $pager = new ADODB_Pager($db,$sql);
 $pager->showPageLinks = true;
-$pager->linksPerPage = 3;
+$pager->linksPerPage = 10;
 $pager->cache = 60;
 $pager->Render($rows=7);
 ?>

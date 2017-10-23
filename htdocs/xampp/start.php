@@ -25,12 +25,12 @@ if ($TEXT['start-text-newest'])
 
 <? echo "<p>&nbsp;<br><i>".getenv("SERVER_SOFTWARE")."</i><br>"; ?>
 <?
-if (file_get_contents("lang.tmp")=="de")
+/* if (file_get_contents("lang.tmp")=="de")
 {
 include("lang/wisdoms-de.php");
 $zufall=mt_rand(0,45);
-echo "<br>&nbsp;<h3><font size=2>Eine ganz kleine Weisheit:<br><cite>".$WISDOM[$zufall]."</cite></font></h3>";
-}
+ echo "<br>&nbsp;<h3><font size=2>Eine ganz kleine Weisheit:<br><cite>".$WISDOM[$zufall]."</cite></font></h3>";
+} */
 ?>
 
 </body>

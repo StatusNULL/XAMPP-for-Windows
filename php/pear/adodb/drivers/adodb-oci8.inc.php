@@ -1,7 +1,7 @@
 <?php
 /*
 
-  version V4.60 24 Jan 2005 (c) 2000-2005 John Lim. All rights reserved.
+  version V4.63 17 May 2005 (c) 2000-2005 John Lim. All rights reserved.
 
   Released under both BSD license and Lesser GPL library license. 
   Whenever there is any discrepancy between the two licenses, 
@@ -284,10 +284,10 @@ NATSOFT.DOMAIN =
 		return 'TO_DATE('.adodb_date($this->fmtTimeStamp,$ts).",'RRRR-MM-DD, HH:MI:SS AM')";
 	}
 	
-	function RowLock($tables,$where) 
+	function RowLock($tables,$where,$flds='1 as ignore') 
 	{
 		if ($this->autoCommit) $this->BeginTrans();
-		return $this->GetOne("select 1 as ignore from $tables where $where for update");
+		return $this->GetOne("select $flds from $tables where $where for update");
 	}
 	
 	function &MetaTables($ttype=false,$showSchema=false,$mask=false) 
@@ -491,6 +491,14 @@ NATSOFT.DOMAIN =
 			case 'a':
 			case 'A':
 				$s .= 'AM';
+				break;
+				
+			case 'w':
+				$s .= 'D';
+				break;
+				
+			case 'l':
+				$s .= 'DAY';
 				break;
 				
 			default:
@@ -698,6 +706,46 @@ NATSOFT.DOMAIN =
 		return $rez;
 	}
 
+		/**
+	 * Execute SQL 
+	 *
+	 * @param sql		SQL statement to execute, or possibly an array holding prepared statement ($sql[0] will hold sql text)
+	 * @param [inputarr]	holds the input data to bind to. Null elements will be set to null.
+	 * @return 		RecordSet or false
+	 */
+	function &Execute($sql,$inputarr=false) 
+	{
+		if ($this->fnExecute) {
+			$fn = $this->fnExecute;
+			$ret =& $fn($this,$sql,$inputarr);
+			if (isset($ret)) return $ret;
+		}
+		if ($inputarr) {
+			#if (!is_array($inputarr)) $inputarr = array($inputarr);
+			
+			$element0 = reset($inputarr);
+			
+			# is_object check because oci8 descriptors can be passed in
+			if (is_array($element0) && !is_object(reset($element0))) {
+				if (is_string($sql))
+					$stmt = $this->Prepare($sql);
+				else
+					$stmt = $sql;
+					
+				foreach($inputarr as $arr) {
+					$ret =& $this->_Execute($stmt,$arr);
+					if (!$ret) return $ret;
+				}
+			} else {
+				$ret =& $this->_Execute($sql,$inputarr);
+			}
+			
+		} else {
+			$ret =& $this->_Execute($sql,false);
+		}
+
+		return $ret;
+	}
 	
 	/*
 		Example of usage:
@@ -997,10 +1045,10 @@ NATSOFT.DOMAIN =
 		if (!$this->_connectionID) return;
 		
 		if (!$this->autoCommit) OCIRollback($this->_connectionID);
-		if (count($this -> _refLOBs) > 0) {
-			foreach ($this -> _refLOBs as $key => $value) {
-				$this -> _refLOBs[$key] -> free();
-				unset($this -> _refLOBs[$key]);
+		if (count($this->_refLOBs) > 0) {
+			foreach ($this ->_refLOBs as $key => $value) {
+				$this->_refLOBs[$key]['LOB']->free();
+				unset($this->_refLOBs[$key]);
 			}
 		}
 		OCILogoff($this->_connectionID);

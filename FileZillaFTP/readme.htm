@@ -1,4 +1,4 @@
-<p align="center"><b><u>FileZilla Server version 0.9.6a beta</u></b></p>
+<p align="center"><b><u>FileZilla Server version 0.9.8 beta</u></b></p>
 <p align="center">Copyright 2001-2004<br>
 by <a href="mailto:Tim.Kosse@gmx.de">Tim Kosse</a><a href="http://sourceforge.net/projects/filezilla/"><br>
 http://sourceforge.net/projects/filezilla/</a></p>
@@ -67,6 +67,33 @@ as restoring it to normal size.</p>
   </tr>
 </table>
 <p align="left"><b><u>Version History:</u></b></p>
+<p><b>Version 0.9.8</b></p>
+<blockquote>
+  <u>New features:</u>
+    <li>Service and Admin interface can be installed separately in the installer</li>
+  </ul>
+  <u>Fixed bugs:</u>
+  <ul>
+    <li>Infinite loop if user disconnects while throttled by anti-hammering code</li>
+    <li>Accept PBSZ command if using SSL/TLS</li>
+  </ul>
+</blockquote>
+<p><b>Version 0.9.7</b></p>
+<blockquote>
+  <u>New features:</u>
+  <ul>
+    <li>Option to force explicit SSL</li>
+  </ul>
+  <u>Fixed bugs:</u>
+  <ul>
+    <li>Available bandwidth was not distributed properly if using speedlimits</li>
+    <li>possible crash after closing client connections if using SSL</li>
+    <li>time based speed limits over midnight did not work properly</li>
+    <li>Connection freeze after SSL initialization</li>
+    <li>taking server offline and back online did not work properly if used multiple times in a row</li>
+    <li>fix infinite loop if speedlimits are enabled</li>
+  </ul>
+</blockquote>
 <p><b>Version 0.9.6a</b></p>
 <blockquote>
   <u>fixed bugs:</u>

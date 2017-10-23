@@ -281,7 +281,7 @@ $TEXT['iart-ok']="OK";
 // ---------------------------------------------------------------------
 
 $TEXT['flash-head']="Grafica Flash (Esempio per PHP+MING)";
-$TEXT['flash-text1']="Il progetto MING per win32 non esiste più e non è completo.<br>Per favore leggi questo: <a class=blue target=extern href=\"http://ming.sourceforge.net/install.html/\">Ming - una libreria per output SWF e un modulo PHP</a>";
+$TEXT['flash-text1']="Il progetto MING per win32 non esiste più e non è completo.<br>Per favore leggi questo: <a class=blue target=extern href=\"http://www.opaque.net/wiki/index.php?Ming\">Ming - una libreria per output SWF e un modulo PHP</a>";
 $TEXT['flash-ok']="OK";
 
 // ---------------------------------------------------------------------

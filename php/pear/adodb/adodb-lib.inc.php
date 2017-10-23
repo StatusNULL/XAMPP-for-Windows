@@ -7,7 +7,7 @@ global $ADODB_INCLUDED_LIB;
 $ADODB_INCLUDED_LIB = 1;
 
 /* 
- @version V4.60 24 Jan 2005 (c) 2000-2005 John Lim (jlim\@natsoft.com.my). All rights reserved.
+ @version V4.63 17 May 2005 (c) 2000-2005 John Lim (jlim\@natsoft.com.my). All rights reserved.
   Released under both BSD license and Lesser GPL library license. 
   Whenever there is any discrepancy between the two licenses, 
   the BSD license will take precedence. See License.txt. 
@@ -81,7 +81,6 @@ function _adodb_replace(&$zthis, $table, $fieldArray, $keyCol, $autoQuote, $has_
 					$cnt = $zthis->GetOne("select count(*) from $table where $where");
 					if ($cnt > 0) return 1; // record already exists
 				} else {
-				
 					if (($zthis->Affected_Rows()>0)) return 1;
 				}
 			} else
@@ -132,9 +131,18 @@ function _adodb_getmenu(&$zthis, $name,$defstr='',$blank1stItem=true,$multiple=f
 	else $compareFields0 = true;
 	
 	$value = '';
+    $optgroup = null;
+    $firstgroup = true;
+    $fieldsize = sizeof($zthis->fields);
 	while(!$zthis->EOF) {
 		$zval = rtrim(reset($zthis->fields));
-		if (sizeof($zthis->fields) > 1) {
+
+		if ($blank1stItem && $zval=="") {
+			$zthis->MoveNext();
+			continue;
+		}
+
+        if ($fieldsize > 1) {
 			if (isset($zthis->fields[1]))
 				$zval2 = rtrim($zthis->fields[1]);
 			else
@@ -142,31 +150,134 @@ function _adodb_getmenu(&$zthis, $name,$defstr='',$blank1stItem=true,$multiple=f
 		}
 		$selected = ($compareFields0) ? $zval : $zval2;
 		
-		if ($blank1stItem && $zval=="") {
-			$zthis->MoveNext();
-			continue;
+        $group = '';
+		if ($fieldsize > 2) {
+            $group = rtrim($zthis->fields[2]);
+        }
+ 
+        if ($optgroup != $group) {
+            $optgroup = $group;
+            if ($firstgroup) {
+                $firstgroup = false;
+                $s .="\n<optgroup label='". htmlspecialchars($group) ."'>";
+            } else {
+                $s .="\n</optgroup>";
+                $s .="\n<optgroup label='". htmlspecialchars($group) ."'>";
+            }
 		}
+	
 		if ($hasvalue) 
 			$value = " value='".htmlspecialchars($zval2)."'";
 		
 		if (is_array($defstr))  {
 			
 			if (in_array($selected,$defstr)) 
-				$s .= "<option selected='selected'$value>".htmlspecialchars($zval).'</option>';
+				$s .= "\n<option selected='selected'$value>".htmlspecialchars($zval).'</option>';
 			else 
 				$s .= "\n<option".$value.'>'.htmlspecialchars($zval).'</option>';
 		}
 		else {
 			if (strcasecmp($selected,$defstr)==0) 
-				$s .= "<option selected='selected'$value>".htmlspecialchars($zval).'</option>';
+				$s .= "\n<option selected='selected'$value>".htmlspecialchars($zval).'</option>';
 			else
 				$s .= "\n<option".$value.'>'.htmlspecialchars($zval).'</option>';
 		}
 		$zthis->MoveNext();
 	} // while
 	
+    // closing last optgroup
+    if($optgroup != null) {
+        $s .= "\n</optgroup>";
+	}
 	return $s ."\n</select>\n";
 }
+
+// Requires $ADODB_FETCH_MODE = ADODB_FETCH_NUM
+function _adodb_getmenu_gp(&$zthis, $name,$defstr='',$blank1stItem=true,$multiple=false,
+			$size=0, $selectAttr='',$compareFields0=true)
+{
+	$hasvalue = false;
+
+	if ($multiple or is_array($defstr)) {
+		if ($size==0) $size=5;
+		$attr = ' multiple size="'.$size.'"';
+		if (!strpos($name,'[]')) $name .= '[]';
+	} else if ($size) $attr = ' size="'.$size.'"';
+	else $attr ='';
+	
+	$s = '<select name="'.$name.'"'.$attr.' '.$selectAttr.'>';
+	if ($blank1stItem) 
+		if (is_string($blank1stItem))  {
+			$barr = explode(':',$blank1stItem);
+			if (sizeof($barr) == 1) $barr[] = '';
+			$s .= "\n<option value=\"".$barr[0]."\">".$barr[1]."</option>";
+		} else $s .= "\n<option></option>";
+
+	if ($zthis->FieldCount() > 1) $hasvalue=true;
+	else $compareFields0 = true;
+	
+	$value = '';
+    $optgroup = null;
+    $firstgroup = true;
+    $fieldsize = sizeof($zthis->fields);
+	while(!$zthis->EOF) {
+		$zval = rtrim(reset($zthis->fields));
+
+		if ($blank1stItem && $zval=="") {
+			$zthis->MoveNext();
+			continue;
+		}
+
+        if ($fieldsize > 1) {
+			if (isset($zthis->fields[1]))
+				$zval2 = rtrim($zthis->fields[1]);
+			else
+				$zval2 = rtrim(next($zthis->fields));
+		}
+		$selected = ($compareFields0) ? $zval : $zval2;
+		
+        $group = '';
+		if ($fieldsize > 2) {
+            $group = rtrim($zthis->fields[2]);
+        }
+ 
+        if ($optgroup != $group) {
+            $optgroup = $group;
+            if ($firstgroup) {
+                $firstgroup = false;
+                $s .="\n<optgroup label='". htmlspecialchars($group) ."'>";
+            } else {
+                $s .="\n</optgroup>";
+                $s .="\n<optgroup label='". htmlspecialchars($group) ."'>";
+            }
+		}
+	
+		if ($hasvalue) 
+			$value = " value='".htmlspecialchars($zval2)."'";
+		
+		if (is_array($defstr))  {
+			
+			if (in_array($selected,$defstr)) 
+				$s .= "\n<option selected='selected'$value>".htmlspecialchars($zval).'</option>';
+			else 
+				$s .= "\n<option".$value.'>'.htmlspecialchars($zval).'</option>';
+		}
+		else {
+			if (strcasecmp($selected,$defstr)==0) 
+				$s .= "\n<option selected='selected'$value>".htmlspecialchars($zval).'</option>';
+			else
+				$s .= "\n<option".$value.'>'.htmlspecialchars($zval).'</option>';
+		}
+		$zthis->MoveNext();
+	} // while
+	
+    // closing last optgroup
+    if($optgroup != null) {
+        $s .= "\n</optgroup>";
+	}
+	return $s ."\n</select>\n";
+}
+
 
 /*
 	Count the number of records this sql statement will return by using
@@ -468,7 +579,8 @@ function _adodb_getupdatesql(&$zthis,&$rs, $arrFields,$forceUpdate=false,$magicq
 		// If there were any modified fields then build the rest of the update query.
 		if ($fieldUpdatedCount > 0 || $forceUpdate) {
 					// Get the table name from the existing query.
-			preg_match("/FROM\s+".ADODB_TABLE_REGEX."/is", $rs->sql, $tableName);
+			if (!empty($rs->tableName)) $tableName = $rs->tableName;
+			else preg_match("/FROM\s+".ADODB_TABLE_REGEX."/is", $rs->sql, $tableName);
 	
 			// Get the full where clause excluding the word "WHERE" from
 			// the existing query.
@@ -637,7 +749,8 @@ static $cacheCols;
 	
 	// Get the table name from the existing query.
 	if (!$tableName) {
-		if (preg_match("/FROM\s+".ADODB_TABLE_REGEX."/is", $rs->sql, $tableName))
+		if (!empty($rs->tableName)) $tableName = $rs->tableName;
+		else if (preg_match("/FROM\s+".ADODB_TABLE_REGEX."/is", $rs->sql, $tableName))
 			$tableName = $tableName[1];
 		else 
 			return false;
@@ -748,57 +861,39 @@ function _adodb_column_sql(&$zthis, $action, $type, $fname, $fnameq, $arrFields,
 			
 		}
 	}
-	
-	$sql = '';
 		
 	switch($type) {
 		case "C":
 		case "X":
 		case 'B':
-			if ($action == 'I') {
-				$sql = $zthis->qstr($arrFields[$fname],$magicq) . ", ";
-			} else {
-				$sql .= $fnameq . "=" . $zthis->qstr($arrFields[$fname],$magicq) . ", ";
-			}
-		  break;
+			$val = $zthis->qstr($arrFields[$fname],$magicq);
+			break;
 
 		case "D":
-			if ($action == 'I') {
-				$sql = $zthis->DBDate($arrFields[$fname]) . ", ";
-			} else {
-				$sql .= $fnameq . "=" . $zthis->DBDate($arrFields[$fname]) . ", ";
-			}
+			$val = $zthis->DBDate($arrFields[$fname]);
 			break;
 
 		case "T":
-			if ($action == 'I') {
-				$sql = $zthis->DBTimeStamp($arrFields[$fname]) . ", ";
-			} else {
-				$sql .= $fnameq . "=" . $zthis->DBTimeStamp($arrFields[$fname]) . ", ";
-			}
+			$val = $zthis->DBTimeStamp($arrFields[$fname]);
 			break;
 
 		default:
 			$val = $arrFields[$fname];
 			if (empty($val)) $val = '0';
-
-
-			if ($action == 'I') {
-				$sql .= $val . ", ";
-			} else {
-				$sql .= $fnameq . "=" . $val  . ", ";
-			}
 			break;
 	}
 
-	return $sql;
+	if ($action == 'I') return $val . ", ";
+	
+	
+	return $fnameq . "=" . $val  . ", ";
+	
 }
 
 
 
 function _adodb_debug_execute(&$zthis, $sql, $inputarr)
 {
-global $HTTP_SERVER_VARS;
 
 	$ss = '';
 	if ($inputarr) {
@@ -811,18 +906,20 @@ global $HTTP_SERVER_VARS;
 	$sqlTxt = str_replace(',',', ',is_array($sql) ? $sql[0] : $sql);
 
 	// check if running from browser or command-line
-	$inBrowser = isset($HTTP_SERVER_VARS['HTTP_USER_AGENT']);
+	$inBrowser = isset($_SERVER['HTTP_USER_AGENT']);
 	
+	$dbt = $zthis->databaseType;
+	if (isset($zthis->dsnType)) $dbt .= '-'.$zthis->dsnType;
 	if ($inBrowser) {
 		$ss = htmlspecialchars($ss);
 		if ($zthis->debug === -1)
-			ADOConnection::outp( "<br>\n($zthis->databaseType): ".htmlspecialchars($sqlTxt)." &nbsp; <code>$ss</code>\n<br>\n",false);
+			ADOConnection::outp( "<br>\n($dbt): ".htmlspecialchars($sqlTxt)." &nbsp; <code>$ss</code>\n<br>\n",false);
 		else 
-			ADOConnection::outp( "<hr>\n($zthis->databaseType): ".htmlspecialchars($sqlTxt)." &nbsp; <code>$ss</code>\n<hr>\n",false);
+			ADOConnection::outp( "<hr>\n($dbt): ".htmlspecialchars($sqlTxt)." &nbsp; <code>$ss</code>\n<hr>\n",false);
 	} else {
-		ADOConnection::outp("-----\n($zthis->databaseType): ".$sqlTxt."\n-----\n",false);
+		ADOConnection::outp("-----\n($dbt): ".$sqlTxt."\n-----\n",false);
 	}
-	
+
 	$qID = $zthis->_query($sql,$inputarr);
 	
 	/* 
@@ -838,11 +935,12 @@ global $HTTP_SERVER_VARS;
 		ADOConnection::outp($zthis->ErrorNo() .': '. $zthis->ErrorMsg());
 	}
 	
+	if ($zthis->debug === 99) _adodb_backtrace(true,9999,2);
 	return $qID;
 }
 
 
-function _adodb_backtrace($printOrArr=true,$levels=9999)
+function _adodb_backtrace($printOrArr=true,$levels=9999,$skippy=0)
 {
 	if (PHPVERSION() < 4.3) return '';
 	 
@@ -860,6 +958,7 @@ function _adodb_backtrace($printOrArr=true,$levels=9999)
 	$tabs = sizeof($traceArr)-2;
 	
 	foreach ($traceArr as $arr) {
+		if ($skippy) {$skippy -= 1; continue;}
 		$levels -= 1;
 		if ($levels < 0) break;
 		

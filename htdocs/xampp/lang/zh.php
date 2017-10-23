@@ -289,7 +289,7 @@ $TEXT['iart-ok']="OK";
 // ---------------------------------------------------------------------
 
 $TEXT['flash-head']="Flash艺术(PHP+MING)";
-$TEXT['flash-text1']="MING的win32版本已经不再提供.<br>请阅读: <a class=blue target=extern href=\"http://ming.sourceforge.net/install.html/\">Ming - an SWF output library and PHP module</a>";
+$TEXT['flash-text1']="MING的win32版本已经不再提供.<br>请阅读: <a class=blue target=extern href=\"http://www.opaque.net/wiki/index.php?Ming\">Ming - an SWF output library and PHP module</a>";
 $TEXT['flash-ok']="OK";
 
 // ---------------------------------------------------------------------

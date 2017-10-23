@@ -301,7 +301,7 @@ $TEXT['iart-ok']="OK";
 $TEXT['flash-head']="Flash Art (Beispiel für PHP+MING)";
 $TEXT['flash-text2']="Font »AnkeCalligraph« von <a class=blue target=extern href=\"http://www.anke-art.de/\">Anke Arnold</a>";
 $TEXT['flash-ok']="OK";
-$TEXT['flash-text1']="Das MING Projekt für Windows wurde leider nicht weiterverfolgt und ist deshalb unvollständig.<br>Vgl. bitte <a class=blue target=extern href=\"http://ming.sourceforge.net/install.html/\">Ming - an SWF output library and PHP module</a>";
+$TEXT['flash-text1']="Das MING Projekt für Windows wurde leider nicht weiterverfolgt und ist deshalb unvollständig.<br>Vgl. bitte <a class=blue target=extern href=\"http://www.opaque.net/wiki/index.php?Ming\">Ming - an SWF output library and PHP module</a>";
 
 // ---------------------------------------------------------------------
 // PHONE BOOK DEMO

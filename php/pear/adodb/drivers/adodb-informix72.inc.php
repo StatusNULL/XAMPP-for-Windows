@@ -1,6 +1,6 @@
 <?php
 /*
-V4.60 24 Jan 2005  (c) 2000-2005 John Lim. All rights reserved.
+V4.63 17 May 2005  (c) 2000-2005 John Lim. All rights reserved.
   Released under both BSD license and Lesser GPL library license.
   Whenever there is any discrepancy between the two licenses,
   the BSD license will take precedence.
@@ -123,10 +123,10 @@ class ADODB_informix72 extends ADOConnection {
 		return true;
 	}
 
-	function RowLock($tables,$where)
+	function RowLock($tables,$where,$flds='1 as ignore')
 	{
 		if ($this->_autocommit) $this->BeginTrans();
-		return $this->GetOne("select 1 as ignore from $tables where $where for update");
+		return $this->GetOne("select $flds from $tables where $where for update");
 	}
 
 	/*	Returns: the last error message from previous database operation

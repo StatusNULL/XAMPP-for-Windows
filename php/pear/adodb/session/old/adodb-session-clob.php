@@ -1,6 +1,6 @@
 <?php
 /*
-  V4.60 24 Jan 2005  (c) 2000-2005 John Lim (jlim@natsoft.com.my). All rights reserved.
+  V4.63 17 May 2005  (c) 2000-2005 John Lim (jlim@natsoft.com.my). All rights reserved.
   Released under both BSD license and Lesser GPL library license. 
   Whenever there is any discrepancy between the two licenses, 
   the BSD license will take precedence.
@@ -15,24 +15,22 @@
  Example
  =======
  
- 	GLOBAL $HTTP_SESSION_VARS;
 	include('adodb.inc.php');
 	include('adodb-session.php');
 	session_start();
 	session_register('AVAR');
-	$HTTP_SESSION_VARS['AVAR'] += 1;
-	print "<p>\$HTTP_SESSION_VARS['AVAR']={$HTTP_SESSION_VARS['AVAR']}</p>";
+	$_SESSION['AVAR'] += 1;
+	print "<p>\$_SESSION['AVAR']={$_SESSION['AVAR']}</p>";
 	
 To force non-persistent connections, call adodb_session_open first before session_start():
 
- 	GLOBAL $HTTP_SESSION_VARS;
 	include('adodb.inc.php');
 	include('adodb-session.php');
 	adodb_session_open(false,false,false);
 	session_start();
 	session_register('AVAR');
-	$HTTP_SESSION_VARS['AVAR'] += 1;
-	print "<p>\$HTTP_SESSION_VARS['AVAR']={$HTTP_SESSION_VARS['AVAR']}</p>";
+	$_SESSION['AVAR'] += 1;
+	print "<p>\$_SESSION['AVAR']={$_SESSION['AVAR']}</p>";
 
  
  Installation
@@ -57,7 +55,7 @@ To force non-persistent connections, call adodb_session_open first before sessio
 	$ADODB_SESSION_TBL = 'sessions'
 	$ADODB_SESSION_USE_LOBS = false; (or, if you wanna use CLOBS (= 'CLOB') or ( = 'BLOB')
 	
-  3. Recommended is PHP 4.0.6 or later. There are documented
+  3. Recommended is PHP 4.1.0 or later. There are documented
 	 session bugs in earlier versions of PHP.
 
   4. If you want to receive notifications when a session expires, then
@@ -409,9 +407,8 @@ function adodb_sess_gc($maxlifetime)
 		$dbt = $ADODB_SESS_CONN->UnixTimeStamp($dbts);
 		$t = time();
 		if (abs($dbt - $t) >= ADODB_SESSION_SYNCH_SECS) {
-		global $HTTP_SERVER_VARS;
 			$msg = 
-			__FILE__.": Server time for webserver {$HTTP_SERVER_VARS['HTTP_HOST']} not in synch with database: database=$dbt ($dbts), webserver=$t (diff=".(abs($dbt-$t)/3600)." hrs)";
+			__FILE__.": Server time for webserver {$_SERVER['HTTP_HOST']} not in synch with database: database=$dbt ($dbts), webserver=$t (diff=".(abs($dbt-$t)/3600)." hrs)";
 			error_log($msg);
 			if ($ADODB_SESS_DEBUG) ADOConnection::outp("<p>$msg</p>");
 		}
@@ -433,12 +430,11 @@ session_set_save_handler(
 /*  TEST SCRIPT -- UNCOMMENT */
 
 if (0) {
-GLOBAL $HTTP_SESSION_VARS;
 
 	session_start();
 	session_register('AVAR');
-	$HTTP_SESSION_VARS['AVAR'] += 1;
-	ADOConnection::outp( "<p>\$HTTP_SESSION_VARS['AVAR']={$HTTP_SESSION_VARS['AVAR']}</p>",false);
+	$_SESSION['AVAR'] += 1;
+	ADOConnection::outp( "<p>\$_SESSION['AVAR']={$_SESSION['AVAR']}</p>",false);
 }
 
 ?>

@@ -9,6 +9,12 @@ program sendmail;
 
   requires indy 9 or higher
 
+  version 12
+    - added cc and bcc support
+
+  version 11
+    - added pop3 support (for pop before smtp authentication)
+
   version 10
     - added support for specifying a different smtp port
 
@@ -76,7 +82,7 @@ program sendmail;
 {$APPTYPE CONSOLE}
 
 uses
-  Windows, Classes, SysUtils, Registry, IniFiles, IDSmtp, IdMessage, IdEmailAddress, IdLogFile, IdGlobal;
+  Windows, Classes, SysUtils, Registry, IniFiles, IDSmtp, IDPOP3, IdMessage, IdEmailAddress, IdLogFile, IdGlobal;
 
 // ---------------------------------------------------------------------------
 
@@ -126,14 +132,23 @@ var
   authUsername  : string;
   authPassword  : string;
   forceSender   : string;
+  pop3server    : string;
+  pop3username  : string;
+  pop3password  : string;
 
-  i    : integer;
-  s    : string;
-  found: boolean;
-  ss   : TStringStream;
-  msg  : TIdMessage;
-  debug: TIdLogFile;
-  sl   : TStringList;
+  registry: TRegistry;
+  iniFile : TIniFile;
+  idPop3  : TIdPop3;
+  idSmtp  : TIdSmtp;
+
+  i     : integer;
+  s     : string;
+  found : boolean;
+  ss    : TStringStream;
+  msg   : TIdMessage;
+  debug : TIdLogFile;
+  sl    : TStringList;
+  header: boolean;
 
 begin
 
@@ -155,36 +170,39 @@ begin
 
   // read default domain from registry
 
-  with TRegistry.Create do
+  registry := TRegistry.Create;
   try
-    RootKey := HKEY_LOCAL_MACHINE;
-    if (OpenKeyReadOnly('\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters')) then
-      defaultDomain := ReadString('Domain');
+    registry.RootKey := HKEY_LOCAL_MACHINE;
+    if (registry.OpenKeyReadOnly('\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters')) then
+      defaultDomain := registry.ReadString('Domain');
   finally
-    Free;
+    registry.Free;
   end;
 
   // read ini
 
-  with TIniFile.Create(ChangeFileExt(ParamStr(0), '.ini')) do
+  iniFile := TIniFile.Create(ChangeFileExt(ParamStr(0), '.ini'));
   try
 
-    smtpServer    := ReadString('sendmail', 'smtp_server',    'mail.mydomain.com');
-    defaultDomain := ReadString('sendmail', 'default_domain', defaultDomain);
-    errorLogFile  := ReadString('sendmail', 'error_logfile',  '');
-    debugLogFile  := ReadString('sendmail', 'debug_logfile',  '');
-    authUsername  := ReadString('sendmail', 'auth_username',  '');
-    authPassword  := ReadString('sendmail', 'auth_password',  '');
-    forceSender   := ReadString('sendmail', 'force_sender',   '');
+    smtpServer    := iniFile.ReadString('sendmail', 'smtp_server',    'mail.mydomain.com');
+    defaultDomain := iniFile.ReadString('sendmail', 'default_domain', defaultDomain);
+    errorLogFile  := iniFile.ReadString('sendmail', 'error_logfile',  '');
+    debugLogFile  := iniFile.ReadString('sendmail', 'debug_logfile',  '');
+    authUsername  := iniFile.ReadString('sendmail', 'auth_username',  '');
+    authPassword  := iniFile.ReadString('sendmail', 'auth_password',  '');
+    forceSender   := iniFile.ReadString('sendmail', 'force_sender',   '');
+    pop3server    := iniFile.ReadString('sendmail', 'pop3_server',    '');
+    pop3username  := iniFile.ReadString('sendmail', 'pop3_username',  '');
+    pop3password  := iniFile.ReadString('sendmail', 'pop3_password',  '');
 
     if (smtpServer = 'mail.mydomain.com') or (defaultDomain = 'mydomain.com') then
     begin
-      writeln('you must configure the smtp_server and default_domain in ' + fileName);
+      writeln('you must configure the smtp_server and default_domain in ' + iniFile.fileName);
       halt(1);
     end;
 
   finally
-    Free;
+    iniFile.Free;
   end;
 
   if (errorLogFile <> '') and (ExtractFilePath(errorLogFile) = '') then
@@ -234,77 +252,112 @@ begin
 
       if (forceSender = '') and (Msg.From.Address = '') then
         raise Exception.Create('email is missing sender''s address');
-      if (Msg.Recipients.Count = 0) then
+      if (Msg.Recipients.Count = 0) and (Msg.CCList.Count = 0) and (Msg.BccList.Count = 0) then
         raise Exception.Create('email is missing recipient''s address');
 
-      with TIdSMTP.Create(nil) do
+      if (debugLogFile <> '') then
+      begin
+        debug          := TIdLogFile.Create(nil);
+        debug.FileName := debugLogFile;
+        debug.Active   := True;
+      end
+      else
+        debug := nil;
+
+      if ((pop3server <> '') and (pop3username <> '')) then
+      begin
+
+        // pop3 before smtp auth
+
+        idPop3 := TIdPOP3.Create(nil);
+        try
+          if (debug <> nil) then
+            idPop3.Intercept := debug;
+          idPop3.Host        := pop3server;
+          idPop3.Username    := pop3username;
+          idPop3.Password    := pop3password;
+          idPop3.Connect(10 * 1000);
+          idPop3.Disconnect;
+        finally
+          idPop3.free;
+        end;
+
+      end;
+
+      idSmtp := TIdSMTP.Create(nil);
       try
 
-        if (debugLogFile <> '') then
-        begin
-          debug          := TIdLogFile.Create(nil);
-          debug.FileName := debugLogFile;
-          debug.Active   := True;
-          Intercept      := debug;
-        end;
+        if (debug <> nil) then
+          idSmtp.Intercept := debug;
 
         // set host, port
 
         i := pos(':', smtpServer);
         if (i = 0) then
         begin
-          host := smtpServer;
-          port := 25;
+          idSmtp.host := smtpServer;
+          idSmtp.port := 25;
         end
         else
         begin
-          host := copy(smtpServer, 1, i - 1);
-          port := strToIntDef(copy(smtpServer, i + 1, length(smtpServer)), 25);
+          idSmtp.host := copy(smtpServer, 1, i - 1);
+          idSmtp.port := strToIntDef(copy(smtpServer, i + 1, length(smtpServer)), 25);
         end;
 
         // connect to server
 
-        Connect(10 * 1000);
+        idSmtp.Connect(10 * 1000);
 
         // authentication
 
         if (authUsername <> '') then
         begin
-          AuthenticationType := atLogin;
-          Username := authUsername;
-          Password := authPassword;
-          Authenticate;
+          idSmtp.AuthenticationType := atLogin;
+          idSmtp.Username := authUsername;
+          idSmtp.Password := authPassword;
+          idSmtp.Authenticate;
         end;
 
         // sender and recipients
 
         if (forceSender = '') then
-          SendCmd('MAIL FROM: <' + appendDomain(Msg.From.Address, defaultDomain) + '>', [250])
+          idSmtp.SendCmd('MAIL FROM: <' + appendDomain(Msg.From.Address, defaultDomain) + '>', [250])
         else
-          SendCmd('MAIL FROM: <' + appendDomain(forceSender, defaultDomain) + '>', [250]);
+          idSmtp.SendCmd('MAIL FROM: <' + appendDomain(forceSender, defaultDomain) + '>', [250]);
 
         for i := 0 to msg.Recipients.Count - 1 do
-          SendCmd('RCPT TO: <' + appendDomain(Msg.Recipients[i].Address, defaultDomain) + '>', [250]);
+          idSmtp.SendCmd('RCPT TO: <' + appendDomain(Msg.Recipients[i].Address, defaultDomain) + '>', [250]);
+
+        for i := 0 to msg.ccList.Count - 1 do
+          idSmtp.SendCmd('RCPT TO: <' + appendDomain(Msg.ccList[i].Address, defaultDomain) + '>', [250]);
+
+        for i := 0 to msg.BccList.Count - 1 do
+          idSmtp.SendCmd('RCPT TO: <' + appendDomain(Msg.BccList[i].Address, defaultDomain) + '>', [250]);
 
         // start message content
 
-        SendCmd('DATA', [354]);
+        idSmtp.SendCmd('DATA', [354]);
 
         // add date header if missing
 
         if (Msg.Headers.Values['date'] = '') then
-          writeln('Date: ' + DateTimeToInternetStr(Now));
+          idSmtp.writeln('Date: ' + DateTimeToInternetStr(Now));
 
         // send message line by line
 
         sl := TStringList.Create;
         try
           sl.Text := messageContent;
+          header  := true;
           for i := 0 to sl.Count - 1 do
           begin
             if (i = 0) and (sl[i] = '') then
               continue;
-            writeln(sl[i]);
+            if (sl[i] = '') then
+              header := false;
+            if (header) and (LowerCase(copy(sl[i], 1, 5)) = 'bcc: ') then
+              continue;
+            idSmtp.writeln(sl[i]);
           end;
         finally
           sl.Free;
@@ -312,11 +365,11 @@ begin
 
         // done
 
-        SendCmd('.', [250]);
-        SendCmd('QUIT');
+        idSmtp.SendCmd('.', [250]);
+        idSmtp.SendCmd('QUIT');
 
       finally
-        Free;
+        idSmtp.Free;
       end;
 
     finally

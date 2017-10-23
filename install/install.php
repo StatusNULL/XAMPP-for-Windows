@@ -60,6 +60,8 @@ global $xamppversion;
 if (file_exists("$partwampp\install\.version")) 
 { include_once("$partwampp\install\.version"); }
 $confhttpdroot=$partwampp."\apache\\conf\\httpd.conf";
+$confhttpd2root=$partwampp."\php\\php4\\httpd4.conf";
+$confhttpd3root=$partwampp."\php\\httpd5.conf";
 
 
 // Find the install status for xampp basic package in the install.sys file
@@ -217,6 +219,18 @@ if ($update=="perl")
 if (($update=="perl" || $update=="python" || $update=="java") && $updatemake=="makenew")
 	{
 	$datei = fopen($confhttpdroot,'a'); 
+	if($datei) 
+            { 
+			fputs($datei, $includehttpdconf);
+			}
+	fclose($datei);	
+	$datei = fopen($confhttpd2root,'a'); 
+	if($datei) 
+            { 
+			fputs($datei, $includehttpdconf);
+			}
+	fclose($datei);
+	$datei = fopen($confhttpd3root,'a'); 
 	if($datei) 
             { 
 			fputs($datei, $includehttpdconf);
@@ -838,8 +852,66 @@ if ($CS > 0)
 				}
 			}
 	fclose($datei);
+	unset ($newzeile);
+	$i=0;	
+	$datei = fopen($confhttpd2root,'r');
+	while(!feof($datei)) 
+	{
+	$zeile = fgets($datei,255);
+	$newzeile[]=$zeile; 
+	$i++; 
+	}
+	fclose($datei);
+	 $datei = fopen($confhttpd2root,'w'); 
+        if($datei) 
+            { 
+                for($z=0;$z<$i+1;$z++) 
+                { 
+					if (eregi($searchstring,$newzeile[$z]))
+					{
+						fputs($datei, $include);
+					}
+					else 
+					{ 
+					fputs($datei,$newzeile[$z]); 
+					}
+				}
+			}
+	fclose($datei);
+	unset ($newzeile);
+	$i=0;	
+	$datei = fopen($confhttpd3root,'r');
+	while(!feof($datei)) 
+	{
+	$zeile = fgets($datei,255);
+	$newzeile[]=$zeile; 
+	$i++; 
+	}
+	fclose($datei);
+	 $datei = fopen($confhttpd3root,'w'); 
+        if($datei) 
+            { 
+                for($z=0;$z<$i+1;$z++) 
+                { 
+					if (eregi($searchstring,$newzeile[$z]))
+					{
+						fputs($datei, $include);
+					}
+					else 
+					{ 
+					fputs($datei,$newzeile[$z]); 
+					}
+				}
+			}
+	fclose($datei);
+	unset ($newzeile);
 	echo "  Done!\r\n\r\n";	
+
+
+
 }
+
+
 }
 
 if ($updatemake=="")

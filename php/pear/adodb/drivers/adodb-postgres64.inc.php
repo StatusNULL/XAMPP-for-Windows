@@ -1,6 +1,6 @@
 <?php
 /*
- V4.60 24 Jan 2005  (c) 2000-2005 John Lim (jlim@natsoft.com.my). All rights reserved.
+ V4.63 17 May 2005  (c) 2000-2005 John Lim (jlim@natsoft.com.my). All rights reserved.
   Released under both BSD license and Lesser GPL library license. 
   Whenever there is any discrepancy between the two licenses, 
   the BSD license will take precedence.
@@ -91,8 +91,8 @@ WHERE relkind in ('r','v') AND (c.relname='%s' or c.relname = lower('%s'))
 	var $hasAffectedRows = true;
 	var $hasLimit = false;	// set to true for pgsql 7 only. support pgsql/mysql SELECT * FROM TABLE LIMIT 10
 	// below suggested by Freek Dijkstra 
-	var $true = 't';		// string that represents TRUE for a database
-	var $false = 'f';		// string that represents FALSE for a database
+	var $true = 'TRUE';		// string that represents TRUE for a database
+	var $false = 'FALSE';		// string that represents FALSE for a database
 	var $fmtDate = "'Y-m-d'";	// used by DBDate() as the default date format used by the database
 	var $fmtTimeStamp = "'Y-m-d G:i:s'"; // used by DBTimeStamp as the default timestamp fmt.
 	var $hasMoveFirst = true;
@@ -106,6 +106,7 @@ WHERE relkind in ('r','v') AND (c.relname='%s' or c.relname = lower('%s'))
 							// http://bugs.php.net/bug.php?id=25404
 							
 	var $_bindInputArray = false; // requires postgresql 7.3+ and ability to modify database
+	var $disableBlobs = false; // set to true to disable blob checking, resulting in 2-5% improvement in performance.
 	
 	// The last (fmtTimeStamp is not entirely correct: 
 	// PostgreSQL also has support for time zones, 
@@ -176,10 +177,10 @@ a different OID if a database must be reloaded. */
 		return @pg_Exec($this->_connectionID, "begin");
 	}
 	
-	function RowLock($tables,$where) 
+	function RowLock($tables,$where,$flds='1 as ignore') 
 	{
 		if (!$this->transCnt) $this->BeginTrans();
-		return $this->GetOne("select 1 as ignore from $tables where $where for update");
+		return $this->GetOne("select $flds from $tables where $where for update");
 	}
 
 	// returns true/false. 
@@ -304,6 +305,14 @@ select viewname,'V' from pg_views where viewname like $mask";
 				$s .= 'AM';
 				break;
 				
+			case 'w':
+				$s .= 'D';
+				break;
+			
+			case 'l':
+				$s .= 'DAY';
+				break;
+				
 			default:
 			// handle escape characters...
 				if ($ch == '\\') {
@@ -405,8 +414,13 @@ select viewname,'V' from pg_views where viewname like $mask";
 		// note that there is a pg_escape_bytea function only for php 4.2.0 or later
 	}
 	
+	// assumes bytea for blob, and varchar for clob
 	function UpdateBlob($table,$column,$val,$where,$blobtype='BLOB')
 	{
+	
+		if ($blobtype == 'CLOB') {
+    		return $this->Execute("UPDATE $table SET $column=" . $this->qstr($val) . " WHERE $where");
+		}
 		// do not use bind params which uses qstr(), as blobencode() already quotes data
 		return $this->Execute("UPDATE $table SET $column='".$this->BlobEncode($val)."'::bytea WHERE $where");
 	}
@@ -839,6 +853,8 @@ class ADORecordSet_postgres64 extends ADORecordSet{
 		$this->_numOfFields = @pg_numfields($qid);
 		
 		// cache types for blob decode check
+		// apparently pg_fieldtype actually performs an sql query on the database to get the type.
+		if (empty($this->connection->noBlobs))
 		for ($i=0, $max = $this->_numOfFields; $i < $max; $i++) {  
 			if (pg_fieldtype($qid,$i) == 'bytea') {
 				$this->_blobArr[$i] = pg_fieldname($qid,$i);
@@ -923,7 +939,7 @@ class ADORecordSet_postgres64 extends ADORecordSet{
 
 		$this->fields = @pg_fetch_array($this->_queryID,$this->_currentRow,$this->fetchMode);
 		
-	if ($this->fields && isset($this->_blobArr)) $this->_fixblobs();
+		if ($this->fields && isset($this->_blobArr)) $this->_fixblobs();
 			
 		return (is_array($this->fields));
 	}
