@@ -244,5 +244,26 @@ $TEXT['about-subhead3']="Colaboração";
 
 $TEXT['about-subhead4']="Contatos pessoais";
 
+	// ---------------------------------------------------------------------
+	// NAVI SPECIALS SECTION
+	// ---------------------------------------------------------------------
+	
+	$TEXT['navi-specials'] = "Specials";
+	
+	// ---------------------------------------------------------------------
+	// PS AND PARADOX EXAMPLE
+	// ---------------------------------------------------------------------
+
+    $TEXT['navi-ps'] = "PHP PostScript";
+	$TEXT['ps-head'] = "PostScript Module Example";
+	$TEXT['ps-text1'] = "PostScript Module »php_ps« by <a class=blue target=extern href=\"mailto:steinm@php.net\">Uwe Steinmann</a>";
+	$TEXT['ps-text2'] = "Tip: To convert PS files to PDF files on win32, you can use <a href=\"http://www.shbox.de/\" target=\"_new\">FreePDF</a> with <a href=\"http://www.ghostscript.com/awki/\" target=\"_new\">GhostScript</a>.";
+	
+	$TEXT['navi-paradox'] = "PHP Paradox";
+	$TEXT['paradox-head'] = "Paradox Module Example";
+	$TEXT['paradox-text1'] = "Paradox Module »php_paradox« by <a class=blue target=extern href=\"mailto:steinm@php.net\">Uwe Steinmann</a>";
+	$TEXT['paradox-text2'] = "<h2>Reading and writing a paradox database</h2>";
+	$TEXT['paradox-text3'] = "More examples you can find in the directory ";
+	$TEXT['paradox-text4'] = "Further information to Paradox databases in <a href=\"http://en.wikipedia.org/wiki/Paradox\" target=\"_new\">WikiPedia</a>.";
 
 ?>

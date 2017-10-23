@@ -31,7 +31,7 @@
  * - load of the libraries/defines_mysql.lib.php library to get the MySQL
  *   release number
  *
- * @version $Id: common.inc.php 10519 2007-07-22 18:36:05Z lem9 $
+ * @version $Id: common.inc.php 10896 2007-11-02 17:34:58Z lem9 $
  */
 
 /**
@@ -140,6 +140,21 @@ foreach ($GLOBALS as $key => $dummy) {
 }
 
 /**
+ * PATH_INFO could be compromised if set, so remove it from PHP_SELF
+ * and provide a clean PHP_SELF here
+ */
+$PMA_PHP_SELF = PMA_getenv('PHP_SELF');
+$_PATH_INFO = PMA_getenv('PATH_INFO');
+if (! empty($_PATH_INFO) && ! empty($PMA_PHP_SELF)) {
+    $path_info_pos = strrpos($PMA_PHP_SELF, $_PATH_INFO);
+    if ($path_info_pos + strlen($_PATH_INFO) === strlen($PMA_PHP_SELF)) {
+        $PMA_PHP_SELF = substr($PMA_PHP_SELF, 0, $path_info_pos);
+    }
+}
+$PMA_PHP_SELF = htmlspecialchars($PMA_PHP_SELF);
+
+
+/**
  * just to be sure there was no import (registering) before here
  * we empty the global space
  */
@@ -153,6 +168,7 @@ $variables_whitelist = array (
     '_ENV',
     '_COOKIE',
     '_SESSION',
+    'PMA_PHP_SELF',
 );
 
 foreach (get_defined_vars() as $key => $value) {
@@ -199,7 +215,7 @@ if (isset($_POST['usesubform'])) {
      * track this
      */
     if (isset($_POST['redirect'])
-      && $_POST['redirect'] != basename(PMA_getenv('PHP_SELF'))) {
+      && $_POST['redirect'] != basename($PMA_PHP_SELF)) {
         $__redirect = $_POST['redirect'];
         unset($_POST['redirect']);
     }
@@ -870,11 +886,11 @@ if (! defined('PMA_MINIMUM_COMMON')) {
      * (note: when $cfg['ServerDefault'] = 0, constant is not defined)
      */
 
-    if (defined('PMA_MYSQL_INT_VERSION') && PMA_MYSQL_INT_VERSION >= 50037 && isset($_REQUEST['profiling'])) {
-       $_SESSION['profiling'] = true;
+    if (PMA_profilingSupported() && isset($_REQUEST['profiling'])) {
+        $_SESSION['profiling'] = true;
     } elseif (isset($_REQUEST['profiling_form'])) {
-       // the checkbox was unchecked
-            unset($_SESSION['profiling']);
+        // the checkbox was unchecked
+        unset($_SESSION['profiling']);
     }
 
 } // end if !defined('PMA_MINIMUM_COMMON')

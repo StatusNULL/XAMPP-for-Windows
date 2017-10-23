@@ -4,7 +4,7 @@
  * Set of functions used to run http authentication.
  * NOTE: Requires PHP loaded as a Apache module.
  *
- * @version $Id: http.auth.lib.php 10461 2007-06-25 11:41:58Z lem9 $
+ * @version $Id: http.auth.lib.php 10893 2007-11-01 20:59:48Z lem9 $
  */
 
 
@@ -36,7 +36,9 @@ function PMA_auth() {
     $server_message = preg_replace('/[^\x20-\x7e]/i', '', $server_message);
     header('WWW-Authenticate: Basic realm="phpMyAdmin ' . $server_message .  '"');
     header('HTTP/1.0 401 Unauthorized');
-    header('status: 401 Unauthorized');
+    if (php_sapi_name() !== 'cgi-fcgi') {
+	header('status: 401 Unauthorized');
+    }
 
     // Defines the charset to be used
     header('Content-Type: text/html; charset=' . $GLOBALS['charset']);
@@ -101,16 +103,19 @@ function PMA_auth_check()
         if (PMA_getenv('PHP_AUTH_USER')) {
             $PHP_AUTH_USER = PMA_getenv('PHP_AUTH_USER');
         } elseif (PMA_getenv('REMOTE_USER')) {
-            // CGI, might be encoded, see bellow
+            // CGI, might be encoded, see below
             $PHP_AUTH_USER = PMA_getenv('REMOTE_USER');
+        } elseif (PMA_getenv('REDIRECT_REMOTE_USER')) {
+            // CGI, might be encoded, see below
+            $PHP_AUTH_USER = PMA_getenv('REDIRECT_REMOTE_USER');
         } elseif (PMA_getenv('AUTH_USER')) {
             // WebSite Professional
             $PHP_AUTH_USER = PMA_getenv('AUTH_USER');
         } elseif (PMA_getenv('HTTP_AUTHORIZATION')) {
-            // IIS, might be encoded, see bellow
+            // IIS, might be encoded, see below
             $PHP_AUTH_USER = PMA_getenv('HTTP_AUTHORIZATION');
         } elseif (PMA_getenv('Authorization')) {
-            // FastCGI, might be encoded, see bellow
+            // FastCGI, might be encoded, see below
             $PHP_AUTH_USER = PMA_getenv('Authorization');
         }
     }

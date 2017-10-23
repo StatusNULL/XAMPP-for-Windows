@@ -1,3 +1,18 @@
+13. Dez 2007 XAMPP 1.6.5 Beta 2
+- Upgrade php_xdebug-2.0.2-5.2.5.dll as php_xdebug.dll
+
+11. Dez 2007 XAMPP 1.6.5 Beta 1
+- Upgrade PHP 5.2.5
+- Upgrade eAccelerator 0.9.5.2 für PHP 5.2.5
+- Upgrade MySQL 5.0.51
+- Upgrade phpMyAdmin 2.11.3
+- Upgrade FileZilla FTP Server 0.9.24
+- Upgrade ADOdb 4.96
+- Upgrade Mercury Mail Transport System v4.52
+
+19 Nov 2007 XAMPP 1.6.5 Beta 0
+- Upgrade OpenSSL 0.9.8g
+
 30 Sept 2007 XAMPP 1.6.4 Beta 3
 - Upgrade eAccelerator 0.9.5.2 für PHP 5.2.4
 - Upgrade phpMyAdmin 2.11.1

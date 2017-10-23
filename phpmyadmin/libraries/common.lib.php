@@ -3,7 +3,7 @@
 /**
  * Misc functions used all over the scripts.
  *
- * @version $Id: common.lib.php 10619 2007-09-09 13:51:15Z lem9 $
+ * @version $Id: common.lib.php 10941 2007-11-25 12:58:41Z lem9 $
  */
 
 /**
@@ -572,7 +572,7 @@ function PMA_mysqlDie($error_message = '', $the_query = '',
  *
  * @access  private
  */
-function PMA_convert_using($string, $mode='unquoted')
+function PMA_convert_using($string, $mode='unquoted', $force_utf8 = false)
 {
     if ($mode == 'quoted') {
         $possible_quote = "'";
@@ -581,8 +581,14 @@ function PMA_convert_using($string, $mode='unquoted')
     }
 
     if (PMA_MYSQL_INT_VERSION >= 40100) {
-        list($conn_charset) = explode('_', $GLOBALS['collation_connection']);
-        $converted_string = "CONVERT(" . $possible_quote . $string . $possible_quote . " USING " . $conn_charset . ")";
+        if ($force_utf8) {
+            $charset = 'utf8';
+            $collate = ' COLLATE utf8_bin';
+        } else {
+            list($charset) = explode('_', $GLOBALS['collation_connection']);
+            $collate = '';
+        }
+        $converted_string = "CONVERT(" . $possible_quote . $string . $possible_quote . " USING " . $charset . ")" . $collate;
     } else {
         $converted_string = $possible_quote . $string . $possible_quote;
     }
@@ -1209,6 +1215,25 @@ function PMA_showMessage($message, $sql_query = null)
 
 
 /**
+ * Verifies if current MySQL server supports profiling 
+ *
+ * @access  public
+ * @return  boolean whether profiling is supported 
+ *
+ * @author   Marc Delisle 
+ */
+function PMA_profilingSupported() {
+    // 5.0.37 has profiling but for example, 5.1.20 does not
+    // (avoid a trip to the server for MySQL before 5.0.37)
+    // and do not set a constant as we might be switching servers
+    if (defined('PMA_MYSQL_INT_VERSION') && PMA_MYSQL_INT_VERSION >= 50037 && PMA_DBI_fetch_value("SHOW VARIABLES LIKE 'profiling'")) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+/**
  * Displays a form with the Profiling checkbox 
  *
  * @param   string  $sql_query
@@ -1217,9 +1242,7 @@ function PMA_showMessage($message, $sql_query = null)
  * @author   Marc Delisle 
  */
 function PMA_profilingCheckbox($sql_query) {
-    // 5.0.37 has profiling but for example, 5.1.20 does not
-    // (avoid doing a fetch_value for MySQL before 5.0.37)
-    if (PMA_MYSQL_INT_VERSION >= 50037 && PMA_DBI_fetch_value("SHOW VARIABLES LIKE 'profiling'")) {
+    if (PMA_profilingSupported()) {
         echo '<form action="sql.php" method="post">' . "\n";
         echo PMA_generate_common_hidden_inputs($GLOBALS['db'], $GLOBALS['table']);
         echo '<input type="hidden" name="sql_query" value="' . $sql_query . '" />' . "\n";
@@ -1286,8 +1309,12 @@ function PMA_formatByteDown($value, $limes = 6, $comma = 0)
     } // end for
 
     if ($unit != $GLOBALS['byteUnits'][0]) {
-        $return_value = PMA_formatNumber($value, 5, $comma);
+        // if the unit is not bytes (as represented in current language)
+        // reformat with max length of 5
+        // 4th parameter=true means do not reformat if value < 1
+        $return_value = PMA_formatNumber($value, 5, $comma, true);
     } else {
+        // do not reformat, just handle the locale
         $return_value = PMA_formatNumber($value, 0);
     }
 
@@ -1357,7 +1384,7 @@ function PMA_formatNumber($value, $length = 3, $comma = 0, $only_down = false)
         $length = 3 - $comma;
     }
 
-    // check for negativ value to retain sign
+    // check for negative value to retain sign
     if ($value < 0) {
         $sign = '-';
         $value = abs($value);
@@ -1449,6 +1476,7 @@ function PMA_localisedDate($timestamp = -1, $format = '')
  * returns a tab for tabbed navigation.
  * If the variables $link and $args ar left empty, an inactive tab is created
  *
+ * @uses    $GLOBALS['PMA_PHP_SELF']
  * @uses    $GLOBALS['strEmpty']
  * @uses    $GLOBALS['strDrop']
  * @uses    $GLOBALS['active_page']
@@ -1492,7 +1520,7 @@ function PMA_getTab($tab)
         } elseif (!empty($tab['active'])
           || (isset($GLOBALS['active_page'])
                && $GLOBALS['active_page'] == $tab['link'])
-          || (basename(PMA_getenv('PHP_SELF')) == $tab['link'] && empty($tab['warning'])))
+          || (basename($GLOBALS['PMA_PHP_SELF']) == $tab['link'] && empty($tab['warning'])))
         {
             $tab['class'] = 'active';
         }
@@ -1788,6 +1816,7 @@ function PMA_flipstring($string, $Separator = "<br />\n")
  * @todo    use PMA_fatalError() if $die === true?
  * @uses    PMA_getenv()
  * @uses    header_meta_style.inc.php
+ * @uses    $GLOBALS['PMA_PHP_SELF']
  * basename
  * @param   array   The names of the parameters needed by the calling
  *                  script.
@@ -1809,7 +1838,7 @@ function PMA_checkParameters($params, $die = true, $request = true)
         $checked_special = false;
     }
 
-    $reported_script_name = basename(PMA_getenv('PHP_SELF'));
+    $reported_script_name = basename($GLOBALS['PMA_PHP_SELF']);
     $found_error = false;
     $error_message = '';
 

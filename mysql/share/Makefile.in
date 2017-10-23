@@ -76,7 +76,7 @@ am__aclocal_m4_deps = $(top_srcdir)/config/ac-macros/alloca.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/config.h
+CONFIG_HEADER = $(top_builddir)/include/config.h
 CONFIG_CLEAN_FILES =
 SOURCES =
 DIST_SOURCES =

@@ -4,7 +4,7 @@
  * displays status variables with descriptions and some hints an optmizing
  *  + reset status variables
  *
- * @version $Id: server_status.php 10423 2007-06-07 00:23:33Z lem9 $
+ * @version $Id: server_status.php 10871 2007-10-22 12:15:53Z lem9 $
  */
 
 /**
@@ -242,7 +242,7 @@ $allocations = array(
 $sections = array(
     // section => section name (description)
     'com'           => array('title' => ''),
-    'query'         => array('title' => ''),
+    'query'         => array('title' => $strSQLQuery),
     'innodb'        => array('title' => 'InnoDB'),
     'ndb'           => array('title' => 'NDB'),
     'ssl'           => array('title' => 'SSL'),
@@ -267,11 +267,8 @@ $sections = array(
 // variable or section name => (name => url)
 $links = array();
 
-// because of PMA_NO_VARIABLES_IMPORT, the $PHP_SELF globalized by
-// grab_globals is not available here when register_globals = Off
-// and in some situations, $_SERVER['PHP_SELF'] is not defined
 $links['table'][$strFlushTables]
-    = PMA_getenv('PHP_SELF') . '?flush=TABLES&amp;' . PMA_generate_common_url();
+    = $PMA_PHP_SELF . '?flush=TABLES&amp;' . PMA_generate_common_url();
 $links['table'][$strShowOpenTables]
     = 'sql.php?sql_query=' . urlencode('SHOW OPEN TABLES') .
       '&amp;goto=server_status.php&amp;' . PMA_generate_common_url();
@@ -282,39 +279,29 @@ $links['repl'][$strShowSlaveHosts]
 $links['repl'][$strShowSlaveStatus]
     = 'sql.php?sql_query=' . urlencode('SHOW SLAVE STATUS') .
       '&amp;goto=server_status.php&amp;' . PMA_generate_common_url();
-$links['repl']['MySQL - ' . $strDocu]
-    = $cfg['MySQLManualBase'] . '/replication.html';
+$links['repl']['doc'] = 'replication';
 
 $links['qcache'][$strFlushQueryCache]
-    = PMA_getenv('PHP_SELF') . '?flush=' . urlencode('QUERY CACHE') . '&amp;' .
+    = $PMA_PHP_SELF . '?flush=' . urlencode('QUERY CACHE') . '&amp;' .
       PMA_generate_common_url();
-$links['qcache']['MySQL - ' . $strDocu]
-    = $cfg['MySQLManualBase'] . '/query-cache.html';
+$links['qcache']['doc'] = 'query_cache';
 
 $links['threads'][$strMySQLShowProcess]
     = 'server_processlist.php?' . PMA_generate_common_url();
-$links['threads']['MySQL - ' . $strDocu]
-    = $cfg['MySQLManualBase'] . '/mysql-threads.html';
+$links['threads']['doc'] = 'mysql_threads';
 
-$links['key']['MySQL - ' . $strDocu]
-    = $cfg['MySQLManualBase'] . '/myisam-key-cache.html';
+$links['key']['doc'] = 'myisam_key_cache';
 
-$links['slow_queries']['MySQL - ' . $strDocu]
-    = $cfg['MySQLManualBase'] . '/slow-query-log.html';
+$links['binlog_cache']['doc'] = 'binary_log';
 
-$links['binlog_cache']['MySQL - ' . $strDocu]
-    = $cfg['MySQLManualBase'] . '/binary-log.html';
-
-$links['Slow_queries']['MySQL - ' . $strDocu]
-    = $cfg['MySQLManualBase'] . '/slow-query-log.html';
+$links['Slow_queries']['doc'] = 'slow_query_log';
 
 $links['innodb'][$strServerTabVariables]
     = 'server_engines.php?engine=InnoDB&amp;' . PMA_generate_common_url();
 $links['innodb'][$strInnodbStat]
     = 'server_engines.php?engine=InnoDB&amp;page=Status&amp;' .
       PMA_generate_common_url();
-$links['innodb']['MySQL - ' . $strDocu]
-    = $cfg['MySQLManualBase'] . '/innodb.html';
+$links['innodb']['doc'] = 'innodb';
 
 
 // sort status vars into arrays
@@ -345,14 +332,12 @@ $hour_factor    = 3600 / $server_status['Uptime'];
 ?>
 <div id="statuslinks">
     <a href="<?php echo
-        PMA_getenv('PHP_SELF') . '?' . PMA_generate_common_url(); ?>"
+        $PMA_PHP_SELF . '?' . PMA_generate_common_url(); ?>"
        ><?php echo $strRefresh; ?></a>
     <a href="<?php echo
-        PMA_getenv('PHP_SELF') . '?flush=STATUS&amp;' . PMA_generate_common_url(); ?>"
+        $PMA_PHP_SELF . '?flush=STATUS&amp;' . PMA_generate_common_url(); ?>"
        ><?php echo $strShowStatusReset; ?></a>
-    <a href="<?php echo
-        $cfg['MySQLManualBase']; ?>/server-status-variables.html"
-       target="documentation">MySQL - <?php echo $strDocu; ?></a>
+       <?php echo PMA_showMySQLDocu('server_status_variables','server_status_variables'); ?>
 </div>
 
 <p>
@@ -367,7 +352,7 @@ echo sprintf($strServerStatusUptime,
 <?php
 foreach ($sections as $section_name => $section) {
     if (! empty($section['vars']) && ! empty($section['title'])) {
-        echo '<a href="' . PMA_getenv('PHP_SELF') . '?' .
+        echo '<a href="' . $PMA_PHP_SELF . '?' .
              PMA_generate_common_url() . '#' . $section_name . '">' .
              $section['title'] . '</a>' . "\n";
     }
@@ -586,7 +571,7 @@ foreach ($sections as $section_name => $section) {
     <table class="data" id="serverstatussection<?php echo $section_name; ?>">
     <caption class="tblHeaders">
         <a class="top"
-           href="<?php echo PMA_getenv('PHP_SELF') . '?' .
+           href="<?php echo $PMA_PHP_SELF . '?' .
                  PMA_generate_common_url() . '#serverstatus'; ?>"
            name="<?php echo $section_name; ?>"><?php echo $strPos1; ?>
             <?php echo
@@ -619,7 +604,11 @@ if (! empty($section['title'])) {
             <th colspan="3" class="tblFooters">
 <?php
             foreach ($links[$section_name] as $link_name => $link_url) {
-                echo '<a href="' . $link_url . '">' . $link_name . '</a>' . "\n";
+                if ('doc' == $link_name) {
+                    echo PMA_showMySQLDocu($link_url, $link_url);
+                } else {
+                    echo '<a href="' . $link_url . '">' . $link_name . '</a>' . "\n";
+                }
             }
             unset($link_url, $link_name);
 ?>
@@ -666,8 +655,12 @@ if (! empty($section['title'])) {
 
             if (isset($links[$name])) {
                 foreach ($links[$name] as $link_name => $link_url) {
-                    echo ' <a href="' . $link_url . '">' . $link_name . '</a>' .
+                    if ('doc' == $link_name) {
+                        echo PMA_showMySQLDocu($link_url, $link_url);
+                    } else {
+                        echo ' <a href="' . $link_url . '">' . $link_name . '</a>' .
                         "\n";
+                    }
                 }
                 unset($link_url, $link_name);
             }

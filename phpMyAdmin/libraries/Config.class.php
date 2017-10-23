@@ -3,7 +3,7 @@
 /**
  *
  *
- * @version $Id: Config.class.php 10655 2007-09-20 16:33:07Z lem9 $
+ * @version $Id: Config.class.php 10967 2007-12-08 12:46:36Z lem9 $
  */
 
 /**
@@ -85,7 +85,7 @@ class PMA_Config
      */
     function checkSystem()
     {
-        $this->set('PMA_VERSION', '2.11.1');
+        $this->set('PMA_VERSION', '2.11.3');
         /**
          * @deprecated
          */
@@ -544,8 +544,7 @@ class PMA_Config
      */
     function getMtime()
     {
-        return $this->source_mtime + $this->default_source_mtime + $_SESSION['PMA_Theme']->mtime_info;
-        //"max()" most probably would only returns "source" last modified timestamp.
+        return intval($_SESSION['PMA_Config']->get('fontsize')) + ($this->source_mtime + $this->default_source_mtime + $_SESSION['PMA_Theme']->mtime_info);
     }
 
     /**
@@ -752,11 +751,16 @@ class PMA_Config
      */
     function checkUpload()
     {
-        $this->set('enable_upload', true);
-        if (strtolower(@ini_get('file_uploads')) == 'off'
-          || @ini_get('file_uploads') == 0) {
+        if (ini_get('file_uploads')) {
+            $this->set('enable_upload', true);
+            // if set "php_admin_value file_uploads Off" in httpd.conf
+            // ini_get() also returns the string "Off" in this case:
+            if ('off' == strtolower(ini_get('file_uploads'))) {
+                $this->set('enable_upload', false);
+            }
+         } else {
             $this->set('enable_upload', false);
-        }
+         }
     }
 
     /**

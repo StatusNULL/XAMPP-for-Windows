@@ -31,6 +31,9 @@ REM Check PEAR global ENV, set them if they do not exist
 IF "%PHP_PEAR_INSTALL_DIR%"=="" SET "PHP_PEAR_INSTALL_DIR=\xampp\php\pear"
 IF "%PHP_PEAR_BIN_DIR%"=="" SET "PHP_PEAR_BIN_DIR=\xampp\php"
 IF "%PHP_PEAR_PHP_BIN%"=="" SET "PHP_PEAR_PHP_BIN=\xampp\php\.\php.exe"
+IF "%PHP_PEAR_DATA_DIR%"=="" SET "PHP_PEAR_DATA_DIR=\xampp\php\pear\data"
+IF "%PHP_PEAR_DOC_DIR%"=="" SET "PHP_PEAR_DOC_DIR=\xampp\php\pear\docs"
+IF "%PHP_PEAR_TEST_DIR%"=="" SET "PHP_PEAR_TEST_DIR=\xampp\php\pear\tests"
 GOTO :INSTALLED
 
 :NOTINSTALLED

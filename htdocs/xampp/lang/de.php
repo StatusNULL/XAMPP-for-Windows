@@ -182,7 +182,7 @@
 
 	$TEXT['start-text4'] = "Für die OpenSSL Unterstützung benutzt bitte das Testzertifikat mit der URL <a href='https://127.0.0.1' target='_top'>https://127.0.0.1</a> bzw. <a href='https://localhost' target='_top'>https://localhost</a>";
 
-	$TEXT['start-text5'] = "Und ganz wichtig! Einen großen Dank für die Mitarbeit und Mithilfe an Carsten, Nemesis, KriS, Boppy, Pc-Dummy und allen anderen Freunden von XAMPP!";
+	$TEXT['start-text5'] = "In dieser Release geht ein herzlicher Dank an <a href=\"http://www.php.net/credits.php\" target=\"_new\">Uwe Steinmann</a> für seine ausgezeichnete Entwicklung und Übersetzung der aktuellen \"Special\" Module!";
 
 	$TEXT['start-text6'] = "Viel Spaß, Kay Vogelgesang + Kai 'Oswald' Seidler";
 
@@ -455,4 +455,26 @@
 	$TEXT['guest1-text1'] = "Ein netter HMTL ONLINE Editor mit viel JavaScript. Optimiert für den IE, funktioniert übrigens nicht mit dem Mozilla FireFox.";
 	$TEXT['guest1-text2'] = "FCKeditor Homepage: <a href=\"http://www.fckeditor.net\" target=\"_new\">www.fckeditor.net</a>. Übrigens: Der Font Arial funktioniert nicht, aber vielleicht weiß hier jemand weiter?";
 	$TEXT['guest1-text3'] = "<a href=\"guest-FCKeditor/fckedit-dynpage.php\" target=\"_new\">Zur dynamischen Seite bearbeitet mit FCKeditor.</A>";
+	
+	// ---------------------------------------------------------------------
+	// NAVI SPECIALS SECTION
+	// ---------------------------------------------------------------------	
+	
+	$TEXT['navi-specials'] = "Specials";
+	
+  	// ---------------------------------------------------------------------
+	// PS AND PARADOX EXAMPLE
+	// ---------------------------------------------------------------------
+
+  	$TEXT['navi-ps'] = "PHP PostScript";
+	$TEXT['ps-head'] = "PostScript Modul Beispiel";
+	$TEXT['ps-text1'] = "PostScript Modul »php_ps« von <a class=blue target=extern href=\"mailto:steinm@php.net\">Uwe Steinmann</a>";
+	$TEXT['ps-text2'] = "Tipp: Zum konvertieren von PS-Dateien zu PDF-Dateien unter win32 kann <a href=\"http://www.shbox.de/\" target=\"_new\">FreePDF</a> mit <a href=\"http://www.ghostscript.com/awki/\" target=\"_new\">GhostScript</a> benutzt werden.";
+  
+  	$TEXT['navi-paradox'] = "PHP Paradox";
+  	$TEXT['paradox-head'] = "Paradox Modul Beispiel";
+	$TEXT['paradox-text1'] = "Paradox Modul »php_paradox« von <a class=blue target=extern href=\"mailto:steinm@php.net\">Uwe Steinmann</a>";
+	$TEXT['paradox-text2'] = "<h2>Lesen und Schreiben einer Paradax Datenbank</h2>";
+	$TEXT['paradox-text3'] = "Weitere Beispiele gibt es im Verzeichnis ";
+  	$TEXT['paradox-text4'] = "Weiterführende Informationen zu Paradox Datenbanken in <a href=\"http://de.wikipedia.org/wiki/Paradox_%28Datenbank%29\" target=\"_new\">WikiPedia</a>.";
 ?>

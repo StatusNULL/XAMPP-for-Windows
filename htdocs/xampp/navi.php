@@ -58,6 +58,19 @@
 					<?php include "navitools.inc"; ?>
 					<?php include "naviservers.inc"; ?>
 					<?php include "naviother.inc"; ?>
+					
+					<br>
+					<br>
+					<span class="nh"><?php echo $TEXT['navi-specials']; ?></span><br>
+				</td>
+			</tr>		
+			<tr>
+				<td height="1" bgcolor="#fb7922" colspan="1" style="background-image:url(img/strichel.gif)" class="white"></td>
+			</tr>
+			
+			<tr valign="top">
+				<td align="right" class="navi">
+					<?php include "special.inc"; ?>
 				</td>
 			</tr>
 			<tr>
@@ -69,6 +82,7 @@
 					<br>
 				</td>
 			</tr>
+			
 			<tr valign="top">
 				<td align="right" class="navi">
 &nbsp;
