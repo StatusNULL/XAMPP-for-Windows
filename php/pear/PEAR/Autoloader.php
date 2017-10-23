@@ -1,4 +1,23 @@
 <?php
+// /* vim: set expandtab tabstop=4 shiftwidth=4: */
+// +----------------------------------------------------------------------+
+// | PHP Version 4                                                        |
+// +----------------------------------------------------------------------+
+// | Copyright (c) 1997-2003 The PHP Group                                |
+// +----------------------------------------------------------------------+
+// | This source file is subject to version 3.0 of the PHP license,       |
+// | that is bundled with this package in the file LICENSE, and is        |
+// | available through the world-wide-web at the following url:           |
+// | http://www.php.net/license/3_0.txt.                                  |
+// | If you did not receive a copy of the PHP license and are unable to   |
+// | obtain it through the world-wide-web, please send a note to          |
+// | license@php.net so we can mail you a copy immediately.               |
+// +----------------------------------------------------------------------+
+// | Author: Stig Bakken <ssb@php.net>                                    |
+// |                                                                      |
+// +----------------------------------------------------------------------+
+//
+// $Id: Autoloader.php,v 1.8 2003/10/05 16:42:18 mj Exp $
 
 if (!extension_loaded("overload")) {
     // die hard without ext/overload
@@ -19,10 +38,12 @@ require_once "PEAR.php";
  * methods, an instance of each class providing separated methods is
  * stored and called every time the aggregated method is called.
  *
- * @author Stig Sæther Bakken <ssb@fast.no>
+ * @author Stig Sæther Bakken <ssb@php.net>
  */
 class PEAR_Autoloader extends PEAR
 {
+    // {{{ properties
+
     /**
      * Map of methods and classes where they are defined
      *
@@ -40,6 +61,9 @@ class PEAR_Autoloader extends PEAR
      * @access private
      */
     var $_method_map = array();
+
+    // }}}
+    // {{{ addAutoload()
 
     /**
      * Add one or more autoload entries.
@@ -66,6 +90,9 @@ class PEAR_Autoloader extends PEAR
         }
     }
 
+    // }}}
+    // {{{ removeAutoload()
+
     /**
      * Remove an autoload entry.
      *
@@ -74,13 +101,16 @@ class PEAR_Autoloader extends PEAR
      * @return bool TRUE if an entry was removed, FALSE if not
      *
      * @access public
-     */       
+     */
     function removeAutoload($method)
     {
         $ok = isset($this->_autoload_map[$method]);
         unset($this->_autoload_map[$method]);
         return $ok;
     }
+
+    // }}}
+    // {{{ addAggregateObject()
 
     /**
      * Add an aggregate object to this object.  If the specified class
@@ -112,6 +142,9 @@ class PEAR_Autoloader extends PEAR
         }
     }
 
+    // }}}
+    // {{{ removeAggregateObject()
+
     /**
      * Remove an aggregate object.
      *
@@ -134,6 +167,9 @@ class PEAR_Autoloader extends PEAR
         }
         return $ok;
     }
+
+    // }}}
+    // {{{ __call()
 
     /**
      * Overloaded object call handler, called each time an
@@ -160,6 +196,8 @@ class PEAR_Autoloader extends PEAR
         }
         return false;
     }
+
+    // }}}
 }
 
 overload("PEAR_Autoloader");

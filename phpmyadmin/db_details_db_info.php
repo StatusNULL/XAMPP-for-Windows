@@ -1,6 +1,16 @@
 <?php
-/* $Id: db_details_db_info.php,v 1.6 2003/05/13 16:26:35 nijel Exp $ */
+/* $Id: db_details_db_info.php,v 1.7 2003/07/19 11:01:51 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
+
+
+// Check parameters
+
+if (!defined('PMA_COMMON_LIB_INCLUDED')) {
+    include('./libraries/common.lib.php');
+}
+
+PMA_checkParameters(array('db'));
+
 
 /**
  * Gets the list of the table in the current db and informations about these

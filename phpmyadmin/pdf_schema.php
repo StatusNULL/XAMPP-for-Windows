@@ -1,5 +1,5 @@
 <?php
-/* $Id: pdf_schema.php,v 1.51 2003/05/14 11:00:51 garvinhicking Exp $ */
+/* $Id: pdf_schema.php,v 1.56 2003/07/10 13:10:53 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -733,7 +733,6 @@ class PMA_RT_Table
         list($this->x, $this->y) = PMA_mysql_fetch_array($result);
         $this->x = (double) $this->x;
         $this->y = (double) $this->y;
-
         // displayfield
         $this->displayfield = PMA_getDisplayField($db, $table_name);
 
@@ -985,7 +984,7 @@ class PMA_RT
 
         // Draws horizontal lines
         for ($l = 0; $l < 21; $l++) {
-            $pdf->line(0, $l * 10, 297, $l * 10);
+            $pdf->line(0, $l * 10, $pdf->fh, $l * 10);
             // Avoid duplicates
             if ($l > 0) {
                 $pdf->SetXY(0, $l * 10);
@@ -996,7 +995,7 @@ class PMA_RT
 
         // Draws vertical lines
         for ($j = 0; $j < 30 ;$j++) {
-            $pdf->line($j * 10, 0, $j * 10, 210);
+            $pdf->line($j * 10, 0, $j * 10, $pdf->fw);
             $pdf->SetXY($j * 10, 0);
             $label = (string) sprintf('%.0f', ($j * 10 - $this->l_marg) * $this->scale + $this->x_min);
             $pdf->Cell(5, 7, $label);
@@ -1097,7 +1096,7 @@ class PMA_RT
      *
      * @see     PMA_PDF
      */
-    function PMA_RT( $which_rel, $show_info = 0, $change_color = 0 , $show_grid = 0, $all_tab_same_wide = 0, $orientation = 'L')
+    function PMA_RT( $which_rel, $show_info = 0, $change_color = 0 , $show_grid = 0, $all_tab_same_wide = 0, $orientation = 'L', $paper = 'A4')
     {
         global $pdf, $db, $cfgRelation, $with_doc;
 
@@ -1106,7 +1105,7 @@ class PMA_RT
         $this->same_wide = $all_tab_same_wide;
 
         // Initializes a new document
-        $pdf          = new PMA_PDF('L');
+        $pdf          = new PMA_PDF('L', 'mm', $paper);
         $pdf->title   = sprintf($GLOBALS['strPdfDbSchema'], $GLOBALS['db'], $which_rel);
         $pdf->cMargin = 0;
         $pdf->Open();
@@ -1135,8 +1134,9 @@ class PMA_RT
         }
         while ($curr_table = @PMA_mysql_fetch_array($tab_rs)) {
             $alltables[] = PMA_sqlAddslashes($curr_table['table_name']);
-            $intable     = '\'' . implode('\', \'', $alltables) . '\'';
+            //$intable     = '\'' . implode('\', \'', $alltables) . '\'';
         }
+
         //              make doc                    //
         if ($with_doc) {
             $pdf->SetAutoPageBreak('auto',15);
@@ -1173,7 +1173,7 @@ class PMA_RT
             $this->PMA_RT_setMinMax($this->tables[$table]);
         }
         // Defines the scale factor
-        $this->scale = ceil(max(($this->x_max - $this->x_min) / (297 - $this->r_marg - $this->l_marg), ($this->y_max - $this->y_min) / (210 - $this->t_marg - $this->b_marg)) * 100) / 100;
+        $this->scale = ceil(max(($this->x_max - $this->x_min) / ($pdf->fh - $this->r_marg - $this->l_marg), ($this->y_max - $this->y_min) / ($pdf->fw - $this->t_marg - $this->b_marg)) * 100) / 100;
         $pdf->PMA_PDF_setScale($this->scale, $this->x_min, $this->y_min, $this->l_marg, $this->t_marg);
 
 
@@ -1187,29 +1187,54 @@ class PMA_RT
         $pdf->PMA_PDF_setFontSizeScale(14);
 
 
-                                /* start snip */
+//        $sql    = 'SELECT * FROM ' . PMA_backquote($cfgRelation['relation'])
+//                .   ' WHERE master_db   = \'' . PMA_sqlAddslashes($db) . '\' '
+//                .   ' AND foreign_db    = \'' . PMA_sqlAddslashes($db) . '\' '
+//                .   ' AND master_table  IN (' . $intable . ')'
+//                .   ' AND foreign_table IN (' . $intable . ')';
+//        $result =  PMA_query_as_cu($sql);
+//
+// lem9: 
+// previous logic was checking master tables and foreign tables
+// but I think that looping on every table of the pdf page as a master
+// and finding its foreigns is OK (then we can support innodb)
 
-        $sql    = 'SELECT * FROM ' . PMA_backquote($cfgRelation['relation'])
-                .   ' WHERE master_db   = \'' . PMA_sqlAddslashes($db) . '\' '
-                .   ' AND foreign_db    = \'' . PMA_sqlAddslashes($db) . '\' '
-                .   ' AND master_table  IN (' . $intable . ')'
-                .   ' AND foreign_table IN (' . $intable . ')';
-        $result =  PMA_query_as_cu($sql);
+        $seen_a_relation = FALSE;
+        reset($alltables);
+        while (list(,$one_table) = each($alltables)) {
+
+            $exist_rel = PMA_getForeigners($db, $one_table, '', 'both');
+            if ($exist_rel) {
+                $seen_a_relation = TRUE;
+                while (list($master_field,$rel) = each($exist_rel)) {
+                    // put the foreign table on the schema only if selected
+                    // by the user 
+                    // (do not use array_search() because we would have to
+                    // to do a === FALSE and this is not PHP3 compatible)
+
+                    if (PMA_isInto($rel['foreign_table'], $alltables)> -1) {
+                        $this->PMA_RT_addRelation($one_table , $master_field, $rel['foreign_table'], $rel['foreign_field']);
+                    }
+
+                } // end while
+            } // end if
+        } // end while
 
         // loic1: also show tables without relations
-        $norelations     = TRUE;
-        if ($result && mysql_num_rows($result) > 0) {
-            $norelations = FALSE;
-            while ($row = PMA_mysql_fetch_array($result)) {
-                $this->PMA_RT_addRelation($row['master_table'] , $row['master_field'], $row['foreign_table'], $row['foreign_field']);
-            }
-        }
+//        $norelations     = TRUE;
+//        if ($result && mysql_num_rows($result) > 0) {
+//            $norelations = FALSE;
+//            while ($row = PMA_mysql_fetch_array($result)) {
+//                $this->PMA_RT_addRelation($row['master_table'] , $row['master_field'], $row['foreign_table'], $row['foreign_field']);
+//            }
+//        }
 
-                                /* end snip */
 
-        if ($norelations == FALSE) {
+//        if ($norelations == FALSE) {
+        if ($seen_a_relation) {
             $this->PMA_RT_drawRelations($change_color);
         }
+
         $this->PMA_RT_drawTables($show_info);
 
         $this->PMA_RT_showRt();
@@ -1527,7 +1552,8 @@ $show_table_dimension = (isset($show_table_dimension) && $show_table_dimension =
 $all_tab_same_wide    = (isset($all_tab_same_wide) && $all_tab_same_wide == 'on') ? 1 : 0;
 $with_doc             = (isset($with_doc) && $with_doc == 'on') ? 1 : 0;
 $orientation          = (isset($orientation) && $orientation == 'P') ? 'P' : 'L';
+$paper                = isset($paper) ? $paper : 'A4';
 PMA_mysql_select_db($db);
 
-$rt = new PMA_RT($pdf_page_number, $show_table_dimension, $show_color, $show_grid, $all_tab_same_wide, $orientation);
+$rt = new PMA_RT($pdf_page_number, $show_table_dimension, $show_color, $show_grid, $all_tab_same_wide, $orientation, $paper);
 ?>

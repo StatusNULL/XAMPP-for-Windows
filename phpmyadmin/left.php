@@ -1,5 +1,5 @@
 <?php
-/* $Id: left.php,v 1.127 2003/05/25 19:47:56 garvinhicking Exp $ */
+/* $Id: left.php,v 1.131 2003/07/25 13:59:47 garvinhicking Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -30,6 +30,8 @@ if ($cfg['OBGzip']) {
         PMA_outBufferPre($ob_mode);
     }
 }
+
+PMA_checkParameters(array('hash'));
 
 include('./libraries/bookmark.lib.php');
 require('./libraries/relation.lib.php');
@@ -65,43 +67,7 @@ function PMA_indent($spaces) {
     return $string;
 }
 
-/* DEBUGGING ONLY - REMOVE WHEN PATCH ACCEPTED
-$path = '';
-$functioncalls = '';
-
-function functioncalls($name, $args, $array) {
-    $GLOBALS['functioncalls'] .= $name . "\n------------------------\n";
-    foreach($array AS $xkey => $key) {
-        $defvals = explode(':' , $key);
-        $key=$defvals[0];
-
-        $val = (isset($args[$xkey]) ? $args[$xkey] : $defvals[1]);
-        if (is_array($val)) {
-            $GLOBALS['functioncalls'] .= $key . "\n";
-            foreach($val AS $skey => $sval) {
-                if (!is_array($val)) {
-                    $GLOBALS['functioncalls'] .= "\t" . $skey . "\n\t\t" . stripslashes(var_export($sval)) . "\n";
-                } else {
-                    $GLOBALS['functioncalls'] .= "\t" . $skey . "\n\t\t[ARRAY]\n";
-                }
-            }
-        } else {
-            $GLOBALS['functioncalls'] .= $key . "\n\t" . stripslashes(var_export($val, true)) . "\n";
-        }
-    }
-    
-    $GLOBALS['functioncalls'] .= "\n\n";
-    
-    return true;
-}
-*/
-
 function PMA_nestedSetHeaderParent($baseid, $key, $keyhistory, $indent, $indent_level, $val, $childout = true) {
-/* DEBUGGING ONLY - REMOVE WHEN PATCH ACCEPTED
-    $args = func_get_args();
-    functioncalls('PMA_nestedSetHeaderParent', $args, array('baseid', 'key','keyhistory','indent','indent_level','val','childout:true'));
-*/
-
     $name = $key;
     $id = eregi_replace('[^a-z0-9]*', '', $baseid . $keyhistory . $key) . $indent;
 
@@ -132,10 +98,6 @@ function PMA_nestedSetHeaderParent($baseid, $key, $keyhistory, $indent, $indent_
 }
 
 function PMA_nestedSetHeader($baseid, $tablestack, $keyhistory, $indent, $indent_level, $headerOut, $firstGroup = false, $firstGroupClose = true) {
-/* DEBUGGING ONLY - REMOVE WHEN PATCH ACCEPTED
-    $args = func_get_args();
-    functioncalls('PMA_nestedSetHeader', $args, array('baseid', 'tablestack','keyhistory','indent','indent_level','headerOut','firstGroup:false'));
-*/
     if ($firstGroup) {
         PMA_nestedSetHeaderParent($baseid, $firstGroup, $keyhistory, $indent, $indent_level, $tablestack);
         $indent++;
@@ -167,10 +129,6 @@ function PMA_nestedSetHeader($baseid, $tablestack, $keyhistory, $indent, $indent
 }
 
 function PMA_nestedSet($baseid, $tablestack, $key = '__protected__', $keyhistory = '', $headerOut = false, $indent = 1) {
-/* DEBUGGING ONLY - REMOVE WHEN PATCH ACCEPTED
-    $args = func_get_args();
-    functioncalls('PMA_nestedSet', $args, array('baseid', 'tablestack', 'key:__protected__', 'keyhistory:\'\'', 'headerOut:false', 'indent:1'));
-*/
 
     if ($keyhistory == '' && $key != '__protected__') {
         $keyhistory = $key;
@@ -340,6 +298,54 @@ if ($cfg['LeftDisplayLogo']) {
     <?php
 }
 echo "\n";
+if ($cfg['LeftDisplayServers']) {
+?>
+        <form method="post" action="index.php" target="_parent">
+            <select name="server" onchange="this.form.submit();">
+    <?php
+    echo "\n";
+    reset($cfg['Servers']);
+    while (list($key, $val) = each($cfg['Servers'])) {
+        if (!empty($val['host'])) {
+            echo '                <option value="' . $key . '"';
+            if (!empty($server) && ($server == $key)) {
+                echo ' selected="selected"';
+            }
+            echo '>';
+            if (!empty($val['verbose'])) {
+                echo $val['verbose'];
+            } else {
+                echo $val['host'];
+                if (!empty($val['port'])) {
+                    echo ':' . $val['port'];
+                }
+                // loic1: skip this because it's not a so good idea to display
+                //        sockets used to everybody
+                // if (!empty($val['socket']) && PMA_PHP_INT_VERSION >= 30010) {
+                //     echo ':' . $val['socket'];
+                // }
+            }
+            // loic1: if 'only_db' is an array and there is more than one
+            //        value, displaying such informations may not be a so good
+            //        idea
+            if (!empty($val['only_db'])) {
+                echo ' - ' . (is_array($val['only_db']) ? implode(', ', $val['only_db']) : $val['only_db']);
+            }
+            if (!empty($val['user']) && ($val['auth_type'] == 'config')) {
+                echo '  (' . $val['user'] . ')';
+            }
+            echo '&nbsp;</option>' . "\n";
+        } // end if (!empty($val['host']))
+    } // end while
+    ?>
+            </select>
+            <input type="hidden" name="lang" value="<?php echo $lang; ?>" />
+            <input type="hidden" name="convcharset" value="<?php echo $convcharset; ?>" />
+            <noscript><input type="submit" value="<?php echo $strGo; ?>" /></noscript>
+        </form>
+<?php
+}
+echo "\n";
 ?>
     <!-- Link to the welcome page -->
     <div id="el1Parent" class="parent" style="margin-bottom: 5px">
@@ -467,7 +473,7 @@ if ($num_dbs > 1) {
                 $book_sql_query = PMA_queryBookmarks($db, $cfg['Bookmark'], '\'' . PMA_sqlAddslashes($table) . '\'', 'label');
 
                 $list_item = '<a target="phpmain' . $hash . '" href="sql.php?' . $common_url_query . '&amp;table=' . urlencode($table) . '&amp;sql_query=' . (isset($book_sql_query) && $book_sql_query != FALSE ? urlencode($book_sql_query) : urlencode('SELECT * FROM ' . PMA_backquote($table))) . '&amp;pos=0&amp;goto=' . $cfg['DefaultTabTable'] . '" title="' . $strBrowse . ': ' . $url_title . '">';
-                $list_item .= '<img src="images/browse.png" width="8" height="8" border="0" alt="' . $strBrowse . ': ' . $url_title . '" /></a>';
+                $list_item .= '<img src="images/button_smallbrowse.png" width="10" height="10" border="0" alt="' . $strBrowse . ': ' . $url_title . '" /></a>';
                 $list_item .= '<bdo dir="' . $text_dir . '">&nbsp;</bdo>' . "\n";
                 $list_item .= '<a class="tblItem" id="tbl_' . md5($table) . '" title="' . $url_title . '" target="phpmain' . $hash . '" href="' . $cfg['DefaultTabTable'] . '?' . $common_url_query . '&amp;table=' . urlencode($table) . '">';
                 $list_item .= ($alias != '' && $cfg['ShowTooltipAliasTB'] ? $alias : htmlspecialchars($table)) . '</a></nobr><br />' . "\n";
@@ -527,7 +533,7 @@ if ($num_dbs > 1) {
                     $book_sql_query = PMA_queryBookmarks($db, $cfg['Bookmark'], '\'' . PMA_sqlAddslashes($table) . '\'', 'label');
 
                     $table_list .= '    <nobr><a target="phpmain' . $hash . '" href="sql.php?' . $common_url_query . '&amp;table=' . urlencode($table) . '&amp;sql_query=' . (isset($book_sql_query) && $book_sql_query != FALSE ? urlencode($book_sql_query) : urlencode('SELECT * FROM ' . PMA_backquote($table))) . '&amp;pos=0&amp;goto=' . $cfg['DefaultTabTable'] . '">' . "\n";
-                    $table_list .= '              <img src="images/browse.png" width="8" height="8" border="0" alt="' . $strBrowse . ': ' . $url_title . '" title="' . $strBrowse . ': ' . $url_title . '" /></a><bdo dir="' . $text_dir . '">&nbsp;</bdo>' . "\n";
+                    $table_list .= '              <img src="images/button_smallbrowse.png" width="10" height="10" border="0" alt="' . $strBrowse . ': ' . $url_title . '" title="' . $strBrowse . ': ' . $url_title . '" /></a><bdo dir="' . $text_dir . '">&nbsp;</bdo>' . "\n";
                     if (PMA_USR_BROWSER_AGENT == 'IE') {
                         $table_list .= '          <span class="tblItem"><a class="tblItem" id="tbl_' . md5($table) . '" title="' . $url_title . '" target="phpmain' . $hash . '" href="' . $cfg['DefaultTabTable'] . '?' . $common_url_query . '&amp;table=' . urlencode($table) . '">' . ($alias != '' && $cfg['ShowTooltipAliasTB'] ? $alias : htmlspecialchars($table)) . '</a></span></nobr><br />' . "\n";
                     } else {
@@ -691,13 +697,13 @@ else if ($num_dbs == 1) {
         echo "\n";
         ?>
         <nobr><a target="phpmain<?php echo $hash; ?>" href="sql.php?<?php echo $common_url_query; ?>&amp;table=<?php echo urlencode($table); ?>&amp;sql_query=<?php echo (isset($book_sql_query) && $book_sql_query != FALSE ? urlencode($book_sql_query) : urlencode('SELECT * FROM ' . PMA_backquote($table))); ?>&amp;pos=0&amp;goto=<?php echo $cfg['DefaultTabTable']; ?>" title="<?php echo $strBrowse . ': ' . $url_title; ?>">
-                  <img src="images/browse.png" width="8" height="8" border="0" alt="<?php echo $strBrowse . ': ' . $url_title; ?>" /></a><bdo dir="<?php echo $text_dir; ?>">&nbsp;</bdo>
+                  <img src="images/button_smallbrowse.png" width="10" height="10" border="0" alt="<?php echo $strBrowse . ': ' . $url_title; ?>" /></a><bdo dir="<?php echo $text_dir; ?>">&nbsp;</bdo>
               <a class="tblItem" id="tbl_<?php echo md5($table); ?>" title="<?php echo $url_title; ?>" target="phpmain<?php echo $hash; ?>" href="<?php echo $cfg['DefaultTabTable']; ?>?<?php echo $common_url_query; ?>&amp;table=<?php echo urlencode($table); ?>">
                   <?php echo ($alias != '' && $cfg['ShowTooltipAliasTB'] ? $alias : htmlspecialchars($table)); ?></a></nobr><br />
         <?php
         } else {
             $list_item = '<a target="phpmain' . $hash . '" href="sql.php?' . $common_url_query . '&amp;table=' . urlencode($table) . '&amp;sql_query=' . (isset($book_sql_query) && $book_sql_query != FALSE ? urlencode($book_sql_query) : urlencode('SELECT * FROM ' . PMA_backquote($table))) . '&amp;pos=0&amp;goto=' . $cfg['DefaultTabTable'] . '" title="' . $strBrowse . ': ' . $url_title . '">';
-            $list_item .= '<img src="images/browse.png" width="8" height="8" border="0" alt="' . $strBrowse . ': ' . $url_title . '" /></a>';
+            $list_item .= '<img src="images/button_smallbrowse.png" width="10" height="10" border="0" alt="' . $strBrowse . ': ' . $url_title . '" /></a>';
             $list_item .= '<bdo dir="' . $text_dir . '">&nbsp;</bdo>' . "\n";
             $list_item .= '<a class="tblItem" id="tbl_' . md5($table) . '" title="' . $url_title . '" target="phpmain' . $hash . '" href="' . $cfg['DefaultTabTable'] . '?' . $common_url_query . '&amp;table=' . urlencode($table) . '">';
             $list_item .= ($alias != '' && $cfg['ShowTooltipAliasTB'] ? $alias : htmlspecialchars($table)) . '</a></nobr><br />';

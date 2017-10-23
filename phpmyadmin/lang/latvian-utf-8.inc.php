@@ -1,5 +1,5 @@
 <?php
-/* $Id: latvian-utf-8.inc.php,v 1.86 2003/05/29 16:44:02 lem9 Exp $ */
+/* $Id: latvian-utf-8.inc.php,v 1.101 2003/08/17 23:36:28 lem9 Exp $ */
 
 /**
  * Latvian language file by Sandis Jērics <sandisj at parks.lv>
@@ -644,4 +644,59 @@ $strNoSpace = 'Insufficient space to save the file %s.';  //to translate
 $strInsertedRowId = 'Inserted row id:';  //to translate
 $strLoadMethod = 'LOAD method';  //to translate
 $strLoadExplanation = 'The best method is checked by default, but you can change if it fails.';  //to translate
+$strExecuteBookmarked = 'Execute bookmarked query';  //to translate
+$strExcelOptions = 'Excel options';  //to translate
+$strReplaceNULLBy = 'Replace NULL by';  //to translate
+$strQueryWindowLock = 'Do not overwrite this query from outside the window';  //to translate
+$strPaperSize = 'Paper size';  //to translate
+$strDatabaseNoTable = 'This database contains no table!';//to translate
+$strViewDumpDatabases = 'View dump (schema) of databases';//to translate
+$strAddIntoComments = 'Add into comments';//to translate
+$strDatabaseExportOptions = 'Database export options';//to translate
+$strAddDropDatabase = 'Add DROP DATABASE';//to translate
+$strToggleScratchboard = 'toggle scratchboard';  //to translate
+$strTableOptions = 'Table options';  //to translate
+$strSecretRequired = 'The configuration file now needs a secret passphrase (blowfish_secret).';  //to translate
+$strAccessDeniedExplanation = 'phpMyAdmin tried to connect to the MySQL server, and the server rejected the connection. You should check the host, username and password in config.inc.php and make sure that they correspond to the information given by the administrator of the MySQL server.';  //to translate
+$strAddAutoIncrement = 'Add AUTO_INCREMENT value';  //to translate
+$strCharsets = 'Charsets';  //to translate
+$strDescription = 'Description';  //to translate
+$strCharsetsAndCollations = 'Character Sets and Collations';  //to translate
+$strCollation = 'Collation';  //to translate
+$strMultilingual = 'multilingual';  //to translate
+$strGerman = 'German';  //to translate
+$strPhoneBook = 'phone book';  //to translate
+$strDictionary = 'dictionary';  //to translate
+$strSwedish = 'Swedish';  //to translate
+$strDanish = 'Danish';  //to translate
+$strCzech = 'Czech';  //to translate
+$strTurkish = 'Turkish';  //to translate
+$strEnglish = 'English';  //to translate
+$strHungarian = 'Hungarian';  //to translate
+$strCroatian = 'Croatian';  //to translate
+$strBulgarian = 'Bulgarian';  //to translate
+$strLithuanian = 'Lithuanian';  //to translate
+$strEstonian = 'Estonian';  //to translate
+$strCaseInsensitive = 'case-insensitive';  //to translate
+$strCaseSensitive = 'case-sensitive';  //to translate
+$strUkrainian = 'Ukrainian';  //to translate
+$strHebrew = 'Hebrew';  //to translate
+$strWestEuropean = 'West European';  //to translate
+$strCentralEuropean = 'Central European';  //to translate
+$strTraditionalChinese = 'Traditional Chinese';  //to translate
+$strCyrillic = 'Cyrillic';  //to translate
+$strArmenian = 'Armenian';  //to translate
+$strArabic = 'Arabic';  //to translate
+$strRussian = 'Russian';  //to translate
+$strUnknown = 'unknown';  //to translate
+$strBaltic = 'Baltic';  //to translate
+$strUnicode = 'Unicode';  //to translate
+$strSimplifiedChinese = 'Simplified Chinese';  //to translate
+$strKorean = 'Korean';  //to translate
+$strGreek = 'Greek';  //to translate
+$strJapanese = 'Japanese';  //to translate
+$strThai = 'Thai';  //to translate
+$strUseThisValue = 'Use this value';  //to translate
+$strWindowNotFound = 'The target browser window could not be updated. Maybe you have closed the parent window or your browser is blocking cross-window updates of your security settings';  //to translate
+$strBrowseForeignValues = 'Browse foreign values';  //to translate
 ?>

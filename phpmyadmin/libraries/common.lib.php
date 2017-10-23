@@ -1,14 +1,11 @@
 <?php
-/* $Id: common.lib.php,v 1.251 2003/05/30 20:54:02 rabus Exp $ */
+/* $Id: common.lib.php,v 1.273.2.1 2003/09/02 10:16:47 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
-error_reporting(E_ALL);
 /**
  * Misc stuff and functions used by almost all the scripts.
  * Among other things, it contains the advanced authentification work.
  */
-
-
 
 if (!defined('PMA_COMMON_LIB_INCLUDED')) {
     define('PMA_COMMON_LIB_INCLUDED', 1);
@@ -41,7 +38,7 @@ if (!defined('PMA_COMMON_LIB_INCLUDED')) {
      * ... so the required order is:
      *
      * - parsing of the configuration file
-     * - first load of the libraries/define.lib.php library (won't get the
+     * - first load of the libraries/defines_php.lib.php library (won't get the
      *   MySQL release number)
      * - load of mysql extension (if necessary)
      * - definition of PMA_sqlAddslashes()
@@ -138,7 +135,7 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
      * Includes compatibility code for older config.inc.php revisions
      * if necessary
      */
-    if (!isset($cfg['FileRevision']) || (int) substr($cfg['FileRevision'], 13, 3) < 181) {
+    if (!isset($cfg['FileRevision']) || (int) substr($cfg['FileRevision'], 13, 3) < 197) {
         include('./libraries/config_import.lib.php');
     }
 
@@ -241,6 +238,15 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
         $cfg['OBGzip'] = FALSE;
     }
 
+    // disable output-buffering (if set to 'auto') for IE6, else enable it.
+    if (strtolower($cfg['OBGzip']) == 'auto') {
+        if (PMA_USR_BROWSER_AGENT == 'IE' && PMA_USR_BROWSER_VER >= 6 && PMA_USR_BROWSER_VER < 7) {
+            $cfg['OBGzip'] = FALSE;
+        } else {
+            $cfg['OBGzip'] = TRUE;
+        }
+    }
+
     if ($is_minimum_common == FALSE) {
         /**
          * Include URL/hidden inputs generating.
@@ -250,33 +256,21 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
 
         /**
          * Loads the mysql extensions if it is not loaded yet
-         * staybyte - 26. June 2001
          */
-        if (((PMA_PHP_INT_VERSION >= 40000 && !@ini_get('safe_mode') && @ini_get('enable_dl'))
-            || (PMA_PHP_INT_VERSION < 40000 && PMA_PHP_INT_VERSION > 30009 && !@get_cfg_var('safe_mode')))
-            && @function_exists('dl')) {
+        if (!@function_exists('mysql_connect')) {
             if (PMA_PHP_INT_VERSION < 40000) {
                 $extension = 'MySQL';
             } else {
                 $extension = 'mysql';
             }
-            if (PMA_IS_WINDOWS) {
-                $suffix = '.dll';
-            } else {
-                $suffix = '.so';
-            }
-            if (!@extension_loaded($extension)) {
-                @dl($extension . $suffix);
-            }
-            if (!@extension_loaded($extension)) {
-                echo $strCantLoadMySQL . '<br />' . "\n"
-                     . '<a href="./Documentation.html#faqmysql" target="documentation">' . $GLOBALS['strDocu'] . '</a>' . "\n";
-                exit();
-            }
-        } // end load mysql extension
+            PMA_dl($extension);
+        }
 
         // check whether mysql is available
         if (!@function_exists('mysql_connect')) {
+            if (empty($is_header_sent)) {
+                include('./libraries/header_http.inc.php');
+            }
             echo $strCantLoadMySQL . '<br />' . "\n"
                  . '<a href="./Documentation.html#faqmysql" target="documentation">' . $GLOBALS['strDocu'] . '</a>' . "\n";
             exit();
@@ -351,10 +345,10 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
          *
          * @author  Robin Johnson <robbat2@users.sourceforge.net>
          */
-        function PMA_formatSql($parsed_sql)
+        function PMA_formatSql($parsed_sql, $unparsed_sql = '')
         {
             global $cfg;
-
+            
             // Check that we actually have a valid set of parsed data
             // well, not quite
             // first check for the SQL parser having hit an error
@@ -366,7 +360,7 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
                 // We don't so just return the input directly
                 // This is intended to be used for when the SQL Parser is turned off
                 $formatted_sql = '<pre>' . "\n"
-                                . $parsed_sql . "\n"
+                                . (($cfg['SQP']['fmtType'] == 'none' && $unparsed_sql != '') ? $unparsed_sql : $parsed_sql) . "\n"
                                 . '</pre>';
                 return $formatted_sql;
             }
@@ -375,7 +369,11 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
 
             switch ($cfg['SQP']['fmtType']) {
                 case 'none':
-                    $formatted_sql = PMA_SQP_formatNone($parsed_sql);
+                    if ($unparsed_sql != '') {
+                        $formatted_sql = "<pre>\n" . PMA_SQP_formatNone(array('raw' => $unparsed_sql)) . "\n</pre>";
+                    } else {
+                        $formatted_sql = PMA_SQP_formatNone($parsed_sql);
+                    }
                     break;
                 case 'html':
                     $formatted_sql = PMA_SQP_formatHtml($parsed_sql,'color');
@@ -391,6 +389,48 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
             return $formatted_sql;
         } // end of the "PMA_formatSql()" function
 
+
+        /**
+         * Displays a link to the official MySQL documentation
+         *
+         * @param   chapter of "HTML, one page per chapter" documentation
+         * @param   contains name of page/anchor that is being linked
+         *
+         * @return  string  the html link
+         *
+         * @access  public
+         */
+        function PMA_showMySQLDocu($chapter, $link)
+        {
+            if (!empty($GLOBALS['cfg']['MySQLManualBase'])) {
+                if (!empty($GLOBALS['cfg']['MySQLManualType'])) {
+                    switch ($GLOBALS['cfg']['MySQLManualType']) {
+                        case 'old':
+                            return '[<a href="' . $GLOBALS['cfg']['MySQLManualBase'] . '/' . $link[0] . '/' . $link[1] . '/' . $link . '.html" target="mysql_doc">' . $GLOBALS['strDocu'] . '</a>]';
+                        case 'chapters':
+                            return '[<a href="' . $GLOBALS['cfg']['MySQLManualBase'] . '/manual_' . $chapter . '.html#' . $link . '" target="mysql_doc">' . $GLOBALS['strDocu'] . '</a>]';
+                        case 'big':
+                            return '[<a href="' . $GLOBALS['cfg']['MySQLManualBase'] . '#' . $link . '" target="mysql_doc">' . $GLOBALS['strDocu'] . '</a>]';
+                        case 'none':
+                            return '';
+                        case 'searchable':
+                        default:
+                            return '[<a href="' . $GLOBALS['cfg']['MySQLManualBase'] . '/' . $link . '.html" target="mysql_doc">' . $GLOBALS['strDocu'] . '</a>]';
+                    }
+                } else {
+                    // no Type defined, show the old one
+                    return '[<a href="' . $GLOBALS['cfg']['MySQLManualBase'] . '/' . $link[0] . '/' . $link[1] . '/' . $link . '.html" target="mysql_doc">' . $GLOBALS['strDocu'] . '</a>]';
+                }
+            } else {
+                // no URL defined
+                if (!empty($GLOBALS['cfg']['ManualBaseShort'])) {
+                    // the old configuration
+                    return '[<a href="' . $GLOBALS['cfg']['MySQLManualBase'] . '/' . $link[0] . '/' . $link[1] . '/' . $link . '.html" target="mysql_doc">' . $GLOBALS['strDocu'] . '</a>]';
+                } else {
+                    return '';
+                }
+            }
+        } // end of the 'PMA_showDocu()' function
 
         /**
          * Displays a MySQL error message in the right frame.
@@ -426,7 +466,7 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
             // Robbat2 - 12 January 2003, 9:46PM
             // Revised, Robbat2 - 13 Janurary 2003, 2:59PM
             if (PMA_SQP_isError()) {
-                $parsed_sql = $the_query;
+                $parsed_sql = htmlspecialchars($the_query);
             } else {
                 $parsed_sql = PMA_SQP_parse($the_query);
             }
@@ -453,7 +493,7 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
                 } // end if
                 echo '</p>' . "\n"
                         . '<p>' . "\n"
-                        . '    ' . PMA_formatSql($parsed_sql) . "\n"
+                        . '    ' . PMA_formatSql($parsed_sql, $the_query) . "\n"
                         . '</p>' . "\n";
             } // end if
             if (!empty($error_message)) {
@@ -467,9 +507,10 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
                     . $error_message . "\n"
                     . '</pre>' . "\n";
 
-
+            echo PMA_showMySQLDocu('Error-returns', 'Error-returns');
+            
             if (!empty($back_url) && $exit) {
-                echo '<a href="' . $back_url . '">' . $GLOBALS['strBack'] . '</a>';
+                echo '&nbsp;&middot;&nbsp;[<a href="' . $back_url . '">' . $GLOBALS['strBack'] . '</a>]';
             }
             echo "\n";
 
@@ -547,7 +588,7 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
         // Some mac browsers need also smaller default fonts size (OmniWeb &
         // Opera)...
         else if (PMA_USR_OS == 'Mac'
-                    && (PMA_USR_BROWSER_AGENT == 'OMNIWEB' || PMA_USR_BROWSER_AGENT == 'OPERA')) {
+                    && (PMA_USR_BROWSER_AGENT == 'OMNIWEB' || PMA_USR_BROWSER_AGENT == 'OPERA' || PMA_USR_BROWSER_AGENT == 'SAFARI')) {
             $font_size     = 'x-small';
             $font_biggest  = 'large';
             $font_bigger   = 'medium';
@@ -725,6 +766,10 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
 
             // Gets the authentication library that fits the $cfg['Server'] settings
             // and run authentication
+
+            // (for a quick check of path disclosure in auth/cookies:)
+            $coming_from_common = TRUE;
+
             include('./libraries/auth/' . $cfg['Server']['auth_type'] . '.auth.lib.php');
             if (!PMA_auth_check()) {
                 PMA_auth();
@@ -1319,7 +1364,7 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
         </tr>
             <?php
             if ($cfg['ShowSQL'] == TRUE && (!empty($GLOBALS['sql_query']) || !empty($GLOBALS['display_query']))) {
-                $local_query = !empty($GLOBALS['display_query']) ? $GLOBALS['display_query'] : $GLOBALS['sql_query'];
+                $local_query = !empty($GLOBALS['display_query']) ? $GLOBALS['display_query'] : (($cfg['SQP']['fmtType'] == 'none' && $GLOBALS['unparsed_sql'] != '') ? $GLOBALS['unparsed_sql'] : $GLOBALS['sql_query']);
                 // Basic url query part
                 $url_qpart = '?' . PMA_generate_common_url(isset($GLOBALS['db']) ? $GLOBALS['db'] : '', isset($GLOBALS['table']) ? $GLOBALS['table'] : '');
                 echo "\n";
@@ -1335,7 +1380,7 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
                  /* SQL-Parser-Analyzer */
                 $sqlnr = 1;
                 if (!empty($GLOBALS['show_as_php'])) {
-                    $new_line = '\';<br />' . "\n" . '            $sql .= \'';
+                    $new_line = '\'<br />' . "\n" . '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;. \' ';
                 }
                 if (isset($new_line)) {
                      /* SQL-Parser-Analyzer */
@@ -1351,7 +1396,7 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
                     $query_base = PMA_validateSQL($query_base);
                 } else {
                     $parsed_sql = PMA_SQP_parse($query_base);
-                    $query_base = PMA_formatSql($parsed_sql);
+                    $query_base = PMA_formatSql($parsed_sql, $query_base);
                 }
 
                 // Prepares links that may be displayed to edit/explain the query
@@ -1481,7 +1526,7 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
                     } else if (!empty($GLOBALS['validatequery'])) {
                         // skip the extra bit here
                     } else {
-                        echo '&nbsp;' . PMA_formatSql(PMA_SQP_parse($GLOBALS['sql_limit_to_append']));
+                        echo '&nbsp;' . PMA_formatSql(PMA_SQP_parse($GLOBALS['sql_limit_to_append'], $GLOBALS['sql_limit_to_append']));
                     }
                 }
 
@@ -1502,49 +1547,6 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
     </div><br />
             <?php
         } // end of the 'PMA_showMessage()' function
-
-
-        /**
-         * Displays a link to the official MySQL documentation
-         *
-         * @param   chapter of "HTML, one page per chapter" documentation
-         * @param   contains name of page/anchor that is being linked
-         *
-         * @return  string  the html link
-         *
-         * @access  public
-         */
-        function PMA_showMySQLDocu($chapter, $link)
-        {
-            if (!empty($GLOBALS['cfg']['MySQLManualBase'])) {
-                if (!empty($GLOBALS['cfg']['MySQLManualType'])) {
-                    switch ($GLOBALS['cfg']['MySQLManualType']) {
-                        case 'old':
-                            return '[<a href="' . $GLOBALS['cfg']['MySQLManualBase'] . '/' . $link[0] . '/' . $link[1] . '/' . $link . '.html" target="mysql_doc">' . $GLOBALS['strDocu'] . '</a>]';
-                        case 'chapters':
-                            return '[<a href="' . $GLOBALS['cfg']['MySQLManualBase'] . '/manual_' . $chapter . '.html#' . $link . '" target="mysql_doc">' . $GLOBALS['strDocu'] . '</a>]';
-                        case 'big':
-                            return '[<a href="' . $GLOBALS['cfg']['MySQLManualBase'] . '#' . $link . '" target="mysql_doc">' . $GLOBALS['strDocu'] . '</a>]';
-                        case 'none':
-                            return '';
-                        case 'searchable':
-                        default:
-                            return '[<a href="' . $GLOBALS['cfg']['MySQLManualBase'] . '/' . $link . '.html" target="mysql_doc">' . $GLOBALS['strDocu'] . '</a>]';
-                    }
-                } else {
-                    // no Type defined, show the old one
-                    return '[<a href="' . $GLOBALS['cfg']['MySQLManualBase'] . '/' . $link[0] . '/' . $link[1] . '/' . $link . '.html" target="mysql_doc">' . $GLOBALS['strDocu'] . '</a>]';
-                }
-            } else {
-                // no URL defined
-                if (!empty($GLOBALS['cfg']['ManualBaseShort'])) {
-                    // the old configuration
-                    return '[<a href="' . $GLOBALS['cfg']['MySQLManualBase'] . '/' . $link[0] . '/' . $link[1] . '/' . $link . '.html" target="mysql_doc">' . $GLOBALS['strDocu'] . '</a>]';
-                } else {
-                    return '';
-                }
-            }
-        } // end of the 'PMA_showDocuShort()' function
 
 
         /**
@@ -1584,6 +1586,28 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
 
             return array($return_value, $unit);
         } // end of the 'PMA_formatByteDown' function
+        
+        
+        /**
+         * Extracts ENUM / SET options from a type definition string
+         *
+         * @param   string   The column type definition
+         *
+         * @return  array    The options or
+         *          boolean  FALSE in case of an error.
+         *
+         * @author  rabus
+         */
+        function PMA_getEnumSetOptions($type_def) {
+            $open = strpos($type_def, '(');
+            $close = strrpos($type_def, ')');
+            if (!$open || !$close) {
+                return FALSE;
+            }
+            $options = substr($type_def, $open + 2, $close - $open - 3);
+            $options = explode('\',\'', $options);
+            return $options;
+        } // end of the 'PMA_getEnumSetOptions' function
 
 
         /**
@@ -1755,8 +1779,14 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
                     list($eachvar, $eachval) = explode('=', $query_pair);
                     $link_or_button .= '            <input type="hidden" name="' . str_replace('amp;', '', $eachvar) . '" value="' . htmlspecialchars(urldecode($eachval)) . '" />' . "\n";
                 } // end while
-                $link_or_button     .= '            <input type="submit" value="'
-                                    . htmlspecialchars($message) . '" />' . "\n" . '</form>' . "\n";
+                
+                if (stristr($message, '<img')) {
+                    $link_or_button     .= '            <input type="image" src="' . eregi_replace('^.*src="(.*)".*$', '\1', $message) . '" value="'
+                                        . htmlspecialchars(eregi_replace('^.*alt="(.*)".*$', '\1', $message)) . '" />' . "\n" . '</form>' . "\n";
+                } else {
+                    $link_or_button     .= '            <input type="submit" value="'
+                                        . htmlspecialchars($message) . '" />' . "\n" . '</form>' . "\n";
+                }
             } // end if... else...
 
             return $link_or_button;
@@ -1853,6 +1883,44 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
 
             return $format_string;
         }
+
+
+        /**
+         * Function added to avoid path disclosures.
+         * Called by each script that needs parameters, it displays
+         * an error message and, by defaults, stops the execution. 
+         *
+         * @param   array   The names of the parameters needed by the calling
+         *                  script.
+         * @param   boolean Stop the execution?
+         *                  (Set this manually to FALSE in the calling script
+         *                   until you know all needed parameters to check).
+         *
+         * @access  public
+         * @author  Marc Delisle (lem9@users.sourceforge.net)
+         */
+        function PMA_checkParameters($params, $die = TRUE) {
+            global $PHP_SELF;
+
+            $reported_script_name = basename($PHP_SELF);
+            $found_error = FALSE;
+            $error_message = '';
+
+            while (list(, $param) = each($params)) {
+                if (!isset($GLOBALS[$param])) {
+                    $error_message .= $reported_script_name . ': Missing ' . $param . '<br />';
+                    $found_error = TRUE;
+                }
+            }
+            if ($found_error) {
+                include('./libraries/header_meta_style.inc.php');
+                echo '</head><body><p>' . $error_message . '</p></body></html>';
+                if ($die) {
+                    exit();
+                }
+            }
+        } // end function
+
 
         // Kanji encoding convert feature appended by Y.Kawada (2002/2/20)
         if (PMA_PHP_INT_VERSION >= 40006

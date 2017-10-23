@@ -58,7 +58,7 @@ echo "<tr>
 Ort: Überall $part\xampp\htdocs ausser $part\xampp\htdocs\modperl und $part\xampp\htdocs\modperlasp<br>
 Perlpfad im Header: Notwendig, hier => #!\xampp\perl\bin\perl.exe<br>
 Beispieldatei: $part\xampp\cgi-bin\perltest.cgi<br> 
-<A HREF=\"http://127.0.0.1/cgi-bin/perltest.cgi\">Test \"Hello World\"</A></B>
+<A HREF=\"/cgi-bin/perltest.cgi\">Test \"Hello World\"</A></B>
 </td>
   </tr>
 <tr>
@@ -72,7 +72,7 @@ Beispieldatei: $part\xampp\cgi-bin\perltest.cgi<br>
 Ort: Nur $part\xampp\htdocs\modperl<br>
 Perlpfad im Header: Nicht notwendig<br>
 Beispieldatei: $part\xampp\htdocs\modperl\datum.pl<br> 
-<A HREF=\"http://127.0.0.1/perl/datum.pl\">Test \"Datum mit Perl\"</A></B>
+<A HREF=\"/perl/datum.pl\">Test \"Datum mit Perl\"</A></B>
 </td>
   </tr>
 <tr>
@@ -86,7 +86,7 @@ Beispieldatei: $part\xampp\htdocs\modperl\datum.pl<br>
 Ort: Nur $part\xampp\htdocs\modperlasp<br>
 Perlpfad im Header: Nicht notwendig<br>
 Beispieldatei: $part\xampp\htdocs\modperlasp\loop.asp<br> 
-<A HREF=\"http://127.0.0.1/asp/loop.asp\">Test \"Zahlen, die wachsen\"</A></B>
+<A HREF=\"/asp/loop.asp\">Test \"Zahlen, die wachsen\"</A></B>
 </td>
   </tr>";
   ?>

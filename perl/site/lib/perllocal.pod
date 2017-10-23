@@ -1,0 +1,44 @@
+=head2 Mon Nov  3 22:46:08 2003: C<Module> L<mod_perl|mod_perl>
+
+=over 4
+
+=item *
+
+C<installed into: c:\xampp\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.99_09>
+
+=item *
+
+C<EXE_FILES: bin/mp2doc bin/mp2bug>
+
+=back
+
+=head2 Mon Nov  3 23:02:18 2003: C<Module> L<mod_perl|mod_perl>
+
+=over 4
+
+=item *
+
+C<installed into: c:\xampp\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.99_10>
+
+=item *
+
+C<EXE_FILES: bin/mp2doc bin/mp2bug>
+
+=back
+

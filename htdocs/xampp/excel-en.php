@@ -20,7 +20,7 @@
 </tr>
 <tr>
     <td align=left width="500" colspan="2">A small reference
- ...<br>This example and a manual, you can find it under <A HREF="http://127.0.0.1/excel/" target="_top">http://127.0.0.1/excel/</A>.</td>
+ ...<br>This example and a manual, you can find it under <A HREF="/excel/" target="_top">http://127.0.0.1/excel/</A>.</td>
   </tr>
   <tr>
     <td align=left width="150">&nbsp;</td><td align=left width="350">&nbsp;</td>

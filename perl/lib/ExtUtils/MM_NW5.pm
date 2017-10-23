@@ -126,6 +126,7 @@ XS_DEFINE_VERSION = -D\$(XS_VERSION_MACRO)=\\\"\$(XS_VERSION)\\\"
 
     # Get the additional include path from the user through the command prompt
     # and append to INCLUDE
+#    $self->{INC} = '';
     push @m, "INC = $self->{'INC'}\n";
 
     push @m, qq{

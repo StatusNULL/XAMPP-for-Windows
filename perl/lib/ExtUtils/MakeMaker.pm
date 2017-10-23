@@ -2,10 +2,10 @@ package ExtUtils::MakeMaker;
 
 BEGIN {require 5.005_03;}
 
-$VERSION = "6.05";
+$VERSION = "6.03";
 $Version_OK = "5.49";   # Makefiles older than $Version_OK will die
                         # (Will be checked from MakeMaker version 4.13 onwards)
-($Revision = substr(q$Revision: 1.69 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: 1.63 $, 10)) =~ s/\s+$//;
 
 require Exporter;
 use Config;
@@ -57,31 +57,109 @@ sub WriteMakefile {
 # Basic signatures of the attributes WriteMakefile takes.  Each is the
 # reference type.  Empty value indicate it takes a non-reference
 # scalar.
-my %Att_Sigs;
-my %Special_Sigs = (
+my %Att_Sigs =
+(
+ ABSTRACT           => '',
+ ABSTRACT_FROM      => '',
+ AUTHOR             => '',
+ BINARY_LOCATION    => '',
  C                  => 'array',
+ CCFLAGS            => '',
  CONFIG             => 'array',
  CONFIGURE          => 'code',
+ DEFINE             => '',
  DIR                => 'array',
+ DISTNAME           => '',
  DL_FUNCS           => 'hash',
  DL_VARS            => 'array',
  EXCLUDE_EXT        => 'array',
  EXE_FILES          => 'array',
+ FIRST_MAKEFILE     => '',
+ FULLPERL           => '',
+ FULLPERLRUN        => '',
+ FULLPERLRUNINST    => '',
  FUNCLIST           => 'array',
  H                  => 'array',
  IMPORTS            => 'hash',
+ INC                => '',
  INCLUDE_EXT        => 'array',
+ INSTALLARCHLIB     => '',
+ INSTALLBIN         => '',
+ INSTALLDIRS        => '',
+ INSTALLMAN1DIR     => '',
+ INSTALLMAN3DIR     => '',
+ INSTALLPRIVLIB     => '',
+ INSTALLSCRIPT      => '',
+ INSTALLSITEARCH    => '',
+ INSTALLSITEBIN     => '',
+ INSTALLSITELIB     => '',
+ INSTALLSITEMAN1DIR => '',
+ INSTALLSITEMAN3DIR => '',
+ INSTALLVENDORARCH  => '',
+ INSTALLVENDORBIN   => '',
+ INSTALLVENDORLIB   => '',
+ INSTALLVENDORMAN1DIR   => '',
+ INSTALLVENDORMAN3DIR   => '',
+ INST_ARCHLIB       => '',
+ INST_BIN           => '',
+ INST_LIB           => '',
+ INST_MAN1DIR       => '',
+ INST_MAN3DIR       => '',
+ INST_SCRIPT        => '',
+ _KEEP_AFTER_FLUSH  => '',
+ LDDLFLAGS          => '',
+ LDFROM             => '',
+ LIB                => '',
+ LIBPERL_A          => '',
  LIBS               => ['array',''],
+ LINKTYPE           => '',
+ MAKEAPERL          => '',
+ MAKEFILE           => '',
  MAN1PODS           => 'hash',
  MAN3PODS           => 'hash',
+ MAP_TARGET         => '',
+ MYEXTLIB           => '',
+ NAME               => '',
+ NEEDS_LINKING      => '',
+ NOECHO             => '',
+ NORECURS           => '',
+ NO_VC              => '',
+ OBJECT             => '',
+ OPTIMIZE           => '',
+ PERL               => '',
+ PERL_CORE          => '',
+ PERLMAINCC         => '',
+ PERL_ARCHLIB       => '',
+ PERL_LIB           => '',
+ PERL_MALLOC_OK     => '',
+ PERLRUN            => '',
+ PERLRUNINST        => '',
+ PERL_SRC           => '',
+ PERM_RW            => '',
+ PERM_RWX           => '',
  PL_FILES           => 'hash',
  PM                 => 'hash',
  PMLIBDIRS          => 'array',
+ PM_FILTER          => '',
+ POLLUTE            => '',
+ PPM_INSTALL_EXEC   => '',
+ PPM_INSTALL_SCRIPT => '',
+ PREFIX             => '',
+ PREREQ_FATAL       => '',
  PREREQ_PM          => 'hash',
+ PREREQ_PRINT       => '',
+ PRINT_PREREQ       => '',
+ SITEPREFIX         => '',
  SKIP               => 'array',
  TYPEMAPS           => 'array',
+ VENDORPREFIX       => '',
+ VERBINST           => '',
+ VERSION            => '',
+ VERSION_FROM       => '',
  XS                 => 'hash',
- _KEEP_AFTER_FLUSH  => '',
+ XSOPT              => '',
+ XSPROTOARG         => '',
+ XS_VERSION         => '',
 
  clean      => 'hash',
  depend     => 'hash',
@@ -93,9 +171,6 @@ my %Special_Sigs = (
  test       => 'hash',
  tool_autosplit => 'hash',
 );
-
-@Att_Sigs{keys %Recognized_Att_Keys} = ('') x keys %Recognized_Att_Keys;
-@Att_Sigs{keys %Special_Sigs} = values %Special_Sigs;
 
 
 sub _verify_att {
@@ -674,11 +749,7 @@ sub check_hints {
     my($self) = @_;
     # We allow extension-specific hints files.
 
-    require File::Spec;
-    my $curdir = File::Spec->curdir;
-
-    my $hint_dir = File::Spec->catdir($curdir, "hints");
-    return unless -d $hint_dir;
+    return unless -d "hints";
 
     # First we look for the best hintsfile we have
     my($hint)="${^O}_$Config{osvers}";
@@ -688,11 +759,11 @@ sub check_hints {
 
     # Also try without trailing minor version numbers.
     while (1) {
-        last if -f File::Spec->catdir($hint_dir, "$hint.pl");  # found
+        last if -f "hints/$hint.pl";      # found
     } continue {
         last unless $hint =~ s/_[^_]*$//; # nothing to cut off
     }
-    my $hint_file = File::Spec->catdir($hint_dir, "$hint.pl");
+    my $hint_file = "hints/$hint.pl";
 
     return unless -f $hint_file;    # really there
 
@@ -706,7 +777,7 @@ sub _run_hintfile {
 
     local $@;
     print STDERR "Processing hints file $hint_file\n";
-    my $ret = do $hint_file;
+    my $ret = do "./$hint_file";
     unless( defined $ret ) {
         print STDERR $@ if $@;
     }
@@ -1505,12 +1576,6 @@ Directory, where executable files should be installed during
 testing. make install will copy the files in INST_SCRIPT to
 INSTALLSCRIPT.
 
-=item LD
-
-Program to be used to link libraries for dynamic loading.
-
-Defaults to $Config{ld}.
-
 =item LDDLFLAGS
 
 Any special flags that might need to be passed to ld to create a
@@ -1912,7 +1977,7 @@ MakeMaker object. The following lines will be parsed o.k.:
 
     $VERSION = '1.00';
     *VERSION = \'1.01';
-    ( $VERSION ) = '$Revision: 1.69 $ ' =~ /\$Revision:\s+([^\s]+)/;
+    ( $VERSION ) = '$Revision: 1.63 $ ' =~ /\$Revision:\s+([^\s]+)/;
     $FOO::VERSION = '1.10';
     *FOO::VERSION = \'1.11';
     our $VERSION = 1.2.3;       # new for perl5.6.0 
@@ -2228,33 +2293,9 @@ in a subdirectory of some other distribution, or is listed as a
 dependency in a CPAN::Bundle, but the functionality is supported by
 different means on the current architecture).
 
-=head2 Other Handy Functions
-
-=over 4
-
-=item prompt
-
-    my $value = prompt($message);
-    my $value = prompt($message, $default);
-
-The C<prompt()> function provides an easy way to request user input
-used to write a makefile.  It displays the $message as a prompt for
-input.  If a $default is provided it will be used as a default.  The
-function returns the $value selected by the user.
-
-If C<prompt()> detects that it is not running interactively, or if the
-PERL_MM_USE_DEFAULT environment variable is set to true, the $default
-will be used without prompting.  This prevents automated processes
-from blocking on user input.
-
-If no $default is provided an empty string will be used instead.
-
-=back
-
-
 =head1 ENVIRONMENT
 
-=over 4
+=over 8
 
 =item PERL_MM_OPT
 

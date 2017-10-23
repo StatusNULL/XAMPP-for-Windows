@@ -1,4 +1,4 @@
-/* $Id: tbl_change.js,v 1.4 2003/01/16 09:16:22 nijel Exp $ */
+/* $Id: tbl_change.js,v 1.5 2003/08/05 17:33:04 nijel Exp $ */
 
 
 /**
@@ -26,10 +26,16 @@ function nullify(theType, urlField, md5Field)
     // Other "ENUM" field
     else if (theType == 2) {
         var elts     = rowForm.elements['field_' + md5Field + '[]'];
-        var elts_cnt = elts.length;
-        for (var i = 0; i < elts_cnt; i++ ) {
-            elts[i].checked = false;
-        } // end for
+        // when there is just one option in ENUM:
+        if (elts.checked) {
+            elts.checked = false;
+        } else {
+            var elts_cnt = elts.length;
+            for (var i = 0; i < elts_cnt; i++ ) {
+                elts[i].checked = false;
+            } // end for
+
+        } // end if
     }
     // Other field types
     else /*if (theType == 5)*/ {

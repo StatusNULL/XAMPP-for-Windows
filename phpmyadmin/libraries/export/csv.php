@@ -1,5 +1,5 @@
 <?php
-/* $Id: csv.php,v 1.2 2003/06/25 16:19:03 nijel Exp $ */
+/* $Id: csv.php,v 1.5 2003/08/12 08:33:11 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -37,6 +37,9 @@ function PMA_exportHeader() {
         $separator          = ',';
         $enclosed           = '"';
         $escaped            = '"';
+        if (isset($GLOBALS['showexcelnames']) && $GLOBALS['showexcelnames'] == 'yes') {
+            $GLOBALS['showcsvnames'] = 'yes';
+        }
     } else {
         if (empty($add_character)) {
             $add_character  = $GLOBALS['crlf'];
@@ -118,10 +121,10 @@ function PMA_exportData($db, $table, $crlf, $error_url, $sql_query) {
         $schema_insert = '';
         for ($i = 0; $i < $fields_cnt; $i++) {
             if ($enclosed == '') {
-                $schema_insert .= mysql_field_name($result, $i);
+                $schema_insert .= stripslashes(mysql_field_name($result, $i));
             } else {
                 $schema_insert .= $enclosed
-                               . str_replace($enclosed, $escaped . $enclosed, mysql_field_name($result, $i))
+                               . str_replace($enclosed, $escaped . $enclosed, stripslashes(mysql_field_name($result, $i)))
                                . $enclosed;
             }
             $schema_insert     .= $separator;
@@ -131,7 +134,6 @@ function PMA_exportData($db, $table, $crlf, $error_url, $sql_query) {
     } // end if
 
     // Format the data
-    $i = 0;
     while ($row = PMA_mysql_fetch_row($result)) {
         $schema_insert = '';
         for ($j = 0; $j < $fields_cnt; $j++) {
@@ -139,6 +141,7 @@ function PMA_exportData($db, $table, $crlf, $error_url, $sql_query) {
                 $schema_insert .= $GLOBALS[$what . '_replace_null'];
             }
             else if ($row[$j] == '0' || $row[$j] != '') {
+                $row[$j] = stripslashes($row[$j]);
                 // loic1 : always enclose fields
                 if ($what == 'excel') {
                     $row[$j]       = ereg_replace("\015(\012)?", "\012", $row[$j]);
@@ -158,9 +161,7 @@ function PMA_exportData($db, $table, $crlf, $error_url, $sql_query) {
                 $schema_insert .= $separator;
             }
         } // end for
-        $schema_insert  =trim($schema_insert);
         if (!PMA_exportOutputHandler($schema_insert . $add_character)) return FALSE;
-        $i++;
     } // end while
     mysql_free_result($result);
 

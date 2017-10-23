@@ -60,22 +60,3 @@ __PACKAGE__->install_aliases(\%aliases);
 1;
 __END__
 
-=head1 NAME
-
-ModPerl::PerlRun - Run unaltered CGI scripts under mod_perl
-
-=head1 SYNOPSIS
-
-=head1 DESCRIPTION
-
-=head1 AUTHORS
-
-Doug MacEachern
-
-Stas Bekman
-
-=head1 SEE ALSO
-
-ModPerl::RegistryCooker(3), Apache(3), mod_perl(3)
-
-=cut

@@ -1,5 +1,5 @@
 <?php
-/* $Id: grab_globals.lib.php,v 1.15 2003/04/06 15:24:21 rabus Exp $ */
+/* $Id: grab_globals.lib.php,v 1.17 2003/08/10 20:36:21 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -63,16 +63,22 @@ if (!defined('PMA_GRAB_GLOBALS_INCLUDED')) {
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             $HTTP_ACCEPT_LANGUAGE = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
         }
+        if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
+            $HTTP_AUTHORIZATION = $_SERVER['HTTP_AUTHORIZATION'];
+        }
     } else if (!empty($HTTP_SERVER_VARS)) {
         if (isset($HTTP_SERVER_VARS['PHP_SELF'])) {
-            $PHP_SELF = $HTTP_SERVER_VARS['HTTP_ACCEPT_LANGUAGE'];
+            $PHP_SELF = $HTTP_SERVER_VARS['PHP_SELF'];
         }
-        if (isset($HTTP_SERVER_VARS['PHP_SELF'])) {
+        if (isset($HTTP_SERVER_VARS['HTTP_ACCEPT_LANGUAGE'])) {
             $HTTP_ACCEPT_LANGUAGE = $HTTP_SERVER_VARS['HTTP_ACCEPT_LANGUAGE'];
+        }
+        if (isset($HTTP_SERVER_VARS['HTTP_AUTHORIZATION'])) {
+            $HTTP_AUTHORIZATION = $HTTP_SERVER_VARS['HTTP_AUTHORIZATION'];
         }
     } // end if
 
-    // Securety fix: disallow accessing serious server files via "?goto="
+    // Security fix: disallow accessing serious server files via "?goto="
     if (isset($goto) && strpos(' ' . $goto, '/') > 0 && substr($goto, 0, 2) != './') {
         unset($goto);
     } // end if

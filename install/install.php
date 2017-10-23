@@ -255,7 +255,7 @@ fclose($old);
 
 						{
 						
-						if (eregi($ppartition,$newzeile[$z]))
+						if (ereg($ppartition,$newzeile[$z]))
 							{
 list ($left, $right) = split ($ppartition, $newzeile[$z]);
   $newline = "$left$ppartition$right";
@@ -444,7 +444,7 @@ fclose($old);
 
 						{
 						
-						if (eregi($ppartition,$newzeile[$z]))
+						if (ereg($ppartition,$newzeile[$z]))
 							{
 list ($left, $right) = split ($ppartition, $newzeile[$z]);
   $newline = "$left$ppartition$right";
@@ -562,7 +562,7 @@ fclose($old);
 						}
 						else
 						{
-						if (eregi($ppartition,$newzeile[$z]))
+						if (ereg($ppartition,$newzeile[$z]))
 	{
 list ($left, $right) = split ($ppartition, $newzeile[$z]);
   $newline = "$left$ppartition$right";
@@ -670,7 +670,7 @@ fclose($datei);
 						}
 						else
 						{
-						if (eregi($ppartition,$newzeile[$z]))
+						if (ereg($ppartition,$newzeile[$z]))
 	{
 list ($left, $right) = split ($ppartition, $newzeile[$z]);
   $newline = "$left$ppartition$right";

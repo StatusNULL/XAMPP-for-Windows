@@ -1,5 +1,5 @@
 <?php
-/* $Id: finnish-utf-8.inc.php,v 1.86 2003/05/29 16:44:01 lem9 Exp $ */
+/* $Id: finnish-utf-8.inc.php,v 1.103 2003/08/17 23:36:27 lem9 Exp $ */
 
 /*
  * Finnish language file by Visa Kopu, visa@visakopu.net
@@ -13,7 +13,7 @@ $right_font_family = 'arial, helvetica, geneva, sans-serif';
 $number_thousands_separator = ',';
 $number_decimal_separator = '.';
 // shortcuts for Byte, Kilo, Mega, Giga, Tera, Peta, Exa
-$byteUnits = array('tavua', 'kt', 'Mt', 'Gt');
+$byteUnits = array('tavua', 'kt', 'Mt', 'Gt', 'Tt', 'Pt', 'Et');
 
 $day_of_week = array('Su', 'Ma', 'Ti', 'Ke', 'To', 'Pe', 'La');
 $month = array('Tammi', 'Helmi', 'Maalis', 'Huhti', 'Touko', 'Kesä', 'Heinä', 'Elo', 'Syys', 'Loka', 'Marras', 'Joulu');
@@ -635,8 +635,8 @@ $strPerMinute = 'per minute';//to translate
 $strPerSecond = 'per second';//to translate
 $strAutomaticLayout = 'Automatic layout';  //to translate
 $strDelOld = 'The current Page has References to Tables that no longer exist. Would you like to delete those References?';  //to translate
-$strFileNameTemplate = 'File name template';//to translate 
-$strFileNameTemplateRemember = 'remember template';//to translate 
+$strFileNameTemplate = 'File name template';//to translate
+$strFileNameTemplateRemember = 'remember template';//to translate
 $strFileNameTemplateHelp = 'Use __DB__ for database name, __TABLE__ for table name and %sany strftime%s options for time specification, extension will be automagically added. Any other text will be preserved.';//to translate
 $strTransformation_text_plain__dateformat = 'Takes a TIME, TIMESTAMP or DATETIME field and formats it using your local dateformat. First option is the offset (in hours) which will be added to the timestamp (Default: 0). Second option is a different dateformat according to the parameters available for PHPs strftime().';//to translate
 $strTransformation_text_plain__substr = 'Only shows part of a string. First option is an offset to define where the output of your text starts (Default 0). Second option is an offset how much text is returned. If empty, returns all the remaining text. The third option defines which chars will be appended to the output when a substring is returned (Default: ...) .';//to translate
@@ -663,4 +663,59 @@ $strNoSpace = 'Insufficient space to save the file %s.';  //to translate
 $strInsertedRowId = 'Inserted row id:';  //to translate
 $strLoadMethod = 'LOAD method';  //to translate
 $strLoadExplanation = 'The best method is checked by default, but you can change if it fails.';  //to translate
+$strExecuteBookmarked = 'Execute bookmarked query';  //to translate
+$strExcelOptions = 'Excel options';  //to translate
+$strReplaceNULLBy = 'Replace NULL by';  //to translate
+$strQueryWindowLock = 'Do not overwrite this query from outside the window';  //to translate
+$strPaperSize = 'Paper size';  //to translate
+$strDatabaseNoTable = 'This database contains no table!';//to translate
+$strViewDumpDatabases = 'View dump (schema) of databases';//to translate
+$strAddIntoComments = 'Add into comments';//to translate
+$strDatabaseExportOptions = 'Database export options';//to translate
+$strAddDropDatabase = 'Add DROP DATABASE';//to translate
+$strToggleScratchboard = 'toggle scratchboard';  //to translate
+$strTableOptions = 'Table options';  //to translate
+$strSecretRequired = 'The configuration file now needs a secret passphrase (blowfish_secret).';  //to translate
+$strAccessDeniedExplanation = 'phpMyAdmin tried to connect to the MySQL server, and the server rejected the connection. You should check the host, username and password in config.inc.php and make sure that they correspond to the information given by the administrator of the MySQL server.';  //to translate
+$strAddAutoIncrement = 'Add AUTO_INCREMENT value';  //to translate
+$strCharsets = 'Charsets';  //to translate
+$strDescription = 'Description';  //to translate
+$strCharsetsAndCollations = 'Character Sets and Collations';  //to translate
+$strCollation = 'Collation';  //to translate
+$strMultilingual = 'multilingual';  //to translate
+$strGerman = 'German';  //to translate
+$strPhoneBook = 'phone book';  //to translate
+$strDictionary = 'dictionary';  //to translate
+$strSwedish = 'Swedish';  //to translate
+$strDanish = 'Danish';  //to translate
+$strCzech = 'Czech';  //to translate
+$strTurkish = 'Turkish';  //to translate
+$strEnglish = 'English';  //to translate
+$strHungarian = 'Hungarian';  //to translate
+$strCroatian = 'Croatian';  //to translate
+$strBulgarian = 'Bulgarian';  //to translate
+$strLithuanian = 'Lithuanian';  //to translate
+$strEstonian = 'Estonian';  //to translate
+$strCaseInsensitive = 'case-insensitive';  //to translate
+$strCaseSensitive = 'case-sensitive';  //to translate
+$strUkrainian = 'Ukrainian';  //to translate
+$strHebrew = 'Hebrew';  //to translate
+$strWestEuropean = 'West European';  //to translate
+$strCentralEuropean = 'Central European';  //to translate
+$strTraditionalChinese = 'Traditional Chinese';  //to translate
+$strCyrillic = 'Cyrillic';  //to translate
+$strArmenian = 'Armenian';  //to translate
+$strArabic = 'Arabic';  //to translate
+$strRussian = 'Russian';  //to translate
+$strUnknown = 'unknown';  //to translate
+$strBaltic = 'Baltic';  //to translate
+$strUnicode = 'Unicode';  //to translate
+$strSimplifiedChinese = 'Simplified Chinese';  //to translate
+$strKorean = 'Korean';  //to translate
+$strGreek = 'Greek';  //to translate
+$strJapanese = 'Japanese';  //to translate
+$strThai = 'Thai';  //to translate
+$strUseThisValue = 'Use this value';  //to translate
+$strWindowNotFound = 'The target browser window could not be updated. Maybe you have closed the parent window or your browser is blocking cross-window updates of your security settings';  //to translate
+$strBrowseForeignValues = 'Browse foreign values';  //to translate
 ?>

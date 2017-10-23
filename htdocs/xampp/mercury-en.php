@@ -18,9 +18,16 @@ $subject = "$subject";
 $message = "$message";
 
 
-$header.="From: $knownsender\r\n";
-$header.=" Cc: $ccaddress";
-// $header.="Bcc: $bcaddress";
+if ($ccaddress=="" || $ccaddress==" ")
+{
+	$header="From: $knownsender";
+	
+}
+else
+{
+	$header .="From: $knownsender\r\n";
+	$header .=" Cc: $ccaddress";
+}
 
 mail($mailtos, $subject, $message, $header);
 

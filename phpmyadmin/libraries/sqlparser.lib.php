@@ -1,5 +1,5 @@
 <?php
-/* $Id: sqlparser.lib.php,v 1.70 2003/06/01 23:09:46 rabus Exp $ */
+/* $Id: sqlparser.lib.php,v 1.87 2003/08/13 16:05:10 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /** SQL Parser Functions for phpMyAdmin
@@ -131,7 +131,7 @@ if (!defined('PMA_SQP_LIB_INCLUDED')) {
             $SQP_errorString = '<p>'.$GLOBALS['strSQLParserUserError'] . '</p>' . "\n"
                 . '<pre>' . "\n"
                 . 'ERROR: ' . $message . "\n"
-                . 'SQL: ' . $sql .  "\n"
+                . 'SQL: ' . htmlspecialchars($sql) .  "\n"
                 . '</pre>' . "\n";
 
             /*
@@ -154,14 +154,15 @@ if (!defined('PMA_SQP_LIB_INCLUDED')) {
          */
         function PMA_SQP_bug($message, $sql)
         {
+            global $SQP_errorString;
             $debugstr = 'ERROR: ' . $message . "\n";
-            $debugstr .= 'CVS: $Id: sqlparser.lib.php,v 1.70 2003/06/01 23:09:46 rabus Exp $' . "\n";
+            $debugstr .= 'CVS: $Id: sqlparser.lib.php,v 1.87 2003/08/13 16:05:10 nijel Exp $' . "\n";
             $debugstr .= 'MySQL: '.PMA_MYSQL_STR_VERSION . "\n";
             $debugstr .= 'USR OS, AGENT, VER: ' . PMA_USR_OS . ' ' . PMA_USR_BROWSER_AGENT . ' ' . PMA_USR_BROWSER_VER . "\n";
             $debugstr .= 'PMA: ' . PMA_VERSION . "\n";
             $debugstr .= 'PHP VER,OS: ' . PMA_PHP_STR_VERSION . ' ' . PHP_OS . "\n";
             $debugstr .= 'LANG: ' . $GLOBALS['lang'] . "\n";
-            $debugstr .= 'SQL: ' . $sql;
+            $debugstr .= 'SQL: ' . htmlspecialchars($sql);
 
             $encodedstr     = $debugstr;
             if (PMA_PHP_INT_VERSION >= 40001 && @function_exists('gzcompress')) {
@@ -169,26 +170,17 @@ if (!defined('PMA_SQP_LIB_INCLUDED')) {
             }
             $encodedstr     = preg_replace("/(\015\012)|(\015)|(\012)/", '<br />' . "\n", chunk_split(base64_encode($encodedstr)));
 
-            echo $GLOBALS['strSQLParserBugMessage'] . '<br />' . "\n"
+            $SQP_errorString .= $GLOBALS['strSQLParserBugMessage'] . '<br />' . "\n"
                  . '----' . $GLOBALS['strBeginCut'] . '----' . '<br />' . "\n"
                  . $encodedstr . "\n"
                  . '----' . $GLOBALS['strEndCut'] . '----' . '<br />' . "\n";
 
-            flush();
-            if (PMA_PHP_INT_VERSION >= 40200 && @function_exists('ob_flush')) {
-                ob_flush();
-            }
-
-            echo '----' . $GLOBALS['strBeginRaw'] . '----<br />' . "\n"
+            $SQP_errorString .= '----' . $GLOBALS['strBeginRaw'] . '----<br />' . "\n"
                  . '<pre>' . "\n"
                  . $debugstr
                  . '</pre>' . "\n"
                  . '----' . $GLOBALS['strEndRaw'] . '----<br />' . "\n";
 
-            flush();
-            if (PMA_PHP_INT_VERSION >= 40200 && @function_exists('ob_flush')) {
-                ob_flush();
-            }
         } // end of the "PMA_SQP_bug()" function
 
 
@@ -428,7 +420,7 @@ if (!defined('PMA_SQP_LIB_INCLUDED')) {
                         $first2 = $punct_data[0] . $punct_data[1];
                         $last2  = $punct_data[$l - 2] . $punct_data[$l - 1];
                         $last   = $punct_data[$l - 1];
-                        if (($first == ',') || ($first == ';') || ($first == '.') || ($first = '*')) {
+                        if (($first == ',') || ($first == ';') || ($first == '.') || ($first == '*')) {
                             $count2     = $count1 + 1;
                             $punct_data = $first;
                         } else if (($last2 == '/*') || ($last2 == '--')) {
@@ -437,7 +429,11 @@ if (!defined('PMA_SQP_LIB_INCLUDED')) {
                         } else if (($last == '-') || ($last == '+') || ($last == '!')) {
                             $count2--;
                             $punct_data = $GLOBALS['PMA_substr']($sql, $count1, $count2 - $count1);
-                        } else {
+                        // TODO: for negation operator, split in 2 tokens ?
+                        // "select x&~1 from t"
+                        // becomes "select x & ~ 1 from t" ?
+
+                        } else if ($last != '~') {
                             $debugstr =  $GLOBALS['strSQPBugUnknownPunctuation'] . ' @ ' . ($count1+1) . "\n"
                                       . 'STR: ' . $punct_data;
                             PMA_SQP_throwError($debugstr, $sql);
@@ -572,6 +568,9 @@ if (!defined('PMA_SQP_LIB_INCLUDED')) {
                 $d_next       = '';
                 $d_next_upper = '';
               }
+
+              //DEBUG echo "[prev: <b>".$d_prev."</b> ".$t_prev."][cur: <b>".$d_cur."</b> ".$t_cur."][next: <b>".$d_next."</b> ".$t_next."]<br>"; 
+
               if ($t_cur == 'alpha') {
                 $t_suffix     = '_identifier';
                 if (($t_next == 'punct_qualifier') || ($t_prev == 'punct_qualifier')) {
@@ -581,17 +580,29 @@ if (!defined('PMA_SQP_LIB_INCLUDED')) {
                   $t_suffix = '_functionName';
                 } else if (PMA_STR_binarySearchInArr($d_cur_upper, $PMA_SQPdata_column_type, $PMA_SQPdata_column_type_cnt))  {
                   $t_suffix = '_columnType';
-                      // Temporary fix for BUG #621357
+
+                  // Temporary fix for BUG #621357
                   //TODO FIX PROPERLY NEEDS OVERHAUL OF SQL TOKENIZER
                   if ($d_cur_upper == 'SET' && $t_next != 'punct_bracket_open_round') {
                     $t_suffix = '_reservedWord';
                   }
                   //END OF TEMPORARY FIX
+
                   // CHARACTER is a synonym for CHAR, but can also be meant as
                   // CHARACTER SET. In this case, we have a reserved word.
                   if ($d_cur_upper == 'CHARACTER' && $d_next_upper == 'SET') {
                     $t_suffix = '_reservedWord';
                   }
+
+                  // experimental
+                  // current is a column type, so previous must not be
+                  // a reserved word but an identifier
+                  // CREATE TABLE SG_Persons (first varchar(64))
+
+                  //if ($sql_array[$i-1]['type'] =='alpha_reservedWord') {
+                  //    $sql_array[$i-1]['type'] = 'alpha_identifier';
+                  //}
+
                 } else if (PMA_STR_binarySearchInArr($d_cur_upper, $PMA_SQPdata_reserved_word, $PMA_SQPdata_reserved_word_cnt)) {
                   $t_suffix = '_reservedWord';
                 } else if (PMA_STR_binarySearchInArr($d_cur_upper, $PMA_SQPdata_column_attrib, $PMA_SQPdata_column_attrib_cnt)) {
@@ -659,6 +670,7 @@ if (!defined('PMA_SQP_LIB_INCLUDED')) {
             $subresult       = array(
                 'querytype'      => '',
                 'select_expr_clause'=> '', // the whole stuff between SELECT and FROM , except DISTINCT
+                'position_of_first_select' => '', // the array index
                 'from_clause'=> '',
                 'group_by_clause'=> '',
                 'order_by_clause'=> '',
@@ -667,7 +679,8 @@ if (!defined('PMA_SQP_LIB_INCLUDED')) {
                 'where_clause_identifiers'   => array(),
                 'queryflags'     => array(),
                 'select_expr'    => array(),
-                'table_ref'      => array()
+                'table_ref'      => array(),
+                'foreign_keys'   => array()
             );
             $subresult_empty = $subresult;
             $seek_queryend         = FALSE;
@@ -701,7 +714,7 @@ if (!defined('PMA_SQP_LIB_INCLUDED')) {
      * I create all sub-values empty, even if they are
      * not present (for example no select_expression alias).
      *
-     * There is a debug section at the end of the main loop, if you want to
+     * There is a debug section at the end of loop #1, if you want to
      * see the exact contents of select_expr and table_ref
      *
      * lem9: queryflags
@@ -714,6 +727,8 @@ if (!defined('PMA_SQP_LIB_INCLUDED')) {
      *
      * ['queryflags']['need_confirm'] = 1; if the query needs confirmation
      * ['queryflags']['select_from'] = 1; if this is a real SELECT...FROM
+     * ['queryflags']['distinct'] = 1;    for a DISTINCT 
+     * ['queryflags']['union'] = 1;       for a UNION 
      *
      * lem9:  query clauses
      *        -------------
@@ -728,6 +743,18 @@ if (!defined('PMA_SQP_LIB_INCLUDED')) {
      *
      * and the identifiers of the where clause are put into the array
      * ['where_clause_identifier']
+     *
+     * lem9:   foreign keys
+     *         ------------
+     * The CREATE TABLE may contain FOREIGN KEY clauses, so they get
+     * analyzed and ['foreign_keys'] is an array filled with the index list,
+     * the REFERENCES table name and REFERENCES index list.
+     *
+     * lem9: position_of_first_select
+     *       ------------------------
+     *
+     * The array index of the first SELECT we find. Will be used to 
+     * insert a SQL_CALC_FOUND_ROWS.
      */
 
             // must be sorted
@@ -1154,8 +1181,6 @@ if (!defined('PMA_SQP_LIB_INCLUDED')) {
             // loop #2: for queryflags
             //          ,querytype (for queries != 'SELECT')
             //
-            // This is not in the loop 1 to keep logic simple
-
             // we will also need this queryflag in loop 2
             // so set it here
             if (isset($current_table_ref) && $current_table_ref > -1) {
@@ -1173,7 +1198,7 @@ if (!defined('PMA_SQP_LIB_INCLUDED')) {
             $in_from = FALSE;
 
             for ($i = 0; $i < $size; $i++) {
-    //echo "trace loop2 <b>"  . $arr[$i]['data'] . "</b> (" . $arr[$i]['type'] . ")<br>";
+    //DEBUG echo "trace loop2 <b>"  . $arr[$i]['data'] . "</b> (" . $arr[$i]['type'] . ")<br>";
 
                // need_confirm
                //
@@ -1199,9 +1224,15 @@ if (!defined('PMA_SQP_LIB_INCLUDED')) {
                        // if the first reserved word is DROP or DELETE,
                        // we know this is a query that needs to be confirmed
                        if ($first_reserved_word=='DROP'
-                           || $first_reserved_word == 'DELETE') {
+                           || $first_reserved_word == 'DELETE'
+                           || $first_reserved_word == 'TRUNCATE') {
                           $subresult['queryflags']['need_confirm'] = 1;
                        }
+
+                       if ($first_reserved_word=='SELECT'){
+                           $position_of_first_select = $i;
+                       }
+                   
                    } else {
                        if ($upper_data=='DROP' && $first_reserved_word=='ALTER') {
                           $subresult['queryflags']['need_confirm'] = 1;
@@ -1211,6 +1242,13 @@ if (!defined('PMA_SQP_LIB_INCLUDED')) {
                    if ($upper_data == 'SELECT') {
                        $in_select_expr = TRUE;
                        $select_expr_clause = '';
+                   }
+                   if ($upper_data == 'DISTINCT') {
+                          $subresult['queryflags']['distinct'] = 1;
+                   }
+
+                   if ($upper_data == 'UNION') {
+                          $subresult['queryflags']['union'] = 1;
                    }
 
                    // if this is a real SELECT...FROM
@@ -1331,6 +1369,72 @@ if (!defined('PMA_SQP_LIB_INCLUDED')) {
 
             } // end for $i (loop #2)
 
+            // -----------------------------------------------------
+            // loop #3: foreign keys
+            // (for now, check only the first query)
+            // (for now, identifiers must be backquoted)
+
+            $seen_foreign = FALSE;
+            $seen_references = FALSE;
+            $in_bracket = FALSE;
+            $foreign_key_number = -1;
+
+            for ($i = 0; $i < $size; $i++) {
+                if ($arr[$i]['type'] == 'alpha_reservedWord') {
+                   $upper_data = strtoupper($arr[$i]['data']);
+                   if ($upper_data == 'FOREIGN') {
+                       $seen_foreign = TRUE;
+                       $seen_references = FALSE;
+                       $foreign_key_number++;
+                   }
+                   if ($upper_data == 'REFERENCES') {
+                       $seen_foreign = FALSE;
+                       $seen_references = TRUE;
+                   }
+                }
+
+                if ($arr[$i]['type'] == 'punct_bracket_open_round') {
+                    $in_bracket = TRUE;
+                }
+
+                if ($arr[$i]['type'] == 'punct_bracket_close_round') {
+                    $in_bracket = FALSE;
+                    if ($seen_references) {
+                        $seen_references = FALSE;
+                    }
+                }
+
+                if (($arr[$i]['type'] == 'quote_backtick')) {
+
+                    if ($seen_foreign && $in_bracket) {
+                        // remove backquotes
+                        $identifier = str_replace('`','',$arr[$i]['data']);
+                        $foreign[$foreign_key_number]['index_list'][] = $identifier;
+                    }
+
+                    if ($seen_references) {
+                        $identifier = str_replace('`','',$arr[$i]['data']);
+                        if ($in_bracket) {
+                            $foreign[$foreign_key_number]['ref_index_list'][] = $identifier;
+                        } else {
+                            // identifier can be table or db.table
+                            $db_table = explode('.',$identifier);
+                            if (isset($db_table[1])) {
+                                $foreign[$foreign_key_number]['ref_db_name'] = $db_table[0];
+                                $foreign[$foreign_key_number]['ref_table_name'] = $db_table[1];
+                            } else {
+                                $foreign[$foreign_key_number]['ref_table_name'] = $db_table[0];
+                            }
+                        }
+                    }
+                }
+            } // end for $i (loop #3)
+
+            if (isset($foreign)) {
+                $subresult['foreign_keys'] = $foreign;     
+            }
+            //DEBUG print_r($foreign);
+
             if (isset($select_expr_clause)) {
                 $subresult['select_expr_clause'] = $select_expr_clause;
             }
@@ -1351,6 +1455,10 @@ if (!defined('PMA_SQP_LIB_INCLUDED')) {
             }
             if (isset($where_clause_identifiers)) {
                 $subresult['where_clause_identifiers'] = $where_clause_identifiers;
+            }
+
+            if (isset($position_of_first_select)) {
+                $subresult['position_of_first_select'] = $position_of_first_select;
             }
 
 
@@ -1394,12 +1502,16 @@ if (!defined('PMA_SQP_LIB_INCLUDED')) {
          * Formats SQL queries to html
          *
          * @param  array   The SQL queries
+         * @param  string  mode 
+         * @param  integer starting token
+         * @param  integer number of tokens to format, -1 = all
          *
          * @return string  The formatted SQL queries
          *
          * @access public
          */
-        function PMA_SQP_formatHtml($arr, $mode='color')
+        function PMA_SQP_formatHtml($arr, $mode='color', $start_token=0,
+            $number_of_tokens=-1)
         {
             // first check for the SQL parser having hit an error
             if (PMA_SQP_isError()) {
@@ -1461,25 +1573,41 @@ if (!defined('PMA_SQP_LIB_INCLUDED')) {
                 'AS',
                 'ASC',
                 'DESC',
+                'DISTINCT',
+                'HOUR',
+                'INTERVAL',
                 'IS',
                 'NOT',
                 'NULL',
                 'ON',
                 'OR'
             );
-            $keywords_no_newline_cnt           = 9;
+            $keywords_no_newline_cnt           = 12;
 
-            $arraysize = $arr['len'];
+            // These reserved words introduce a privilege list
+            $keywords_priv_list                = array(
+                'GRANT',
+                'REVOKE'
+            );
+            $keywords_priv_list_cnt            = 2;
+
+            if ($number_of_tokens == -1) {
+                $arraysize = $arr['len'];
+            } else {
+                $arraysize = $number_of_tokens;
+            }
             $typearr   = array();
             if ($arraysize >= 0) {
                 $typearr[0] = '';
                 $typearr[1] = '';
                 $typearr[2] = '';
-                $typearr[3] = $arr[0]['type'];
+                //$typearr[3] = $arr[0]['type'];
+                $typearr[3] = $arr[$start_token]['type'];
             }
 
-            for ($i = 0; $i < $arraysize; $i++) {
-                // DEBUG echo "<b>" . $arr[$i]['data'] . "</b> " . $arr[$i]['type'] . "<br />";
+            $in_priv_list = FALSE;
+            for ($i = $start_token; $i < $arraysize; $i++) {
+// DEBUG echo "<b>" . $arr[$i]['data'] . "</b> " . $arr[$i]['type'] . "<br />";
                 $before = '';
                 $after  = '';
                 $indent = 0;
@@ -1547,13 +1675,14 @@ if (!defined('PMA_SQP_LIB_INCLUDED')) {
                         }
                         break;
                     case 'punct_queryend':
-                        if (($typearr[3] != 'comment_mysql') && ($typearr[3] != 'comment_ansi')) {
+                        if (($typearr[3] != 'comment_mysql') && ($typearr[3] != 'comment_ansi') && $typearr[3] != 'comment_c') {
                             $after     .= $html_line_break;
                             $after     .= $html_line_break;
                         }
                         $space_punct_listsep               = ' ';
                         $space_punct_listsep_function_name = ' ';
                         $space_alpha_reserved_word         = ' ';
+                        $in_priv_list                      = FALSE;
                         break;
                     case 'comment_mysql':
                     case 'comment_ansi':
@@ -1589,12 +1718,11 @@ if (!defined('PMA_SQP_LIB_INCLUDED')) {
                         if ($typearr[1] == 'alpha_identifier') {
                             $before .= ' ';
                         }
-                        if (($typearr[3] == 'alpha_columnAttrib') || ($typearr[3] == 'quote_single')) {
+                        if (($typearr[3] == 'alpha_columnAttrib') || ($typearr[3] == 'quote_single') || ($typearr[3] == 'digit_integer')) {
                             $after     .= ' ';
                         }
                         break;
                     case 'alpha_reservedWord':
-                        //$upper         = $arr[$i]['data'];
                         $arr[$i]['data'] = strtoupper($arr[$i]['data']);
                         if ((($typearr[1] != 'alpha_reservedWord')
                             || (($typearr[1] == 'alpha_reservedWord')
@@ -1604,8 +1732,19 @@ if (!defined('PMA_SQP_LIB_INCLUDED')) {
                             // do not put a space before the first token, because
                             // we use a lot of eregi() checking for the first
                             // reserved word at beginning of query
+                            // so do not put a newline before
+                            //
+                            // also we must not be inside a privilege list
                             if ($i > 0) {
-                                $before    .= $space_alpha_reserved_word;
+                                if (!$in_priv_list) {
+                                    $before    .= $space_alpha_reserved_word;
+                                }
+                            } else {
+                            // on first keyword, check if it introduces a
+                            // privilege list
+                                if (PMA_STR_binarySearchInArr($arr[$i]['data'], $keywords_priv_list, $keywords_priv_list_cnt)) {
+                                    $in_priv_list = TRUE;
+                                } 
                             }
                         } else {
                             $before    .= ' ';
@@ -1613,8 +1752,10 @@ if (!defined('PMA_SQP_LIB_INCLUDED')) {
 
                         switch ($arr[$i]['data']) {
                             case 'CREATE':
-                                $space_punct_listsep       = $html_line_break;
-                                $space_alpha_reserved_word = ' ';
+                                if (!$in_priv_list) {
+                                    $space_punct_listsep       = $html_line_break;
+                                    $space_alpha_reserved_word = ' ';
+                                }
                                 break;
                             case 'EXPLAIN':
                             case 'DESCRIBE':
@@ -1627,13 +1768,17 @@ if (!defined('PMA_SQP_LIB_INCLUDED')) {
                             case 'TRUNCATE':
                             case 'ANALYZE':
                             case 'ANALYSE':
-                                $space_punct_listsep       = $html_line_break;
-                                $space_alpha_reserved_word = ' ';
+                                if (!$in_priv_list) {
+                                    $space_punct_listsep       = $html_line_break;
+                                    $space_alpha_reserved_word = ' ';
+                                }
                                 break;
                             case 'INSERT':
                             case 'REPLACE':
-                                $space_punct_listsep       = $html_line_break;
-                                $space_alpha_reserved_word = $html_line_break;
+                                if (!$in_priv_list) {
+                                    $space_punct_listsep       = $html_line_break;
+                                    $space_alpha_reserved_word = $html_line_break;
+                                }
                                 break;
                             case 'VALUES':
                                 $space_punct_listsep       = ' ';
@@ -1659,6 +1804,9 @@ if (!defined('PMA_SQP_LIB_INCLUDED')) {
                         if ($infunction && $typearr[3] == 'punct_bracket_close_round') {
                             $after     .= ' ';
                         }
+                        break;
+                    case 'alpha_variable':
+                        $after      = ' ';
                         break;
                     case 'quote_double':
                     case 'quote_single':

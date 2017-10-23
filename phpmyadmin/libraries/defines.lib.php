@@ -1,5 +1,5 @@
 <?php
-/* $Id: defines.lib.php,v 1.44 2003/03/22 23:49:46 rabus Exp $ */
+/* $Id: defines.lib.php,v 1.46 2003/07/09 08:57:20 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -94,6 +94,10 @@ if (!defined('PMA_USR_OS')) {
     } else if (ereg('(Konqueror/)(.*)(;)', $HTTP_USER_AGENT, $log_version)) {
         define('PMA_USR_BROWSER_VER', $log_version[2]);
         define('PMA_USR_BROWSER_AGENT', 'KONQUEROR');
+    } else if (ereg('Mozilla/([0-9].[0-9]{1,2})', $HTTP_USER_AGENT, $log_version)
+               && ereg('Safari/([0-9]*)', $HTTP_USER_AGENT, $log_version2)) {
+        define('PMA_USR_BROWSER_VER', $log_version[1] . '.' . $log_version2[1]);
+        define('PMA_USR_BROWSER_AGENT', 'SAFARI');
     } else if (ereg('Mozilla/([0-9].[0-9]{1,2})', $HTTP_USER_AGENT, $log_version)) {
         define('PMA_USR_BROWSER_VER', $log_version[1]);
         define('PMA_USR_BROWSER_AGENT', 'MOZILLA');

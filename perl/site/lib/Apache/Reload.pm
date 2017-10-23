@@ -63,6 +63,10 @@ sub handler {
 
     my $TouchFile = ref($o) && $o->dir_config("ReloadTouchFile");
 
+    my $ConstantRedefineWarnings = ref($o) && 
+        (lc($o->dir_config("ReloadConstantRedefineWarnings") || '') eq 'off') 
+            ? 0 : 1;
+
     my $TouchModules;
 
     if ($TouchFile) {
@@ -141,6 +145,8 @@ sub handler {
                 undef %{$symref};
             }
             no warnings FATAL => 'all';
+            local $SIG{__WARN__} = \&skip_redefine_const_sub_warn
+                unless $ConstantRedefineWarnings;
             require $key;
             warn("Apache::Reload: process $$ reloading $key\n")
                     if $DEBUG;
@@ -149,6 +155,11 @@ sub handler {
     }
 
     return Apache::OK;
+}
+
+sub skip_redefine_const_sub_warn {
+    return if $_[0] =~ /^Constant subroutine [\w:]+ redefined at/;
+    CORE::warn(@_);
 }
 
 1;
@@ -174,7 +185,8 @@ Apache::Reload - Reload Perl Modules when Changed on Disk
   PerlSetVar ReloadAll Off
   PerlSetVar ReloadModules "ModPerl::* Apache::*"
   #PerlSetVar ReloadDebug On
-
+  #PerlSetVar ReloadConstantRedefineWarnings Off
+  
   # Reload a single module from within itself:
   package My::Apache::Module;
   use Apache::Reload;
@@ -341,16 +353,138 @@ reloaded, are actually getting reloaded, turn the debug mode on:
 
   PerlSetVar ReloadDebug On
 
-=head1 Problems With Reloading Modules Which Do Not Declare Their Package Name
+=head1 Silencing 'Constant subroutine ... redefined at' Warnings
 
-If you modify modules which don't declare their C<package> and rely on
-C<Apache::Reload> to reload them you may encounter problems: i.e.,
+If a module defines constants, e.g.:
+
+  use constant PI => 3.14;
+
+and gets re-loaded, Perl issues a mandatory warnings which can't be
+silenced by conventional means (since Perl 5.8.0). This is because
+constants are inlined at compile time, so if there are other modules
+that are using constants from this module, but weren't reloaded they
+will see different values. Hence the warning is mandatory. However
+chances are that most of the time you won't modify the constant
+subroutine and you don't want I<error_log> to be cluttered with
+(hopefully) irrelevant warnings. In such cases, if you haven't
+modified the constant subroutine, or you know what you are doing, you
+can tell C<Apache::Reload> to shut those for you (it overrides
+C<$SIG{__WARN__}> to accomplish that):
+
+  PerlSetVar ReloadConstantRedefineWarnings Off
+
+For the reasons explained above this option is turned on by default.
+
+since: mod_perl 1.99_10
+
+=head1 Caveats
+
+=head2 Problems With Reloading Modules Which Do Not Declare Their Package Name
+
+If you modify modules, which don't declare their C<package>, and rely on
+C<Apache::Reload> to reload them, you may encounter problems: i.e.,
 it'll appear as if the module wasn't reloaded when in fact it
 was. This happens because when C<Apache::Reload> C<require()>s such a
 module all the global symbols end up in the C<Apache::Reload>
 namespace!  So the module does get reloaded and you see the compile
 time errors if there are any, but the symbols don't get imported to
 the right namespace. Therefore the old version of the code is running.
+
+=head2 Problems with Scripts Running with Registry Handlers that Cache the Code
+
+The following problem is relevant only to registry handlers that cache
+the compiled script. For example it concerns
+C<L<ModPerl::Registry|docs::2.0::api::ModPerl::Registry>> but not
+C<L<ModPerl::PerlRun|docs::2.0::api::ModPerl::PerlRun>>.
+
+=head3 The Problem
+
+Let's say that there is a module C<My::Utils>:
+
+  #file:My/Utils.pm
+  #----------------
+  package My::Utils;
+  BEGIN { warn __PACKAGE__ , " was reloaded\n" }
+  use base qw(Exporter);
+  @EXPORT = qw(colour);
+  sub colour { "white" }
+  1;
+
+And a registry script F<test.pl>:
+
+  #file:test.pl
+  #------------
+  use My::Utils;
+  print "Content-type: text/plain\n\n";
+  print "the color is " . colour();
+
+Assuming that the server is running in a single mode, we request the
+script for the first time and we get the response:
+
+  the color is white
+
+Now we change F<My/Utils.pm>:
+
+  -  sub colour { "white" }
+  +  sub colour { "red" }
+
+And issue the request again. C<Apache::Reload> does its job and we can
+see that C<My::Utils> was reloaded (look in the I<error_log>
+file). However the script still returns:
+
+  the color is white
+
+=head3 The Explanation
+
+Even though F<My/Utils.pm> was reloaded, C<ModPerl::Registry>'s cached
+code won't run 'C<use My::Utils;>' again (since it happens only once,
+i.e. during the compile time). Therefore the script doesn't know that
+the subroutine reference has been changed.
+
+This is easy to verify. Let's change the script to be:
+
+  #file:test.pl
+  #------------
+  use My::Utils;
+  print "Content-type: text/plain\n\n";
+  my $sub_int = \&colour;
+  my $sub_ext = \&My::Utils::colour;
+  print "int $sub_int\n";
+  print "ext $sub_ext\n";
+
+Issue a request, you will see something similar to:
+
+  int CODE(0x8510af8)
+  ext CODE(0x8510af8)
+
+As you can see both point to the same CODE reference (meaning that
+it's the same symbol). After modifying F<My/Utils.pm> again:
+
+  -  sub colour { "red" }
+  +  sub colour { "blue" }
+
+and calling the script on the secondnd time, we get:
+
+  int CODE(0x8510af8)
+  ext CODE(0x851112c)
+
+You can see that the internal CODE reference is not the same as the
+external one.
+
+=head3 The Solution
+
+There are two solutions to this problem:
+
+Solution 1: replace C<use()> with an explicit C<require()> +
+C<import()>.
+
+ - use My::Utils;
+ + require My::Utils; My::Utils->import();
+
+now the changed functions will be reimported on every request.
+
+Solution 2: remember to touch the script itself every time you change
+the module that it requires.
 
 =head1 Threaded MPM and Multiple Perl Interpreters
 

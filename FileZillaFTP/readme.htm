@@ -1,4 +1,4 @@
-<p align="center"><b><u>FileZilla Server version 0.8.5 beta</u></b></p>
+<p align="center"><b><u>FileZilla Server version 0.8.7 beta</u></b></p>
 <p align="center">Copyright 2001<br>
 by <a href="mailto:Tim.Kosse@gmx.de">Tim Kosse</a><a href="http://sourceforge.net/projects/filezilla/"><br>
 http://sourceforge.net/projects/filezilla/</a></p>
@@ -72,6 +72,40 @@ as restoring it to normal size.</p>
   </tr>
 </table>
 <p align="left"><b><u>Version History:</u></b></p>
+<p><b>version 0.8.7</b></p>
+<blockquote>
+  <u>new features and improvements:</u>
+  <ul>
+    <li>lots of performance improvements:
+      <ul>
+        <li>connection establishment is up to 100ms faster</li>
+        <li>some optimizations in the welcome message, directory listing and permission code</li>
+      </ul>
+      Thanks to Tom Diviney for a lot of testing.
+    </li>
+    <li>Improved behaviour of LIST and NLST with arguments, should fix the mget issue, fix provided by Bengt Johannesson</li>
+  </ul>
+  <u>fixed bugs:</u>
+  <ul>
+    <li>Creation of transfer connection in active mode was not RFC 959 compatible.</li>
+    <li>possible fix for stalling GSS transfers</li>
+  </ul>
+</blockquote>    
+<p><b>version 0.8.6</b></p>
+<blockquote>
+  <u>new features:</u>
+  <ul>
+    <li>new log window, it's now possible to select text</li>
+  </ul>
+  <u>fixed bugs:</u>
+  <ul>
+    <li>due to a bug in the Windows api function CreateDirectory it was possible to create directories with one or more dots at the end of their name.
+      Such directories can't be accessed or deleted by most programs.
+      FileZilla Server now checks for dots at the end of diretories and denies creation of such directories.
+      If you already have such directories on your disk, you can delete them in the console using <b>rmdir \\?\&lt;path&gt;</b>, replace path with the full path of the invalid directory.</li>
+    <li>Usergroups no longer change randomly if there are more than one user group.</li>
+  </ul>
+</blockquote>
 <p><b>version 0.8.5:</b></p>
 <blockquote>
   <u>new features:</u>

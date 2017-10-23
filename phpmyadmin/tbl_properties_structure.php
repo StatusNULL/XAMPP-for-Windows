@@ -1,7 +1,6 @@
 <?php
-/* $Id: tbl_properties_structure.php,v 1.38 2003/05/30 14:17:13 rabus Exp $ */
+/* $Id: tbl_properties_structure.php,v 1.54 2003/08/15 17:56:20 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
-
 
 if (!defined('PMA_GRAB_GLOBALS_INCLUDED')) {
     include('./libraries/grab_globals.lib.php');
@@ -9,13 +8,26 @@ if (!defined('PMA_GRAB_GLOBALS_INCLUDED')) {
 if (!defined('PMA_COMMON_LIB_INCLUDED')) {
     include('./libraries/common.lib.php');
 }
+if (PMA_MYSQL_INT_VERSION >= 40100 && !defined('PMA_MYSQL_CHARSETS_LIB_INCLUDED')) {
+    include('./libraries/mysql_charsets.lib.php');
+}
 
 /**
  * Drop multiple fields if required
  */
+
+// workaround for IE problem:
+if (isset($submit_mult_change_x)) {
+    $submit_mult = $strChange;
+}
+if (isset($submit_mult_drop_x)) {
+    $submit_mult = $strDrop;
+}
+
 if ((!empty($submit_mult) && isset($selected_fld))
     || isset($mult_btn)) {
     $action = 'tbl_properties_structure.php';
+    $err_url = 'tbl_properties_structure.php?' . PMA_generate_common_url($db, $table);
     include('./mult_submits.inc.php');
 }
 
@@ -69,7 +81,7 @@ $fields_cnt  = mysql_num_rows($fields_rs);
 
 <!-- TABLE INFORMATIONS -->
 
-<form action="tbl_properties_structure.php" name="fieldsForm">
+<form method="post" action="tbl_properties_structure.php" name="fieldsForm">
     <?php echo PMA_generate_common_hidden_inputs($db, $table); ?>
 
 <table border="<?php echo $cfg['Border']; ?>">
@@ -140,19 +152,27 @@ while ($row = PMA_mysql_fetch_array($fields_rs)) {
     }
 
     // rabus: Devide charset from the rest of the type definition (MySQL >= 4.1)
-    if (PMA_MYSQL_INT_VERSION >= 40100 && (
-        substr($type, 0, 4) == 'char'
-        || substr($type, 0, 7) == 'varchar'
-        || substr($type, 0, 4) == 'text'
-        || substr($type, 0, 8) == 'tinytext'
-        || substr($type, 0, 10) == 'mediumtext'
-        || substr($type, 0, 8) == 'longtext'
-        ) && !$binary) {
-        if (strpos($type, ' character set ')) {
-            $type = substr($type, 0, strpos($type, ' character set '));
-        }
-        if (!empty($row['Collation'])) {
-            $field_charset = $row['Collation'];
+    unset($field_charset);
+    if (PMA_MYSQL_INT_VERSION >= 40100) {
+        if ((substr($type, 0, 4) == 'char'
+            || substr($type, 0, 7) == 'varchar'
+            || substr($type, 0, 4) == 'text'
+            || substr($type, 0, 8) == 'tinytext'
+            || substr($type, 0, 10) == 'mediumtext'
+            || substr($type, 0, 8) == 'longtext'
+            || substr($type, 0, 3) == 'set'
+            || substr($type, 0, 4) == 'enum'
+            ) && !$binary) {
+            if (strpos($type, ' character set ')) {
+                $type = substr($type, 0, strpos($type, ' character set '));
+            }
+            if (!empty($row['Collation'])) {
+                $field_charset = $row['Collation'];
+            } else {
+                $field_charset = '';
+            }
+        } else {
+            $field_charset = '';
         }
     }
 
@@ -196,6 +216,56 @@ while ($row = PMA_mysql_fetch_array($fields_rs)) {
     }
     echo "\n";
 
+    $titles = array();
+    if ($cfg['PropertiesIconic'] == true) {
+        // We need to copy the value or else the == 'both' check will always return true
+        $propicon = (string)$cfg['PropertiesIconic'];
+
+        if ($propicon == 'both') {
+            $iconic_spacer = '<nobr>';
+        } else {
+            $iconic_spacer = '';
+        }
+
+        $titles['Change']        = $iconic_spacer . '<img hspace="7" width="12" height="13" src="images/button_edit.png" alt="' . $strChange . '" title="' . $strChange . '" border="0" />';
+        $titles['Drop']          = $iconic_spacer . '<img hspace="7" width="11" height="12" src="images/button_drop.png" alt="' . $strDrop . '" title="' . $strDrop . '" border="0" />';
+        $titles['NoDrop']        = $iconic_spacer . '<img hspace="7" width="11" height="13" src="images/button_drop.png" alt="' . $strDrop . '" title="' . $strDrop . '" border="0" />';
+        $titles['Primary']       = $iconic_spacer . '<img hspace="7" width="11" height="13" src="images/button_primary.png" alt="' . $strPrimary . '" title="' . $strPrimary . '" border="0" />';
+        $titles['Index']         = $iconic_spacer . '<img hspace="7" width="11" height="13" src="images/button_index.png" alt="' . $strIndex . '" title="' . $strIndex . '" border="0" />';
+        $titles['Unique']        = $iconic_spacer . '<img hspace="7" width="11" height="13" src="images/button_unique.png" alt="' . $strUnique . '" title="' . $strUnique . '" border="0" />';
+        $titles['IdxFulltext']   = $iconic_spacer . '<img hspace="7" width="11" height="13" src="images/button_fulltext.png" alt="' . $strIdxFulltext . '" title="' . $strIdxFulltext . '" border="0" />';
+        $titles['NoPrimary']     = $iconic_spacer . '<img hspace="7" width="11" height="13" src="images/button_noprimary.png" alt="' . $strPrimary . '" title="' . $strPrimary . '" border="0" />';
+        $titles['NoIndex']       = $iconic_spacer . '<img hspace="7" width="11" height="13" src="images/button_noindex.png" alt="' . $strIndex . '" title="' . $strIndex . '" border="0" />';
+        $titles['NoUnique']      = $iconic_spacer . '<img hspace="7" width="11" height="13" src="images/button_nounique.png" alt="' . $strUnique . '" title="' . $strUnique . '" border="0" />';
+        $titles['NoIdxFulltext'] = $iconic_spacer . '<img hspace="7" width="11" height="13" src="images/button_nofulltext.png" alt="' . $strIdxFulltext . '" title="' . $strIdxFulltext . '" border="0" />';
+
+        if ($propicon == 'both') {
+            $titles['Change']        .= '&nbsp;' . $strChange . '</nobr>';
+            $titles['Drop']          .= '&nbsp;' . $strDrop . '</nobr>';
+            $titles['NoDrop']        .= '&nbsp;' . $strDrop . '</nobr>';
+            $titles['Primary']       .= '&nbsp;' . $strPrimary . '</nobr>';
+            $titles['Index']         .= '&nbsp;' . $strIndex . '</nobr>';
+            $titles['Unique']        .= '&nbsp;' . $strUnique . '</nobr>';
+            $titles['IdxFulltext'  ] .= '&nbsp;' . $strIdxFulltext . '</nobr>';
+            $titles['NoPrimary']     .= '&nbsp;' . $strPrimary . '</nobr>';
+            $titles['NoIndex']       .= '&nbsp;' . $strIndex . '</nobr>';
+            $titles['NoUnique']      .= '&nbsp;' . $strUnique . '</nobr>';
+            $titles['NoIdxFulltext'] .= '&nbsp;' . $strIdxFulltext . '</nobr>';
+        }
+    } else {
+        $titles['Change']        = $strChange;
+        $titles['Drop']          = $strDrop;
+        $titles['NoDrop']        = $strDrop;
+        $titles['Primary']       = $strPrimary;
+        $titles['Index']         = $strIndex;
+        $titles['Unique']        = $strUnique;
+        $titles['IdxFulltext']   = $strIdxFulltext;
+        $titles['NoPrimary']     = $strPrimary;
+        $titles['NoIndex']       = $strIndex;
+        $titles['NoUnique']      = $strUnique;
+        $titles['NoIdxFulltext'] = $strIdxFulltext;
+    }
+
     ?>
 <tr>
     <td align="center" bgcolor="<?php echo $bgcolor; ?>">
@@ -203,16 +273,16 @@ while ($row = PMA_mysql_fetch_array($fields_rs)) {
     </td>
     <td bgcolor="<?php echo $bgcolor; ?>" nowrap="nowrap">&nbsp;<label for="checkbox_row_<?php echo $i; ?>"><?php echo $field_name; ?></label>&nbsp;</td>
     <td bgcolor="<?php echo $bgcolor; ?>"<?php echo $type_nowrap; ?>><?php echo $type; echo $type_mime; ?><bdo dir="ltr"></bdo></td>
-<?php echo PMA_MYSQL_INT_VERSION >= 40100 ? '    <td bgcolor="' . $bgcolor . '">' . (empty($field_charset) ? '&nbsp;' : $field_charset) . '</td>' . "\n" : '' ?>
+<?php echo PMA_MYSQL_INT_VERSION >= 40100 ? '    <td bgcolor="' . $bgcolor . '">' . (empty($field_charset) ? '&nbsp;' : '<dfn title="' . PMA_getCollationDescr($field_charset) . '">' . $field_charset . '</dfn>') . '</td>' . "\n" : '' ?>
     <td bgcolor="<?php echo $bgcolor; ?>" nowrap="nowrap"><?php echo $strAttribute; ?></td>
     <td bgcolor="<?php echo $bgcolor; ?>"><?php echo (($row['Null'] == '') ? $strNo : $strYes); ?>&nbsp;</td>
     <td bgcolor="<?php echo $bgcolor; ?>" nowrap="nowrap"><?php if (isset($row['Default'])) echo $row['Default']; ?>&nbsp;</td>
     <td bgcolor="<?php echo $bgcolor; ?>" nowrap="nowrap"><?php echo $row['Extra']; ?>&nbsp;</td>
-    <td bgcolor="<?php echo $bgcolor; ?>">
+    <td align="center" bgcolor="<?php echo $bgcolor; ?>">
         <a href="tbl_alter.php?<?php echo $url_query; ?>&amp;field=<?php echo $field_encoded; ?>">
-            <?php echo $strChange; ?></a>
+            <?php echo $titles['Change']; ?></a>
     </td>
-    <td bgcolor="<?php echo $bgcolor; ?>">
+    <td align="center" bgcolor="<?php echo $bgcolor; ?>">
         <?php
         // loic1: Drop field only if there is more than one field in the table
         if ($fields_cnt > 1) {
@@ -220,52 +290,52 @@ while ($row = PMA_mysql_fetch_array($fields_rs)) {
             ?>
         <a href="sql.php?<?php echo $url_query; ?>&amp;sql_query=<?php echo urlencode('ALTER TABLE ' . PMA_backquote($table) . ' DROP ' . PMA_backquote($row['Field'])); ?>&amp;cpurge=1&amp;purgekey=<?php echo urlencode($row['Field']); ?>&amp;zero_rows=<?php echo urlencode(sprintf($strFieldHasBeenDropped, htmlspecialchars($row['Field']))); ?>"
             onclick="return confirmLink(this, 'ALTER TABLE <?php echo PMA_jsFormat($table); ?> DROP <?php echo PMA_jsFormat($row['Field']); ?>')">
-            <?php echo $strDrop; ?></a>
+            <?php echo $titles['Drop']; ?></a>
             <?php
         } else {
-            echo "\n" . '        ' . $strDrop;
+            echo "\n" . '        ' . $titles['NoDrop'];
         }
         echo "\n";
         ?>
     </td>
-    <td bgcolor="<?php echo $bgcolor; ?>">
+    <td align="center" bgcolor="<?php echo $bgcolor; ?>">
         <?php
         if ($type == 'text' || $type == 'blob') {
-            echo $strPrimary . "\n";
+            echo $titles['NoPrimary'] . "\n";
         } else {
             echo "\n";
             ?>
         <a href="sql.php?<?php echo $url_query; ?>&amp;sql_query=<?php echo urlencode('ALTER TABLE ' . PMA_backquote($table) . ' DROP PRIMARY KEY, ADD PRIMARY KEY(' . $primary . PMA_backquote($row['Field']) . ')'); ?>&amp;zero_rows=<?php echo urlencode(sprintf($strAPrimaryKey, htmlspecialchars($row['Field']))); ?>"
             onclick="return confirmLink(this, 'ALTER TABLE <?php echo PMA_jsFormat($table); ?> DROP PRIMARY KEY, ADD PRIMARY KEY(<?php echo PMA_jsFormat($row['Field']); ?>)')">
-            <?php echo $strPrimary; ?></a>
+            <?php echo $titles['Primary']; ?></a>
             <?php
         }
         echo "\n";
         ?>
     </td>
-    <td bgcolor="<?php echo $bgcolor; ?>">
+    <td align="center" bgcolor="<?php echo $bgcolor; ?>">
         <?php
         if ($type == 'text' || $type == 'blob') {
-            echo $strIndex . "\n";
+            echo $titles['NoIndex'] . "\n";
         } else {
             echo "\n";
             ?>
         <a href="sql.php?<?php echo $url_query; ?>&amp;sql_query=<?php echo urlencode('ALTER TABLE ' . PMA_backquote($table) . ' ADD INDEX(' . PMA_backquote($row['Field']) . ')'); ?>&amp;zero_rows=<?php echo urlencode(sprintf($strAnIndex ,htmlspecialchars($row['Field']))); ?>">
-            <?php echo $strIndex; ?></a>
+            <?php echo $titles['Index']; ?></a>
             <?php
         }
         echo "\n";
         ?>
     </td>
-    <td bgcolor="<?php echo $bgcolor; ?>">
+    <td align="center" bgcolor="<?php echo $bgcolor; ?>">
         <?php
         if ($type == 'text' || $type == 'blob') {
-            echo $strUnique . "\n";
+            echo $titles['NoUnique'] . "\n";
         } else {
             echo "\n";
             ?>
         <a href="sql.php?<?php echo $url_query; ?>&amp;sql_query=<?php echo urlencode('ALTER TABLE ' . PMA_backquote($table) . ' ADD UNIQUE(' . PMA_backquote($row['Field']) . ')'); ?>&amp;zero_rows=<?php echo urlencode(sprintf($strAnIndex , htmlspecialchars($row['Field']))); ?>">
-            <?php echo $strUnique; ?></a>
+            <?php echo $titles['Unique']; ?></a>
             <?php
         }
         echo "\n";
@@ -277,16 +347,16 @@ while ($row = PMA_mysql_fetch_array($fields_rs)) {
             && ($type == 'text' || strpos(' ' . $type, 'varchar'))) {
             echo "\n";
             ?>
-    <td bgcolor="<?php echo $bgcolor; ?>" nowrap="nowrap">
+    <td align="center" bgcolor="<?php echo $bgcolor; ?>" nowrap="nowrap">
         <a href="sql.php?<?php echo $url_query; ?>&amp;sql_query=<?php echo urlencode('ALTER TABLE ' . PMA_backquote($table) . ' ADD FULLTEXT(' . PMA_backquote($row['Field']) . ')'); ?>&amp;zero_rows=<?php echo urlencode(sprintf($strAnIndex , htmlspecialchars($row['Field']))); ?>">
-            <?php echo $strIdxFulltext; ?></a>
+            <?php echo $titles['IdxFulltext']; ?></a>
     </td>
             <?php
         } else {
             echo "\n";
             ?>
-    <td bgcolor="<?php echo $bgcolor; ?>" nowrap="nowrap">
-        <?php echo $strIdxFulltext . "\n"; ?>
+    <td align="center" bgcolor="<?php echo $bgcolor; ?>" nowrap="nowrap">
+        <?php echo $titles['NoIdxFulltext'] . "\n"; ?>
     </td>
             <?php
         } // end if... else...
@@ -305,7 +375,10 @@ $checkall_url = 'tbl_properties_structure.php?' . PMA_generate_common_url($db,$t
 
 <tr>
     <td colspan="<?php echo PMA_MYSQL_INT_VERSION >= 40100 ? '14' : (PMA_MYSQL_INT_VERSION >= 32323 ? '13' : '12'); ?>">
-        <img src="./images/arrow_<?php echo $text_dir; ?>.gif" border="0" width="38" height="22" alt="<?php echo $strWithChecked; ?>" />
+        <table>
+            <tr>
+                <td>
+                    <img src="./images/arrow_<?php echo $text_dir; ?>.gif" border="0" width="38" height="22" alt="<?php echo $strWithChecked; ?>" />
         <a href="<?php echo $checkall_url; ?>&amp;checkall=1" onclick="setCheckboxes('fieldsForm', true); return false;">
             <?php echo $strCheckAll; ?></a>
         &nbsp;/&nbsp;
@@ -313,17 +386,43 @@ $checkall_url = 'tbl_properties_structure.php?' . PMA_generate_common_url($db,$t
             <?php echo $strUncheckAll; ?></a>
         &nbsp;&nbsp;&nbsp;
         <i><?php echo $strWithChecked; ?></i>&nbsp;&nbsp;
-        <input type="submit" name="submit_mult" value="<?php echo $strChange; ?>" />
-<?php
-// Drop button if there is at least two fields
-if ($fields_cnt > 1) {
-    ?>
-        &nbsp;<i><?php echo $strOr; ?></i>&nbsp;
-        <input type="submit" name="submit_mult" value="<?php echo $strDrop; ?>" />
-    <?php
+                </td>
+                <td>
+                    <?php
+
+if ($cfg['PropertiesIconic']) {
+    /* Opera has trouble with <input type="image"> */
+    /* IE has trouble with <button> */
+    if (PMA_USR_BROWSER_AGENT != 'IE') {
+        echo '<button class="mult_submit" type="submit" name="submit_mult" value="' . $strChange . '" title="' . $strChange . '">' . "\n"
+           . '<img src="./images/button_edit.png" title="' . $strChange . '" alt="' . $strChange . '" width="12" height="13" />' . (($propicon == 'both') ? '&nbsp;' . $strChange : '') . "\n"
+           . '</button>' . "\n";
+    } else {
+        echo '                    <input type="image" name="submit_mult_change" value="' .$strChange . '" title="' . $strChange . '" src="./images/button_edit.png" />'  . (($propicon == 'both') ? '&nbsp;' . $strChange : '') . "\n"; 
+    }
+    // Drop button if there is at least two fields
+    if ($fields_cnt > 1) {
+        if (PMA_USR_BROWSER_AGENT != 'IE') {
+            echo '                    <button class="mult_submit" type="submit" name="submit_mult" value="' . $strDrop . '" title="' . $strDrop . '">' . "\n"
+               . '<img src="./images/button_drop.png" title="' . $strDrop . '" alt="' . $strDrop . '" width="11" height="13" />' . (($propicon == 'both') ? '&nbsp;' . $strDrop : '') . "\n"
+               . '</button>' . "\n";
+        } else {
+            echo '                    <input type="image" name="submit_mult_drop" value="' .$strDrop . '" title="' . $strDrop . '" src="./images/button_drop.png" />' . (($propicon == 'both') ? '&nbsp;' . $strDrop : '') . "\n"; 
+        }
+    }
+} else {
+    echo '                    <input type="submit" name="submit_mult" value="' . $strChange . '" title="' . $strChange . '" />' . "\n";
+    // Drop button if there is at least two fields
+    if ($fields_cnt > 1) {
+        echo '                    &nbsp;<i>' . $strOr . '</i>&nbsp;' . "\n"
+           . '                    <input type="submit" name="submit_mult" value="' . $strDrop . '" title="' . $strDrop . '" />' . "\n";
+    }
 }
-echo "\n";
+
 ?>
+                </td>
+            </tr>
+        </table>
     </td>
 </tr>
 </table>
@@ -508,7 +607,7 @@ if ($cfg['ShowStats']) {
             <td bgcolor="<?php echo $bgcolor; ?>"><?php echo $strCharset; ?></td>
             <td bgcolor="<?php echo $bgcolor; ?>" align="<?php echo $cell_align_left; ?>" nowrap="nowrap">
             <?php
-            echo $showtable['Charset'];
+            echo '<dfn title="' . PMA_getCollationDescr($tbl_charset) . '">' . $tbl_charset . '</dfn>';
             ?>
             </td>
         </tr>

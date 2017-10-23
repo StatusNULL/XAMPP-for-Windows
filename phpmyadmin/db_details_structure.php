@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_details_structure.php,v 1.60 2003/05/10 16:14:34 nijel Exp $ */
+/* $Id: db_details_structure.php,v 1.65 2003/08/15 17:15:57 garvinhicking Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -19,6 +19,7 @@ if (empty($is_info)) {
     if ((!empty($submit_mult) && isset($selected_tbl))
        || isset($mult_btn)) {
         $action = 'db_details_structure.php';
+        $err_url = 'db_details_structure.php?'. PMA_generate_common_url($db);
         include('./mult_submits.inc.php');
     }
     include('./db_details_common.php');
@@ -35,6 +36,44 @@ if (empty($is_info)) {
     if ((!empty($submit_mult) && isset($selected_tbl))
        || isset($mult_btn)) {
         PMA_showMessage($strSuccess);
+    }
+}
+
+// Display function
+function pma_TableHeader($alternate = FALSE) {
+    if ($alternate) {
+?>
+            <table border="<?php echo $GLOBALS['cfg']['Border']; ?>">
+            <tr>
+                <td></td>
+                <th>&nbsp;<?php echo $GLOBALS['strTable']; ?>&nbsp;</th>
+                <th colspan="6"><?php echo $GLOBALS['strAction']; ?></th>
+                <th><?php echo $GLOBALS['strRecords']; ?></th>
+            </tr>
+<?php
+    } else {
+?>
+            <table border="<?php echo $GLOBALS['cfg']['Border']; ?>">
+            <tr>
+                <td></td>
+                <th>&nbsp;<?php echo $GLOBALS['strTable']; ?>&nbsp;</th>
+                <th colspan="6"><?php echo $GLOBALS['strAction']; ?></th>
+                <th><?php echo $GLOBALS['strRecords']; ?></th>
+                <?php
+                if (!($GLOBALS['cfg']['PropertiesNumColumns'] > 1)) {
+                ?>
+                <th><?php echo $GLOBALS['strType']; ?></th>
+                <?php
+                }
+                ?>
+                <?php
+                if ($GLOBALS['cfg']['ShowStats']) {
+                    echo '<th>' . $GLOBALS['strSize'] . '</th>';
+                }
+                echo "\n";
+                ?>
+            </tr>
+<?php
     }
 }
 
@@ -60,14 +99,56 @@ if ($cfgRelation['commwork'] && isset($db_comment) && $db_comment == 'true') {
 <!-- TABLE LIST -->
 
 <?php
+$titles = array();
+if ($cfg['PropertiesIconic'] == true) {
+    // We need to copy the value or else the == 'both' check will always return true
+    $propicon = (string)$cfg['PropertiesIconic'];
+
+    if ($propicon == 'both') {
+        $iconic_spacer = '<nobr>';
+    } else {
+        $iconic_spacer = '';
+    }
+
+    $titles['Browse']     = $iconic_spacer . '<img hspace="7" width="12" height="13" src="images/button_browse.png" alt="' . $strBrowse . '" title="' . $strBrowse . '" border="0" />';
+    $titles['Select']     = $iconic_spacer . '<img hspace="7" width="14" height="13" src="images/button_select.png" alt="' . $strSelect . '" title="' . $strSelect . '" border="0" />';
+    $titles['NoBrowse']   = $iconic_spacer . '<img hspace="7" width="12" height="13" src="images/button_nobrowse.png" alt="' . $strBrowse . '" title="' . $strBrowse . '" border="0" />';
+    $titles['NoSelect']   = $iconic_spacer . '<img hspace="7" width="14" height="13" src="images/button_noselect.png" alt="' . $strSelect . '" title="' . $strSelect . '" border="0" />';
+    $titles['Insert']     = $iconic_spacer . '<img hspace="7" width="13" height="13" src="images/button_insert.png" alt="' . $strInsert . '" title="' . $strInsert . '" border="0" />';
+    $titles['Properties'] = $iconic_spacer . '<img hspace="7" width="18" height="13" src="images/button_properties.png" alt="' . $strProperties . '" title="' . $strProperties . '" border="0" />';
+    $titles['Drop']       = $iconic_spacer . '<img hspace="7" width="11" height="13" src="images/button_drop.png" alt="' . $strDrop . '" title="' . $strDrop . '" border="0" />';
+    $titles['Empty']      = $iconic_spacer . '<img hspace="7" width="11" height="13" src="images/button_empty.png" alt="' . $strEmpty . '" title="' . $strEmpty . '" border="0" />';
+    $titles['NoEmpty']    = $iconic_spacer . '<img hspace="7" width="11" height="13" src="images/button_noempty.png" alt="' . $strEmpty . '" title="' . $strEmpty . '" border="0" />';
+
+    if ($propicon == 'both') {
+        $titles['Browse']     .= '&nbsp;' . $strBrowse . '</nobr>';
+        $titles['Select']     .= '&nbsp;' . $strSelect . '</nobr>';
+        $titles['NoBrowse']   .= '&nbsp;' . $strBrowse . '</nobr>';
+        $titles['NoSelect']   .= '&nbsp;' . $strSelect . '</nobr>';
+        $titles['Insert']     .= '&nbsp;' . $strInsert . '</nobr>';
+        $titles['Properties'] .= '&nbsp;' . $strProperties . '</nobr>';
+        $titles['Drop']       .= '&nbsp;' . $strDrop . '</nobr>';
+        $titles['Empty']      .= '&nbsp;' . $strEmpty . '</nobr>';
+        $titles['NoEmpty']    .= '&nbsp;' . $strEmpty . '</nobr>';
+    }
+} else {
+    $titles['Browse']     = $strBrowse;
+    $titles['Select']     = $strSelect;
+    $titles['NoBrowse']   = $strBrowse;
+    $titles['NoSelect']   = $strSelect;
+    $titles['Insert']     = $strInsert;
+    $titles['Properties'] = $strProperties;
+    $titles['Drop']       = $strDrop;
+    $titles['Empty']      = $strEmpty;
+    $titles['NoEmpty']    = $strEmpty;
+}
+
 // 1. No tables
 if ($num_tables == 0) {
     echo $strNoTablesFound . "\n";
 }
-
 // 2. Shows table informations on mysql >= 3.23.03 - staybyte - 11 June 2001
 else if (PMA_MYSQL_INT_VERSION >= 32303) {
-
     // Get additional information about tables for tooltip
     if ($cfg['ShowTooltip']) {
         $tooltip_truename = array();
@@ -111,24 +192,22 @@ else if (PMA_MYSQL_INT_VERSION >= 32303) {
 <form method="post" action="db_details_structure.php" name="tablesForm">
     <?php echo PMA_generate_common_hidden_inputs($db); ?>
 
-<table border="<?php echo $cfg['Border']; ?>">
-<tr>
-    <td></td>
-    <th>&nbsp;<?php echo $strTable; ?>&nbsp;</th>
-    <th colspan="6"><?php echo $strAction; ?></th>
-    <th><?php echo $strRecords; ?></th>
-    <th><?php echo $strType; ?></th>
-    <?php
-    if ($cfg['ShowStats']) {
-        echo '<th>' . $strSize . '</th>';
+<?php
+    if ($cfg['PropertiesNumColumns'] > 1) {
+?>
+<table cellspacing="0" cellpadding="0" border="0">
+    <tr>
+        <td valign="top">
+<?php
     }
-    echo "\n";
-    ?>
-</tr>
-    <?php
+    
+    pma_TableHeader();
+
     $i = $sum_entries = 0;
     (double) $sum_size = 0;
     $checked   = (!empty($checkall) ? ' checked="checked"' : '');
+    $num_columns = ($cfg['PropertiesNumColumns'] > 1 ? (ceil($num_tables / $cfg['PropertiesNumColumns']) + 1) : 0);
+    $row_count = 0;
     while (list($keyname, $sts_data) = each($tables)) {
         $table         = $sts_data['Name'];
         $table_encoded = urlencode($table);
@@ -145,15 +224,29 @@ else if (PMA_MYSQL_INT_VERSION >= 32303) {
         $tbl_url_query = $url_query . '&amp;table=' . $table_encoded;
         $bgcolor       = ($i++ % 2) ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo'];
         echo "\n";
+
+        $row_count++;
+        if($num_columns > 0 && $num_tables > $num_columns && (($row_count % ($num_columns)) == 0)) {
+            $bgcolor       = $cfg['BgcolorTwo'];
+            $row_count = 1;
         ?>
-<tr>
-    <td align="center" bgcolor="<?php echo $bgcolor; ?>">
-        <input type="checkbox" name="selected_tbl[]" value="<?php echo $table_encoded; ?>" id="checkbox_tbl_<?php echo $i; ?>"<?php echo $checked; ?> />
+            </tr>
+        </table>
     </td>
-    <td bgcolor="<?php echo $bgcolor; ?>" nowrap="nowrap">
-        &nbsp;<b><label for="checkbox_tbl_<?php echo $i; ?>" title="<?php echo $alias; ?>"><?php echo $truename; ?></label>&nbsp;</b>&nbsp;
-    </td>
-    <td bgcolor="<?php echo $bgcolor; ?>">
+    <td><img src="./images/spacer.gif" border="0" width="10" height="1" alt="" /></td>
+    <td valign="top">
+        <?php
+            pma_TableHeader();
+        }
+        ?>
+            <tr>
+                <td align="center" bgcolor="<?php echo $bgcolor; ?>">
+                    <input type="checkbox" name="selected_tbl[]" value="<?php echo $table_encoded; ?>" id="checkbox_tbl_<?php echo $i; ?>"<?php echo $checked; ?> />
+                </td>
+                <td bgcolor="<?php echo $bgcolor; ?>" nowrap="nowrap">
+                    &nbsp;<b><label for="checkbox_tbl_<?php echo $i; ?>" title="<?php echo $alias; ?>"><?php echo $truename; ?></label>&nbsp;</b>&nbsp;
+                </td>
+                <td align="center" bgcolor="<?php echo $bgcolor; ?>">
         <?php
         include('./libraries/bookmark.lib.php');
         $book_sql_query = PMA_queryBookmarks($db, $cfg['Bookmark'], '\'' . PMA_sqlAddslashes($table) . '\'', 'label');
@@ -161,36 +254,36 @@ else if (PMA_MYSQL_INT_VERSION >= 32303) {
         if (!empty($sts_data['Rows'])) {
             echo '<a href="sql.php?' . $tbl_url_query . '&amp;sql_query='
                  . (isset($book_sql_query) && $book_sql_query != FALSE ? urlencode($book_sql_query) : urlencode('SELECT * FROM ' . PMA_backquote($table)))
-                 . '&amp;pos=0">' . $strBrowse . '</a>';
+                 . '&amp;pos=0">' . $titles['Browse'] . '</a>';
         } else {
-            echo $strBrowse;
+            echo $titles['NoBrowse'];
         }
         ?>
-    </td>
-    <td bgcolor="<?php echo $bgcolor; ?>">
+                </td>
+                <td bgcolor="<?php echo $bgcolor; ?>">
         <?php
         if (!empty($sts_data['Rows'])) {
             echo '<a href="tbl_select.php?' . $tbl_url_query . '">'
-                 . $strSelect . '</a>';
+                 . $titles['Select'] . '</a>';
         } else {
-            echo $strSelect;
+            echo $titles['NoSelect'];
         }
         ?>
-    </td>
-    <td bgcolor="<?php echo $bgcolor; ?>">
+                </td>
+                <td align="center" bgcolor="<?php echo $bgcolor; ?>">
         <a href="tbl_change.php?<?php echo $tbl_url_query; ?>">
-            <?php echo $strInsert; ?></a>
-    </td>
-    <td bgcolor="<?php echo $bgcolor; ?>">
+            <?php echo $titles['Insert']; ?></a>
+                </td>
+                <td align="center" bgcolor="<?php echo $bgcolor; ?>">
         <a href="tbl_properties_structure.php?<?php echo $tbl_url_query; ?>">
-            <?php echo $strProperties; ?></a>
-    </td>
-    <td bgcolor="<?php echo $bgcolor; ?>">
+            <?php echo $titles['Properties']; ?></a>
+                </td>
+                <td align="center" bgcolor="<?php echo $bgcolor; ?>">
         <a href="sql.php?<?php echo $tbl_url_query; ?>&amp;reload=1&amp;purge=1&amp;sql_query=<?php echo urlencode('DROP TABLE ' . PMA_backquote($table)); ?>&amp;zero_rows=<?php echo urlencode(sprintf($strTableHasBeenDropped, htmlspecialchars($table))); ?>"
             onclick="return confirmLink(this, 'DROP TABLE <?php echo PMA_jsFormat($table); ?>')">
-            <?php echo $strDrop; ?></a>
-    </td>
-    <td bgcolor="<?php echo $bgcolor; ?>">
+            <?php echo $titles['Drop']; ?></a>
+                </td>
+                <td align="center" bgcolor="<?php echo $bgcolor; ?>">
         <?php
         if (!empty($sts_data['Rows'])) {
             echo '<a href="sql.php?' . $tbl_url_query
@@ -206,12 +299,12 @@ else if (PMA_MYSQL_INT_VERSION >= 32303) {
                      . urlencode(sprintf($strTableHasBeenEmptied, htmlspecialchars($table)))
                      . '" onclick="return confirmLink(this, \'DELETE FROM ';
             }
-            echo PMA_jsFormat($table) . '\')">' . $strEmpty . '</a>';
+            echo PMA_jsFormat($table) . '\')">' . $titles['Empty'] . '</a>';
         } else {
-             echo $strEmpty;
+             echo $titles['NoEmpty'];
         }
         ?>
-    </td>
+                </td>
         <?php
         echo "\n";
 
@@ -274,35 +367,40 @@ else if (PMA_MYSQL_INT_VERSION >= 32303) {
                 $display_rows                   =  'unknown';
             }
             ?>
-    <td align="right" bgcolor="<?php echo $bgcolor; ?>">
+                <td align="right" bgcolor="<?php echo $bgcolor; ?>">
             <?php
             echo "\n" . '        ' . $display_rows . "\n";
             ?>
-    </td>
-    <td bgcolor="<?php echo $bgcolor; ?>" nowrap="nowrap">
-        &nbsp;<?php echo (isset($sts_data['Type']) ? $sts_data['Type'] : '&nbsp;'); ?>&nbsp;
-    </td>
+                </td>
             <?php
+            if (!($cfg['PropertiesNumColumns'] > 1)) {
+            ?>
+                <td bgcolor="<?php echo $bgcolor; ?>" nowrap="nowrap">
+                    &nbsp;<?php echo (isset($sts_data['Type']) ? $sts_data['Type'] : '&nbsp;'); ?>&nbsp;
+                </td>
+            <?php
+            }
+            
             if ($cfg['ShowStats']) {
                 echo "\n";
                 ?>
-    <td align="right" bgcolor="<?php echo $bgcolor; ?>" nowrap="nowrap">
-        &nbsp;&nbsp;
-        <a href="tbl_properties_structure.php?<?php echo $tbl_url_query; ?>#showusage"><?php echo $formated_size . ' ' . $unit; ?></a>
-    </td>
+                <td align="right" bgcolor="<?php echo $bgcolor; ?>" nowrap="nowrap">
+                    &nbsp;&nbsp;
+                    <a href="tbl_properties_structure.php?<?php echo $tbl_url_query; ?>#showusage"><?php echo $formated_size . ' ' . $unit; ?></a>
+                </td>
                 <?php
                 echo "\n";
             } // end if
         } else {
             ?>
-    <td colspan="3" align="center" bgcolor="<?php echo $bgcolor; ?>">
-        <?php echo $strInUse . "\n"; ?>
-    </td>
+                <td colspan="3" align="center" bgcolor="<?php echo $bgcolor; ?>">
+                    <?php echo $strInUse . "\n"; ?>
+                </td>
             <?php
         }
         echo "\n";
         ?>
-</tr>
+            </tr>
         <?php
     }
     // Show Summary
@@ -311,50 +409,55 @@ else if (PMA_MYSQL_INT_VERSION >= 32303) {
     }
     echo "\n";
     ?>
-<tr>
-    <td></td>
-    <th align="center" nowrap="nowrap">
-        &nbsp;<b><?php echo sprintf($strTables, number_format($num_tables, 0, $number_decimal_separator, $number_thousands_separator)); ?></b>&nbsp;
-    </th>
-    <th colspan="6" align="center">
-        <b><?php echo $strSum; ?></b>
-    </th>
-    <th align="right" nowrap="nowrap">
-        <b><?php echo number_format($sum_entries, 0, $number_decimal_separator, $number_thousands_separator); ?></b>
-    </th>
-    <th align="center">
-        <b>--</b>
-    </th>
+            <tr>
+                <td></td>
+                <th align="center" nowrap="nowrap">
+                    &nbsp;<b><?php echo sprintf($strTables, number_format($num_tables, 0, $number_decimal_separator, $number_thousands_separator)); ?></b>&nbsp;
+                </th>
+                <th colspan="6" align="center">
+                    <b><?php echo $strSum; ?></b>
+                </th>
+                <th align="right" nowrap="nowrap">
+                    <b><?php echo number_format($sum_entries, 0, $number_decimal_separator, $number_thousands_separator); ?></b>
+                </th>
     <?php
+    if (!($cfg['PropertiesNumColumns'] > 1)) {
+    ?>
+                <th align="center">
+                    <b>--</b>
+                </th>
+    <?php
+    }
+
     if ($cfg['ShowStats']) {
         echo "\n";
         ?>
-    <th align="right" nowrap="nowrap">
-        &nbsp;
-        <b><?php echo $sum_formated . ' ' . $unit; ?></b>
-    </th>
+                <th align="right" nowrap="nowrap">
+                    &nbsp;
+                    <b><?php echo $sum_formated . ' ' . $unit; ?></b>
+                </th>
         <?php
     }
     echo "\n";
     ?>
-</tr>
+            </tr>
 
     <?php
     // Check all tables url
     $checkall_url = 'db_details_structure.php?' . PMA_generate_common_url($db);
     echo "\n";
     ?>
-<tr>
-    <td colspan="<?php echo (($cfg['ShowStats']) ? '11' : '10'); ?>" valign="bottom">
-        <img src="./images/arrow_<?php echo $text_dir; ?>.gif" border="0" width="38" height="22" alt="<?php echo $strWithChecked; ?>" />
-        <a href="<?php echo $checkall_url; ?>&amp;checkall=1" onclick="setCheckboxes('tablesForm', true); return false;">
-            <?php echo $strCheckAll; ?></a>
-        &nbsp;/&nbsp;
-        <a href="<?php echo $checkall_url; ?>" onclick="setCheckboxes('tablesForm', false); return false;">
-            <?php echo $strUncheckAll; ?></a>
-        &nbsp;&nbsp;&nbsp;
-        <img src="./images/spacer.gif" border="0" width="38" height="1" alt="" />
-        <select name="submit_mult" dir="ltr" onchange="this.form.submit();">
+            <tr>
+                <td colspan="<?php echo (($cfg['ShowStats']) ? '11' : '10'); ?>" valign="bottom">
+                    <img src="./images/arrow_<?php echo $text_dir; ?>.gif" border="0" width="38" height="22" alt="<?php echo $strWithChecked; ?>" />
+                    <a href="<?php echo $checkall_url; ?>&amp;checkall=1" onclick="setCheckboxes('tablesForm', true); return false;">
+                        <?php echo $strCheckAll; ?></a>
+                    &nbsp;/&nbsp;
+                    <a href="<?php echo $checkall_url; ?>" onclick="setCheckboxes('tablesForm', false); return false;">
+                        <?php echo $strUncheckAll; ?></a>
+                    &nbsp;&nbsp;&nbsp;
+                    <img src="./images/spacer.gif" border="0" width="38" height="1" alt="" />
+                    <select name="submit_mult" dir="ltr" onchange="this.form.submit();">
     <?php
     echo "\n";
     echo '            <option value="' . $strWithChecked . '" selected="selected">'
@@ -374,19 +477,27 @@ else if (PMA_MYSQL_INT_VERSION >= 32303) {
     echo '            <option value="' . $strAnalyzeTable . '" >'
          . $strAnalyzeTable . '</option>' . "\n";
     ?>
-        </select>
-        <script type="text/javascript" language="javascript">
-        <!--
-        // Fake js to allow the use of the <noscript> tag
-        //-->
-        </script>
-        <noscript>
-            <input type="submit" value="<?php echo $strGo; ?>" />
-        </noscript>
-    </td>
-</tr>
+                    </select>
+                    <script type="text/javascript" language="javascript">
+                    <!--
+                    // Fake js to allow the use of the <noscript> tag
+                    //-->
+                    </script>
+                    <noscript>
+                        <input type="submit" value="<?php echo $strGo; ?>" />
+                    </noscript>
+                </td>
+            </tr>
+            </table>
+<?php
+if ($cfg['PropertiesNumColumns'] > 1) {
+?>
+        </td>
+    </tr>
 </table>
-
+<?php
+}
+?>
 </form>
     <?php
 } // end case mysql >= 3.23.03
@@ -413,17 +524,22 @@ else {
     echo "\n";
     ?>
 <form action="db_details_structure.php">
-    <?php echo PMA_generate_common_hidden_inputs($db); ?>
+    <?php PMA_generate_common_hidden_inputs($db); ?>
 
-<table border="<?php echo $cfg['Border']; ?>">
-<tr>
-    <td></td>
-    <th>&nbsp;<?php echo $strTable; ?>&nbsp;</th>
-    <th colspan="6"><?php echo $strAction; ?></th>
-    <th><?php echo $strRecords; ?></th>
-</tr>
-    <?php
+<?php
+    if ($cfg['PropertiesNumColumns'] > 1) {
+?>
+<table cellspacing="0" cellpadding="0" border="0">
+    <tr>
+        <td valign="top">
+<?php
+    }
+
+    pma_TableHeader(true);
+    
     $checked = (!empty($checkall) ? ' checked="checked"' : '');
+    $num_columns = ($cfg['PropertiesNumColumns'] > 1 ? (ceil($num_tables / $cfg['PropertiesNumColumns']) + 1) : 0);
+    $row_count = 0;
     while ($i < $num_tables) {
         $table         = $tables[$i];
         $table_encoded = urlencode($table);
@@ -433,36 +549,49 @@ else {
         $tbl_url_query = $url_query . '&amp;table=' . $table_encoded;
         $bgcolor       = ($i % 2) ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo'];
         echo "\n";
+        $row_count++;
+        if($num_columns > 0 && $num_tables > $num_columns && (($row_count % ($num_columns)) == 0)) {
+            $bgcolor       = $cfg['BgcolorTwo'];
+            $row_count = 1;
         ?>
-<tr>
-    <td align="center" bgcolor="<?php echo $bgcolor; ?>">
-        <input type="checkbox" name="selected_tbl[]" value="<?php echo $table_encoded; ?>" id="checkbox_tbl_<?php echo $i; ?>"<?php echo $checked; ?> />
+            </tr>
+        </table>
     </td>
-    <td bgcolor="<?php echo $bgcolor; ?>" class="data">
-        <b>&nbsp;<label for="checkbox_tbl_<?php echo $i; ?>"><?php echo $table_name; ?></label>&nbsp;</b>
-    </td>
-    <td bgcolor="<?php echo $bgcolor; ?>">
-        <a href="sql.php?<?php echo $tbl_url_query; ?>&amp;sql_query=<?php echo urlencode('SELECT * FROM ' . PMA_backquote($table)); ?>&amp;pos=0"><?php echo $strBrowse; ?></a>
-    </td>
-    <td bgcolor="<?php echo $bgcolor; ?>">
-        <a href="tbl_select.php?<?php echo $tbl_url_query; ?>"><?php echo $strSelect; ?></a>
-    </td>
-    <td bgcolor="<?php echo $bgcolor; ?>">
-        <a href="tbl_change.php?<?php echo $tbl_url_query; ?>"><?php echo $strInsert; ?></a>
-    </td>
-    <td bgcolor="<?php echo $bgcolor; ?>">
-        <a href="tbl_properties.php?<?php echo $tbl_url_query; ?>"><?php echo $strProperties; ?></a>
-    </td>
-    <td bgcolor="<?php echo $bgcolor; ?>">
-        <a href="sql.php?<?php echo $tbl_url_query; ?>&amp;reload=1&amp;purge=1&amp;sql_query=<?php echo urlencode('DROP TABLE ' . PMA_backquote($table)); ?>&amp;zero_rows=<?php echo urlencode(sprintf($strTableHasBeenDropped, $table_name)); ?>"><?php echo $strDrop; ?></a>
-    </td>
-    <td bgcolor="<?php echo $bgcolor; ?>">
-        <a href="sql.php?<?php echo $tbl_url_query; ?>&amp;sql_query=<?php echo urlencode('DELETE FROM ' . PMA_backquote($table)); ?>&amp;zero_rows=<?php echo urlencode(sprintf($strTableHasBeenEmptied, $table_name)); ?>"><?php echo $strEmpty; ?></a>
-    </td>
-    <td align="right" bgcolor="<?php echo $bgcolor; ?>">
-        <?php PMA_countRecords($db, $table); echo "\n"; ?>
-    </td>
-</tr>
+    <td><img src="./images/spacer.gif" border="0" width="10" height="1" alt="" /></td>
+    <td valign="top">
+        <?php
+            pma_TableHeader(true);
+        }
+        ?>
+            <tr>
+                <td align="center" bgcolor="<?php echo $bgcolor; ?>">
+                    <input type="checkbox" name="selected_tbl[]" value="<?php echo $table_encoded; ?>" id="checkbox_tbl_<?php echo $i; ?>"<?php echo $checked; ?> />
+                </td>
+                <td bgcolor="<?php echo $bgcolor; ?>" class="data">
+                    <b>&nbsp;<label for="checkbox_tbl_<?php echo $i; ?>"><?php echo $table_name; ?></label>&nbsp;</b>
+                </td>
+                <td bgcolor="<?php echo $bgcolor; ?>">
+                    <a href="sql.php?<?php echo $tbl_url_query; ?>&amp;sql_query=<?php echo urlencode('SELECT * FROM ' . PMA_backquote($table)); ?>&amp;pos=0"><?php echo $strBrowse; ?></a>
+                </td>
+                <td align="center" bgcolor="<?php echo $bgcolor; ?>">
+                    <a href="tbl_select.php?<?php echo $tbl_url_query; ?>"><?php echo $titles['Select']; ?></a>
+                </td>
+                <td bgcolor="<?php echo $bgcolor; ?>">
+                    <a href="tbl_change.php?<?php echo $tbl_url_query; ?>"><?php echo $titles['Insert']; ?></a>
+                </td>
+                <td bgcolor="<?php echo $bgcolor; ?>">
+                    <a href="tbl_properties.php?<?php echo $tbl_url_query; ?>"><?php echo $titles['Properties']; ?></a>
+                </td>
+                <td bgcolor="<?php echo $bgcolor; ?>">
+                    <a href="sql.php?<?php echo $tbl_url_query; ?>&amp;reload=1&amp;purge=1&amp;sql_query=<?php echo urlencode('DROP TABLE ' . PMA_backquote($table)); ?>&amp;zero_rows=<?php echo urlencode(sprintf($strTableHasBeenDropped, $table_name)); ?>"><?php echo $titles['Drop']; ?></a>
+                </td>
+                <td bgcolor="<?php echo $bgcolor; ?>">
+                    <a href="sql.php?<?php echo $tbl_url_query; ?>&amp;sql_query=<?php echo urlencode('DELETE FROM ' . PMA_backquote($table)); ?>&amp;zero_rows=<?php echo urlencode(sprintf($strTableHasBeenEmptied, $table_name)); ?>"><?php echo $titles['Empty']; ?></a>
+                </td>
+                <td align="right" bgcolor="<?php echo $bgcolor; ?>">
+                    <?php PMA_countRecords($db, $table); echo "\n"; ?>
+                </td>
+            </tr>
         <?php
         $i++;
     } // end while
@@ -471,28 +600,36 @@ else {
     // Check all tables url
     $checkall_url = 'db_details_structure.php?' . PMA_generate_common_url($db);
     ?>
-<tr>
-    <td colspan="9">
-        <img src="./images/arrow_<?php echo $text_dir; ?>.gif" border="0" width="38" height="22" alt="<?php echo $strWithChecked; ?>" />
-        <a href="<?php echo $checkall_url; ?>&amp;checkall=1" onclick="setCheckboxes('tablesForm', true); return false;">
-            <?php echo $strCheckAll; ?></a>
-        &nbsp;/&nbsp;
-        <a href="<?php echo $checkall_url; ?>" onclick="setCheckboxes('tablesForm', false); return false;">
-            <?php echo $strUncheckAll; ?></a>
-    </td>
-</tr>
-
-<tr>
-    <td colspan="9">
-        <img src="./images/spacer.gif" border="0" width="38" height="1" alt="" />
-        <i><?php echo $strWithChecked; ?></i>&nbsp;&nbsp;
-        <input type="submit" name="submit_mult" value="<?php echo $strDrop; ?>" />
-        &nbsp;<?php $strOr . "\n"; ?>&nbsp;
-        <input type="submit" name="submit_mult" value="<?php echo $strEmpty; ?>" />
-    </td>
-</tr>
+            <tr>
+                <td colspan="9">
+                    <img src="./images/arrow_<?php echo $text_dir; ?>.gif" border="0" width="38" height="22" alt="<?php echo $strWithChecked; ?>" />
+                    <a href="<?php echo $checkall_url; ?>&amp;checkall=1" onclick="setCheckboxes('tablesForm', true); return false;">
+                        <?php echo $strCheckAll; ?></a>
+                    &nbsp;/&nbsp;
+                    <a href="<?php echo $checkall_url; ?>" onclick="setCheckboxes('tablesForm', false); return false;">
+                        <?php echo $strUncheckAll; ?></a>
+                </td>
+            </tr>
+            
+            <tr>
+                <td colspan="9">
+                    <img src="./images/spacer.gif" border="0" width="38" height="1" alt="" />
+                    <i><?php echo $strWithChecked; ?></i>&nbsp;&nbsp;
+                    <input type="submit" name="submit_mult" value="<?php echo $strDrop; ?>" />
+                    &nbsp;<?php $strOr . "\n"; ?>&nbsp;
+                    <input type="submit" name="submit_mult" value="<?php echo $strEmpty; ?>" />
+                </td>
+            </tr>
+            </table>
+<?php
+    if ($cfg['PropertiesNumColumns'] > 1) {
+?>
+        </td>
+    </tr>
 </table>
-
+<?php
+    }
+?>
 </form>
     <?php
 } // end case mysql < 3.23.03
@@ -620,9 +757,21 @@ if ($cfgRelation['pdfwork'] && $num_tables > 0) {
             <select name="orientation">
                 <option value="L"><?php echo $strLandscape;?></option>
                 <option value="P"><?php echo $strPortrait;?></option>
-            </select>
-            &nbsp;&nbsp;<input type="submit" value="<?php echo $strGo; ?>" />
-        </form>
+            </select><br />
+            <?php echo $strPaperSize; ?>
+            <select name="paper">
+            <?php
+                while (list($key,$val) = each($cfg['PDFPageSizes'])) {
+                    echo '<option value="' . $val . '"';
+                    if ($val == $cfg['PDFDefaultPageSize']) {
+                        echo ' selected="selected"';
+                    }
+                    echo ' >' . $val . '</option>' . "\n";
+                }
+            ?>
+                </select><br />
+                &nbsp;&nbsp;<input type="submit" value="<?php echo $strGo; ?>" />
+            </form>
     </li>
         <?php
     }   // end if

@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_change.php,v 1.151 2003/05/30 14:17:13 rabus Exp $ */
+/* $Id: tbl_change.php,v 1.157.2.1 2003/08/27 14:20:11 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -21,7 +21,7 @@ if (!empty($disp_message)) {
         $goto          = 'tbl_properties.php?'
                        . PMA_generate_common_url($db, $table)
                        . '&amp;$show_query=1'
-                       . '&amp;sql_query=' . urlencode($disp_query);
+                       . '&amp;sql_query=' . (isset($disp_query) ? urlencode($disp_query) : '');
     } else {
         $show_query = '1';
     }
@@ -176,6 +176,25 @@ if ($cfg['ShowFunctionFields']) {
     </tr>
 
 <?php
+if ($cfg['PropertiesIconic'] == true) {
+    // We need to copy the value or else the == 'both' check will always return true
+    $propicon = (string)$cfg['PropertiesIconic'];
+
+    if ($propicon == 'both') {
+        $iconic_spacer = '<nobr>';
+    } else {
+        $iconic_spacer = '';
+    }
+
+    $titles['Browse']     = $iconic_spacer . '<img width="12" height="13" src="images/button_browse.png" alt="' . $strBrowseForeignValues . '" title="' . $strBrowseForeignValues . '" border="0" />';
+
+    if ($propicon == 'both') {
+        $titles['Browse']        .= '&nbsp;' . $strBrowseForeignValues . '</nobr>';
+    }
+} else {
+    $titles['Browse']        = $strBrowseForeignValues;
+}
+
 // Set if we passed the first timestamp field
 $timestamp_seen = 0;
 $fields_cnt     = mysql_num_rows($table_def);
@@ -428,27 +447,29 @@ for ($i = 0; $i < $fields_cnt; $i++) {
 
     include('./libraries/get_foreign.lib.php');
 
-    if (isset($disp) && $disp) {
+    if (isset($foreign_link) && $foreign_link == true) {
+        ?>
+        <td bgcolor="<?php echo $bgcolor; ?>">
+        <?php echo $backup_field . "\n"; ?>
+        <input type="hidden" name="fields_type[<?php echo urlencode($field); ?>]" value="foreign" />
+        <input type="hidden" name="fields[<?php echo urlencode($field); ?>]" value="" id="field_<?php echo $i; ?>_1" />
+        <input type="text"   name="field_<?php echo md5($field); ?>[]" class="textfield" <?php echo $chg_evt_handler; ?>="return unNullify('<?php echo urlencode($field); ?>')" tabindex="<?php echo ($i + 1); ?>" id="field_<?php echo $i; ?>_3" value="<?php echo htmlspecialchars($data); ?>" />
+        <script type="text/javascript" language="javascript">
+            document.writeln('<a target="_blank" onclick="window.open(this.href, \'foreigners\', \'width=640,height=240,scrollbars=yes\'); return false" href="browse_foreigners.php?<?php echo PMA_generate_common_url($db, $table); ?>&amp;field=<?php echo urlencode($field); ?>"><?php echo str_replace("'", "\'", $titles['Browse']); ?></a>');
+        </script>
+        </td>
+        <?php
+    } else if (isset($disp) && $disp) {
         ?>
         <td bgcolor="<?php echo $bgcolor; ?>">
         <?php echo $backup_field . "\n"; ?>
         <input type="hidden" name="fields_type[<?php echo urlencode($field); ?>]" value="foreign" />
         <input type="hidden" name="fields[<?php echo urlencode($field); ?>]" value="" id="field_<?php echo $i; ?>_1" />
         <select name="field_<?php echo md5($field); ?>[]" <?php echo $chg_evt_handler; ?>="return unNullify('<?php echo urlencode($field); ?>')" tabindex="<?php echo ($i + 1); ?>" id="field_<?php echo $i; ?>_3">
-            <option value=""></option>
+            <?php echo PMA_foreignDropdown($disp, $foreign_field, $foreign_display, $data, 100); ?>
+        </select>
+        </td>
         <?php
-        echo "\n";
-        while ($relrow = @PMA_mysql_fetch_array($disp)) {
-            $key   = $relrow[$foreign_field];
-            $value = (($foreign_display != FALSE) ? '&nbsp;-&nbsp;' . htmlspecialchars($relrow[$foreign_display]) : '');
-            echo '            <option value="' . htmlspecialchars($key) . '"';
-            if ($key == $data) {
-               echo ' selected="selected"';
-            } // end if
-            echo '>' . htmlspecialchars($key) . $value . '</option>' . "\n";
-        } // end while
-        echo '            </select>' . "\n";
-        echo '        </td>' . "\n";
         unset($disp);
     }
     else if ($cfg['LongtextDoubleTextarea'] && strstr($type, 'longtext')) {
@@ -477,9 +498,7 @@ for ($i = 0; $i < $fields_cnt; $i++) {
         }
     }
     else if ($type == 'enum') {
-        $enum        = str_replace('enum(', '', $row_table_def['Type']);
-        $enum        = ereg_replace('\\)$', '', $enum);
-        $enum        = explode('\',\'', substr($enum, 1, -1));
+        $enum        = PMA_getEnumSetOptions($row_table_def['Type']);
         $enum_cnt    = count($enum);
         ?>
         <td bgcolor="<?php echo $bgcolor; ?>">
@@ -538,9 +557,7 @@ for ($i = 0; $i < $fields_cnt; $i++) {
         echo "\n";
     }
     else if ($type == 'set') {
-        $set = str_replace('set(', '', $row_table_def['Type']);
-        $set = ereg_replace('\)$', '', $set);
-        $set = explode(',', $set);
+        $set = PMA_getEnumSetOptions($row_table_def['Type']);
 
         if (isset($vset)) {
             unset($vset);
@@ -548,7 +565,8 @@ for ($i = 0; $i < $fields_cnt; $i++) {
         for ($vals = explode(',', $data); list($t, $k) = each($vals);) {
             $vset[$k] = 1;
         }
-        $size = min(4, count($set));
+        $countset = count($set);
+        $size = min(4, $countset);
         ?>
         <td bgcolor="<?php echo $bgcolor; ?>">
             <?php echo $backup_field . "\n"; ?>
@@ -557,17 +575,13 @@ for ($i = 0; $i < $fields_cnt; $i++) {
             <select name="field_<?php echo md5($field); ?>[]" size="<?php echo $size; ?>" multiple="multiple" <?php echo $chg_evt_handler; ?>="return unNullify('<?php echo urlencode($field); ?>')" tabindex="<?php echo ($i + 1); ?>" id="field_<?php echo $i; ?>_3">
         <?php
         echo "\n";
-        $countset = count($set);
-        for ($j = 0; $j < $countset;$j++) {
-            $subset = substr($set[$j], 1, -1);
-            // Removes automatic MySQL escape format
-            $subset = str_replace('\'\'', '\'', str_replace('\\\\', '\\', $subset));
+        for ($j = 0; $j < $countset; $j++) {
             echo '                ';
-            echo '<option value="'. htmlspecialchars($subset) . '"';
-            if (isset($vset[$subset]) && $vset[$subset]) {
+            echo '<option value="'. htmlspecialchars($set[$j]) . '"';
+            if (isset($vset[$set[$j]]) && $vset[$set[$j]]) {
                 echo ' selected="selected"';
             }
-            echo '>' . htmlspecialchars($subset) . '</option>' . "\n";
+            echo '>' . htmlspecialchars($set[$j]) . '</option>' . "\n";
         } // end for
         ?>
             </select>
@@ -719,16 +733,23 @@ echo "\n";
 
 // Defines whether "insert a new row after the current insert" should be
 // checked or not (keep this choice sticky)
-$checked = !empty($disp_message) ? ' checked="checked"' : '';
+// but do not check both radios, because Netscape 4.8 would display both checked
+if (!empty($disp_message)) {
+    $checked_after_insert_new_insert = ' checked="checked"';
+    $checked_after_insert_back = '';
+} else {
+    $checked_after_insert_back = ' checked="checked"';
+    $checked_after_insert_new_insert = '';
+}
 ?>
         </td>
         <td valign="middle">
             &nbsp;&nbsp;&nbsp;<b>-- <?php echo $strAnd; ?> --</b>&nbsp;&nbsp;&nbsp;
         </td>
         <td valign="middle" nowrap="nowrap">
-            <input type="radio" name="after_insert" value="back" id="radio_after_insert_back" checked="checked" tabindex="<?php echo ((3 * $fields_cnt) + 3); ?>" /><label for="radio_after_insert_back"><?php echo $strAfterInsertBack; ?></label><br />
+            <input type="radio" name="after_insert" value="back" id="radio_after_insert_back" <?php echo $checked_after_insert_back; ?> tabindex="<?php echo ((3 * $fields_cnt) + 3); ?>" /><label for="radio_after_insert_back"><?php echo $strAfterInsertBack; ?></label><br />
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<?php echo $strOr; ?><br />
-            <input type="radio" name="after_insert" value="new_insert" id="radio_after_insert_new_insert"<?php echo $checked; ?> tabindex="<?php echo ((3 * $fields_cnt) + 4); ?>" /><label for="radio_after_insert_new_insert"><?php echo $strAfterInsertNewInsert; ?></label>
+            <input type="radio" name="after_insert" value="new_insert" id="radio_after_insert_new_insert"<?php echo $checked_after_insert_new_insert; ?> tabindex="<?php echo ((3 * $fields_cnt) + 4); ?>" /><label for="radio_after_insert_new_insert"><?php echo $strAfterInsertNewInsert; ?></label>
         </td>
     </tr>
 

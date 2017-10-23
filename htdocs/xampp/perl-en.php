@@ -64,7 +64,7 @@ After that, please (re)start apache.</b> <br><br>
 Location: Overall $part\xampp\htdocs except $part\xampp\htdocs\modperl and $part\xampp\htdocs\modperlasp<br>
 Perl Path into header: Necessarily, here => #!\xampp\perl\bin\perl.exe<br>
 Example: $part\xampp\cgi-bin\test.cgi<br> 
-<A HREF=\"http://127.0.0.1/cgi-bin/test.cgi\">Test \"Hello World\"</A></B>
+<A HREF=\"/cgi-bin/test.cgi\">Test \"Hello World\"</A></B>
 </td>
   </tr>
 <tr>
@@ -78,7 +78,7 @@ Example: $part\xampp\cgi-bin\test.cgi<br>
 Location: Only $part\xampp\htdocs\modperl<br>
 Perl Path into header: Not necessarily<br>
 Example: $part\xampp\htdocs\modperl\datum.pl<br> 
-<A HREF=\"http://127.0.0.1/perl/datum-en.pl\">Test \"Date with Perl\"</A></B>
+<A HREF=\"/perl/datum-en.pl\">Test \"Date with Perl\"</A></B>
 </td>
   </tr>
 <tr>
@@ -92,7 +92,7 @@ Example: $part\xampp\htdocs\modperl\datum.pl<br>
 Location: Only $part\xampp\htdocs\modperlasp<br>
 Perl Path into header: Not necessarily<br>
 Example: $part\xampp\htdocs\modperlasp\loop.asp<br> 
-<A HREF=\"http://127.0.0.1/asp/loop.asp\">Test \"Numbers, which growing\"</A></B>
+<A HREF=\"/asp/loop.asp\">Test \"Numbers, which growing\"</A></B>
 </td>
   </tr>";
   ?>

@@ -1,0 +1,691 @@
+Turck MMCache for PHP
+=====================
+
+What is Turck MMCache?
+----------------------
+Turck MMCache is a free open source PHP accelerator, optimizer, encoder and
+dynamic content cache for PHP. It increases performance of PHP scripts
+by caching them in compiled state, so that the overhead of compiling is almost
+completely eliminated. Also it uses some optimizations to speed up execution
+of PHP scripts. Turck MMCache typically reduces server load and increases
+the speed of your PHP code by 1-10 times.
+
+Turck MMCache stores compiled PHP scripts in shared memory and executes code
+directly from it. It creates locks only for short time, while searching
+compiled PHP script in the cache, so one script can be executed simultaneously
+by several engines. MM shared memory library (http://www.engelschall.com/sw/mm/)
+was used by Turck MMCache before version 2.3.13 for management of the shared
+memory and locking. Files that can't fit in shared memory are cached on disk only.
+
+Turck MMCache was first launched in 2001 to speed up the www.guestbooks4all.com
+service. It has been tested with PHP 4.1.0 - 4.3.3 under GNU/Linux and Windows
+with Apache 1.3 and 2.0.
+Patches for ports to other OSs and PHP versions are welcome.
+
+Since version 2.3.10, Turck MMCache contains a PHP encoder and loader.
+You can encode PHP scripts using encoder.php in order to distribute them without
+sources. Encoded files can be run on any site which runs PHP with Turck MMCache
+2.3.10 or above. The sources of encoded scripts can't be restored because
+they are stored in a compiled form and the encoded version doesn't contain
+the source. Of course, some internals of the scripts can be restored with
+different reverse engineering tools (disassemblers, debuggers, etc), but it is
+not trivial.
+
+Since version 2.3.15, Turck MMCache is compatible with Zend Optimizer's
+loader. Zend Optimizer must be installed after Turck MMCache in php.ini.
+If you don't use scripts encoded with Zend Encoder then we do not recommend
+you install Zend Optimizer with Turck MMCache.
+
+Turck MMCache does not work in CGI mode.
+
+Here are some other products that provide the same functionality:
+
+ - Zend Performance Suite (http://www.zend.com/)
+ - PHP Accelerator (http://www.php-accelerator.co.uk/)
+ - Alternative PHP Cache (http://apc.communityconnect.com/)
+ - AfterBurner Cache (http://www.bwcache.bware.it/)
+
+What is TurckSoft?
+------------------
+TURCK SOFTWARE ST. PETERSBURG was founded in August 1998 as a branch of German
+Corporate Headquarters Turck GmbH Munich, Germany, the leading provider of
+IT-solutions in building-investment software in Germany. The main goal
+of TURCK SOFTWARE ST. PETERSBURG foundation was to develop the laborious and
+complex finance-analysis systems, using Russian labour market. The significant
+prerequisites of it were the reliability and the most precision in terms and
+as the consequence - the highest quality of our software.
+Today TURCK SOFTWARE ST. PETERSBURG is an independent enterprise
+(main shareholder: Helmut Turck), which works mainly for customers
+from the German bank and insurance branch.
+
+Company address:
+
+Address: Turck Software St. Petersburg, ul.Stremiannaia, 16,
+         191025 Saint-Petersburg, Russia
+Phone:   +7(812) 112-01-20
+Fax:     +7(812) 167-10-86
+
+Where is Turck MMCache already used?
+------------------------------------
+The following you will find a list of sites that use Turck MMCache
+If you want to be added, please send e-mail to mmcache@turckware.ru
+
+ - www.guestbooks4all.com (http://www.guestbooks4all.com)
+ - www.home.pl (http://www.home.pl)
+   one of biggest polish hosting service (about 10000 domains hosted)
+ - www.comlog.nl (http://www.comlog.nl)
+   a hosting company, with aprox. 300 sites on the server running MMCache
+ - www.desilva.biz (http://www.desilva.biz)
+   Popular and useful computer tutorials, tips & tricks
+ - XMBForum.com (http://www.xmbforum.com)
+   one of the worlds most popular message boards powering several million boards.
+ - LyricsTime (http://www.lyricstime.com)
+   Comprehensive song lyrics collection of numerous full albums,
+   A revolutionary song lyrics search engine.
+ - www.palcomtech.com (http://www.palcomtech.com)
+   combination of offline learning and e-learning school in palembang, indonesia
+ - www.idahoimageworks.com (http://www.idahoimageworks.com)
+   Graphic/Web Design, Programming and Hosting Company
+ - www.christianforums.com (http://www.christianforums.com)
+   The world's largest Christian Forums running vBulletin
+ - SearchIRC (http://searchirc.com)
+   search 600,000+ IRC channels in over 900 IRC networks
+ - www.mailit.ath.cx  (http://www.mailit.ath.cx )
+   Mail services provider
+ - RevolutionHosting.net (http://www.revolutionhosting.net)
+   hosting company with over 100 PHP-intensive sites
+ - PHP Classes (http://www.phpclasses.org)
+   the PHP classes repository
+ - PbNation.com (http://www.pbnation.com)
+   one of the largest paintball forums (over 3.5 million hits a day).
+ - MyEclipse  (http://www.myeclipseide.com)
+   postNuke-powered portal site
+ - RFhost.com (http://www.rfhost.com)
+   a hosting company that offer web hosting services using Cpanel and
+   Plesk Control Panels
+ - eXtremeScripts (http://www.extremescript.com)
+   a vbulletin and webdesign help site with loads of resources to help everyone
+ - www.cote.azur.fr (http://www.cote.azur.fr)
+   the biggest French Riviera web site with about 40 000 Visits more than
+   2 000 000 hits and 180 000 pages per day
+ - www.phpBB.de (http://www.phpbb.de)
+   the official german support forum for the well-known forum software phpBB
+ - X-Wars - The Third Legend (http://www.xwars.de)
+   the popular german realtime browser online game with round about 5.500.000
+   hits and 600.000 pages per day.
+ - NXServe (http://www.nxserve.com)
+   the hosting company with hundreds of sites, including a number of php driven
+   forums with up to 200 simultaneous users online
+ - www.infos-du-net.com (http://www.infos-du-net.com)
+   a French News website with ~15 000 visitors and ~40 000 pages seen per day
+ - rackAID (http://www.rackaid.com)
+   a consultant company providing support for Cobalt Raq, Ensim, Plesk and
+   CPANEL servers
+ - Ensim Links (http://www.ensimlinks.com)
+   online resource directory for users and administrators of Ensim server
+   appliances
+ - Raq Links  (http://www.raqlinks.com)
+   online resource directory for users and administrators of Cobalt Raq server
+   appliances
+ - mac.against.org (http://mac.against.org)
+   a "Switcher" site with Macintosh and Unix technical resources, HOWTOs,
+   and little known things about mobile phones and wireless
+ - prisjakt.nu (http://www.prisjakt.nu)
+   a Swedish shopping agent and forum for homeelectronics with over 10.000
+   members
+ - prince.org (http://www.prince.org)
+   the independent and unofficial prince fan community site with about 3 million
+   pageviews per month.
+ - dogsoldier.com (http://www.dogsoldier.com)
+   programming/hosting/postnuke portal sites
+ - FUDforum (http://fud.prohost.org)
+   GPL bulletin board
+ - MediaMiner Anime (http://www.mediaminer.org)
+   anime community site
+ - phpn.de (http://www.phpn.de)
+   PHP news network collects news from major php weblogs/sites on the net
+ - xp-hosting.com (http://www.xp-hosting.com)
+   a Russian hosting company, 200+ PHP sites
+ - kingsofchaos.com (http://www.kingsofchaos.com)
+   Massively Multiplayer Online Role Playing Game with 135,000 players
+ - ad-rotator.com (http://www.ad-rotator.com)
+   Remotely-hosted banner ad server
+ - Der Keiler (http://www.derkeiler.com)
+   Real-time updated archive of all important security mailing-lists and
+   newsgroups
+ - KwMap.com (http://www.KwMap.com/)
+   a keyword map of the whole internet
+ - AutomotiveForums.com  (http://www.automotiveforums.com)
+   one of the most popular destinations for automotive enthusiasts online.
+   It offers hundreds of forums for various makes and models as well as for
+   many miscellaneous topics.
+ - fotocommunity.de (http://www.fotocommunity.de)
+   europes largest community for photography with about 1.5 mio. hits per day
+
+Latest News
+-----------
+2003-10-31 Turck MMCache version 2.4.5 is released
+           - tested with php-5.0.0b2, older PHP5 betas are not longer supported
+           - now MMCache is comaptible with DBG, Xdebug and APD (EXPERIMENTAL)
+           - rollback to select() instead of sched_yield() because of highe load
+           - handling of unclean PHP shutdown was implemented
+           - "MMCache does not initialize itself on Apache restart" bug was fixed
+2003-10-24 Turck MMCache version 2.4.4 is released
+           - new API functions mmcache_lock and mmcache_unlock were implemented
+           - shared memory corryption BUG was fixed
+           - BUG in encoder.php was fixed (thanks to Olivier Gambier)
+           - memory leaks in content caching functions were fixed
+2003-10-20 Turck MMCache version 2.4.3 is released
+           - if mmcache.check_mtime=1 then also check for the same file size
+           - optimizer's BUG related to overloaded object handling was fixed
+           - some problems with file identification by inode were solved
+           - mm_malloc() possible crash was fixed
+           - Solaris comatibility was fixed
+           - Tested on AIX (Thanks to Christophe Leitienne)
+2003-10-10 Turck MMCache version 2.4.2 is released
+           - encoder/loader object inheritance bug was fixed
+           - session handler registration on "graceful apache restart" was fixed
+           - builtin_functions check on class store was removed
+           - locking of disk cache files was implemented
+           - tested with php5-200309300930
+           - some 64-bit specific BUGs were fixed
+           - incorrect optimization of "!(strlen($string)!=0)" was fixed
+2003-09-29 Turck MMCache version 2.4.1 is released
+           - protection of disk cache files by crc32 checksum was implemented
+           - mmcache_get/mmcache_put cross-host security was fixed
+           - optimizer bug fixed "function test() {$a=$GLOBALS['a']+1;}"
+           - crash during include of non existing file with Zend Optimizer was fixed
+           - "Clean" button was implemented in "mmcache.php" to remove all
+             expired data from shared memory and disk cache
+           - additional configuration directives "mmcache.keys",
+             "mmcache.sessions" and "mmcache.content" were added to control
+             where to cache data, session data and content.
+           - some 64-bit specific BUGs were fixed (Ilia Alshanetsky)
+2003-09-22 Turck MMCache version 2.4.0 is released
+           - support for incomlete classes in mmcache_get() was implemented
+           - check for proper PHP version was added
+           - include('x.php'); include_once('x.php') bug with php-4.3.3 was fixed
+           - improper "Cannot redeclare ()" error was fixed
+           - caching of files with absolute path but without drive on Windows was fixed
+           - tested with PHP 4.3.3 and php5-200309021330
+2003-08-20 Turck MMCache version 2.3.23 is released
+           This is should be the last version prior to the stable 2.4.0 release.
+           Please test this release as much as possible.
+           - HTTP caching of mmcache.php was disabled
+           - Usage of POSIX semaphors on Mac OS X was disabled
+           - Handling of scripts with PHP syntax errors was fixed
+           - ZE2 support was improved (tested with php5-200308140730)
+2003-08-11 Turck MMCache version 2.3.22 is released
+           - optimization of $GLOBALS[] for ZE2 was implemented
+           - comparsion with zero optimization pattern was improved
+           - "mmcache.shm_only" configuration directive was added to disable
+             caching of scripts on disk. It has no effect on session and content
+             caching
+           - bug with get_parent_class() and is_subclass_of() was fixed
+2003-07-31 Turck MMCache version 2.3.21 is released
+           - using $_SERVER['PHP_SELF'] instead of $PHP_SELF in encoder.php and
+             mmcache_password.php
+           - virtualhost support was improved. You can start mmcache with
+             "mmcache.enable=0" and enable it only for some virtual hosts or
+             directories.
+           - ZE2 compatibility was improved (tested with php5-200307290730)
+           - Some serios bugs were fixed
+2003-07-25 Turck MMCache version 2.3.20 is released
+           - optimizer for ZE2 was implemented
+           - optimization of extension_loaded() was fixed for encoded scripts
+           - optimization of <?php do {echo 1;} while(0); echo 2;?> was fixed
+           - "mmcache.compress" configuration directive was added to enable or
+             disable cached content compression
+           - "mmcache_password.php" and "encoder.php" now can work from web and
+             from command line
+           - proper "__FILE__" handling in encoded files was implemented
+           - PHP constant MMCACHE_VERSION was introduced
+2003-07-10 Turck MMCache version 2.3.19 is released
+           - content compression was reimplemented
+           - bug in runtime class/function declaration was fixed
+           - optimization for functions extension_loaded(), function_exists(),
+             is_callable(), defined() was implemented
+           - optimization of reset() functuin was fixed
+           - mmcache_get() and mmcache_put() now support for stdClass objects
+2003-07-02 Turck MMCache version 2.3.18 is released
+           - standalone loader (TurckLoader) was imlemented
+           - mmcache() security was reimplemented. mmcache() is enabled in safe
+             mode, but it can be protected by password. See Web Interface
+             section for more details.
+           - This release was tested with PHP 5.0.0b1
+2003-06-25 Turck MMCache version 2.3.17 is released
+           - Content caching was improved to cache HTTP headers
+           - some serios bugs were fixed
+2003-06-20 Turck MMCache version 2.3.16 is released
+           - FastCGI support on Windows was implemented
+           - ZE2 support was improved (tested with php5-200306160730)
+           - some content caching bugs were fixed
+           - some memory leaks were fixed
+           - user and content caches were separated across virtualhosts
+           - mmcache() function was disabled in safe mode
+2003-06-11 Turck MMCache version 2.3.15 is released
+           - session locking was implemented (like "files" sessions does)
+           - content caching was implemented
+           - Zend Optimizer support was implemented
+2003-06-05 Turck MMCache version 2.3.14 is released
+           - "mmcache.filter" option was implemented. It can be used to disable
+              caching of files those matches or not matches to the patterns.
+           - user cache was extended to disk. mmcache_put() stores value to
+             file and to shared memory if it is available. mmcache_get() tries
+             to get value from shared memory and if it is not found then from
+             file.
+           - "mmcache.shm_max" option was implemented. mmcache_put() stores
+             values in shared memory if they are less then "shm_max".
+           - "mmcache.shm_ttl" and "mmcache.shm_prune_period" were implemented
+           - now MMCache session handlers can be installed in php.ini file
+             through configuration directive "session.save_handler=mmcache"
+             (PHP 4.2.0 or above is required). The older PHP versions should
+             call "mmcache_set_session_handlers" function.
+           - optimizer bug was fixed.
+           - this release was tested with PHP 4.3.2.
+2003-05-29 Turck MMCache version 2.3.13  is released
+           - mmcache session handling was implemented. It will intresting
+             for Windows user who hadn't fast shared memory session storage.
+             (see mmcache_set_session_handlers() function)
+           - mmcache_gc() function was implemented. It removes all expired
+             values from MMCache shared storage.
+           - saving/restoring user cache (session data and values which where
+             cached by mmcache_put() function) on httpd shutdown/startup
+           - libmm replacement was implemented to avoid libmm limitations
+           - optimizer's bug was fixed
+           - The new benchmark results were published on MMCache home page.
+2003-05-22 Turck MMCache version 2.3.12 is released.
+           - Bug with too many open files was fixed
+           - low levels spinlocks on x86 was disabled by default
+2003-05-19 Turck MMCache version 2.3.11 is released.
+           - PHP crash on some platforms when loading encoded files was fixed
+           - performence was improved by using indoes instead of realnames
+           - performence was improved by using low level spinlocks on x86
+           - 64-bit processor compatibility fixes
+           - encoder memory leaks were fixed
+
+2003-05-08 Turck MMCache version 2.3.10 is released.
+           - Encoder and Loader were implemented
+           - ZE2 support was improved (tested with php5-200305050530)
+
+2003-04-10 Turck MMCache version 2.3.9 is released.
+           - ZE2 support was implemented (tested with php5-200304090530)
+           - some bugs were fixed
+           - new optimisations were added
+
+2003-03-17 Turck MMCache version 2.3.8 is released.
+           - some bugs were fixed
+           - new optimisations were added
+           - temporary memory usage was improved
+           - shared memory usage was improved
+2003-03-06 Turck MMCache version 2.3.7 is released.
+           - files those can't fit in shared memory cached on disk
+             (see "mmcache.cache_dir" directive)
+           - proper handling of "include_path" directive
+           - added some new optimizations
+2003-02-28 Turck MMCache version 2.3.6 is released.
+           - fixed some optimizer bugs
+           - fixed caching classes those extend internal ones
+2003-02-25 Turck MMCache version 2.3.5 is released.
+           - added new configuration directive "mmcache.shm_size"
+           - implemented memory info for Windows version
+           - improved shared memory usage
+           - added some new optimizations
+           - fixed some optimizer bugs
+           - tested with PHP 4.3.1
+
+2003-02-13 Turck MMCache version 2.3.4 is released.
+           - crash detection
+           - shared memory overflow detection
+           - new peephole optimization patterns
+           - fixed some optimizer bugs
+
+2003-01-30 Turck MMCache version 2.3.3 is released.
+           - Apache 2 support implemented
+           - Module globals now thread safe
+           - Better shared memory usage
+           - Fixed bugs in mmcache.php
+           - Fixed bugs in config.m4 script
+           - Tested witn Apache 2.0.40 and PHP 4.2.2 on RedHat Linux 8.0
+
+2003-01-23 Turck MMCache version 2.3.2 is released.
+           - Fixed some optimization bugs.
+
+2003-01-13 Turck MMCache version 2.3.1 is released.
+           - Fixed some optimization bugs.
+           - Better support of function and class runtime declaration
+             implemented.
+           - Tested with PHP 4.3.0
+
+2002-12-20 Turck MMCache version 2.3.0 is released.
+           - Now it works with PHP 4.2.3 under Linux and Windows.
+
+2002-12-09 Turck MMCache version 2.2.0 is released under GPL
+
+Download
+--------
+Latest Turck MMcache versions can be downloaded at the  sourceforge page:
+http://sourceforge.net/project/showfiles.php?group_id=69426
+
+Requirements
+------------
+apache 1.3, mod_php 4.1, autoconf, automake, libtool, m4
+
+Compatibility
+-------------
+This version of the Turck MMCache has been successfully tested on PHP
+4.1.0-4.3.3 under RedHat Linux 7.0, 7.3, 8.0 and Windows
+with Apache 1.3 and 2.0.
+
+Quick install
+-------------
+Step 1. Compiling Turck MMCache
+
+  export PHP_PREFIX="/usr"
+  $PHP_PREFIX/bin/phpize
+  ./configure --enable-mmcache=shared --with-php-config=$PHP_PREFIX/bin/php-config
+  make
+
+  You must specify the real prefix where PHP is installed in the "export"
+  command. It may be "/usr" "/usr/local", or something else.
+
+Step 2. Installing Turck MMCache
+
+  make install
+
+Step 3. Configuring Turck MMCache
+
+Turck MMCache can be installed both as Zend or PHP extension, so you need
+to edit your php.ini file (usually /etc/php.ini).
+
+To install as Zend extension:
+
+  zend_extension="/usr/lib/php4/mmcache.so"
+  mmcache.shm_size="16"
+  mmcache.cache_dir="/tmp/mmcache"
+  mmcache.enable="1"
+  mmcache.optimizer="1"
+  mmcache.check_mtime="1"
+  mmcache.debug="0"
+  mmcache.filter=""
+  mmcache.shm_max="0"
+  mmcache.shm_ttl="0"
+  mmcache.shm_prune_period="0"
+  mmcache.shm_only="0"
+  mmcache.compress="1"
+
+  If you use thread safe build of PHP you must use "zend_extension_ts" instead
+  of "zend_extension".
+
+To install as PHP extension:
+
+  extension="mmcache.so"
+  mmcache.shm_size="16"
+  mmcache.cache_dir="/tmp/mmcache"
+  mmcache.enable="1"
+  mmcache.optimizer="1"
+  mmcache.check_mtime="1"
+  mmcache.debug="0"
+  mmcache.filter=""
+  mmcache.shm_max="0"
+  mmcache.shm_ttl="0"
+  mmcache.shm_prune_period="0"
+  mmcache.shm_only="0"
+  mmcache.compress="1"
+
+Step 4. Creating cache directory
+
+  mkdir /tmp/mmcache
+  chmod 0777 /tmp/mmcache
+
+Windows Installation Notes
+--------------------------
+
+To build Turck MMCache on Windows platform you will need
+MS Visual Studio C++ 6.0.
+
+Step 1. Compiling Turck MMCache
+  - Unpack php sources.
+  - Put mmcache sources under "ext/mmcache".
+  - Put "php4ts.lib" into "ext/mmcache".
+  - Copy "main/config.w32.h.in" into "main/config.w32.h".
+  - Open project file "ext/mmcache/mmcache.dsp".
+  - Select release configuration and build "mmcache.dll".
+
+
+Step 2. Installing Turck MMCache
+  Copy "mmcache.dll" into your PHP extension folder.
+
+Step 3. Configuring Turck MMCache
+  Add the following lines into your "php.ini" file (usually "c:\winnt\php.ini")
+
+  zend_extension_ts="c:\fullpathtommcache\mmcache.dll"
+  mmcache.shm_size="16"
+  mmcache.cache_dir="c:\tmp\mmcache"
+  mmcache.enable="1"
+  mmcache.optimizer="1"
+  mmcache.check_mtime="1"
+  mmcache.debug="0"
+  mmcache.filter=""
+  mmcache.shm_max="0"
+  mmcache.shm_ttl="0"
+  mmcache.shm_prune_period="0"
+  mmcache.shm_only="0"
+  mmcache.compress="1"
+
+Step 4. Creating cache directory
+
+  mkdir c:\tmp\mmcache
+
+Configuration Options
+---------------------
+
+mmcache.shm_size
+    The amount of shared memory (in megabytes) that Turck MMCache will use.
+    "0" means OS default. Default value is "0".
+
+mmcache.cache_dir
+    The directory that is used for disk cache. Turck MMCache stores precompiled
+    code, session data, content and user entries  here. The same data can be
+    stored in shared memory also (for more quick access). Default value is
+    "/tmp/mmcache".
+
+mmcache.enable
+    Enables or disables Turck MMCache. Should be "1" for enabling or
+    "0" for disabling. Default value is "1".
+
+mmcache.optimizer
+    Enables or disables internal peephole optimizer which may speed up code
+    execution. Should be "1" for enabling or "0" for disabling.
+    Default value is "1".
+
+mmcache.debug
+    Enables or disables debug logging. Should be "1" for enabling or
+    "0" for disabling. Default value is "0".
+
+mmcache.check_mtime
+    Enables or disables PHP file modification checking. Should be "1"
+    for enabling or "0" for disabling. You should set it to "1" if you want
+    to recompile PHP files after modification. Default value is "1".
+
+mmcache.filter
+    Determine which PHP files must be cached. You may specify the number of
+    patterns (for example "*.php *.phtml") which specifies to cache or
+    not to cache. If pattern starts with the character "!", it means to ignore
+    files which are matched by the following pattern. Default value is "" that
+    means - all PHP scripts will be cached.
+
+mmcache.shm_max
+    Disables putting large values into shared memory by "mmcache_put()"
+    function.
+    It indicates the largest allowed size in bytes (10240, 10K, 1M). The "0"
+    disables the limit. Default value is "0".
+
+mmcache.shm_ttl
+    When MMCache fails to get shared memory for new script it removes all
+    scripts which were not accessed at last "shm_ttl" seconds from shared
+    memory. Default value is "0" that means - don't remove any files from
+    shared memory.
+
+mmcache.shm_prune_period
+    When MMCache fails to get shared memory for new script it tryes to remove
+    old script if the previous try was made more then "shm_prune_period"
+    seconds ago. Default value is "0" that means - don't try to remove any
+    files from shared memory.
+
+mmcache.shm_only
+    Enables or disables caching of compiled scripts on disk. It has no effect
+    on session data and content caching. Default value is "0" that means -
+    use disk and shared memory for caching.
+
+mmcache.compress
+    Enables or disables cached content compression. Default value is "1" that
+    means enable compression.
+
+mmcache.keys
+mmcache.sessions
+mmcache.content
+    Determine where keys, session data and content will be cached. The possible
+    values are:
+    "shm_and_disk" - cache data in shared memory and on disk (default value)
+    "shm"          - cache data in shared memory or on disk if shared memory
+                     is full or data size greater then "mmcache.shm_max"
+    "shm_only"     - cache data in shared memory
+    "disk_only"    - cache data on disk
+    "none"         - don't cache data
+
+Turck MMCache API
+-----------------
+
+mmcache_put($key, $value, $ttl=0)
+  puts the $value into shard memory for $ttl seconds.
+
+mmcache_get($key)
+  returns the value from shared memory which was stored by mmcache_put() or null
+  if it is not exists or was expired.
+
+mmcache_rm($key)
+  removres the $key from shared memory
+
+mmcache_gc()
+  removes all expired keys from shared memory
+
+mmcache_lock($lock)
+  creates a lock with specified name. The lock can be released by function
+  mmcache_unlock() or automatic on the end of request.
+  For Example:
+  <?php
+    mmcache_lock("count");
+    mmcache_put("count",mmcache_get("count")+1));
+  ?>
+
+mmcache_unlock($lock)
+  release lock with specified name
+
+mmcache_set_session_handlers()
+  install the MMCache session handlers.
+  Since PHP 4.2.0 you can install MMCache session handlers
+  in "php.ini" by "session.save_handler=mmcache".
+
+mmcache_cache_output($key, $eval_code, $ttl=0)
+  caches the output of $eval_code in shared memory for $ttl seconds.
+  Output can be removed from cache by calling mmcach_rm() with the same $key.
+  For Example:
+  <?php mmcache_cache_output('test', 'echo time(); phpinfo();', 30); ?>
+
+mmcache_cache_result($key, $eval_code, $ttl=0)
+  caches the result of $eval_code in shared memory for $ttl seconds.
+  Result can be removed from cache by calling mmcach_rm() with the same $key.
+  For Example:
+  <?php mmcache_cache_output('test', 'time()." Hello";', 30); ?>
+
+mmcache_cache_page($key, $ttl=0)
+  caches the full page for $ttl seconds.
+  For Example:
+  <?php
+    mmcache_cache_page($_SERVER['PHP_SELF'].'?GET='.serialize($_GET), 30);
+    echo time();
+    phpinfo();
+  ?>
+
+mmcache_rm_page($key)
+  removes the page which was cached by mmcache_cache_page() with the same $key
+  from cache
+
+mmcache_encode($filename)
+  returns the encoded bytecode of compiled file $filename
+
+mmcache_load($code)
+  loads script which was encoded by mmcache_encode()
+
+WEB interface
+-------------
+Turck MMCache can be managed through web interface script mmcache.php.
+So you need to put this file on your web site. For security reasons it is
+recommended to restrict the usage of this script by your local IP.
+
+Since version 2.3.18 admin interface may be protected by password.
+To generate password run the mmcache_password.php from command line and
+follow the instruction.
+
+  $ php -q mmcache_password.php
+  Changing password for Turck MMCache Web Interface (mmcache.php)
+
+  Enter admin name: admin
+  New admin password: mmcache
+  Retype new admin password: mmcache
+
+  Add the following lines into your php.ini and restart HTTPD
+
+  mmcache.admin.name="admin"
+  mmcache.admin.password="$1$0ScD9gkb$nOEmFerNMvQ576hELeLrG0"
+
+If you use mmcache.php in directory that is password-protected by HTTPD then
+MMCache's admin name and password must be the same.
+
+Encoder
+-------
+Turck MMCache is a PHP Encoder. You can encode PHP scripts in order to
+distribute them without sources.
+
+Turck MMCache contains only the command line interface to Encoder - encoder.php.
+It should be run from command line:
+
+  $ php -q encoder.php
+
+To encode one script do:
+
+  $ php -q encoder.php -f input.php -o output.php
+
+To encode directory do:
+
+  $ php -q encoder.php -rcf input_dir -o output_dir
+
+If you use non command line PHP build, you must set "register_argc_argv = On"
+in your php.ini.
+
+Jason Sheets has written PHPCoder a GUI front end to the Turck MMCache Encoder.
+
+PHPCoder is a web-based front-end to the Turck MMCache encoding functions and
+allows you to easily encode your PHP scripts into non-reverisble byte-code.
+PHPCoder allows you to set restrictions on the encoded scripts, for example you
+can lock a script to a particular server IP address, server host name, visitor
+IP, or even place a time limit on the script so it will expire after x amount
+of time.  PHP Coder also allows you to specify Text, HTML or PHP code that
+should be prepended and appended to each file before it is encoded, allowing
+you to easily and securely implement your own licensing scheme.
+
+PHP Coder is available at http://phpcoder.shadonet.com
+
+Standalone Loader
+-----------------
+You can use files encoded by Turck MMCache without it. For this reason you must
+use TurckLoader. It is a regular PHP extension that can be used with other
+accelerators or without them. It can be loaded on startup or in runtime by dl().
+TurckLoader is not need with Turck MMCache, becuse it is already compiled in.
+For more information about TurckLoader see README.loader file.
+
+Contact us
+----------
+To contact us with questions, patches or bugs, please send e-mail to
+mmcache@turckware.ru

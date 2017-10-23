@@ -2,7 +2,7 @@ package ExtUtils::Install;
 
 use 5.00503;
 use vars qw(@ISA @EXPORT $VERSION);
-$VERSION = 1.30;
+$VERSION = 1.29;
 
 use Exporter;
 use Carp ();
@@ -110,11 +110,12 @@ sub install {
 	    exists $hash{"blib/arch"} and
 	    directory_not_empty("blib/arch")) {
 	    $targetroot = install_rooted_dir($hash{"blib/arch"});
-            print "Files found in blib/arch: installing files in blib/lib into architecture dependent library tree\n";
+            print "Files found in blib/arch: installing files in blib/lib into architecture dependent library tree\n" if $verbose;
 	}
 	chdir($source) or next;
 	find(sub {
-	    my ($mode,$size,$atime,$mtime) = (stat)[2,7,8,9];
+	    my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
+                         $atime,$mtime,$ctime,$blksize,$blocks) = stat;
 	    return unless -f _;
 	    return if $_ eq ".exists";
 	    my $targetdir  = File::Spec->catdir($targetroot, $File::Find::dir);
@@ -146,7 +147,7 @@ sub install {
 	    } else {
 		print "Skipping $targetfile (unchanged)\n" if $verbose;
 	    }
-
+	    
 	    if (! defined $inc_uninstall) { # it's called 
 	    } elsif ($inc_uninstall == 0){
 		inc_uninstall($_,$File::Find::dir,$verbose,1); # nonono set to 1
@@ -162,7 +163,7 @@ sub install {
     if ($pack{'write'}) {
 	$dir = install_rooted_dir(dirname($pack{'write'}));
 	mkpath($dir,0,0755);
-	print "Writing $pack{'write'}\n";
+	print "Writing $pack{'write'}\n" if $verbose;
 	$packlist->write(install_rooted_file($pack{'write'}));
     }
 }
@@ -254,7 +255,7 @@ sub inc_uninstall {
 	    }
 	    # if not verbose, we just say nothing
 	} else {
-	    print "Unlinking $targetfile (shadowing?)\n";
+	    print "Unlinking $targetfile (shadowing?)\n" if $verbose;
 	    forceunlink($targetfile);
 	}
     }

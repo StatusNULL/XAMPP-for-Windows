@@ -12,7 +12,7 @@ goto endofperl
 @rem ';
 #!perl
 #line 15
-    eval 'exec C:\Perl\bin\perl.exe -S $0 ${1+"$@"}'
+    eval 'exec c:\xampp\perl\bin\perl.exe -S $0 ${1+"$@"}'
         if $running_under_some_shell;
 
 # perlivp V 0.02
@@ -57,7 +57,7 @@ my $pass__total = 0;
 my $error_total = 0;
 my $tests_total = 0;
 
-my $perlpath = 'C:\Perl\bin\perl.exe';
+my $perlpath = 'c:\xampp\perl\bin\perl.exe';
 my $useithreads = 'define';
 
 print "## Checking Perl binary via variable `\$perlpath' = $perlpath.\n" if $opt{'p'};

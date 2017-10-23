@@ -1,5 +1,5 @@
 <?php
-/* $Id: display_tbl.lib.php,v 1.156 2003/05/22 09:58:52 nijel Exp $ */
+/* $Id: display_tbl.lib.php,v 1.165 2003/08/17 23:38:03 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -110,7 +110,7 @@ if (!defined('PMA_DISPLAY_TBL_LIB_INCLUDED')) {
                 $do_display['nav_bar']   = (string) '0';
                 $do_display['ins_row']   = (string) '0';
                 $do_display['bkm_form']  = (string) '1';
-                $do_display['text_btn']  = (string) '0';
+                $do_display['text_btn']  = (string) '1';
                 $do_display['pview_lnk'] = (string) '1';
             }
             // 2.3 Other statements (ie "SELECT" ones) -> updates
@@ -118,18 +118,12 @@ if (!defined('PMA_DISPLAY_TBL_LIB_INCLUDED')) {
             //     $do_display['text_btn'] (keeps other default values)
             else {
                 $prev_table = $fields_meta[0]->table;
+                $do_display['text_btn']  = (string) '1';
                 for ($i = 0; $i < $GLOBALS['fields_cnt']; $i++) {
                     $is_link = ($do_display['edit_lnk'] != 'nn'
                                 || $do_display['del_lnk'] != 'nn'
                                 || $do_display['sort_lnk'] != '0'
                                 || $do_display['ins_row'] != '0');
-                    // 2.3.1 Displays text cut/expand button?
-                    if ($do_display['text_btn'] == '0' && eregi('BLOB', $fields_meta[$i]->type)) {
-                        $do_display['text_btn'] = (string) '1';
-                        if (!$is_link) {
-                            break;
-                        }
-                    } // end if (2.3.1)
                     // 2.3.2 Displays edit/delete/sort/insert links?
                     if ($is_link
                         && ($fields_meta[$i]->table == '' || $fields_meta[$i]->table != $prev_table)) {
@@ -357,9 +351,9 @@ if (!defined('PMA_DISPLAY_TBL_LIB_INCLUDED')) {
        </td>
        <td>
             <?php //<form> for keep the form alignment of button < and << ?>
-<form>
+            <form>
             <?php echo $GLOBALS['strPageNumber']; ?>
-<select name="goToPage" onChange="goToUrl(this, '<?php echo "sql.php?sql_query=".$encoded_query."&amp;session_max_rows=".$session_max_rows."&amp;disp_direction=".$disp_direction."&amp;repeat_cells=".$repeat_cells."&amp;goto=".$goto."&amp;dontlimitchars=".$dontlimitchars."&amp;".PMA_generate_common_url($db, $table)."&amp;"; ?>')">
+                <select name="goToPage" onChange="goToUrl(this, '<?php echo "sql.php?sql_query=".$encoded_query."&amp;session_max_rows=".$session_max_rows."&amp;disp_direction=".$disp_direction."&amp;repeat_cells=".$repeat_cells."&amp;goto=".$goto."&amp;dontlimitchars=".$dontlimitchars."&amp;".PMA_generate_common_url($db, $table)."&amp;"; ?>')">
 
            <?php
             if ($nbTotalPage < 200) {
@@ -379,8 +373,8 @@ if (!defined('PMA_DISPLAY_TBL_LIB_INCLUDED')) {
                 echo "                <option ".$selected." value=\"".(($i - 1) * $session_max_rows)."\">".$i."</option>\n";
             }
            ?>
-		
-         </select>
+
+                </select>
             </form>
         </td>
             <?php
@@ -988,7 +982,7 @@ if (!defined('PMA_DISPLAY_TBL_LIB_INCLUDED')) {
                         $uva_condition = $uva_nonprimary_condition;
                     }
                     
-                    $uva_condition     = urlencode(ereg_replace('[[:space:]]?AND$', '', $uva_condition));
+                    $uva_condition     = urlencode(preg_replace('|[[:space:]]?AND$|', '', $uva_condition));
                 } // end if (1.1)
 
                 // 1.2 Defines the urls for the modify/delete link(s)
@@ -998,6 +992,15 @@ if (!defined('PMA_DISPLAY_TBL_LIB_INCLUDED')) {
                             . '&amp;disp_direction=' . $disp_direction
                             . '&amp;repeat_cells=' . $repeat_cells
                             . '&amp;dontlimitchars=' . $dontlimitchars;
+
+                // We need to copy the value or else the == 'both' check will always return true
+                $propicon = (string)$GLOBALS['cfg']['PropertiesIconic'];
+
+                if ($propicon == 'both') {
+                    $iconic_spacer = '<nobr>';
+                } else {
+                    $iconic_spacer = '';
+                }
 
                 // 1.2.1 Modify link(s)
                 if ($is_display['edit_lnk'] == 'ur') { // update row case
@@ -1013,7 +1016,14 @@ if (!defined('PMA_DISPLAY_TBL_LIB_INCLUDED')) {
                               . '&amp;primary_key=' . $uva_condition
                               . '&amp;sql_query=' . urlencode($sql_query)
                               . '&amp;goto=' . urlencode($lnk_goto);
-                    $edit_str = $GLOBALS['strEdit'];
+                    if ($GLOBALS['cfg']['PropertiesIconic'] == FALSE) {
+                        $edit_str = $GLOBALS['strEdit'];
+                    } else {
+                        $edit_str = $iconic_spacer . '<img width="12" height="13" src="images/button_edit.png" alt="' . $GLOBALS['strEdit'] . '" title="' . $GLOBALS['strEdit'] . '" border="0" />';
+                        if ($propicon == 'both') {
+                            $edit_str .= '&nbsp;' . $GLOBALS['strEdit'] . '</nobr>';
+                        }
+                    }
                 } // end if (1.2.1)
 
                 if ($table == $GLOBALS['cfg']['Bookmark']['table'] && $db == $GLOBALS['cfg']['Bookmark']['db']) {
@@ -1021,7 +1031,7 @@ if (!defined('PMA_DISPLAY_TBL_LIB_INCLUDED')) {
                                     . PMA_generate_common_hidden_inputs($row['dbase'], '')
                                     . '<input type="hidden" name="id_bookmark" value="' . $row['id'] . '" />'
                                     . '<input type="hidden" name="action_bookmark" value="0" />'
-                                    . '<input type="submit" name="SQL" value="' . $GLOBALS['strGo'] . '" />'
+                                    . '<input type="submit" name="SQL" value="' . $GLOBALS['strExecuteBookmarked'] . '" />'
                                     . '</form>';
                 } else { 
                     $bookmark_go = '';
@@ -1042,7 +1052,14 @@ if (!defined('PMA_DISPLAY_TBL_LIB_INCLUDED')) {
                     $js_conf  = 'DELETE FROM ' . PMA_jsFormat($table)
                               . ' WHERE ' . trim(PMA_jsFormat(urldecode($uva_condition), FALSE))
                               . ((PMA_MYSQL_INT_VERSION >= 32207) ? ' LIMIT 1' : '');
-                    $del_str  = $GLOBALS['strDelete'];
+                    if ($GLOBALS['cfg']['PropertiesIconic'] == FALSE) {
+                        $del_str = $GLOBALS['strDelete'];
+                    } else {
+                        $del_str = $iconic_spacer . '<img width="12" height="13" src="images/button_drop.png" alt="' . $GLOBALS['strDelete'] . '" title="' . $GLOBALS['strDelete'] . '" border="0" />';
+                        if ($propicon == 'both') {
+                            $del_str .= '&nbsp;' . $GLOBALS['strDelete'] . '</nobr>';
+                        }
+                    }
                 } else if ($is_display['del_lnk'] == 'kp') { // kill process case
                     $lnk_goto = 'sql.php'
                               . '?' . str_replace('&amp;', '&', $url_query)
@@ -1053,20 +1070,27 @@ if (!defined('PMA_DISPLAY_TBL_LIB_INCLUDED')) {
                               . '&amp;sql_query=' . urlencode('KILL ' . $row['Id'])
                               . '&amp;goto=' . urlencode($lnk_goto);
                     $js_conf  = 'KILL ' . $row['Id'];
-                    $del_str  = $GLOBALS['strKill'];
+                    if ($GLOBALS['cfg']['PropertiesIconic'] == FALSE) {
+                        $del_str = $GLOBALS['strKill'];
+                    } else {
+                        $del_str = $iconic_spacer . '<img width="12" height="13" src="images/button_drop.png" alt="' . $GLOBALS['strKill'] . '" title="' . $GLOBALS['strKill'] . '" border="0" />';
+                        if ($propicon == 'both') {
+                            $del_str .= '&nbsp;' . $GLOBALS['strKill'] . '</nobr>';
+                        }
+                    }
                 } // end if (1.2.2)
 
                 // 1.3 Displays the links at left if required
                 if ($GLOBALS['cfg']['ModifyDeleteAtLeft']
                     && ($disp_direction == 'horizontal' || $disp_direction == 'horizontalflipped')) {
                     if (!empty($edit_url)) {
-                        echo '    <td valign="' . ($bookmark_go != '' ? 'top' : 'middle') . '" bgcolor="' . $bgcolor . '">' . "\n";
+                        echo '    <td align="center" valign="' . ($bookmark_go != '' ? 'top' : 'middle') . '" bgcolor="' . $bgcolor . '">' . "\n";
                         echo PMA_linkOrButton($edit_url, $edit_str, '');
                         echo $bookmark_go;
                         echo '    </td>' . "\n";
                     }
                     if (!empty($del_url)) {
-                        echo '    <td valign="' . ($bookmark_go != '' ? 'top' : 'middle') . '" bgcolor="' . $bgcolor . '">' . "\n";
+                        echo '    <td align="center" valign="' . ($bookmark_go != '' ? 'top' : 'middle') . '" bgcolor="' . $bgcolor . '">' . "\n";
                         echo PMA_linkOrButton($del_url, $del_str, (isset($js_conf) ? $js_conf : ''));
                         echo '    </td>' . "\n";
                     }
@@ -1091,7 +1115,7 @@ if (!defined('PMA_DISPLAY_TBL_LIB_INCLUDED')) {
                 }
 
                 // garvin: Wrap MIME-transformations. [MIME]
-                $default_function = 'htmlspecialchars'; // default_function
+                $default_function = 'default_function'; // default_function
                 $transform_function = $default_function;
                 $transform_options = array();
 
@@ -1220,8 +1244,6 @@ if (!defined('PMA_DISPLAY_TBL_LIB_INCLUDED')) {
                             // loic1: displays all space characters, 4 space
                             // characters for tabulations and <cr>/<lf>
                             $row[$pointer]     = ($default_function != $transform_function ? $transform_function($row[$pointer], $transform_options) : $default_function($row[$pointer]));
-                            $row[$pointer]     = str_replace("\011", ' &nbsp;&nbsp;&nbsp;', str_replace('  ', ' &nbsp;', $row[$pointer]));
-                            $row[$pointer]     = ereg_replace("((\015\012)|(\015)|(\012))", '<br />', $row[$pointer]);
 
                             $vertical_display['data'][$row_no][$i] = '    <td valign="top" ' . $column_style . ' bgcolor="' . $bgcolor . '">' . $row[$pointer] . '</td>' . "\n";
                         } else {
@@ -1237,12 +1259,11 @@ if (!defined('PMA_DISPLAY_TBL_LIB_INCLUDED')) {
                         // loic1: support blanks in the key
                         $relation_id = $row[$pointer];
 
-                        // loic1: Cut text/blob fields even if $cfg['ShowBlob'] is true
-                        if (eregi('BLOB', $meta->type)) {
-                            if (strlen($row[$pointer]) > $GLOBALS['cfg']['LimitChars'] && ($dontlimitchars != 1)) {
-                                $row[$pointer] = substr($row[$pointer], 0, $GLOBALS['cfg']['LimitChars']) . '...';
-                            }
+                        // nijel: Cut all fields to $cfg['LimitChars']
+                        if (strlen($row[$pointer]) > $GLOBALS['cfg']['LimitChars'] && ($dontlimitchars != 1)) {
+                            $row[$pointer] = substr($row[$pointer], 0, $GLOBALS['cfg']['LimitChars']) . '...';
                         }
+
                         // loic1: displays special characters from binaries
                         $field_flags = PMA_mysql_field_flags($dt_result, $i);
                         if (eregi('BINARY', $field_flags)) {
@@ -1257,8 +1278,6 @@ if (!defined('PMA_DISPLAY_TBL_LIB_INCLUDED')) {
                         // characters for tabulations and <cr>/<lf>
                         else {
                             $row[$pointer]     = ($default_function != $transform_function ? $transform_function($row[$pointer], $transform_options) : $default_function($row[$pointer]));
-                            $row[$pointer]     = str_replace("\011", ' &nbsp;&nbsp;&nbsp;', str_replace('  ', ' &nbsp;', $row[$pointer]));
-                            $row[$pointer]     = ereg_replace("((\015\012)|(\015)|(\012))", '<br />', $row[$pointer]);
                         }
 
                         // garvin: transform functions may enable nowrapping:
@@ -1330,13 +1349,13 @@ if (!defined('PMA_DISPLAY_TBL_LIB_INCLUDED')) {
             if ($GLOBALS['cfg']['ModifyDeleteAtRight']
                 && ($disp_direction == 'horizontal' || $disp_direction == 'horizontalflipped')) {
                 if (!empty($edit_url)) {
-                    echo '    <td valign="' . ($bookmark_go != '' ? 'top' : 'middle') . '" bgcolor="' . $bgcolor . '">' . "\n";
+                    echo '    <td align="center" valign="' . ($bookmark_go != '' ? 'top' : 'middle') . '" bgcolor="' . $bgcolor . '">' . "\n";
                     echo PMA_linkOrButton($edit_url, $edit_str, '');
                     echo $bookmark_go;
                     echo '    </td>' . "\n";
                 }
                 if (!empty($del_url)) {
-                    echo '    <td valign="' . ($bookmark_go != '' ? 'top' : 'middle') . '" bgcolor="' . $bgcolor . '">' . "\n";
+                    echo '    <td align="center" valign="' . ($bookmark_go != '' ? 'top' : 'middle') . '" bgcolor="' . $bgcolor . '">' . "\n";
                     echo PMA_linkOrButton($del_url, $del_str, (isset($js_conf) ? $js_conf : ''));
                     echo '    </td>' . "\n";
                 }
@@ -1357,14 +1376,14 @@ if (!defined('PMA_DISPLAY_TBL_LIB_INCLUDED')) {
             }
 
             if (isset($edit_url)) {
-                $vertical_display['edit'][$row_no]   .= '    <td valign="' . ($bookmark_go != '' ? 'top' : 'middle') . '" bgcolor="' . $bgcolor . '">' . "\n"
+                $vertical_display['edit'][$row_no]   .= '    <td align="center" valign="' . ($bookmark_go != '' ? 'top' : 'middle') . '" bgcolor="' . $bgcolor . '">' . "\n"
                                                      . PMA_linkOrButton($edit_url, $edit_str, '')
                                                      . $bookmark_go
                                                      .  '    </td>' . "\n";
             }
 
             if (isset($del_url)) {
-                $vertical_display['delete'][$row_no] .= '    <td valign="' . ($bookmark_go != '' ? 'top' : 'middle') . '" bgcolor="' . $bgcolor . '">' . "\n"
+                $vertical_display['delete'][$row_no] .= '    <td align="center" valign="' . ($bookmark_go != '' ? 'top' : 'middle') . '" bgcolor="' . $bgcolor . '">' . "\n"
                                                      . PMA_linkOrButton($del_url, $del_str, (isset($js_conf) ? $js_conf : ''))
                                                      .  '    </td>' . "\n";
             }
@@ -1622,34 +1641,32 @@ if (!defined('PMA_DISPLAY_TBL_LIB_INCLUDED')) {
         // init map
         $map = array();
 
-        if ($cfgRelation['relwork']) {
-            // find tables
-            //$pattern = '`?[[:space:]]+(((ON|on)[[:space:]]+[^,]+)?,|((NATURAL|natural)[[:space:]]+)?(INNER|inner|LEFT|left|RIGHT|right)([[:space:]]+(OUTER|outer))?[[:space:]]+(JOIN|join))[[:space:]]*`?';
-            //$target  = eregi_replace('^.*[[:space:]]+FROM[[:space:]]+`?|`?[[:space:]]*(ON[[:space:]]+[^,]+)?(WHERE[[:space:]]+.*)?$', '', $sql_query);
-            //$target = eregi_replace('`?[[:space:]]ORDER BY[[:space:]](.*)','',$target);
-            //$tabs    = '(\'' . join('\',\'', split($pattern, $target)) . '\')';
-            $target=array();
-            reset($analyzed_sql[0]['table_ref']);
-            while (list ($table_ref_position, $table_ref) = each ($analyzed_sql[0]['table_ref'])) {
-               $target[] = $analyzed_sql[0]['table_ref'][$table_ref_position]['table_true_name'];
-            }
-            $tabs    = '(\'' . join('\',\'', $target) . '\')';
+        // find tables
 
-            $local_query = 'SELECT master_field, foreign_db, foreign_table, foreign_field'
-                         . ' FROM ' . PMA_backquote($cfgRelation['relation'])
-                         . ' WHERE master_db = \'' . PMA_sqlAddslashes($db) . '\''
-                         . ' AND master_table IN ' . $tabs;
-            $result      = @PMA_query_as_cu($local_query, FALSE);
-            if ($result) {
-                while ($rel = PMA_mysql_fetch_row($result)) {
-                    // check for display field?
-                    if ($cfgRelation['displaywork']) {
-                        $display_field = PMA_getDisplayField($rel[1], $rel[2]);
-                        $map[$rel[0]] = array($rel[2], $rel[3], $display_field, $rel[1]);
-                    } // end if
-                } // end while
+        $target=array();
+        reset($analyzed_sql[0]['table_ref']);
+        while (list ($table_ref_position, $table_ref) = each ($analyzed_sql[0]['table_ref'])) {
+           $target[] = $analyzed_sql[0]['table_ref'][$table_ref_position]['table_true_name'];
+        }
+        $tabs    = '(\'' . join('\',\'', $target) . '\')';
+
+        if ($cfgRelation['displaywork']) {
+            if (empty($table)) {
+                $exist_rel = FALSE;
+            } else {
+                $exist_rel = PMA_getForeigners($db, $table, '', 'both');
+                if ($exist_rel) {
+                    while (list($master_field,$rel) = each($exist_rel)) {
+                        $display_field = PMA_getDisplayField($rel['foreign_db'],$rel['foreign_table']);
+                        $map[$master_field] = array($rel['foreign_table'],
+                                              $rel['foreign_field'],
+                                              $display_field,
+                                              $rel['foreign_db']);
+                    } // end while
+                } // end if
             } // end if
-        } // end 2b
+        } // end if
+        // end 2b
 
         // 3. ----- Displays the results table -----
         echo '<!-- Results table -->' . "\n"
@@ -1683,5 +1700,12 @@ if (!defined('PMA_DISPLAY_TBL_LIB_INCLUDED')) {
         }
     } // end of the 'PMA_displayTable()' function
 
+    function default_function($buffer) {
+        $buffer = htmlspecialchars($buffer);
+        $buffer = str_replace("\011", ' &nbsp;&nbsp;&nbsp;', str_replace('  ', ' &nbsp;', $buffer));
+        $buffer = ereg_replace("((\015\012)|(\015)|(\012))", '<br />', $buffer);
+        
+        return $buffer;
+    }
 } // $__PMA_DISPLAY_TBL_LIB__
 ?>

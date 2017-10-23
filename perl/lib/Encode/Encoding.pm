@@ -1,7 +1,7 @@
 package Encode::Encoding;
 # Base class for classes which implement encodings
 use strict;
-our $VERSION = do { my @r = (q$Revision: 1.32 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
+our $VERSION = do { my @r = (q$Revision: 1.30 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
 
 require Encode;
 
@@ -127,22 +127,6 @@ true, SHOULD becomes MUST.
 If I<$check> is false then C<decode> should make a "best effort" to
 convert the string - for example by using Unicode's "\x{FFFD}" as a
 replacement character.
-
-=back
-
-=back
-
-If you want your encoding to work with L<encoding> pragma, you should
-also implement the method below.
-
-=over 4
-
-=item -E<gt>cat_decode($destination, $octets, $offset, $terminator [,$check])
-
-MUST decode I<$octets> with I<$offset> and concatenate it to I<$destination>.
-Decoding will terminate when $terminator (a string) appears in output.
-I<$offset> will be modified to the last $octets position at end of decode.
-Returns true if $terminator appears output, else returns false.
 
 =back
 

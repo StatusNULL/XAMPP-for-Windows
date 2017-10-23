@@ -1,7 +1,13 @@
 <?php
-/* $Id: server_links.inc.php,v 1.7 2003/03/18 13:33:22 nijel Exp $ */
+/* $Id: server_links.inc.php,v 1.10 2003/07/23 19:08:11 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
+// Check parameters
+
+if (!defined('PMA_COMMON_LIB_INCLUDED')) {
+    include('./libraries/common.lib.php');
+}
+PMA_checkParameters(array('is_superuser', 'url_query'));
 
 /**
  * Counts amount of navigation tabs
@@ -49,10 +55,14 @@ if ($cfg['ShowMysqlInfo']) {
 if ($cfg['ShowMysqlVars']) {
     echo PMA_printTab($strServerTabVariables, 'server_variables.php', $url_query);
 }
+if (PMA_MYSQL_INT_VERSION >= 40100) {
+    echo PMA_printTab($strCharsets, 'server_collations.php', $url_query);
+}
 if ($is_superuser) {
     echo PMA_printTab($strPrivileges, 'server_privileges.php', $url_query);
 }
 echo PMA_printTab($strServerTabProcesslist, 'server_processlist.php', $url_query);
+echo PMA_printTab($strExport, 'server_export.php', $url_query);
 ?>
     </tr>
 </table>

@@ -1,5 +1,5 @@
 <?php
-/* $Id: main.php,v 1.140 2003/05/02 20:42:00 garvinhicking Exp $ */
+/* $Id: main.php,v 1.144 2003/08/01 00:09:30 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -20,7 +20,7 @@ if (!defined('PMA_COMMON_LIB_INCLUDED'))  {
 if (!isset($pma_uri_parts)) {
     $pma_uri_parts = parse_url($cfg['PmaAbsoluteUri']);
     $cookie_path   = substr($pma_uri_parts['path'], 0, strrpos($pma_uri_parts['path'], '/'));
-    $is_https      = ($pma_uri_parts['scheme'] == 'https') ? 1 : 0;
+    $is_https      = (isset($pma_uri_parts['scheme']) && $pma_uri_parts['scheme'] == 'https') ? 1 : 0;
 }
 setcookie('lang', $lang, time() + 60*60*24*30, $cookie_path, '', $is_https);
 // Defines the "item" image depending on text direction
@@ -183,7 +183,7 @@ if ($server > 0) {
     $is_reload_priv  = FALSE;
 
 // We were checking privileges with 'USE mysql' but users with the global
-// priv CREATE TEMPORARY TABLES or LOCK TABLES can do a 'USE mysql' 
+// priv CREATE TEMPORARY TABLES or LOCK TABLES can do a 'USE mysql'
 // (even if they cannot see the tables)
     $is_superuser    = @PMA_mysql_query('SELECT COUNT(*) FROM mysql.user', $userlink);
     if ($dbh) {
@@ -362,7 +362,6 @@ if ($server > 0) {
             <?php
         }
 
-//        if ($is_process_priv) {
         echo "\n";
         ?>
         <tr>
@@ -374,7 +373,19 @@ if ($server > 0) {
             </td>
         </tr>
         <?php
-//        } // end if
+
+        if (PMA_MYSQL_INT_VERSION >= 40100) {
+            echo "\n";
+            ?>
+        <tr>
+            <td valign="baseline"><img src="<?php echo $item_img; ?>" width="7" height="7" alt="item" /></td>
+            <td>
+                <a href="./server_collations.php?<?php echo $common_url_query; ?>">
+                    <?php echo $strCharsetsAndCollations; ?></a>&nbsp;
+            </td>
+        </tr>
+            <?php
+        }
 
         if ($is_reload_priv) {
             echo "\n";
@@ -408,6 +419,13 @@ if ($server > 0) {
             <td>
                 <a href="./server_databases.php?<?php echo $common_url_query; ?>">
                     <?php echo $strDatabases; ?></a>
+            </td>
+        </tr>
+        <tr>
+            <td valign="baseline"><img src="<?php echo $item_img; ?>" width="7" height="7" alt="item" /></td>
+            <td>
+                <a href="./server_export.php?<?php echo $common_url_query; ?>">
+                    <?php echo $strExport; ?></a>
             </td>
         </tr>
         <?php
@@ -569,7 +587,7 @@ if ($is_superuser || $cfg['ShowPhpInfo']) {
         <tr>
             <td valign="baseline"><img src="<?php echo $item_img; ?>" width="7" height="7" alt="item" /></td>
             <td>
-                <a href="phpinfo.php" target="_new"><?php echo $strShowPHPInfo; ?></a>
+                <a href="phpinfo.php?<?php echo PMA_generate_common_url(); ?>" target="_blank"><?php echo $strShowPHPInfo; ?></a>
             </td>
         </tr>
     <?php
@@ -581,10 +599,10 @@ echo "\n";
         <tr>
             <td valign="baseline"><img src="<?php echo $item_img; ?>" width="7" height="7" alt="item" /></td>
             <td>
-                <a href="http://www.phpMyAdmin.net/" target="_new"><?php echo $strHomepageOfficial; ?></a><br />
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<a href="ChangeLog" target="_new">ChangeLog</a>]
-                &nbsp;&nbsp;&nbsp;[<a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/phpmyadmin/phpMyAdmin/" target="_new">CVS</a>]
-                &nbsp;&nbsp;&nbsp;[<a href="http://sourceforge.net/mail/?group_id=23067" target="_new">Lists</a>]
+                <a href="http://www.phpMyAdmin.net/" target="_blank"><?php echo $strHomepageOfficial; ?></a><br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<a href="ChangeLog" target="_blank">ChangeLog</a>]
+                &nbsp;&nbsp;&nbsp;[<a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/phpmyadmin/phpMyAdmin/" target="_blank">CVS</a>]
+                &nbsp;&nbsp;&nbsp;[<a href="http://sourceforge.net/mail/?group_id=23067" target="_blank">Lists</a>]
             </td>
         </tr>
         </table>

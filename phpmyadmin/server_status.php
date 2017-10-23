@@ -1,5 +1,5 @@
 <?php
-/* $Id: server_status.php,v 1.7 2003/03/18 13:33:23 nijel Exp $ */
+/* $Id: server_status.php,v 1.11 2003/08/10 20:10:37 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -136,7 +136,7 @@ unset($tmp_array);
                             <td bgcolor="<?php echo $cfg['BgcolorOne']; ?>">&nbsp;<?php echo $strTotalUC; ?>&nbsp;</td>
                             <td bgcolor="<?php echo $cfg['BgcolorOne']; ?>" align="right">&nbsp;<?php echo number_format($serverStatus['Connections'], 0, $number_decimal_separator, $number_thousands_separator); ?>&nbsp;</td>
                             <td bgcolor="<?php echo $cfg['BgcolorOne']; ?>" align="right">&nbsp;<?php echo number_format(($serverStatus['Connections'] * 3600 / $serverStatus['Uptime']), 2, $number_decimal_separator, $number_thousands_separator); ?>&nbsp;</td>
-                            <td bgcolor="<?php echo $cfg['BgcolorOne']; ?>" align="right">&nbsp;100,00&nbsp;%&nbsp;</td>
+                            <td bgcolor="<?php echo $cfg['BgcolorOne']; ?>" align="right">&nbsp;<?php echo number_format(100, 2, $number_decimal_separator, $number_thousands_separator); ?>&nbsp;%&nbsp;</td>
                         </tr>
                     </table>
                 </td>
@@ -146,8 +146,27 @@ unset($tmp_array);
     <br />
     <li>
         <!-- Queries -->
-        <?php echo sprintf($strQueryStatistics, number_format($serverStatus['Questions'], 0, $number_decimal_separator, $number_thousands_separator)); ?><br />
+        <?php echo sprintf($strQueryStatistics, number_format($serverStatus['Questions'], 0, $number_decimal_separator, $number_thousands_separator)) . "\n"; ?>
         <table border="0">
+            <tr>
+                <td colspan="2">
+                    <br />
+                    <table border="0" align="right">
+                        <tr>
+                            <th>&nbsp;<?php echo $strTotalUC; ?>&nbsp;</th>
+                            <th>&nbsp;&oslash;&nbsp;<?php echo $strPerHour; ?>&nbsp;</th>
+                            <th>&nbsp;&oslash;&nbsp;<?php echo $strPerMinute; ?>&nbsp;</th>
+                            <th>&nbsp;&oslash;&nbsp;<?php echo $strPerSecond; ?>&nbsp;</th>
+                        </tr>
+                        <tr>
+                            <td bgcolor="<?php echo $cfg['BgcolorOne']; ?>" align="right">&nbsp;<?php echo number_format($serverStatus['Questions'], 0, $number_decimal_separator, $number_thousands_separator); ?>&nbsp;</td>
+                            <td bgcolor="<?php echo $cfg['BgcolorOne']; ?>" align="right">&nbsp;<?php echo number_format(($serverStatus['Questions'] * 3600 / $serverStatus['Uptime']), 2, $number_decimal_separator, $number_thousands_separator); ?>&nbsp;</td>
+                            <td bgcolor="<?php echo $cfg['BgcolorOne']; ?>" align="right">&nbsp;<?php echo number_format(($serverStatus['Questions'] * 60 / $serverStatus['Uptime']), 2, $number_decimal_separator, $number_thousands_separator); ?>&nbsp;</td>
+                            <td bgcolor="<?php echo $cfg['BgcolorOne']; ?>" align="right">&nbsp;<?php echo number_format(($serverStatus['Questions'] / $serverStatus['Uptime']), 2, $number_decimal_separator, $number_thousands_separator); ?>&nbsp;</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
             <tr>
                 <td valign="top">
                     <table border="0">
@@ -161,12 +180,16 @@ unset($tmp_array);
 $useBgcolorOne = TRUE;
 $countRows = 0;
 while (list($name, $value) = each($queryStats)) {
+
+// For the percentage column, use Questions - Connections, because
+// the number of connections is not an item of the Query types
+// but is included in Questions. Then the total of the percentages is 100. 
 ?>
                         <tr>
                             <td bgcolor="<?php echo $useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']; ?>">&nbsp;<?php echo htmlspecialchars($name); ?>&nbsp;</td>
                             <td bgcolor="<?php echo $useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']; ?>" align="right">&nbsp;<?php echo number_format($value, 0, $number_decimal_separator, $number_thousands_separator); ?>&nbsp;</td>
                             <td bgcolor="<?php echo $useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']; ?>" align="right">&nbsp;<?php echo number_format(($value * 3600 / $serverStatus['Uptime']), 2, $number_decimal_separator, $number_thousands_separator); ?>&nbsp;</td>
-                            <td bgcolor="<?php echo $useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']; ?>" align="right">&nbsp;<?php echo number_format(($value * 100 / $serverStatus['Questions']), 2, $number_decimal_separator, $number_thousands_separator); ?>&nbsp;%&nbsp;</td>
+                            <td bgcolor="<?php echo $useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']; ?>" align="right">&nbsp;<?php echo number_format(($value * 100 / ($serverStatus['Questions'] - $serverStatus['Connections'])), 2, $number_decimal_separator, $number_thousands_separator); ?>&nbsp;%&nbsp;</td>
                         </tr>
 <?php
     $useBgcolorOne = !$useBgcolorOne;
@@ -191,26 +214,6 @@ unset($useBgcolorOne);
                     </table>
                 </td>
             </tr>
-            <tr>
-                <td colspan="2">
-                    <br />
-                    <table border="0" align="right">
-                        <tr>
-                            <th>&nbsp;<?php echo $strTotalUC; ?>&nbsp;</th>
-                            <th>&nbsp;&oslash;&nbsp;<?php echo $strPerHour; ?>&nbsp;</th>
-                            <th>&nbsp;&oslash;&nbsp;<?php echo $strPerMinute; ?>&nbsp;</th>
-                            <th>&nbsp;&oslash;&nbsp;<?php echo $strPerSecond; ?>&nbsp;</th>
-                        </tr>
-
-                        <tr>
-                            <td bgcolor="<?php echo $cfg['BgcolorOne']; ?>" align="right">&nbsp;<?php echo number_format($serverStatus['Questions'], 0, $number_decimal_separator, $number_thousands_separator); ?>&nbsp;</td>
-                            <td bgcolor="<?php echo $cfg['BgcolorOne']; ?>" align="right">&nbsp;<?php echo number_format(($serverStatus['Questions'] * 3600 / $serverStatus['Uptime']), 2, $number_decimal_separator, $number_thousands_separator); ?>&nbsp;</td>
-                            <td bgcolor="<?php echo $cfg['BgcolorOne']; ?>" align="right">&nbsp;<?php echo number_format(($serverStatus['Questions'] * 60 / $serverStatus['Uptime']), 2, $number_decimal_separator, $number_thousands_separator); ?>&nbsp;</td>
-                            <td bgcolor="<?php echo $cfg['BgcolorOne']; ?>" align="right">&nbsp;<?php echo number_format(($serverStatus['Questions'] / $serverStatus['Uptime']), 2, $number_decimal_separator, $number_thousands_separator); ?>&nbsp;</td>
-                        </tr>
-
-                    </table>
-                </td>
         </table>
     </li>
 <?php
@@ -244,7 +247,7 @@ if (!empty($serverStatus)) {
 ?>
                         <tr>
                             <td bgcolor="<?php echo $useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']; ?>">&nbsp;<?php echo htmlspecialchars(str_replace('_', ' ', $name)); ?>&nbsp;</td>
-                            <td bgcolor="<?php echo $useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']; ?>">&nbsp;<?php echo htmlspecialchars($value); ?>&nbsp;</td>
+                            <td bgcolor="<?php echo $useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']; ?>" align="right">&nbsp;<?php echo htmlspecialchars($value); ?>&nbsp;</td>
                         </tr>
 <?php
         $useBgcolorOne = !$useBgcolorOne;

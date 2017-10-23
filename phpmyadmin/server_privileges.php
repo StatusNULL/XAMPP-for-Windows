@@ -1,5 +1,5 @@
 <?php
-/* $Id: server_privileges.php,v 1.32 2003/04/29 13:43:53 nijel Exp $ */
+/* $Id: server_privileges.php,v 1.37.2.1 2003/08/20 14:27:52 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -155,11 +155,11 @@ function PMA_displayPrivTable($db = '*', $table = '*', $submit = TRUE, $indent =
         $username = $GLOBALS['username'];
         $hostname = $GLOBALS['hostname'];
         if ($db == '*') {
-            $sql_query = 'SELECT * FROM `user` WHERE `User` = "' . $username . '" AND `Host` = "' . $hostname . '";';
+            $sql_query = 'SELECT * FROM `user` WHERE `User` = "' . PMA_sqlAddslashes($username) . '" AND `Host` = "' . $hostname . '";';
         } else if ($table == '*') {
-            $sql_query = 'SELECT * FROM `db` WHERE `User` = "' . $username . '" AND `Host` = "' . $hostname . '" AND `Db` = "' . $db . '";';
+            $sql_query = 'SELECT * FROM `db` WHERE `User` = "' . PMA_sqlAddslashes($username) . '" AND `Host` = "' . $hostname . '" AND `Db` = "' . $db . '";';
         } else {
-            $sql_query = 'SELECT `Table_priv` FROM `tables_priv` WHERE `User` = "' . $username . '" AND `Host` = "' . $hostname . '" AND `Db` = "' . $db . '" AND `Table_name` = "' . $table . '";';
+            $sql_query = 'SELECT `Table_priv` FROM `tables_priv` WHERE `User` = "' . PMA_sqlAddslashes($username) . '" AND `Host` = "' . $hostname . '" AND `Db` = "' . $db . '" AND `Table_name` = "' . $table . '";';
         }
         $res = PMA_mysql_query($sql_query, $userlink) or PMA_mysqlDie(PMA_mysql_error($userlink), $sql_query);
         if ($res) {
@@ -194,7 +194,7 @@ function PMA_displayPrivTable($db = '*', $table = '*', $submit = TRUE, $indent =
         unset($sql_query);
         $row1 = PMA_mysql_fetch_array($res, MYSQL_ASSOC);
         mysql_free_result($res);
-        $av_grants = explode ('\',\'' , substr($row1['Type'], 5, strlen($row1['Type']) - 7));
+        $av_grants = explode ('\',\'' , substr($row1['Type'], strpos($row1['Type'], '(') + 2, strpos($row1['Type'], ')') - strpos($row1['Type'], '(') - 3));
         unset($row1);
         $users_grants = explode(',', $row['Table_priv']);
         while (list(, $current_grant) = each($av_grants)) {
@@ -220,7 +220,7 @@ function PMA_displayPrivTable($db = '*', $table = '*', $submit = TRUE, $indent =
         }
     }
     if (!empty($columns)) {
-        $sql_query = 'SELECT `Column_name`, `Column_priv` FROM `columns_priv` WHERE `User` = "' . $username . '" AND `Host` = "' . $hostname . '" AND `Db` = "' . $db . '" AND `Table_name` = "' . $table . '";';
+        $sql_query = 'SELECT `Column_name`, `Column_priv` FROM `columns_priv` WHERE `User` = "' . PMA_sqlAddslashes($username) . '" AND `Host` = "' . $hostname . '" AND `Db` = "' . $db . '" AND `Table_name` = "' . $table . '";';
         $res = PMA_mysql_query($sql_query, $userlink) or PMA_mysqlDie(PMA_mysql_error($userlink), $sql_query);
         while ($row1 = PMA_mysql_fetch_row($res)) {
             $row1[1] = explode(',', $row1[1]);
@@ -516,7 +516,7 @@ function PMA_displayLoginInformationFields($mode = 'new', $indent = 0)
        . $spaces . '        </select>' . "\n"
        . $spaces . '    </td>' . "\n"
        . $spaces . '    <td bgcolor="' . $cfg['BgcolorTwo'] . '">' . "\n"
-       . $spaces . '        <input type="text" class="textfield" name="hostname" value="' . $GLOBALS['hostname'] . '" class="textfield" title="' . $GLOBALS['strHost'] . '" onchange="pred_hostname.value = \'userdefined\';" />' . "\n"
+       . $spaces . '        <input type="text" class="textfield" name="hostname" value="' . ( isset($GLOBALS['hostname']) ? $GLOBALS['hostname'] : '' ) . '" class="textfield" title="' . $GLOBALS['strHost'] . '" onchange="pred_hostname.value = \'userdefined\';" />' . "\n"
        . $spaces . '    </td>' . "\n"
        . $spaces . '</tr>' . "\n"
        . $spaces . '<tr>' . "\n"
@@ -555,7 +555,7 @@ function PMA_displayLoginInformationFields($mode = 'new', $indent = 0)
  * Changes / copies a user, part I
  */
 if (!empty($change_copy)) {
-    $local_query = 'SELECT * FROM `mysql`.`user` WHERE `User` = "' . $old_username . '" AND `Host` = "' . $old_hostname . '";';
+    $local_query = 'SELECT * FROM `mysql`.`user` WHERE `User` = "' . PMA_sqlAddslashes($old_username) . '" AND `Host` = "' . $old_hostname . '";';
     $res = PMA_mysql_query($local_query, $userlink) or PMA_mysqlDie(PMA_mysql_error($userlink), $local_query);
     if (!$res) {
         $message = $strNoUsersFound;
@@ -597,7 +597,7 @@ if (!empty($adduser_submit) || !empty($change_copy)) {
             unset($row);
             break;
     }
-    $local_query = 'SELECT "foo" FROM `user` WHERE `User` = "' . $username . '" AND `Host` = "' . $hostname . '";';
+    $local_query = 'SELECT "foo" FROM `user` WHERE `User` = "' . PMA_sqlAddslashes($username) . '" AND `Host` = "' . $hostname . '";';
     $res = PMA_mysql_query($local_query, $userlink) or PMA_mysqlDie(PMA_mysql_error($userlink), $local_query);
     unset($local_query);
     if (mysql_affected_rows($userlink) == 1) {
@@ -605,7 +605,7 @@ if (!empty($adduser_submit) || !empty($change_copy)) {
         $adduser = 1;
     } else {
         if (PMA_MYSQL_INT_VERSION >= 32211) {
-            $real_sql_query = 'GRANT ' . join(', ', PMA_extractPrivInfo()) . ' ON *.* TO "' . $username . '"@"' . $hostname . '"';
+            $real_sql_query = 'GRANT ' . join(', ', PMA_extractPrivInfo()) . ' ON *.* TO "' . PMA_sqlAddslashes($username) . '"@"' . $hostname . '"';
             if ($pred_password != 'none' && $pred_password != 'keep') {
                 $pma_pw_hidden = '';
                 for ($i = 0; $i < strlen($pma_pw); $i++) {
@@ -619,24 +619,26 @@ if (!empty($adduser_submit) || !empty($change_copy)) {
                 }
                 $sql_query = $real_sql_query;
             }
-            if ((isset($Grant_priv) && $Grant_priv == 'Y') || isset($max_questions) || isset($max_connections) || isset($max_updates)) {
+            if ((isset($Grant_priv) && $Grant_priv == 'Y') || (PMA_MYSQL_INT_VERSION >= 40002 && (isset($max_questions) || isset($max_connections) || isset($max_updates)))) {
                 $real_sql_query .= 'WITH';
                 $sql_query .= 'WITH';
                 if (isset($Grant_priv) && $Grant_priv == 'Y') {
                     $real_sql_query .= ' GRANT OPTION';
                     $sql_query .= ' GRANT OPTION';
                 }
-                if (isset($max_questions)) {
-                    $real_sql_query .= ' MAX_QUERIES_PER_HOUR ' . (int)$max_questions;
-                    $sql_query .= ' MAX_QUERIES_PER_HOUR ' . (int)$max_questions;
-                }
-                if (isset($max_connections)) {
-                    $real_sql_query .= ' MAX_CONNECTIONS_PER_HOUR ' . (int)$max_connections;
-                    $sql_query .= ' MAX_CONNECTIONS_PER_HOUR ' . (int)$max_connections;
-                }
-                if (isset($max_updates)) {
-                    $real_sql_query .= ' MAX_UPDATES_PER_HOUR ' . (int)$max_updates;
-                    $sql_query .= ' MAX_UPDATES_PER_HOUR ' . (int)$max_updates;
+                if (PMA_MYSQL_INT_VERSION >= 40002) {
+                    if (isset($max_questions)) {
+                        $real_sql_query .= ' MAX_QUERIES_PER_HOUR ' . (int)$max_questions;
+                        $sql_query .= ' MAX_QUERIES_PER_HOUR ' . (int)$max_questions;
+                    }
+                    if (isset($max_connections)) {
+                        $real_sql_query .= ' MAX_CONNECTIONS_PER_HOUR ' . (int)$max_connections;
+                        $sql_query .= ' MAX_CONNECTIONS_PER_HOUR ' . (int)$max_connections;
+                    }
+                    if (isset($max_updates)) {
+                        $real_sql_query .= ' MAX_UPDATES_PER_HOUR ' . (int)$max_updates;
+                        $sql_query .= ' MAX_UPDATES_PER_HOUR ' . (int)$max_updates;
+                    }
                 }
             }
             $real_sql_query .= ';';
@@ -650,7 +652,7 @@ if (!empty($adduser_submit) || !empty($change_copy)) {
             unset($real_sql_query);
         } else {
             $privileges = PMA_extractPrivInfo();
-            $real_sql_query = 'INSERT INTO `user` SET `Host` = "' . $hostname . '", `User` = "' . $username . '"';
+            $real_sql_query = 'INSERT INTO `user` SET `Host` = "' . $hostname . '", `User` = "' . PMA_sqlAddslashes($username) . '"';
             if ($pred_password != 'none') {
                 $pma_pw_hidden = '';
                 for ($i = 0; $i < strlen($pma_pw); $i++) {
@@ -679,16 +681,16 @@ if (!empty($adduser_submit) || !empty($change_copy)) {
  * Changes / copies a user, part III
  */
 if (!empty($change_copy)) {
-    $local_query = 'SELECT * FROM `mysql`.`db` WHERE `User` = "' . $old_username . '" AND `Host` = "' . $old_hostname . '";';
+    $local_query = 'SELECT * FROM `mysql`.`db` WHERE `User` = "' . PMA_sqlAddslashes($old_username) . '" AND `Host` = "' . $old_hostname . '";';
     $res = PMA_mysql_query($local_query, $userlink) or PMA_mysqlDie(PMA_mysql_error($userlink), $local_query);
     while ($row = PMA_mysql_fetch_array($res, MYSQL_ASSOC)) {
-        $queries[] = 'GRANT ' . join(', ', PMA_extractPrivInfo($row)) . ' ON `' . $row['Db'] . '`.* TO "' . $username . '"@"' . $hostname . '"' . ($row['Grant_priv'] == 'Y' ? ' WITH GRANT OPTION' : '') . ';';
+        $queries[] = 'GRANT ' . join(', ', PMA_extractPrivInfo($row)) . ' ON `' . $row['Db'] . '`.* TO "' . PMA_sqlAddslashes($username) . '"@"' . $hostname . '"' . ($row['Grant_priv'] == 'Y' ? ' WITH GRANT OPTION' : '') . ';';
     }
     mysql_free_result($res);
-    $local_query = 'SELECT `Db`, `Table_name`, `Table_priv` FROM `mysql`.`tables_priv` WHERE `User` = "' . $old_username . '" AND `Host` = "' . $old_hostname . '";';
+    $local_query = 'SELECT `Db`, `Table_name`, `Table_priv` FROM `mysql`.`tables_priv` WHERE `User` = "' . PMA_sqlAddslashes($old_username) . '" AND `Host` = "' . $old_hostname . '";';
     $res = PMA_mysql_query($local_query, $userlink) or PMA_mysqlDie(PMA_mysql_error($userlink), $local_query);
     while ($row = PMA_mysql_fetch_array($res, MYSQL_ASSOC)) {
-        $local_query = 'SELECT `Column_name`, `Column_priv` FROM `mysql`.`columns_priv` WHERE `User` = "' . $old_username . '" AND `Host` = "' . $old_hostname . '" AND `Db` = "' . $row['Db'] . '";';
+        $local_query = 'SELECT `Column_name`, `Column_priv` FROM `mysql`.`columns_priv` WHERE `User` = "' . PMA_sqlAddslashes($old_username) . '" AND `Host` = "' . $old_hostname . '" AND `Db` = "' . $row['Db'] . '";';
         $res2 = PMA_mysql_query($local_query, $userlink) or PMA_mysqlDie(PMA_mysql_error($userlink), $local_query);
         $tmp_privs1 = PMA_extractPrivInfo($row);
         $tmp_privs2 = array(
@@ -726,7 +728,7 @@ if (!empty($change_copy)) {
             $tmp_privs1[] = 'REFERENCES (`' . join(', ', $tmp_privs2['References']) . '`)';
         }
         unset($tmp_privs2);
-        $queries[] = 'GRANT ' . join(', ', $tmp_privs1) . ' ON `' . $row['Db'] . '`.`' . $row['Table_name'] . '` TO "' . $username . '"@"' . $hostname . '"' . (in_array('Grant', explode(',', $row['Table_priv'])) ? ' WITH GRANT OPTION' : '') . ';';
+        $queries[] = 'GRANT ' . join(', ', $tmp_privs1) . ' ON `' . $row['Db'] . '`.`' . $row['Table_name'] . '` TO "' . PMA_sqlAddslashes($username) . '"@"' . $hostname . '"' . (in_array('Grant', explode(',', $row['Table_priv'])) ? ' WITH GRANT OPTION' : '') . ';';
     }
 }
 
@@ -737,29 +739,35 @@ if (!empty($change_copy)) {
 if (!empty($update_privs)) {
     if (PMA_MYSQL_INT_VERSION >= 32211) {
         $db_and_table = empty($dbname) ? '*.*' : PMA_backquote($dbname) . '.' . (empty($tablename) ? '*' : PMA_backquote($tablename));
-        $sql_query0 = 'REVOKE ALL PRIVILEGES ON ' . $db_and_table . ' FROM "' . $username . '"@"' . $hostname . '";';
-        $sql_query1 = 'REVOKE GRANT OPTION ON ' . $db_and_table . ' FROM "' . $username . '"@"' . $hostname . '";';
-        $sql_query2 = 'GRANT ' . join(', ', PMA_extractPrivInfo()) . ' ON ' . $db_and_table . ' TO "' . $username . '"@"' . $hostname . '"';
-        if ((isset($Grant_priv) && $Grant_priv == 'Y') || (empty($dbname) && (isset($max_questions) || isset($max_connections) || isset($max_updates)))) {
+        $sql_query0 = 'REVOKE ALL PRIVILEGES ON ' . $db_and_table . ' FROM "' . PMA_sqlAddslashes($username) . '"@"' . $hostname . '";';
+        if (!isset($Grant_priv) || $Grant_priv != 'Y') {
+            $sql_query1 = 'REVOKE GRANT OPTION ON ' . $db_and_table . ' FROM "' . PMA_sqlAddslashes($username) . '"@"' . $hostname . '";';
+        }
+        $sql_query2 = 'GRANT ' . join(', ', PMA_extractPrivInfo()) . ' ON ' . $db_and_table . ' TO "' . PMA_sqlAddslashes($username) . '"@"' . $hostname . '"';
+        if ((isset($Grant_priv) && $Grant_priv == 'Y') || (empty($dbname) && PMA_MYSQL_INT_VERSION >= 40002 && (isset($max_questions) || isset($max_connections) || isset($max_updates)))) {
             $sql_query2 .= 'WITH';
             if (isset($Grant_priv) && $Grant_priv == 'Y') {
                 $sql_query2 .= ' GRANT OPTION';
             }
-            if (isset($max_questions)) {
-                $sql_query2 .= ' MAX_QUERIES_PER_HOUR ' . (int)$max_questions;
-            }
-            if (isset($max_connections)) {
-                $sql_query2 .= ' MAX_CONNECTIONS_PER_HOUR ' . (int)$max_connections;
-            }
-            if (isset($max_updates)) {
-                $sql_query2 .= ' MAX_UPDATES_PER_HOUR ' . (int)$max_updates;
+            if (PMA_MYSQL_INT_VERSION >= 40002) {
+                if (isset($max_questions)) {
+                    $sql_query2 .= ' MAX_QUERIES_PER_HOUR ' . (int)$max_questions;
+                }
+                if (isset($max_connections)) {
+                    $sql_query2 .= ' MAX_CONNECTIONS_PER_HOUR ' . (int)$max_connections;
+                }
+                if (isset($max_updates)) {
+                    $sql_query2 .= ' MAX_UPDATES_PER_HOUR ' . (int)$max_updates;
+                }
             }
         }
         $sql_query2 .= ';';
         PMA_mysql_query($sql_query0, $userlink); // this query may fail, but this does not matter :o)
-        PMA_mysql_query($sql_query1, $userlink); // this one may fail, too...
+        if (isset($sql_query1)) {
+            PMA_mysql_query($sql_query1, $userlink); // this one may fail, too...
+        }
         PMA_mysql_query($sql_query2, $userlink) or PMA_mysqlDie(PMA_mysql_error($userlink), $sql_query2);
-        $sql_query = $sql_query0 . ' ' . $sql_query1 . ' ' . $sql_query2;
+        $sql_query = $sql_query0 . ' ' . (isset($sql_query1) ? $sql_query1 . ' ' : '') . $sql_query2;
         $message = sprintf($strUpdatePrivMessage, '\'' . $username . '\'@\'' . $hostname . '\'');
     } else {
         $sql_query = 'SHOW COLUMNS FROM `user`;';
@@ -818,8 +826,8 @@ if (!empty($change_pw)) {
         for ($i = 0; $i < strlen($pma_pw); $i++) {
             $hidden_pw .= '*';
         }
-        $local_query = 'SET PASSWORD FOR "' . $username . '"@"' . $hostname . '" = PASSWORD("' . $pma_pw . '")';
-        $sql_query = 'SET PASSWORD FOR "' . $username . '"@"' . $hostname . '" = PASSWORD("' . $hidden_pw . '")';
+        $local_query = 'SET PASSWORD FOR "' . PMA_sqlAddslashes($username) . '"@"' . $hostname . '" = PASSWORD("' . PMA_sqlAddslashes($pma_pw) . '")';
+        $sql_query = 'SET PASSWORD FOR "' . PMA_sqlAddslashes($username) . '"@"' . $hostname . '" = PASSWORD("' . $hidden_pw . '")';
         PMA_mysql_query($local_query, $userlink) or PMA_mysqlDie(PMA_mysql_error($userlink));
         $message = sprintf($strPasswordChanged, '\'' . $username . '\'@\'' . $hostname . '\'');
     }
@@ -842,14 +850,14 @@ if (!empty($delete) || (!empty($change_copy) && $mode < 4)) {
         if ($mode == 2) {
             // The SHOW GRANTS query may fail if the user has not been loaded
             // into memory
-            $res = PMA_mysql_query('SHOW GRANTS FOR "' . $this_user . '"@"' . $this_host . '";', $userlink);
+            $res = PMA_mysql_query('SHOW GRANTS FOR "' . PMA_sqlAddslashes($this_user) . '"@"' . $this_host . '";', $userlink);
             if ($res) {
-                $queries[] = 'REVOKE ALL PRIVILEGES ON *.* FROM "' . $this_user . '"@"' . $this_host . '";';
+                $queries[] = 'REVOKE ALL PRIVILEGES ON *.* FROM "' . PMA_sqlAddslashes($this_user) . '"@"' . $this_host . '";';
                 while ($row = PMA_mysql_fetch_row($res)) {
                     $this_table = substr($row[0], (strpos($row[0], 'ON') + 3), (strpos($row[0], ' TO ') - strpos($row[0], 'ON') - 3));
                     if ($this_table != '*.*') {
-                        $queries[] = 'REVOKE ALL PRIVILEGES ON ' . $this_table . ' FROM "' . $this_user . '"@"' . $this_host . '";';
-                        $queries[] = 'REVOKE GRANT OPTION ON ' . $this_table . ' FROM "' . $this_user . '"@"' . $this_host . '";';
+                        $queries[] = 'REVOKE ALL PRIVILEGES ON ' . $this_table . ' FROM "' . PMA_sqlAddslashes($this_user) . '"@"' . $this_host . '";';
+                        $queries[] = 'REVOKE GRANT OPTION ON ' . $this_table . ' FROM "' . PMA_sqlAddslashes($this_user) . '"@"' . $this_host . '";';
                     }
                     unset($this_table);
                 }
@@ -857,13 +865,13 @@ if (!empty($delete) || (!empty($change_copy) && $mode < 4)) {
             }
             unset($res);
         }
-        $queries[] = 'DELETE FROM `user` WHERE `User` = "' . $this_user . '" AND `Host` = "' . $this_host . '";';
+        $queries[] = 'DELETE FROM `user` WHERE `User` = "' . PMA_sqlAddslashes($this_user) . '" AND `Host` = "' . $this_host . '";';
         if ($mode != 2) {
             // If we REVOKE the table grants, we should not need to modify the
             // `db`, `tables_priv` and `columns_priv` tables manually...
-            $queries[] = 'DELETE FROM `db` WHERE `User` = "' . $this_user . '" AND `Host` = "' . $this_host . '";';
-            $queries[] = 'DELETE FROM `tables_priv` WHERE `User` = "' . $this_user . '" AND `Host` = "' . $this_host . '";';
-            $queries[] = 'DELETE FROM `columns_priv` WHERE `User` = "' . $this_user . '" AND `Host` = "' . $this_host . '";';
+            $queries[] = 'DELETE FROM `db` WHERE `User` = "' . PMA_sqlAddslashes($this_user) . '" AND `Host` = "' . $this_host . '";';
+            $queries[] = 'DELETE FROM `tables_priv` WHERE `User` = "' . PMA_sqlAddslashes($this_user) . '" AND `Host` = "' . $this_host . '";';
+            $queries[] = 'DELETE FROM `columns_priv` WHERE `User` = "' . PMA_sqlAddslashes($this_user) . '" AND `Host` = "' . $this_host . '";';
         }
         if (!empty($drop_users_db)) {
             $queries[] = 'DROP DATABASE IF EXISTS ' . PMA_backquote($this_user) . ';';
@@ -1056,7 +1064,7 @@ if (empty($adduser) && empty($checkprivs)) {
             }
         }
         echo '</h2>' . "\n";
-        $res = PMA_mysql_query('SELECT "foo" FROM `user` WHERE `User` = "' . $username . '" AND `Host` = "' . $hostname . '";', $userlink);
+        $res = PMA_mysql_query('SELECT "foo" FROM `user` WHERE `User` = "' . PMA_sqlAddslashes($username) . '" AND `Host` = "' . $hostname . '";', $userlink);
         if (mysql_affected_rows($userlink) <= 0) {
             echo $strUserNotFound;
             include('./footer.inc.php');
@@ -1094,9 +1102,9 @@ if (empty($adduser) && empty($checkprivs)) {
                . '                <th colspan="2">&nbsp;' . $strAction . '&nbsp;</th>' . "\n"
                . '            </tr>' . "\n";
             if (empty($dbname)) {
-                $sql_query = 'SELECT * FROM `db` WHERE `Host` = "' . $hostname . '" AND `User` = "' . $username . '" ORDER BY `Db` ASC;';
+                $sql_query = 'SELECT * FROM `db` WHERE `Host` = "' . $hostname . '" AND `User` = "' . PMA_sqlAddslashes($username) . '" ORDER BY `Db` ASC;';
             } else {
-                $sql_query = 'SELECT `Table_name`, `Table_priv`, IF(`Column_priv` = "", 0, 1) AS "Column_priv" FROM `tables_priv` WHERE `Host` = "' . $hostname . '" AND `User` = "' . $username . '" AND `Db` = "' . $dbname . '" ORDER BY `Table_name` ASC;';
+                $sql_query = 'SELECT `Table_name`, `Table_priv`, IF(`Column_priv` = "", 0, 1) AS "Column_priv" FROM `tables_priv` WHERE `Host` = "' . $hostname . '" AND `User` = "' . PMA_sqlAddslashes($username) . '" AND `Db` = "' . $dbname . '" ORDER BY `Table_name` ASC;';
             }
             $res = PMA_mysql_query($sql_query, $userlink) or PMA_mysqlDie(PMA_mysql_error($userlink), $sql_query);
             if (mysql_affected_rows($userlink) == 0) {
@@ -1106,7 +1114,7 @@ if (empty($adduser) && empty($checkprivs)) {
             } else {
                 $useBgcolorOne = TRUE;
                 if (empty($dbname)) {
-                    $res2 = PMA_mysql_query('SELECT `Db` FROM `tables_priv` WHERE `Host` = "' . $hostname . '" AND `User` = "' . $username . '" GROUP BY `Db` ORDER BY `Db` ASC;') or PMA_mysqlDie(PMA_mysql_error($userlink), 'SELECT `Db` FROM `tables_priv` WHERE `Host` = "' . $hostname . '" AND `User` = "' . $username . '" GROUP BY `Db` ORDER BY `Db` ASC;');
+                    $res2 = PMA_mysql_query('SELECT `Db` FROM `tables_priv` WHERE `Host` = "' . $hostname . '" AND `User` = "' . PMA_sqlAddslashes($username) . '" GROUP BY `Db` ORDER BY `Db` ASC;') or PMA_mysqlDie(PMA_mysql_error($userlink), 'SELECT `Db` FROM `tables_priv` WHERE `Host` = "' . $hostname . '" AND `User` = "' . PMA_sqlAddslashes($username) . '" GROUP BY `Db` ORDER BY `Db` ASC;');
                     $row2 = PMA_mysql_fetch_array($res2, MYSQL_ASSOC);
                 }
                 $found_rows = array();

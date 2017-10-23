@@ -1,9 +1,17 @@
 <?php
-/* $Id: tbl_properties_table_info.php,v 1.16 2003/03/12 19:40:35 garvinhicking Exp $ */
+/* $Id: tbl_properties_table_info.php,v 1.19 2003/07/19 12:41:46 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 // this should be recoded as functions, to avoid messing with global
 // variables
+
+// Check parameters
+
+if (!defined('PMA_COMMON_LIB_INCLUDED')) {
+    include('./libraries/common.lib.php');
+}
+
+PMA_checkParameters(array('db', 'table'));
 
 /**
  * Gets table informations
@@ -14,6 +22,7 @@ if (PMA_MYSQL_INT_VERSION >= 32303) {
     $table_info_result   = PMA_mysql_query($local_query) or PMA_mysqlDie('', $local_query, '', $err_url_0);
     $showtable           = PMA_mysql_fetch_array($table_info_result);
     $tbl_type            = strtoupper($showtable['Type']);
+    $tbl_charset         = empty($showtable['Charset']) ? '' : $showtable['Charset'];
     $table_info_num_rows = (isset($showtable['Rows']) ? $showtable['Rows'] : 0);
     $show_comment        = (isset($showtable['Comment']) ? $showtable['Comment'] : '');
     $auto_increment      = (isset($showtable['Auto_increment']) ? $showtable['Auto_increment'] : '');

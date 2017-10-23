@@ -12,7 +12,7 @@ goto endofperl
 @rem ';
 #!perl
 #line 15
-    eval 'exec C:\Perl\bin\perl.exe -S $0 ${1+"$@"}'
+    eval 'exec c:\xampp\perl\bin\perl.exe -S $0 ${1+"$@"}'
 	if 0;
 
 use warnings;
@@ -28,7 +28,7 @@ my @pagers = ();
 push @pagers, $pager if -x $pager;
 
 (my $bindir = <<'/../') =~ s/\s*\z//;
-C:\Perl\bin
+c:\xampp\perl\bin
 /../
 
 (my $pod2man = <<'/../') =~ s/\s*\z//;

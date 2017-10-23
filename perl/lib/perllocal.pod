@@ -1,0 +1,22 @@
+=head2 Thu Oct 30 21:35:52 2003: C<Module> L<mod_perl|mod_perl>
+
+=over 4
+
+=item *
+
+C<installed into: c:\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.99_11-dev>
+
+=item *
+
+C<EXE_FILES: bin/mp2doc bin/mp2bug>
+
+=back
+

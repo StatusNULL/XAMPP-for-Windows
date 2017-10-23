@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_details_links.php,v 1.21 2003/03/18 13:33:20 nijel Exp $ */
+/* $Id: db_details_links.php,v 1.22 2003/06/05 18:43:19 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -71,12 +71,7 @@ echo PMA_printTab($strStructure, 'db_details_structure.php', $url_query);
 echo PMA_printTab($strSQL, 'db_details.php', $url_query . '&amp;db_query_force=1');
 echo PMA_printTab($strExport, $lnk3, $arg3);
 echo PMA_printTab($strSearch, $lnk4, $arg4);
-
-// Query by example and dump of the db are only displayed if there is at least
-// one table in the db
-if ($num_tables > 0) {
-    echo PMA_printTab($strQBE, 'db_details_qbe.php', $url_query);
-} // end if
+echo PMA_printTab($strQBE, ($num_tables > 0) ? 'db_details_qbe.php' : '', $url_query);
 
 // Displays drop link
 if ($lnk5) {

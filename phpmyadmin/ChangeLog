@@ -2,11 +2,794 @@
 phpMyAdmin - Changelog
 ----------------------
 
-$Id: ChangeLog,v 1.2450 2003/06/02 00:39:00 lem9 Exp $
+$Id: ChangeLog,v 1.2697.2.19 2003/09/07 20:37:17 lem9 Exp $
 $Source: /cvsroot/phpmyadmin/phpMyAdmin/ChangeLog,v $
+
+2003-09-07 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/chinese_big5: removed control/M's 
+    ### 2.5.3 released
+
+2003-09-02 Alexander M. Turek  <rabus@users.sourceforge.net>
+    * Documentation.html:
+      - rewrote FAQ 1.17;
+      - corrected some other FAQs;
+      - tidied up "Requirements" section about MySQL.
+
+2003-09-02 Marc Delisle  <lem9@users.sourceforge.net>
+    * translators.html: azerbaijani, and change of address for
+      swedish translator
+
+2003-09-02 Michal Cihar  <nijel@users.sourceforge.net>
+    * libraries/common.lib.php3: Fix displaying PHP code (bug #798804).
+
+2003-09-01 Michal Cihar  <nijel@users.sourceforge.net>
+    * libraries/mysql_charsets.lib.php3: Name of column is sometimes Default
+      (bug #798426).
+    * lang/estonian: Updated, thanks to Alvar Soome (finsoft).
+    * lang/azerbaijani, lang/sync_lang.sh, libraries/select_lang.lib.php3: New
+      translation, thanks to Shehriyar Imanov (sheki).
+
+2003-08-28 Alexander M. Turek  <rabus@users.sourceforge.net>
+    * README: Updated php / MySQL versions.
+
+2003-08-28 Michal Cihar  <nijel@users.sourceforge.net>
+    * libraries/display_export.lib.php3: Allow xml to be also default export
+      (bug #796706).
+
+2003-08-27 Marc Delisle  <lem9@users.sourceforge.net>
+    ### 2.5.3-rc3 released
+
+2003-08-27 Garvin Hicking <me@supergarv.de>
+    * lang/german*: Update
+
+2003-08-27 Alexander M. Turek  <rabus@users.sourceforge.net>
+    * tbl_change.php3: bug #795171 (foreign field empty when editing record).
+    * browse_foreigners.php3: undefined variable.
+
+2003-08-23 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/galician: Updated, thanks to Xosé Calvo.
+    * lang/spanish: Updated, thanks to Daniel Hinostroza (dhinostroza).
+    * lang/indonesian: Updated, thanks to Rachim Tamsjadi (tamsy).
+    * lang/polish: Updated, thanks to Jakub Wilk (ubanus).
+    * lang/swedish: Updated, thanks to Björn T. Hallberg (bth).
+    * lang/greek update, thanks to Kyriakos Xagoraris (theremon)
+
+2003-08-20 Alexander M. Turek  <rabus@users.sourceforge.net>
+    * server_privileges.php3: Fixed some typos.
+
+2003-08-18 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/romanian: Updated, thanks to Valics Lehel.
+    * lang/turkish update, thanks to Bora Alioglu
+
+2003-08-18 Michal Cihar  <nijel@users.sourceforge.net>
+    * lang/czech: Updated.
+    * lang/catalan: Updated, thanks to Xavier Navarro (xavin).
+    * lang/chinese_big5: Updated, thanks to Siu Sun (siusun).
+    * lang/italian: Updated, thanks to Pietro Danesi (danone).
+    * lang/serbian: Updated, thanks to Mihailo Stefanovic (mikis).
+
+2003-08-17 Marc Delisle  <lem9@users.sourceforge.net>
+    * browse_foreigners.php3, tbl_change.php3, tbl_select.php3,
+      libraries/display_tbl.lib.php3, /relation.lib.php3, /get_foreign.lib.php3:
+      Patch 789367: Browse foreign values, thanks to Garvin
+    ### 2.5.3-rc2 released
+
+2003-08-17 Alexander M. Turek  <rabus@users.sourceforge.net>
+    * translators.html: Garvin is now the official German translator,
+      temporarily.
+
+2003-08-16 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/spanish: Updated, thanks to Daniel Hinostroza (dhinostroza).
+
+2003-08-16 Alexander M. Turek  <rabus@users.sourceforge.net>
+    * Documentation.html: Bad anchor link and other typos.
+
+2003-08-15 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_properties_structure.php3: bug 786710, IE and dropping fields,
+      and bug 788676: added a table to help Netscape aligning the icons
+      with the text
+
+2003-08-15 Garvin Hicking <me@supergarv.de>
+    * tbl_properties_structure.php3: RFE #784900 (show alternate text for
+      multi-submit button)
+    * tbl_properties_structure.php3, db_details_structure.php3: RFE #787810
+      - Enlarge area around the new buttons for better usability
+
+2003-08-15 Michal Cihar  <nijel@users.sourceforge.net>
+    * Documentation: Synced export FAQ with export page.
+    * Documentation: Fixed information about transformations.
+
+2003-08-14 Michal Cihar  <nijel@users.sourceforge.net>
+    * server_privileges.php3: Fix notice about undefined index (bug #780861).
+
+2003-08-13 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_change.php3: do not check both radios (confuses Netscape 4.8)
+
+2003-08-13 Michal Cihar  <nijel@users.sourceforge.net>
+    * tbl_addfield.php3: Highlight correct tab after changing structure.
+    * libraries/sqlparser.lib.php3: Bug #788097 (add space after
+      alpha_variable).
+
+2003-08-12 Michal Cihar  <nijel@users.sourceforge.net>
+    * libraries/export/csv.php3: Don't trim resulting line (bug #782483).
+    * libraries/functions.js: Don't ask for confirmation of query that will
+      not be executed (bug #783667).
+    * lang/slovak: Updated, thanks to Lubos Klokner (erkac).
+    * lang/czech: Updated, thanks to me :).
+
+2003-08-11 Michal Cihar  <nijel@users.sourceforge.net>
+    * libraries/export/csv.php3, libraries/export/latex.php3,
+      libraries/export/xml.php3: Added some stripslashes to generate correct
+      exports.
+
+2003-08-10 Marc Delisle  <lem9@users.sourceforge.net>
+    * server_status.php3: bug 786331, a 100,00% not internationalized,
+      and align values for "More status variables"
+    * libraries/grab_globals.lib.php3: probable fix for IIS HTTP auth bug
+
+2003-08-09 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/auth/cookie.auth.lib.php3: Cookies required message
+      should not look like an error
+
+2003-08-08 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/catalan update, thanks to Xavier Navarro (xavin).
+    * lang/lithuanian: Updated, thanks to Vilius Zigmantas.
+    * lang/polish: Updated, thanks to Jakub Wilk (ubanus).
+    * lang/english, french: typos about $strDBGMaxTimeMs
+
+2003-08-07 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/serbian update, thanks to Mihailo Stefanovic
+    * lang/romanian: Updated, thanks to Valics Lehel.
+    * lang/galician: Updated, thanks to Xosé Calvo.
+    * lang/bulgarian:  Updated, thanks to Stanislav Yordanov (stanprog).
+    * lang/spanish: Updated, thanks to Daniel Hinostroza (dhinostroza).
+    * lang/chinese_gb: Updated, thanks to Wang (fundawang).
+    * lang/swedish: Updated, thanks to Björn T. Hallberg (bth).
+    * Documentation.html: bug 782597: FAQ 1.30 about Turck MMCache
+
+2003-08-06 Marc Delisle  <lem9@users.sourceforge.net>
+    * sql.php3: bug 782925: fix "Showing rows..." message when user has
+      put a LIMIT in the query
+    * libraries/relation.lib.php3: bug 784143: SHOW CREATE TABLE on older
+      MySQL versions
+
+2003-08-06 Michal Cihar  <nijel@users.sourceforge.net>
+    * libraries/common.lib.php3: Parse better enum fields (bug #784154).
+
+2003-08-05 Garvin Hicking <me@supergarv.de>
+    * libraries/common.lib.php3: Moved docu function (PHP3 compatbility)
+      (Bug #782966)
+    * tbl_change.php3: RFE #772991: Shorten dropdown field using
+      $cfg['LimitChars']
+    * tbl_change.php3: RFE #762221: Swap relational insert key order
+
+2003-08-05 Michal Cihar  <nijel@users.sourceforge.net>
+    * sql.php3: Fixed regular expression.
+    * libraries/export/latex.php3: Use "table (field)" instead of
+      "table -> field" when dumping relations into LaTeX (bug #776957).
+    * libraries/display_export.lib.php3, libraries/export/csv.php3,
+      libraries/config_import.lib.php3, config.inc.php3: Allow column headers
+      for Excel export (bug #771299).
+    * header.inc.php3: Don't allow including this file twice.
+    * db_details.php3, db_details_importdocsql.php3, export.php3,
+      tbl_move_copy.php3, tbl_rename.php3: Added some html quoting.
+    * libraries/tbl_change.js: When ENUM field has just one value, it could
+      not be set to NULL (bug #783533).
+    * tbl_move_copy.php3: Use database we're working on to avoid some problems
+      with replicated databases (bug #780439).
+    * read_dump.php3, sql.php3: Bookmark all SQL queries and not only the last
+      one (bug #780569).
+
+2003-08-05 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/sqlparser.data.php3: bug 779453, wrong count
+    * lang/turkish update, thanks to Bora Alioglu
+    * lang/romanian: Updated, thanks to Valics Lehel.
+    * lang/ukrainian: update, thanks to Markijan Baran
+    * sql.php3: bug 782828, do not go into confirm dialog if we are coming
+      from "Create PHP Code" or "Without PHP Code"
+
+2003-08-04 Michal Cihar  <nijel@users.sourceforge.net>
+    * lang/czech: Updated.
+
+2003-08-01 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_select.php3: bug 697979, implemented a suggestion by
+      Joerg Klein (j0erch) to do a SELECT * when all fields were selected
+      on the Select page, to avoid (in most cases) a IE limitation
+
+2003-08-01 Alexander M. Turek  <rabus@users.sourceforge.net>
+    * main.php3: Added link to charset page.
+    * libraries/mysql_charsets.lib.php3, lang/*.inc.php3: More detailed charset
+      information.
+    * tbl_properties_structure.php3: Tooltips for collations.
+
+2003-07-31 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_replace_fields: bug 780793: a '+' sign in ENUM (or SET
+      or a foreign key) was wrongly urldecoded to a space
+    * sql.php3: bug 781170, bad check for DROP DATABASE and IF EXISTS
+
+2003-07-30 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_move_copy.php3: wrong Missing message
+
+2003-07-30 Alexander M. Turek  <rabus@users.sourceforge.net>
+    * server_privileges.php3: Implemented some version checks to avoid bugs like
+      #777785.
+
+2003-07-29 Marc Delisle  <lem9@users.sourceforge.net>
+    * serbian: big update,
+      thanks to Branislav Jovanovic <branej@users.sourceforge.net> and
+      Mihailo Stefanovic <mst@mikis.org>
+    * sql.php3: bug 779301: MySQL 3 and SELECT DISTINCT
+    * lang/spanish: Updated, thanks to Daniel Hinostroza (dhinostroza).
+    * lang/catalan update, thanks to Xavier Navarro (xavin).
+    ### 2.5.3-rc1 released
+
+2003-07-29 Garvin Hicking <me@supergarv.de>
+    * Documentation.html, config.inc.php3, read_dump.php3,
+      css/phpmyadmin.css.php3, libraries/common.lib.php3,
+      libraries/config_import.lib.php3, libraries/sqlparser.lib.php3
+      o Introduced $cfg['IgnoreMultiSubmitErrors'] to let PMA continue
+        execution of a multi-query statement even though single queries
+        may fail
+      o Introduced $cfg['VerboseMultiSubmit'] to let PMA show the result
+        of each query of a multi-query statement (taking some maximum
+        line/pieces amounts into account)
+      o changed formatting of syntax_comment to include some space
+    * libraries/common.lib.php3, libaries/mysql_wrappers.lib.php3:
+      Display MySQL error code and link to the MySQL-Documentation of
+      error codes
+
+2003-07-28 Alexander M. Turek  <rabus@users.sourceforge.net>
+    * tbl_properties_structure.php3, css/phpmyadmin.css.php3: Use icons for
+      multi-submit buttons.
+
+2003-07-28 Garvin Hicking <me@supergarv.de>
+    * sql.php3, libraries/common.lib.php3 - when $cfg['SQP']['fmtType']
+      is set to 'none', positively retain any user formatting for query
+      output. (RFE #769219)
+    * tbl_properties_structure.php3: fixed strNoDrop to strDrop
+
+2003-07-28 Marc Delisle  <lem9@users.sourceforge.net>
+    * sql.php3: bug 778899, could not create a bookmark
+    * ldi_table.php3: Users with register_global=off received some
+      Missing messages, due to a missing "require" in ldi_table.php3
+
+2003-07-27 Alexander M. Turek  <rabus@users.sourceforge.net>
+    * server_privileges.php3: A user could not edit his own global privileges.
+
+2003-07-25 Garvin Hicking <me@supergarv.de>
+    * Documentation.html: Updated my E-Mail, added latest credits-items
+    * images/*, config.inc.php3, db_details_structure.php3,
+      libraries/common.lib.php3, table_details_structure.php3,
+      libraries/display_tbl.lib.php3, Documentation.html,
+      left.php3:
+      Even more new images on more places: DB properties, Table
+      properties, Table Display (LinkOrButton unified as well),
+      Left frame.
+      Multi-column mode also works for MySQL < 3.23.03 (does anybody even
+      care?)
+
+2003-07-25 Marc Delisle  <lem9@users.sourceforge.net>
+    * header.inc.php3: XHTML compatibility
+    * libraries/sqlparser.lib.php3, /relation.lib.php3: bug 776789,
+      unable to insert record with FK in another db
+
+2003-07-24 Garvin Hicking <me@supergarv.de>
+    * libraries/sqlparser.lib.php3 - Confirmation is also needed on
+      TRUNCATE statements!
+    * libraries/common.lib.php3 - RFE #758051 (simpler PHPcode generation)
+    * config.inc.php3, db_details_structure.php3, libraries/common.lib.php3,
+      libraries/config_import.lib.php3: *EXPERIMENTAL* - implemented buttons
+      for the database properties page and implemented RFE #752062: multi-
+      column display for many tables.
+      (thanks to Kawika Ohumukini [boogie33]).
+
+2003-07-24 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/sqlparser.lib.php3 /relation.lib.php3 /get_foreign.lib.php3:
+      bug 772765, InnoDB and multi-columns foreign key
+    * tbl_select.php3: LIKE in Select sub-page for non-text fields
+
+2003-07-23 Alexander M. Turek  <rabus@users.sourceforge.net>
+    * libraries/mysql_charsets.lib.php3:
+      - better method for retrieving the supported MySQL charsets;
+      - fixed a bug that caused "armascii8" to appear twice in the charsets
+        list (as "armascii8" and "armascii");
+      - added ability to retrieve all collations and related MySQL settings;
+      - added a function to build description strings for given collations
+        (still needs some optimization).
+    * libraries/sqlparser.data.php3: Support for SHOW COLLATION.
+    * server_collations.php3, server_links.inc.php3, lang/*.inc.php3:
+      New status page "Character Sets and Collations" for MySQL 4.1.
+
+2003-07-23 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/grab_globals.lib.php3: error when $_SERVER does not exist
+    * tbl_printview.php3: wrong validation for path disclosure (bug 776436)
+
+2003-07-23 Garvin Hicking <me@supergarv.de>
+    * css/phpmyadmin.css.php3: Removed 'lowercase' transform
+      (Bug #769827)
+    * libraries/display_export.lib.php3, libraries/export/sql.php3
+      Only print Update/Creation/Check time when the checkbox 'Include
+      Comments' is chosen. So it is now also possible to check that
+      box even though the relational features could be deactivated.
+      But all checks to relational comments will only use those if
+      the relation features work.
+
+2003-07-22 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/estonian update, thanks to finsoft@sourceforge.net.
+    ### 2.5.2 released
+
+2003-07-20 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_properties_operations.php3: Do not display the
+      "Referential integrity check" section for InnoDB tables
+      as this was intended for pmadb relations
+
+2003-07-19 Marc Delisle  <lem9@users.sourceforge.net>
+    * (in lots of scripts): checks for paths disclosure
+    * lang/catalan update, thanks to Xavier Navarro (xavin).
+
+2003-07-18 Garvin Hicking <me@supergarv.de>
+    * read_dump.php3: When PHP3 < 4.3.0 is detected, try an alternative
+      way of rewriting bookmark variables.
+    * Documentation.html: Bookmark variable expansion only works with PHP
+      4.3.0 and above
+    * tbl_query_box.php3: For the querywindow - if no items are available
+      for the 'file import' tab, hide the 'Go' button and instead display
+      a warning message. Can happen if you don't have $cfg['UploadDir']
+      set and $is_upload is false.
+
+2003-07-17 Marc Delisle  <lem9@users.sourceforge.net>
+    * server_status.php3: the percentages of Query types did not add up
+      to 100, because the number of connections is included in the total
+      number of queries, thanks to jht001 ( Jams H Thompson )
+
+2003-07-17 Alexander M. Turek  <rabus@users.sourceforge.net>
+    * tbl_change.php3, libraries/common.lib.php3: Fixed a MySQL 4.1 bug that
+      appeared when inserting values into ENUM or SET fields.
+
+2003-07-17 Garvin Hicking <me@supergarv.de>
+    * tbl_query_box.php3: Removed onsubmit() attribute of the noscript area.
+      Thanks to andreas_e ;)
+
+2003-07-16 Michal Cihar  <nijel@users.sourceforge.net>
+    * lang/galician: Updated, thanks to Xosé Calvo.
+
+2003-07-16 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/export/sql.php3: bug 771575: wrong quotes for variable expansion
+
+2003-07-16 Alexander M. Turek  <rabus@users.sourceforge.net>
+    * libraries/functions.js: Bug #771794 (CHAR length check although field name
+      is empty).
+
+2003-07-15 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_properties.inc.php3: bug 771523: wrong type displayed for
+      a LONGTEXT with character set latin7
+    * db_details_structure.php3, tbl_properties_structure.php3: missing
+      $err_url for mult_submits
+    * scripts/create-tables.sql: don't use backquotes in USE
+
+2003-07-14 Garvin Hicking <me@supergarv.de>
+    * Documentation.html: Link to phpMyAdmin homepage for a 'link section'
+
+2003-07-14 Alexander M. Turek  <rabus@users.sourceforge.net>
+    * libraries/sqlparser.data.php3: SHOW BINLOG EVENTS.
+
+2003-07-14 Marc Delisle  <lem9@users.sourceforge.net>
+    ### 2.5.2-rc2 released
+
+2003-07-12 Marc Delisle  <lem9@users.sourceforge.net>
+    * mult_submit.inc.php3: bug 770095, error in multiple TRUNCATEs
+    * lang/estonian update, thanks to finsoft@sourceforge.net.
+
+2003-07-11 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/turkish update, thanks to Bora Alioglu
+    * lang/slovak update, thanks to Lubos Klokner
+
+2003-07-11 Alexander M. Turek  <rabus@users.sourceforge.net>
+    * db_create.php3:
+      - Display CREATE DATABASE query;
+      - Call user-defined default tab instead of hardcoded db_details.php3.
+    * index.php3: Don't display scrollbars in queryframe (Opera fix).
+    * libraries/display_export.lib.php3: Disabled XML export for multiple
+      databases because an XML file must not contain more than one database.
+
+2003-07-10 Garvin Hicking <me@supergarv.de>
+    * libraries/display_tbl.lib.php3: Let the default function take
+      the honor to replace special strings, so that a non-default function
+      does not necessary have them introduced. Very convenient for the
+      text/plain->formatted display, which would otherwise get every
+      CR/LF converted to a <br> and introduce nasty skew.
+
+2003-07-10 Marc Delisle  <lem9@users.sourceforge.net>
+    * pdf_schema.php3: do not display a foreign table if it's not selected
+      by user to be on the schema
+
+2003-07-10 Michal Cihar  <nijel@users.sourceforge.net>
+    * lang/spanish: Updated, thanks to Daniel Hinostroza (dhinostroza).
+    * lang/italian: Updated, thanks to Pietro Danesi (danone).
+    * footer.inc.php3: Fix JS error when in query window is not active SQL
+      tab.
+
+2003-07-09 Michal Cihar  <nijel@users.sourceforge.net>
+    * libraries/auth/cookie.auth.lib.php3: Fixed broken login with backslash
+      in password/username (bug #747020).
+    * server_privileges.php3: Fixed escaping when backslash in
+      password/username.
+    * libraries/export/sql.php3: Separate extended inserts by , and not by ;
+      (bug #768351).
+    * lang/chinese_big5: Updated, thanks to Siu Sun (siusun).
+    * lang/spanish: Updated, thanks to Daniel Hinostroza (dhinostroza).
+    * lang/galician: Updated, thanks to Xosé Calvo.
+
+2003-07-09 Garvin Hicking <me@supergarv.de>
+    * tbl_query_box.php3: Fix Bug #768652 (sql history tab submittet to
+      whole frameset)
+    * Documentation.html, config.inc.php3, libraries/common.lib.php3,
+      libraries/config_import.lib.php3, header.inc.php3: Created auto-detection
+      for $cfg['OBGzip'] and set this as default. It will auto-enable OBGzip
+      for all browsers except IE6.x. Created a meta-header to identify which
+      setting is used, to make our debugging of bugreports easier.
+
+2003-07-08 Garvin Hicking <me@supergarv.de>
+    * tbl_query_box.php3, footer.inc.php3: Removed any 'top.' DOM reference.
+      This enables phpMyAdmin to be used within a frameset without trying
+      to escape out of the security JS-sandbox zone. Tested with IE6, Mozilla
+      1.4 and IE5.5.
+
+2003-07-08 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/sqlparser.lib.php3, sql.php3: bug 762213,
+      incorrect row count for MySQL 4.1 subqueries;
+      bug 649665, incorrect row count for UNIONs
+
+2003-07-08 Michal Cihar  <nijel@users.sourceforge.net>
+    * config.inc.php3, tbl_properties_operations.php3,
+      libraries/config_import.lib.php3, libraries/display_export.lib.php3,
+      libraries/export/sql.php3, lang/*: Added checkbox for exporting/copying
+      AUTO_INCREMENT value (RFE #763957).
+    * mult_submits.inc.php3: Fixed undefined variable warning (bug #767740).
+    * pdf_schema.php3: Don't use hardcoded sizes of paper (bug #767680).
+    * lang/chinese_gb: Updated, thanks to Wang (fundawang).
+    * lang/chinese_big5: Updated, thanks to Siu Sun (siusun).
+    * lang/polish: Updated, thanks to Jakub Wilk (ubanus).
+    * lang/romanian: Updated, thanks to Valics Lehel.
+    * lang/swedish: Updated, thanks to Björn T. Hallberg (bth).
+    * lang/slovak: Updated, thanks to Lubos Klokner (erkac).
+    * lang/indonesian: Updated, thanks to Rachim Tamsjadi (tamsy).
+
+2003-07-08 Alexander M. Turek  <rabus@users.sourceforge.net>
+    * libraries/common.lib.php3: Send headers before exiting because of missing
+      MySQL extension.
+    * lang/german-*.inc.php3: Updates.
+
+2003-07-07 Alexander M. Turek  <rabus@users.sourceforge.net>
+    * libraries/common.lib.php3, libraries/config_import.lib.php3: Backwards
+      compatibility.
+    * libraries/common.lib.php3: Dynamic loading of MySQL extension always failed.
+
+2003-07-07 Garvin Hicking <me@supergarv.de>
+    * tbl_change.php3: Fix undefined index for disp_query
+      (when inserting a new row with a file uploaded to a column)
+    * libraries/transformations/image_jpeg__inline.inc.php3,
+      libraries/transformations/image_png__inline.inc.php3: Proper escaping
+      of &amp;
+    * libraries/common.lib.php3, libraries/defines.lib.php3: Safari detection,
+      smaller default font size (like OPERA). Bug #752646.
+
+2003-07-07 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/auth/cookie.auth.lib.php3, config.inc.php3, user_password.php3,
+      Documentation.html: only one blowfish secret is necessary for
+      all servers, thanks to Alexander M. Turek
+    ### 2.5.2-rc1 released
+
+2003-07-06 Michal Cihar  <nijel@users.sourceforge.net>
+    * lang/czech: Updated.
+    * css/phpmyadmin.css.php3: url() should not contain quotes.
+
+2003-07-06 Alexander M. Turek  <rabus@users.sourceforge.net>
+    * lang/german-*.inc.php3: Updates.
+    * libraries/export/sql.php3: Fixed bug #761956 (timestamp export fails).
+
+2003-07-05 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/auth/config.auth.lib.php3, lang/*.php3:
+      $strAccessDeniedExplanation
+    * lang/swedish update, thanks to Björn T. Hallberg (bth).
+    * lang/polish update, thanks to Jakub Wilk (ubanus).
+
+2003-07-05 Michal Cihar  <nijel@users.sourceforge.net>
+    * lang/czech: Updated.
+
+2003-07-04 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/auth/cookie.auth.lib.php3: PHP3 compatibility
+    * user_password.php3, libraries/auth/cookie.auth.lib.php3:
+      sometimes, binary contents in cookies is not retrieved properly,
+      so protect it with base64_encode()
+    * lang/ukrainian: update, thanks to Markijan Baran
+
+2003-07-03 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/romanian update, thanks to Valics Lehel
+    * lang/turkish update, thanks to Bora Alioglu
+    * lang/italian update, thanks to Pietro Danesi
+
+2003-07-01 Marc Delisle  <lem9@users.sourceforge.net>
+    * Documentation.html: faq 8.1 about security alert of 2003-06-18
+    * tbl_properties_links.php3: fix missing SQL section for exports
+    * libraries/auth/cookie.auth.lib.php3, libraries/blowfish.php3,
+      libraries/common.lib.php3, libraries/config_import.lib.php3,
+      config.inc.php3, user_password.php3, Documentation.html, lang/*:
+      now used the blowfish algorithm to encrypt the password in the
+      temporary cookie
+
+2003-06-30 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/french: update
+
+2003-06-30 Michal Cihar  <nijel@users.sourceforge.net>
+    * tbl_properties_operations.php3, lang/*: Reorganised layout a bit, added
+      CHECK link for InnoDB, use correct table type name fo BerkeleyDB.
+    * tbl_query_box.php3: Moved load text files link outside form.
+
+2003-06-27 Garvin Hicking <dont_sobic.c_me_please@supergarv.de>
+    * left.php3: Removed debugging code
+
+2003-06-27 Michal Cihar  <nijel@users.sourceforge.net>
+    * libraries/display_tbl.lib.php3, libraries/relation.lib.php3: Added some
+      checks to avoid trying to use relations when no table (bug #761835).
+
+2003-06-27 Marc Delisle  <lem9@users.sourceforge.net>
+    * sql.php3: bug 760648: incorrect result count on MySQL 3
+
+2003-06-26 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/ukrainian: update, thanks to Markijan Baran
+    * libraries/sqlparser.lib.php3 typo
+
+2003-06-26 Michal Cihar  <nijel@users.sourceforge.net>
+    * sql.php3, tbl_properties_links.php3, tbl_properties_structure.php3: Go
+      back to tbl_properties_structure.php3 when not dropping table.
+
+2003-06-25 Marc Delisle  <lem9@users.sourceforge.net>
+    * scripts/create-release.sh: typo, bzip should be bzip2
+    * libraries/sqlparser.lib.php3, tbl_properties_export.php3:
+      bug 760648 export SELECT DISTINCT results
+
+2003-06-25 Michal Cihar  <nijel@users.sourceforge.net>
+    * libraries/sqlparser.lib.php3: Fixed XSS problem.
+    * tbl_properties.inc.php3, libraries/functions.js: Alert user when not
+      specied length for CHAR/VARCHAR fields.
+    * libraries/export/{csv,latex,xml}.php3: Use correct field names when
+      exporting custom SQL (also saves one SQL query for export) (fixes bug
+      #755386).
+    * lang/italian: Updated, thanks to Pietro Danesi (danone).
+    * lang/norwegian:  Updated, thanks to Sven-Erik Andersen (sven-erik).
+    * lang/bulgarian:  Updated, thanks to Stanislav Yordanov (stanprog).
+    * lang/czech:  Updated.
+    * lang/*: Removed duplicate strReset.
+    * lang/check_lang.sh: Ignore japanese specific messages.
+    * sql.php3, libraries/display_export.lib.php3: Support for exporting any
+      query into CSV/LaTeX/XML (RFE #684804).
+
+2003-06-24 Marc Delisle  <lem9@users.sourceforge.net>
+    * sql.php3, bug 759568, row count, DISTINCT and MySQL 4
+
+2003-06-23 Marc Delisle  <lem9@users.sourceforge.net>
+    * pdf_pages.php3: automatic layout start at 300,300 for better look
+      on the dom-drag scratchboard
+
+2003-06-23 Garvin Hicking <me@supergarv.de>
+    * Documentation.html, config.inc.php3, pdf_pages.php3,
+      css/phpmyadmin.css.php3, libraries/common.lib.php3,
+      libraries/config_import.lib.php3, libraries/dom-drag.js,
+      libraries/functions.js: Added Patch #757907: DHTML WYSIWYG-control
+      for PDF-relation setup. Based on DOM-drag.js, a library provided
+      by Aaron Boodman (youngpup.net).
+    * lang/german*: Updates
+    * lang/*, pdf_pages.php3: Strings for DHTML scratchboard
+
+2003-06-23 Alexander M. Turek  <rabus@users.sourceforge.net>
+    * lang/arabic-*.inc.php3, lang/czech-*.inc.php3, lang/finnish-*.inc.php3,
+      lang/french-*.inc.php3, lang/georgian-utf-8.inc.php3,
+      lang/lithuanian-*.inc.php3, lang/malay-*.inc.php3,
+      lang/russian-*.inc.php3, lang/ukrainian-*.inc.php3: Checked all language
+      files for incomplete arrays ($byteUnits, $day_of_week and $month).
+    * libraries/common.lib.php3: Security fix against bad JS code.
+    * translators.html: Removed Loïc from list; he is inactive at the moment.
+    * Documentation.html: Changed my email address.
+
+2003-06-22 Robin Johnson <robbat2@users.sourceforge.net>
+    * scripts/updatedocs.sh:
+      - Cleanup scripts/updatedocs.sh (I use it elsewhere as well).
+    * scripts/create-release.sh:
+      - Moved to using updatedocs.sh for updating documentation.
+      - Make tarring faster by re-arranging ops.
+
+2003-06-21 Marc Delisle  <lem9@users.sourceforge.net>
+    * sql.php3: typo in call to cleanup columns
+
+2003-06-20 Marc Delisle  <lem9@users.sourceforge.net>
+    * pdf_schema.php3: use PMA_getForeigners()
+    * db_details_qbe.php3: undefined variable
+
+2003-06-20 Garvin Hicking <me@supergarv.de>
+    * db_details_importdocsql.php3: Will now NEVER reveal any filename
+      the docSQL import isn't able to read. Can now only read contents
+      of the 'docSQL' subdirectory and never be able to go higher than
+      that level.
+
+2003-06-19 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/sqlparser.lib.php3: analyzer for FOREIGN KEYS
+    * libraries/sqlparser.lib.php3: bug 756861, DEFAULT 0 becomes DEFAULT0
+    * libraries/display_tbl.lib.php3: use PMA_getForeigners()
+    * libraries/relation.lib.php3: now PMA_getForeigners() gets also
+      foreign keys defined in innnodb
+    * tbl_select.php3: use PMA_getForeigners() also for innodb
+
+2003-06-17 Michal Cihar  <nijel@users.sourceforge.net>
+    * config.inc.php3: Fixed typo (s/'PMA_pdf_page'/'PMA_pdf_pages'/).
+
+2003-06-17 Alexander M. Turek  <rabus@users.sourceforge.net>
+    * lang/polish-*.inc.php3: Updates, thanks to Jakub Wilk (ubanus).
+
+2003-06-16 Michal Cihar  <nijel@users.sourceforge.net>
+    * index.php3: Use $cfg['DefaultTabServer'] (bug #754260).
+
+2003-06-14 Michal Cihar  <nijel@users.sourceforge.net>
+    * export.php3: Fixed saving compressed dumps on server.
+    * libraries/display_export.lib.php3: Fixed description for line
+      terminating character.
+
+2003-06-13 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/sqlparser.data.php3: bug 753813, "session" is not
+      a reserved word
+
+2003-06-13 Michal Cihar  <nijel@users.sourceforge.net>
+    * libraries/charset_conversion.lib.php3, libraries/common.lib.php3,
+      libraries/defines_php.lib.php3, libraries/dbg/setup.php3: Use new PMA_dl
+      function, that checks true dl availability (fixes #747717). All checks
+      are based on php 4.3.1 source, so if this gets changed, we will need to
+      change checks also.
+
+2003-06-12 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/relation.lib.php3: bug 751787: should not disable all
+      the features, when the relation feature is broken
+
+2003-06-11 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/auth/cookie.auth.lib.php3: undefined scheme
+    * main.php3: undefined scheme
+
+2003-06-10 Marc Delisle  <lem9@users.sourceforge.net>
+    * db_details_qbe.php3: bug 751787, missing FROM part in query generator
+    * libraries/export/sql.php3: typo largeblob -> longblob
+
+2003-06-10 Michal Cihar  <nijel@users.sourceforge.net>
+    * scripts/create-release.sh: Set correct permissions before releasing.
+    * Documentation, config.inc.php3, db_details_export.php3, export.php3,
+      main.php3, server_export.php3, server_links.inc.php3, tbl_dump.php3,
+      tbl_move_copy.php3, tbl_properties_export.php3, lang/*,
+      libraries/build_dump.lib.php3, libraries/config_import.lib.php3,
+      libraries/display_export.lib.php3, libraries/export/*: Reworked export,
+      changes:
+        - support for exporting selected databases
+        - if not needed buffering, output is send directly
+        - unifies all export, so there is now more common code
+        - sql export can contain relations and mime types in comments
+        - configurable defaults for export.
+
+2003-06-09 Michal Cihar  <nijel@users.sourceforge.net>
+    * libraries/display_tbl.lib.php3: Display Full/Partial text links for
+      almost every select.
+    * lang/italian: Updated, thanks to Pietro Danesi (danone).
+    * lang/czech: Updated.
+
+2003-06-08 Alexander M. Turek  <rabus@users.sourceforge.net>
+    * server_privileges.php3: MySQL 4.1 users could not edit column privileges.
+    * tbl_properties.inc.php3, tbl_properties_structure.inc.php3:
+      SET and ENUM fields may have a character set, too.
+
+2003-06-07 Alexander M. Turek  <rabus@users.sourceforge.net>
+    * libraries/common.lib.php3: Incremented required config.inc.php3 revision
+      number.
+    * tbl_addfield.php3, tbl_alter.php3, tbl_create.php3,
+      tbl_properties.inc.php3, tbl_properties_operations.php3,
+      tbl_properties_structure.php3, tbl_properties_table_info.php3,
+      libraries/mysql_charsets.lib.php3: Improved MySQL 4.1 support:
+      - phpMyAdmin is now able to assign / alter table and field charsets;
+      - The table structure page sometimes displayed "Array" in the charset
+        column;
+      - When altering the field type, the input box for the field length
+        sometimes had a strange default value.
+
+2003-06-06 Marc Delisle  <lem9@users.sourceforge.net>
+    * Documentation.html, config.inc.php3: new LimitChars behavior
+
+2003-06-06 Michal Cihar  <nijel@users.sourceforge.net>
+    * mult_submits.inc.php3: Missing ;.
+    * libraries/relation_cleanup.lib.php3, mult_submits.inc.php3, sql.php3:
+      Cleanup phpMyAdmin tables also after multi submit actions (RFE #749989).
+    * tbl_query_box.php3: Don't add target if not in query window.
+    * libraries/display_tbl.lib.php3: $cfg['LimitChars'] now limits all fields
+      (RFE #742123).
+    * pdf_pages.php3: Fixed undefined index warnings, don't attemt to
+      edit/display deleted page just after deleting.
+    * libraries/config_import.lib.php3, lang/*, config.inc.php3,
+      db_details_structure.php3, pdf_pages.php3, pdf_schema.php3: User can
+      select paper size for pdf (RFE #631551).
+    * read_dump.php3: Fixed undefined variable warning (bug #750070).
+    * libraries/sqlparser.lib.php3: Fixed bad displaying of parser bug report
+      (bug #678289).
+
+2003-06-05 Marc Delisle  <lem9@users.sourceforge.net>
+    * Documentation.html: new faq 6.20 about CREATE TEMPORARY TABLES
+    * libraries/sqlparser.lib.php3: bug 716679, parsing of negation operator
+    * tbl_properties_links.php3, tbl_properties_operations.php3: merge
+      the Options tab into Operations
+
+2003-06-05 Michal Cihar  <nijel@users.sourceforge.net>
+    * libraries/display_export.lib.php3, libraries/functions.js: Some
+      javascript cleanup.
+    * db_details_links.php3: Display Query tab even with no tables.
+    * libraries/charset_conversion.lib.php3: Default iconv parameters to empty
+      string.
+    * config.inc.php3, left.php3, libraries/config_import.lib.php3: Optional
+      dropdown for server list in left frame (RFE #555978).
+    * tbl_query_box.php3: Possibility to upload SQL file with no database
+      selected (RFE #641760).
+    * lang/czech: Typo.
+
+2003-06-04 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/sqlparser.lib.php3: bug 592692, pretty printer
+      and GRANT or REVOKE
+    * libraries/sqlparser.lib.php3: bug 683975, various pretty printer bugs
+
+2003-06-04 Michal Cihar  <nijel@users.sourceforge.net>
+    * mult_submits.inc.php3: Use TRUNCATE when using MySQL 4 (bug #748792).
+
+2003-06-03 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/spanish: Updates, thanks to Dr. med. Daniel Hinostroza C.
+    * lang/slovak update, thanks to Lubos Klokner
+
+2003-06-03 Michal Cihar  <nijel@users.sourceforge.net>
+    * libraries/config_import.lib.php3: Fixed MySQLManualType/MySQLManualBase
+      setting.
+
+2003-06-03 Garvin Hicking <me@supergarv.de>
+    * lang/*, tbl_query_box.php3, Documentation.html, footer.inc.php3:
+      (Experimental)
+      New feature - The automatic update of the query window seems to
+      cause some headache for users. They type in their query, want to
+      look in a different table for some fields, want to switch back to
+      their browser window and the changes are lost because the last table
+      is always filled in. Now we have a checkbox to preserve the edited
+      content from any update outside of the window. It is automatically
+      checked by editing the contents of the query textarea and can be
+      unchecked to restore previous behaviour. Thanks to Alexander Meis
+      for this suggestion. Optionally we could build in a config variable
+      to override this 'onChange' effect, but I guess it's not necessary.
+    * libraries/display_tbl.lib.php3: Bug #748084 - Use preg_replace instead
+      of ereg_replace, because it interprets \0, \1 and so on not as strings
+      but as regex-subpatterns and fails to convert those strings correctly.
+      We'll have to see if that can be the case on other usages of
+      preg_replace as well.
+
+2003-06-02 Alexander M. Turek  <rabus@users.sourceforge.net>
+    * server_status.php3: RFE #723325 (Move total query statistics).
+
+2003-06-02 Michal Cihar  <nijel@users.sourceforge.net>
+    * libraries/display_tbl.lib.php3, lang/*: Better text on button for
+      executing bookmark (bug #745993).
+    * scripts/create-release.sh: Better checking for input, exit when cvs
+      doesn't work, don't include CVS and .cvsignore in tarballs, don't chmod
+      everything to 775.
+    * libraries/build_dump.lib.php3, libraries/display_export.lib.php3,
+      tbl_dump.php3, lang/*: Allow to replace "NULL" with alternative string
+      (RFE #747343).
+    * Documentation.*: Add simple LaTeX document, to show how to use LaTeX
+      export.
+    * main.php3: Add server to phpinfo link to avoid relogin with more
+      servers.
+    * main.php3, tbl_properties.inc.php3: Replace target="_new" with
+      target="_blank" as it should be.
 
 2003-06-02 Marc Delisle  <lem9@users.sourceforge.net>
     ### 2.5.1 released
+    * (not in 2.5.1) sql.php3: bug 747451, incorrect detection of
+      PROCEDURE ANALYSE()
 
 2003-06-02 Alexander M. Turek  <rabus@users.sourceforge.net>
     * Happy Birthday to me :-)
@@ -99,7 +882,7 @@ $Source: /cvsroot/phpmyadmin/phpMyAdmin/ChangeLog,v $
     * lang/chinese_big5: Updated, thanks to Siu Sun
     ### 2.5.1-rc1 released
 
-2003-05-26 michal cihar  <nijel@users.sourceforge.net>
+2003-05-26 Michal Cihar  <nijel@users.sourceforge.net>
     * documentation, config.inc.php3, tbl_change.php3,
       tbl_properties.inc.php3, libraries/config_import.lib.php3: possibility
       to disable ctrl+arrows moving.
@@ -1944,7 +2727,7 @@ $Source: /cvsroot/phpmyadmin/phpMyAdmin/ChangeLog,v $
 
 
          --- Older ChangeLogs can be found on our project website ---
-                     http://www.phpmyadmin.net/ChangeLogs/
+                     http://www.phpmyadmin.net/old-stuff/ChangeLogs/
 
 # vim: ft=changelog
 # vim: expandtab ts=4 sw=4 sts=4

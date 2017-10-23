@@ -1,5 +1,5 @@
 <?php
-/* $Id: latex.php,v 1.2 2003/06/25 16:19:03 nijel Exp $ */
+/* $Id: latex.php,v 1.4 2003/08/11 08:39:23 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -124,7 +124,7 @@ function PMA_exportData($db, $table, $crlf, $error_url, $sql_query) {
     
     // show column names
     if (isset($GLOBALS['latex_showcolumns'])) {
-        $local_buffer = implode("\000", $columns);
+        $local_buffer = stripslashes(implode("\000", $columns));
         for($k=0;$k<count($tex_escape);$k++) {
             $local_buffer = str_replace($tex_escape[$k], '\\' . $tex_escape[$k], $local_buffer);
         }
@@ -141,7 +141,7 @@ function PMA_exportData($db, $table, $crlf, $error_url, $sql_query) {
         // print each row
         for($i = 0; $i < $columns_cnt; $i++) {
             if ( isset($record[$columns[$i]]) && (!function_exists('is_null') || !is_null($record[$columns[$i]]))) {
-                $column_value = $record[$columns[$i]];
+                $column_value = stripslashes($record[$columns[$i]]);
 
                 //    $ % { } & # _ ^
                 // escaping special characters
@@ -306,7 +306,7 @@ function PMA_exportStructure($db, $table, $crlf, $error_url, $do_relation = fals
         if ($do_relation && $have_rel) {
             $local_buffer .= "\000";
             if (isset($res_rel[$field_name])) {
-                $local_buffer .= $res_rel[$field_name]['foreign_table'] . ' -> ' . $res_rel[$field_name]['foreign_field'];
+                $local_buffer .= $res_rel[$field_name]['foreign_table'] . ' (' . $res_rel[$field_name]['foreign_field'] . ')';
             }
         }
         if ($do_comments && $cfgRelation['commwork']) {

@@ -1,9 +1,9 @@
 #
-# $Id: Encode.pm,v 1.95 2003/05/21 08:40:59 dankogai Exp $
+# $Id: Encode.pm,v 1.83 2002/11/18 17:28:29 dankogai Exp $
 #
 package Encode;
 use strict;
-our $VERSION = do { my @r = (q$Revision: 1.95 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
+our $VERSION = do { my @r = (q$Revision: 1.83 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
 our $DEBUG = 0;
 use XSLoader ();
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -131,7 +131,6 @@ sub resolve_alias {
 sub encode($$;$)
 {
     my ($name, $string, $check) = @_;
-    return undef unless defined $string;
     $check ||=0;
     my $enc = find_encoding($name);
     unless(defined $enc){
@@ -146,7 +145,6 @@ sub encode($$;$)
 sub decode($$;$)
 {
     my ($name,$octets,$check) = @_;
-    return undef unless defined $octets;
     $check ||=0;
     my $enc = find_encoding($name);
     unless(defined $enc){
@@ -161,7 +159,6 @@ sub decode($$;$)
 sub from_to($$$;$)
 {
     my ($string,$from,$to,$check) = @_;
-    return undef unless defined $string;
     $check ||=0;
     my $f = find_encoding($from);
     unless (defined $f){
@@ -271,19 +268,6 @@ sub predefine_encodings{
 		return $octets;
 	    };
 	}
-	*cat_decode = sub{ # ($obj, $dst, $src, $pos, $trm, $chk)
-	    my ($obj, undef, undef, $pos, $trm) = @_; # currently ignores $chk
-	    my ($rdst, $rsrc, $rpos) = \@_[1,2,3];
-	    use bytes;
-	    if ((my $npos = index($$rsrc, $trm, $pos)) >= 0) {
-		$$rdst .= substr($$rsrc, $pos, $npos - $pos + length($trm));
-		$$rpos = $npos + length($trm);
-		return 1;
-	    }
-	    $$rdst .= substr($$rsrc, $pos);
-	    $$rpos = length($$rsrc);
-	    return '';
-	};
 	$Encode::Encoding{utf8} =
 	    bless {Name => "utf8"} => "Encode::utf8";
     }
@@ -543,11 +527,11 @@ except for hz and ISO-2022-kr.  For gory details, see L<Encode::Encoding> and L<
 
 =head1 Handling Malformed Data
 
+=over 2
+
 The I<CHECK> argument is used as follows.  When you omit it,
 the behaviour is the same as if you had passed a value of 0 for
 I<CHECK>.
-
-=over 2
 
 =item I<CHECK> = Encode::FB_DEFAULT ( == 0)
 
@@ -622,8 +606,6 @@ constants via C<use Encode qw(:fallback_all)>.
  HTMLCREF      0x0200
  XMLCREF       0x0400
 
-=back
-
 =head2 Unimplemented fallback schemes
 
 In the future, you will be able to use a code reference to a callback
@@ -692,7 +674,7 @@ Here is how Encode takes care of the utf8 flag.
 
 When you encode, the resulting utf8 flag is always off.
 
-=item *
+=item
 
 When you decode, the resulting utf8 flag is on unless you can
 unambiguously represent data.  Here is the definition of

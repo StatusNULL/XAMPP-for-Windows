@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_create.php,v 1.18 2003/01/08 13:50:26 nijel Exp $ */
+/* $Id: db_create.php,v 1.20 2003/07/19 10:43:59 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -10,6 +10,11 @@ require('./libraries/grab_globals.lib.php');
 $js_to_run = 'functions.js';
 require('./header.inc.php');
 
+if (!defined('PMA_COMMON_LIB_INCLUDED')) {
+    include('./libraries/common.lib.php');
+}
+
+PMA_checkParameters(array('db'));
 
 /**
  * Defines the url to return to in case of error in a sql statement
@@ -27,14 +32,14 @@ if (PMA_MYSQL_INT_VERSION < 32306) {
 /**
  * Executes the db creation sql query
  */
-$local_query = 'CREATE DATABASE ' . PMA_backquote($db);
-$result      = PMA_mysql_query('CREATE DATABASE ' . PMA_backquote($db)) or PMA_mysqlDie('', $local_query, FALSE, $err_url);
+$sql_query = 'CREATE DATABASE ' . PMA_backquote($db);
+$result      = PMA_mysql_query('CREATE DATABASE ' . PMA_backquote($db)) or PMA_mysqlDie('', $sql_query, FALSE, $err_url);
 
 
 /**
- * Displays the result and moves back to the calling page
+ * Displays the result and calls default page
  */
 $message = $strDatabase . ' ' . htmlspecialchars($db) . ' ' . $strHasBeenCreated;
-require('./db_details.php');
+require('./' . $cfg['DefaultTabDatabase']);
 
 ?>

@@ -1,9 +1,9 @@
-# NOTE: Derived from blib\lib\Storable.pm.
+# NOTE: Derived from ..\..\lib\Storable.pm.
 # Changes made here will be lost when autosplit is run again.
 # See AutoSplit.pm.
 package Storable;
 
-#line 347 "blib\lib\Storable.pm (autosplit into blib\lib\auto\Storable\thaw.al)"
+#line 347 "..\..\lib\Storable.pm (autosplit into ..\..\lib\auto\Storable\thaw.al)"
 #
 # thaw
 #
@@ -20,9 +20,6 @@ sub thaw {
 	$@ = $da;
 	return $self;
 }
-
-1;
-__END__
 
 1;
 # end of Storable::thaw

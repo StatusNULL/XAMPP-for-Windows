@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_printview.php,v 1.28 2003/03/13 16:44:54 garvinhicking Exp $ */
+/* $Id: db_printview.php,v 1.29 2003/07/19 11:10:20 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -9,6 +9,13 @@
 require('./libraries/grab_globals.lib.php');
 require('./header.inc.php');
 
+// Check parameters
+
+if (!defined('PMA_COMMON_LIB_INCLUDED')) {
+    include('./libraries/common.lib.php');
+}
+
+PMA_checkParameters(array('db'));
 
 /**
  * Defines the url to return to in case of error in a sql statement

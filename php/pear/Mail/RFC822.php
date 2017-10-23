@@ -1,23 +1,37 @@
 <?php
-//
-// +----------------------------------------------------------------------+
-// | PHP Version 4                                                        |
-// +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2002 The PHP Group                                |
-// +----------------------------------------------------------------------+
-// | This source file is subject to version 2.02 of the PHP license,      |
-// | that is bundled with this package in the file LICENSE, and is        |
-// | available at through the world-wide-web at                           |
-// | http://www.php.net/license/2_02.txt.                                 |
-// | If you did not receive a copy of the PHP license and are unable to   |
-// | obtain it through the world-wide-web, please send a note to          |
-// | license@php.net so we can mail you a copy immediately.               |
-// +----------------------------------------------------------------------+
-// | Authors: Richard Heyes <richard@phpguru.org>                         |
-// |          Chuck Hagenbuch <chuck@horde.org>                           |
-// +----------------------------------------------------------------------+
-
-require_once ('PEAR.php');
+// +-----------------------------------------------------------------------+
+// | Copyright (c) 2001-2002, Richard Heyes                                |
+// | All rights reserved.                                                  |
+// |                                                                       |
+// | Redistribution and use in source and binary forms, with or without    |
+// | modification, are permitted provided that the following conditions    |
+// | are met:                                                              |
+// |                                                                       |
+// | o Redistributions of source code must retain the above copyright      |
+// |   notice, this list of conditions and the following disclaimer.       |
+// | o Redistributions in binary form must reproduce the above copyright   |
+// |   notice, this list of conditions and the following disclaimer in the |
+// |   documentation and/or other materials provided with the distribution.| 
+// | o The names of the authors may not be used to endorse or promote      |
+// |   products derived from this software without specific prior written  |
+// |   permission.                                                         |
+// |                                                                       |
+// | THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS   |
+// | "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT     |
+// | LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR |
+// | A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT  |
+// | OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, |
+// | SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT      |
+// | LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, |
+// | DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY |
+// | THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT   |
+// | (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE |
+// | OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  |
+// |                                                                       |
+// +-----------------------------------------------------------------------+
+// | Authors: Richard Heyes <richard@phpguru.org>                          |
+// |          Chuck Hagenbuch <chuck@horde.org>                            |
+// +-----------------------------------------------------------------------+
 
 /**
 * RFC 822 Email address list validation Utility
@@ -32,17 +46,18 @@ require_once ('PEAR.php');
 *
 * How do I use it?
 *
-* $address_string = 'My Group: "Richard Heyes" <richard@localhost> (A comment), ted@example.com (Ted Bloggs), Barney;';
-* $structure = Mail_RFC822::parseAddressList($address_string, 'example.com', TRUE)
+* $address_string = 'My Group: "Richard" <richard@localhost> (A comment), ted@example.com (Ted Bloggs), Barney;';
+* $structure = Mail_RFC822::parseAddressList($address_string, 'example.com', true)
 * print_r($structure);
 *
 * @author  Richard Heyes <richard@phpguru.org>
 * @author  Chuck Hagenbuch <chuck@horde.org>
-* @version $Revision: 1.18.2.1 $
+* @version $Revision: 1.10 $
+* @license BSD
 * @package Mail
 */
 
-class Mail_RFC822 extends PEAR{
+class Mail_RFC822 {
 
     /**
      * The address being parsed by the RFC822 object.
@@ -171,19 +186,17 @@ class Mail_RFC822 extends PEAR{
         }
         
         if ($this->address === false || isset($this->error)) {
-            return $this->raiseError($this->error);
+            require_once 'PEAR.php';
+            return PEAR::raiseError($this->error);
         }
-
-        // Reset timer since large amounts of addresses can take a long time to
-        // get here
-        set_time_limit(30);
 
         // Loop through all the addresses
         for ($i = 0; $i < count($this->addresses); $i++){
 
             if (($return = $this->_validateAddress($this->addresses[$i])) === false
                 || isset($this->error)) {
-                return $this->raiseError($this->error);
+                require_once 'PEAR.php';
+                return PEAR::raiseError($this->error);
             }
             
             if (!$this->nestGroups) {
@@ -584,6 +597,7 @@ class Mail_RFC822 extends PEAR{
         // A couple of defaults.
         $phrase  = '';
         $comment = '';
+        $comments = array();
 
         // Catch any RFC822 comments and store them separately
         $_mailbox = $mailbox;
@@ -604,9 +618,10 @@ class Mail_RFC822 extends PEAR{
             }
         }
 
-        for($i=0; $i<count(@$comments); $i++){
-            $mailbox = str_replace('('.$comments[$i].')', '', $mailbox);
+        foreach ($comments as $comment) {
+            $mailbox = str_replace("($comment)", '', $mailbox);
         }
+
         $mailbox = trim($mailbox);
 
         // Check for name + route-addr
@@ -863,6 +878,29 @@ class Mail_RFC822 extends PEAR{
     function approximateCount($data)
     {
         return count(preg_split('/(?<!\\\\),/', $data));
+    }
+    
+    /**
+    * This is a email validating function seperate to the rest
+    * of the class. It simply validates whether an email is of
+    * the common internet form: <user>@<domain>. This can be
+    * sufficient for most people. Optional stricter mode can
+    * be utilised which restricts mailbox characters allowed
+    * to alphanumeric, full stop, hyphen and underscore.
+    *
+    * @param  string  $data   Address to check
+    * @param  boolean $strict Optional stricter mode
+    * @return mixed           False if it fails, an indexed array
+    *                         username/domain if it matches
+    */
+    function isValidInetAddress($data, $strict = false)
+    {
+        $regex = $strict ? '/^([.0-9a-z_-]+)@(([0-9a-z-]+\.)+[0-9a-z]{2,4})$/i' : '/^([*+!.&#$|\'\\%\/0-9a-z^_`{}=?~:-]+)@(([0-9a-z-]+\.)+[0-9a-z]{2,4})$/i';
+        if (preg_match($regex, trim($data), $matches)) {
+            return array($matches[1], $matches[2]);
+        } else {
+            return false;
+        }
     }
 }
 ?>

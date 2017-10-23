@@ -6,7 +6,7 @@
    Transformations  -  FAQ  -  Developers  -  Credits  -  Translators
    ______________________________________________________________________
    
-                        phpMyAdmin 2.5.1 Documentation
+                        phpMyAdmin 2.5.3 Documentation
                                        
      * SourceForge phpMyAdmin project page   [ http://www.phpmyadmin.net/
        ] 
@@ -14,8 +14,8 @@
           + Version history: ChangeLog
           + General notes: README
           + License: LICENSE
-     * Documentation version: $Id: Documentation.html,v 1.452 2003/06/02
-       00:40:13 lem9 Exp $
+     * Documentation version: $Id: Documentation.html,v 1.493.2.4
+       2003/09/07 20:21:14 lem9 Exp $
        
 Requirements
 
@@ -23,10 +23,9 @@ Requirements
        function that was added in PHP 3.0.6, but was buggy up until
        PHP 3.0.8. Then you should not run this script with PHP3 < 3.0.8.
        PHP also needs to be compiled with MySQL support;
-       If you want to display inline thumbnails of JPEGs, you also need
-       GD2 support in PHP.
-     * MySQL (tested with 3.21.x, 3.22.x, 3.23.x, 4.0.x and 4.1.x);
-       Note: The implemented MySQL 4.1.x support is experimental!
+       If you want to display inline thumbnails of JPEGs with the
+       original aspect ratio, you also need GD2 support in PHP.
+     * MySQL 3.21 or newer (details);
      * a web-browser (doh!).
        
 Introduction
@@ -104,15 +103,17 @@ Installation
        your databases, or a login dialog if using HTTP or cookie
        authentication mode.
     6. For a whole set of new features (bookmarks, comments, SQL-history,
-       PDP-generation) you need to create a set of tables in your
-       database. Please look at your scripts/ directory, where you should
-       find a file called create_tables.sql. You can already use your
-       phpMyAdmin to create the tables for you. Please be aware that you
-       may have to have special (administrator) privileges to create the
-       database and tables. After having imported the create_tables.sql
-       file, you should specify the table names in your config.inc.php3
-       file. The directives used for that can be found in the
-       Configuration section.
+       PDF-generation, field contents transformation, etc.) you need to
+       create a set of tables in your database. Please look at your
+       scripts/ directory, where you should find a file called
+       create_tables.sql. (If you are using a Windows server, pay special
+       attention to FAQ 1.23). You can already use your phpMyAdmin to
+       create the tables for you. Please be aware that you may have to
+       have special (administrator) privileges to create the database and
+       tables. After having imported the create_tables.sql file, you
+       should specify the table names in your config.inc.php3 file. The
+       directives used for that can be found in the Configuration
+       section.
        
    Upgrading from an older version:
      * Please do not copy your older config.inc.php3 over the new one: it
@@ -136,8 +137,8 @@ Installation
        section).
        However, keep in mind that the password travels in plain text,
        unless you are using the HTTPS protocol.
-       In cookie mode, we send the password in a temporary cookie, so
-       most browsers should not store the password in their cookie file.
+       In cookie mode, the password is stored, encrypted with the
+       blowfish algorithm, in a temporary cookie.
      * For 'HTTP' and 'cookie' modes, phpMyAdmin needs a controluser that
        has only the SELECT privilege on the mysql.user (all columns
        except "Password"), mysql.db (all columns) & mysql.tables_priv
@@ -176,7 +177,7 @@ GRANT SELECT (
        ... and if you want to use the many new relation and bookmark
        features:
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON <pma_db> TO 'pma'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON <pma_db>.* TO 'pma'@'localhost';
 
        (this of course requires you to have a special DB for phpMyAdmin,
        the contents will be explained later)
@@ -282,6 +283,12 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
           If you do not want to use those features set this variable to
           TRUE to stop this message from appearing.
           
+   $cfg['blowfish_secret'] string
+          Starting with version 2.5.2, the 'cookie' auth_type uses
+          blowfish algorithm to encrypt the password.
+          If at least one server configuration uses 'cookie' auth_type,
+          enter here a passphrase that will be used by blowfish.
+          
    $cfg['Servers'] array
           Since version 1.4.2, phpMyAdmin supports the administration of
           multiple MySQL servers. Therefore, a $cfg['Servers']-array has
@@ -293,7 +300,8 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
           free the hostname of the other $cfg['Server']-entries.
           
    $cfg['Servers'][$i]['host'] string
-          The hostname of your $i-th MySQL-server. E.g. localhost.
+          The hostname or IP address of your $i-th MySQL-server. E.g.
+          localhost.
           
    $cfg['Servers'][$i]['port'] string
           The port-number of your $i-th MySQL-server. Default is 3306
@@ -389,6 +397,9 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
           to work with master / foreign - tables. To use those as well as
           the bookmark feature you need special tables with a predefined
           structure, which we explain below.
+          See the Quick Install section in this document for a quick way
+          of creating those tables. Also, if you are using a Windows
+          server, read FAQ 1.23.
           If you are the only user of this phpMyAdmin installation, you
           can use your current database to store those special tables; in
           this case, just put your current database name in
@@ -435,11 +446,14 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
           + display in an optional tool-tip the "display field" when
             browsing the master table, if you move the mouse to a column
             containing a foreign key (use also the 'table_info' table);
+            (see FAQ 6.7)
+          + in edit/insert mode, display a drop-down list of possible
+            foreign keys (key value and "display field" are shown)
+            (see FAQ 6.21)
           + display links on the table properties page, to check
             referential integrity (display missing foreign keys) for each
             described key;
-          + in query-by-example, create automatic joins (see an example
-            in the FAQ, section "Using phpMyAdmin");
+          + in query-by-example, create automatic joins (see FAQ 6.6)
           + enable you to get a PDF schema of your database (also uses
             the table_coords table).
             
@@ -663,9 +677,14 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
           If you have only one server configured, $cfg['ServerDefault']
           MUST be set to that server.
           
-   $cfg['OBGzip'] boolean
+   $cfg['OBGzip'] string/boolean
           Defines whether to use GZip output buffering for increased
           speed in HTTP transfers.
+          Set to true/false for enabling/disabling. When set to 'auto'
+          (string), phpMyAdmin tries to enable output buffering and will
+          automatically disable it, if your browser has some problems
+          with buffering. IE6 with a certain patch is known to cause data
+          corruption having enabled buffering.
           
    $cfg['PersistentConnections'] boolean
           Whether persistent connections should be used or not
@@ -703,6 +722,16 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
    $cfg['UseDbSearch'] boolean
           Define whether the "search string inside database" is enabled
           or not.
+          
+   $cfg['IgnoreMultiSubmitErrors'] boolean
+          Define whether phpMyAdmin will continue executing a multi-query
+          statement if one of the queries fails. Default is to abort
+          execution.
+          
+   $cfg['VerboseMultiSubmit'] boolean
+          Define whether phpMyAdmin will output the results of each query
+          of a multi-query statement embedded into the SQL output as
+          inline comments. Defaults to TRUE.
           
    $cfg['LeftFrameLight'] boolean
           Defines whether to use select-based menu and display only the
@@ -821,6 +850,19 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
    $cfg['LightTabs'] string
           If set to True, do use less graphically intense tabs on the top
           of the mainframe.
+          
+   $cfg['PropertiesIconic'] string
+          If set to True, will display icons instead of text for db and
+          table properties links (like 'Browse', 'Select', 'Insert',
+          ...).
+          Can be set to 'both' if you want icons AND text.
+          When set to False, will only show text.
+          
+   $cfg['PropertiesNumColumns'] integer
+          How many columns will be utilized to display the tables on the
+          database property view? Default is 1 column. When setting this
+          to a value larger than 1, the type of the database will be
+          omitted for more display space.
           
    $cfg['DefaultTabServer'] string
           Defines the tab displayed by default on server view. Possible
@@ -975,7 +1017,7 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
           Enable Ctrl+Arrows moving between fields when editing?
           
    $cfg['LimitChars'] integer
-          Maximal number of Chars showed in a TEXT OR a BLOB field on
+          Maximal number of Chars showed in any non-numeric field on
           browse view. Can be turned off by a toggle button on the browse
           page.
           
@@ -1038,6 +1080,11 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
           must be owned by the same user as the owner of the phpMyAdmin
           scripts.
           
+   $cfg['Export'] array
+          In this array are defined default parameters for export, names
+          of items are simmilar to texts seen on export page, so you can
+          easily identify what they mean.
+          
    $cfg['RepeatCells'] integer
           Repeat the headers every X cells, or 0 to deactivate.
           
@@ -1070,7 +1117,17 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
           window is opened they remain saved.
           When using the JavaScript based query window, it will always
           get updated when you click on a new table/db to browse and will
-          focus if you click on "Edit SQL" after using a query.
+          focus if you click on "Edit SQL" after using a query. You can
+          suppress updating the query window by checking the box "Do not
+          overwrite this query from outside the window" below the query
+          textarea. Then you can browse tables/databases in the
+          background without losing the contents of the textarea, so this
+          is especially useful when composing a query with tables you
+          first have to look in. The checkbox will get automatically
+          checked whenever you change the contents of the textarea.
+          Please uncheck the button whenever you definitely want the
+          query window to get updated even though you have made
+          alterations.
           If $cfg['QueryHistoryDB'] is set to TRUE you can specify the
           amount of saved history items using $cfg['QueryHistoryMax'].
           The query window also has a custom tabbed look to group the
@@ -1089,6 +1146,33 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
           count by SELECT COUNT. If approximate row count is smaller than
           this value, SELECT COUNT will be used, otherwise only value
           returned by SHOW TABLE STATUS.
+          
+   $cfg['WYSIWYG-PDF'] boolean
+          Utilizes a WYSIWYG editing control to easily place elements of
+          a PDF page. By clicking on the button 'toggle scratchboard' on
+          the page where you edit x/y coordinates of those elements you
+          can activate a scratchboard where all your elements are placed.
+          By clicking on an element, you can move them around in the
+          pre-defined area and the x/y coordinates will get updated
+          dynamically. Likewise, when entering a new position directly
+          into the input field, the new position in the scratchboard
+          changes after your cursors leaves the input field.
+          You have to click on the 'OK'-button below the tables to save
+          the new positions. If you want to place a new element, first
+          add it to the table of elements and then you can drag the new
+          element around.
+          By changing the paper size and the orientation you can change
+          the size of the scratchboard as well. You can do so by just
+          changing the dropdown field below, and the scratchboard will
+          resize automatically, without interfering with the current
+          placement of the elements.
+          If ever an element gets out of range you can either enlarge the
+          paper size or click on the 'reset' button to place all elements
+          below each other.
+          NOTE: You have to use a recent browser like IE6 or Mozilla to
+          get this control to work. The basic Drag&Drop script
+          functionality was kindly borrowed from www.youngpup.net and is
+          underlying so specific license.
           
    $cfg['SQP']['fmtType'] string [html|none]
           The main use of the new SQL Parser is to pretty-print SQL
@@ -1217,12 +1301,16 @@ Transformations
    <www.your-host.com>/<your-install-dir>/libraries/transformations/overv
    iew.php3 installation.
    
+   For a tutorial on how to effectively use transformations, see our Link
+   section on the official phpMyAdmin-homepage.
+   
   [2. Usage]
   
    Go to your tbl_properties.inc.php3 page (i.e. reached through clicking
-   on the 'properties' link for a table). There you will see three new
-   fields at the end of the line. They are called 'MIME-type', 'Browser
-   transformation' and 'Transformation options'.
+   on the 'properties' link for a table). There click on "Change" (or
+   change icon) and there you will see three new fields at the end of the
+   line. They are called 'MIME-type', 'Browser transformation' and
+   'Transformation options'.
      * The field 'MIME-type' is a dropdown field. You have the options to
        leave that field empty or to use 'auto' [this feature is not yet
        available]. Please note that transformations are inactive as long
@@ -1358,7 +1446,11 @@ Transformations
 FAQ - Frequently Asked Questions
 
    Server  -  Configuration  -  Limitations  -  Multi-user  -  Browsers
-   -  Usage tips  -  Project  -
+   -  Usage tips  -  Project  -  Security
+   
+   Please have a look at our Link section on the official phpMyAdmin
+   homepage for in-depth coverage of phpMyAdmin's features and/or
+   interface.
    
   [1. Server]
   
@@ -1499,7 +1591,7 @@ FAQ - Frequently Asked Questions
    and password. Please modify your field names to align with current
    standards.
    
-    [1.16] I cannot upload big dump files.
+    [1.16] I cannot upload big dump files (memory, http or timeout problems).
     
    The first things to check (or ask your host provider to check) are the
    values of upload_max_filesize, memory_limit and post_max_size in the
@@ -1507,16 +1599,26 @@ FAQ - Frequently Asked Questions
    All of these three settings limit the maximum size of data that can be
    submitted and handled by PHP. One user also said that post_max_size
    and memory_limit need to be larger than upload_max_filesize.
+   If you get a timeout problem, look at the $cfg['UploadDir'] feature.
    
-    [1.17] Does phpMyAdmin support MySQL 4.1 and 5.0?
+    [1.17] Which MySQL versions does phpMyAdmin support?
     
-   phpMyAdmin provides limited support for MySQL 4.1. That means that you
-   can neither assign character sets to a table or field on create nor
-   change the (automatically) assigned character set.
-   When compiling php, we strongly recommend that you manually link it to
-   a MySQL 4.1 client library since the one that is currently bundled
-   with php is rather old and might cause problems.
-   MySQL 5 is not yet supported.
+   All MySQL versions from 3.21 till 4.0 are fully supported. Please note
+   that the older your MySQL version is, the more limitations you will
+   have to face.
+   phpMyAdmin provides experimental support for MySQL 4.1. That means
+   that although you can assign character sets to a table or field,
+   phpMyAdmin will not recode the data when inserting or extracting it.
+   Instead, it will still use the character set you specified for the
+   MySQL connection.
+   When compiling php, we strongly recommend that you manually link the
+   MySQL extension to a MySQL client library of at least the same version
+   since the one that is bundled with php 4.x is rather old and might
+   cause problems.
+   Also, we do not yet support the imporoved MySQL extension (mysqli)
+   that comes with php 5. For the moment, the old MySQL extension should
+   also work fine here, if compiled correctly.
+   MySQL 5.0 and 5.1 are not yet supported.
    
     [1.18] I'm running MySQL <= 4.0.1 having lower_case_table_names set to 1.
     If I create a new table with a capital letter in its name it is changed to
@@ -1537,10 +1639,10 @@ FAQ - Frequently Asked Questions
     Configuration".
     
    To connect to a MySQL server, PHP needs a set of MySQL functions
-   called "MySQL extension". This extension may be part of the PHP server
-   (compiled-in), otherwise it needs to be loaded dynamically. Its name
-   is probably mysql.so or mysql.dll. phpMyAdmin tried to load the
-   extension but failed.
+   called "MySQL extension". This extension may be part of the PHP
+   distribution (compiled-in), otherwise it needs to be loaded
+   dynamically. Its name is probably mysql.so or php_mysql.dll.
+   phpMyAdmin tried to load the extension but failed.
    Usually, the problem is solved by installing a software package called
    "PHP-MySQL" or something similar.
    
@@ -1591,7 +1693,7 @@ FAQ - Frequently Asked Questions
    should work.
    
     [1.27] I get empty page when I want to view huge page (eg.
-    db_details_structure.php3 with plenty of dabases).
+    db_details_structure.php3 with plenty of tables).
     
    This is a PHP bug that occur when GZIP output buffering enabled. If
    you turn off it (by $cfg['OBGzip'] = FALSE in config.inc.php3), it
@@ -1623,6 +1725,11 @@ FAQ - Frequently Asked Questions
    of lines and restart Apache:
    #SetOutputFilter PHP
    #SetInputFilter PHP
+   
+    [1.30] I get the error "left.php: Missing hash".
+    
+   This problem is known to happen when the server is running Turck
+   MMCache but upgrading MMCache to version 2.3.21 solves the problem.
    
   [2. Configuration]
   
@@ -1706,10 +1813,9 @@ FAQ - Frequently Asked Questions
     relogin in with the same nick.
     
    This is related to the authentication mechanism (protocol) used by
-   phpMyAdmin. We plan to change it as soon as we may find enough free
-   time to do it, but you can bypass this problem: just close all the
-   opened browser windows and then go back to phpMyAdmin. You should be
-   able to log in again.
+   phpMyAdmin. To bypass this problem: just close all the opened browser
+   windows and then go back to phpMyAdmin. You should be able to log in
+   again.
    
     [3.2] When dumping a large table in compressed mode, I get a memory limit
     error or a time limit error.
@@ -2038,6 +2144,8 @@ FAQ - Frequently Asked Questions
    Starting from the previous example, create the PMA_table_info as
    explained in the configuration section, then browse your persons
    table, and move the mouse over a town code or country code.
+   See also FAQ 6.21 for an additionnal feature that "display field"
+   enables: drop-down list of possible values.
    
     [6.8] How can I produce a PDF schema of my database?
     
@@ -2049,19 +2157,23 @@ FAQ - Frequently Asked Questions
      * Choose "Structure" in the navigation on top
      * Choose "Edit PDF Pages" which should be somewhere at the bottom of
        the page
-     * Enter the name for a first pdf page and submit
+     * Enter the name for a first pdf page and submit (you can also use
+       the "Automatic layout", which will place on your page all the
+       tables that are linked)
      * Choose this page to edit
-     * Now add a table you want to show on this page and it's coordinates
+     * Now add a table you want to show on this page and its coordinates
        and submit
-       First you will have to guess this coordinates of course, so just
+       First you will have to guess those coordinates of course, so just
        expect to have an area of about 297 * 210 and put the tables
        coordinates somewhere in there, you will be able to have a look at
        what happened and change them later.
        For example, x=100 and y=200 means that the table will be at 200
        mm down and 100 mm right from the upper left corner.
        Actually if you have a width of more than 300 or a height of more
-       than 200 than it will automatically be scaled but 300*100 is a
+       than 200 then it will automatically be scaled but 200*100 is a
        good start to have an idea of what coordinates to use.
+     * There is also a visual editor (scratchboard) available, see the
+       explanation at the $cfg['WYSIWYG-PDF'] section.
      * After every table you submitted you will have the possibility to
        submit more tables
      * When you have entered enough tables Click on your db name in the
@@ -2103,8 +2215,10 @@ FAQ - Frequently Asked Questions
    INSERT verb and the table name.
    "Enclose table and field names with backquotes" ensures that field and
    table names formed with special characters are protected.
-   "Include column comments as inline SQL-comments" includes any column
-   comments set in the PMA-DB in the dump as SQL comments (/* xxx */).
+   "Add AUTO_INCREMENT value" ensures, that AUTO_INCREMENT value (if any)
+   will be included in backup.
+   "Add into comments" includes column comments, relations and MIME types
+   set in the PMA-DB in the dump as SQL comments (/* xxx */).
    
     [6.13] I would like to create a database with a dot in its name.
     
@@ -2154,7 +2268,7 @@ FAQ - Frequently Asked Questions
    Plus, you have a whole overview of available mimetypes. Who knows all
    those mimetypes by heart so he/she can enter it at will?
    
-    [6.17] Bookmarks: Where can I store bookmarks? Why can't I see any
+    [6.18] Bookmarks: Where can I store bookmarks? Why can't I see any
     bookmarks below the query box? What is this variable for?
     
    Any query you have executed can be stored as a bookmark on the page
@@ -2192,6 +2306,37 @@ FAQ - Frequently Asked Questions
    Your initial query which is going to be stored as a bookmark has to
    yield at least one result row so you can store the bookmark. You may
    have that to work around using well positioned "/**/" comments.
+   
+    [6.19] How can I create simple LaTeX document to include exported table?
+    
+   You can simply include table in your LaTeX documents, minimal sample
+   document should look like following one (assuming you have table
+   exported in file table.tex):
+\documentclass{article}
+\usepackage{longtable}
+
+\begin{document}
+
+\include{table}
+
+\end{document}
+
+    [6.20] In MySQL 4, I see a lot of databases which are not mine, and cannot
+    access them.
+    
+   Upgrading to MySQL 4 usually gives users a global privilege: CREATE
+   TEMPORARY TABLES. This privilege also enables users to see all the
+   database names. See this bug report.
+   So if your users do not need this privilege, you can remove it and
+   their databases list will shorten.
+   
+    [6.21] In edit/insert mode, how can I see a list of possible values for a
+    field, based on some foreign table?
+    
+   You have to setup appropriate links between the tables, and also setup
+   the "display field" in the foreign table. See FAQ 6.6 for an example.
+   Then, if there are 200 values or less in the foreign table, a
+   drop-down list of values will be available.
    
   [7. phpMyAdmin project]
   
@@ -2240,6 +2385,37 @@ FAQ - Frequently Asked Questions
    who have already contributed something useful to phpMyAdmin.
    Also, have a look at the Developers section.
    
+  [8. Security ]
+  
+    [8.1] Security alert, dated 2003-06-18.
+    
+   Last update of this FAQ: 2003-07-22.
+   The phpMyAdmin development team received notice of this security
+   alert: http://www.securityfocus.com/archive/1/325641.
+   The team regrets that the author did not communicate with us before
+   sending this alert. However, here is our current reply to the points
+   mentionned:
+     * "Directory transversal attack"
+       This problem had been fixed in version 2.5.0, even if the author
+       reports the 2.5.2 development version as vulnerable, which we
+       could not reproduce.
+     * "Remote local file retrieving"
+       This is a misleading title, as the author tells in his text: "Note
+       that you can't request files ( only dirs )".
+     * "Remote internal directory listing"
+       It was possible to retrieve the list of phpMyAdmin's directory
+       (which we doubt can cause any damage), but we fixed this in the
+       2.5.2 version.
+     * "XSS and Path disclosures"
+       Most of the XSS problems have been fixed in version 2.5.0. The
+       rest have been fixed in the 2.5.2 version.
+       We believe that the Path disclosures problems have also been fixed
+       in version 2.5.2.
+     * "Information encoding weakness"
+       We believe that an exploit for this weakness would be difficult to
+       achieve. However version 2.5.2 now encrypts the password with the
+       well-known blowfish algorithm.
+       
 Developers Information
 
    phpMyAdmin is Open Source, so you're invited to contribute to it. Many
@@ -2345,10 +2521,10 @@ CREDITS, in chronological order
     * main author of the version 2.1.0.1
     * bugfixes
 
-- Alexander M. Turek <rabus_at_bugfixes.info>
+- Alexander M. Turek <derrabus_at_gmx.de>
     * XML exports
     * MySQL 4 related features
-    * various small features and fixes
+    * various features and fixes
     * German language file updates
 
 - Mike Beck <mike.beck_at_ibmiller.de>
@@ -2365,14 +2541,17 @@ CREDITS, in chronological order
   (http://sourceforge.net/projects/phpmysqlformgen/)
     * suggested the patch for multiple table printviews
 
-- Garvin Hicking <hicking_at_faktor-e.de>
+- Garvin Hicking <me_at_supergarv.de>
     * built the patch for vertical display of table rows
     * built the Javascript based Query window + SQL history
     * Improvement of column/db comments
     * (MIME)-Transformations for columns
     * Use custom alias names for Databases in left frame
+    * hierarchical/nested table display
+    * PDF-scratchboard for WYSIWYG-distribution of PDF relations
+    * new icon sets
     * vertical display of column properties page
-    * some bugfixes, smaller features
+    * some bugfixes, features, support, german language additions
 
 - Yukihiro Kawada <kawada_at_den.fujifilm.co.jp>
     * japanese kanji encoding conversion feature
@@ -2390,8 +2569,11 @@ CREDITS, in chronological order
 - Olof Edlund <olof.edlund_at_upright.se>
     * SQL validator server
 
-- Ivan R. Lanin <ivanlanin_at_users.sourceforfe.net>
+- Ivan R. Lanin <ivanlanin_at_users.sourceforge.net>
     * phpMyAdmin logo
+
+- Mike Cochrane <mike_at_graftonhall.co.nz>
+    * blowfish library from the Horde project
 
 And also to the following people who have contributed minor changes,
 enhancements, bugfixes or support for a new language since version 2.1.0:

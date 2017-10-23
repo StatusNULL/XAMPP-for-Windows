@@ -1,6 +1,16 @@
 <?php
-/* $Id: tbl_move_copy.php,v 1.29 2003/05/13 09:33:39 nijel Exp $ */
+/* $Id: tbl_move_copy.php,v 1.34 2003/08/05 17:54:14 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
+
+// Check parameters
+
+require('./libraries/grab_globals.lib.php');
+
+if (!defined('PMA_COMMON_LIB_INCLUDED')) {
+    include('./libraries/common.lib.php');
+}
+
+PMA_checkParameters(array('db', 'table'));
 
 /**
  * Insert data from one table to another one
@@ -138,9 +148,14 @@ if (isset($new_name) && trim($new_name) != '') {
     } else {
         $source = PMA_backquote($db) . '.' . PMA_backquote($table);
         if (empty($target_db)) $target_db = $db;
+
+        // This could avoid some problems with replicated databases, when 
+        // moving table from replicated one to not replicated one
+        PMA_mysql_select_db($target_db);
+        
         $target = PMA_backquote($target_db) . '.' . PMA_backquote($new_name);
 
-        include('./libraries/build_dump.lib.php');
+        include('./libraries/export/sql.php');
 
         $sql_structure = PMA_getTableDef($db, $table, "\n", $err_url);
         $parsed_sql =  PMA_SQP_parse($sql_structure);
@@ -214,6 +229,11 @@ if (isset($new_name) && trim($new_name) != '') {
 
         // Drops old table if the user has requested to move it
         if (isset($submit_move)) {
+            
+            // This could avoid some problems with replicated databases, when 
+            // moving table from replicated one to not replicated one
+            PMA_mysql_select_db($db);
+            
             $sql_drop_table = 'DROP TABLE ' . $source;
             $result         = @PMA_mysql_query($sql_drop_table);
             if (PMA_mysql_error()) {
@@ -380,7 +400,7 @@ if (isset($new_name) && trim($new_name) != '') {
         }
 
         $message   = (isset($submit_move) ? $strMoveTableOK : $strCopyTableOK);
-        $message   = sprintf($message, $source, $target);
+        $message   = sprintf($message, htmlspecialchars($source), htmlspecialchars($target));
         $reload    = 1;
         $js_to_run = 'functions.js';
         /* Check: Work on new table or on old table? */

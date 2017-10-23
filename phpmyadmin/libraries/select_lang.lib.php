@@ -1,5 +1,5 @@
 <?php
-/* $Id: select_lang.lib.php,v 1.90 2003/05/15 17:24:46 lem9 Exp $ */
+/* $Id: select_lang.lib.php,v 1.92.2.1 2003/09/01 14:51:52 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -54,6 +54,8 @@ if (!defined('PMA_SELECT_LANG_LIB_INCLUDED')) {
         'af-iso-8859-1'=> array('af|afrikaans', 'afrikaans-iso-8859-1', 'af'),
         'ar-utf-8'     => array('ar([-_][[:alpha:]]{2})?|arabic', 'arabic-utf-8', 'ar'),
         'ar-win1256'   => array('ar([-_][[:alpha:]]{2})?|arabic', 'arabic-windows-1256', 'ar'),
+        'az-utf-8'     => array('az|azerbaijani', 'azerbaijani-utf-8', 'az'),
+        'az-iso-8859-9'=> array('az|azerbaijani', 'azerbaijani-iso-8859-9', 'az'),
         'bg-utf-8'     => array('bg|bulgarian', 'bulgarian-utf-8', 'bg'),
         'bg-win1251'   => array('bg|bulgarian', 'bulgarian-windows-1251', 'bg'),
         'bg-koi8-r'    => array('bg|bulgarian', 'bulgarian-koi8-r', 'bg'),
@@ -126,8 +128,11 @@ if (!defined('PMA_SELECT_LANG_LIB_INCLUDED')) {
         'sl-win1250'   => array('sl|slovenian', 'slovenian-windows-1250', 'sl'),
         'sq-utf-8'     => array('sq|albanian', 'albanian-utf-8', 'sq'),
         'sq-iso-8859-1'=> array('sq|albanian', 'albanian-iso-8859-1', 'sq'),
-        'sr-utf-8'     => array('sr|serbian', 'serbian-utf-8', 'sr'),
-        'sr-win1250'   => array('sr|serbian', 'serbian-windows-1250', 'sr'),
+        'sr-utf-8'     => array('sr|serbian', 'serbian_cyrillic-utf-8', 'sr'),
+        'sr-win1251'   => array('sr|serbian', 'serbian_cyrillic-windows-1251', 'sr'),
+        'sr-lat-utf-8'  => array('sr[-_]lat|serbian latin', 'serbian_latin-utf-8', 'sr-lat'),
+        'sr-lat-win1250'=> array('sr[-_]lat|serbian latin', 'serbian_latin-windows-1250', 'sr-lat'),
+        'pt-br-iso-8859-1' => array('pt[-_]br|brazilian portuguese', 'brazilian_portuguese-iso-8859-1', 'pt-BR'),
         'sv-utf-8'     => array('sv|swedish', 'swedish-utf-8', 'sv'),
         'sv-iso-8859-1'=> array('sv|swedish', 'swedish-iso-8859-1', 'sv'),
         'th-utf-8'     => array('th|thai', 'thai-utf-8', 'th'),

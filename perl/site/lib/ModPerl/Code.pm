@@ -37,27 +37,32 @@ my %hook_proto = (
     Process    => {
         ret  => 'void',
         args => [{type => 'apr_pool_t', name => 'p'},
-                 {type => 'server_rec', name => 's'}],
+                 {type => 'server_rec', name => 's'},
+                 {type => 'dummy', name => 'MP_HOOK_VOID'}],
     },
     Files      => {
         ret  => 'int',
         args => [{type => 'apr_pool_t', name => 'pconf'},
                  {type => 'apr_pool_t', name => 'plog'},
                  {type => 'apr_pool_t', name => 'ptemp'},
-                 {type => 'server_rec', name => 's'}],
+                 {type => 'server_rec', name => 's'},
+                 {type => 'dummy', name => 'MP_HOOK_RUN_ALL'}],
     },
     PerSrv     => {
         ret  => 'int',
-        args => [{type => 'request_rec', name => 'r'}],
+        args => [{type => 'request_rec', name => 'r'}, 
+                 {type => 'dummy', name => 'MP_HOOK_RUN_ALL'}],
     },
     Connection => {
         ret  => 'int',
-        args => [{type => 'conn_rec', name => 'c'}],
+        args => [{type => 'conn_rec', name => 'c'},
+                 {type => 'dummy', name => 'MP_HOOK_RUN_FIRST'}],
     },
     PreConnection => {
         ret  => 'int',
         args => [{type => 'conn_rec', name => 'c'},
-                 {type => 'void', name => 'csd'}],
+                 {type => 'void', name => 'csd'},
+                 {type => 'dummy', name => 'MP_HOOK_RUN_ALL'}],
     },
 );
 
@@ -111,7 +116,7 @@ my %flags = (
     Req => [qw(NONE SET_GLOBAL_REQUEST PARSE_HEADERS SETUP_ENV 
                CLEANUP_REGISTERED)],
     Interp => [qw(NONE IN_USE PUTBACK CLONED BASE)],
-    Handler => [qw(NONE PARSED METHOD OBJECT ANON AUTOLOAD DYNAMIC)],
+    Handler => [qw(NONE PARSED METHOD OBJECT ANON AUTOLOAD DYNAMIC FAKE)],
 );
 
 $flags{DirSeen} = $flags{Dir};
@@ -210,6 +215,12 @@ sub generate_handler_hooks {
 
             my($protostr, $pass) = canon_proto($prototype, $name);
             my $ix = $self->{handler_index}->{$class}->[$i];
+
+            if ($callback =~ m/modperl_callback_per_(dir|srv)/) {
+                if ($ix =~ m/AUTH|TYPE|TRANS/) {
+                    $pass =~ s/MP_HOOK_RUN_ALL/MP_HOOK_RUN_FIRST/;
+                }
+            }
 
             print $h_fh "\n$protostr;\n";
 
@@ -443,13 +454,15 @@ my %trace = (
 #    'a' => 'all',
     'c' => 'configuration for directive handlers',
     'd' => 'directive processing',
-    's' => 'perl sections',
-    'h' => 'handlers',
-    'm' => 'memory allocations',
-    't' => 'benchmark-ish timings',
-    'i' => 'interpreter pool management',
-    'g' => 'Perl runtime interaction',
+    'e' => 'environment variables',
     'f' => 'filters',
+    'g' => 'Perl runtime interaction',
+    'h' => 'handlers',
+    'i' => 'interpreter pool management',
+    'm' => 'memory allocations',
+    'o' => 'I/O',
+    's' => 'perl sections',
+    't' => 'benchmark-ish timings',
 );
 
 sub generate_trace {
@@ -557,8 +570,12 @@ sub canon_define {
 
 sub canon_args {
     my $args = shift->{args};
-    my @in   = map { "$_->{type} *$_->{name}" } @$args;
     my @pass = map { $_->{name} } @$args;
+    my @in;
+    foreach my $href (@$args) {
+        push @in, "$href->{type} *$href->{name}"
+            unless $href->{type} eq 'dummy';
+    }
     return wantarray ? (\@in, \@pass) : \@in;
 }
 
@@ -590,8 +607,8 @@ my %sources = (
 );
 
 my @c_src_names = qw(interp tipool log config cmd options callback handler
-                     gtop util io filter bucket mgv pcw global env cgi
-                     perl perl_global perl_pp sys module svptr_table
+                     gtop util io io_apache filter bucket mgv pcw global env
+                     cgi perl perl_global perl_pp sys module svptr_table
                      const constants apache_compat);
 my @h_src_names = qw(perl_unembed);
 my @g_c_names = map { "modperl_$_" } qw(hooks directives flags xsinit);

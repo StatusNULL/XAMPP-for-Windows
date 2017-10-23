@@ -1,5 +1,5 @@
 <?php
-/* $Id: mysql_wrappers.lib.php,v 1.5 2003/03/20 19:50:48 nijel Exp $ */
+/* $Id: mysql_wrappers.lib.php,v 1.6 2003/07/29 10:20:51 garvinhicking Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -23,10 +23,14 @@ if (!defined('PMA_MYSQL_WRAPPERS_LIB_INCLUDED')){
 
     function PMA_mysql_error($id = FALSE) {
         if ($id != FALSE) {
-            return PMA_convert_display_charset(mysql_error($id));
-        } else {
-            return PMA_convert_display_charset(mysql_error());
+            if (mysql_errno($id) != 0) {
+                return PMA_convert_display_charset('#' . mysql_errno($id) . ' - ' . mysql_error($id));
+            }
+        } elseif (mysql_errno() != 0) {
+            return PMA_convert_display_charset('#' . mysql_errno() . ' - ' . mysql_error());
         }
+        
+        return FALSE;
     }
 
     function PMA_mysql_fetch_array($result, $type = FALSE) {

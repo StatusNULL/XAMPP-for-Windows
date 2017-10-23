@@ -5,7 +5,7 @@ $VERSION = 0.02;
 
 require ExtUtils::MM_Win32;
 @ISA = qw(ExtUtils::MM_Win32);
-
+use Config;
 
 =head1 NAME
 
@@ -58,6 +58,8 @@ sub xs_cpp {
 sub xs_o {
     my($self) = shift;
     return '' unless $self->needs_linking();
+    # having to choose between .xs -> .c -> .o and .xs -> .o confuses dmake
+    return '' if $Config{make} eq 'dmake';
     '
 .xs$(OBJ_EXT):
 	$(PERL) -I$(PERL_ARCHLIB) -I$(PERL_LIB) $(XSUBPP) \\

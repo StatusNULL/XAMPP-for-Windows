@@ -5,25 +5,25 @@
 // +----------------------------------------------------------------------+
 // | Copyright (c) 1997-2003 The PHP Group                                |
 // +----------------------------------------------------------------------+
-// | This source file is subject to version 2.02 of the PHP license,      |
+// | This source file is subject to version 3.0 of the PHP license,       |
 // | that is bundled with this package in the file LICENSE, and is        |
-// | available at through the world-wide-web at                           |
-// | http://www.php.net/license/2_02.txt.                                 |
+// | available through the world-wide-web at the following url:           |
+// | http://www.php.net/license/3_0.txt.                                  |
 // | If you did not receive a copy of the PHP license and are unable to   |
 // | obtain it through the world-wide-web, please send a note to          |
 // | license@php.net so we can mail you a copy immediately.               |
 // +----------------------------------------------------------------------+
-// | Authors: Stig Sæther Bakken <ssb@fast.no>                            |
+// | Authors: Stig Sæther Bakken <ssb@php.net>                            |
 // +----------------------------------------------------------------------+
 //
-// $Id: Builder.php,v 1.8 2002/12/31 16:18:26 sebastian Exp $
+// $Id: Builder.php,v 1.13 2003/10/05 16:42:18 mj Exp $
 
 require_once 'PEAR/Common.php';
 
 /**
  * Class to handle building (compiling) extensions.
  *
- * @author Stig Sæther Bakken <ssb@fast.no>
+ * @author Stig Sæther Bakken <ssb@php.net>
  */
 class PEAR_Builder extends PEAR_Common
 {
@@ -206,7 +206,7 @@ class PEAR_Builder extends PEAR_Common
             return $this->raiseError("`phpize' failed");
         }
 
-        // start of interactive part
+        // {{{ start of interactive part
         $configure_command = "$dir/configure";
         if (isset($info['configure_options'])) {
             foreach ($info['configure_options'] as $o) {
@@ -222,9 +222,9 @@ class PEAR_Builder extends PEAR_Common
                 }
             }
         }
-        // end of interactive part
+        // }}} end of interactive part
 
-        // make configurable
+        // FIXME make configurable
         if(!$user=getenv('USER')){
             $user='defaultuser';
         }
@@ -252,9 +252,13 @@ class PEAR_Builder extends PEAR_Common
         }
         foreach ($to_run as $cmd) {
             $err = $this->_runCommand($cmd, $callback);
-            if (PEAR::isError($err) && !$err) {
+            if (PEAR::isError($err)) {
                 chdir($old_cwd);
                 return $err;
+            }
+            if (!$err) {
+                chdir($old_cwd);
+                return $this->raiseError("`$cmd' failed");
             }
         }
         if (!($dp = opendir("modules"))) {
@@ -306,7 +310,7 @@ class PEAR_Builder extends PEAR_Common
         if ($what != 'cmdoutput') {
             return;
         }
-        $this->log(3, rtrim($data));
+        $this->log(1, rtrim($data));
         if (preg_match('/You should update your .aclocal.m4/', $data)) {
             return;
         }
@@ -316,8 +320,8 @@ class PEAR_Builder extends PEAR_Common
             $apino = (int)$matches[2];
             if (isset($this->$member)) {
                 $this->$member = $apino;
-                $msg = sprintf("%-22s : %d", $matches[1], $apino);
-                $this->log(1, $msg);
+                //$msg = sprintf("%-22s : %d", $matches[1], $apino);
+                //$this->log(1, $msg);
             }
         }
     }
@@ -348,12 +352,20 @@ class PEAR_Builder extends PEAR_Common
         if (!$pp) {
             return $this->raiseError("failed to run `$command'");
         }
+        if ($callback && $callback[0]->debug == 1) {
+            $olddbg = $callback[0]->debug;
+            $callback[0]->debug = 2;
+        }
+
         while ($line = fgets($pp, 1024)) {
             if ($callback) {
                 call_user_func($callback, 'cmdoutput', $line);
             } else {
                 $this->log(2, rtrim($line));
             }
+        }
+        if ($callback && isset($olddbg)) {
+            $callback[0]->debug = $olddbg;
         }
         $exitcode = @pclose($pp);
         return ($exitcode == 0);

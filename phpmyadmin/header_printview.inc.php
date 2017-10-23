@@ -1,5 +1,5 @@
 <?php
-/* $Id: header_printview.inc.php,v 1.8 2003/03/10 20:32:17 rabus Exp $ */
+/* $Id: header_printview.inc.php,v 1.9 2003/07/19 11:19:41 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -13,6 +13,10 @@ if ($cfg['OBGzip']) {
         PMA_outBufferPre($ob_mode);
     }
 }
+
+// Check parameters
+
+PMA_checkParameters(array('db', 'full_sql_query'));
 
 
 // garvin: For re-usability, moved http-headers

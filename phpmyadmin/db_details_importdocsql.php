@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_details_importdocsql.php,v 1.14 2003/03/20 23:14:56 nijel Exp $ */
+/* $Id: db_details_importdocsql.php,v 1.18 2003/08/05 17:12:47 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -19,6 +19,9 @@ require('./header.inc.php');
 //require common added for string importing - Robbat2, 15 January 2003 9.34PM
 //all hardcoded strings converted by Robbat2, 15 January 2003 9.34PM
 require('./libraries/common.lib.php');
+
+// Check parameters
+PMA_checkParameters(array('db'));
 
 /**
  * Imports docSQL files
@@ -99,11 +102,11 @@ global $GLOBALS;
         
         return 1;
     } else {
-        if ($content != '') {
-            echo '<p><font color="orange">' . sprintf($GLOBALS['strIgnoringFile'], ' ' . $file) . '</font></p>' . "\n";
+        if ($content != 'none') {
+            echo '<p><font color="orange">' . sprintf($GLOBALS['strIgnoringFile'], ' ' . htmlspecialchars($file)) . '</font></p>' . "\n";
         } else {
             // garvin: disabled. Shouldn't impose ANY non-submitted files ever.
-            echo '<p><font color="orange">' . sprintf($GLOBALS['strIgnoringFile'], ' ' . '') . '</font></p>' . "\n";
+            echo '<p><font color="orange">' . sprintf($GLOBALS['strIgnoringFile'], ' ' . '...') . '</font></p>' . "\n";
         }
         return 0;
     } // end working on table
@@ -171,9 +174,11 @@ if (isset($do) && $do == 'import') {
     
                 // function is_writeable() is valid on PHP3 and 4
                 if (!is_writeable($tmp_subdir)) {
-                    // if we cannot move the file, let PHP report the error
-                    error_reporting(E_ALL);
                     $docsql_text = PMA_readFile($sql_file, $sql_file_compression);
+                    if ($docsql_text == FALSE) {
+                        echo $strFileCouldNotBeRead;
+                        exit();
+                    }
                 }
                 else {
                     $sql_file_new = $tmp_subdir . basename($sql_file);
@@ -206,7 +211,7 @@ if (isset($do) && $do == 'import') {
     } else {
         
         // echo '<h1>Starting Import</h1>';
-        $docpath = $DOCUMENT_ROOT . dirname($PHP_SELF) . '/' . eregi_replace('\.\.*', '.', $docpath);
+        $docpath = $DOCUMENT_ROOT . dirname($PHP_SELF) . '/docSQL/' . eregi_replace('\.\.*', '.', $docpath);
         if (substr($docpath, strlen($docpath) - 2, 1) != '/') {
             $docpath = $docpath . '/';
         }
@@ -239,7 +244,7 @@ if (isset($do) && $do == 'import') {
     <input type="hidden" name="do" value="import" />
     <b><?php echo $strAbsolutePathToDocSqlDir; ?>:</b>
     <br /><br />
-    <?php echo dirname($PHP_SELF); ?>/<input class="textfield" type="text" name="docpath" size="15" value="<?php echo (isset($orig_docpath) ? $orig_docpath : 'docSQL/'); ?>" />
+    <?php echo dirname($PHP_SELF) . '/docSQL'; ?>/<input class="textfield" type="text" name="docpath" size="15" value="<?php echo (isset($orig_docpath) ? $orig_docpath : ''); ?>" />
 <?php
 // garvin: displays import dump feature only if file upload available
 if ($is_upload) {

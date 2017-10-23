@@ -3,7 +3,7 @@
 // +----------------------------------------------------------------------+
 // | PHP Version 4                                                        |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2002 The PHP Group                                |
+// | Copyright (c) 1997-2003 The PHP Group                                |
 // +----------------------------------------------------------------------+
 // | This source file is subject to version 2.02 of the PHP license,      |
 // | that is bundled with this package in the file LICENSE, and is        |
@@ -16,18 +16,56 @@
 // | Author: Chuck Hagenbuch <chuck@horde.org>                            |
 // +----------------------------------------------------------------------+
 //
-// $Id: mail.php,v 1.4 2002/02/28 08:27:14 sebastian Exp $
+// $Id: mail.php,v 1.5 2003/07/10 07:04:54 jon Exp $
 
-require_once ('Mail.php');
+require_once 'Mail.php';
 
 /**
  * internal PHP-mail() implementation of the PEAR Mail:: interface.
  * @access public
  * @package Mail
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
  
- class Mail_mail extends Mail {
+class Mail_mail extends Mail
+{
+    /**
+     * Any arguments to pass to the mail() function.
+     * @var string
+     */
+    var $_params = '';
+
+    /**
+     * Constructor.
+     *
+     * Instantiates a new Mail_mail:: object based on the parameters
+     * passed in.
+     *
+     * @param string $params Extra arguments for the mail() function.
+     *
+     * @access public
+     */
+    function Mail_mail($params = '')
+    {
+        /*
+         * The other mail implementations accept parameters as arrays.  In the
+         * interest of being consistent, explode an array into a string of
+         * parameter arguments.
+         */
+        if (is_array($params)) {
+            $this->_params = join(' ', $params);
+        } else {
+            $this->_params = $params;
+        }
+
+        /*
+         * Because the mail() function may pass headers as command line
+         * arguments, we can't guarantee the use of the standard "\r\n"
+         * separator.  Instead, we use the system's native line separator.
+         */
+        $this->sep = (strstr(PHP_OS, 'WIN')) ? "\r\n" : "\n";
+    }
+
 	/**
      * Implements Mail_mail::send() function using php's built-in mail()
      * command.
@@ -59,7 +97,7 @@ require_once ('Mail.php');
         if (is_array($recipients)) {
             $recipients = implode(', ', $recipients);
         }
-        
+
         // get the Subject out of the headers array so that we can
         // pass it as a seperate argument to mail().
         $subject = '';
@@ -67,11 +105,11 @@ require_once ('Mail.php');
             $subject = $headers['Subject'];
             unset($headers['Subject']);
         }
-        
+
         // flatten the headers out.
         list(,$text_headers) = Mail::prepareHeaders($headers);
-        
-        return mail($recipients, $subject, $body, $text_headers);
+
+        return mail($recipients, $subject, $body, $text_headers, $this->_params);
     }
-    
+
 }

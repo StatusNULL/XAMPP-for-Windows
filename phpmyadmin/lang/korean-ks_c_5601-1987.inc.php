@@ -1,5 +1,5 @@
 <?php
-/* $Id: korean-ks_c_5601-1987.inc.php,v 1.85 2003/05/29 16:44:02 lem9 Exp $ */
+/* $Id: korean-ks_c_5601-1987.inc.php,v 1.100 2003/08/17 23:36:28 lem9 Exp $ */
 
 /* Translated by WooSuhan <kjh@unews.NOSPAM.co.kr> */
 
@@ -72,13 +72,13 @@ $strCarriage = '캐리지 리턴: \\r';
 $strChange = '변경';
 $strChangeDisplay = '출력할 필드 선택';
 $strChangePassword = '암호 변경';
-$strCharsetOfFile = '파일 문자셋:'; 
+$strCharsetOfFile = '파일 문자셋:';
 $strCheckAll = '모두 체크';
 $strCheckDbPriv = '데이터베이스 권한 검사';
 $strCheckPrivs = '사용권한 보기';
 $strCheckPrivsLong = '데이터베이스 &quot;%s&quot; 에 대한 사용권한 검사.';
 $strCheckTable = '테이블 검사';
-$strChoosePage = '편집할 페이지를 선택하세요'; 
+$strChoosePage = '편집할 페이지를 선택하세요';
 $strColComFeat = '열(칼럼) 설명(코멘트) 출력하기';
 $strColumn = '열(칼럼)';
 $strColumnNames = '열(칼럼) 이름';
@@ -96,7 +96,7 @@ $strCreateIndex = '%s 개 열(칼럼)에 인덱스 만들기 ';
 $strCreateIndexTopic = '새 인덱스 만들기';
 $strCreateNewDatabase = '새 데이터베이스 만들기';
 $strCreateNewTable = '데이터베이스 %s에 새로운 테이블을 만듭니다.';
-$strCreatePage = '새 페이지 만들기'; 
+$strCreatePage = '새 페이지 만들기';
 
 $strDBGMaxTimeMs = '최대시간, ms';
 $strDBGMinTimeMs = '최소시간, ms';
@@ -340,7 +340,7 @@ $strQueryTime = '질의 실행시간 %01.4f 초';
 $strQueryType = '질의 종류';
 
 $strReType = '재입력';
-$strReceived = '받음'; 
+$strReceived = '받음';
 $strRecords = '레코드수';
 $strReferentialIntegrity = 'referential 무결성 검사:';
 $strRelationNotWorking = 'linked Tables에서 작동하는 부가기능이 사용되지 않습니다. 이유를 알려면 %s여기를 클릭%s하십시오.';
@@ -400,7 +400,7 @@ $strSelectFields = '필드 선택 (하나 이상):';
 $strSelectNumRows = '질의(in query)';
 $strSend = '파일로 저장';
 $strSent = '보냄';
-$strServer = '서버 %s'; 
+$strServer = '서버 %s';
 $strServerChoice = '서버 선택';
 $strServerStatus = '런타임 정보';
 $strServerStatusUptime = '이 MySQL 서버는 %s 동안 구동되었습니다. <br/>구동 시작날짜는 %s 입니다.';
@@ -485,7 +485,7 @@ $strUsers = '사용자들';
 $strUsersDeleted = '선택한 사용자들을 삭제했습니다.';
 $strUsersHavingAccessToDb = '&quot;%s&quot; 에 접근할 수 있는 사용자들';
 
-$strValidateSQL = 'SQL 검사'; 
+$strValidateSQL = 'SQL 검사';
 $strValidatorError = 'SQL 검사기가 초기화되지 않았습니다. %s문서%s에서 설명한 php 확장모듈을 설치했는지 확인해보십시오.';
 $strValue = '값';
 $strVar = '변수';
@@ -660,4 +660,59 @@ $strXML = 'XML';//to translate
 
 $strLoadMethod = 'LOAD method';  //to translate
 $strLoadExplanation = 'The best method is checked by default, but you can change if it fails.';  //to translate
+$strExecuteBookmarked = 'Execute bookmarked query';  //to translate
+$strExcelOptions = 'Excel options';  //to translate
+$strReplaceNULLBy = 'Replace NULL by';  //to translate
+$strQueryWindowLock = 'Do not overwrite this query from outside the window';  //to translate
+$strPaperSize = 'Paper size';  //to translate
+$strDatabaseNoTable = 'This database contains no table!';//to translate
+$strViewDumpDatabases = 'View dump (schema) of databases';//to translate
+$strAddIntoComments = 'Add into comments';//to translate
+$strDatabaseExportOptions = 'Database export options';//to translate
+$strAddDropDatabase = 'Add DROP DATABASE';//to translate
+$strToggleScratchboard = 'toggle scratchboard';  //to translate
+$strTableOptions = 'Table options';  //to translate
+$strSecretRequired = 'The configuration file now needs a secret passphrase (blowfish_secret).';  //to translate
+$strAccessDeniedExplanation = 'phpMyAdmin tried to connect to the MySQL server, and the server rejected the connection. You should check the host, username and password in config.inc.php and make sure that they correspond to the information given by the administrator of the MySQL server.';  //to translate
+$strAddAutoIncrement = 'Add AUTO_INCREMENT value';  //to translate
+$strCharsets = 'Charsets';  //to translate
+$strDescription = 'Description';  //to translate
+$strCharsetsAndCollations = 'Character Sets and Collations';  //to translate
+$strCollation = 'Collation';  //to translate
+$strMultilingual = 'multilingual';  //to translate
+$strGerman = 'German';  //to translate
+$strPhoneBook = 'phone book';  //to translate
+$strDictionary = 'dictionary';  //to translate
+$strSwedish = 'Swedish';  //to translate
+$strDanish = 'Danish';  //to translate
+$strCzech = 'Czech';  //to translate
+$strTurkish = 'Turkish';  //to translate
+$strEnglish = 'English';  //to translate
+$strHungarian = 'Hungarian';  //to translate
+$strCroatian = 'Croatian';  //to translate
+$strBulgarian = 'Bulgarian';  //to translate
+$strLithuanian = 'Lithuanian';  //to translate
+$strEstonian = 'Estonian';  //to translate
+$strCaseInsensitive = 'case-insensitive';  //to translate
+$strCaseSensitive = 'case-sensitive';  //to translate
+$strUkrainian = 'Ukrainian';  //to translate
+$strHebrew = 'Hebrew';  //to translate
+$strWestEuropean = 'West European';  //to translate
+$strCentralEuropean = 'Central European';  //to translate
+$strTraditionalChinese = 'Traditional Chinese';  //to translate
+$strCyrillic = 'Cyrillic';  //to translate
+$strArmenian = 'Armenian';  //to translate
+$strArabic = 'Arabic';  //to translate
+$strRussian = 'Russian';  //to translate
+$strUnknown = 'unknown';  //to translate
+$strBaltic = 'Baltic';  //to translate
+$strUnicode = 'Unicode';  //to translate
+$strSimplifiedChinese = 'Simplified Chinese';  //to translate
+$strKorean = 'Korean';  //to translate
+$strGreek = 'Greek';  //to translate
+$strJapanese = 'Japanese';  //to translate
+$strThai = 'Thai';  //to translate
+$strUseThisValue = 'Use this value';  //to translate
+$strWindowNotFound = 'The target browser window could not be updated. Maybe you have closed the parent window or your browser is blocking cross-window updates of your security settings';  //to translate
+$strBrowseForeignValues = 'Browse foreign values';  //to translate
 ?>

@@ -3,7 +3,7 @@
 // +----------------------------------------------------------------------+
 // | PHP Version 4                                                        |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2002 The PHP Group                                |
+// | Copyright (c) 1997-2003 The PHP Group                                |
 // +----------------------------------------------------------------------+
 // | This source file is subject to version 2.02 of the PHP license,      |
 // | that is bundled with this package in the file LICENSE, and is        |
@@ -22,7 +22,7 @@ require_once 'Mail.php';
  * Sendmail implementation of the PEAR Mail:: interface.
  * @access public
  * @package Mail
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.4 $
  */
 class Mail_sendmail extends Mail {
     
@@ -62,6 +62,13 @@ class Mail_sendmail extends Mail {
     {
         if (isset($params['sendmail_path'])) $this->sendmail_path = $params['sendmail_path'];
         if (isset($params['sendmail_args'])) $this->sendmail_args = $params['sendmail_args'];
+
+        /*
+         * Because we need to pass message headers to the sendmail program on
+         * the commandline, we can't guarantee the use of the standard "\r\n"
+         * separator.  Instead, we use the system's native line separator.
+         */
+        $this->sep = (strstr(PHP_OS, 'WIN')) ? "\r\n" : "\n";
     }
     
 	/**
@@ -108,7 +115,7 @@ class Mail_sendmail extends Mail {
             $from = escapeShellCmd($from);
             $mail = popen($this->sendmail_path . (!empty($this->sendmail_args) ? ' ' . $this->sendmail_args : '') . " -f$from -- $recipients", 'w');
             fputs($mail, $text_headers);
-            fputs($mail, "\n");  // newline to end the headers section
+            fputs($mail, $this->sep);  // newline to end the headers section
             fputs($mail, $body);
             $result = pclose($mail) >> 8 & 0xFF; // need to shift the pclose result to get the exit code
         } else {

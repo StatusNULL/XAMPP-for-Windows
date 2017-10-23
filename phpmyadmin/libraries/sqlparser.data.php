@@ -1,5 +1,5 @@
 <?php
-/* $Id: sqlparser.data.php,v 1.16 2003/05/30 19:55:41 rabus Exp $ */
+/* $Id: sqlparser.data.php,v 1.22 2003/08/05 10:49:06 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -212,6 +212,7 @@ if (!defined('PMA_SQP_DATA_INCLUDED')) {
         'BACKUP',
         'BEGIN',
         'BETWEEN',
+        'BINLOG',
         'BOTH',
         'BY',
         'CASCADE',
@@ -222,6 +223,7 @@ if (!defined('PMA_SQP_DATA_INCLUDED')) {
         'CHECK',
         'CHECKSUM',
         'CLIENT',
+        'COLLATION',
         'COLUMN',
         'COLUMNS',
         'COMMENT',
@@ -256,6 +258,7 @@ if (!defined('PMA_SQP_DATA_INCLUDED')) {
         'END',
         'ESCAPE',
         'ESCAPED',
+        'EVENTS',
         'EXECUTE',
         'EXISTS',
         'EXPLAIN',
@@ -391,7 +394,6 @@ if (!defined('PMA_SQP_DATA_INCLUDED')) {
         'SECOND',
         'SELECT',
         'SERIALIZABLE',
-        'SESSION',
         'SHARE',
         'SHOW',
         'SHUTDOWN',
@@ -451,7 +453,7 @@ if (!defined('PMA_SQP_DATA_INCLUDED')) {
         'YEAR_MONTH'
     );
     //$PMA_SQPdata_reserved_word_cnt = count($PMA_SQPdata_reserved_word);
-    $PMA_SQPdata_reserved_word_cnt = 250;
+    $PMA_SQPdata_reserved_word_cnt = 255;
 
     $PMA_SQPdata_column_type = array (
         'BIGINT',

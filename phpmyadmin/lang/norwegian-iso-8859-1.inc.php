@@ -1,5 +1,5 @@
 <?php
-/* $Id: norwegian-iso-8859-1.inc.php,v 1.105 2003/05/29 16:44:02 lem9 Exp $ */
+/* $Id: norwegian-iso-8859-1.inc.php,v 1.120 2003/08/17 23:36:28 lem9 Exp $ */
 
 /**
  * Translated by Sven-Erik Andersen <sven_erik at andersen.as>
@@ -28,6 +28,8 @@ $strAccessDenied = 'Ingen tilgang';
 $strAction = 'Handling';
 $strAddDeleteColumn = 'Legg til/Slett kolonne';
 $strAddDeleteRow = 'Legg til/Slett kriterierad';
+$strAddDropDatabase = 'Legg til DROP DATABASE';
+$strAddIntoComments = 'Legg til i kommentarer';
 $strAddNewField = 'Legg til felt';
 $strAddPriv = 'Legg til nytt privilegium';
 $strAddPrivMessage = 'Du har lagt til ett nytt privilegium.';
@@ -143,7 +145,9 @@ $strData = 'Data';
 $strDataDict = 'Dataordbok';
 $strDataOnly = 'Bare data';
 $strDatabase = 'Database ';
+$strDatabaseExportOptions = 'Database eksportinnstillinger';
 $strDatabaseHasBeenDropped = 'Databasen %s har blitt slettet';
+$strDatabaseNoTable = 'Denne databasen har ingen tabeller!';
 $strDatabaseWildcard = 'Database (jokertegn er tillatt):';
 $strDatabases = 'databaser';
 $strDatabasesDropped = '%s databasene har blitt slettet.';
@@ -196,6 +200,8 @@ $strEndCut = 'STOPP KUTT';
 $strEndRaw = 'STOPP UFORMATERT';
 $strEnglishPrivileges = 'OBS: MySQL privilegiumnavn er på engelsk';
 $strError = 'Feil';
+$strExcelOptions = 'Excel-innstillinger';
+$strExecuteBookmarked = 'Utfør lagret spørring';
 $strExplain = 'Forklar SQL';
 $strExport = 'Eksporter';
 $strExportToXML = 'Eksporter til XML format';
@@ -287,6 +293,8 @@ $strLines = 'Linjer';
 $strLinesTerminatedBy = 'Linker avsluttet med';
 $strLinkNotFound = 'Link ikke funnet';
 $strLinksTo = 'Linker til';
+$strLoadExplanation = 'Den beste måten er automatiskt valgt, men du kan endre hvis det ikke fungerer.';
+$strLoadMethod = 'LOAD metode';
 $strLocalhost = 'Lokal';
 $strLocationTextfile = 'Plassering av filen';
 $strLogPassword = 'Passord:';
@@ -371,6 +379,7 @@ $strOverwriteExisting = 'Overskriv eksisterende fil(-er)';
 $strPHP40203 = 'Du bruker PHP 4.2.3, som har en alvorlig feil med flerbyte-strenger (mbstring). Se PHP-feilrapport 19404. Denne versjonen av PHP er ikke anbefalt for bruk med phpMyAdmin.';
 $strPHPVersion = 'PHP-Versjon';
 $strPageNumber = 'Sidenummer:';
+$strPaperSize = 'Papirstørelse';
 $strPartialText = 'Delvis tekst';
 $strPassword = 'Passord';
 $strPasswordChanged = 'Passordet til %s er endret.';
@@ -442,6 +451,7 @@ $strQuerySQLHistory = 'SQL-historie';
 $strQueryStatistics = '<b>Spørrings statistikk</b>: Siden oppstart, har %s spørringer blitt sendt til tjeneren.';
 $strQueryTime = 'Spørring tok %01.4f sek';
 $strQueryType = 'Spørringstype';
+$strQueryWindowLock = 'Ikke overskriv denne spørringen fra andre vinduer';
 
 $strReType = 'Gjenta';
 $strReceived = 'Mottatt';
@@ -460,6 +470,7 @@ $strRenameTable = 'Endre tabellens navn';
 $strRenameTableOK = 'Tabellen %s har fått nytt navn %s';
 $strRepairTable = 'Reparer tabell';
 $strReplace = 'Erstatt';
+$strReplaceNULLBy = 'Erstatt NULL med';
 $strReplaceTable = 'Erstatt tabell med filen';
 $strReset = 'Tøm skjema';
 $strResourceLimits = 'Ressursbegrensninger';
@@ -623,6 +634,7 @@ $strValue = 'Verdi';
 $strVar = 'Variabler';
 $strViewDump = 'Vis dump (skjema) av tabell';
 $strViewDumpDB = 'Vis dump (skjema) av database';
+$strViewDumpDatabases = 'Vis dumpet skjema av databaser';
 
 $strWebServerUploadDirectory = 'webtjener opplastingskatalog';
 $strWebServerUploadDirectoryError = 'Katalogen du anga for opplasting kan ikke nåes';
@@ -641,6 +653,51 @@ $strZeroRemovesTheLimit = 'Merk: Ved å sette disse til 0 (null) fjerner begrensn
 $strZip = 'Komprimert (zip)';
 // To translate
 
-$strLoadMethod = 'LOAD method';  //to translate
-$strLoadExplanation = 'The best method is checked by default, but you can change if it fails.';  //to translate
+
+$strToggleScratchboard = 'toggle scratchboard';  //to translate
+
+$strTableOptions = 'Table options';  //to translate
+$strSecretRequired = 'The configuration file now needs a secret passphrase (blowfish_secret).';  //to translate
+$strAccessDeniedExplanation = 'phpMyAdmin tried to connect to the MySQL server, and the server rejected the connection. You should check the host, username and password in config.inc.php and make sure that they correspond to the information given by the administrator of the MySQL server.';  //to translate
+$strAddAutoIncrement = 'Add AUTO_INCREMENT value';  //to translate
+$strCharsets = 'Charsets';  //to translate
+$strDescription = 'Description';  //to translate
+$strCharsetsAndCollations = 'Character Sets and Collations';  //to translate
+$strCollation = 'Collation';  //to translate
+$strMultilingual = 'multilingual';  //to translate
+$strGerman = 'German';  //to translate
+$strPhoneBook = 'phone book';  //to translate
+$strDictionary = 'dictionary';  //to translate
+$strSwedish = 'Swedish';  //to translate
+$strDanish = 'Danish';  //to translate
+$strCzech = 'Czech';  //to translate
+$strTurkish = 'Turkish';  //to translate
+$strEnglish = 'English';  //to translate
+$strHungarian = 'Hungarian';  //to translate
+$strCroatian = 'Croatian';  //to translate
+$strBulgarian = 'Bulgarian';  //to translate
+$strLithuanian = 'Lithuanian';  //to translate
+$strEstonian = 'Estonian';  //to translate
+$strCaseInsensitive = 'case-insensitive';  //to translate
+$strCaseSensitive = 'case-sensitive';  //to translate
+$strUkrainian = 'Ukrainian';  //to translate
+$strHebrew = 'Hebrew';  //to translate
+$strWestEuropean = 'West European';  //to translate
+$strCentralEuropean = 'Central European';  //to translate
+$strTraditionalChinese = 'Traditional Chinese';  //to translate
+$strCyrillic = 'Cyrillic';  //to translate
+$strArmenian = 'Armenian';  //to translate
+$strArabic = 'Arabic';  //to translate
+$strRussian = 'Russian';  //to translate
+$strUnknown = 'unknown';  //to translate
+$strBaltic = 'Baltic';  //to translate
+$strUnicode = 'Unicode';  //to translate
+$strSimplifiedChinese = 'Simplified Chinese';  //to translate
+$strKorean = 'Korean';  //to translate
+$strGreek = 'Greek';  //to translate
+$strJapanese = 'Japanese';  //to translate
+$strThai = 'Thai';  //to translate
+$strUseThisValue = 'Use this value';  //to translate
+$strWindowNotFound = 'The target browser window could not be updated. Maybe you have closed the parent window or your browser is blocking cross-window updates of your security settings';  //to translate
+$strBrowseForeignValues = 'Browse foreign values';  //to translate
 ?>

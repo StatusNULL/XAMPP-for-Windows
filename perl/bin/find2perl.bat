@@ -12,10 +12,10 @@ goto endofperl
 @rem ';
 #!perl
 #line 15
-    eval 'exec C:\Perl\bin\perl.exe -S $0 ${1+"$@"}'
+    eval 'exec c:\xampp\perl\bin\perl.exe -S $0 ${1+"$@"}'
       if $running_under_some_shell;
 (my $perlpath = <<'/../') =~ s/\s*\z//;
-C:\Perl\bin\perl.exe
+c:\xampp\perl\bin\perl.exe
 /../
 use strict;
 use vars qw/$statdone/;

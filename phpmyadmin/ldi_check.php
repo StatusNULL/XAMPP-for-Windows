@@ -1,5 +1,5 @@
 <?php
-/* $Id: ldi_check.php,v 1.29 2003/05/29 16:44:32 lem9 Exp $ */
+/* $Id: ldi_check.php,v 1.31 2003/07/19 15:19:17 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -21,6 +21,9 @@
 require('./libraries/grab_globals.lib.php');
 require('./libraries/common.lib.php');
 
+// Check parameters
+
+PMA_checkParameters(array('db', 'table'));
 
 /**
  * If a file from UploadDir was submitted, use this file
@@ -68,8 +71,9 @@ if (isset($btnLDI) && isset($local_textfile) && $local_textfile != '') {
 
             // function is_writeable() is valid on PHP3 and 4
             if (!is_writeable($tmp_subdir)) {
-                // if we cannot move the file, let PHP report the error
-                error_reporting(E_ALL);
+                echo $strWebServerUploadDirectoryError . ': ' . $tmp_subdir
+                 . '<br />';
+                exit();
             } else {
                 $textfile_new = $tmp_subdir . basename($textfile);
                 if (PMA_PHP_INT_VERSION < 40003) {
@@ -97,8 +101,11 @@ if (isset($btnLDI) && empty($textfile)) {
         $replace = '';
     }
 
-    error_reporting(E_ALL);
-    chmod($textfile, 0644);
+    // the error message does not correspond exactly to the error...
+    if (!@chmod($textfile, 0644)) {
+       echo $strFileCouldNotBeRead . ' ' . $textfile . '<br />';
+       exit();
+    }
 
     // Kanji encoding convert appended by Y.Kawada
     if (function_exists('PMA_kanji_file_conv')) {

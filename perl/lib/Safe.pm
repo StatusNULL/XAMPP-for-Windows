@@ -3,7 +3,7 @@ package Safe;
 use 5.003_11;
 use strict;
 
-$Safe::VERSION = "2.09";
+our $VERSION = "2.08";
 
 use Carp;
 
@@ -47,7 +47,7 @@ sub new {
     # the whole glob *_ rather than $_ and @_ separately, otherwise
     # @_ in non default packages within the compartment don't work.
     $obj->share_from('main', $default_share);
-    Opcode::_safe_pkg_prep($obj->{Root}) if($Opcode::VERSION > 1.04);
+    Opcode::_safe_pkg_prep($obj->{Root});
     return $obj;
 }
 
@@ -383,9 +383,8 @@ This shares the variable(s) in the argument list with the compartment.
 This is almost identical to exporting variables using the L<Exporter>
 module.
 
-Each NAME must be the B<name> of a non-lexical variable, typically
-with the leading type identifier included. A bareword is treated as a
-function name.
+Each NAME must be the B<name> of a variable, typically with the leading
+type identifier included. A bareword is treated as a function name.
 
 Examples of legal names are '$foo' for a scalar, '@foo' for an
 array, '%foo' for a hash, '&foo' or 'foo' for a subroutine and '*foo'
@@ -427,7 +426,7 @@ C<main::> package to the code inside the compartment.
 Any attempt by the code in STRING to use an operator which is not permitted
 by the compartment will cause an error (at run-time of the main program
 but at compile-time for the code in STRING).  The error is of the form
-"'%s' trapped by operation mask...".
+"%s trapped by operation mask operation...".
 
 If an operation is trapped in this way, then the code in STRING will
 not be executed. If such a trapped operation occurs or any other

@@ -1,5 +1,5 @@
 <?php
-/* $Id: xml.php,v 1.2 2003/06/25 16:19:03 nijel Exp $ */
+/* $Id: xml.php,v 1.3 2003/08/11 08:39:23 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -110,7 +110,7 @@ function PMA_exportData($db, $table, $crlf, $error_url, $sql_query) {
     
     $columns_cnt = mysql_num_fields($result);
     for ($i = 0; $i < $columns_cnt; $i++) {
-        $columns[$i] = mysql_field_name($result, $i);
+        $columns[$i] = stripslashes(mysql_field_name($result, $i));
     }
     unset($i);
     
@@ -122,7 +122,7 @@ function PMA_exportData($db, $table, $crlf, $error_url, $sql_query) {
         for ($i = 0; $i < $columns_cnt; $i++) {
             // There is no way to dectect a "NULL" value with PHP3
             if ( isset($record[$columns[$i]]) && (!function_exists('is_null') || !is_null($record[$columns[$i]]))) {
-                $buffer .= '        <' . $columns[$i] . '>' . htmlspecialchars($record[$columns[$i]])
+                $buffer .= '        <' . $columns[$i] . '>' . htmlspecialchars(stripslashes($record[$columns[$i]]))
                         .  '</' . $columns[$i] . '>' . $crlf;
             }
         }

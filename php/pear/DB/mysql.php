@@ -1,9 +1,9 @@
 <?php
-//
+/* vim: set expandtab tabstop=4 shiftwidth=4 foldmethod=marker: */
 // +----------------------------------------------------------------------+
 // | PHP Version 4                                                        |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2002 The PHP Group                                |
+// | Copyright (c) 1997-2003 The PHP Group                                |
 // +----------------------------------------------------------------------+
 // | This source file is subject to version 2.02 of the PHP license,      |
 // | that is bundled with this package in the file LICENSE, and is        |
@@ -13,10 +13,10 @@
 // | obtain it through the world-wide-web, please send a note to          |
 // | license@php.net so we can mail you a copy immediately.               |
 // +----------------------------------------------------------------------+
-// | Author: Stig Bakken <ssb@fast.no>                                    |
+// | Author: Stig Bakken <ssb@php.net>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: mysql.php,v 1.89.2.1 2002/04/09 19:04:14 ssb Exp $
+// $Id: mysql.php,v 1.23 2003/09/10 13:32:12 cox Exp $
 //
 // Database independent query interface definition for PHP's MySQL
 // extension.
@@ -71,6 +71,7 @@ class DB_mysql extends DB_common
             1006 => DB_ERROR_CANNOT_CREATE,
             1007 => DB_ERROR_ALREADY_EXISTS,
             1008 => DB_ERROR_CANNOT_DROP,
+            1022 => DB_ERROR_ALREADY_EXISTS,
             1046 => DB_ERROR_NODBSELECTED,
             1050 => DB_ERROR_ALREADY_EXISTS,
             1051 => DB_ERROR_NOSUCHTABLE,
@@ -81,6 +82,7 @@ class DB_mysql extends DB_common
             1136 => DB_ERROR_VALUE_COUNT_ON_ROW,
             1146 => DB_ERROR_NOSUCHTABLE,
             1048 => DB_ERROR_CONSTRAINT,
+            1216 => DB_ERROR_CONSTRAINT
         );
     }
 
@@ -100,8 +102,9 @@ class DB_mysql extends DB_common
 
     function connect($dsninfo, $persistent = false)
     {
-        if (!DB::assertExtension('mysql'))
+        if (!DB::assertExtension('mysql')) {
             return $this->raiseError(DB_ERROR_EXTENSION_NOT_FOUND);
+        }
 
         $this->dsn = $dsninfo;
         if (isset($dsninfo['protocol']) && $dsninfo['protocol'] == 'unix') {
@@ -117,7 +120,6 @@ class DB_mysql extends DB_common
 
         $connect_function = $persistent ? 'mysql_pconnect' : 'mysql_connect';
 
-        @ini_set('track_errors', true);
         if ($dbhost && $user && $pw) {
             $conn = @$connect_function($dbhost, $user, $pw);
         } elseif ($dbhost && $user) {
@@ -127,7 +129,6 @@ class DB_mysql extends DB_common
         } else {
             $conn = false;
         }
-        @ini_restore('track_errors');
         if (empty($conn)) {
             if (($err = @mysql_error()) != '') {
                 return $this->raiseError(DB_ERROR_CONNECT_FAILED, null, null,
@@ -203,8 +204,10 @@ class DB_mysql extends DB_common
         $ismanip = DB::isManip($query);
         $this->last_query = $query;
         $query = $this->modifyQuery($query);
-        if (!@mysql_select_db($this->_db, $this->connection)) {
-            return $this->mysqlRaiseError(DB_ERROR_NODBSELECTED);
+        if ($this->_db) {
+            if (!@mysql_select_db($this->_db, $this->connection)) {
+                return $this->mysqlRaiseError(DB_ERROR_NODBSELECTED);
+            }
         }
         if (!$this->autocommit && $ismanip) {
             if ($this->transaction_opcount == 0) {
@@ -237,38 +240,17 @@ class DB_mysql extends DB_common
     /**
      * Move the internal mysql result pointer to the next available result
      *
-     * @param a valid fbsql result resource
+     * This method has not been implemented yet.
+     *
+     * @param a valid sql result resource
      *
      * @access public
      *
-     * @return true if a result is available otherwise return false
+     * @return false
      */
     function nextResult($result)
     {
         return false;
-    }
-
-    // }}}
-    // {{{ fetchRow()
-
-    /**
-     * Fetch and return a row of data (it uses fetchInto for that)
-     * @param $result MySQL result identifier
-     * @param   $fetchmode  format of fetched row array
-     * @param   $rownum     the absolute row number to fetch
-     *
-     * @return  array   a row of data, or false on error
-     */
-    function fetchRow($result, $fetchmode = DB_FETCHMODE_DEFAULT, $rownum=null)
-    {
-        if ($fetchmode == DB_FETCHMODE_DEFAULT) {
-            $fetchmode = $this->fetchmode;
-        }
-        $res = $this->fetchInto ($result, $arr, $fetchmode, $rownum);
-        if ($res !== DB_OK) {
-            return $res;
-        }
-        return $arr;
     }
 
     // }}}
@@ -298,11 +280,16 @@ class DB_mysql extends DB_common
             $arr = @mysql_fetch_row($result);
         }
         if (!$arr) {
+            // See: http://bugs.php.net/bug.php?id=22328
+            // for why we can't check errors on fetching
+            return null;
+            /*
             $errno = @mysql_errno($this->connection);
             if (!$errno) {
                 return NULL;
             }
             return $this->mysqlRaiseError($errno);
+            */
         }
         return DB_OK;
     }
@@ -330,18 +317,11 @@ class DB_mysql extends DB_common
             return false;
         }
 
-        // [ssb]: WTF? unset($this->prepare_types[$result]) makes PHP
-        // crash on my laptop (4.1.2 as well as 4.3.0-dev)
 
-        $copy = $this->prepare_types;
-        unset($copy[$result]);
-        $this->prepare_types = $copy;
-//        unset($this->prepare_types[$result]);
+		// I fixed the unset thing.
 
-        $copy = $this->prepare_tokens;
-        unset($copy[$result]);
-        $this->prepare_tokens = $copy;
-//        unset($this->prepare_tokens[$result]);
+        $this->prepare_types = array();
+        $this->prepare_tokens = array();
 
         return true;
     }
@@ -413,8 +393,10 @@ class DB_mysql extends DB_common
     function commit()
     {
         if ($this->transaction_opcount > 0) {
-            if (!@mysql_select_db($this->_db, $this->connection)) {
-                return $this->mysqlRaiseError(DB_ERROR_NODBSELECTED);
+            if ($this->_db) {
+                if (!@mysql_select_db($this->_db, $this->connection)) {
+                    return $this->mysqlRaiseError(DB_ERROR_NODBSELECTED);
+                }
             }
             $result = @mysql_query('COMMIT', $this->connection);
             $result = @mysql_query('SET AUTOCOMMIT=1', $this->connection);
@@ -435,8 +417,10 @@ class DB_mysql extends DB_common
     function rollback()
     {
         if ($this->transaction_opcount > 0) {
-            if (!@mysql_select_db($this->_db, $this->connection)) {
-                return $this->mysqlRaiseError(DB_ERROR_NODBSELECTED);
+            if ($this->_db) {
+                if (!@mysql_select_db($this->_db, $this->connection)) {
+                    return $this->mysqlRaiseError(DB_ERROR_NODBSELECTED);
+                }
             }
             $result = @mysql_query('ROLLBACK', $this->connection);
             $result = @mysql_query('SET AUTOCOMMIT=1', $this->connection);
@@ -547,13 +531,10 @@ class DB_mysql extends DB_common
                 $result->getCode() == DB_ERROR_NOSUCHTABLE)
             {
                 $result = $this->createSequence($seq_name);
-                // Since createSequence initializes the ID to be 1,
-                // we do not need to retrieve the ID again (or we will get 2)
                 if (DB::isError($result)) {
                     return $this->raiseError($result);
                 } else {
-                    // First ID of a newly created sequence is 1
-                    return 1;
+                    $repeat = 1;
                 }
 
             /** BACKWARDS COMPAT **/
@@ -585,7 +566,12 @@ class DB_mysql extends DB_common
             return $res;
         }
         // insert yields value 1, nextId call will generate ID 2
-        return $this->query("INSERT INTO ${seqname} VALUES(0)");
+        $res = $this->query("INSERT INTO ${seqname} VALUES(0)");
+        if (DB::isError($res)) {
+            return $res;
+        }
+        // so reset to zero
+        return $this->query("UPDATE ${seqname} SET id = 0;");
     }
 
     // }}}
@@ -598,10 +584,12 @@ class DB_mysql extends DB_common
     }
 
     // }}}
+    // {{{ _BCsequence()
 
     /**
-    * Bacwards Compatibility with old sequence emulation implementation
+    * Backwards compatibility with old sequence emulation implementation
     * (clean up the dupes)
+    *
     * @param string $seqname The sequence name to clean up
     * @return mixed DB_Error or true
     */
@@ -642,7 +630,9 @@ class DB_mysql extends DB_common
         return true;
     }
 
+    // }}}
     // {{{ quote()
+
     /**
     * Quote the given string so it can be safely used within string delimiters
     * in a query.
@@ -655,12 +645,18 @@ class DB_mysql extends DB_common
             case 'null':
                 return 'NULL';
             case 'integer':
+            case 'double':
                 return $str;
             case 'string':
             default:
-                return "'".mysql_escape_string($str)."'";
+                if(function_exists('mysql_real_escape_string')) {
+                    return "'".mysql_real_escape_string($str, $this->connection)."'";
+                } else {
+                    return "'".mysql_escape_string($str)."'";
+                }
         }
     }
+
     // }}}
     // {{{ modifyQuery()
 
@@ -682,8 +678,11 @@ class DB_mysql extends DB_common
 
     function modifyLimitQuery($query, $from, $count)
     {
-        $query = $query . " LIMIT $from, $count";
-        return $query;
+        if (DB::isManip($query)) {
+            return $query . " LIMIT $count";
+        } else {
+            return $query . " LIMIT $from, $count";
+        }
     }
 
     // }}}
@@ -710,7 +709,7 @@ class DB_mysql extends DB_common
         /*
          * depending on $mode, metadata returns the following values:
          *
-         * - mode is false (default):
+         * - mode is null (default):
          * $result[]:
          *   [0]["table"]  table name
          *   [0]["name"]   field name
@@ -796,7 +795,7 @@ class DB_mysql extends DB_common
     }
 
     // }}}
-    // {{{ getTablesQuery()
+    // {{{ getSpecialQuery()
 
     /**
     * Returns the query needed to get some backend info

@@ -1,25 +1,32 @@
 package ModPerl::TestRun;
 
-use Apache::TestRunPerl ();
+use strict;
+use warnings FATAL => 'all';
 
-our @ISA = qw(Apache::TestRunPerl);
+use base qw(Apache::TestRunPerl);
+
+# some mp2 tests require more than one server instance to be available
+# without which the server may hang, waiting for the single server
+# become available
+use constant MIN_MAXCLIENTS => 2;
 
 sub new_test_config {
     my $self = shift;
+
+    $self->{conf_opts}->{maxclients} = MIN_MAXCLIENTS;
 
     ModPerl::TestConfig->new($self->{conf_opts});
 }
 
 package ModPerl::TestConfig;
 
-our @ISA = qw(Apache::TestConfig);
+use base qw(Apache::TestConfig);
 
-#don't inherit LoadModule perl_module from the apache httpd.conf
-
-sub should_load_module {
+# don't inherit LoadModule perl_module from the apache httpd.conf
+sub should_skip_module {
     my($self, $name) = @_;
 
-    $name eq 'mod_perl.c' ? 0 : $self->SUPER::should_load_module($name);
+    $name eq 'mod_perl.c' ? 1 : $self->SUPER::should_skip_module($name);
 }
 
 1;

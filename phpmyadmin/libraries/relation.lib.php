@@ -1,5 +1,5 @@
 <?php
-/* $Id: relation.lib.php,v 1.36 2003/05/13 09:38:47 nijel Exp $ */
+/* $Id: relation.lib.php,v 1.44 2003/08/17 23:37:50 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -137,41 +137,41 @@ if (!defined('PMA_RELATION_LIB_INCLUDED')){
         if (isset($cfgRelation['relation'])) {
             $cfgRelation['relwork']         = TRUE;
             if (isset($cfgRelation['table_info'])) {
-                $cfgRelation['displaywork'] = TRUE;
+                    $cfgRelation['displaywork'] = TRUE;
             }
-            if (isset($cfgRelation['table_coords']) && isset($cfgRelation['pdf_pages'])) {
-                $cfgRelation['pdfwork']     = TRUE;
-            }
-            if (isset($cfgRelation['column_info'])) {
-                $cfgRelation['commwork']    = TRUE;
-                
-                if ($cfg['Server']['verbose_check']) {
-                    $mime_query  = 'SHOW FIELDS FROM ' . PMA_backquote($cfgRelation['db']) . '.' . PMA_backquote($cfgRelation['column_info']);
-                    $mime_rs     = PMA_query_as_cu($mime_query, FALSE);
+        }
+        if (isset($cfgRelation['table_coords']) && isset($cfgRelation['pdf_pages'])) {
+            $cfgRelation['pdfwork']     = TRUE;
+        }
+        if (isset($cfgRelation['column_info'])) {
+            $cfgRelation['commwork']    = TRUE;
+               
+            if ($cfg['Server']['verbose_check']) {
+                $mime_query  = 'SHOW FIELDS FROM ' . PMA_backquote($cfgRelation['db']) . '.' . PMA_backquote($cfgRelation['column_info']);
+                $mime_rs     = PMA_query_as_cu($mime_query, FALSE);
                     
-                    $mime_field_mimetype                = FALSE;
-                    $mime_field_transformation          = FALSE;
-                    $mime_field_transformation_options  = FALSE;
-                    while ($curr_mime_field = @PMA_mysql_fetch_array($mime_rs)) {
-                        if ($curr_mime_field[0] == 'mimetype') {
-                            $mime_field_mimetype               = TRUE;
-                        } else if ($curr_mime_field[0] == 'transformation') {
-                            $mime_field_transformation         = TRUE; 
-                        } else if ($curr_mime_field[0] == 'transformation_options') {
-                            $mime_field_transformation_options = TRUE; 
-                        }
+                $mime_field_mimetype                = FALSE;
+                $mime_field_transformation          = FALSE;
+                $mime_field_transformation_options  = FALSE;
+                while ($curr_mime_field = @PMA_mysql_fetch_array($mime_rs)) {
+                    if ($curr_mime_field[0] == 'mimetype') {
+                        $mime_field_mimetype               = TRUE;
+                    } else if ($curr_mime_field[0] == 'transformation') {
+                        $mime_field_transformation         = TRUE; 
+                    } else if ($curr_mime_field[0] == 'transformation_options') {
+                        $mime_field_transformation_options = TRUE; 
                     }
-                    
-                    if ($mime_field_mimetype == TRUE
-                        && $mime_field_transformation == TRUE
-                        && $mime_field_transformation_options == TRUE) {
-                        $cfgRelation['mimework'] = TRUE;
-                    }
-                } else {
+                }
+                   
+                if ($mime_field_mimetype == TRUE
+                    && $mime_field_transformation == TRUE
+                    && $mime_field_transformation_options == TRUE) {
                     $cfgRelation['mimework'] = TRUE;
                 }
+            } else {
+                $cfgRelation['mimework'] = TRUE;
             }
-        } // end if
+        }
         
         if (isset($cfgRelation['history'])) {
             $cfgRelation['historywork']     = TRUE;
@@ -272,6 +272,7 @@ if (!defined('PMA_RELATION_LIB_INCLUDED')){
      * @param   string   the name of the db to check for
      * @param   string   the name of the table to check for
      * @param   string   the name of the column to check for
+     * @param   string   the source for foreign key information
      *
      * @return  array    db,table,column
      *
@@ -280,33 +281,63 @@ if (!defined('PMA_RELATION_LIB_INCLUDED')){
      *
      * @access  public
      *
-     * @author  Mike Beck <mikebeck@users.sourceforge.net>
+     * @author  Mike Beck <mikebeck@users.sourceforge.net> and Marc Delisle
      */
-    function PMA_getForeigners($db, $table, $column = '') {
+    function PMA_getForeigners($db, $table, $column = '', $source = 'both') {
         global $cfgRelation, $err_url_0;
 
-        $rel_query     = 'SELECT master_field, foreign_db, foreign_table, foreign_field'
-                       . ' FROM ' . PMA_backquote($cfgRelation['relation'])
-                       . ' WHERE master_db =  \'' . PMA_sqlAddslashes($db) . '\' '
-                       . ' AND   master_table = \'' . PMA_sqlAddslashes($table) . '\' ';
-        if (!empty($column)) {
-            $rel_query .= ' AND master_field = \'' . PMA_sqlAddslashes($column) . '\'';
+        if ($cfgRelation['relwork'] && ($source == 'both' || $source == 'internal')) {
+            $rel_query     = 'SELECT master_field, foreign_db, foreign_table, foreign_field'
+                           . ' FROM ' . PMA_backquote($cfgRelation['relation'])
+                           . ' WHERE master_db =  \'' . PMA_sqlAddslashes($db) . '\' '
+                           . ' AND   master_table = \'' . PMA_sqlAddslashes($table) . '\' ';
+            if (!empty($column)) {
+                $rel_query .= ' AND master_field = \'' . PMA_sqlAddslashes($column) . '\'';
+            }
+            $relations     = PMA_query_as_cu($rel_query);
+            $i = 0;
+            while ($relrow = @PMA_mysql_fetch_array($relations)) {
+                $field                            = $relrow['master_field'];
+                $foreign[$field]['foreign_db']    = $relrow['foreign_db'];
+                $foreign[$field]['foreign_table'] = $relrow['foreign_table'];
+                $foreign[$field]['foreign_field'] = $relrow['foreign_field'];
+                $i++;
+            } // end while
         }
-        $relations     = PMA_query_as_cu($rel_query);
-        $i = 0;
-        while ($relrow = @PMA_mysql_fetch_array($relations)) {
-            $field                            = $relrow['master_field'];
-            $foreign[$field]['foreign_db']    = $relrow['foreign_db'];
-            $foreign[$field]['foreign_table'] = $relrow['foreign_table'];
-            $foreign[$field]['foreign_field'] = $relrow['foreign_field'];
-            $i++;
-         } // end while
 
-         if (isset($foreign) && is_array($foreign)) {
-            return $foreign;
-         } else {
-            return FALSE;
-         }
+        if (PMA_MYSQL_INT_VERSION >= 32320 && ($source == 'both' || $source == 'innodb') && !empty($table)) {
+            $show_create_table_query = 'SHOW CREATE TABLE ' 
+                . PMA_backquote($db) . '.' . PMA_backquote($table);
+            $show_create_table_res = PMA_mysql_query($show_create_table_query);
+            list(,$show_create_table) = PMA_mysql_fetch_row($show_create_table_res);
+
+            $analyzed_sql = PMA_SQP_analyze(PMA_SQP_parse($show_create_table));
+            while (list(,$one_key) = each ($analyzed_sql[0]['foreign_keys'])) {
+
+            // the analyzer may return more than one column name in the
+            // index list or the ref_index_list
+                while (list($i,$field) = each($one_key['index_list'])) {
+
+            // If a foreign key is defined in the 'internal' source (pmadb)
+            // and in 'innodb', we won't get it twice if $source='both'
+            // because we use $field as key
+
+                    if (isset($one_key['ref_db_name'])) {
+                        $foreign[$field]['foreign_db']    = $one_key['ref_db_name'];
+                    } else {
+                        $foreign[$field]['foreign_db']    = $db;
+                    }
+                    $foreign[$field]['foreign_table'] = $one_key['ref_table_name'];
+                    $foreign[$field]['foreign_field'] = $one_key['ref_index_list'][$i];
+                }
+            }
+        }      
+
+        if (isset($foreign) && is_array($foreign)) {
+           return $foreign;
+        } else {
+           return FALSE;
+        }
     } // end of the 'PMA_getForeigners()' function
 
 
@@ -527,7 +558,7 @@ if (!defined('PMA_RELATION_LIB_INCLUDED')){
         
     } // end of 'PMA_getHistory()' function
 
-/**
+    /**
     * Set a SQL history entry
     *
     * @param   string   the name of the db
@@ -553,5 +584,60 @@ if (!defined('PMA_RELATION_LIB_INCLUDED')){
 
         return true;
     } // end of 'PMA_purgeHistory()' function
+    
+    /**
+    * Outputs dropdown with values of foreign fields
+    *
+    * @param   string   the query of the foreign keys
+    * @param   string   the foreign field
+    * @param   string   the foreign field to display
+    * @param   string   the current data of the dropdown
+    *
+    * @return  string   the <option value=""><option>s
+    *
+    * @access  public
+    */
+    function PMA_foreignDropdown($disp, $foreign_field, $foreign_display, $data, $max = 100) {
+        global $cfg;
+        
+        $ret = '<option value=""></option>' . "\n";
+
+        $reloptions = array('content-id' => array(), 'id-content' => array());
+        while ($relrow = @PMA_mysql_fetch_array($disp)) {
+            $key   = $relrow[$foreign_field];
+            if (strlen($relrow[$foreign_display]) <= $cfg['LimitChars']) {
+                $value  = (($foreign_display != FALSE) ? htmlspecialchars($relrow[$foreign_display]) : '');
+                $vtitle = '';
+            } else {
+                $vtitle = htmlspecialchars($relrow[$foreign_display]);
+                $value  = (($foreign_display != FALSE) ? htmlspecialchars(substr($vtitle, 0, $cfg['LimitChars']) . '...') : '');
+            }
+            
+            $reloption = '<option value="' . htmlspecialchars($key) . '"';
+            if ($vtitle != '') {
+                $reloption .= ' title="' . $vtitle . '"';
+            }
+            
+            if ($key == $data) {
+               $reloption .= ' selected="selected"';
+            } // end if
+
+            $reloptions['id-content'][] = $reloption . '>' . $value . '&nbsp;-&nbsp;' . htmlspecialchars($key) .  '</option>' . "\n";
+            $reloptions['content-id'][] = $reloption . '>' . htmlspecialchars($key) .  '&nbsp;-&nbsp;' . $value . '</option>' . "\n";
+        } // end while
+        
+        if ($max == -1 || count($reloptions['content-id']) < $max) {
+            $ret .= implode('', $reloptions['content-id']);
+            if (count($reloptions['content-id']) > 0) {
+                $ret .= '<option value=""></option>' . "\n";
+                $ret .= '<option value=""></option>' . "\n";
+            }
+        }
+
+        $ret .= implode('', $reloptions['id-content']);
+        
+        return $ret;
+    } // end of 'PMA_foreignDropdown()' function
+    
 } // $__PMA_RELATION_LIB__
 ?>

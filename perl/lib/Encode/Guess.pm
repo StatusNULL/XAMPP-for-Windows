@@ -2,7 +2,7 @@ package Encode::Guess;
 use strict;
 
 use Encode qw(:fallbacks find_encoding);
-our $VERSION = do { my @r = (q$Revision: 1.8 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
+our $VERSION = do { my @r = (q$Revision: 1.6 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
 
 my $Canon = 'Guess';
 our $DEBUG = 0;
@@ -79,66 +79,45 @@ sub guess {
     $BOM = unpack('N', $octet);
     return find_encoding('UTF-32') 
 	if (defined $BOM and ($BOM == 0xFeFF or $BOM == 0xFFFe0000));
+
     my %try =  %{$obj->{Suspects}};
     for my $c (@_){
 	my $e = find_encoding($c) or die "Unknown encoding: $c";
 	$try{$e->name} = $e;
 	$DEBUG and warn "Added: ", $e->name;
     }
-    if ($octet =~ /\x00/o){ # if \x00 found, we assume UTF-(16|32)(BE|LE)
-	my $utf;
-	my ($be, $le) = (0, 0);
-	if ($octet =~ /\x00\x00/o){ # UTF-32(BE|LE) assumed
-	    $utf = "UTF-32";
-	    for my $char (unpack('N*', $octet)){
-		$char & 0x0000ffff and $be++;
-		$char & 0xffff0000 and $le++;
-	    }
-	}else{ # UTF-16(BE|LE) assumed
-	    $utf = "UTF-16";
-	    for my $char (unpack('n*', $octet)){
-		$char & 0x00ff and $be++;
-		$char & 0xff00 and $le++;
+    my $nline = 1;
+    for my $line (split /\r\n?|\n/, $octet){
+	# cheat 2 -- \e in the string
+	if ($line =~ /\e/o){
+	    my @keys = keys %try;
+	    delete @try{qw/utf8 ascii/};
+	    for my $k (@keys){
+		ref($try{$k}) eq 'Encode::XS' and delete $try{$k};
 	    }
 	}
-	$DEBUG and warn "$utf, be == $be, le == $le";
-	$be == $le 
-	    and return "Encodings ambiguous between $utf BE and LE ($be, $le)";
-	$utf .= ($be > $le) ? 'BE' : 'LE';
-	return find_encoding($utf);
-    }else{
-	my $nline = 1;
-	for my $line (split /\r\n?|\n/, $octet){
-	    # cheat 2 -- \e in the string
-	    if ($line =~ /\e/o){
-		my @keys = keys %try;
-		delete @try{qw/utf8 ascii/};
-		for my $k (@keys){
-		    ref($try{$k}) eq 'Encode::XS' and delete $try{$k};
-		}
+	my %ok = %try;
+	# warn join(",", keys %try);
+	for my $k (keys %try){
+	    my $scratch = $line;
+	    $try{$k}->decode($scratch, FB_QUIET);
+	    if ($scratch eq ''){
+		$DEBUG and warn sprintf("%4d:%-24s ok\n", $nline, $k);
+	    }else{
+		use bytes ();
+		$DEBUG and 
+		    warn sprintf("%4d:%-24s not ok; %d bytes left\n", 
+				 $nline, $k, bytes::length($scratch));
+		delete $ok{$k};
+		
 	    }
-	    my %ok = %try;
-	    # warn join(",", keys %try);
-	    for my $k (keys %try){
-		my $scratch = $line;
-		$try{$k}->decode($scratch, FB_QUIET);
-		if ($scratch eq ''){
-		    $DEBUG and warn sprintf("%4d:%-24s ok\n", $nline, $k);
-		}else{
-		    use bytes ();
-		    $DEBUG and 
-			warn sprintf("%4d:%-24s not ok; %d bytes left\n", 
-				     $nline, $k, bytes::length($scratch));
-		    delete $ok{$k};
-		}
-	    }
-	    %ok or return "No appropriate encodings found!";
-	    if (scalar(keys(%ok)) == 1){
-		my ($retval) = values(%ok);
-		return $retval;
-	    }
-	    %try = %ok; $nline++;
 	}
+	%ok or return "No appropriate encodings found!";
+	if (scalar(keys(%ok)) == 1){
+	    my ($retval) = values(%ok);
+	    return $retval;
+	}
+	%try = %ok; $nline++;
     }
     $try{ascii} or 
 	return  "Encodings too ambiguous: ", join(" or ", keys %try);
@@ -164,7 +143,7 @@ Encode::Guess -- Guesses encoding from data
   my $data = encode("Guess", $utf8);   # this doesn't work!
 
   # more elaborate way
-  use Encode::Guess;
+  use Encode::Guess,
   my $enc = guess_encoding($data, qw/euc-jp shiftjis 7bit-jis/);
   ref($enc) or die "Can't guess: $enc"; # trap error this way
   $utf8 = $enc->decode($data);
@@ -219,21 +198,9 @@ When you are content with suspects list, you can now
 
 =item Encode::Guess->guess($data)
 
-But it will croak if:
-
-=over
-
-=item *
-
-Two or more suspects remain
-
-=item *
-
-No suspects left
-
-=back
-
-So you should instead try this;
+But it will croak if Encode::Guess fails to eliminate all other
+suspects but the right one or no suspect was good.  So you should
+instead try this;
 
   my $decoder = Encode::Guess->guess($data);
 
@@ -282,7 +249,7 @@ one suspect (besides ascii and utf8).
 
 The reason is that Encode::Guess guesses encoding by trial and error.
 It first splits $data into lines and tries to decode the line for each
-suspect.  It keeps it going until all but one encoding is eliminated
+suspect.  It keeps it going until all but one encoding was eliminated
 out of suspects list.  ISO-8859 series is just too successful for most
 cases (because it fills almost all code points in \x00-\xff).
 

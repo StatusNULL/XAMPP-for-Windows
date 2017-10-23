@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_rename.php,v 1.24 2003/03/12 13:41:18 garvinhicking Exp $ */
+/* $Id: tbl_rename.php,v 1.26 2003/08/05 17:12:48 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -10,6 +10,7 @@ require('./libraries/grab_globals.lib.php');
 $js_to_run = 'functions.js';
 require('./libraries/common.lib.php');
 
+PMA_checkParameters(array('db','table'));
 
 /**
  * Defines the url to return to in case of error in a sql statement
@@ -36,7 +37,7 @@ if (isset($new_name) && trim($new_name) != '') {
     PMA_mysql_select_db($db);
     $sql_query = 'ALTER TABLE ' . PMA_backquote($old_name) . ' RENAME ' . PMA_backquote($new_name);
     $result    = PMA_mysql_query($sql_query) or PMA_mysqlDie('', '', '', $err_url);
-    $message   = sprintf($strRenameTableOK, $old_name, $table);
+    $message   = sprintf($strRenameTableOK, htmlspecialchars($old_name), htmlspecialchars($table));
     $reload    = 1;
 
     // garvin: Move old entries from comments to new table

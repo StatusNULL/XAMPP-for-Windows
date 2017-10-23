@@ -21,10 +21,10 @@ fields - compile-time class fields
 	}
     }
 
-    my $var = Foo->new;
+    my Foo $var = Foo::->new;
     $var->{foo} = 42;
 
-    # this will generate an error
+    # this will generate a compile-time error
     $var->{zap} = 42;
 
     # subclassing
@@ -51,13 +51,10 @@ hash of the calling package, but this may change in future versions.
 Do B<not> update the %FIELDS hash directly, because it must be created
 at compile-time for it to be fully useful, as is done by this pragma.
 
-  Only valid for perl before 5.9.0:
-
-  If a typed lexical variable holding a reference is used to access a
-  hash element and a package with the same name as the type has
-  declared class fields using this pragma, then the operation is
-  turned into an array access at compile time.
-
+If a typed lexical variable holding a reference is used to access a
+hash element and a package with the same name as the type has declared
+class fields using this pragma, then the operation is turned into an
+array access at compile time.
 
 The related C<base> pragma will combine fields from base classes and any
 fields declared using the C<fields> pragma.  This enables field
@@ -68,15 +65,10 @@ the class and are not visible to subclasses.  Inherited fields can be
 overridden but will generate a warning if used together with the C<-w>
 switch.
 
-  Only valid for perls before 5.9.0:
-
-  The effect of all this is that you can have objects with named
-  fields which are as compact and as fast arrays to access. This only
-  works as long as the objects are accessed through properly typed
-  variables. If the objects are not typed, access is only checked at
-  run time.
-
-
+The effect of all this is that you can have objects with named fields
+which are as compact and as fast arrays to access.  This only works
+as long as the objects are accessed through properly typed variables.
+If the objects are not typed, access is only checked at run time.
 
 The following functions are supported:
 
@@ -84,22 +76,15 @@ The following functions are supported:
 
 =item new
 
-B< perl before 5.9.0: > fields::new() creates and blesses a
-pseudo-hash comprised of the fields declared using the C<fields>
-pragma into the specified class.
-
-B< perl 5.9.0 and higher: > fields::new() creates and blesses a
-restricted-hash comprised of the fields declared using the C<fields>
-pragma into the specified class.
-
-
+fields::new() creates and blesses a pseudo-hash comprised of the fields
+declared using the C<fields> pragma into the specified class.
 This makes it possible to write a constructor like this:
 
     package Critter::Sounds;
     use fields qw(cat dog bird);
 
     sub new {
-	my $self = shift;
+	my Critter::Sounds $self = shift;
 	$self = fields::new($self) unless ref $self;
 	$self->{cat} = 'meow';				# scalar element
 	@$self{'dog','bird'} = ('bark','tweet');	# slice
@@ -108,53 +93,47 @@ This makes it possible to write a constructor like this:
 
 =item phash
 
-B< before perl 5.9.0: > 
+fields::phash() can be used to create and initialize a plain (unblessed)
+pseudo-hash.  This function should always be used instead of creating
+pseudo-hashes directly.
 
-  fields::phash() can be used to create and initialize a plain (unblessed)
-  pseudo-hash.  This function should always be used instead of creating
-  pseudo-hashes directly.
+If the first argument is a reference to an array, the pseudo-hash will
+be created with keys from that array.  If a second argument is supplied,
+it must also be a reference to an array whose elements will be used as
+the values.  If the second array contains less elements than the first,
+the trailing elements of the pseudo-hash will not be initialized.
+This makes it particularly useful for creating a pseudo-hash from
+subroutine arguments:
 
-  If the first argument is a reference to an array, the pseudo-hash will
-  be created with keys from that array.  If a second argument is supplied,
-  it must also be a reference to an array whose elements will be used as
-  the values.  If the second array contains less elements than the first,
-  the trailing elements of the pseudo-hash will not be initialized.
-  This makes it particularly useful for creating a pseudo-hash from
-  subroutine arguments:
+    sub dogtag {
+	my $tag = fields::phash([qw(name rank ser_num)], [@_]);
+    }
 
-      sub dogtag {
-         my $tag = fields::phash([qw(name rank ser_num)], [@_]);
-      }
+fields::phash() also accepts a list of key-value pairs that will
+be used to construct the pseudo hash.  Examples:
 
-  fields::phash() also accepts a list of key-value pairs that will
-  be used to construct the pseudo hash.  Examples:
+    my $tag = fields::phash(name => "Joe",
+			    rank => "captain",
+			    ser_num => 42);
 
-      my $tag = fields::phash(name => "Joe",
-                             rank => "captain",
-                             ser_num => 42);
-
-      my $pseudohash = fields::phash(%args);
-
-B< perl 5.9.0 and higher: >
-
-Pseudo-hashes have been removed from Perl as of 5.10.  Consider using
-restricted hashes instead.  Using fields::phash() will cause an error.
+    my $pseudohash = fields::phash(%args);
 
 =back
 
 =head1 SEE ALSO
 
 L<base>,
+L<perlref/Pseudo-hashes: Using an array as a hash>
 
 =cut
 
-require 5.005;
+use 5.006_001;
 use strict;
 no strict 'refs';
-eval q{use warnings::register;} if $] >= 5.006;
-use vars qw(%attr $VERSION);
+use warnings::register;
+our(%attr, $VERSION);
 
-$VERSION = "1.0201";
+$VERSION = "1.02";
 
 # some constants
 sub _PUBLIC    () { 1 }
@@ -193,11 +172,7 @@ sub import {
 	if ($fno and $fno != $next) {
 	    require Carp;
             if ($fno < $fattr->[0]) {
-              if ($] < 5.006001) {
-                warn("Hides field '$f' in base class") if $^W;
-              } else {
                 warnings::warnif("Hides field '$f' in base class") ;
-              }
             } else {
                 Carp::croak("Field name '$f' already in use");
             }
@@ -268,60 +243,43 @@ sub _dump  # sometimes useful for debugging
     }
 }
 
-if ($] < 5.009) {
-  eval <<'EOC';
-  sub new {
+sub new {
     my $class = shift;
     $class = ref $class if ref $class;
     return bless [\%{$class . "::FIELDS"}], $class;
-  }
-EOC
-} else {
-  eval <<'EOC';
-  sub new {
-    my $class = shift;
-    $class = ref $class if ref $class;
-    use Hash::Util;
-    my $self = bless {}, $class;
-    Hash::Util::lock_keys(%$self, keys %{$class.'::FIELDS'});
-    return $self;
-  }
-EOC
 }
 
 sub phash {
-    die "Pseudo-hashes have been removed from Perl" if $] >= 5.009;
     my $h;
     my $v;
     if (@_) {
-       if (ref $_[0] eq 'ARRAY') {
-           my $a = shift;
-           @$h{@$a} = 1 .. @$a;
-           if (@_) {
-               $v = shift;
-               unless (! @_ and ref $v eq 'ARRAY') {
-                   require Carp;
-                   Carp::croak ("Expected at most two array refs\n");
-               }
-           }
-       }
-       else {
-           if (@_ % 2) {
-               require Carp;
-               Carp::croak ("Odd number of elements initializing pseudo-hash\n");
-           }
-           my $i = 0;
-           @$h{grep ++$i % 2, @_} = 1 .. @_ / 2;
-           $i = 0;
-           $v = [grep $i++ % 2, @_];
-       }
+	if (ref $_[0] eq 'ARRAY') {
+	    my $a = shift;
+	    @$h{@$a} = 1 .. @$a;
+	    if (@_) {
+		$v = shift;
+		unless (! @_ and ref $v eq 'ARRAY') {
+		    require Carp;
+		    Carp::croak ("Expected at most two array refs\n");
+		}
+	    }
+	}
+	else {
+	    if (@_ % 2) {
+		require Carp;
+		Carp::croak ("Odd number of elements initializing pseudo-hash\n");
+	    }
+	    my $i = 0;
+	    @$h{grep ++$i % 2, @_} = 1 .. @_ / 2;
+	    $i = 0;
+	    $v = [grep $i++ % 2, @_];
+	}
     }
     else {
-       $h = {};
-       $v = [];
+	$h = {};
+	$v = [];
     }
     [ $h, @$v ];
-
 }
 
 1;

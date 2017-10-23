@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_select.php,v 1.57 2003/05/20 13:12:28 nijel Exp $ */
+/* $Id: tbl_select.php,v 1.61 2003/08/17 23:36:51 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -10,14 +10,33 @@ require('./libraries/grab_globals.lib.php');
 require('./libraries/common.lib.php');
 require('./libraries/relation.lib.php'); // foreign keys
 
+if ($cfg['PropertiesIconic'] == true) {
+    // We need to copy the value or else the == 'both' check will always return true
+    $propicon = (string)$cfg['PropertiesIconic'];
+
+    if ($propicon == 'both') {
+        $iconic_spacer = '<nobr>';
+    } else {
+        $iconic_spacer = '';
+    }
+
+    $titles['Browse']     = $iconic_spacer . '<img width="12" height="13" src="images/button_browse.png" alt="' . $strBrowseForeignValues . '" title="' . $strBrowseForeignValues . '" border="0" />';
+
+    if ($propicon == 'both') {
+        $titles['Browse']        .= '&nbsp;' . $strBrowseForeignValues . '</nobr>';
+    }
+} else {
+    $titles['Browse']        = $strBrowseForeignValues;
+}
 
 /**
  * Defines arrays of functions (should possibly be in config.inc.php
  * so it can also be used in tbl_qbe.php)
+ *
+ * LIKE works also on integers and dates so I added it in numfunctions
  */
-$numfunctions  = array('=', '>', '>=', '<', '<=', '!=');
+$numfunctions  = array('=', '>', '>=', '<', '<=', '!=', 'LIKE');
 $textfunctions = array('LIKE', '=', '!=');
-
 
 /**
  * Not selection yet required -> displays the selection form
@@ -65,9 +84,12 @@ if (!isset($param) || $param[0] == '') {
         // <markus@noga.de>
         // retrieve keys into foreign fields, if any
         $cfgRelation = PMA_getRelationsParam();
-        $foreigners  = ($cfgRelation['relwork'] ? PMA_getForeigners($db, $table) : FALSE);
+        // check also foreigners even if relwork is FALSE (to get
+        // foreign keys from innodb)
+        //$foreigners  = ($cfgRelation['relwork'] ? PMA_getForeigners($db, $table) : FALSE);
+        $foreigners  = PMA_getForeigners($db, $table);
         ?>
-<form method="post" action="tbl_select.php">
+<form method="post" action="tbl_select.php" name="insertForm">
     <?php echo PMA_generate_common_hidden_inputs($db, $table); ?>
     <input type="hidden" name="goto" value="<?php echo $goto; ?>" />
     <input type="hidden" name="back" value="tbl_select.php" />
@@ -144,16 +166,17 @@ if (!isset($param) || $param[0] == '') {
             if ($foreigners && isset($foreigners[$field]) && isset($disp) && $disp && @PMA_mysql_fetch_array($disp)) {
                 // f o r e i g n    k e y s
                 echo '                    <select name="fields[]">' . "\n";
-                echo '                        <option value=""></option>' . "\n";
                 // go back to first row
                 mysql_data_seek($disp,0);
-                while ($relrow = @PMA_mysql_fetch_array($disp)) {
-                    $key   = $relrow[$foreign_field];
-                    $value = (($foreign_display != FALSE) ? '-' . htmlspecialchars($relrow[$foreign_display]) : '');
-                    echo '                        <option value="' . htmlspecialchars($key) . '">'
-                         . htmlspecialchars($key) . $value . '</option>' . "\n";
-                } // end while
+                echo PMA_foreignDropdown($disp, $foreign_field, $foreign_display, $data, 100);
                 echo '                    </select>' . "\n";
+            } else if (isset($foreign_link) && $foreign_link == true) {
+            ?>
+            <input type="text"   name="fields[]" id="field_<?php echo md5($field); ?>[]" class="textfield" />
+            <script type="text/javascript" language="javascript">
+                document.writeln('<a target="_blank" onclick="window.open(this.href, \'foreigners\', \'width=640,height=240,scrollbars=yes\'); return false" href="browse_foreigners.php?<?php echo PMA_generate_common_url($db, $table); ?>&amp;field=<?php echo urlencode($field); ?>"><?php echo str_replace("'", "\'", $titles['Browse']); ?></a>');
+            </script>
+            <?php
             } else if (substr($fields_type[$i], 0, 3)=='enu'){
                 // e n u m s
                 $enum_value=explode(", ",str_replace("'", "", substr($fields_type[$i], 5, -1)));
@@ -199,6 +222,7 @@ if (!isset($param) || $param[0] == '') {
     </ul>
 
     &nbsp;&nbsp;&nbsp;&nbsp;
+    <input type="hidden" name="max_number_of_fields" value="<?php echo $fields_cnt; ?>" />
     <input type="submit" name="submit" value="<?php echo $strGo; ?>" />
 </form>
         <?php
@@ -213,15 +237,28 @@ if (!isset($param) || $param[0] == '') {
  */
 else {
     // Builds the query
-    $sql_query = 'SELECT ' . PMA_backquote(urldecode($param[0]));
-    $i         = 0;
-    $c         = count($param);
-    while ($i < $c) {
-        if ($i > 0) {
-            $sql_query .= ',' . PMA_backquote(urldecode($param[$i]));
+
+    $sql_query = 'SELECT ';
+
+    // if all fields were selected to display, we do a SELECT *
+    // (more efficient and this helps prevent a problem in IE
+    // if one of the rows is edited and we come back to the Select results)
+
+    if (count($param) == $max_number_of_fields) {
+        $sql_query .= '* ';
+    } else {
+
+        $sql_query .= PMA_backquote(urldecode($param[0]));
+        $i         = 0;
+        $c         = count($param);
+        while ($i < $c) {
+            if ($i > 0) {
+                $sql_query .= ',' . PMA_backquote(urldecode($param[$i]));
+            }
+            $i++;
         }
-        $i++;
-    }
+    } // end if
+
     $sql_query .= ' FROM ' . PMA_backquote($table);
     // The where clause
     if ($where != '') {

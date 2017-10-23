@@ -1,5 +1,5 @@
 # -*- Mode: cperl; cperl-indent-level: 4 -*-
-# $Id: Harness.pm,v 1.47 2003/04/24 19:33:05 andy Exp $
+# $Id: Harness.pm,v 1.38 2002/06/19 21:01:01 schwern Exp $
 
 package Test::Harness;
 
@@ -22,7 +22,7 @@ use vars qw($VERSION $Verbose $Switches $Have_Devel_Corestack $Curtest
 
 $Have_Devel_Corestack = 0;
 
-$VERSION = '2.28';
+$VERSION = '2.26';
 
 $ENV{HARNESS_ACTIVE} = 1;
 
@@ -328,7 +328,6 @@ It returns true if everything was ok.  Otherwise it will die() with
 one of the messages in the DIAGNOSTICS section.
 
 =for _private
-
 This is just _run_all_tests() plus _show_results()
 
 =cut
@@ -470,7 +469,7 @@ sub _run_all_tests {
                     failed      => \@failed,
                     bonus       => $results{bonus},
                     skipped     => $results{skip},
-                    skip_reason => $results{skip_reason},
+                    skip_reason => $Strap->{_skip_reason},
                     skip_all    => $Strap->{skip_all},
                     ml          => $ml,
                    );
@@ -483,7 +482,12 @@ sub _run_all_tests {
 
         my($estatus, $wstatus) = @results{qw(exit wait)};
 
-        if ($results{passing}) {
+        if ($wstatus) {
+            $failedtests{$tfile} = _dubious_return(\%test, \%tot, 
+                                                  $estatus, $wstatus);
+            $failedtests{$tfile}{name} = $tfile;
+        }
+        elsif ($results{passing}) {
             if ($test{max} and $test{skipped} + $test{bonus}) {
                 my @msg;
                 push(@msg, "$test{skipped}/$test{max} skipped: $test{skip_reason}")
@@ -503,26 +507,10 @@ sub _run_all_tests {
             $tot{good}++;
         }
         else {
-            # List unrun tests as failures.
-            if ($test{'next'} <= $test{max}) {
-                push @{$test{failed}}, $test{'next'}..$test{max};
-            }
-            # List overruns as failures.
-            else {
-                my $details = $results{details};
-                foreach my $overrun ($test{max}+1..@$details)
-                {
-                    next unless ref $details->[$overrun-1];
-                    push @{$test{failed}}, $overrun
+            if ($test{max}) {
+                if ($test{'next'} <= $test{max}) {
+                    push @{$test{failed}}, $test{'next'}..$test{max};
                 }
-            }
-
-            if ($wstatus) {
-                $failedtests{$tfile} = _dubious_return(\%test, \%tot, 
-                                                       $estatus, $wstatus);
-                $failedtests{$tfile}{name} = $tfile;
-            }
-            elsif($results{seen}) {
                 if (@{$test{failed}}) {
                     my ($txt, $canon) = canonfailed($test{max},$test{skipped},
                                                     @{$test{failed}});
@@ -548,7 +536,7 @@ sub _run_all_tests {
                                            };
                 }
                 $tot{bad}++;
-            } else {
+            } elsif ($test{'next'} == 0) {
                 print "FAILED before any test output arrived\n";
                 $tot{bad}++;
                 $failedtests{$tfile} = { canon       => '??',
@@ -709,10 +697,10 @@ $Handlers{test} = sub {
         _print_ml("ok $curr/$max");
 
         if( $detail->{type} eq 'skip' ) {
-            $totals->{skip_reason} = $detail->{reason}
-              unless defined $totals->{skip_reason};
-            $totals->{skip_reason} = 'various reasons'
-              if $totals->{skip_reason} ne $detail->{reason};
+            $self->{_skip_reason} = $detail->{reason}
+              unless defined $self->{_skip_reason};
+            $self->{_skip_reason} = 'various reasons'
+              if $self->{_skip_reason} ne $detail->{reason};
         }
     }
     else {
@@ -870,15 +858,12 @@ sub _create_fmts {
     sub corestatus {
         my($st) = @_;
 
-        my $did_core;
-        eval { # we may not have a WCOREDUMP
+        eval {
             local $^W = 0;  # *.ph files are often *very* noisy
-            require 'wait.ph';
-            $did_core = WCOREDUMP($st);
+            require 'wait.ph'
         };
-        if( $@ ) {
-            $did_core = $st & 0200;
-        }
+        return if $@;
+        my $did_core = defined &WCOREDUMP ? WCOREDUMP($st) : $st & 0200;
 
         eval { require Devel::CoreStack; $Have_Devel_Corestack++ } 
           unless $tried_devel_corestack++;
@@ -943,7 +928,7 @@ __END__
 
 =head1 EXPORT
 
-C<&runtests> is exported by Test::Harness by default.
+C<&runtests> is exported by Test::Harness per default.
 
 C<$verbose> and C<$switches> are exported upon request.
 
@@ -1072,14 +1057,6 @@ with perl distributions for ages. Numerous anonymous contributors
 exist.  Andreas Koenig held the torch for many years.
 
 Current maintainer is Michael G Schwern E<lt>schwern@pobox.comE<gt>
-
-=head1 LICENSE
-
-This program is free software; you can redistribute it and/or 
-modify it under the same terms as Perl itself.
-
-See F<http://www.perl.com/perl/misc/Artistic.html>
-
 
 =head1 TODO
 

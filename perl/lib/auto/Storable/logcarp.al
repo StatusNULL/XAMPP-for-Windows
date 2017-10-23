@@ -1,9 +1,9 @@
-# NOTE: Derived from blib\lib\Storable.pm.
+# NOTE: Derived from ..\..\lib\Storable.pm.
 # Changes made here will be lost when autosplit is run again.
 # See AutoSplit.pm.
 package Storable;
 
-#line 69 "blib\lib\Storable.pm (autosplit into blib\lib\auto\Storable\logcarp.al)"
+#line 69 "..\..\lib\Storable.pm (autosplit into ..\..\lib\auto\Storable\logcarp.al)"
 sub logcarp {
   Carp::carp(@_);
 }

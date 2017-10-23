@@ -1,9 +1,9 @@
-# NOTE: Derived from blib\lib\Storable.pm.
+# NOTE: Derived from ..\..\lib\Storable.pm.
 # Changes made here will be lost when autosplit is run again.
 # See AutoSplit.pm.
 package Storable;
 
-#line 86 "blib\lib\Storable.pm (autosplit into blib\lib\auto\Storable\show_file_magic.al)"
+#line 86 "..\..\lib\Storable.pm (autosplit into ..\..\lib\auto\Storable\show_file_magic.al)"
 sub show_file_magic {
     print <<EOM;
 #

@@ -12,12 +12,12 @@ goto endofperl
 @rem ';
 #!perl
 #line 15
-    eval 'exec C:\Perl\bin\perl.exe -S $0 ${1+"$@"}'
+    eval 'exec c:\xampp\perl\bin\perl.exe -S $0 ${1+"$@"}'
 	if $running_under_some_shell;
 
-my $config_tag1 = 'v5.8.0 - Thu Apr 24 20:37:04 2003';
+my $config_tag1 = 'v5.8.0 - Mon Nov  3 22:13:19 2003';
 
-my $patchlevel_date = 1048674940;
+my $patchlevel_date = 1048638302;
 my $patch_tags = '+ACTIVEPERL_LOCAL_PATCHES_ENTRY ';
 my @patches = (
     'ACTIVEPERL_LOCAL_PATCHES_ENTRY'

@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_details.php,v 1.184 2003/04/14 13:17:17 nijel Exp $ */
+/* $Id: db_details.php,v 1.185 2003/08/05 17:12:47 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -59,7 +59,7 @@ $auto_sel  = ($cfg['TextareaAutoSelect']
     <input type="hidden" name="goto" value="db_details.php" />
     <input type="hidden" name="zero_rows" value="<?php echo htmlspecialchars($strSuccess); ?>" />
     <input type="hidden" name="prev_sql_query" value="<?php echo ((!empty($query_to_display)) ? htmlspecialchars($query_to_display) : ''); ?>" />
-    <?php echo sprintf($strRunSQLQuery, $db) . ' ' . PMA_showMySQLDocu('Reference', 'SELECT'); ?>&nbsp;:<br />
+    <?php echo sprintf($strRunSQLQuery, htmlspecialchars($db)) . ' ' . PMA_showMySQLDocu('Reference', 'SELECT'); ?>&nbsp;:<br />
     <div style="margin-bottom: 5px">
 <textarea name="sql_query" cols="<?php echo $cfg['TextareaCols'] * 2; ?>" rows="<?php echo $cfg['TextareaRows']; ?>" wrap="virtual" dir="<?php echo $text_dir; ?>"<?php echo $auto_sel; ?>>
 <?php echo ((!empty($query_to_display)) ? htmlspecialchars($query_to_display) : ''); ?>

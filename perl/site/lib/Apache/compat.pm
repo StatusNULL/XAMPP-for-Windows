@@ -345,19 +345,10 @@ sub finfo {
 
 *log_reason = \&log_error;
 
-sub slurp_filename {
-    my $r = shift;
-    open my $fh, $r->filename;
-    local $/;
-    my $data = <$fh>;
-    close $fh;
-    return \$data;
-}
-
 #XXX: would like to have a proper implementation
 #that reads line-by-line as defined by $/
 #the best way will probably be to use perlio in 5.8.0
-#anything else would be more effort that it is worth
+#anything else would be more effort than it is worth
 sub READLINE {
     my $r = shift;
     my $line;
@@ -400,6 +391,9 @@ sub send_fd {
 }
 
 sub is_main { !shift->main }
+
+# really old back-compat methods, they shouldn't be used in mp1
+*cgi_var = *cgi_env = \&Apache::RequestRec::subprocess_env;
 
 package Apache::File;
 

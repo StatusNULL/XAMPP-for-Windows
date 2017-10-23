@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_printview.php,v 1.64 2003/04/10 16:33:16 nijel Exp $ */
+/* $Id: tbl_printview.php,v 1.66 2003/07/23 18:31:10 lem9 Exp $ */
 
 
 /**
@@ -10,6 +10,11 @@ if (!isset($selected_tbl)) {
     include('./header.inc.php');
 }
 
+// Check parameters
+
+if (!isset($the_tables) || !is_array($the_tables)) {
+    $the_tables = array();
+}
 
 /**
  * Gets the relations settings
@@ -635,7 +640,7 @@ function printPage()
 //-->
 </script>
 <?php
-echo '<br /><br />&nbsp;<input type="button" style="visibility: ; width: 100px; height: 25px" id="print" value="Print" onclick="printPage()">' . "\n";
+echo '<br /><br />&nbsp;<input type="button" style="visibility: ; width: 100px; height: 25px" id="print" value="' . $strPrint . '" onclick="printPage()">' . "\n";
 
 require('./footer.inc.php');
 ?>

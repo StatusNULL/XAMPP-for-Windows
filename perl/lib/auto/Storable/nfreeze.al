@@ -1,9 +1,9 @@
-# NOTE: Derived from blib\lib\Storable.pm.
+# NOTE: Derived from ..\..\lib\Storable.pm.
 # Changes made here will be lost when autosplit is run again.
 # See AutoSplit.pm.
 package Storable;
 
-#line 264 "blib\lib\Storable.pm (autosplit into blib\lib\auto\Storable\nfreeze.al)"
+#line 264 "..\..\lib\Storable.pm (autosplit into ..\..\lib\auto\Storable\nfreeze.al)"
 #
 # nfreeze
 #

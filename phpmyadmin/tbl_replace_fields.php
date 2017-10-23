@@ -1,9 +1,18 @@
 <?php
-/* $Id: tbl_replace_fields.php,v 1.15 2003/05/22 09:58:52 nijel Exp $ */
+/* $Id: tbl_replace_fields.php,v 1.17 2003/07/31 17:06:57 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 // note: grab_globals has extracted the fields from _FILES
 //       or HTTP_POST_FILES
+
+// Check parameters
+
+if (!defined('PMA_COMMON_LIB_INCLUDED')) {
+    include('./libraries/common.lib.php');
+}
+
+PMA_checkParameters(array('db','encoded_key'));
+
 
 // f i e l d    u p l o a d e d    f r o m    a    f i l e
 
@@ -123,7 +132,9 @@ if (!$check_stop) {
                             if ($val == 'null') {
                                 // void
                             } else {
-                                $val = "'" . PMA_sqlAddslashes(urldecode($val)) . "'";
+                                // the data here is not urlencoded!
+                                //$val = "'" . PMA_sqlAddslashes(urldecode($val)) . "'";
+                                $val = "'" . PMA_sqlAddslashes($val) . "'";
                             }
                         } else {
                             $val     = "''";
@@ -134,7 +145,9 @@ if (!$check_stop) {
                     $f = 'field_' . md5($key);
                     if (!empty($$f)) {
                         $val = implode(',', $$f);
-                        $val = "'" . PMA_sqlAddslashes(urldecode($val)) . "'";
+                        // the data here is not urlencoded!
+                        //$val = "'" . PMA_sqlAddslashes(urldecode($val)) . "'";
+                        $val = "'" . PMA_sqlAddslashes($val) . "'";
                     } else {
                         $val = "''";
                     }
@@ -147,7 +160,9 @@ if (!$check_stop) {
                         if ($val == 'null') {
                             // void
                         } else {
-                            $val = "'" . PMA_sqlAddslashes(urldecode($val)) . "'";
+                            // the data here is not urlencoded!
+                            //$val = "'" . PMA_sqlAddslashes(urldecode($val)) . "'";
+                            $val = "'" . PMA_sqlAddslashes($val) . "'";
                         }
                     } else {
                         $val     = "''";

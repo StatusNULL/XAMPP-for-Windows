@@ -1,5 +1,5 @@
 <?php
-/* $Id: config_import.lib.php,v 1.46 2003/06/01 21:50:19 nijel Exp $ */
+/* $Id: config_import.lib.php,v 1.58 2003/08/05 14:08:23 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -56,6 +56,19 @@ if (!defined('PMA_CONFIG_IMPORT_LIB_INCLUDED')) {
         }
     }
 
+    if (!isset($cfg['PmaAbsoluteUri_DisableWarning'])) {
+        $cfg['PmaAbsoluteUri_DisableWarning'] = FALSE;
+    }
+
+    if (!isset($cfg['PmaNoRelation_DisableWarning'])) {
+        $cfg['PmaNoRelation_DisableWarning'] = FALSE;
+    }
+
+    // do not set a default value here!
+    if (!isset($cfg['blowfish_secret'])) {
+        $cfg['blowfish_secret'] = '';
+    }
+
     if (!isset($cfg['Servers'])) {
         if (isset($cfgServers)) {
             $cfg['Servers'] = $cfgServers;
@@ -96,6 +109,14 @@ if (!defined('PMA_CONFIG_IMPORT_LIB_INCLUDED')) {
                                              ? 'http'
                                              : 'config';
                 unset($cfg['Servers'][$i]['adv_auth']);
+            }
+
+            // for users who use the "first" blowfish mechanism
+            if (isset($cfg['Servers'][$i]['blowfish_secret'])) {
+                if (empty($cfg['blowfish_secret'])) {
+                    $cfg['blowfish_secret'] = $cfg['Servers'][$i]['blowfish_secret'];
+                }
+                unset($cfg['Servers'][$i]['blowfish_secret']);
             }
 
             if (!isset($cfg['Servers'][$i]['compress'])) {
@@ -185,7 +206,7 @@ if (!defined('PMA_CONFIG_IMPORT_LIB_INCLUDED')) {
             $cfg['OBGzip'] = $cfgOBGzip;
             unset($cfgOBGzip);
         } else {
-            $cfg['OBGzip'] = TRUE;
+            $cfg['OBGzip'] = 'auto';
         }
     }
 
@@ -256,6 +277,14 @@ if (!defined('PMA_CONFIG_IMPORT_LIB_INCLUDED')) {
         $cfg['UseDbSearch'] = TRUE;
     }
 
+    if (!isset($cfg['IgnoreMultiSubmitErrors'])) {
+        $cfg['IgnoreMultiSubmitErrors'] = FALSE;
+    }
+
+    if (!isset($cfg['VerboseMultiSubmit'])) {
+        $cfg['VerboseMultiSubmit'] = TRUE;
+    }
+
     if (!isset($cfg['LeftFrameLight'])) {
         if (isset($cfgLeftFrameLight)) {
             $cfg['LeftFrameLight'] = $cfgLeftFrameLight;
@@ -276,7 +305,15 @@ if (!defined('PMA_CONFIG_IMPORT_LIB_INCLUDED')) {
     if (!isset($cfg['LightTabs'])) {
         $cfg['LightTabs'] = FALSE;
     }
+    
+    if (!isset($cfg['PropertiesIconic'])) {
+        $cfg['PropertiesIconic'] = TRUE;
+    }
 
+    if (!isset($cfg['PropertiesNumColumns'])) {
+        $cfg['PropertiesNumColumns'] = 1;
+    }
+    
     if (!isset($cfg['ShowTooltip'])) {
         if (isset($cfgShowTooltip)) {
             $cfg['ShowTooltip'] = $cfgShowTooltip;
@@ -287,6 +324,10 @@ if (!defined('PMA_CONFIG_IMPORT_LIB_INCLUDED')) {
 
     if (!isset($cfg['LeftDisplayLogo'])) {
         $cfg['LeftDisplayLogo'] = TRUE;
+    }
+
+    if (!isset($cfg['LeftDisplayServers'])) {
+        $cfg['LeftDisplayServers'] = FALSE;
     }
 
     if (!isset($cfg['ShowStats'])) {
@@ -454,17 +495,17 @@ if (!defined('PMA_CONFIG_IMPORT_LIB_INCLUDED')) {
         $cfg['DefaultTabTable'] = 'tbl_properties_structure.php';
     }
 
-    if (!isset($cfg['ManualBase'])) {
+    if (!isset($cfg['MySQLManualBase'])) {
         if (isset($cfgManualBaseShort)) {
-            $cfg['ManualBase'] = $cfgManualBaseShort;
+            $cfg['MySQLManualBase'] = $cfgManualBaseShort;
             $cfg['MySQLManualType'] = 'old';
             unset($cfgManualBaseShort);
         } else if (isset($cfg['ManualBaseShort'])) {
-            $cfg['ManualBase'] = $cfg['ManualBaseShort'];
+            $cfg['MySQLManualBase'] = $cfg['ManualBaseShort'];
             $cfg['MySQLManualType'] = 'old';
             unset($cfg['ManualBaseShort']);
         } else {
-            $cfg['ManualBase'] = 'http://www.mysql.com/doc/en';
+            $cfg['MySQLManualBase'] = 'http://www.mysql.com/doc/en';
             $cfg['MySQLManualType'] = 'searchable';
         }
     }
@@ -735,6 +776,10 @@ if (!defined('PMA_CONFIG_IMPORT_LIB_INCLUDED')) {
 
     if (!isset($cfg['MaxExactCount'])) {
         $cfg['MaxExactCount'] = 20000;
+    }
+
+    if (!isset($cfg['WYSIWYG-PDF'])) {
+        $cfg['WYSIWYG-PDF'] = TRUE;
     }
 
     if (!isset($cfg['ShowTooltipAliasDB'])) {
@@ -1013,7 +1058,7 @@ if (!defined('PMA_CONFIG_IMPORT_LIB_INCLUDED')) {
            'ENUM'         => '',
            'SET'          => ''
         );
-    
+
         // Map above defined groups to any function
         $cfg['RestrictFunctions'] = array(
             'FUNC_CHAR'   => array(
@@ -1029,7 +1074,7 @@ if (!defined('PMA_CONFIG_IMPORT_LIB_INCLUDED')) {
                 'USER',
                 'CONCAT'
             ),
-    
+
             'FUNC_DATE'   => array(
                 'NOW',
                 'CURDATE',
@@ -1042,7 +1087,7 @@ if (!defined('PMA_CONFIG_IMPORT_LIB_INCLUDED')) {
                 'UNIX_TIMESTAMP',
                 'WEEKDAY'
             ),
-    
+
             'FUNC_NUMBER' => array(
                 'ASCII',
                 'CHAR',
@@ -1057,17 +1102,117 @@ if (!defined('PMA_CONFIG_IMPORT_LIB_INCLUDED')) {
         );
     }
 
-    if (!isset($cfg['PmaAbsoluteUri_DisableWarning'])) {
-        $cfg['PmaAbsoluteUri_DisableWarning'] = FALSE;
-    }
-    if (!isset($cfg['PmaNoRelation_DisableWarning'])) {
-        $cfg['PmaNoRelation_DisableWarning'] = FALSE;
-    }
     if (!isset($cfg['GD2Available'])) {
         $cfg['GD2Available'] = 'auto';
     }
+    if (!isset($cfg['PDFPageSizes'])) {
+        $cfg['PDFPageSizes']        = array('A3', 'A4', 'A5', 'letter', 'legal');
+    }
+    if (!isset($cfg['PDFDefaultPageSize'])) {
+        $cfg['PDFDefaultPageSize']  = 'A4';
+    }
     if (!isset($cfg['CtrlArrowsMoving'])) {
         $cfg['CtrlArrowsMoving'] = TRUE;
+    }
+
+    if (!isset($cfg['Export']['format'])) {
+        $cfg['Export']['format'] = 'sql';
+    } // sql/latex/excel/csv/xml
+    if (!isset($cfg['Export']['compression'])) {
+        $cfg['Export']['compression'] = 'none';
+    } // none/zip/gzip/bzip2
+
+    if (!isset($cfg['Export']['asfile'])) {
+        $cfg['Export']['asfile'] = FALSE;
+    }
+    if (!isset($cfg['Export']['onserver'])) {
+        $cfg['Export']['onserver'] = FALSE;
+    }
+    if (!isset($cfg['Export']['onserver_overwrite'])) {
+        $cfg['Export']['onserver_overwrite'] = FALSE;
+    }
+    if (!isset($cfg['Export']['remember_file_template'])) {
+        $cfg['Export']['remember_file_template'] = TRUE;
+    }
+    if (!isset($cfg['Export']['csv_null'])) {
+        $cfg['Export']['csv_null']                  = 'NULL';
+    }
+    if (!isset($cfg['Export']['csv_columns'])) {
+        $cfg['Export']['csv_columns'] = FALSE;
+    }
+    if (!isset($cfg['Export']['excel_null'])) {
+        $cfg['Export']['excel_null']                = 'NULL';
+    }
+    if (!isset($cfg['Export']['excel_columns'])) {
+        $cfg['Export']['excel_columns'] = FALSE;
+    }
+    if (!isset($cfg['Export']['latex_null'])) {
+        $cfg['Export']['latex_null']                = '\textit{NULL}';
+    }
+    if (!isset($cfg['Export']['csv_separator'])) {
+        $cfg['Export']['csv_separator'] = ';';
+    }
+    if (!isset($cfg['Export']['csv_enclosed'])) {
+        $cfg['Export']['csv_enclosed'] = '&quot;';
+    }
+    if (!isset($cfg['Export']['csv_escaped'])) {
+        $cfg['Export']['csv_escaped'] = '\\';
+    }
+    if (!isset($cfg['Export']['csv_terminated'])) {
+        $cfg['Export']['csv_terminated'] = 'AUTO';
+    }
+
+    if (!isset($cfg['Export']['latex_structure'])) {
+        $cfg['Export']['latex_structure'] = TRUE;
+    }
+    if (!isset($cfg['Export']['latex_data'])) {
+        $cfg['Export']['latex_data'] = TRUE;
+    }
+    if (!isset($cfg['Export']['latex_columns'])) {
+        $cfg['Export']['latex_columns'] = TRUE;
+    }
+    if (!isset($cfg['Export']['latex_relation'])) {
+        $cfg['Export']['latex_relation'] = TRUE;
+    }
+    if (!isset($cfg['Export']['latex_comments'])) {
+        $cfg['Export']['latex_comments'] = TRUE;
+    }
+    if (!isset($cfg['Export']['latex_mime'])) {
+        $cfg['Export']['latex_mime'] = TRUE;
+    }
+
+    if (!isset($cfg['Export']['sql_drop_database'])) {
+        $cfg['Export']['sql_drop_database'] = FALSE;
+    }
+    if (!isset($cfg['Export']['sql_drop_table'])) {
+        $cfg['Export']['sql_drop_table'] = FALSE;
+    }
+    if (!isset($cfg['Export']['sql_auto_increment'])) {
+        $cfg['Export']['sql_auto_increment'] = TRUE;
+    }
+    if (!isset($cfg['Export']['sql_structure'])) {
+        $cfg['Export']['sql_structure'] = TRUE;
+    }
+    if (!isset($cfg['Export']['sql_data'])) {
+        $cfg['Export']['sql_data'] = TRUE;
+    }
+    if (!isset($cfg['Export']['sql_backquotes'])) {
+        $cfg['Export']['sql_backquotes'] = TRUE;
+    }
+    if (!isset($cfg['Export']['sql_relation'])) {
+        $cfg['Export']['sql_relation'] = FALSE;
+    }
+    if (!isset($cfg['Export']['sql_columns'])) {
+        $cfg['Export']['sql_columns'] = FALSE;
+    }
+    if (!isset($cfg['Export']['sql_extended'])) {
+        $cfg['Export']['sql_extended'] = FALSE;
+    }
+    if (!isset($cfg['Export']['sql_comments'])) {
+        $cfg['Export']['sql_comments'] = FALSE;
+    }
+    if (!isset($cfg['Export']['sql_mime'])) {
+        $cfg['Export']['sql_mime'] = FALSE;
     }
 
 } // $__PMA_CONFIG_IMPORT_LIB__

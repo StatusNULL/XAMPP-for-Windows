@@ -3,7 +3,7 @@
 // +----------------------------------------------------------------------+
 // | PHP Version 4                                                        |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2002 The PHP Group                                |
+// | Copyright (c) 1997-2003 The PHP Group                                |
 // +----------------------------------------------------------------------+
 // | This source file is subject to version 2.02 of the PHP license,      |
 // | that is bundled with this package in the file LICENSE, and is        |
@@ -16,28 +16,29 @@
 // | Author: Stig Bakken <ssb@fast.no>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: Parser.php,v 1.22 2002/02/28 08:27:18 sebastian Exp $
+// $Id: Parser.php,v 1.5 2003/02/23 10:48:31 ssb Exp $
 
-require_once "PEAR.php";
+require_once 'PEAR.php';
 
 /**
-* XML Parser class.  This is an XML parser based on PHP's "xml" extension,
-* based on the bundled expat library.
-*
-* @author  Stig Bakken <ssb@fast.no>
-* @todo    Tests that need to be made:
-*          - error class
-*          - mixing character encodings
-*          - a test using all expat handlers
-*          - options (folding, output charset)
-*          - different parsing modes
-*
-* @notes   - It requires PHP 4.0.4pl1 or greater
-*          - From revision 1.17, the function names used by the 'func' mode
-*            are in the format "xmltag_$elem", for example: use "xmltag_name"
-*            to handle the <name></name> tags of your xml file.
-*/
-class XML_Parser extends PEAR {
+ * XML Parser class.  This is an XML parser based on PHP's "xml" extension,
+ * based on the bundled expat library.
+ *
+ * @author  Stig Bakken <ssb@fast.no>
+ * @todo    Tests that need to be made:
+ *          - error class
+ *          - mixing character encodings
+ *          - a test using all expat handlers
+ *          - options (folding, output charset)
+ *          - different parsing modes
+ *
+ * @notes   - It requires PHP 4.0.4pl1 or greater
+ *          - From revision 1.17, the function names used by the 'func' mode
+ *            are in the format "xmltag_$elem", for example: use "xmltag_name"
+ *            to handle the <name></name> tags of your xml file.
+ */
+class XML_Parser extends PEAR
+{
     // {{{ properties
 
     /**
@@ -66,26 +67,31 @@ class XML_Parser extends PEAR {
      * @var  array
      */
     var $handler = array(
-        "character_data_handler"            => "cdataHandler",
-        "default_handler"                   => "defaultHandler",
-        "processing_instruction_handler"    => "piHandler",
-        "unparsed_entitry_decl_handler"     => "unparsedHandler",
-        "notation_decl_handler"             => "notationHandler",
-        "external_entity_ref_handler"       => "entityrefHandler"
+        'character_data_handler'            => 'cdataHandler',
+        'default_handler'                   => 'defaultHandler',
+        'processing_instruction_handler'    => 'piHandler',
+        'unparsed_entity_decl_handler'      => 'unparsedHandler',
+        'notation_decl_handler'             => 'notationHandler',
+        'external_entity_ref_handler'       => 'entityrefHandler'
     );
 
-    /** @var string source encoding */
+    /**
+     * @var string source encoding
+     */
     var $srcenc;
 
-    /** @var string target encoding */
+    /**
+     * @var string target encoding
+     */
     var $tgtenc;
 
     /*
-    * Use call_user_func when php >= 4.0.7
-    * @var boolean
-    * @see setMode()
-    */
+     * Use call_user_func when php >= 4.0.7
+     * @var boolean
+     * @see setMode()
+     */
     var $use_call_user_func = true;
+
     // }}}
     // {{{ constructor
 
@@ -128,12 +134,13 @@ class XML_Parser extends PEAR {
     // {{{ setMode()
 
     /**
-    * Sets the mode and all handler.
-    *
-    * @param    string
-    * @see      $handler
-    */
-    function setMode($mode) {
+     * Sets the mode and all handler.
+     *
+     * @param    string
+     * @see      $handler
+     */
+    function setMode($mode)
+    {
 
         $this->mode = $mode;
 
@@ -170,15 +177,16 @@ class XML_Parser extends PEAR {
     // {{{ setInputFile()
 
     /**
-    * Defines
-    *
-    * @param    string      Filename (full path)
-    * @return   resource    fopen handle of the given file
-    * @throws   XML_Parser_Error
-    * @see      setInput(), parse()
-    * @access   public
-    */
-    function setInputFile($file) {
+     * Defines
+     *
+     * @param    string      Filename (full path)
+     * @return   resource    fopen handle of the given file
+     * @throws   XML_Parser_Error
+     * @see      setInput(), parse()
+     * @access   public
+     */
+    function setInputFile($file)
+    {
 
         $fp = @fopen($file, "rb");
         if (is_resource($fp)) {
@@ -193,14 +201,14 @@ class XML_Parser extends PEAR {
     // {{{ setInput()
 
     /**
-    * Sets the file handle to use with parse().
-    *
-    * @param    resource    fopen
-    * @access   public
-    * @see      parse(), setInputFile()
-    */
-    function setInput($fp) {
-
+     * Sets the file handle to use with parse().
+     *
+     * @param    resource    fopen
+     * @access   public
+     * @see      parse(), setInputFile()
+     */
+    function setInput($fp)
+    {
         if (is_resource($fp)) {
             $this->fp = $fp;
             return true;
@@ -213,15 +221,15 @@ class XML_Parser extends PEAR {
     // {{{ parse()
 
     /**
-    * Central parsing function.
-    *
-    * @throws   XML_Parser_Error
-    * @return   boolean true on success
-    * @see      parseString()
-    * @access   public
-    */
-    function parse() {
-
+     * Central parsing function.
+     *
+     * @throws   XML_Parser_Error
+     * @return   boolean true on success
+     * @see      parseString()
+     * @access   public
+     */
+    function parse()
+    {
         if (!is_resource($this->fp)) {
             return $this->raiseError("no input");
         }
@@ -245,15 +253,15 @@ class XML_Parser extends PEAR {
     // {{{ parseString()
 
     /**
-    * Parses a string.
-    *
-    * @param    string  XML data
-    * @param    boolean ???
-    * @throws   XML_Parser_Error
-    * @return   mixed   true on success or a string with the xml parser error
-    */
-    function parseString($data, $eof = false) {
-
+     * Parses a string.
+     *
+     * @param    string  XML data
+     * @param    boolean ???
+     * @throws   XML_Parser_Error
+     * @return   mixed   true on success or a string with the xml parser error
+     */
+    function parseString($data, $eof = false)
+    {
         if (!xml_parse($this->parser, $data, $eof)) {
             $err = $this->raiseError($this->parser);
             xml_parser_free($this->parser);
@@ -294,21 +302,26 @@ class XML_Parser extends PEAR {
         }
     }
 
+    // }}}
+    // {{{ startHandler()
+
     /**
-    *
-    * @abstract
-    */
-    function StartHandler($xp, $elem, &$attribs)
+     *
+     * @abstract
+     */
+    function startHandler($xp, $elem, &$attribs)
     {
         return NULL;
     }
 
+    // }}}
+    // {{{ endHandler()
 
     /**
-    *
-    * @abstract
-    */
-    function EndHandler($xp, $elem)
+     *
+     * @abstract
+     */
+    function endHandler($xp, $elem)
     {
         return NULL;
     }
@@ -317,7 +330,8 @@ class XML_Parser extends PEAR {
     // }}}
 }
 
-class XML_Parser_Error extends PEAR_Error {
+class XML_Parser_Error extends PEAR_Error
+{
     // {{{ properties
 
     var $error_message_prefix = 'XML_Parser: ';
@@ -325,8 +339,8 @@ class XML_Parser_Error extends PEAR_Error {
     // }}}
     // {{{ constructor()
 
-    function XML_Parser_Error($msgorparser = 'unknown error', $code = 0, $mode = PEAR_ERROR_RETURN, $level = E_USER_NOTICE) {
-
+    function XML_Parser_Error($msgorparser = 'unknown error', $code = 0, $mode = PEAR_ERROR_RETURN, $level = E_USER_NOTICE)
+    {
         if (is_resource($msgorparser)) {
             $code = xml_get_error_code($msgorparser);
             $msgorparser = sprintf("%s at XML input line %d",

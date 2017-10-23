@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_replace.php,v 1.71 2003/05/14 16:57:26 nijel Exp $ */
+/* $Id: tbl_replace.php,v 1.72 2003/07/19 12:42:35 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -9,6 +9,8 @@
 require('./libraries/grab_globals.lib.php');
 require('./libraries/common.lib.php');
 
+// Check parameters
+PMA_checkParameters(array('db','table','goto'));
 
 /**
  * Initializes some variables

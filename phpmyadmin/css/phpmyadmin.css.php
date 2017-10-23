@@ -1,5 +1,5 @@
 <?php
-/* $Id: phpmyadmin.css.php,v 1.4 2003/05/02 10:03:26 garvinhicking Exp $ */
+/* $Id: phpmyadmin.css.php,v 1.9 2003/07/29 09:58:59 garvinhicking Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 chdir('..');
@@ -56,7 +56,7 @@ div {font-family: <?php echo $left_font_family; ?>; font-size: <?php echo $font_
 .item, .item:active, .item:hover, .tblItem, .tblItem:active {font-size: <?php echo $font_smaller; ?>; color: #333399; text-decoration: none}
 .tblItem:hover {color: #FF0000; text-decoration: underline}
             <?php
-            } else { 
+            } else {
             ?>
 /* Layer effeccts neccessary: capable, but no is_DOM. We found an older CSS-Browser */
 div {font-family: <?php echo $left_font_family; ?>; font-size: <?php echo $font_size; ?>; color: #000000}
@@ -125,10 +125,10 @@ body {
     <?php
     if ($GLOBALS['cfg']['RightBgImage'] == '') {
         // calls from a css file are relative to itself, so use ../images
-        echo '    background-image: url(\'../images/vertical_line.png\');' . "\n"
+        echo '    background-image: url(../images/vertical_line.png);' . "\n"
              . '    background-repeat: repeat-y;' . "\n";
     } else {
-        echo '    background-image: url(\'' . $GLOBALS['cfg']['RightBgImage'] . '\');' . "\n";
+        echo '    background-image: url(' . $GLOBALS['cfg']['RightBgImage'] . ');' . "\n";
     } // end if... else...
     ?>
     background-color: <?php echo $GLOBALS['cfg']['RightBgColor'] . "\n"; ?>
@@ -190,16 +190,44 @@ fieldset fieldset {
     margin:     0.8em;
 }
 
+button.mult_submit {
+    border: none;
+    background-color: transparent;
+}
+
+.pdflayout {
+    overflow:         hidden;
+    clip:             inherit;
+    background-color: #FFFFFF;
+    display:          none;
+    border:           1px solid #000000;
+    position:         relative;
+}
+
+.pdflayout_table {
+    background:       <?php echo $GLOBALS['cfg']['ThBgcolor']; ?>;
+    color:            #000000;
+    overflow:         hidden;
+    clip:             inherit;
+    z-index:          2;
+    display:          inline;
+    visibility:       inherit;
+    cursor:           move;
+    position:         absolute;
+    font-size:        <?php echo $font_smaller; ?>;
+    border:           1px dashed #000000;
+}
+
 .print{font-family:arial;font-size:8pt;}
 
 .syntax {font-family: sans-serif; font-size: <?php echo $font_smaller; ?>;}
-.syntax_comment            {}
+.syntax_comment            { padding-left: 4pt; padding-right: 4pt;}
 .syntax_digit              {}
 .syntax_digit_hex          {}
 .syntax_digit_integer      {}
 .syntax_digit_float        {}
 .syntax_punct              {}
-.syntax_alpha              {text-transform: lowercase;}
+.syntax_alpha              {}
 .syntax_alpha_columnType   {text-transform: uppercase;}
 .syntax_alpha_columnAttrib {text-transform: uppercase;}
 .syntax_alpha_reservedWord {text-transform: uppercase; font-weight: bold;}

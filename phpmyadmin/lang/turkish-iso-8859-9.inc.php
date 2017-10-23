@@ -1,5 +1,5 @@
 <?php
-/* $Id: turkish-iso-8859-9.inc.php,v 1.92 2003/05/29 16:44:04 lem9 Exp $ */
+/* $Id: turkish-iso-8859-9.inc.php,v 1.110.2.1 2003/08/18 20:58:07 lem9 Exp $ */
 
 //çeviride eksik veya hatalý olduðunu düþündüðünüz kýsýmlarý bora@ktu.edu.tr adresine gönderebilirsiniz...
 //bora alioðlu 02.08.2002...tempus fugit...
@@ -21,9 +21,12 @@ $datefmt = '%B %d, %Y at %I:%M %p';
 
 $strAPrimaryKey = '%s üzerinde birincil index eklendi';
 $strAccessDenied = 'Eriþim engellendi';
+$strAccessDeniedExplanation = 'phpMyAdmin MySQL sunucusuna baðlanmayý denedi,ve sunucu baðlantýyý reddetti . config.inc içerisindeki bilgisayar adresini(host) , kullanýcý adýný ve þifreyi kontrol edin ve MySQL sunucusunun admini tarafýndan size verilen bilgiyle uyuþtuðundan emin olun.';
 $strAction = 'Eylem';
 $strAddDeleteColumn = 'Sütun alaný Ekle/Sil';
 $strAddDeleteRow = 'Kriter satýrý Ekle/Sil';
+$strAddDropDatabase = 'DROP DATABASE ekle(veritabanýný kaldýr)';
+$strAddIntoComments = 'Yorumlara ekle';
 $strAddNewField = 'Yeni alan ekle';
 $strAddPriv = 'Yeni ayrýcalýk ekle';
 $strAddPrivMessage = 'Yeni ayrýcalýk eklediniz..';
@@ -61,6 +64,8 @@ $strBookmarkQuery = ' SQL-sorgusu';
 $strBookmarkThis = 'Bu SQL-sorgusunu iþaretle';
 $strBookmarkView = 'Sadece gözat';
 $strBrowse = 'Tara';
+$strBrowseForeignValues = 'Foreign(yabancý) deðerleri tara';
+$strBulgarian = 'Bulgarca'; 
 $strBzip = '"bzipped"';
 
 $strCantLoadMySQL = 'mySQL uzantýsýný yükleyemiyor,<br />lütfen PHP ayarlarýný kontrol ediniz.';
@@ -69,15 +74,20 @@ $strCantRenameIdxToPrimary = 'Index\'i PRIMARY olarak adland&#305;r&#305;mazs&#3
 $strCantUseRecodeIconv = 'Uzantý raporlarý yüklenmiþken , ne iconv ne libinconv ne de recode_string fonksiyonu  kullanýlamaz.  Php ayarlarýnýzý kontrol ediniz.';
 $strCardinality = 'En önemli';
 $strCarriage = 'Enter Karakteri: \\r';
+$strCaseInsensitive = 'büyük küçük harf duyarsýz'; 
+$strCaseSensitive = 'büyük küçük harf duyarlý'; 
 $strChange = 'Deðiþtir';
 $strChangeDisplay = 'Görmek istediðiniz alaný seçiniz';
 $strChangePassword = 'Þifre Deðiþtir';
 $strCharsetOfFile = 'Dosyanýn karakter seti:';
+$strCharsets = 'Karakter setleri'; 
+$strCharsetsAndCollations = 'Karakter setleri ve karþýlaþtýrmalar'; 
 $strCheckAll = 'Tümünü seç';
 $strCheckDbPriv = 'Veritabaný önceliklerini kontrol et';
 $strCheckTable = 'Tabloyu kontrol et';
 $strChoosePage = 'Lütfen düzenlemek istediðiniz sayfayý seçin';
 $strColComFeat = 'Sütun yorumlarý gösteriliyor';
+$strCollation = 'Karþýlaþtýrma'; 
 $strColumn = 'Sütun';
 $strColumnNames = 'Sütun adlarý';
 $strComments = 'Yorumlar';
@@ -97,11 +107,16 @@ $strCreateNewTable = '%s veritabaný üzerinde yeni bir tablo oluþtur';
 $strCreatePage = 'Yeni sayfa oluþtur';
 $strCreatePdfFeat = 'PDF\'lerin oluþturulmasý';
 $strCriteria = 'Kriter';
+$strCroatian = 'Hýrvatça'; 
+$strCzech = 'Çekçe'; 
 
+$strDanish = 'Danimarkaca'; 
 $strData = 'Veri';
 $strDataOnly = 'Sadece veri';
 $strDatabase = 'Veritabaný ';
+$strDatabaseExportOptions = 'Veritabaný export ayarlarý';
 $strDatabaseHasBeenDropped = '%s veritabaný kaldýrýldý.';
+$strDatabaseNoTable = 'Bu veritabaný tablo içermiyor!';
 $strDatabaseWildcard = 'Veritabaný (* izin verili):';
 $strDatabases = 'veritabanlarý';
 $strDatabasesStats = 'Veritabaný istatistikleri';
@@ -112,6 +127,8 @@ $strDeleteUserMessage = '%s kullanýcýsýný sildiniz.';
 $strDeleted = 'Satýr silindi.';
 $strDeletedRows = 'Silinen satýrlar:';
 $strDescending = 'Azalan';
+$strDescription = 'Tanýmlama'; 
+$strDictionary = 'sözlük'; 
 $strDisabled = 'Etkin deðil';
 $strDisplay = 'Görüntüle';
 $strDisplayFeat = 'Özellikleri Göster';
@@ -136,8 +153,12 @@ $strEmpty = 'Boþalt';
 $strEmptyResultSet = 'MySQL boþ bir sonuc kümesi döndürdü ( sýfýr satýr).';
 $strEnabled = 'Etkin';
 $strEnd = 'Son';
+$strEnglish = 'Ýngilizce'; 
 $strEnglishPrivileges = ' Not: mySQL  öncelik adlarý Ýngilizce olarak belirtilmiþtir ';
 $strError = 'Hata';
+$strEstonian = 'Estonyaca'; 
+$strExcelOptions = 'Excel ayarlarý';
+$strExecuteBookmarked = 'Ýþaretlenmiþ sorguyu çalýþtýr';
 $strExplain = 'SQL\'i açýkla';
 $strExport = 'Dönüþtür';
 $strExportToXML = 'XML formatýna dönüþtür';
@@ -162,6 +183,7 @@ $strFunction = 'Fonksiyon';
 $strGenBy = 'Oluþturuldu->:';
 $strGenTime = 'Çýktý Tarihi';
 $strGeneralRelationFeat = 'Genel iliþki özellikleri';
+$strGerman = 'Almanca'; 
 $strGo = 'Git';
 $strGrants = 'Haklar';
 $strGzip = '"gziplenmiþ"';
@@ -174,6 +196,7 @@ $strHomepageOfficial = 'phpMyAdmin Web Sayfasý';
 $strHomepageSourceforge = 'Sourceforge phpMyAdmin Yükleme Sayfasý';
 $strHost = 'Sunucu:';
 $strHostEmpty = 'Sunucu ismi alaný doldurulmadý!';
+$strHungarian = 'Macarca'; 
 
 $strIdxFulltext = 'Tüm metinler';
 $strIfYouWish = 'Eðer bir tablo\'nun sadece bazý sütunlarýný yüklemek istiyorsanýz,virgüllerle ayrýlmýþ bir alan listesi belirtiniz.';
@@ -206,6 +229,7 @@ $strLines = 'Satýrlar';
 $strLinesTerminatedBy = 'Satýr sonu';
 $strLinkNotFound = 'Link bulunamadý';
 $strLinksTo = 'Linkler->';
+$strLithuanian = 'Litvanyaca'; 
 $strLocalhost = 'Local';
 $strLocationTextfile = 'Dosyadan yükle';
 $strLogPassword = '&#350;ifre:';
@@ -220,6 +244,7 @@ $strModifyIndexTopic = 'Index düzenle';
 $strMoveTable = 'Tabloyu (veritabaný<b>.</b>tablo) taþý:';
 $strMoveTableOK = '%s tablosu %s üzerine taþýndý.';
 $strMoveTableSameNames = 'Tabloyu aynýsýna taþýyamýyor!';
+$strMultilingual = 'çoklu dil'; 
 $strMustSelectFile = 'Eklemek istediðiniz dosyayý seçmeniz gerekir.';
 $strMySQLCharset = 'MySQL karakter seti';
 $strMySQLReloaded = 'MySQL yeniden yüklendi.';
@@ -272,6 +297,7 @@ $strOverwriteExisting = 'Mevcut dosyalarýn üzerine yaz!';
 
 $strPHPVersion = 'PHP Sürümü';
 $strPageNumber = 'Sayfa numarasý:';
+$strPaperSize = 'Kaðýt boyu';
 $strPartialText = 'Bölümsel Metinler';
 $strPassword = 'Þifre';
 $strPasswordEmpty = 'Þifre alaný doldurulmadý!';
@@ -279,6 +305,7 @@ $strPasswordNotSame = 'Girilen þifreler ayný deðil!';
 $strPdfDbSchema = ' "%s" veritabanýnýn þemasý - Sayfa %s';
 $strPdfInvalidPageNum = 'Tanýmlanmamýþ PDF sayfa numarasý!';
 $strPdfInvalidTblName = ' "%s" tablosu bulunamýyor !';
+$strPhoneBook = 'telefon defteri'; 
 $strPhp = 'PHP kodu oluþtur';
 $strPmaDocumentation = 'phpMyAdmin yardým';
 $strPmaUriError = '<tt>$cfg[\'PmaAbsoluteUri\']</tt>\' nin deðeri  konfigurasyon dosyasýnýn içinde verilmelidir!';
@@ -301,6 +328,7 @@ $strQBEDel = 'Del';
 $strQBEIns = 'Ins';
 $strQueryOnDb = 'Veritabaný üzerinde SQL-sorgusu&nbsp;<b>%s</b>:';
 $strQueryStatistics = '<b>Query statistics</b>: Since its startup, %s queries have been sent to the server.';
+$strQueryWindowLock = 'Pencere dýþýndan bu sorgunun üzerine yazma';
 
 $strReType = 'Yeniden gir';
 $strRecords = 'Kayýtlar';
@@ -315,6 +343,7 @@ $strRenameTable = 'Tablonun ismini þuna deðiþtir';
 $strRenameTableOK = '%s tablosu %s olarak yeniden adlandýrýldý';
 $strRepairTable = 'Tablo\'yu onar';
 $strReplace = 'Yerdeðiþtir';
+$strReplaceNULLBy = 'NULL u yerdeðiþtir';
 $strReplaceTable = 'Tablo verisini bir dosyadaki ile deðiþtir';
 $strReset = 'Sýfýrla';
 $strRevoke = 'Geçersiz kýl';
@@ -350,6 +379,7 @@ $strSearchOption3 = 'tam eþleþim';
 $strSearchOption4 = 'normal deyim gibi';
 $strSearchResultsFor = ' "%s" %s için arama sonuçlarý:';
 $strSearchType = 'Bul:';
+$strSecretRequired = 'Ayar dosyasý için gizli bir þifre gerekiyor (blowfish_secret).';
 $strSelect = 'Seç';
 $strSelectADb = ' Lütfen bir veritaban&#305; seçiniz';
 $strSelectAll = 'Tümünü seç';
@@ -387,6 +417,7 @@ $strStructure = 'Yapý';
 $strSubmit = 'Onayla';
 $strSuccess = 'SQL sorgunuz baþarýyla çalýþtýrýlmýþtýr';
 $strSum = 'toplam';
+$strSwedish = 'Ýsveçce'; 
 
 $strTable = 'Tablo';
 $strTableComments = 'Tablo yorumlarý';
@@ -395,6 +426,7 @@ $strTableHasBeenDropped = '%s tablosu kaldýrýlmýþtýr';
 $strTableHasBeenEmptied = '%s tablosu boþaltýlmýþtýr';
 $strTableHasBeenFlushed = '%s tablosu ba&#351;ar&#305;yla kapat&#305;lm&#305;&#351;t&#305;r.';
 $strTableMaintenance = 'Tablo bakýmý';
+$strTableOptions = 'Tablo ayarlarý';
 $strTableStructure = 'Tablo için tablo yapýsý';
 $strTableType = 'Tablo tipi';
 $strTables = '%s tablo';
@@ -402,9 +434,12 @@ $strTextAreaLength = 'Boyutu nedeniyle,<br /> bu alan düzenlenmeyebilir ';
 $strTheContent = 'Dosyanýzýn içeriði eklendi.';
 $strTheContents = 'Dosyanýn içeriði tablonun içeriðini ayný birincil veya unique anahtar deðerli sütunlar için yer deðiþtirir..';
 $strTheTerminator = 'Alan bitimini belirten iþaret.';
+$strToggleScratchboard = 'toggle scratchboard';
 $strTotal = 'toplam';
+$strTurkish = 'Türkçe'; 
 $strType = 'Tip';
 
+$strUkrainian = 'Ukraynaca'; 
 $strUncheckAll = 'Hiçbirisini Seçme';
 $strUnique = 'Unique';
 $strUnselectAll = 'Hiçbirisini seçme';
@@ -415,6 +450,7 @@ $strUpdateQuery = 'Sorguyu güncelle';
 $strUsage = 'Kullaným';
 $strUseBackquotes = 'Tablo ve alan isimleri için ters týrnak " ` " iþaretini kullan';
 $strUseTables = 'Tablolarý kullan';
+$strUseThisValue = 'Bu deðeri kullan';
 $strUser = 'Kullanýcý:';
 $strUserEmpty = 'Kullanýcý ismi alaný doldurulmadý!';
 $strUserName = 'Kullanýcý ismi';
@@ -424,8 +460,10 @@ $strValidateSQL = 'SQL\'i doðrula';
 $strValue = 'Deðer';
 $strViewDump = 'Tablo\'nun döküm(þema)\'ünü göster';
 $strViewDumpDB = 'Veritabaný\'nýn döküm(þema)\'ünü göster';
+$strViewDumpDatabases = 'Veritabanlarýnýn þemalarýný (dump) gör';
 
 $strWelcome = '%s \'e HOÞGELDÝNÝZ....';
+$strWindowNotFound = 'Hedefteki tarayý penceresi güncellenemiyor...Baðlantýsý olan pencereyi kapattýnýz veya tarayýcýnýzýn güvenlik ayarlarý buna izin vermiyor';
 $strWithChecked = 'seçilileri:';
 $strWrongUser = 'Hatalý kullanýcý/parola. Eriþim engellendi.';
 
@@ -437,14 +475,18 @@ $timespanfmt = '%s days, %s hours, %s minutes and %s seconds'; //to translate
 
 $strAbortedClients = 'Aborted'; //to translate
 $strAbsolutePathToDocSqlDir = 'Please enter the absolute path on webserver to docSQL directory';  //to translate
+$strAddAutoIncrement = 'Add AUTO_INCREMENT value';  //to translate
 $strAddPrivilegesOnDb = 'Add privileges on the following database'; //to translate
 $strAddPrivilegesOnTbl = 'Add privileges on the following table'; //to translate
 $strAddedColumnComment = 'Added comment for column';  //to translate
 $strAddedColumnRelation = 'Added relation for column';  //to translate
 $strAdministration = 'Administration'; //to translate
+$strArabic = 'Arabic';  //to translate
+$strArmenian = 'Armenian';  //to translate
 $strAutodetect = 'Autodetect';  //to translate
 $strAutomaticLayout = 'Automatic layout';  //to translate
 
+$strBaltic = 'Baltic';  //to translate
 $strBeginCut = 'BEGIN CUT';  //to translate
 $strBeginRaw = 'BEGIN RAW';  //to translate
 $strBzError = 'phpMyAdmin was unable to compress the dump because of a broken Bz2 extension in this php version. It is strongly recommended to set the <code>$cfg[\'BZipDump\']</code> directive in your phpMyAdmin configuration file to <code>FALSE</code>. If you want to use the Bz2 compression features, you should upgrade to a later php version. See php bug report %s for details.'; //to translate
@@ -452,6 +494,7 @@ $strBzError = 'phpMyAdmin was unable to compress the dump because of a broken Bz
 $strCSVOptions = 'CSV options';//to translate
 $strCannotLogin = 'Cannot login to MySQL server';  //to translate
 $strCantLoad = 'cannot load %s extension,<br />please check PHP Configuration';  //to translate
+$strCentralEuropean = 'Central European';  //to translate
 $strChangeCopyMode = 'Create a new user with the same privileges and ...';  //to translate
 $strChangeCopyModeCopy = '... keep the old one.';  //to translate
 $strChangeCopyModeDeleteAndReload = ' ... delete the old one from the user tables and reload the privileges afterwards.';  //to translate
@@ -466,6 +509,7 @@ $strCommand = 'Command'; //to translate
 $strCompression = 'Compression'; //to translate
 $strConnections = 'Connections'; //to translate
 $strCouldNotKill = 'phpMyAdmin was unable to kill thread %s. It probably has already been closed.'; //to translate
+$strCyrillic = 'Cyrillic';  //to translate
 
 $strDBComment = 'Database comment: ';//to translate
 $strDBGContext = 'Context';  //to translate
@@ -498,15 +542,18 @@ $strEndRaw = 'END RAW';  //to translate
 
 $strFailedAttempts = 'Failed attempts'; //to translate
 $strFileCouldNotBeRead = 'File could not be read';  //to translate
-$strFileNameTemplate = 'File name template';//to translate 
+$strFileNameTemplate = 'File name template';//to translate
 $strFileNameTemplateHelp = 'Use __DB__ for database name, __TABLE__ for table name and %sany strftime%s options for time specification, extension will be automagically added. Any other text will be preserved.';//to translate
-$strFileNameTemplateRemember = 'remember template';//to translate 
+$strFileNameTemplateRemember = 'remember template';//to translate
 $strFlushPrivilegesNote = 'Note: phpMyAdmin gets the users\' privileges directly from MySQL\'s privilege tables. The content of this tables may differ from the privileges the server uses if manual changes have made to it. In this case, you should %sreload the privileges%s before you continue.'; //to translate
 
 $strGlobal = 'global';  //to translate
 $strGlobalPrivileges = 'Global privileges'; //to translate
 $strGlobalValue = 'Global value'; //to translate
 $strGrantOption = 'Grant'; //to translate
+$strGreek = 'Greek';  //to translate
+
+$strHebrew = 'Hebrew';  //to translate
 
 $strId = 'ID'; //to translate
 $strIgnoringFile = 'Ignoring file %s';  //to translate
@@ -516,12 +563,17 @@ $strImportFinished = 'Import finished';  //to translate
 $strInnodbStat = 'InnoDB Status';  //to translate
 $strInsecureMySQL = 'Your configuration file contains settings (root with no password) that correspond to the default MySQL privileged account. Your MySQL server is running with this default, is open to intrusion, and you really should fix this security hole.';  //to translate
 
+$strJapanese = 'Japanese';  //to translate
 $strJumpToDB = 'Jump to database &quot;%s&quot;.';  //to translate
 $strJustDelete = 'Just delete the users from the privilege tables.'; //to translate
 $strJustDeleteDescr = 'The &quot;deleted&quot; users will still be able to access the server as usual until the privileges are reloaded.'; //to translate
 
+$strKorean = 'Korean';  //to translate
+
 $strLaTeX = 'LaTeX';  //to translate
 $strLandscape = 'Landscape';  //to translate
+$strLoadExplanation = 'The best method is checked by default, but you can change if it fails.';  //to translate
+$strLoadMethod = 'LOAD method';  //to translate
 $strLoginInformation = 'Login Information'; //to translate
 
 $strMIME_MIMEtype = 'MIME-type';//to translate
@@ -595,6 +647,7 @@ $strResourceLimits = 'Resource limits'; //to translate
 $strRevokeAndDelete = 'Revoke all active privileges from the users and delete them afterwards.'; //to translate
 $strRevokeAndDeleteDescr = 'The users will still have the USAGE privilege until the privileges are reloaded.'; //to translate
 $strRowsModeFlippedHorizontal = 'horizontal (rotated headers)';//to translate
+$strRussian = 'Russian';  //to translate
 
 $strSQLOptions = 'SQL options';//to translate
 $strSQLParserBugMessage = 'There is a chance that you may have found a bug in the SQL parser. Please examine your query closely, and check that the quotes are correct and not mis-matched. Other possible failure causes may be that you are uploading a file with binary outside of a quoted text area. You can also try your query on the MySQL command line interface. The MySQL server error output below, if there is any, may also help you in diagnosing the problem. If you still have problems or if the parser fails where the command line interface succeeds, please reduce your SQL query input to the single query that causes problems, and submit a bug report with the data chunk in the CUT section below:';  //to translate
@@ -612,6 +665,7 @@ $strServerVars = 'Server variables and settings'; //to translate
 $strSessionValue = 'Session value'; //to translate
 $strShowDatadictAs = 'Data Dictionary Format';  //to translate
 $strShowFullQueries = 'Show Full Queries';  //to translate
+$strSimplifiedChinese = 'Simplified Chinese';  //to translate
 $strStatCheckTime = 'Last check';//to translate
 $strStatCreateTime = 'Creation';//to translate
 $strStatUpdateTime = 'Last update';//to translate
@@ -620,11 +674,13 @@ $strSwitchToTable = 'Switch to copied table';  //to translate
 
 $strTableOfContents = 'Table of contents';  //to translate
 $strTblPrivileges = 'Table-specific privileges'; //to translate
+$strThai = 'Thai';  //to translate
 $strThisHost = 'This Host'; //to translate
 $strThisNotDirectory = 'This was not a directory';  //to translate
 $strThreadSuccessfullyKilled = 'Thread %s was successfully killed.'; //to translate
 $strTime = 'Time'; //to translate
 $strTotalUC = 'Total'; //to translate
+$strTraditionalChinese = 'Traditional Chinese';  //to translate
 $strTraffic = 'Traffic'; //to translate
 $strTransformation_image_jpeg__inline = 'Displays a clickable thumbnail; options: width,height in pixels (keeps the original ratio)';  //to translate
 $strTransformation_image_jpeg__link = 'Displays a link to this image (direct blob download, i.e.).';//to translate
@@ -638,6 +694,8 @@ $strTransformation_text_plain__substr = 'Only shows part of a string. First opti
 $strTransformation_text_plain__unformatted = 'Displays HTML code as HTML entities. No HTML formatting is shown.';//to translate
 $strTruncateQueries = 'Truncate Shown Queries';  //to translate
 
+$strUnicode = 'Unicode';  //to translate
+$strUnknown = 'unknown';  //to translate
 $strUpdComTab = 'Please see Documentation on how to update your Column_comments Table';  //to translate
 $strUseHostTable = 'Use Host Table';  //to translate
 $strUseTextField = 'Use text field'; //to translate
@@ -652,6 +710,7 @@ $strVar = 'Variable'; //to translate
 
 $strWebServerUploadDirectory = 'web-server upload directory';  //to translate
 $strWebServerUploadDirectoryError = 'The directory you set for upload work cannot be reached';  //to translate
+$strWestEuropean = 'West European';  //to translate
 $strWildcard = 'wildcard';  //to translate
 $strWritingCommentNotPossible = 'Writing of comment not possible';  //to translate
 $strWritingRelationNotPossible = 'Writing of relation not possible';  //to translate
@@ -659,6 +718,4 @@ $strWritingRelationNotPossible = 'Writing of relation not possible';  //to trans
 $strXML = 'XML';//to translate
 
 $strZeroRemovesTheLimit = 'Note: Setting these options to 0 (zero) removes the limit.'; //to translate
-$strLoadMethod = 'LOAD method';  //to translate
-$strLoadExplanation = 'The best method is checked by default, but you can change if it fails.';  //to translate
 ?>

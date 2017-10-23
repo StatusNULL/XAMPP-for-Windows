@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_properties_common.php,v 1.11 2003/04/16 12:52:48 nijel Exp $ */
+/* $Id: tbl_properties_common.php,v 1.12 2003/07/19 12:14:51 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -16,6 +16,8 @@ if (!defined('PMA_BOOKMARK_LIB_INCLUDED')) {
     include('./libraries/bookmark.lib.php');
 }
 
+// Check parameters
+PMA_checkParameters(array('db','table'));
 
 /**
  * Defines the urls to return to in case of error in a sql statement

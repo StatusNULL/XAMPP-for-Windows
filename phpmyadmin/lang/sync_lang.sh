@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: sync_lang.sh,v 1.52 2003/05/29 12:32:07 lem9 Exp $
+# $Id: sync_lang.sh,v 1.53.2.1 2003/09/01 14:51:52 nijel Exp $
 ##
 # Shell script that synchronises all translations in phpMyAdmin
 ##
@@ -73,6 +73,7 @@ BASE_TRANSLATIONS=`cat <<EOT
 afrikaans-iso-8859-1
 albanian-iso-8859-1
 arabic-windows-1256
+azerbaijani-iso-8859-9
 brazilian_portuguese-iso-8859-1
 bulgarian-windows-1251
 catalan-iso-8859-1
@@ -103,7 +104,8 @@ polish-iso-8859-2
 portuguese-iso-8859-1
 romanian-iso-8859-1
 russian-windows-1251
-serbian-windows-1250
+serbian_cyrillic-windows-1251
+serbian_latin-windows-1250
 slovenian-iso-8859-2
 slovak-iso-8859-2
 spanish-iso-8859-1

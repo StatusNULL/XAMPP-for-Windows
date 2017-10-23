@@ -1,13 +1,22 @@
 <?php
-/* $Id: tbl_properties_links.php,v 1.32 2003/03/12 20:20:17 garvinhicking Exp $ */
+/* $Id: tbl_properties_links.php,v 1.37 2003/07/19 15:22:06 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
 /**
  * Sets error reporting level
  */
-error_reporting(E_ALL);
+// (removed to avoid path disclosure, not sure about why this was here)
+// error_reporting(E_ALL);
 
+
+// Check parameters
+
+if (!defined('PMA_COMMON_LIB_INCLUDED')) {
+    include('./libraries/common.lib.php');
+}
+
+PMA_checkParameters(array('db'));
 
 /**
  * Count amount of navigation tabs
@@ -47,10 +56,7 @@ if ($table_info_num_rows > 0) {
     $att6    = '';
 }
 
-// The 'back' is supposed to be set to the current sub-page. This is necessary
-// when you have js deactivated, you click on Drop, then click cancel, and want
-// to get back to the same sub-page.
-$arg7 = ereg_replace('tbl_properties[^.]*.php$', 'db_details.php', $url_query) . '&amp;reload=1&amp;purge=1&amp;sql_query=' . urlencode('DROP TABLE ' . PMA_backquote($table) ) . '&amp;zero_rows=' . urlencode(sprintf($strTableHasBeenDropped, htmlspecialchars($table)));
+$arg7 = $url_query . '&amp;reload=1&amp;purge=1&amp;sql_query=' . urlencode('DROP TABLE ' . PMA_backquote($table) ) . '&amp;zero_rows=' . urlencode(sprintf($strTableHasBeenDropped, htmlspecialchars($table)));
 $att7 = 'class="drop" onclick="return confirmLink(this, \'DROP TABLE ' . PMA_jsFormat($table) . '\')"';
 
 
@@ -71,11 +77,8 @@ echo PMA_printTab($strBrowse, $lnk2, $arg2);
 echo PMA_printTab($strSQL, 'tbl_properties.php', $url_query);
 echo PMA_printTab($strSelect, $lnk4, $arg4);
 echo PMA_printTab($strInsert, 'tbl_change.php', $url_query);
-echo PMA_printTab($strExport, 'tbl_properties_export.php', $url_query);
+echo PMA_printTab($strExport, 'tbl_properties_export.php', $url_query . '&amp;single_table=true');
 echo PMA_printTab($strOperations, 'tbl_properties_operations.php', $url_query);
-if (PMA_MYSQL_INT_VERSION >= 32322) {
-    echo PMA_printTab($strOptions, 'tbl_properties_options.php', $url_query);
-}
 echo PMA_printTab($strEmpty, $lnk6, $arg6, $att6);
 echo PMA_printTab($strDrop, 'sql.php', $arg7, $att7);
 echo "\n";

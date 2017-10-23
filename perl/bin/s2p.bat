@@ -12,7 +12,7 @@ goto endofperl
 @rem ';
 #!perl
 #line 15
-    eval 'exec C:\Perl\bin\perl.exe -S $0 ${1+"$@"}'
+    eval 'exec c:\xampp\perl\bin\perl.exe -S $0 ${1+"$@"}'
 	if $running_under_some_shell;
 my $startperl;
 my $perlpath;
@@ -20,7 +20,7 @@ my $perlpath;
 #!perl
 /../
 ($perlpath = <<'/../') =~ s/\s*\z//;
-C:\Perl\bin\perl.exe
+c:\xampp\perl\bin\perl.exe
 /../
 
 $0 =~ s/^.*?(\w+)[\.\w]*$/$1/;

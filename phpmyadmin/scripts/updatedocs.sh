@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: updatedocs.sh,v 1.1 2003/03/05 15:11:17 robbat2 Exp $
+# $Id: updatedocs.sh,v 1.2 2003/06/22 20:21:11 robbat2 Exp $
 #
 # Script to build plain text documentation from the HTML version
 #
@@ -8,12 +8,19 @@ SRC=Documentation.html
 DST=Documentation.txt
 OPTIONS="--dont_wrap_pre --nolist --dump"
 CMD=lynx
-if [ ! -e "$SRC" ]; then
-  if [ -e ../"$SRC" ]; then
-    SRC="../$SRC"
-  else
+
+TMPDOCDIRS=".. . `pwd` `pwd`/`dirname ${0}`/.. `dirname ${0}`/.."
+for dir in ${TMPDOCDIRS}; do
+    [ -e "${dir}/${SRC}" ] && DOCDIR="${dir}"
+    [ -n "${DOCDIR}" ] && break
+done
+unset TMPDOCDIRS
+if [ -z "${DOCDIR}" ]; then
     echo 'Unable to locate documentation!'
-    return
-  fi;
-fi;
-$CMD $OPTIONS "$SRC" > "$DST"
+    exit -1
+fi
+
+SRC="${DOCDIR}/${SRC}"
+DST="${DOCDIR}/${DST}"
+
+${CMD} ${OPTIONS} "${SRC}" > "${DST}"

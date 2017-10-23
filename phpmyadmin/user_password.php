@@ -1,5 +1,5 @@
 <?php
-/* $Id: user_password.php,v 1.16 2003/03/17 13:22:54 lem9 Exp $ */
+/* $Id: user_password.php,v 1.19 2003/07/07 11:10:07 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -8,7 +8,6 @@
  */
 require('./libraries/grab_globals.lib.php');
 require('./libraries/common.lib.php');
-
 
 /**
  * Displays an error message and exits if the user isn't allowed to use this
@@ -56,7 +55,7 @@ if (isset($nopass)) {
 
         // Changes password cookie if required
         if ($cfg['Server']['auth_type'] == 'cookie') {
-            setcookie('pma_cookie_password', $pma_pw, 0, $cookie_path, '', $is_https);
+            setcookie('pma_cookie_password', base64_encode(PMA_blowfish_encrypt($pma_pw,$GLOBALS['cfg']['blowfish_secret'])), 0, $cookie_path, '', $is_https);
         } // end if
         // For http auth. mode, the "back" link will also enforce new
         // authentication

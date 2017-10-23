@@ -1,5 +1,5 @@
 <?php
-/* $Id: sql.php,v 1.3 2003/07/06 21:45:04 rabus Exp $ */
+/* $Id: sql.php,v 1.7 2003/07/23 14:36:54 garvinhicking Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -147,21 +147,21 @@ function PMA_getTableDef($db, $table, $crlf, $error_url, $do_relation = false, $
         $result = PMA_mysql_query('SHOW TABLE STATUS FROM ' . PMA_backquote($db) . ' LIKE \'' . PMA_sqlAddslashes($table) . '\'');
         if ($result != FALSE && mysql_num_rows($result) > 0) {
             $tmpres        = PMA_mysql_fetch_array($result);
-            if (!empty($tmpres['Auto_increment'])) {
+            if (isset($GLOBALS['auto_increment']) && !empty($tmpres['Auto_increment'])) {
                 $auto_increment .= ' AUTO_INCREMENT=' . $tmpres['Auto_increment'] . ' ';
             }
 
-            if (isset($tmpres['Create_time']) && !empty($tmpres['Create_time'])) {
+            if ($do_comments && isset($tmpres['Create_time']) && !empty($tmpres['Create_time'])) {
                 $schema_create .= '# ' . $GLOBALS['strStatCreateTime'] . ': ' . PMA_localisedDate(strtotime($tmpres['Create_time'])) . $crlf;
                 $new_crlf = '#' . $crlf . $crlf;
             }
 
-            if (isset($tmpres['Update_time']) && !empty($tmpres['Update_time'])) {
+            if ($do_comments && isset($tmpres['Update_time']) && !empty($tmpres['Update_time'])) {
                 $schema_create .= '# ' . $GLOBALS['strStatUpdateTime'] . ': ' . PMA_localisedDate(strtotime($tmpres['Update_time'])) . $crlf;
                 $new_crlf = '#' . $crlf . $crlf;
             }
 
-            if (isset($tmpres['Check_time']) && !empty($tmpres['Check_time'])) {
+            if ($do_comments && isset($tmpres['Check_time']) && !empty($tmpres['Check_time'])) {
                 $schema_create .= '# ' . $GLOBALS['strStatCheckTime'] . ': ' . PMA_localisedDate(strtotime($tmpres['Check_time'])) . $crlf;
                 $new_crlf = '#' . $crlf . $crlf;
             }
@@ -310,10 +310,10 @@ function PMA_getTableDef($db, $table, $crlf, $error_url, $do_relation = false, $
         $sub_part = (isset($row['Sub_part'])) ? $row['Sub_part'] : '';
 
         if ($kname != 'PRIMARY' && $row['Non_unique'] == 0) {
-            $kname = "UNIQUE|$kname";
+            $kname = 'UNIQUE|' . $kname;
         }
         if ($comment == 'FULLTEXT') {
-            $kname = 'FULLTEXT|$kname';
+            $kname = 'FULLTEXT|' . $kname;
         }
         if (!isset($index[$kname])) {
             $index[$kname] = array();
@@ -407,9 +407,6 @@ function PMA_getTableContentFast($db, $table, $crlf, $error_url, $sql_query)
     global $rows_cnt;
     global $current_row;
 
-    $eol_dlm = (isset($GLOBALS['extended_ins']) && ($GLOBALS['current_row'] < $GLOBALS['rows_cnt']))
-             ? ','
-             : ';';
     $buffer = '';
 
     $result      = PMA_mysql_query($sql_query) or PMA_mysqlDie('', $sql_query, '', $error_url);
@@ -489,7 +486,7 @@ function PMA_getTableContentFast($db, $table, $crlf, $error_url, $sql_query)
             }
             unset($values);
 
-            if (!PMA_exportOutputHandler($insert_line . $eol_dlm . $crlf)) return FALSE;
+            if (!PMA_exportOutputHandler($insert_line . ((isset($GLOBALS['extended_ins']) && ($current_row < $rows_cnt)) ? ',' : ';') . $crlf)) return FALSE;
 
         } // end while
     } // end if ($result != FALSE)

@@ -1,11 +1,19 @@
 <?php
-/* $Id: ldi_table.php,v 1.27 2003/05/29 17:43:19 garvinhicking Exp $ */
+/* $Id: ldi_table.php,v 1.29 2003/07/28 17:47:07 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
 /**
  * This file defines the forms used to insert a textfile into a table
  */
+
+require('./libraries/grab_globals.lib.php');
+
+// Check parameters
+if (!defined('PMA_COMMON_LIB_INCLUDED')) {
+    include('./libraries/common.lib.php');
+}
+PMA_checkParameters(array('db', 'table'));
 
 
 /**
@@ -15,7 +23,6 @@ require('./tbl_properties_common.php');
 $err_url   = 'ldi_table.php' . $err_url;
 $url_query .= '&amp;goto=ldi_table.php&amp;back=ldi_table.php';
 require('./tbl_properties_table_info.php');
-
 
 /**
  * Displays the form
