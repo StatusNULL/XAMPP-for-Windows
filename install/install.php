@@ -16,12 +16,7 @@
   ########################################################################\r\n\r\n"; 
 
 
-/// Your system? /// 
-/* echo "\r\n  Checking your system: ";
-$system = system ("echo '%os%'");
-if ($system!="'Windows_NT'")
-{$system = "Windows"; echo "$system (not NT)";} */
-/// Your system END /// 
+
 
 /// Where I stand? ///
 $curdir = getcwd();
@@ -320,7 +315,79 @@ if ($CS == 2)
 // }
 if ($configure < 1)
 {
-echo "  Configure XAMPP with awk ...";
+
+/// Your system? /// 
+// echo "\r\n  Checking your system: ";
+echo "  Configure XAMPP with awk for ";
+$system = system ("echo '%os%'");
+if ($system!="'Windows_NT'")
+{$system = "Windows"; echo "  $system 98/ME/HOME (not NT)";} 
+/// Your system END /// 
+if ($system=="Windows")
+{
+	$confhttpdroot=$partwampp."\apache\\conf\\httpd.conf";
+	$includewin="Win32DisableAcceptEx ON\r\n";
+	echo "\r\n  Disable AcceptEx Winsocks v2 support (only NT)";
+	$datei = fopen($confhttpdroot,'r');
+	unset($newzeile);
+	$i=0;
+	while(!feof($datei)) 
+	{
+	$zeile = fgets($datei,255);
+	$newzeile[]=$zeile; 
+	$i++; 
+	}
+	fclose($datei);
+	 $datei = fopen($confhttpdroot,'w'); 
+        if($datei) 
+            { 
+                for($z=0;$z<$i+1;$z++) 
+                { 
+					if (eregi("Win32DisableAcceptEx",$newzeile[$z]))
+					{
+						fputs($datei, $includewin);
+					}
+					else 
+					{ 
+					fputs($datei,$newzeile[$z]); 
+					}
+				}
+			}
+	fclose($datei);
+}
+else
+{
+	$confhttpdroot=$partwampp."\apache\\conf\\httpd.conf";
+	$includewin="# Win32DisableAcceptEx ON\r\n";
+	echo "\r\n  Enable AcceptEx Winsocks v2 support for NT systems";
+	$datei = fopen($confhttpdroot,'r');
+	$i=0;
+	unset($newzeile);
+	while(!feof($datei)) 
+	{
+	$zeile = fgets($datei,255);
+	$newzeile[]=$zeile; 
+	$i++; 
+	}
+	fclose($datei);
+	 $datei = fopen($confhttpdroot,'w'); 
+        if($datei) 
+            { 
+                for($z=0;$z<$i+1;$z++) 
+                { 
+					if (eregi("Win32DisableAcceptEx",$newzeile[$z]))
+					{
+						fputs($datei, $includewin);
+					}
+					else 
+					{ 
+					fputs($datei,$newzeile[$z]); 
+					}
+				}
+			}
+	fclose($datei);
+}
+
 $substit="\"".$substit."\"";
 for ($i=1;$i<=$count;$i++)
 {
@@ -430,17 +497,13 @@ copy($workersbin,$workersjk);
 
 }	
 
-	/* $pythoninstallreg = fopen($pythoninstallregpath,'a');
-	$reginfo = "\r\n\"PYTHONHOME\"=\"$awkpart\\\\python\""; 
-	fputs($pythoninstallreg,$reginfo); 
-	fclose($pythoninstallreg); 	*/
 
 	$installsys = fopen($installsysroot,'w');
 	$wamppinfo = "DIR = $partwampp\r\nBasis = xampp\r\nVersion = 1.4\r\nPerl = $perl"; 
 	fputs($installsys,$wamppinfo); 
 	fclose($installsys); 
 	
-echo " Ready!\r\n\r\n";
+echo "\r\n  Ready!\r\n\r\n";
 
 
 

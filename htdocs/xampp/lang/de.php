@@ -335,4 +335,28 @@ $TEXT['ADOdb-table']="Tabelle dieser Datenbank";
 $TEXT['ADOdb-nottable']="<p><B>Tabelle nicht gefunden!</B>";
 $TEXT['ADOdb-notdbserver']="<p><B>Der Treiber für diesen Datenbankserver existiert nicht oder es handelt es ich um ein ODBC, ADO oder OLEDB Treiber!</B>";
 
+
+// ---------------------------------------------------------------------
+// INFO
+// ---------------------------------------------------------------------
+
+$TEXT['info-package']="Packet";
+$TEXT['info-pages']="Seiten";
+$TEXT['info-extension']="Endungen";
+$TEXT['info-module']="Apache Modul";
+$TEXT['info-description']="Beschreibung";
+$TEXT['info-signature']="Signatur";
+$TEXT['info-docdir']="Dokumentverzeichnis";
+$TEXT['info-port']="Standard Port";
+$TEXT['info-service']="Dienste";
+$TEXT['info-examples']="Beispiele";
+$TEXT['info-conf']="Konfigurationsdateien";
+$TEXT['info-requires']="Braucht";
+$TEXT['info-alternative']="Alternativ";
+$TEXT['info-tomcatwarn']="Warnung! Tomcat ist nicht auf Port 8080 gestartet.";
+$TEXT['info-tomcatok']="OK! Der Tomcat ist auf Port 8080 erfolgreich gestartet.";
+$TEXT['info-tryjava']="Das Java Beispiel (JSP) über Apache MOD_JK.";
+$TEXT['info-nococoon']="Warnung! Tomcat ist nicht auf Port 8080 gestartet. So kann ich nicht \"Cocoon\" installieren!";
+$TEXT['info-okcocoon']="Ok! Der Tomcat ist hochgefahren. Die Installation kann ein paar Minuten dauern. Zum installieren von \"Cocoon\" klicke nun hier ...";
+
 ?>

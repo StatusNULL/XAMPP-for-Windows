@@ -6,4 +6,4 @@
 <a class=n target=content onClick="h(this);" href=phonebook.php><?=$TEXT['navi-phonebook']?></a><br>
 <a class=n target=content onClick="h(this);" href=pear.php><?=$TEXT['navi-pear']?></a><br>
 <a class=n target=content onClick="h(this);" href=adodb.php><?=$TEXT['navi-adodb']?></a><br>
-<a class=n target=content onClick="h(this);" href=/perl/modperl.pl><?=$TEXT['navi-perl']?></a>
+<a class=n target=content onClick="h(this);" href=perl-info.php><?=$TEXT['navi-perl']?></a>

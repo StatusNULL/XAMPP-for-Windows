@@ -24,6 +24,7 @@
 		$pdf->ezTable($data,"","",array('xPos'=>'left','xOrientation'=>'right','width'=>500));
 
 		$pdf->ezStream();
+		exit;
 
 	}
 ?>

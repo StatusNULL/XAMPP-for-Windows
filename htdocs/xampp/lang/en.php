@@ -332,4 +332,29 @@ $TEXT['ADOdb-table']="Selected table of database";
 $TEXT['ADOdb-nottable']="<p><B>Table not found!</B>";
 $TEXT['ADOdb-notdbserver']="<p><B>The driver for this database server does not exists or perhaps it is an ODBC, ADO or OLEDB driver!</B>";
 
+
+// ---------------------------------------------------------------------
+// INFO
+// ---------------------------------------------------------------------
+
+$TEXT['info-package']="Package";
+$TEXT['info-pages']="Pages";
+$TEXT['info-extension']="Extensions";
+$TEXT['info-module']="Apache module";
+$TEXT['info-description']="Description";
+$TEXT['info-signature']="Signature";
+$TEXT['info-docdir']="Document root";
+$TEXT['info-port']="Default port";
+$TEXT['info-service']="Services";
+$TEXT['info-examples']="Examples";
+$TEXT['info-conf']="Configuration files";
+$TEXT['info-requires']="Requires";
+$TEXT['info-alternative']="Alternative";
+$TEXT['info-tomcatwarn']="Warning! Tomcat is not started on port 8080.";
+$TEXT['info-tomcatok']="OK! Tomcat is started on port 8080 successfully.";
+$TEXT['info-tryjava']="The java example (JSP) with Apache MOD_JK.";
+$TEXT['info-nococoon']="Warning! Tomcat is not started on port 8080. Cannot install
+\"Cocoon\" without running Tomcat server!";
+$TEXT['info-okcocoon']="Ok! The Tomcat is running normaly. The installation works can last some minutes! To install \"Cocoon\" now click here ...";
+
 ?>
