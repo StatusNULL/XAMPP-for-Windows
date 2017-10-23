@@ -1,4 +1,4 @@
-/* Copyright (c) 2009, 2011, Oracle and/or its affiliates. All rights reserved.
+/* Copyright (c) 2009, 2013, Oracle and/or its affiliates. All rights reserved.
  
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -600,6 +600,7 @@
 #define DEFAULT_CHARSET_HOME "C:/Program Files/MySQL/MySQL Server 5.5"
 #define PLUGINDIR "C:/Program Files/MySQL/MySQL Server 5.5/lib/plugin"
 /* #undef DEFAULT_SYSCONFDIR */
+#define DEFAULT_TMPDIR P_tmpdir
 
 /* #undef SO_EXT */
 
@@ -609,10 +610,10 @@
 #define PACKAGE "mysql"
 #define PACKAGE_BUGREPORT ""
 #define PACKAGE_NAME "MySQL Server"
-#define PACKAGE_STRING "MySQL Server 5.5.34"
+#define PACKAGE_STRING "MySQL Server 5.5.36"
 #define PACKAGE_TARNAME "mysql"
-#define PACKAGE_VERSION "5.5.34"
-#define VERSION "5.5.34"
+#define PACKAGE_VERSION "5.5.36"
+#define VERSION "5.5.36"
 #define PROTOCOL_VERSION 10
 
 

@@ -1,5 +1,5 @@
 ===== Information about the build process: =====
-Build was run at Mon 09/09/2013 on host 'TYR26'
+Build was run at Tue 01/14/2014 on host 'TYR24'
 
 Build was done on  Windows-6.0 using x86
 Build was done using cmake 2.8.10 
@@ -23,7 +23,9 @@ INSTALL_LAYOUT:STRING=STANDALONE
 LIGHT_EXECUTABLE:FILEPATH=C:/Program Files (x86)/Windows Installer XML v3.5/bin/light.exe
 MYSQL_DATADIR:PATH=C:/Program Files/MySQL/MySQL Server 5.5/data
 MYSQL_MAINTAINER_MODE:BOOL=OFF
+TMPDIR:BOOL=OFF
 WITH_ARCHIVE_STORAGE_ENGINE:BOOL=ON
+WITH_ASAN:BOOL=OFF
 WITH_BLACKHOLE_STORAGE_ENGINE:BOOL=ON
 WITH_DEBUG:BOOL=OFF
 WITH_EMBEDDED_SERVER:BOOL=ON

@@ -1,4 +1,5 @@
 package HTML::Perlinfo::Common;
+use CGI qw(escapeHTML);
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(initialize_globals print_table_colspan_header print_table_row print_table_color_start print_table_color_end print_color_box print_table_row_color print_table_start print_table_end print_box_start print_box_end print_hr print_table_header print_section print_license add_link check_path check_args check_module_args perl_version release_date process_args error_msg match_string);
@@ -291,7 +292,12 @@ sub  print_table_colspan_header {
 		  if ((not defined ($row_element)) || ($row_element !~ /\S/)) {
 			  $HTML .= "<i>no value</i>";
 		  } else {
-			  my $elem_esc = $row_element;
+			  my $elem_esc;
+			  if (($i == 0) || ($row_element eq "<i>no value</i>")) {
+				$elem_esc = $row_element;
+			  }  else  {
+				$elem_esc = escapeHTML($row_element);
+			  }
 			  $HTML .= "$elem_esc";
 
 		  }
