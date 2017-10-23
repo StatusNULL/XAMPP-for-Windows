@@ -1,18 +1,9 @@
-22. Mai 2007 XAMPP 1.6.2 Beta 3
-- Fix Apache2.2 "NET start Apache2.2" Bug in xampp control panel 2.5
+13. Juli 2007 XAMPP 1.6.3 Beta 2
+- Upgrade MySQL 5.0.45
+- Upgrade phpMyAdmin 2.10.2 (with new db dump)
+- Upgrade eAccelerator 0.9.5.1 für PHP 5.2
+- Upgrade ADOdb 4.95
 
-
-16. Mai 2007 XAMPP 1.6.2 Beta 3
-- Fix Apache2.2 "running" Bug in xampp control panel 2.5
-
-14. Mai 2007 XAMPP 1.6.2 Beta 2
-- UPDATE MySQL 5.0.41 5.2.2
-- UPDATE XAMPP Control Version 2.5 
-
-07. Mai 2007 XAMPP 1.6.2 Beta 1
-- UPDATE PHP 5.2.2
-- UPDATE PHP 4.4.7
-- UPDATE phpMyAdmin 2.10.1
-- UPDATE eAccelerator
-- Fix Security Leck in adodb.php
-- FIX http://bugs.xampp.org/view.php?id=31 (only Installer)
+05. Juni 2007 XAMPP 1.6.3 Beta 1
+- UPDATE PHP 5.2.3
+- Fix current release Number in the XAMPP Securtiy section

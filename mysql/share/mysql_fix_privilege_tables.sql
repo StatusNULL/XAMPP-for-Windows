@@ -69,6 +69,7 @@ CREATE TABLE IF NOT EXISTS procs_priv ( Host char(60) binary DEFAULT '' NOT NULL
 # this sql script.
 # On windows you should do 'mysql --force mysql < mysql_fix_privilege_tables.sql'
 
+set sql_mode='';
 set storage_engine=MyISAM;
 
 ALTER TABLE user add File_priv enum('N','Y') COLLATE utf8_general_ci NOT NULL;
