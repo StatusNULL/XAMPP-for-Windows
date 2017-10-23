@@ -1,6 +1,22 @@
-/* Copyright 2003 MySQL AB;
+/* Copyright (C) 2003 MySQL AB
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
+
+/*
    Translation done in 2003 by Egor Egorov; Ensita.NET, http://www.ensita.net/
-   This file is public domain and comes with NO WARRANTY of any kind */
+*/
 /* charset: KOI8-R */
 
 "hashchk",
@@ -79,7 +95,7 @@
 "Столбец типа BLOB '%-.64s' не может быть использован как значение ключа в таблице такого типа",
 "Слишком большая длина столбца '%-.64s' (максимум = %d). Используйте тип BLOB вместо текущего",
 "Некорректное определение таблицы: может существовать только один автоинкрементный столбец, и он должен быть определен как ключ",
-"%s: Готов принимать соединения.\nВерсия: '%s'  сокет: '%s'  порт: %d\n",
+"%s: Готов принимать соединения.\nВерсия: '%s'  сокет: '%s'  порт: %d",
 "%s: Корректная остановка\n",
 "%s: Получен сигнал %d. Прекращаем!\n",
 "%s: Остановка завершена\n",

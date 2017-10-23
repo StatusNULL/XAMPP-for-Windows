@@ -258,6 +258,11 @@ $cfg['CharEditing']           = 'input';
 $cfg['ZipDump']               = TRUE;   // Allow the use of zip/gzip/bzip
 $cfg['GZipDump']              = TRUE;   // compression for
 $cfg['BZipDump']              = TRUE;   // dump files
+$cfg['CompressOnFly']         = TRUE;   // Will compress gzip/bzip2 exports on
+                                        // fly without need for much memory.
+                                        // If you encounter problems with
+                                        // created gzip/bzip2 files disable
+                                        // this feature.
 
 // Tabs display settings
 $cfg['LightTabs']             = FALSE;  // use graphically less intense menu tabs
@@ -561,6 +566,7 @@ $cfg['SQP']['fmtColor']     = array(        // Syntax colouring data
     'alpha_reservedWord' => '#990099',
     'alpha_functionName' => '#FF0000',
     'alpha_identifier'   => 'black',
+    'alpha_charset'      => '#6495ed',
     'alpha_variable'     => '#800000',
     'quote'              => '#008000',
     'quote_double'       => '',

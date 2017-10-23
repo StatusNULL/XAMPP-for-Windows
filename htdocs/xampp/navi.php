@@ -56,7 +56,7 @@
 <a target=_parent class=n href="lang.php?de"><?=$TEXT['navi-german']?></a><br>
 
 
-<p class=navi>&copy;2002/2003<br>
+<p class=navi>&copy;2002/2004<br>
 <? if(file_get_contents("lang.tmp")=="de") { ?>
 <a target="_new" href="http://www.apachefriends.org/index.html"><img border=0 src="img/apachefriends.gif"></a><p>
 <? } else { ?>

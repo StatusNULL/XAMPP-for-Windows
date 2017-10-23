@@ -1,4 +1,4 @@
-#!C:\wampp2\perl\bin\perl.exe
+#!c:\xampp\perl\bin\perl.exe
 use strict;
 use warnings;
 use Getopt::Long;

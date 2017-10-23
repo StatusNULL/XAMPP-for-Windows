@@ -9,7 +9,7 @@ $TEXT['global-xampp']="XAMPP for Windows";
 // NAVIGATION
 // ---------------------------------------------------------------------
 
-$TEXT['navi-xampp']="XAMPP 1.4.6";
+$TEXT['navi-xampp']="XAMPP 1.4.7";
 $TEXT['navi-welcome']="Welcome";
 $TEXT['navi-status']="Status";
 $TEXT['navi-security']="Security";
