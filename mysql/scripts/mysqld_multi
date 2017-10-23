@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!@PERL@
 
 use Getopt::Long;
 use POSIX qw(strftime);
@@ -10,8 +10,8 @@ $opt_config_file   = undef();
 $opt_example       = 0;
 $opt_help          = 0;
 $opt_log           = undef();
-$opt_mysqladmin    = "/usr/local/bin/mysqladmin";
-$opt_mysqld        = "/usr/local/libexec/mysqld";
+$opt_mysqladmin    = "@bindir@/mysqladmin";
+$opt_mysqld        = "@libexecdir@/mysqld";
 $opt_no_log        = 0;
 $opt_password      = undef();
 $opt_tcp_ip        = 0;
@@ -195,7 +195,7 @@ sub quote_opt_arg
 
 ####
 #### Init log file. Check for appropriate place for log file, in the following
-#### order my_print_defaults mysqld datadir, /usr/local/share, /var/log, /tmp
+#### order my_print_defaults mysqld datadir, @datadir@, /var/log, /tmp
 ####
 
 sub init_log
@@ -217,7 +217,7 @@ sub init_log
   }
   if (!defined($logdir))
   {
-    $logdir= "/usr/local/share" if (-d "/usr/local/share" && -w "/usr/local/share");
+    $logdir= "@datadir@" if (-d "@datadir@" && -w "@datadir@");
   }
   if (!defined($logdir))
   {
@@ -464,9 +464,9 @@ sub find_groups
   }
   else
   {
-    if (-f "/usr/local/etc/my.cnf" && -r "/usr/local/etc/my.cnf")
+    if (-f "@sysconfdir@/my.cnf" && -r "@sysconfdir@/my.cnf")
     {
-      open(MY_CNF, "</usr/local/etc/my.cnf") && (@tmp=<MY_CNF>) && close(MY_CNF);
+      open(MY_CNF, "<@sysconfdir@/my.cnf") && (@tmp=<MY_CNF>) && close(MY_CNF);
     } elsif (-f "/etc/my.cnf" && -r "/etc/my.cnf")
     {
       open(MY_CNF, "</etc/my.cnf") && (@tmp=<MY_CNF>) && close(MY_CNF);
@@ -714,7 +714,7 @@ sub example
 #   (as per Linux/Unix standard). You may even replace the
 #   /etc/init.d/mysql.server script with it.
 #
-#   Before using, you must create a my.cnf file either in /usr/local/etc/my.cnf
+#   Before using, you must create a my.cnf file either in @sysconfdir@/my.cnf
 #   or /root/.my.cnf and add the [mysqld_multi] and [mysqld#] groups.
 #
 #   The script can be found from support-files/mysqld_multi.server.sh
@@ -722,17 +722,17 @@ sub example
 #
 
 [mysqld_multi]
-mysqld     = /usr/local/bin/mysqld_safe
-mysqladmin = /usr/local/bin/mysqladmin
+mysqld     = @bindir@/mysqld_safe
+mysqladmin = @bindir@/mysqladmin
 user       = multi_admin
 password   = my_password
 
 [mysqld2]
 socket     = /tmp/mysql.sock2
 port       = 3307
-pid-file   = /usr/local/var2/hostname.pid2
-datadir    = /usr/local/var2
-language   = /usr/local/share/mysql/english
+pid-file   = @localstatedir@2/hostname.pid2
+datadir    = @localstatedir@2
+language   = @datadir@/mysql/english
 user       = unix_user1
 
 [mysqld3]
@@ -741,25 +741,25 @@ ledir      = /path/to/mysqld-binary/
 mysqladmin = /path/to/mysqladmin/mysqladmin
 socket     = /tmp/mysql.sock3
 port       = 3308
-pid-file   = /usr/local/var3/hostname.pid3
-datadir    = /usr/local/var3
-language   = /usr/local/share/mysql/swedish
+pid-file   = @localstatedir@3/hostname.pid3
+datadir    = @localstatedir@3
+language   = @datadir@/mysql/swedish
 user       = unix_user2
 
 [mysqld4]
 socket     = /tmp/mysql.sock4
 port       = 3309
-pid-file   = /usr/local/var4/hostname.pid4
-datadir    = /usr/local/var4
-language   = /usr/local/share/mysql/estonia
+pid-file   = @localstatedir@4/hostname.pid4
+datadir    = @localstatedir@4
+language   = @datadir@/mysql/estonia
 user       = unix_user3
  
 [mysqld6]
 socket     = /tmp/mysql.sock6
 port       = 3311
-pid-file   = /usr/local/var6/hostname.pid6
-datadir    = /usr/local/var6
-language   = /usr/local/share/mysql/japanese
+pid-file   = @localstatedir@6/hostname.pid6
+datadir    = @localstatedir@6
+language   = @datadir@/mysql/japanese
 user       = unix_user4
 EOF
   exit(0);

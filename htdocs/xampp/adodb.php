@@ -17,6 +17,18 @@
 		<?php echo $TEXT['ADOdb-example']; ?><p>
 
 		<?php
+		
+	 $host = "127.0.0.1";
+	 $timeout = "1";
+
+	 if ($REMOTE_ADDR) {
+		if ($REMOTE_ADDR != $host) {
+			echo "<h2> FORBIDDEN FOR CLIENT $REMOTE_ADDR (only localhost!)<h2>";
+		}
+	}
+	else {
+		
+		// if ()
 			if (empty($_POST['dbserver'])) {
 				$_POST['dbserver'] = 'mysql';
 			}
@@ -83,6 +95,7 @@
 					}
 				}
 			}
+		}
 		?>
 
 		<form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">

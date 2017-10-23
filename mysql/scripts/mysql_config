@@ -78,31 +78,31 @@ me=`get_full_path $0`
 
 basedir=`echo $me | sed -e 's;/bin/mysql_config;;'`
 
-ldata='/usr/local/var'
-execdir='/usr/local/libexec'
-bindir='/usr/local/bin'
+ldata='@localstatedir@'
+execdir='@libexecdir@'
+bindir='@bindir@'
 
 # If installed, search for the compiled in directory first (might be "lib64")
-pkglibdir='/usr/local/lib/mysql'
+pkglibdir='@pkglibdir@'
 pkglibdir_rel=`echo $pkglibdir | sed -e "s;^$basedir/;;"`
 fix_path pkglibdir $pkglibdir_rel lib/mysql lib
 
-pkgincludedir='/usr/local/include/mysql'
+pkgincludedir='@pkgincludedir@'
 fix_path pkgincludedir include/mysql include
 
-version='5.0.36'
-socket='/tmp/mysql.sock'
-port='3306'
-ldflags=''
+version='@VERSION@'
+socket='@MYSQL_UNIX_ADDR@'
+port='@MYSQL_TCP_PORT@'
+ldflags='@LDFLAGS@'
 
 # Create options 
 # We intentionally add a space to the beginning and end of lib strings, simplifies replace later
-libs=" $ldflags -L$pkglibdir -lmysqlclient -lz -lcrypt -lnsl -lm "
-libs="$libs   "
-libs_r=" $ldflags -L$pkglibdir -lmysqlclient_r -lz -lpthread -lcrypt -lnsl -lm  -lpthread   "
-embedded_libs=" $ldflags -L$pkglibdir -lmysqld -lz -lpthread -lcrypt -lnsl -lm  -lpthread   -lrt  "
+libs=" $ldflags -L$pkglibdir -lmysqlclient @ZLIB_DEPS@ @NON_THREADED_LIBS@"
+libs="$libs @openssl_libs@ @STATIC_NSS_FLAGS@ "
+libs_r=" $ldflags -L$pkglibdir -lmysqlclient_r @ZLIB_DEPS@ @LIBS@ @openssl_libs@ "
+embedded_libs=" $ldflags -L$pkglibdir -lmysqld @ZLIB_DEPS@ @LIBS@ @WRAPLIBS@ @innodb_system_libs@ @openssl_libs@ "
 
-cflags="-I$pkgincludedir  " #note: end space!
+cflags="-I$pkgincludedir @CFLAGS@ " #note: end space!
 include="-I$pkgincludedir"
 
 # Remove some options that a client doesn't have to care about

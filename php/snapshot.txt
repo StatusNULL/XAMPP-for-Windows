@@ -1,7 +1,7 @@
 This snapshot was automatically generated on
-Thu, 02 Nov 2006 12:41:34 +0100
+Wed, 02 May 2007 19:23:14 -0400
 
-Version: 5.2.0
+Version: 5.2.2
 Branch: HEAD
 Build: Release_TS
 
@@ -47,8 +47,8 @@ Module: php5apache2_2.dll
 
 Module: php_curl.dll
 ===========================
-	libeay32.dll
 	ssleay32.dll
+	libeay32.dll
 
 Module: php_fdf.dll
 ===========================
@@ -57,10 +57,6 @@ Module: php_fdf.dll
 Module: php_imap.dll
 ===========================
 	crypt32.dll
-
-Module: php_ifx.dll
-===========================
-	isqlt09a.dll
 
 Module: php_interbase.dll
 ===========================
@@ -115,4 +111,8 @@ Module: php_pdo_firebird.dll
 Module: php_pdo_mysql.dll
 ===========================
 	libmysql.dll
+
+Module: php_pdo_sqlite_external.dll
+===========================
+	sqlite3.dll
 

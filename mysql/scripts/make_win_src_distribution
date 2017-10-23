@@ -22,7 +22,7 @@ trap "echo '*** script failed ***'" 0
 # Script to create a Windows src package
 #
 
-version=5.0.36
+version=@VERSION@
 CP="cp -p"
 
 DEBUG=0
@@ -176,7 +176,7 @@ vreplace()
 {
   for arg do
     unix_to_dos $arg
-    cat $arg | sed -e 's!@''VERSION''@!5.0.36!' > $arg.tmp
+    cat $arg | sed -e 's!@''VERSION''@!@VERSION@!' > $arg.tmp
     rm -f $arg
     mv $arg.tmp $arg
   done
@@ -414,7 +414,7 @@ fi
 
 if test -z $DIRNAME
 then
-  NEW_DIR_NAME=mysql-$version$SUFFIX
+  NEW_DIR_NAME=mysql@MYSQL_SERVER_SUFFIX@-$version$SUFFIX
 else
   NEW_DIR_NAME=$DIRNAME
 fi

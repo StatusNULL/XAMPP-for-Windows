@@ -21,9 +21,9 @@
 # The temporary directory path given to "--tmp=<path>" has to be
 # absolute and with no spaces.
 
-machine=i686
-system=pc-linux-gnu
-version=5.0.36
+machine=@MACHINE_TYPE@
+system=@SYSTEM_TYPE@
+version=@VERSION@
 SOURCE=`pwd`
 CP="cp -p"
 MV="mv"
@@ -115,7 +115,12 @@ if [ $BASE_SYSTEM != "netware" ] ; then
  chmod o-rwx $BASE/data $BASE/data/*
 fi
 
-# Copy files if they exists, warn for those that don't
+# Copy files if they exists, warn for those that don't.
+# Note that when listing files to copy, we might list the file name
+# twice, once in the directory location where it is build, and a
+# second time in the ".libs" location. In the case the firs one
+# is a wrapper script, the second one will overwrite it with the
+# binary file.
 copyfileto()
 {
   destdir=$1
@@ -143,7 +148,8 @@ BIN_FILES="extra/comp_err$BS extra/replace$BS extra/perror$BS \
   extra/resolve_stack_dump$BS extra/mysql_waitpid$BS \
   myisam/myisamchk$BS myisam/myisampack$BS myisam/myisamlog$BS \
   myisam/myisam_ftdump$BS \
-  sql/mysqld$BS sql/mysql_tzinfo_to_sql$BS \
+  sql/mysqld$BS sql/mysqld-debug$BS \
+  sql/mysql_tzinfo_to_sql$BS \
   server-tools/instance-manager/mysqlmanager$BS \
   client/mysql$BS client/mysqlshow$BS client/mysqladmin$BS \
   client/mysqldump$BS client/mysqlimport$BS \
@@ -164,6 +170,7 @@ if [ $BASE_SYSTEM = "netware" ] ; then
 # For all other platforms:
 else
   BIN_FILES="$BIN_FILES \
+    server-tools/instance-manager/.libs/mysqlmanager \
     client/mysqltestmanagerc \
     client/mysqltestmanager-pwgen tools/mysqltestmanager \
     client/.libs/mysql client/.libs/mysqlshow client/.libs/mysqladmin \
@@ -251,7 +258,6 @@ copyfileto $BASE/mysql-test \
          netware/mysql_test_run.nlm netware/install_test_db.ncf
 
 $CP mysql-test/lib/*.pl  $BASE/mysql-test/lib
-$CP mysql-test/lib/*.sql $BASE/mysql-test/lib
 $CP mysql-test/t/*.def $BASE/mysql-test/t
 $CP mysql-test/include/*.inc $BASE/mysql-test/include
 $CP mysql-test/include/*.test $BASE/mysql-test/include
@@ -273,12 +279,12 @@ if [ $BASE_SYSTEM != "netware" ] ; then
   copyfileto $BASE/bin scripts/*
   $BASE/bin/replace \@localstatedir\@ ./data \@bindir\@ ./bin \@scriptdir\@ \
       ./bin \@libexecdir\@ ./bin \@sbindir\@ ./bin \@prefix\@ . \@HOSTNAME\@ \
-      /bin/hostname \@pkgdatadir\@ ./support-files \
+      @HOSTNAME@ \@pkgdatadir\@ ./support-files \
       < scripts/mysql_install_db.sh > $BASE/scripts/mysql_install_db
   $BASE/bin/replace \@prefix\@ /usr/local/mysql \@bindir\@ ./bin \
       \@sbindir\@ ./bin \@libexecdir\@ ./bin \
-      \@MYSQLD_USER\@ mysql \@localstatedir\@ /usr/local/mysql/data \
-      \@HOSTNAME\@ /bin/hostname \
+      \@MYSQLD_USER\@ @MYSQLD_USER@ \@localstatedir\@ /usr/local/mysql/data \
+      \@HOSTNAME\@ @HOSTNAME@ \
       < support-files/mysql.server.sh > $BASE/support-files/mysql.server
   $BASE/bin/replace /my/gnu/bin/hostname /bin/hostname -- $BASE/bin/mysqld_safe
   mv $BASE/support-files/binary-configure $BASE/configure
@@ -298,12 +304,6 @@ rm -f $BASE/bin/Makefile* $BASE/bin/*.in $BASE/bin/*.sh \
 # Copy system dependent files
 #
 if [ $BASE_SYSTEM = "netware" ] ; then
-  echo "CREATE DATABASE mysql;" > $BASE/bin/init_db.sql
-  echo "CREATE DATABASE test;" >> $BASE/bin/init_db.sql
-  sh ./scripts/mysql_create_system_tables.sh real "" "%" 0 \
-      >> $BASE/bin/init_db.sql
-  sh ./scripts/mysql_create_system_tables.sh test "" "%" 0 \
-      > $BASE/bin/test_db.sql
   ./scripts/fill_help_tables < ./Docs/manual.texi >> ./netware/init_db.sql
 fi
 
@@ -335,19 +335,19 @@ fi
 
 # NDB Cluster
 if [ x$NDBCLUSTER = x1 ]; then
-  ( cd ndb            ; make DESTDIR=$BASE/ndb-stage install )
-  ( cd mysql-test/ndb ; make DESTDIR=$BASE/ndb-stage install )
-  $CP $BASE/ndb-stage/usr/local/bin/* $BASE/bin/.
-  $CP $BASE/ndb-stage/usr/local/libexec/* $BASE/bin/.
-  $CP $BASE/ndb-stage/usr/local/lib/mysql/* $BASE/lib/.
-  $CP $BASE/ndb-stage/usr/local/share/mysql/* $BASE/share/mysql/.
-  $CP -r $BASE/ndb-stage/usr/local/include/mysql/ndb $BASE/include
-  $CP -r $BASE/ndb-stage/usr/local/mysql-test/ndb $BASE/mysql-test/. || exit 1
+  ( cd ndb            ; @MAKE@ DESTDIR=$BASE/ndb-stage install )
+  ( cd mysql-test/ndb ; @MAKE@ DESTDIR=$BASE/ndb-stage install )
+  $CP $BASE/ndb-stage@bindir@/* $BASE/bin/.
+  $CP $BASE/ndb-stage@libexecdir@/* $BASE/bin/.
+  $CP $BASE/ndb-stage@pkglibdir@/* $BASE/lib/.
+  $CP $BASE/ndb-stage@pkgdatadir@/* $BASE/share/mysql/.
+  $CP -r $BASE/ndb-stage@pkgincludedir@/ndb $BASE/include
+  $CP -r $BASE/ndb-stage@prefix@/mysql-test/ndb $BASE/mysql-test/. || exit 1
   rm -rf $BASE/ndb-stage
 fi
 
 # Change the distribution to a long descriptive name
-NEW_NAME=mysql-$version-$platform$SUFFIX
+NEW_NAME=mysql@MYSQL_SERVER_SUFFIX@-$version-$platform$SUFFIX
 
 # Print the platform name for build logs
 echo "PLATFORM NAME: $platform"
@@ -360,8 +360,8 @@ BASE=$BASE2
 # If we are compiling with gcc, copy libgcc.a to the distribution as libmygcc.a
 #
 
-if [ x"yes" = x"yes" ] ; then
-  gcclib=`ccache gcc  --print-libgcc-file`
+if [ x"@GXX@" = x"yes" ] ; then
+  gcclib=`@CC@ @CFLAGS@ --print-libgcc-file`
   if [ $? -ne 0 ] ; then
     echo "Warning: Couldn't find libgcc.a!"
   else

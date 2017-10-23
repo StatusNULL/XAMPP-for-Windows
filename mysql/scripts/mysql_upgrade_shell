@@ -75,12 +75,12 @@ find_my_print_defaults () {
   elif test -x ./extra/my_print_defaults
   then
     print_defaults="./extra/my_print_defaults"
-  elif test -x /usr/local/bin/my_print_defaults
+  elif test -x @bindir@/my_print_defaults
   then
-    print_defaults="/usr/local/bin/my_print_defaults"
-  elif test -x /usr/local/bin/mysql_print_defaults
+    print_defaults="@bindir@/my_print_defaults"
+  elif test -x @bindir@/mysql_print_defaults
   then
-    print_defaults="/usr/local/bin/mysql_print_defaults"
+    print_defaults="@bindir@/mysql_print_defaults"
   else
     print_defaults="my_print_defaults"
   fi
@@ -137,8 +137,8 @@ then
     bindir="$MY_BASEDIR_VERSION/bin"
 # Since we didn't find anything, used the compiled-in defaults
   else
-    MY_BASEDIR_VERSION=/usr/local
-    bindir=/usr/local/bin
+    MY_BASEDIR_VERSION=@prefix@
+    bindir=@bindir@
   fi
 else
   bindir="$MY_BASEDIR_VERSION/bin"
@@ -160,7 +160,7 @@ then
     DATADIR=$MY_BASEDIR_VERSION/var
   # Or just give up and use our compiled-in default
   else
-    DATADIR=/usr/local/var
+    DATADIR=@localstatedir@
   fi
 fi
 
@@ -182,7 +182,7 @@ CHECK_FILE=$DATADIR/mysql_upgrade.info
 if test -f $CHECK_FILE -a $force = 0
 then
   version=`cat $CHECK_FILE`
-  if test "$version" = "5.0"
+  if test "$version" = "@MYSQL_BASE_VERSION@"
   then
     if test $verbose = 1
     then
@@ -209,7 +209,7 @@ if [ $? = 0 ]
 then
   # Remember base version so that we don't run this script again on the
   # same base version
-  echo "5.0" > $CHECK_FILE
+  echo "@MYSQL_BASE_VERSION@" > $CHECK_FILE
 fi
 
 $bindir/mysql_fix_privilege_tables --silent --user=$user $args

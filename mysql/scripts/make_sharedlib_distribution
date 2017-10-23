@@ -19,9 +19,9 @@
 # Get some info from configure
 # chmod +x ./scripts/setsomevars
 
-machine=i686
-system=pc-linux-gnu
-version=5.0.36
+machine=@MACHINE_TYPE@
+system=@SYSTEM_TYPE@
+version=@VERSION@
 export machine system version
 SOURCE=`pwd` 
 CP="cp -p"

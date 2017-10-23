@@ -1,12 +1,18 @@
-31. March 2007, XAMPP 1.6.1
-- Vista Bugfix: Change Installer Default Installation Path to c:\apachefriends
+22. Mai 2007 XAMPP 1.6.2 Beta 3
+- Fix Apache2.2 "NET start Apache2.2" Bug in xampp control panel 2.5
 
-13. March 2007 XAMPP 1.6.1 Beta 1
-- UPDATE MySQL 5.0.37
-- UPDATE PHP 4.4.6
-- UPDATE OpenSSL 0.9.8e
-- UPDATE phpMyAdmin 2.10.02
-- UPDATE FileZilla FTP Server 0.9.23
-- UPDATE ADOdb 4.94
-- UPDATE Fake Sendmail
-- UPDATE ZEND Optimizer 3.2.4
+
+16. Mai 2007 XAMPP 1.6.2 Beta 3
+- Fix Apache2.2 "running" Bug in xampp control panel 2.5
+
+14. Mai 2007 XAMPP 1.6.2 Beta 2
+- UPDATE MySQL 5.0.41 5.2.2
+- UPDATE XAMPP Control Version 2.5 
+
+07. Mai 2007 XAMPP 1.6.2 Beta 1
+- UPDATE PHP 5.2.2
+- UPDATE PHP 4.4.7
+- UPDATE phpMyAdmin 2.10.1
+- UPDATE eAccelerator
+- Fix Security Leck in adodb.php
+- FIX http://bugs.xampp.org/view.php?id=31 (only Installer)

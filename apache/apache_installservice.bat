@@ -8,10 +8,10 @@ echo Please use apache_start.bat instead
 goto exit
 
 :WinNT
-echo Installing Apache2 as an Service
-bin\apache -n Apache2 -D Apache2 -k install
-echo Now we Start Apache2 :)
-net start Apache2
+echo Installing Apache2.2 as an Service
+bin\apache -k install
+echo Now we Start Apache2.2 :)
+net start Apache2.2
 
 :exit
 pause
