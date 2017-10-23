@@ -54,7 +54,7 @@ my $cwd = cwd();
 my $basedir;
 
 my $socket  = '/tmp/mysql.sock';
-my $version = '5.1.30';
+my $version = '5.1.33';
 
 sub which
 {
@@ -202,7 +202,7 @@ $flags->{libs} =
 $flags->{libs_r} =
   [@ldflags,@lib_r_opts,'','',''];
 $flags->{embedded_libs} =
-  [@ldflags,@lib_e_opts,'','','','',''];
+  [@ldflags,@lib_e_opts,'','','','','',''];
 
 $flags->{include} = ["-I$pkgincludedir"];
 $flags->{cflags}  = [@{$flags->{include}},split(" ",'-D_WINDOWS /MT /Zi /O2 /Ob1 /D NDEBUG -DDBUG_OFF /wd4996')];

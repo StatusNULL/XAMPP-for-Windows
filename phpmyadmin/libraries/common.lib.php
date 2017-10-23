@@ -3,7 +3,7 @@
 /**
  * Misc functions used all over the scripts.
  *
- * @version $Id: common.lib.php 12027 2008-11-28 18:23:56Z lem9 $
+ * @version $Id: common.lib.php 12239 2009-02-16 10:56:11Z lem9 $
  */
 
 /**
@@ -784,14 +784,15 @@ function PMA_getTableList($db, $tables = null, $limit_offset = 0, $limit_count =
             // Do not check exact row count here,
             // if row count is invalid possibly the table is defect
             // and this would break left frame;
-            // but we can check row count if this is a view,
+            // but we can check row count if this is a view or the
+            // information_schema database
             // since PMA_Table::countRecords() returns a limited row count
             // in this case.
 
             // set this because PMA_Table::countRecords() can use it
             $tbl_is_view = PMA_Table::isView($db, $table['Name']);
 
-            if ($tbl_is_view) {
+            if ($tbl_is_view || 'information_schema' == $db) {
                 $table['Rows'] = PMA_Table::countRecords($db, $table['Name'],
                         $return = true);
             }
@@ -1020,6 +1021,10 @@ function PMA_showMessage($message, $sql_query = null, $type = 'notice')
     echo '<div align="' . $GLOBALS['cell_align_left'] . '">' . "\n";
 
     if ($message instanceof PMA_Message) {
+        if (isset($GLOBALS['special_message'])) {
+            $message->addMessage($GLOBALS['special_message']);
+            unset($GLOBALS['special_message']);
+        }
         $message->display();
         $type = $message->getLevel();
     } else {
@@ -1500,10 +1505,11 @@ function PMA_localisedDate($timestamp = -1, $format = '')
  * @uses    array_merge()
  * @uses    basename()
  * @param   array   $tab    array with all options
+ * @param   array   $url_params
  * @return  string  html code for one tab, a link if valid otherwise a span
  * @access  public
  */
-function PMA_getTab($tab)
+function PMA_getTab($tab, $url_params = array())
 {
     // default values
     $defaults = array(
@@ -1543,9 +1549,7 @@ function PMA_getTab($tab)
     // build the link
     if (!empty($tab['link'])) {
         $tab['link'] = htmlentities($tab['link']);
-        $tab['link'] = $tab['link'] . $tab['sep']
-            .(empty($GLOBALS['url_query']) ?
-                PMA_generate_common_url() : $GLOBALS['url_query']);
+        $tab['link'] = $tab['link'] . PMA_generate_common_url($url_params);
         if (! empty($tab['args'])) {
             foreach ($tab['args'] as $param => $value) {
                 $tab['link'] .= PMA_get_arg_separator('html') . urlencode($param) . '='
@@ -1596,17 +1600,18 @@ function PMA_getTab($tab)
  * @uses    PMA_getTab()
  * @uses    htmlentities()
  * @param   array   $tabs   one element per tab
- * @param   string  $tag_id id used for the html-tag
+ * @param   array   $url_params
  * @return  string  html-code for tab-navigation
  */
-function PMA_getTabs($tabs, $tag_id = 'topmenu')
+function PMA_getTabs($tabs, $url_params)
 {
+    $tag_id = 'topmenu';
     $tab_navigation =
          '<div id="' . htmlentities($tag_id) . 'container">' . "\n"
         .'<ul id="' . htmlentities($tag_id) . '">' . "\n";
 
     foreach ($tabs as $tab) {
-        $tab_navigation .= PMA_getTab($tab) . "\n";
+        $tab_navigation .= PMA_getTab($tab, $url_params) . "\n";
     }
 
     $tab_navigation .=
@@ -2198,7 +2203,7 @@ function PMA_listNavigator($count, $pos, $_url_params, $script, $frame, $max_cou
         echo "\n", '<form action="./', basename($script), '" method="post" target="', $frame, '">', "\n";
         echo PMA_generate_common_hidden_inputs($_url_params);
         echo PMA_pageselector(
-            $script . PMA_generate_common_url($_url_params) . '&',
+            $script . PMA_generate_common_url($_url_params) . '&amp;',
                 $max_count,
                 floor(($pos + 1) / $max_count) + 1,
                 ceil($count / $max_count));

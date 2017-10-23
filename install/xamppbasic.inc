@@ -42,7 +42,7 @@
 	$backslashrootreal[] = "$partwampp\apache\bin\\apu-1-config.bat";
 	$backslashrootreal[] = "$partwampp\apache\bin\\apxs.bat";
 	$backslashrootreal[] = "$partwampp\apache\bin\\apxs.pl";
-	$slashrootreal[] =  "$partwampp\mysql\bin\\my.cnf";
+	$slashrootreal[] =  "$partwampp\mysql\bin\\my.ini";
 	$slashrootreal[] = "$partwampp\apache\conf\\httpd.conf";
 	$slashrootreal[] = "$partwampp\apache\conf\extra\\httpd-autoindex.conf";
 	$slashrootreal[] = "$partwampp\apache\conf\extra\\httpd-dav.conf";

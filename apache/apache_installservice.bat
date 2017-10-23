@@ -9,7 +9,7 @@ goto exit
 
 :WinNT
 echo Installing Apache2.2 as an Service
-bin\apache -k install
+..\xampp_cli.exe installservice apache
 echo Now we Start Apache2.2 :)
 net start Apache2.2
 

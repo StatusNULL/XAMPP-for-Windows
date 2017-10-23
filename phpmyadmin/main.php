@@ -2,7 +2,7 @@
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
  *
- * @version $Id: main.php 11668 2008-10-22 17:03:22Z lem9 $
+ * @version $Id: main.php 12304 2009-03-24 12:56:58Z nijel $
  */
 
 /**
@@ -230,7 +230,7 @@ echo '<h2>phpMyAdmin</h2>';
 echo '<ul>';
 PMA_printListItem($strVersionInformation . ': ' . PMA_VERSION, 'li_pma_version');
 PMA_printListItem($strDocu, 'li_pma_docs', 'Documentation.html', null, '_blank');
-PMA_printListItem($strWiki, 'li_pma_wiki', 'http://wiki.cihar.com', null, '_blank');
+PMA_printListItem($strWiki, 'li_pma_wiki', 'http://wiki.phpmyadmin.net', null, '_blank');
 
 // does not work if no target specified, don't know why
 PMA_printListItem($strHomepageOfficial, 'li_pma_homepage', 'http://www.phpMyAdmin.net/', null, '_blank');
@@ -300,7 +300,10 @@ if (!empty($_SESSION['auto_blowfish_secret']) &&
  * of strpos().
  * If no default server is set, PMA_DBI_get_client_info() is not defined yet.
  */
-if (function_exists('PMA_DBI_get_client_info')) {
+ /**
+ * Only XAMPP: libmysql from MySQL 5.1.30 do not function with PHP 5.2.8, so no warning for older clients
+ */
+/* if (function_exists('PMA_DBI_get_client_info')) {
     $_client_info = PMA_DBI_get_client_info();
     if ($server > 0 && strpos($_client_info, 'mysqlnd') === false && substr(PMA_MYSQL_CLIENT_API, 0, 3) != substr(PMA_MYSQL_INT_VERSION, 0, 3)) {
         trigger_error(PMA_sanitize(sprintf($strMysqlLibDiffersServerVersion,
@@ -309,7 +312,7 @@ if (function_exists('PMA_DBI_get_client_info')) {
             E_USER_NOTICE);
     }
     unset($_client_info);
-}
+} */
 
 /**
  * Warning about Suhosin

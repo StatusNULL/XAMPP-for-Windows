@@ -1,3 +1,3 @@
 @echo off
 echo Mysql shutdowm ...
-mysql\bin\mysqladmin --user=pma --password= shutdown
+xampp_cli.exe stop mysql

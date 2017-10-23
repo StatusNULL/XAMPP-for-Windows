@@ -1,29 +1,29 @@
-###### ApacheFriends XAMPP (Basispaket) version 1.7.0 ######
+###### ApacheFriends XAMPP (Basispaket) version 1.7.1 ######
 
   + Apache 2.2.11
-  + MySQL 5.1.30 (Community Server)
-  + PHP 5.2.8 + PEAR (Support for PHP 4 has been discontinued)
-  + PHP-Switch win32 1.0 (use "php-switch.bat" in the xampp main directory) 
-  + XAMPP Control Version 2.5 from www.nat32.com	
+  + MySQL 5.1.33 (Community Server)
+  + PHP 5.2.9 + PEAR (Support for PHP 4 has been discontinued)
+  + XAMPP Control Version 2.5 from www.nat32.com
+  + XAMPP CLI Bundle 1.3 from Carsten Wiedmann	
   + XAMPP Security 1.0	
   + SQLite 2.8.15
   + OpenSSL 0.9.8i
-  + phpMyAdmin 3.1.1
-  + ADOdb 4.990
-  + Mercury Mail Transport System v4.52
-  + FileZilla FTP Server 0.9.29
+  + phpMyAdmin 3.1.3.1
+  + ADOdb 5.06a
+  + Mercury Mail Transport System v4.62
+  + FileZilla FTP Server 0.9.31
   + Webalizer 2.01-10
   + Zend Optimizer 3.3.0 
-  + eAccelerator 0.9.5.3 für PHP 5.2.8 (but not activated in the php.ini)
+  + eAccelerator 0.9.5.3 für PHP 5.2.9 (but not activated in the php.ini)
 
 --------------------------------------------------------------- 
 
 * System Requirements:
  
   + 64 MB RAM (RECOMMENDED)
-  + 200 MB free fixed disk 
-  + Windows 98, ME
-  + Windows NT, 2000, XP (RECOMMENDED)
+  + 250 MB free fixed disk 
+  + Windows NT, 2000, 2003, XP (RECOMMENDED), VISTA
+  + Only 32 Bit (NOT for 64 bit systems) 
 
 ---------------------------------------------------------------
 
@@ -37,15 +37,15 @@ Step 1: Unpack the package into a directory of your choice. Please start the
 "setup_xampp.bat" and beginning the installation. Note: XAMPP makes no entries in the windows registry and no settings for the system variables.
 
 Step 2: If installation ends successfully, start the Apache 2 with 
-"apache_start".bat", MySQL with "mysql_start".bat". Stop the MySQL Server with "mysql_stop.bat". For shutdown the Apache HTTPD, only close the Apache Command (CMD).
+"apache_start".bat", MySQL with "mysql_start".bat". Stop the MySQL Server with "mysql_stop.bat". For shutdown the Apache HTTPD, only close the Apache Command (CMD). Or use the fine XAMPP Control Panel with double-click on "xampp-control.exe"! 
 
 Step 3: Start your browser and type http://127.0.0.1 or http://localhost in the location bar. You should see our pre-made
 start page with certain examples and test screens.
 
-Step 4: PHP (with mod_php, as *.php, *.php3, *.php4, *.phtml), Perl by default with *.cgi, SSI with *.shtml are all located in => C:\xampp\htdocs\.
+Step 4: PHP (with mod_php, as *.php, *.php3, *.php4, *.php5, *.phtml), Perl by default with *.cgi, SSI with *.shtml are all located in => C:\xampp\htdocs\.
 Examples:
 - C:\xampp\htdocs\test.php => http://localhost/test.php
-- C:\xampp\myhome\test.php => http://localhost/myhome/test.php
+- C:\xampp\htdocs\myhome\test.php => http://localhost/myhome/test.php
 
 Step 5: XAMPP UNINSTALL? Simply remove the "xampp" Directory.
 But before please shutdown the apache and mysql.
@@ -117,17 +117,7 @@ To fix most of the security weaknesses simply call the following URL:
 
 The root password for MySQL and phpMyAdmin, and also a XAMPP directory protection can being established here.
 
----------------------------------------------------------------
-
-* Apache Notes:
-
-(1) In contrast of apache 1.x, you can not stop the apache 2.x with the command "apache -k shutdown". These functions only for an installations as service by NT systems. So, simply close
-the Apache START command for shutdown.
-  
-(2) To use the experimental version of mod_auth_mysql remove the # in the httpd.conf. Detailed information about this topic can be found on the left menu of XAMPP, once you started it.
-
-(3) To use Mod_Dav load the Modules mod_dav.so + mod_dav_fs.so in the "httpd.conf" by removing the # on 
-the beginning of their lines. Then try http://127.0.0.1:81 (NOT for Microsoft Frontpage, but for Adobe Dreamweaver!)
+* NOTE: Some example sites can only access by the local systems, means over localhost. 
 
 ---------------------------------------------------------------
 
@@ -135,11 +125,9 @@ the beginning of their lines. Then try http://127.0.0.1:81 (NOT for Microsoft Fr
 
 (1) The MySQL server can be started by double-clicking (executing) mysql_start.bat. This file can be found in the same folder you installed XAMPP in, most likely this will be C:\xampp\.
 The exact path to this file is X:\xampp\mysql_start.bat, where "X" indicates the letter of the drive you unpacked XAMPP into. This batch file starts the MySQL server in console mode. The first intialization might take a few minutes.
-Do not close the DOS window or you'll crash the server!
-To stop the server, please use mysql_shutdown.bat, which is located in the same directory.
+Do not close the DOS window or you'll crash the server! To stop the server, please use mysql_stop.bat, which is located in the same directory. Or use the fine XAMPP Control Panel with double-click on "xampp-control.exe" for all these things! 
 
-(2) To use the MySQL Daemon with "innodb" for better performance, please edit the "my" (or "my.cnf") file in the C:\xampp\mysql\bin directory or for services the c:\my.cnf for windows NT/2000/XP. In there, activate the "innodb_data_file_path=ibdata1:30M" statement. Attention, "innodb" is not recommended for 95/98/ME.
-To use MySQL as Service for NT / 2000 / XP, simply copy the "my" / "my.cnf" file to "C:\my", or "C:\my.cnf". Please note that this file has to be placed in C:\ (root), other locations are not permitted. Then execute the "mysql_installservice.bat" in the mysql folder.
+(2) To use MySQL as Service for NT / 2000 / XP, simply copy the "my.ini" file to "C:\my.ini". Please note that this file has to be placed in C:\ (root), other locations are not permitted. Then execute the "mysql_installservice.bat" in the mysql folder.
 
 (3) MySQL starts with standard values for the user id and the password. The preset user id is "root", the password is "" (= no password). To access MySQL via PHP with the preset values, you'll have to use the following syntax:
 

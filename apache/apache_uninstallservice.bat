@@ -12,7 +12,7 @@ echo Are you sure you wan't this?
 echo now stopping Apache2.2 when it runs
 net stop Apache2.2
 echo Time to say good bye to Apache2.2 :(
-bin\apache -k uninstall
+..\xampp_cli.exe deinstallservice apache
 
 :exit
 pause

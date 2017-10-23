@@ -351,7 +351,7 @@ memory_limit = 128M      ; Maximum amount of memory a script may consume (128MB)
 ;
 ;   - Show all errors, except coding standards warnings
 ;
-error_reporting  =  E_ALL
+error_reporting = E_ALL
 
 ; Print out errors (as a part of the output).  For production web sites,
 ; you're strongly encouraged to turn this feature off, and use error logging
@@ -921,7 +921,7 @@ pgsql.max_links = -1
 ; Notice message logging require a little overheads.
 pgsql.ignore_notice = 0
 
-; Log PostgreSQL backends Noitce message or not.
+; Log PostgreSQL backends Notice message or not.
 ; Unless pgsql.ignore_notice=0, module cannot log notice message.
 pgsql.log_notice = 0
 

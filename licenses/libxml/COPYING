@@ -1,8 +1,7 @@
-Except where otherwise noted in the source code (e.g. the files hash.c,
-list.c and the trio files, which are covered by a similar licence but
-with different Copyright notices) all the files are:
+Except where otherwise noted in the source code (trio files, hash.c and list.c)
+covered by a similar licence but with different Copyright notices:
 
- Copyright (C) 1998-2003 Daniel Veillard.  All Rights Reserved.
+ Copyright (C) 1998-2002 Daniel Veillard.  All Rights Reserved.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

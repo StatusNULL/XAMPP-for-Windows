@@ -1,5 +1,5 @@
 <?php
-/* $Id: english-utf-8.inc.php 11883 2008-11-16 19:50:31Z lem9 $ */
+/* $Id: english-utf-8.inc.php 12304 2009-03-24 12:56:58Z nijel $ */
 
 $charset = 'utf-8';
 $text_dir = 'ltr'; // ('ltr' for left to right, 'rtl' for right to left)
@@ -958,10 +958,10 @@ $strSetupLoginCookieDeleteAll_desc = 'If TRUE, logout deletes cookies for all se
 $strSetupLoginCookieDeleteAll_name = 'Delete all cookies on logout';
 $strSetupLoginCookieRecall_desc = 'Define whether the previous login should be recalled or not in cookie authentication mode';
 $strSetupLoginCookieRecall_name = 'Recall user name';
-$strSetupLoginCookieStore_desc = 'Define how long (in seconds) a login cookie should be stored in browser. The default of 0 means that it will be kept for the existing session only, and will be deleted as soon as you close the browser window. This is recommended for non-trusted environments.';
+$strSetupLoginCookieStore_desc = 'Defines how long (in seconds) a login cookie should be stored in browser. The default of 0 means that it will be kept for the existing session only, and will be deleted as soon as you close the browser window. This is recommended for non-trusted environments.';
 $strSetupLoginCookieStore_name = 'Login cookie store';
 $strSetupLoginCookieValidity_desc = 'Define how long (in seconds) a login cookie is valid';
-$strSetupLoginCookieValidityMsg = '[a@?page=form&formset=features#tab_Security]Login cookie validity[/a] should be should be set to 1800 seconds (30 minutes) at most. Values larger than 1800 may pose a security risk such as impersonation.';
+$strSetupLoginCookieValidityMsg = '[a@?page=form&formset=features#tab_Security]Login cookie validity[/a] should be set to 1800 seconds (30 minutes) at most. Values larger than 1800 may pose a security risk such as impersonation.';
 $strSetupLoginCookieValidity_name = 'Login cookie validity';
 $strSetupMaxCharactersInDisplayedSQL_desc = 'Maximum number of characters used when a SQL query is displayed';
 $strSetupMaxCharactersInDisplayedSQL_name = 'Maximum displayed SQL length';
@@ -1015,16 +1015,16 @@ $strSetupServers_auth_swekey_config_desc = 'The path for the config file for [a@
 $strSetupServers_auth_swekey_config_name = 'SweKey config file';
 $strSetupServers_auth_type_desc = 'Authentication method to use';
 $strSetupServers_auth_type_name = 'Authentication type';
-$strSetupServers_bookmarktable_desc = 'Leave blank for no [a@http://wiki.cihar.com/pma/bookmark]bookmark[/a] support, default: [kbd]pma_bookmark[/kbd]';
+$strSetupServers_bookmarktable_desc = 'Leave blank for no [a@http://wiki.phpmyadmin.net/pma/bookmark]bookmark[/a] support, default: [kbd]pma_bookmark[/kbd]';
 $strSetupServers_bookmarktable_name = 'Bookmark table';
 $strSetupServers_column_info_desc = 'Leave blank for no column comments/mime types, default: [kbd]pma_column_info[/kbd]';
 $strSetupServers_column_info_name = 'Column information table';
 $strSetupServers_compress_desc = 'Compress connection to MySQL server';
 $strSetupServers_compress_name = 'Compress connection';
-$strSetupServers_connect_type_desc = 'How to connect to server, keep tcp if unsure';
+$strSetupServers_connect_type_desc = 'How to connect to server, keep [kdb]tcp[/kdb] if unsure';
 $strSetupServers_connect_type_name = 'Connection type';
 $strSetupServers_controlpass_name = 'Control user password';
-$strSetupServers_controluser_desc = 'A special MySQL user configured with limited permissions, more information available on [a@http://wiki.cihar.com/pma/controluser]wiki[/a]';
+$strSetupServers_controluser_desc = 'A special MySQL user configured with limited permissions, more information available on [a@http://wiki.phpmyadmin.net/pma/controluser]wiki[/a]';
 $strSetupServers_controluser_name = 'Control user';
 $strSetupServers_CountTables_desc = 'Count tables when showing database list';
 $strSetupServers_CountTables_name = 'Count tables';
@@ -1051,15 +1051,15 @@ $strSetupServers_password_desc = 'Leave empty if not using config auth';
 $strSetupServers_password_name = 'Password for config auth';
 $strSetupServers_pdf_pages_desc = 'Leave blank for no PDF schema support, default: [kbd]pma_pdf_pages[/kbd]';
 $strSetupServers_pdf_pages_name = 'PDF schema: pages table';
-$strSetupServers_pmadb_desc = 'Database used for relations, bookmarks, and PDF features. See [a@http://wiki.cihar.com/pma/pmadb]pmadb[/a] for complete information. Leave blank for no support. Default: [kbd]phpmyadmin[/kbd]';
+$strSetupServers_pmadb_desc = 'Database used for relations, bookmarks, and PDF features. See [a@http://wiki.phpmyadmin.net/pma/pmadb]pmadb[/a] for complete information. Leave blank for no support. Default: [kbd]phpmyadmin[/kbd]';
 $strSetupServers_pmadb_name = 'PMA database';
 $strSetupServers_port_desc = 'Port on which MySQL server is listening, leave empty for default';
 $strSetupServers_port_name = 'Server port';
-$strSetupServers_relation_desc = 'Leave blank for no [a@http://wiki.cihar.com/pma/relation]relation-links[/a] support, default: [kbd]pma_relation[/kbd]';
+$strSetupServers_relation_desc = 'Leave blank for no [a@http://wiki.phpmyadmin.net/pma/relation]relation-links[/a] support, default: [kbd]pma_relation[/kbd]';
 $strSetupServers_relation_name = 'Relation table';
 $strSetupServers_ShowDatabasesCommand_desc = 'SQL command to fetch available databases';
 $strSetupServers_ShowDatabasesCommand_name = 'SHOW DATABASES command';
-$strSetupServers_SignonSession_desc = 'See [a@http://wiki.cihar.com/pma/auth_types#signon]authentication types[/a] for an example';
+$strSetupServers_SignonSession_desc = 'See [a@http://wiki.phpmyadmin.net/pma/auth_types#signon]authentication types[/a] for an example';
 $strSetupServers_SignonSession_name = 'Signon session name';
 $strSetupServers_SignonURL_name = 'Signon URL';
 $strSetupServerSslMsg = 'You should use SSL connections if your web server supports it';
@@ -1194,7 +1194,7 @@ $strShowStatusInnodb_dblwr_writesDescr = 'The number of doublewrite operations t
 $strShowStatusInnodb_log_waitsDescr = 'The number of waits we had because log buffer was too small and we had to wait for it to be flushed before continuing.';
 $strShowStatusInnodb_log_write_requestsDescr = 'The number of log write requests.';
 $strShowStatusInnodb_log_writesDescr = 'The number of physical writes to the log file.';
-$strShowStatusInnodb_os_log_fsyncsDescr = 'The number of fsyncs writes done to the log file.';
+$strShowStatusInnodb_os_log_fsyncsDescr = 'The number of fsync() writes done to the log file.';
 $strShowStatusInnodb_os_log_pending_fsyncsDescr = 'The number of pending log file fsyncs.';
 $strShowStatusInnodb_os_log_pending_writesDescr = 'Pending log file writes.';
 $strShowStatusInnodb_os_log_writtenDescr = 'The number of bytes written to the log file.';

@@ -1,5 +1,5 @@
 ;  Mercury/32 template file.
-;  Mercury Mail Transport System, Copyright 1993-2000, David Harris.
+;  Mercury Mail Transport System, Copyright 1993-2007, David Harris.
 ;
 ;  This file is used as the default template by Mercury when constructing
 ;  Subscription "Welcome" messages for moderated mailing lists with no
@@ -25,6 +25,7 @@
 ;     ~p4     The subscriber's address
 ;     ~p5     The subscriber's "personal name"
 ;     ~p6     The formal mailing address for the list
+;     ~p7     The user's password (v4.53 and later only)
 ;
 Welcome to the ~p2 mailing list!
 

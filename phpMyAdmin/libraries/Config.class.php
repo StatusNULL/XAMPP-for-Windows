@@ -3,7 +3,7 @@
 /**
  *
  *
- * @version $Id: Config.class.php 12110 2008-12-09 17:22:43Z lem9 $
+ * @version $Id: Config.class.php 12312 2009-03-24 20:32:19Z lem9 $
  */
 
 /**
@@ -85,7 +85,7 @@ class PMA_Config
      */
     function checkSystem()
     {
-        $this->set('PMA_VERSION', '3.1.1');
+        $this->set('PMA_VERSION', '3.1.3.1');
         /**
          * @deprecated
          */
@@ -168,7 +168,6 @@ class PMA_Config
         } elseif (preg_match('@OmniWeb/([0-9].[0-9]{1,2})@', $HTTP_USER_AGENT, $log_version)) {
             $this->set('PMA_USR_BROWSER_VER', $log_version[1]);
             $this->set('PMA_USR_BROWSER_AGENT', 'OMNIWEB');
-        //} elseif (ereg('Konqueror/([0-9].[0-9]{1,2})', $HTTP_USER_AGENT, $log_version)) {
         // Konqueror 2.2.2 says Konqueror/2.2.2
         // Konqueror 3.0.3 says Konqueror/3
         } elseif (preg_match('@(Konqueror/)(.*)(;)@', $HTTP_USER_AGENT, $log_version)) {

@@ -3,7 +3,7 @@
 /**
  * holds the PMA_List_Database class
  *
- * @version $Id: List_Database.class.php 11365 2008-07-01 19:21:28Z lem9 $
+ * @version $Id: List_Database.class.php 12218 2009-02-01 12:52:18Z lem9 $
  */
 
 /**
@@ -86,7 +86,7 @@ require_once './libraries/List.class.php';
             return;
         }
 
-        foreach ($this as $key => $db) {
+        foreach ($this->getArrayCopy() as $key => $db) {
             if (preg_match('/' . $GLOBALS['cfg']['Server']['hide_db'] . '/', $db)) {
                 $this->offsetUnset($key);
             }
@@ -281,7 +281,7 @@ require_once './libraries/List.class.php';
             $db_tooltip = '';
 
             if (isset($db_tooltips[$db])) {
-                $db_tooltip = $_db_tooltips[$db];
+                $db_tooltip = $db_tooltips[$db];
             }
 
             if ($GLOBALS['cfg']['LeftFrameDBTree']
@@ -481,10 +481,10 @@ require_once './libraries/List.class.php';
                             // TODO: db names may contain characters
                             //       that are regexp instructions
                             $re        = '(^|(\\\\\\\\)+|[^\])';
-                            $tmp_regex = ereg_replace($re . '%', '\\1.*', ereg_replace($re . '_', '\\1.{1}', $tmp_matchpattern));
+                            $tmp_regex = preg_replace('/' . addcslashes($re,'/') . '%/', '\\1.*', preg_replace('/' . addcslashes($re,'/') . '_/', '\\1.{1}', $tmp_matchpattern));
                             // Fixed db name matching
                             // 2000-08-28 -- Benjamin Gandon
-                            if (ereg('^' . $tmp_regex . '$', $tmp_db)) {
+                            if (preg_match('/^' . addcslashes($tmp_regex,'/') . '$/', $tmp_db)) {
                                 $dblist[] = $tmp_db;
                                 break;
                             }

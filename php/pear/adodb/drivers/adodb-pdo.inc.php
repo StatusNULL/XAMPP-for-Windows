@@ -1,6 +1,6 @@
 <?php
 /* 
-V4.990 11 July 2008  (c) 2000-2008 John Lim (jlim#natsoft.com). All rights reserved.
+V5.06 16 Oct 2008   (c) 2000-2008 John Lim (jlim#natsoft.com). All rights reserved.
   Released under both BSD license and Lesser GPL library license. 
   Whenever there is any discrepancy between the two licenses, 
   the BSD license will take precedence. 
@@ -64,6 +64,9 @@ function adodb_pdo_type($t)
 
 
 
+
+
+
 class ADODB_pdo extends ADOConnection {
 	var $databaseType = "pdo";	
 	var $dataProvider = "pdo";
@@ -89,7 +92,7 @@ class ADODB_pdo extends ADOConnection {
 	
 	function _UpdatePDO()
 	{
-		$d = &$this->_driver;
+		$d = $this->_driver;
 		$this->fmtDate = $d->fmtDate;
 		$this->fmtTimeStamp = $d->fmtTimeStamp;
 		$this->replaceQuote = $d->replaceQuote;
@@ -112,7 +115,7 @@ class ADODB_pdo extends ADOConnection {
 		if (!empty($this->_driver->_hasdual)) $sql = "select $this->sysTimeStamp from dual";
 		else $sql = "select $this->sysTimeStamp";
 		
-		$rs =& $this->_Execute($sql);
+		$rs = $this->_Execute($sql);
 		if ($rs && !$rs->EOF) return $this->UnixTimeStamp(reset($rs->fields));
 		
 		return false;
@@ -169,6 +172,15 @@ class ADODB_pdo extends ADOConnection {
 		}
 		$this->_driver = new ADODB_pdo_base();
 		return false;
+	}
+	
+	function Concat() 
+	{
+		$args = func_get_args();
+		if(method_exists($this->_driver, 'Concat')) 
+			return call_user_func_array(array($this->_driver, 'Concat'), $args); 
+		
+		return call_user_func_array(array($this,'parent::Concat'), $args); 
 	}
 	
 	// returns true or false
@@ -355,8 +367,6 @@ class ADODB_pdo extends ADOConnection {
 	}
 }
 
-
-
 class ADODB_pdo_base extends ADODB_pdo {
 
 	var $sysDate = "'?'";
@@ -390,7 +400,6 @@ class ADODB_pdo_base extends ADODB_pdo {
 		return false;
 	}
 }
-
 
 class ADOPDOStatement {
 
@@ -508,7 +517,7 @@ class ADORecordSet_pdo extends ADORecordSet {
 	}
 
 	// returns the field object
-	function &FetchField($fieldOffset = -1) 
+	function FetchField($fieldOffset = -1) 
 	{
 		$off=$fieldOffset+1; // offsets begin at 1
 		

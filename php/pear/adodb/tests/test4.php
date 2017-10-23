@@ -33,20 +33,20 @@ FROM ADOXYZ WHERE id = -1";
 // Select an empty record from the database 
 
 
-#$conn = &ADONewConnection("mssql");  // create a connection
+#$conn = ADONewConnection("mssql");  // create a connection
 #$conn->PConnect("", "sa", "natsoft", "northwind"); // connect to MySQL, testdb
 
-$conn = &ADONewConnection("mysql");  // create a connection
+$conn = ADONewConnection("mysql");  // create a connection
 $conn->PConnect("localhost", "root", "", "test"); // connect to MySQL, testdb
 
 
-#$conn =& ADONewConnection('oci8po');
+#$conn = ADONewConnection('oci8po');
 #$conn->Connect('','scott','natsoft');
 
 if (PHP_VERSION  >= 5) {
 	$connstr = "mysql:dbname=northwind";
 	$u = 'root';$p='';
-	$conn =& ADONewConnection('pdo');
+	$conn = ADONewConnection('pdo');
 	$conn->Connect($connstr, $u, $p);
 }
 //$ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;

@@ -6,7 +6,7 @@ if not exist .\conf\ssl.key mkdir .\conf\ssl.key
 
 bin\openssl req -new -out server.csr
 bin\openssl rsa -in privkey.pem -out server.key
-bin\openssl x509 -in server.csr -out server.crt -req -signkey server.key -days 365
+bin\openssl x509 -in server.csr -out server.crt -req -signkey server.key -days 3650
 
 set OPENSSL_CONF=
 del .rnd

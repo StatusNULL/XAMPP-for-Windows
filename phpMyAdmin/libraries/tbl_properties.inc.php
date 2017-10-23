@@ -4,7 +4,7 @@
  * Display form for changing/adding table fields/columns
  *
  * included by tbl_addfield.php, -_alter.php, -_create.php
- * @version $Id: tbl_properties.inc.php 11631 2008-10-04 12:42:22Z lem9 $
+ * @version $Id: tbl_properties.inc.php 12212 2009-01-24 17:32:16Z lem9 $
  */
 if (! defined('PHPMYADMIN')) {
     exit;
@@ -113,7 +113,7 @@ if (!$is_backup) {
     $header_cells[] = $strIndex;
 }
 
-$header_cells[] = '<abbr title="AUTO_INCREMENT">A_I</abbr>';
+$header_cells[] = '<abbr title="AUTO_INCREMENT">' . ($display_type == 'horizontal' ? 'A_I' : 'AUTO_INCREMENT') . '</abbr>';
 
 require_once './libraries/relation.lib.php';
 require_once './libraries/transformations.lib.php';
@@ -174,7 +174,8 @@ for ($i = 0; $i < $num_fields; $i++) {
             $row['Key'] = '';
         }
 
-        $row['DefaultType']  = (isset($_REQUEST['field_default_type'][$i]) ? $_REQUEST['field_default_type'][$i] : 'USER_DEFINED');
+        // put None in the drop-down for Default, when someone adds a field 
+        $row['DefaultType']  = (isset($_REQUEST['field_default_type'][$i]) ? $_REQUEST['field_default_type'][$i] : 'NONE');
         $row['DefaultValue'] = (isset($_REQUEST['field_default_value'][$i]) ? $_REQUEST['field_default_value'][$i] : '');
 
         switch ($row['DefaultType']) {
@@ -529,7 +530,7 @@ for ($i = 0; $i < $num_fields; $i++) {
     $content_cells[$i][$ci] = '<input name="field_extra[' . $i . ']"'
         . ' id="field_' . $i . '_' . ($ci - $ci_offset) . '"';
 
-    if (isset($row['Extra']) && $row['Extra'] == 'auto_increment') {
+    if (isset($row['Extra']) && strtolower($row['Extra']) == 'auto_increment') {
         $content_cells[$i][$ci] .= ' checked="checked"';
     }
 

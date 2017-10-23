@@ -2,8 +2,8 @@
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
  * @todo    we must handle the case if sql.php is called directly with a query
- *          what returns 0 rows - to prevent cyclic redirects or includes
- * @version $Id: sql.php 11388 2008-07-14 19:52:16Z lem9 $
+ *          that returns 0 rows - to prevent cyclic redirects or includes
+ * @version $Id: sql.php 12211 2009-01-24 16:43:56Z lem9 $
  */
 
 /**
@@ -105,7 +105,8 @@ if (isset($find_real_end) && $find_real_end) {
  */
 if (isset($store_bkm)) {
     PMA_Bookmark_save($fields, (isset($bkm_all_users) && $bkm_all_users == 'true' ? true : false));
-    PMA_sendHeaderLocation($cfg['PmaAbsoluteUri'] . $goto);
+    // go back to sql.php to redisplay query; do not use &amp; in this case:
+    PMA_sendHeaderLocation($cfg['PmaAbsoluteUri'] . $goto . '&label=' . $fields['label']);
 } // end if
 
 /**
@@ -466,7 +467,7 @@ if (isset($GLOBALS['show_as_php']) || !empty($GLOBALS['validatequery'])) {
 } // end else "didn't ask to see php code"
 
 // No rows returned -> move back to the calling page
-if ($num_rows < 1 || $is_affected) {
+if (0 == $num_rows || $is_affected) {
     if ($is_delete) {
         $message = PMA_Message::success('strRowsDeleted');
         $message->addParam($num_rows);
@@ -552,7 +553,7 @@ if ($num_rows < 1 || $is_affected) {
         require './' . $goto;
     } else {
         // avoid a redirect loop when last record was deleted
-        if ('sql.php' == $cfg['DefaultTabTable']) {
+        if (0 == $num_rows && 'sql.php' == $cfg['DefaultTabTable']) {
             $goto = str_replace('sql.php','tbl_structure.php',$goto);
         }
         PMA_sendHeaderLocation($cfg['PmaAbsoluteUri'] . str_replace('&amp;', '&', $goto) . '&message=' . urlencode($message));
@@ -615,6 +616,12 @@ else {
     // hide edit and delete links for information_schema
     if ($db == 'information_schema') {
         $disp_mode = 'nnnn110111';
+    }
+
+    if (isset($label)) {
+        $message = PMA_message::success('strBookmarkCreated');
+        $message->addParam($label);
+        $message->display();
     }
 
     PMA_displayTable($result, $disp_mode, $analyzed_sql);
