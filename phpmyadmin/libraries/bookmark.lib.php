@@ -1,5 +1,5 @@
 <?php
-/* $Id: bookmark.lib.php,v 2.2 2003/11/26 22:52:23 rabus Exp $ */
+/* $Id: bookmark.lib.php,v 2.2.4.1 2004/02/11 18:13:07 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -80,23 +80,24 @@ function PMA_listBookmarks($db, $cfgBookmark)
  * @param   array    the bookmark parameters for the current user
  * @param   mixed    the id of the bookmark to get
  * @param   string   which field to look up the $id
+ * @param   boolean  TRUE: get all bookmarks regardless of the owning user
  *
  * @return  string   the sql query
  *
  * @access  public
  */
-function PMA_queryBookmarks($db, $cfgBookmark, $id, $id_field = 'id')
+function PMA_queryBookmarks($db, $cfgBookmark, $id, $id_field = 'id', $action_bookmark_all = FALSE)
 {
-
     if (empty($cfgBookmark['db']) || empty($cfgBookmark['table'])) {
         return '';
     }
 
     $query          = 'SELECT query FROM ' . PMA_backquote($cfgBookmark['db']) . '.' . PMA_backquote($cfgBookmark['table'])
                     . ' WHERE dbase = \'' . PMA_sqlAddslashes($db) . '\''
-                    . ' AND (user = \'' . PMA_sqlAddslashes($cfgBookmark['user']) . '\''
-                    . '      OR user = \'\')'
+                    . ($action_bookmark_all? '' : ' AND (user = \'' . PMA_sqlAddslashes($cfgBookmark['user']) . '\''
+                    . '      OR user = \'\')' )
                     . ' AND ' . PMA_backquote($id_field) . ' = ' . $id;
+
     if (isset($GLOBALS['dbh'])) {
         $result = PMA_mysql_query($query, $GLOBALS['dbh']);
     } else {

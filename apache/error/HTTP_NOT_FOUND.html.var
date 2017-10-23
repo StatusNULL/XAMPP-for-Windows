@@ -84,25 +84,25 @@ Content-language: es
 Content-type: text/html; charset=ISO-8859-1
 Body:----------es--
 <!--#set var="CONTENT_LANGUAGE" value="es"
---><!--#set var="TITLE" value="Object not found!"
+--><!--#set var="TITLE" value="&iexcl;Objeto no encontrado&excl;"
 --><!--#include virtual="include/top.html" -->
 
-    El URL requerido no ha sido localizado en
+    El enlace requerido no ha sido localizado en
     este servidor.
 
   <!--#if expr="$HTTP_REFERER" -->
 
-    El URL en la
+    El enlace en la
     <a href="<!--#echo encoding="url" var="HTTP_REFERER" -->">p&aacute;gina
-    referida</a> parece tener algun error o estar fuera de tiempo. Porfavor
+    referente</a> parece tener algun error o ha expirado. Por favor
     comunique al autor de
     <a href="<!--#echo encoding="url" var="HTTP_REFERER" -->">la
-    p&aacute;gina</a> acerca del error.
+    p&aacute;gina</a> el error.
 
   <!--#else -->
 
-    Si usted provisiono el URL de manera manual le solicitamos
-    que porfavor revise los datos e intente de nuevo.
+    Si usted proporcion&oacute; el enlace de manera manual le solicitamos
+    que por favor revise los datos e intentelo de nuevo.
 
   <!--#endif -->
 
@@ -138,6 +138,60 @@ Body:----------fr--
 <!--#include virtual="include/bottom.html" -->
 ----------fr--
 
+Content-language: it
+Content-type: text/html; charset=ISO-8859-1
+Body:----------it--
+<!--#set var="CONTENT_LANGUAGE" value="it"
+--><!--#set var="TITLE" value="Oggetto non trovato!"
+--><!--#include virtual="include/top.html" -->
+
+    L'URL richiesto non esiste su questo server.
+
+  <!--#if expr="$HTTP_REFERER" -->
+
+    Il link della
+    <a href="<!--#echo encoding="url" var="HTTP_REFERER" -->">pagina da cui
+    sei arrivato</a> potrebbe essere errato o non essere pi&ugrave; valido.
+    Per favore, informa dell'errore l'autore della
+    <a href="<!--#echo encoding="url" var="HTTP_REFERER" -->">pagina</a>.
+
+  <!--#else -->
+
+    Se hai scritto l'URL a mano, per favore controlla che
+    non ci siano errori.
+
+  <!--#endif -->
+
+<!--#include virtual="include/bottom.html" -->
+----------it--
+
+Content-language: ko
+Content-type: text/html; charset=EUC-KR
+Body:----------ko--
+<!--#set var="CONTENT_LANGUAGE" value="ko"
+--><!--#set var="TITLE" value="°´Ã¼ ¾øÀ½!"
+--><!--#set var="CHARACTER_ENCODING" value="EUC-KR"
+--><!--#include virtual="include/top.html" -->
+
+    ¿äÃ»ÇÑ URLÀ» ÀÌ ¼­¹ö¿¡¼­ Ã£À» ¼ö ¾ø½À´Ï´Ù.
+
+  <!--#if expr="$HTTP_REFERER" -->
+
+    <a href="<!--#echo encoding="url" var="HTTP_REFERER"-->">ÀÌÀü
+    ÆäÀÌÁö</a>¿¡ ÀÖ´Â ¸µÅ©°¡ Àß¸øµÇ¾ú°Å³ª ¿À·¡µÇ¾î ¾ø¾îÁø °Í °°½À´Ï´Ù.
+    <a href="<!--#echo encoding="url" var="HTTP_REFERER"-->">±× ÆäÀÌÁö</a>¸¦
+    ¸¸µçÀÌ¿¡°Ô ÀÌ »ç½ÇÀ» ¾Ë·ÁÁÖ½Ã±â ¹Ù¶ø´Ï´Ù.
+
+  <!--#else -->
+
+    URLÀ» Á÷Á¢ ÀÔ·ÂÇÏ¼Ì´Ù¸é ¹Ù¸£°Ô ÀÔ·ÂÇÏ¼Ì´ÂÁö È®ÀÎÇÏ½Ã°í ´Ù½Ã ½ÃµµÇÏ½Ã±â
+    ¹Ù¶ø´Ï´Ù.
+
+  <!--#endif -->
+
+<!--#include virtual="include/bottom.html" -->
+----------ko--
+
 Content-language: nl
 Content-type: text/html; charset=ISO-8859-1
 Body:----------nl--
@@ -165,59 +219,31 @@ Body:----------nl--
 <!--#include virtual="include/bottom.html" -->
 ----------nl--
 
-Content-language: sv
-Content-type: text/html; charset=ISO-8859-1
-Body:----------sv--
-<!--#set var="CONTENT_LANGUAGE" value="sv"
---><!--#set var="TITLE" value="Objektet hittas ej!"
+Content-language: pl
+Content-type: text/html; charset=ISO-8859-2
+Body:----------pl--
+<!--#set var="CONTENT_LANGUAGE" value="pl"
+--><!--#set var="TITLE" value="Nie znaleziono obiektu!"
+--><!--#set var="CHARACTER_ENCODING" value="ISO-8859-2"
 --><!--#include virtual="include/top.html" -->
 
-    Den efterfr&aring;gade adressen hittades inte p&aring; denna server.
+    Nie znaleziono ¿±danego URLa na tym serwerze.
 
   <!--#if expr="$HTTP_REFERER" -->
 
-    L&auml;nken p&aring; den
-    <a href="<!--#echo encoding="url" var="HTTP_REFERER" -->">tidigare sidan</a> 
-    verkar vara felaktig eller inaktuell. V&auml;nligen informera f&ouml;rfattaren av
-    <a href="<!--#echo encoding="url" var="HTTP_REFERER" -->">sidan</a>
-    om felet.
+    Odno¶nik na
+    <a href="<!--#echo encoding="url" var="HTTP_REFERER" -->">referuj±cej stronie
+    </a> wydaje siê byæ nieprawid³owy lub nieaktualny. Poinformuj autora
+    <a href="<!--#echo encoding="url" var="HTTP_REFERER" -->">tej strony</a>
+    o problemie.
 
   <!--#else -->
-
-    Om du skrev in adressen manuellt s&aring; kontrollera din stavning och
-    f&ouml;rs&ouml;k igen.
+    Je¶li wpisa³e¶ URLa rêcznie, sprawd¼, czy nie siê nie pomyli³e¶.
 
   <!--#endif -->
 
 <!--#include virtual="include/bottom.html" -->
-----------sv--
-
-Content-language: it
-Content-type: text/html; charset=ISO-8859-1
-Body:----------it--
-<!--#set var="CONTENT_LANGUAGE" value="it"
---><!--#set var="TITLE" value="Oggetto non trovato!"
---><!--#include virtual="include/top.html" -->
-
-    L'URL richiesto non esiste su questo server.
-
-  <!--#if expr="$HTTP_REFERER" -->
-
-    Il link della
-    <a href="<!--#echo encoding="url" var="HTTP_REFERER" -->">pagina da cui
-    sei arrivato</a> potrebbe essere errato o non essere pi&ugrave; valido.
-    Per favore, informa dell'errore l'autore della
-    <a href="<!--#echo encoding="url" var="HTTP_REFERER" -->">pagina</a>.
-
-  <!--#else -->
-
-    Se hai scritto l'URL a mano, per favore controlla che
-    non ci siano errori.
-
-  <!--#endif -->
-
-<!--#include virtual="include/bottom.html" -->
-----------it--
+----------pl--
 
 Content-language: pt-br
 Content-type: text/html; charset=ISO-8859-1
@@ -272,3 +298,56 @@ Body:----------ro--
 
 <!--#include virtual="include/bottom.html" -->
 ----------ro--
+
+Content-language: sv
+Content-type: text/html; charset=ISO-8859-1
+Body:----------sv--
+<!--#set var="CONTENT_LANGUAGE" value="sv"
+--><!--#set var="TITLE" value="Objektet hittas ej!"
+--><!--#include virtual="include/top.html" -->
+
+    Den efterfr&aring;gade adressen hittades inte p&aring; denna server.
+
+  <!--#if expr="$HTTP_REFERER" -->
+
+    L&auml;nken p&aring; den
+    <a href="<!--#echo encoding="url" var="HTTP_REFERER" -->">tidigare sidan</a> 
+    verkar vara felaktig eller inaktuell. V&auml;nligen informera f&ouml;rfattaren av
+    <a href="<!--#echo encoding="url" var="HTTP_REFERER" -->">sidan</a>
+    om felet.
+
+  <!--#else -->
+
+    Om du skrev in adressen manuellt s&aring; kontrollera din stavning och
+    f&ouml;rs&ouml;k igen.
+
+  <!--#endif -->
+
+<!--#include virtual="include/bottom.html" -->
+----------sv--
+
+Content-language: tr
+Content-type: text/html; charset=ISO-8859-9
+Body:----------tr--
+<!--#set var="CONTENT_LANGUAGE" value="tr"
+--><!--#set var="CHARACTER_ENCODING" value="ISO-8859-9"
+--><!--#set var="TITLE" value="Object not found!"
+--><!--#include virtual="include/top.html" -->
+
+    Talep etti&#287;iniz URL, sunucu üzerinde bulunmuyor.
+
+  <!--#if expr="$HTTP_REFERER" -->
+
+    <a href="<!--#echo encoding="url" var="HTTP_REFERER" -->">Referans sayfa</a>
+    üzerindeki ba&#287;lant&#305; güncel de&#287;il.
+    Lütfen <a href="<!--#echo encoding="url" var="HTTP_REFERER" -->">referans sayfa</a>'n&#305;n
+    yazar&#305;n&#305; konuyla ilgili bilgilendirin.
+
+  <!--#else -->
+
+    URL'i kendiniz elle girdiyseniz, yaz&#305;m&#305;n&#305;z&#305; denetleyip tekrar deneyin.
+
+  <!--#endif -->
+
+<!--#include virtual="include/bottom.html" -->
+----------tr--

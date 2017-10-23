@@ -17,13 +17,11 @@ goto endofperl
 
 =head1 NAME
 
-diagnostics - Perl compiler pragma to force verbose warning diagnostics
-
-splain - filter to produce verbose descriptions of perl warning diagnostics
+diagnostics, splain - produce verbose warning diagnostics
 
 =head1 SYNOPSIS
 
-As a pragma:
+Using the C<diagnostics> pragma:
 
     use diagnostics;
     use diagnostics -verbose;
@@ -31,11 +29,10 @@ As a pragma:
     enable  diagnostics;
     disable diagnostics;
 
-As a program:
+Using the C<splain> standalone filter program:
 
     perl program 2>diag.out
     splain [-v] [-p] diag.out
-
 
 =head1 DESCRIPTION
 
@@ -186,7 +183,7 @@ use strict;
 use 5.006;
 use Carp;
 
-our $VERSION = 1.11;
+our $VERSION = 1.12;
 our $DEBUG;
 our $VERBOSE;
 our $PRETTY;

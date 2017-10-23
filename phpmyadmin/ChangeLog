@@ -2,36 +2,202 @@
 phpMyAdmin - Changelog
 ----------------------
 
-$Id: ChangeLog,v 2.62.2.26 2004/01/03 02:15:17 lem9 Exp $
+$Id: ChangeLog,v 2.111.2.27 2004/03/01 14:32:48 lem9 Exp $
 $Source: /cvsroot/phpmyadmin/phpMyAdmin/ChangeLog,v $
 
-2004-01-03 Marc Delisle  <lem9@users.sourceforge.net>
-    ### 2.5.5pl1 released
+2004-03-01 Marc Delisle  <lem9@users.sourceforge.net>
+    ### 2.5.6 released
+
+2004-02-29 Alexander M. Turek  <howcanisleepwithyourvoiceinmyhead@derrabus.de>
+    * libraries/common.lib.php: Yet another ungly fix concerning the missing
+      mysql_get_client_info() function.
+
+2004-02-26 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/sqlparser.lib.php: bug 905066, memory eater, thanks to xuefer
+
+2004-02-24 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_row_delete.php: bug 878995: mult_submits.inc.php should not be
+      called twice
+
+2004-02-18 Marc Delisle  <lem9@users.sourceforge.net>
+    * export.php: bug 899610, undefined variable $save_filename
+
+2004-02-15 Marc Delisle  <lem9@users.sourceforge.net>
+    ### 2.5.6-rc2 released
+
+2004-02-15 Alexander M. Turek  <onehotminute@derrabus.de>
+    * config.inc.php, libraries/config_import.lib.php: Added missing Arabic
+      Windows-1256 charset to the default value of $cfg['AvailableCharsets'].
+    * lang/russian-dos-866.inc.php: Wrong charset (Hotfix, better fix in HEAD).
+
+2004-02-14 Alexander M. Turek  <thewall@derrabus.de>
+    * libraries/common.lib.php, libraries/defines.lib.php: Hotfix for bug
+      #872953 (Undefined function: mysql_get_client_info() ); bug is already
+      fixed in HEAD branch because of the new DBI libraries.
+
+2004-02-13 Alexander M. Turek  <resist@derrabus.de>
+    * libraries/common.lib.php: Fixed bug #890186 (PMA chokes on undefined
+      parser functions if one of the very first queries fails.
+
+2004-02-11 Marc Delisle  <lem9@users.sourceforge.net>
+    * server_privileges.php: bug 818654, password not copied
+    * read_dump.php, libraries/display_tbl.lib.php, /bookmark.lib.php:
+      bug 879005: execute stored bookmarks when user is different
+
+2004-02-08 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/spanish: Updated, thanks to Daniel Hinostroza (hinostroza).
+    * lang/serbian: Updated, thanks to Mihailo Stefanovic (mikis).
+    * lang/dutch update, thanks to Ivo Teel
+    * lang/estonian: Updated, thanks to Alvar Soome (finsoft).
+
+2004-02-05 Alexander M. Turek  <chaos@derrabus.de>
+    * Documentation.html: Added FAQ 1.17a about error message, "Client does not
+      support authentication protocol".
+
+2004-02-04 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/sqlparser.lib.php: bug 890573 (was a typo)
+
+2004-02-03 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_change.php: bug 879923, NULL default value of DATETIME field
+
+2004-02-02 Marc Delisle  <lem9@users.sourceforge.net>
+    * export.php: security fix, thanks to Cedric Cochin for the advisory
+    ### 2.5.6-rc1 released
+    * lang/slovak: Updated, thanks to Lubos Klokner (erkac).
+
+2004-02-02 Alexander M. Turek  <supposedformerinfatuationjunkie@derrabus.de>
+    * libraries/mysql_charsets.lib.php: Use PMA_backquote().
+
+2004-01-30 Alexander M. Turek  <stormfront@derrabus.de>
+    * lang/german-*.inc.php: Updates.
+
+2004-01-29 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/catalan: Updated, thanks to Xavier Navarro (xavin)
+    * lang/italian: Updated, thanks to Pietro Danesi (danone).
+    * lang/danish: updates, thanks to Finn Sorensen (alleyman01)
+
+2004-01-27 Marc Delisle  <lem9@users.sourceforge.net>
+    * main.php: bug 884606, MySQL version check before server choice
+
+2004-01-25 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_row_delete.php: bug 882695, broken row highlighting
+    * libraries/display_tbl.lib.php: bug 879792, bad sort link
+
+2004-01-23 Alexander M. Turek  <foreveryoung@derrabus.de>
+    * Documentation.html: Changed my email address.
+    * header_printview.inc.php:
+      - Don't bypass $cfg['Server']['verbose'] settings;
+      - Include MySQL version in SQL printview headers.
+    * header.inc.php: Avoid sending headers twice.
+
+2004-01-14 Marc Delisle  <lem9@users.sourceforge.net>
+    * mult_submits.inc.php: bug 876805, dropping a field with the
+      multi-submit mechanism removes all internal relations of a table,
+      patch thanks to Joosep-Georg Järvemaa (j-georg)
+
+2004-01-12 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/spanish: Updated, thanks to Daniel Hinostroza (hinostroza).
+    * lang/swedish: Updated, thanks to Björn T. Hallberg (bth).
+    * lang/portuguese: Updated, thanks to Lopo Pizarro (lopopizarro).
+
+2004-01-09 Alexander M. Turek  <singwhenyourewinning@derrabus.de>
+    * libraries/sqlparser.lib.php: Support for _charset syntax.
+
+2004-01-09 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/sqlparser.data.php: bug 873236 SQL_CALC_FOUND_ROWS
+
+2004-01-07 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/display_tbl.lib.php, /display_tbl_links.lib.php:
+      bug 857743, SHOW errors
+
+2004-01-06 Alexander M. Turek  <therising@derrabus.de>
+    * libraries/charset_conversion.lib.php: Skip charset conversion code if
+      input charset and output charset are the same.
+
+2004-01-05 Garvin Hicking <returnofthegarv@supergarv.de>
+    * browse_foreigners.php, tbl_change.php: Sort key/value pairs
+      as discussed in RFE #868369. Made foreigner window resizable.
+    * libraries/functions.js: Reverted row marker patch. See RFE #867284
+      for details.
+    * libraries/display_tbl.lib.php, libraries/display_tbl_links.lib.php,
+      libraries/functions.js: Upon clicking on a result row, de/activate
+      the checkbox next to it. Only makes sense for horizontal mode. Can be
+      deactivated by setting BrowseMarkerColor to an empty string in config.inc.php.
+
+2004-01-05 Alexander M. Turek  <rumors@derrabus.de>
+    * tbl_properties_operations.php: Changing a table's charset changed the
+      charset of all fields (MySQL >= 4.1.1).
+
+2004-01-04 Alexander M. Turek  <beggaronabeachofgold@derrabus.de>
+    * libraries/config_import.lib.php: Added missing compatibility code for
+      $cfg['RecodingEngine'].
+
+2004-01-02 Alexander M. Turek  <wecantdance@derrabus.de>
+    * libraries/mysql_charsets.lib.php, libraries/sqlparser.lib.php:
+      MySQL collations are now parsed and highlighted.
+    * libraries/export/sql.php: Include charset / collation information in db
+      export.
 
 2004-01-02 Marc Delisle  <lem9@users.sourceforge.net>
     * db_details_structure.php: bug 868996, debug code still in place,
       thanks to Matthias Fichtner (mfichtner)
     * browse_foreigners.php: paging does not work; obey RepeatCells=0
     * libraries/display_tbl.lib.php: bug 857743, SHOW FIELDS
-    * lang/czech: wrong charset for windows-1250 (for Michal)
+
+2003-12-30 Michal Cihar  <happynewyer@cihar.com>
+    * lang/czech: Updated.
+    * lang/*: Fixed typo s/Chech-Slovak/Czech-Slovak/.
+
+2003-12-30 Alexander M. Turek  <facevalue@derrabus.de>
+    * config.inc.php, db_details_common.php, db_details_structure.php,
+      tbl_properties_operations.php, css/phpmyadmin.css.php,
+      libraries/common.lib.php, libraries/config_import.lib.php,
+      libraries/mysql_charsets.lib.php, libraries/sqlparser.lib.php:
+      - SQL parser detected the character set "binary" as column attribute;
+      - MySQL charsets are now parsed and highlighted - Note: the SQL parser
+        library now has to be included AFTER having connected to the MySQL
+        server;
+      - The default charset of a database may now be changed;
+      - Ensured that the user's connection is used for setting and retreiving
+        charset information.
+      * libraries/defines.lib.php: typo.
 
 2003-12-30 Marc Delisle  <lem9@users.sourceforge.net>
     * tbl_select.php: bug 867320, dropdowns in search page
 
+2003-12-29 Alexander M. Turek  <crazysexycool@derrabus.de>
+    * db_details_structure.php, libraries/mysql_charsets.lib.php:
+      - display database collation (MySQL >= 4.1.1);
+      - list collations of all tables.
+    * tbl_properties_strcuture, tbl_properties_table_info.php:
+      - Changed "Charset" label to "Collation" because it fits better;
+      - The column collations weren't displayed with MySQL 5.0.
+    * libraries/sqlparser.data.php: New reserved words:
+      - COLLATE (since MySQL 4.1.0);
+      - RETURN  (since MySQL 5.0.0).
+
 2003-12-28 Marc Delisle  <lem9@users.sourceforge.net>
     ### 2.5.5 released
 
-2003-12-28 Alexander M. Turek  <tragickingdom@derrabus.de>
+2003-12-27 Alexander M. Turek  <tragickingdom@derrabus.de>
     * Documentation.html, README: I tested phpMyAdmin with MySQL 5.0.0-alpha.
 
 2003-12-25 Marc Delisle  <lem9@users.sourceforge.net>
+    * db_details_qbe.php: error when generating joins
     * Documentation.html: FAQ 6.22: default bookmark execution
 
 2003-12-23 Marc Delisle  <lem9@users.sourceforge.net>
+    * css/phpmyadmin.css.php: Patch 864334, preserve white-space between quotes
     * db_datadict.php, db_printview.php: bug 863713: printing on non-IE browser
 
 2003-12-21 Marc Delisle  <lem9@users.sourceforge.net>
     * lang/norwegian:  Updated, thanks to Sven-Erik Andersen (sven-erik).
+
+2003-12-18 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_relation.php: bug 860258: do not destroy foreign key references
+      to another db (still cannot enter via phpMyAdmin this kind of
+      references)
+    * lang/indonesian: Updated, thanks to Rachim Tamsjadi (tamsy).
 
 2003-12-17 Michal Cihar  <ilovetranslations@cihar.com>
     * lang/sync_lang.sh: Fix generation of translation, when source is in
@@ -49,11 +215,22 @@ $Source: /cvsroot/phpmyadmin/phpMyAdmin/ChangeLog,v $
     * read_dump.php: bug 859062: Go & Bookmark problem when the
       query has a character like "+" in it
 
-2003-12-14 Marc Delisle  <lem9@users.sourceforge.net>
-    ### 2.5.5-rc2 released
+2003-12-13 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_query_box.php, ldi_table.php: maximum upload size
+    * tbl_change.php: max BLOB upload size
+
+2003-12-12 Marc Delisle  <lem9@users.sourceforge.net>
+    * db_details.php, libraries/common.lib.php, lang/*:
+      new feature to display the maximum upload size
+      TODO: detect if upload succeeded
 
 2003-12-12 Garvin Hicking <juststayalittlebitlonger@supergarv.de>
     * export.php: Fixed Regex
+    * transformation_wrapper.php, lang/*, libraries/display_tbl.lib.php,
+      libraries/transformations/application_octetstream__download.inc.php:
+      Added a new transformation to download blob/binary field contents
+      with customized filenames. Needed two minor tweeks to the general
+      system.
 
 2003-12-11 Michal Cihar  <imreallyaway@cihar.com>
     * libraries/export/sql.php: Fix moving foreign key definition on Windows
@@ -64,14 +241,21 @@ $Source: /cvsroot/phpmyadmin/phpMyAdmin/ChangeLog,v $
       and Inserted rows; wrong message for insert ids
     * libraries/display_tbl.lib.php: bug 857743, SHOW DATABASES
 
+2003-12-11 Alexander M. Turek  <bleibtallesanders@derrabus.de>
+    * server_collations.php, lang/*.inc.php, libraries/mysql_charsets.lib.php:
+      Updated character sets overview for MySQL 4.1.1.
+    * db_create.php, main.php: Ability to specify a default character set for a
+      new database.
+    * libraries/sqlparser.lib.php: Bug #857749.
+
 2003-12-11 Garvin Hicking <me@supergarv.de>
     * header_printview.inc.php: RFE #856503, show number of rows in printview
+    * tbl_change.php, tbl_replace.php, tbl_replace_fields.php: Fixed #857445,
+      #857684 where non-existant fields caused PHP notices.
     * db_details.php: Removed unneccessary whitespace
     * sql.php: Bug #857742: When dropping the only remaining database, an
       error occured. Fixed by checking if databases remein (as suggested
       by lem9)
-    * tbl_change.php, tbl_replace.php, tbl_replace_fields.php: Fixed #857445,
-      #857684 where non-existant fields caused PHP notices.
 
 2003-12-10 Garvin Hicking <me@supergarv.de>
     * db_datadict.php: Bug 857186: Real fix for the problem. The '@'

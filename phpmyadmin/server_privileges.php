@@ -1,5 +1,5 @@
 <?php
-/* $Id: server_privileges.php,v 2.4 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: server_privileges.php,v 2.4.4.1 2004/02/11 14:23:47 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -559,6 +559,12 @@ if (!empty($change_copy)) {
     } else {
         $row = PMA_mysql_fetch_array($res, MYSQL_ASSOC);
         extract($row, EXTR_OVERWRITE);
+        // Recent MySQL versions have the field "Password" in mysql.user,
+        // so the previous extract creates $Password but this script
+        // uses $password
+        if (!isset($password) && isset($Password)) {
+            $password=$Password;
+        }
         mysql_free_result($res);
         $queries = array();
     }

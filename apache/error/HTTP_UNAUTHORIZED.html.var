@@ -64,21 +64,21 @@ Content-language: es
 Content-type: text/html; charset=ISO-8859-1
 Body:----------es--
 <!--#set var="CONTENT_LANGUAGE" value="es"
---><!--#set var="TITLE" value="Authentication required!"
+--><!--#set var="TITLE" value="&iexcl;Autentificaci&oacute;n requerida&excl;"
 --><!--#include virtual="include/top.html" -->
 
     El servidor no puede certificar que usted este autorizado
-    para accesar el URL "<!--#echo encoding="url" var="REDIRECT_URL" -->".
-    Usted pudo suministrar informaci&oacute;n incorrecta accidentalmente
-    (ejem. una contrase&ntilde;a inv&aacute;lida) o, el buscador no sabe 
+    para acceder al enlace "<!--#echo encoding="url" var="REDIRECT_URL" -->".
+    Usted pudo suministrar informaci&oacute;n err&oacute;nea accidentalmente
+    (ejem. una contrase&ntilde;a inv&aacute;lida) o, el navegador no sabe 
     como suministrar la informaci&oacute;n requerida.
 
   <!--#include virtual="include/spacer.html" -->
 
     En caso de que a usted le este permitido el uso del
-    documento requerido, le solicitamos de la manera mas atenta
-    que porfavor vuelva a intentar la operaci&oacute;n suministrando
-    nuevamente su numero de identificaci&oacute;n y su contrase&ntilde;a.
+    documento requerido, le solicitamos de la manera m&aacute;s atenta
+    que por favor vuelva a intentar la operaci&oacute;n suministrando
+    nuevamente su identificador y su contrase&ntilde;a.
 
 <!--#include virtual="include/bottom.html" -->
 ----------es--
@@ -107,46 +107,6 @@ Body:----------fr--
 <!--#include virtual="include/bottom.html" -->
 ----------fr--
 
-Content-language: nl
-Content-type: text/html; charset=ISO-8859-1
-Body:----------nl--
-<!--#set var="CONTENT_LANGUAGE" value="nl"
---><!--#set var="TITLE" value="Authenticatie nodig!"
---><!--#include virtual="include/top.html" -->
-
-    De server kon niet controleren of u gemachtigd bent om toegang te krijgen
-    tot de URL "<!--#echo encoding="url" var="REDIRECT_URL" -->".
-    U hebt zich onvoldoende geauthenticeerd ( vb : verkeerd paswoord ), of
-    uw browser is niet in staat de nodige authentificatiegegevens door te geven.
-
-  <!--#include virtual="include/spacer.html" -->
-
-    Indien u toch gemachtigd bent toegang te krijgen tot het document,
-    controleer uw gebruikersnaam en paswoord en probeer opnieuw.
-
-<!--#include virtual="include/bottom.html" -->
-----------nl--
-
-Content-language: sv
-Content-type: text/html; charset=ISO-8859-1
-Body:----------sv--
-<!--#set var="CONTENT_LANGUAGE" value="sv"
---><!--#set var="TITLE" value="Autentisering kr&auml;vs!"
---><!--#include virtual="include/top.html" -->
-
-    Servern kunde inte verifiera att du har till&aring;telse att bes&ouml;ka 
-    adressen "<!--#echo encoding="url" var="REDIRECT_URL" -->".
-    Antingen angav du felaktiga uppgifter (ex. fel l&ouml;senord) eller s&aring;
-    st&ouml;djer inte din webbl&auml;sare detta autentiseringss&auml;tt.
-
-  <!--#include virtual="include/spacer.html" -->
-
-    Om du har till&aring;telse att bes&ouml;ka sidan, v&auml;nligen kontrollera ditt 
-    anv&auml;ndarnamn samt l&ouml;senord och f&ouml;rs&ouml;k igen.
-
-<!--#include virtual="include/bottom.html" -->
-----------sv--
-
 Content-language: it
 Content-type: text/html; charset=ISO-8859-1
 Body:----------it--
@@ -167,6 +127,68 @@ Body:----------it--
 
 <!--#include virtual="include/bottom.html" -->
 ----------it--
+
+Content-language: ko
+Content-type: text/html; charset=EUC-KR
+Body:----------ko--
+<!--#set var="CONTENT_LANGUAGE" value="ko"
+--><!--#set var="TITLE" value="ÀÎÁõ ÇÊ¿ä!"
+--><!--#set var="CHARACTER_ENCODING" value="EUC-KR"
+--><!--#include virtual="include/top.html" -->
+
+    ÀÌ ¼­¹ö°¡ "<!--#echo encoding="url" var="REDIRECT_URL" -->" URLÀ»
+    Á¢±ÙÇÒ ¼ö ÀÖ´Â ±ÇÇÑÀÌ ÀÖ´ÂÁö È®ÀÎÇÏÁö ¸øÇß½À´Ï´Ù.
+    Àß¸øµÈ ÀÎÁõ Á¤º¸(°¡·É, Àß¸øµÈ ¾ÏÈ£)¸¦ º¸³Â°Å³ª ¾Æ´Ï¸é
+    »ç¿ëÇÏ½Ã´Â ºê¶ó¿ìÀú°¡ ÇÊ¿äÇÑ ÀÎÁõ Á¤º¸¸¦ ¾î¶»°Ô º¸³»´ÂÁö ¸ð¸£´Â °ÍÀÔ´Ï´Ù.
+
+  <!--#include virtual="include/spacer.html" -->
+
+    ÀÌ ¹®¼­¸¦ »ç¿ëÇÒ ¼ö ÀÖµµ·Ï Çã°¡¸¦ ¹Þ¾Ò´Âµ¥µµ ÀÌ·±´Ù¸é,
+    »ç¿ëÀÚ ID¿Í ¾ÏÈ£¸¦ È®ÀÎÇÏ½Ã°í ´Ù½Ã ½ÃµµÇÏ½Ã±â ¹Ù¶ø´Ï´Ù.
+
+<!--#include virtual="include/bottom.html" -->
+----------ko--
+
+Content-language: nl
+Content-type: text/html; charset=ISO-8859-1
+Body:----------nl--
+<!--#set var="CONTENT_LANGUAGE" value="nl"
+--><!--#set var="TITLE" value="Authenticatie nodig!"
+--><!--#include virtual="include/top.html" -->
+
+    De server kon niet controleren of u gemachtigd bent om toegang te krijgen
+    tot de URL "<!--#echo encoding="url" var="REDIRECT_URL" -->".
+    U hebt zich onvoldoende geauthenticeerd ( vb : verkeerd paswoord ), of
+    uw browser is niet in staat de nodige authentificatiegegevens door te geven.
+
+  <!--#include virtual="include/spacer.html" -->
+
+    Indien u toch gemachtigd bent toegang te krijgen tot het document,
+    controleer uw gebruikersnaam en paswoord en probeer opnieuw.
+
+<!--#include virtual="include/bottom.html" -->
+----------nl--
+
+Content-language: pl
+Content-type: text/html; charset=ISO-8859-2
+Body:----------pl--
+<!--#set var="CONTENT_LANGUAGE" value="pl"
+--><!--#set var="TITLE" value="Wymagana autoryzacja!"
+--><!--#set var="CHARACTER_ENCODING" value="ISO-8859-2"
+--><!--#include virtual="include/top.html" -->
+
+    Serwer nie mo¿e zweryfikowaæ, ¿e masz uprawnienia dostêpu do
+    URLa "<!--#echo encoding="url" var="REDIRECT_URL" -->".
+    Nie poda³e¶ prawid³owych danych autoryzacyjnych (np. has³a),
+    lub twoja przegl±darka nie potrafi ich przes³aæ.
+
+  <!--#include virtual="include/spacer.html" -->
+
+    Je¶li masz prawo dostêpu do ¿±danego dokumentu, sprad¼
+    podan± nazwê u¿ytkownika i has³o.
+
+<!--#include virtual="include/bottom.html" -->
+----------pl--
 
 Content-language: pt-br
 Content-type: text/html; charset=ISO-8859-1
@@ -207,3 +229,43 @@ Body:----------ro--
 
 <!--#include virtual="include/bottom.html" -->
 ----------ro--
+
+Content-language: sv
+Content-type: text/html; charset=ISO-8859-1
+Body:----------sv--
+<!--#set var="CONTENT_LANGUAGE" value="sv"
+--><!--#set var="TITLE" value="Autentisering kr&auml;vs!"
+--><!--#include virtual="include/top.html" -->
+
+    Servern kunde inte verifiera att du har till&aring;telse att bes&ouml;ka 
+    adressen "<!--#echo encoding="url" var="REDIRECT_URL" -->".
+    Antingen angav du felaktiga uppgifter (ex. fel l&ouml;senord) eller s&aring;
+    st&ouml;djer inte din webbl&auml;sare detta autentiseringss&auml;tt.
+
+  <!--#include virtual="include/spacer.html" -->
+
+    Om du har till&aring;telse att bes&ouml;ka sidan, v&auml;nligen kontrollera ditt 
+    anv&auml;ndarnamn samt l&ouml;senord och f&ouml;rs&ouml;k igen.
+
+<!--#include virtual="include/bottom.html" -->
+----------sv--
+
+Content-language: tr
+Content-type: text/html; charset=ISO-8859-9
+Body:----------tr--
+<!--#set var="CONTENT_LANGUAGE" value="tr"
+--><!--#set var="CHARACTER_ENCODING" value="ISO-8859-9"
+--><!--#set var="TITLE" value="Authentication required!"
+--><!--#include virtual="include/top.html" -->
+
+    Sunucu bu dokümana eri&#351;im izninizi do&#287;rulayamad&#305;.
+    Ya kimli&#287;iniz do&#287;rulanamad&#305; (örne&#287;in hatal&#305; parola girdiniz),
+    ya da gezgininiz bu i&#351;lemi yerine getiremiyor.
+
+  <!--#include virtual="include/spacer.html" -->
+
+    E&#287;er bu dokümana eri&#351;me izniniz varsa, lütfen kimli&#287;inizi
+    ve parolan&#305;z&#305; kontrol edip, tekrar deneyin.
+
+<!--#include virtual="include/bottom.html" -->
+----------tr--

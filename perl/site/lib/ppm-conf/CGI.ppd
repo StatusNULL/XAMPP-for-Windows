@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOFTPKG NAME="CGI" VERSION="2,91,0,0">
+  <IMPLEMENTATION>
+    <CODEBASE HREF="http://ppm.ActiveState.com/PPMPackages/5.8-windows/MSWin32-x86-multi-thread-5.8/CGI-2.91.tar.gz" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    <OS NAME="MSWin32" />
+  </IMPLEMENTATION>
+  <ABSTRACT>Simple Common Gateway Interface Class</ABSTRACT>
+  <AUTHOR>Lincoln D. Stein (lstein@cshl.org)</AUTHOR>
+  <TITLE>CGI</TITLE>
+</SOFTPKG>

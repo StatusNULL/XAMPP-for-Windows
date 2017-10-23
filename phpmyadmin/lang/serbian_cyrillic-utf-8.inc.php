@@ -1,5 +1,5 @@
 <?php
-/* $Id: serbian_cyrillic-utf-8.inc.php,v 2.3 2003/12/02 18:06:35 lem9 Exp $ */
+/* $Id: serbian_cyrillic-utf-8.inc.php,v 2.7.2.1 2004/02/08 13:22:31 lem9 Exp $ */
 
 /**
  * Translated by:
@@ -157,6 +157,7 @@ $strCriteria = 'Критеријум';
 $strCroatian = 'Хрватски';
 $strCyrillic = 'Ћирилични';
 $strCzech = 'Чешки';
+$strCzechSlovak = 'Чешко-словачки';
 
 $strDBComment = 'Коментар базе:';
 $strDBGContext = 'Контекст';
@@ -266,6 +267,7 @@ $strFunction = 'Функција';
 $strGenBy = 'Генерисао';
 $strGenTime = 'Време креирања';
 $strGeneralRelationFeat = 'Опште особине релација';
+$strGeorgian = 'Грузијски';
 $strGerman = 'Немачки';
 $strGlobal = 'глобално';
 $strGlobalPrivileges = 'Глобалне привилегије';
@@ -365,6 +367,7 @@ $strMIME_transformation_note = 'За листу доступних опција 
 $strMIME_transformation_options = 'Опције трансформације';
 $strMIME_transformation_options_note = 'Молимо унесите вредности за опције трансформације користећи овај облик: \'a\',\'b\',\'c\'...<br />Ако треба да унесете обрнуту косу црту ("\\") или апостроф ("\'") у те вредности, ставите обрнуту косу црту испред њих (на пример \'\\\\xyz\' или \'a\\\'b\').';
 $strMIME_without = 'MIME-типови приказани у курзиву немају одвојене функције трансформације.';
+$strMaximumSize = 'Максимална величина: %s%s';
 $strMissingBracket = 'Недостаје заграда';
 $strModifications = 'Измене су сачуване';
 $strModify = 'Промени';
@@ -656,6 +659,7 @@ $strTotal = 'укупно';
 $strTotalUC = 'Укупно';
 $strTraditionalChinese = 'Традиционални кинески';
 $strTraffic = 'Саобраћај';
+$strTransformation_application_octetstream__download = 'Приказује везу за преузимање бинарних података за поље. Прва опција је име бинарне датотеке. Друга опција је могуће име поља реда табеле који садржи име датотеке. Ако дате другу опцију, прва мора бити постављена на празан стринг';
 $strTransformation_image_jpeg__inline = 'Приказује умањену слику на коју је могуће кликнути; опције: ширина, висина у пикселима (чува оригинални однос)';
 $strTransformation_image_jpeg__link = 'Приказује линк ка овој снимци (нпр. директно преузимање из BLOB-а).';
 $strTransformation_image_png__inline = 'Прикажи JPEG слике на страни';

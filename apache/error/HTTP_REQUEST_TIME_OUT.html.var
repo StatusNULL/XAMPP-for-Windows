@@ -42,11 +42,11 @@ Content-language: es
 Content-type: text/html; charset=ISO-8859-1
 Body:----------es--
 <!--#set var="CONTENT_LANGUAGE" value="es"
---><!--#set var="TITLE" value="Request time-out!"
+--><!--#set var="TITLE" value="&iexcl;La solicitud ha excedido el tiempo de espera permitido&excl;"
 --><!--#include virtual="include/top.html" -->
 
-	El servidor ha cerrado la conecci&oacute;n de red 
-	debido a que el buscador no termino la solicitud
+	El servidor ha cerrado la conexi&oacute;n de red 
+	debido a que el navegador no termin&oacute; la solicitud
 	dentro del tiempo especificado.
     
 <!--#include virtual="include/bottom.html" -->
@@ -65,33 +65,6 @@ Body:----------fr--
 <!--#include virtual="include/bottom.html" -->
 ----------fr--
 
-Content-language: nl
-Content-type: text/html; charset=ISO-8859-1
-Body:----------nl--
-<!--#set var="CONTENT_LANGUAGE" value="nl"
---><!--#set var="TITLE" value="Tijdlimiet overschreden!"
---><!--#include virtual="include/top.html" -->
-
-   De server heeft de netwerkverbinding gesloten omdat de browser
-   de vraag niet heeft be&euml;indigd binnen een gestelde tijd.
-
-<!--#include virtual="include/bottom.html" -->
-----------nl--
-
-Content-language: sv
-Content-type: text/html; charset=ISO-8859-1
-Body:----------sv--
-<!--#set var="CONTENT_LANGUAGE" value="sv"
---><!--#set var="TITLE" value="Request time-out!"
---><!--#include virtual="include/top.html" -->
-
-    Servern st&auml;ngde f&ouml;rbindelsen d&auml;rf&ouml;r att
-    webbl&auml;saren inte avslutade f&ouml;rfr&aring;gan inom
-    f&ouml;rbest&auml;md tid.
-
-<!--#include virtual="include/bottom.html" -->
-----------sv--
-
 Content-language: it
 Content-type: text/html; charset=ISO-8859-1
 Body:----------it--
@@ -105,6 +78,47 @@ Body:----------it--
 
 <!--#include virtual="include/bottom.html" -->
 ----------it--
+
+Content-language: ko
+Content-type: text/html; charset=EUC-KR
+Body:----------ko--
+<!--#set var="CONTENT_LANGUAGE" value="ko"
+--><!--#set var="TITLE" value="¿äÃ» ½Ã°£ ÃÊ°ú!"
+--><!--#set var="CHARACTER_ENCODING" value="EUC-KR"
+--><!--#include virtual="include/top.html" -->
+
+    ºê¶ó¿ìÀú°¡ ³Ê¹« ¿À·§µ¿¾È ¿äÃ»À» ³¡³»Áö ¾Ê¾Æ¼­ ¼­¹ö°¡ ³×Æ®¿öÅ© ¿¬°áÀ»
+    °­Á¦·Î ²÷¾ú½À´Ï´Ù.
+
+<!--#include virtual="include/bottom.html" -->
+----------ko--
+
+Content-language: nl
+Content-type: text/html; charset=ISO-8859-1
+Body:----------nl--
+<!--#set var="CONTENT_LANGUAGE" value="nl"
+--><!--#set var="TITLE" value="Tijdlimiet overschreden!"
+--><!--#include virtual="include/top.html" -->
+
+   De server heeft de netwerkverbinding gesloten omdat de browser
+   de vraag niet heeft be&euml;indigd binnen een gestelde tijd.
+
+<!--#include virtual="include/bottom.html" -->
+----------nl--
+
+Content-language: pl
+Content-type: text/html; charset=ISO-8859-2
+Body:----------pl--
+<!--#set var="CONTENT_LANGUAGE" value="pl"
+--><!--#set var="TITLE" value="Przedawnione ¿±danie!"
+--><!--#set var="CHARACTER_ENCODING" value="ISO-8859-2"
+--><!--#include virtual="include/top.html" -->
+
+    Serwer zamkn±³ po³±czenie sieciowe poniewa¿ przegl±darka
+    nie zakoñczy³a operacji w przewidywanym czasie.
+
+<!--#include virtual="include/bottom.html" -->
+----------pl--
 
 Content-language: pt-br
 Content-type: text/html; charset=ISO-8859-1
@@ -132,3 +146,31 @@ Body:----------ro--
 
 <!--#include virtual="include/bottom.html" -->
 ----------ro--
+
+Content-language: sv
+Content-type: text/html; charset=ISO-8859-1
+Body:----------sv--
+<!--#set var="CONTENT_LANGUAGE" value="sv"
+--><!--#set var="TITLE" value="Request time-out!"
+--><!--#include virtual="include/top.html" -->
+
+    Servern st&auml;ngde f&ouml;rbindelsen d&auml;rf&ouml;r att
+    webbl&auml;saren inte avslutade f&ouml;rfr&aring;gan inom
+    f&ouml;rbest&auml;md tid.
+
+<!--#include virtual="include/bottom.html" -->
+----------sv--
+
+Content-language: tr
+Content-type: text/html; charset=ISO-8859-9
+Body:----------tr--
+<!--#set var="CONTENT_LANGUAGE" value="tr"
+--><!--#set var="CHARACTER_ENCODING" value="ISO-8859-9"
+--><!--#set var="TITLE" value="Request time-out!"
+--><!--#include virtual="include/top.html" -->
+
+    Sunucu a&#287; ba&#287;lant&#305;s&#305;n&#305; kapatt&#305; çünkü gezgin
+    talebini belirlenmi&#351; süre içinde tamamlayamad&#305;.
+
+<!--#include virtual="include/bottom.html" --> 
+----------tr--

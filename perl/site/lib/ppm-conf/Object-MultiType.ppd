@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOFTPKG NAME="Object-MultiType" VERSION="0,04,0,0">
+  <IMPLEMENTATION>
+    <CODEBASE HREF="http://ppm.ActiveState.com/PPMPackages/5.8-windows/MSWin32-x86-multi-thread-5.8/Object-MultiType-0.04.tar.gz" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    <OS NAME="MSWin32" />
+  </IMPLEMENTATION>
+  <ABSTRACT>Perl Objects as Hash, Array, Scalar, Code and Glob at the same time.</ABSTRACT>
+  <AUTHOR>Graciliano Monteiro Passos (gm@virtuasites.com.br)</AUTHOR>
+  <TITLE>Object-MultiType</TITLE>
+</SOFTPKG>

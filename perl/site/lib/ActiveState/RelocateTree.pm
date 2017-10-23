@@ -24,7 +24,7 @@ my $modifier = $^O eq 'MSWin32' ? '(?i)' : '';
 sub spongedir {
     my %sponges = (
 	ppm => '/tmp'.'/.ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZpErLZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZperl',
-	thisperl => 'D:\pdirect\p4\Apps\Gecko'.'\MSI\data\ActivePerl\Perl',
+	thisperl => 'C:\p4view\Apps\Gecko\M'.'SI\data\ActivePerl\Perl',
     );
     return $sponges{lc$_[0]};
 }

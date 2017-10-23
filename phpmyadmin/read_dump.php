@@ -1,5 +1,5 @@
 <?php
-/* $Id: read_dump.php,v 2.3.2.1 2003/12/15 18:13:40 lem9 Exp $ */
+/* $Id: read_dump.php,v 2.4.2.1 2004/02/11 18:13:44 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -52,7 +52,7 @@ if (!empty($id_bookmark)) {
     require_once('./libraries/bookmark.lib.php');
     switch ($action_bookmark) {
         case 0: // bookmarked query that have to be run
-            $sql_query = PMA_queryBookmarks($db, $cfg['Bookmark'], $id_bookmark);
+            $sql_query = PMA_queryBookmarks($db, $cfg['Bookmark'], $id_bookmark,'id',(isset($action_bookmark_all) ? TRUE : FALSE));
             if (isset($bookmark_variable) && !empty($bookmark_variable)) {
                 $sql_query = preg_replace('|/\*(.*)\[VARIABLE\](.*)\*/|imsU', '${1}' . PMA_sqlAddslashes($bookmark_variable) . '${2}', $sql_query);
             }

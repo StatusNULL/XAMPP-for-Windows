@@ -1,5 +1,5 @@
 <?php
-/* $Id: sql.php,v 2.3.2.1 2003/12/11 11:15:28 garvinhicking Exp $ */
+/* $Id: sql.php,v 2.5 2004/01/05 00:37:02 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -711,8 +711,10 @@ else {
             echo '</p>' . "\n";
         }
 
-        // Export link, if only one table
+        // Export link
         // (the url_query has extra parameters that won't be used to export)
+        // (the single_table parameter is used in display_export.lib.php
+        //  to hide the SQL and the structure export dialogs)
         if (!isset($printview)) {
             if (isset($analyzed_sql[0]['table_ref'][0]['table_true_name']) && !isset($analyzed_sql[0]['table_ref'][1]['table_true_name'])) {
                 $single_table   = '&amp;single_table=true';

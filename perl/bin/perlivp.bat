@@ -77,7 +77,7 @@ $tests_total++;
 
 print "## Checking Perl version via variable `\$]'.\n" if $opt{'p'};
 
-my $ivp_VERSION = 5.008002;
+my $ivp_VERSION = 5.008003;
 
 if ($ivp_VERSION == $]) {
     print "## Perl version `$]' appears installed as expected.\n" if $opt{'v'};

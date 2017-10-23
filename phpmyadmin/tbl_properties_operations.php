@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_properties_operations.php,v 2.4 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: tbl_properties_operations.php,v 2.6 2004/01/05 13:29:09 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -38,8 +38,8 @@ if (isset($submittype)) {
     $message       = $strSuccess;
 }
 if (isset($submitcharset)) {
-    $sql_query     = 'ALTER TABLE ' . PMA_backquote($table) . ' CHARACTER SET = ' . $tbl_charset;
-    $result        = PMA_mysql_query($sql_query) or PMA_mysqlDie('', $sql_query, '', $err_url);
+    $sql_query     = 'ALTER TABLE ' . PMA_backquote($table) . ' DEFAULT CHARACTER SET = ' . $tbl_charset;
+    $result        = PMA_mysql_query($sql_query, $userlink) or PMA_mysqlDie(PMA_mysql_error($userlink), $sql_query, '', $err_url);
     $message       = $strSuccess;
 }
 if (isset($submitoptions)) {

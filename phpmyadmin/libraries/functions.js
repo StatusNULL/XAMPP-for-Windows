@@ -1,4 +1,4 @@
-/* $Id: functions.js,v 2.0 2003/11/18 15:20:43 nijel Exp $ */
+/* $Id: functions.js,v 2.2 2004/01/05 16:10:15 garvinhicking Exp $ */
 
 
 /**
@@ -423,6 +423,11 @@ function setPointer(theRow, theRowNum, theAction, theDefaultColor, thePointerCol
         else if (theAction == 'click' && theMarkColor != '') {
             newColor              = theMarkColor;
             marked_row[theRowNum] = true;
+            // Garvin: deactivated onclick marking of the checkbox because it's also executed
+            // when an action (like edit/delete) on a single item is performed. Then the checkbox
+            // would get deactived, even though we need it activated. Maybe there is a way
+            // to detect if the row was clicked, and not an item therein...
+            // document.getElementById('id_rows_to_delete' + theRowNum).checked = true;
         }
     }
     // 4.1.2 Current color is the pointer one
@@ -434,6 +439,7 @@ function setPointer(theRow, theRowNum, theAction, theDefaultColor, thePointerCol
         else if (theAction == 'click' && theMarkColor != '') {
             newColor              = theMarkColor;
             marked_row[theRowNum] = true;
+            // document.getElementById('id_rows_to_delete' + theRowNum).checked = true;
         }
     }
     // 4.1.3 Current color is the marker one
@@ -445,6 +451,7 @@ function setPointer(theRow, theRowNum, theAction, theDefaultColor, thePointerCol
             marked_row[theRowNum] = (typeof(marked_row[theRowNum]) == 'undefined' || !marked_row[theRowNum])
                                   ? true
                                   : null;
+            // document.getElementById('id_rows_to_delete' + theRowNum).checked = false;
         }
     } // end 4
 

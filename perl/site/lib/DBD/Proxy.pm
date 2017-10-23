@@ -835,7 +835,7 @@ and fast CGI applications.
 This attribute can be used to reduce network traffic: By default calls
 to $dbh->quote() are passed to the remote driver.  Of course this slows
 down things quite a lot, but is the safest default behaviour.
-  
+
 However, if you set the I<proxy_quote> attribute to the value 'C<local>'
 either in the database handle or in the statement handle, and the call
 to quote has only one parameter, then the local default DBI quote
@@ -866,12 +866,12 @@ executing the above example in two steps:
 =over
 
 =item 1.)
- 
+
 The first step is fetching the value of the key "csv_tables" in the
 handle $dbh. The value returned is complex, a hash ref.
- 
+
 =item 2.)
- 
+
 The second step is storing some value (the right hand side of the
 assignment) as the key "passwd" in the hash ref from step 1.
 

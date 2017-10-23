@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_printview.php,v 2.2.2.1 2003/12/22 19:41:53 lem9 Exp $ */
+/* $Id: db_printview.php,v 2.3 2003/12/22 19:39:49 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 

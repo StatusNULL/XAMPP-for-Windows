@@ -1,16 +1,16 @@
-  ApacheFriends XAMPP Version 1.3 für Windows (09.02.2004)
+  ApacheFriends XAMPP Version 1.4 für Windows (25.03.2004)
 
-  + Apache 2.0.48
-  + MySQL 4.0.17
+  + Apache 2.0.49
+  + MySQL 4.0.18
   + PHP 4.3.4 + PEAR
   + mod_php 4.3.4 
-  + Perl 5.8.2 
-  + mod_perl 1.99_12
-  + mod_ssl 2.0.48
-  + openssl 0.9.7c
+  + Perl 5.8.3 
+  + mod_perl 1.99_13
+  + mod_ssl 2.0.49
+  + openssl 0.9.7d
   + SQLite 2.8.11  + mod_auth_mysql (only experimental)
 
-  + PHPMyAdmin 2.5.5 pl1
+  + PHPMyAdmin 2.5.6
   + Webalizer 2.01-10
   + Mercury Mail Transport System for Win32 and NetWare Systems v3.32
   + JpGraph 1.14 (only for non-commercial, open-source and educational use)
@@ -189,5 +189,5 @@ PHPMyAdmin zugreifen darf.
 ---------------------------------------------------------------	
     
 Have a lot of fun! Viel Spaß! Bonne Chance!
-Last revised version 09.02.2004 Kay Vogelgesang
+Last revised version 25.03.2004 Kay Vogelgesang
  

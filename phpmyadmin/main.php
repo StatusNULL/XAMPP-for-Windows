@@ -1,5 +1,5 @@
 <?php
-/* $Id: main.php,v 2.7 2003/12/09 15:06:08 lem9 Exp $ */
+/* $Id: main.php,v 2.8.2.1 2004/01/27 18:14:51 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -292,22 +292,32 @@ if ($server > 0) {
         <?php
         // The user is allowed to create a db
         if ($is_create_priv) {
-            echo "\n";
-            ?>
-        <!-- db creation form -->
-        <tr>
-            <td valign="baseline"><img src="<?php echo $item_img; ?>" width="7" height="7" alt="item" /></td>
-            <td>
-            <form method="post" action="db_create.php">
-                <?php echo $strCreateNewDatabase . '&nbsp;' . PMA_showMySQLDocu('Reference', 'CREATE_DATABASE'); ?><br />
-                <?php echo PMA_generate_common_hidden_inputs(); ?>
-                <input type="hidden" name="reload" value="1" />
-                <input type="text" name="db" value="<?php echo $db_to_create; ?>" maxlength="64" class="textfield" />
-                <input type="submit" value="<?php echo $strCreate; ?>" />
-            </form>
-            </td>
-        </tr>
-            <?php
+            echo "\n"
+               . '        <!-- db creation form -->' . "\n"
+               . '        <tr>' . "\n"
+               . '            <td valign="baseline"><img src="' . $item_img . '" width="7" height="7" alt="item" /></td>' . "\n"
+               . '            <td>' . "\n"
+               . '                <form method="post" action="db_create.php">' . "\n"
+               . '                    ' . $strCreateNewDatabase . '&nbsp;' . PMA_showMySQLDocu('Reference', 'CREATE_DATABASE') . "\n"
+               . '<br />' . "\n"
+               . PMA_generate_common_hidden_inputs(5)
+               . '                    <input type="hidden" name="reload" value="1" />' . "\n"
+               . '                    <input type="text" name="db" value="' . $db_to_create . '" maxlength="64" class="textfield" />' . "\n";
+
+            if (PMA_MYSQL_INT_VERSION >= 40101) {
+                require_once('./libraries/mysql_charsets.lib.php');
+                echo '                    <select name="db_charset">' . "\n"
+                   . '                        <option value="">' . $strCharset . '</option>' . "\n"
+                   . '                        <option value=""></option>' . "\n";
+                for ($i = 0; isset($mysql_charsets[$i]); $i++) {
+                    echo '                        <option value="' . htmlspecialchars($mysql_charsets[$i]) . '">' . htmlspecialchars($mysql_charsets[$i]) . '</option>' . "\n";
+                }
+                echo '                    </select>' . "\n";
+            }
+            echo '                    <input type="submit" value="' . $strCreate . '" />' . "\n"
+               . '                </form>' . "\n"
+               . '            </td>' . "\n"
+               . '        </tr>' . "\n";
         } else {
             echo "\n";
             ?>
@@ -639,7 +649,8 @@ if (PMA_PHP_INT_VERSION < 40100) {
  * Warning for old MySQL version
  */
 
-if (PMA_MYSQL_INT_VERSION < 32332) {
+// not yet defined before the server choice
+if (defined('PMA_MYSQL_INT_VERSION') && PMA_MYSQL_INT_VERSION < 32332) {
     echo '<p class="warning">' . sprintf($strUpgrade, 'MySQL', '3.23.32') . '</p>' . "\n";
 }
 

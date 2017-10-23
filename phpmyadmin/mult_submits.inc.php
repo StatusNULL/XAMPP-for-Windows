@@ -1,5 +1,5 @@
 <?php
-/* $Id: mult_submits.inc.php,v 2.3 2003/12/04 16:09:12 garvinhicking Exp $ */
+/* $Id: mult_submits.inc.php,v 2.3.4.1 2004/01/14 14:22:45 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -234,7 +234,7 @@ else if ($mult_btn == $strYes) {
                 break;
 
             case 'drop_fld':
-                PMA_relationsCleanupTable($db, $table, $selected[$i]);
+                PMA_relationsCleanupColumn($db, $table, $selected[$i]);
                 $sql_query .= (empty($sql_query) ? 'ALTER TABLE ' . PMA_backquote($table) : ',')
                            . ' DROP ' . PMA_backquote(urldecode($selected[$i]))
                            . (($i == $selected_cnt-1) ? ';' : '');

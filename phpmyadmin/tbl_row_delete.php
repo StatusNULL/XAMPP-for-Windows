@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_row_delete.php,v 2.4 2003/12/04 17:25:36 garvinhicking Exp $ */
+/* $Id: tbl_row_delete.php,v 2.4.4.3 2004/02/24 19:49:27 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 require_once('./libraries/grab_globals.lib.php');
 require_once('./libraries/common.lib.php');
@@ -24,6 +24,10 @@ if (isset($mult_btn)) {
 
 if ($submit_mult == 'row_edit') {
     $js_to_run = 'tbl_change.js';
+}
+
+if ($submit_mult == 'row_delete') {
+    $js_to_run = 'functions.js';
 }
 
 require_once('./header.inc.php');
@@ -80,6 +84,11 @@ if (!empty($submit_mult)) {
                 $pos       = $original_pos;
             }
             
+            // this is because sql.php could call tbl_properties_structure
+            // which would think it needs to call mult_submits.inc.php:
+            unset($submit_mult);
+            unset($mult_btn);
+
             require('./sql.php');
             
             /**

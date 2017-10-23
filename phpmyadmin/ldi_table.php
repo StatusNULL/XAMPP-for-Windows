@@ -1,5 +1,5 @@
 <?php
-/* $Id: ldi_table.php,v 2.2 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: ldi_table.php,v 2.3 2003/12/13 13:20:06 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -30,8 +30,12 @@ require('./tbl_properties_table_info.php');
     <table cellpadding="5" border="2">
     <tr>
         <td><?php echo $strLocationTextfile; ?></td>
-        <td colspan="2"><input type="file" name="textfile" />
+        <td colspan="2"><input type="file" name="textfile" />&nbsp;
         <?php
+echo PMA_displayMaximumUploadSize($max_upload_size);
+// some browsers should respect this :)
+echo '    ' . PMA_generateHiddenMaxFileSize($max_upload_size) . "\n";
+
 if (!empty($cfg['UploadDir'])) {
     if (substr($cfg['UploadDir'], -1) != '/') {
         $cfg['UploadDir'] .= '/';

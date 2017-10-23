@@ -1,4 +1,4 @@
-=head2 Tue Dec  9 10:28:57 2003: C<Module> L<Win32|Win32>
+=head2 Tue Feb  3 00:38:21 2004: C<Module> L<Win32|Win32>
 
 =over 4
 
@@ -12,7 +12,7 @@ C<LINKTYPE: dynamic>
 
 =item *
 
-C<VERSION: 0.21>
+C<VERSION: 0.22>
 
 =item *
 
@@ -20,7 +20,7 @@ C<EXE_FILES: >
 
 =back
 
-=head2 Tue Dec  9 10:29:04 2003: C<Module> L<Win32::AuthenticateUser|Win32::AuthenticateUser>
+=head2 Tue Feb  3 00:38:28 2004: C<Module> L<Win32::AuthenticateUser|Win32::AuthenticateUser>
 
 =over 4
 
@@ -42,7 +42,7 @@ C<EXE_FILES: >
 
 =back
 
-=head2 Tue Dec  9 10:29:09 2003: C<Module> L<ActiveState::RelocateTree|ActiveState::RelocateTree>
+=head2 Tue Feb  3 00:38:33 2004: C<Module> L<ActiveState::RelocateTree|ActiveState::RelocateTree>
 
 =over 4
 
@@ -64,7 +64,7 @@ C<EXE_FILES: bin/reloc_perl>
 
 =back
 
-=head2 Tue Dec  9 10:29:19 2003: C<Module> L<Compress::Zlib|Compress::Zlib>
+=head2 Tue Feb  3 00:38:44 2004: C<Module> L<Compress::Zlib|Compress::Zlib>
 
 =over 4
 
@@ -86,7 +86,7 @@ C<EXE_FILES: >
 
 =back
 
-=head2 Tue Dec  9 10:29:23 2003: C<Module> L<IO::Zlib|IO::Zlib>
+=head2 Tue Feb  3 00:38:47 2004: C<Module> L<IO::Zlib|IO::Zlib>
 
 =over 4
 
@@ -108,7 +108,7 @@ C<EXE_FILES: >
 
 =back
 
-=head2 Tue Dec  9 10:29:27 2003: C<Module> L<Archive::Tar|Archive::Tar>
+=head2 Tue Feb  3 00:38:51 2004: C<Module> L<Archive::Tar|Archive::Tar>
 
 =over 4
 
@@ -130,7 +130,7 @@ C<EXE_FILES: >
 
 =back
 
-=head2 Tue Dec  9 10:29:30 2003: C<Module> L<MD5|MD5>
+=head2 Tue Feb  3 00:38:55 2004: C<Module> L<MD5|MD5>
 
 =over 4
 
@@ -152,7 +152,7 @@ C<EXE_FILES: >
 
 =back
 
-=head2 Tue Dec  9 10:29:36 2003: C<Module> L<Digest::MD2|Digest::MD2>
+=head2 Tue Feb  3 00:39:01 2004: C<Module> L<Digest::MD2|Digest::MD2>
 
 =over 4
 
@@ -174,7 +174,7 @@ C<EXE_FILES: >
 
 =back
 
-=head2 Tue Dec  9 10:29:42 2003: C<Module> L<Digest::MD4|Digest::MD4>
+=head2 Tue Feb  3 00:39:07 2004: C<Module> L<Digest::MD4|Digest::MD4>
 
 =over 4
 
@@ -196,7 +196,7 @@ C<EXE_FILES: >
 
 =back
 
-=head2 Tue Dec  9 10:29:48 2003: C<Module> L<Digest::SHA1|Digest::SHA1>
+=head2 Tue Feb  3 00:39:13 2004: C<Module> L<Digest::SHA1|Digest::SHA1>
 
 =over 4
 
@@ -218,7 +218,7 @@ C<EXE_FILES: >
 
 =back
 
-=head2 Tue Dec  9 10:29:52 2003: C<Module> L<Digest::HMAC|Digest::HMAC>
+=head2 Tue Feb  3 00:39:17 2004: C<Module> L<Digest::HMAC|Digest::HMAC>
 
 =over 4
 
@@ -240,7 +240,7 @@ C<EXE_FILES: >
 
 =back
 
-=head2 Tue Dec  9 10:29:55 2003: C<Module> L<Data::Dump|Data::Dump>
+=head2 Tue Feb  3 00:39:20 2004: C<Module> L<Data::Dump|Data::Dump>
 
 =over 4
 
@@ -262,7 +262,7 @@ C<EXE_FILES: >
 
 =back
 
-=head2 Tue Dec  9 10:29:59 2003: C<Module> L<File::CounterFile|File::CounterFile>
+=head2 Tue Feb  3 00:39:24 2004: C<Module> L<File::CounterFile|File::CounterFile>
 
 =over 4
 
@@ -284,7 +284,7 @@ C<EXE_FILES: >
 
 =back
 
-=head2 Tue Dec  9 10:30:02 2003: C<Module> L<Font::AFM|Font::AFM>
+=head2 Tue Feb  3 00:39:28 2004: C<Module> L<Font::AFM|Font::AFM>
 
 =over 4
 
@@ -306,7 +306,7 @@ C<EXE_FILES: >
 
 =back
 
-=head2 Tue Dec  9 10:30:06 2003: C<Module> L<HTML::Tagset|HTML::Tagset>
+=head2 Tue Feb  3 00:39:31 2004: C<Module> L<HTML::Tagset|HTML::Tagset>
 
 =over 4
 
@@ -328,7 +328,7 @@ C<EXE_FILES: >
 
 =back
 
-=head2 Tue Dec  9 10:30:13 2003: C<Module> L<HTML::Parser|HTML::Parser>
+=head2 Tue Feb  3 00:39:38 2004: C<Module> L<HTML::Parser|HTML::Parser>
 
 =over 4
 
@@ -350,7 +350,7 @@ C<EXE_FILES: >
 
 =back
 
-=head2 Tue Dec  9 10:30:16 2003: C<Module> L<HTML-Tree|HTML-Tree>
+=head2 Tue Feb  3 00:39:42 2004: C<Module> L<HTML-Tree|HTML-Tree>
 
 =over 4
 
@@ -372,7 +372,7 @@ C<EXE_FILES: >
 
 =back
 
-=head2 Tue Dec  9 10:30:21 2003: C<Module> L<URI|URI>
+=head2 Tue Feb  3 00:39:47 2004: C<Module> L<URI|URI>
 
 =over 4
 
@@ -394,7 +394,7 @@ C<EXE_FILES: >
 
 =back
 
-=head2 Tue Dec  9 10:30:32 2003: C<Module> L<libwww-perl|libwww-perl>
+=head2 Tue Feb  3 00:39:59 2004: C<Module> L<libwww-perl|libwww-perl>
 
 =over 4
 
@@ -416,7 +416,7 @@ C<EXE_FILES: bin/lwp-request bin/lwp-mirror bin/lwp-rget bin/lwp-download bin/GE
 
 =back
 
-=head2 Tue Dec  9 10:30:50 2003: C<Module> L<XML::Parser|XML::Parser>
+=head2 Tue Feb  3 00:40:18 2004: C<Module> L<XML::Parser|XML::Parser>
 
 =over 4
 
@@ -438,7 +438,7 @@ C<EXE_FILES: >
 
 =back
 
-=head2 Tue Dec  9 10:30:54 2003: C<Module> L<XML::Simple|XML::Simple>
+=head2 Tue Feb  3 00:40:22 2004: C<Module> L<XML::Simple|XML::Simple>
 
 =over 4
 
@@ -460,7 +460,7 @@ C<EXE_FILES: >
 
 =back
 
-=head2 Tue Dec  9 10:31:01 2003: C<Module> L<SOAP::Lite|SOAP::Lite>
+=head2 Tue Feb  3 00:40:29 2004: C<Module> L<SOAP::Lite|SOAP::Lite>
 
 =over 4
 
@@ -482,7 +482,7 @@ C<EXE_FILES: bin/SOAPsh.pl bin/XMLRPCsh.pl bin/stubmaker.pl>
 
 =back
 
-=head2 Tue Dec  9 10:31:26 2003: C<Module> L<Archive::Zip|Archive::Zip>
+=head2 Tue Feb  3 00:40:55 2004: C<Module> L<Archive::Zip|Archive::Zip>
 
 =over 4
 
@@ -504,7 +504,7 @@ C<EXE_FILES: crc32>
 
 =back
 
-=head2 Tue Dec  9 10:31:27 2003: C<Module> L<Text::Autoformat|Text::Autoformat>
+=head2 Tue Feb  3 00:40:55 2004: C<Module> L<Text::Autoformat|Text::Autoformat>
 
 =over 4
 
@@ -526,7 +526,7 @@ C<EXE_FILES: >
 
 =back
 
-=head2 Tue Dec  9 10:31:28 2003: C<Module> L<Text::Reform|Text::Reform>
+=head2 Tue Feb  3 00:40:56 2004: C<Module> L<Text::Reform|Text::Reform>
 
 =over 4
 
@@ -548,7 +548,7 @@ C<EXE_FILES: >
 
 =back
 
-=head2 Tue Dec  9 10:31:28 2003: C<Module> L<Unicode::String|Unicode::String>
+=head2 Tue Feb  3 00:40:57 2004: C<Module> L<Unicode::String|Unicode::String>
 
 =over 4
 
@@ -570,7 +570,7 @@ C<EXE_FILES: >
 
 =back
 
-=head2 Tue Dec  9 10:31:30 2003: C<Module> L<PPM3|PPM3>
+=head2 Tue Feb  3 00:40:59 2004: C<Module> L<PPM3|PPM3>
 
 =over 4
 
@@ -584,7 +584,7 @@ C<LINKTYPE: dynamic>
 
 =item *
 
-C<VERSION: undef>
+C<VERSION: 3.1>
 
 =item *
 
@@ -592,7 +592,7 @@ C<EXE_FILES: bin/ppm3-bin bin/ppm3>
 
 =back
 
-=head2 Tue Dec  9 10:31:49 2003: C<Module> L<ActiveState::Rx|ActiveState::Rx>
+=head2 Tue Feb  3 00:41:19 2004: C<Module> L<ActiveState::Rx|ActiveState::Rx>
 
 =over 4
 
@@ -614,7 +614,7 @@ C<EXE_FILES: >
 
 =back
 
-=head2 Tue Dec  9 10:31:52 2003: C<Module> L<ActivePerl::DocTools|ActivePerl::DocTools>
+=head2 Tue Feb  3 00:41:23 2004: C<Module> L<ActivePerl::DocTools|ActivePerl::DocTools>
 
 =over 4
 
@@ -636,7 +636,7 @@ C<EXE_FILES: >
 
 =back
 
-=head2 Tue Dec  9 10:37:42 2003: C<Module> L<Tk|Tk>
+=head2 Tue Feb  3 00:47:08 2004: C<Module> L<Tk|Tk>
 
 =over 4
 
@@ -658,7 +658,7 @@ C<EXE_FILES: ptksh ptked>
 
 =back
 
-=head2 Mon Feb  2 20:32:14 2004: C<Module> L<mod_perl|mod_perl>
+=head2 Thu Mar 25 04:31:48 2004: C<Module> L<DBI|DBI>
 
 =over 4
 
@@ -672,7 +672,29 @@ C<LINKTYPE: dynamic>
 
 =item *
 
-C<VERSION: 1.99_12>
+C<VERSION: 1.42>
+
+=item *
+
+C<EXE_FILES: dbiproxy dbiprof>
+
+=back
+
+=head2 Thu Mar 25 05:13:32 2004: C<Module> L<mod_perl|mod_perl>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.99_13>
 
 =item *
 
@@ -680,7 +702,7 @@ C<EXE_FILES: bin/mp2doc bin/mp2bug>
 
 =back
 
-=head2 Mon Feb  2 22:08:11 2004: C<Module> L<DBI|DBI>
+=head2 Thu Mar 25 05:40:03 2004: C<Module> L<mod_perl|mod_perl>
 
 =over 4
 
@@ -694,55 +716,11 @@ C<LINKTYPE: dynamic>
 
 =item *
 
-C<VERSION: 1.40>
+C<VERSION: 1.99_13>
 
 =item *
 
-C<EXE_FILES: dbiproxy dbiprof>
-
-=back
-
-=head2 Mon Feb  2 22:12:50 2004: C<Module> L<DBD::Multiplex|DBD::Multiplex>
-
-=over 4
-
-=item *
-
-C<installed into: C:\wampp2\perl\site\lib>
-
-=item *
-
-C<LINKTYPE: dynamic>
-
-=item *
-
-C<VERSION: 0.9>
-
-=item *
-
-C<EXE_FILES: >
-
-=back
-
-=head2 Mon Feb  2 22:13:48 2004: C<Module> L<DBI|DBI>
-
-=over 4
-
-=item *
-
-C<installed into: C:\wampp2\perl\site\lib>
-
-=item *
-
-C<LINKTYPE: dynamic>
-
-=item *
-
-C<VERSION: 1.40>
-
-=item *
-
-C<EXE_FILES: dbiproxy dbiprof>
+C<EXE_FILES: bin/mp2doc bin/mp2bug>
 
 =back
 

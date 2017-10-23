@@ -1,5 +1,5 @@
 <?php
-/* $Id: display_tbl.lib.php,v 2.12.2.2 2004/01/02 13:36:54 lem9 Exp $ */
+/* $Id: display_tbl.lib.php,v 2.17.2.2 2004/02/11 18:13:31 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -93,7 +93,7 @@ function PMA_setDisplayMode(&$the_disp_mode, &$the_total)
         else if ($GLOBALS['is_show']) {
             // 2.2.1 TODO : defines edit/delete links depending on show statement
             $tmp = preg_match('@^SHOW[[:space:]]+(VARIABLES|(FULL[[:space:]]+)?PROCESSLIST|STATUS|TABLE|GRANTS|CREATE|LOGS|DATABASES|FIELDS)@i', $GLOBALS['sql_query'], $which);
-            if (strpos(' ' . strtoupper($which[1]), 'PROCESSLIST') > 0) {
+            if (isset($which[1]) && strpos(' ' . strtoupper($which[1]), 'PROCESSLIST') > 0) {
                 $do_display['edit_lnk'] = 'nn'; // no edit link
                 $do_display['del_lnk']  = 'kp'; // "kill process" type edit link
             }
@@ -753,7 +753,8 @@ function PMA_displayTableHeaders(&$is_display, &$fields_meta, $fields_cnt = 0, $
                || ( isset($analyzed_sql[0]['select_expr'][$i]['expr'])
                    && isset($analyzed_sql[0]['select_expr'][$i]['column'])
                    && $analyzed_sql[0]['select_expr'][$i]['expr'] !=
-                   $analyzed_sql[0]['select_expr'][$i]['column']) ) {
+                   $analyzed_sql[0]['select_expr'][$i]['column']
+                   && !empty($fields_meta[$i]->table)) ) {
                 $sort_tbl = PMA_backquote($fields_meta[$i]->table) . '.';
             } else {
                 $sort_tbl = '';
@@ -943,6 +944,7 @@ function PMA_displayTableBody(&$dt_result, &$is_display, $map, $analyzed_sql)
     global $sql_query, $pos, $session_max_rows, $fields_meta, $fields_cnt;
     global $vertical_display, $disp_direction, $repeat_cells, $highlight_columns;
     global $dontlimitchars;
+    global $row; // mostly because of browser transformations, to make the row-data accessible in a plugin
 
     if (!is_array($map)) {
         $map = array();
@@ -1141,6 +1143,7 @@ function PMA_displayTableBody(&$dt_result, &$is_display, $map, $analyzed_sql)
                                 . PMA_generate_common_url($row['dbase'], '')
                                 . '&amp;id_bookmark=' . $row['id']
                                 . '&amp;action_bookmark=0'
+                                . '&amp;action_bookmark_all=1'
                                 . '&amp;SQL=' . $GLOBALS['strExecuteBookmarked']
                                 .' " title="' . $GLOBALS['strExecuteBookmarked'] . '">';
 
@@ -1487,9 +1490,9 @@ function PMA_displayTableBody(&$dt_result, &$is_display, $map, $analyzed_sql)
         }
 
 
-        if (!empty($del_url)) {
+        if (!empty($del_url) && $is_display['del_lnk'] != 'kp') {
             $vertical_display['row_delete'][$row_no] .= '    <td width="10" align="center" valign="' . ($bookmark_go != '' ? 'top' : 'middle') . '" bgcolor="' . $bgcolor . '">' . "\n"
-                                                     .  '        <input type="checkbox" name="rows_to_delete[' . $uva_condition . ']" value="' . $del_query . '" />' . "\n"
+                                                     .  '        <input type="checkbox" id="id_rows_to_delete' . $row_no . '" name="rows_to_delete[' . $uva_condition . ']" value="' . $del_query . '" />' . "\n"
                                                      .  '    </td>' . "\n";
         } else {
             unset($vertical_display['row_delete'][$row_no]);

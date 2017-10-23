@@ -1,4 +1,4 @@
-# Net::Cmd.pm $Id: //depot/libnet/Net/Cmd.pm#30 $
+# Net::Cmd.pm $Id: //depot/libnet/Net/Cmd.pm#33 $
 #
 # Copyright (c) 1995-1997 Graham Barr <gbarr@pobox.com>. All rights reserved.
 # This program is free software; you can redistribute it and/or
@@ -21,7 +21,7 @@ BEGIN {
   }
 }
 
-$VERSION = "2.23";
+$VERSION = "2.24";
 @ISA     = qw(Exporter);
 @EXPORT  = qw(CMD_INFO CMD_OK CMD_MORE CMD_REJECT CMD_ERROR CMD_PENDING);
 
@@ -198,7 +198,7 @@ sub command
 
 
  $cmd->dataend()
-    if(exists ${*$cmd}{'net_cmd_lastch'});
+    if(exists ${*$cmd}{'net_cmd_need_crlf'});
 
  if (scalar(@_))
   {
@@ -392,8 +392,13 @@ sub datasend
 
  return 0 unless defined(fileno($cmd));
 
- return 1
-    unless length($line);
+ unless (length $line) {
+   # Even though we are not sending anything, the fact we were
+   # called means that dataend needs to be called before the next
+   # command, which happens of net_cmd_need_crlf exists
+   ${*$cmd}{'net_cmd_need_crlf'} ||= 0;
+   return 1;
+ }
 
  if($cmd->debug) {
    foreach my $b (split(/\n/,$line)) {
@@ -401,23 +406,70 @@ sub datasend
    }
   }
 
- # Translate LF => CRLF, but not if the LF is
- # already preceeded by a CR
- $line =~ s/\G()\n|([^\r\n])\n/$+\015\012/sgo;
-
- ${*$cmd}{'net_cmd_lastch'} ||= " ";
- $line = ${*$cmd}{'net_cmd_lastch'} . $line;
+ $line =~ s/\r?\n/\r\n/sg;
+ $line =~ tr/\r\n/\015\012/ unless "\r" eq "\015";
 
  $line =~ s/(\012\.)/$1./sog;
+ $line =~ s/^\./../ unless ${*$cmd}{'net_cmd_need_crlf'};
 
- ${*$cmd}{'net_cmd_lastch'} = substr($line,-1,1);
+ ${*$cmd}{'net_cmd_need_crlf'} = substr($line,-1,1) ne "\012";
 
- my $len = length($line) - 1;
- my $offset = 1;
+ my $len = length($line);
+ my $offset = 0;
  my $win = "";
  vec($win,fileno($cmd),1) = 1;
  my $timeout = $cmd->timeout || undef;
 
+ local $SIG{PIPE} = 'IGNORE' unless $^O eq 'MacOS';
+
+ while($len)
+  {
+   my $wout;
+   if (select(undef,$wout=$win, undef, $timeout) > 0)
+    {
+     my $w = syswrite($cmd, $line, $len, $offset);
+     unless (defined($w))
+      {
+       carp("$cmd: $!") if $cmd->debug;
+       return undef;
+      }
+     $len -= $w;
+     $offset += $w;
+    }
+   else
+    {
+     carp("$cmd: Timeout") if($cmd->debug);
+     return undef;
+    }
+  }
+
+ 1;
+}
+
+sub rawdatasend
+{
+ my $cmd = shift;
+ my $arr = @_ == 1 && ref($_[0]) ? $_[0] : \@_;
+ my $line = join("" ,@$arr);
+
+ return 0 unless defined(fileno($cmd));
+
+ return 1
+    unless length($line);
+
+ if($cmd->debug)
+  {
+   my $b = "$cmd>>> ";
+   print STDERR $b,join("\n$b",split(/\n/,$line)),"\n";
+  }
+
+ my $len = length($line);
+ my $offset = 0;
+ my $win = "";
+ vec($win,fileno($cmd),1) = 1;
+ my $timeout = $cmd->timeout || undef;
+
+ local $SIG{PIPE} = 'IGNORE' unless $^O eq 'MacOS';
  while($len)
   {
    my $wout;
@@ -449,23 +501,18 @@ sub dataend
  return 0 unless defined(fileno($cmd));
 
  return 1
-    unless(exists ${*$cmd}{'net_cmd_lastch'});
+    unless(exists ${*$cmd}{'net_cmd_need_crlf'});
 
- if(${*$cmd}{'net_cmd_lastch'} eq "\015")
-  {
-   syswrite($cmd,"\012",1);
-  }
- elsif(${*$cmd}{'net_cmd_lastch'} ne "\012")
-  {
-   syswrite($cmd,"\015\012",2);
-  }
+ local $SIG{PIPE} = 'IGNORE' unless $^O eq 'MacOS';
+ syswrite($cmd,"\015\012",2)
+    if ${*$cmd}{'net_cmd_need_crlf'};
 
  $cmd->debug_print(1, ".\n")
     if($cmd->debug);
 
  syswrite($cmd,".\015\012",3);
 
- delete ${*$cmd}{'net_cmd_lastch'};
+ delete ${*$cmd}{'net_cmd_need_crlf'};
 
  $cmd->response() == CMD_OK;
 }
@@ -564,11 +611,11 @@ These methods provide a user interface to the C<Net::Cmd> object.
 =item debug ( VALUE )
 
 Set the level of debug information for this object. If C<VALUE> is not given
-then the current state is returned. Otherwise the state is changed to 
-C<VALUE> and the previous state returned. 
+then the current state is returned. Otherwise the state is changed to
+C<VALUE> and the previous state returned.
 
 Different packages
-may implement different levels of debug but a non-zero value results in 
+may implement different levels of debug but a non-zero value results in
 copies of all commands and responses also being sent to STDERR.
 
 If C<VALUE> is C<undef> then the debug level will be set to the default
@@ -614,7 +661,7 @@ returns true if C<response> returns CMD_OK.
 
 =head1 CLASS METHODS
 
-These methods are not intended to be called by the user, but used or 
+These methods are not intended to be called by the user, but used or
 over-ridden by a sub-class of C<Net::Cmd>
 
 =over 4
@@ -670,6 +717,11 @@ some C<debug_print> calls into your method.
 
 Unget a line of text from the server.
 
+=item rawdatasend ( DATA )
+
+Send data to the remote server without performing any conversions. C<DATA>
+is a scalar.
+
 =item read_until_dot ()
 
 Read data from the remote server until a line consisting of a single '.'.
@@ -707,6 +759,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/Cmd.pm#30 $>
+I<$Id: //depot/libnet/Net/Cmd.pm#33 $>
 
 =cut

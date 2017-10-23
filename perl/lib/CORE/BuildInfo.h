@@ -1,15 +1,15 @@
 /* BuildInfo.h
  *
- * Copyright (c) 1998-2003 ActiveState Corp.  All rights reserved.
+ * Copyright (c) 1998-2004 ActiveState Corp.  All rights reserved.
  *
  */
 
 #ifndef ___BuildInfo__h___
 #define ___BuildInfo__h___
 
-#define PRODUCT_BUILD_NUMBER	"808"
-#define PERLFILEVERSION		"5,8,2,808\0"
-#define PERLRC_VERSION		5,8,2,808
+#define PRODUCT_BUILD_NUMBER	"809"
+#define PERLFILEVERSION		"5,8,3,809\0"
+#define PERLRC_VERSION		5,8,3,809
 #define ACTIVEPERL_CHANGELIST   ""
 #define PERLPRODUCTVERSION	"Build " PRODUCT_BUILD_NUMBER ACTIVEPERL_CHANGELIST "\0"
 #define PERLPRODUCTNAME		"ActivePerl\0"

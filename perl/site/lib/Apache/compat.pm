@@ -1,3 +1,17 @@
+# Copyright 2001-2004 The Apache Software Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 package Apache::compat;
 
 use strict;
@@ -139,6 +153,34 @@ EOI
 }
 EOI
 
+    'Apache::server_root_relative' => <<'EOI',
+{
+    require Apache::Server;
+    require Apache::ServerUtil;
+
+    my $orig_sub = *Apache::Server::server_root_relative{CODE};
+    *Apache::server_root_relative = sub {
+        my $class = shift;
+        return Apache->server->server_root_relative(@_);
+    };
+    $orig_sub;
+}
+
+EOI
+
+    'Apache::Util::ht_time' => <<'EOI',
+{
+    require Apache::Util;
+    my $orig_sub = *Apache::Util::ht_time{CODE};
+    *Apache::Util::ht_time = sub {
+        my $r = Apache::compat::request('Apache::Util::ht_time');
+        return $orig_sub->($r->pool, @_);
+    };
+    $orig_sub;
+}
+
+EOI
+
 );
 
 my %overridden_mp2_api = ();
@@ -210,7 +252,7 @@ sub request {
 
 package Apache::Server;
 # XXX: is that good enough? see modperl/src/modules/perl/mod_perl.c:367
-our $CWD = Apache->server_root_relative();
+our $CWD = Apache::server_root;
 
 our $AddPerlVersion = 1;
 
@@ -320,6 +362,10 @@ sub hard_timeout {}
 sub kill_timeout {}
 sub reset_timeout {}
 
+# this function is from mp1's Apache::SubProcess 3rd party module
+# which is now a part of mp2 API. this function doesn't exist in 2.0.
+sub cleanup_for_exec {}
+
 sub current_callback {
     return Apache::current_callback();
 }
@@ -334,9 +380,6 @@ sub send_http_header {
 
     $r->content_type($type);
 }
-
-#to support $r->server_root_relative
-*server_root_relative = \&Apache::server_root_relative;
 
 #we support Apache->request; this is needed to support $r->request
 #XXX: seems sorta backwards
@@ -406,7 +449,7 @@ sub get_remote_host {
     $r->connection->get_remote_host($type, $r->per_dir_config);
 }
 
-#XXX: should port 1.x's Apache::unescape_url_info
+#XXX: should port 1.x's Apache::URI::unescape_url_info
 sub parse_args {
     my($r, $string) = @_;
     return () unless defined $string and $string;
@@ -589,7 +632,8 @@ sub tmpfile {
         my $tmpfile = "$TMPDIR/${$}" . $TMPNAM++;
         my $fh = $class->new;
 
-        sysopen($fh, $tmpfile, $Mode, $Perms);
+        sysopen $fh, $tmpfile, $Mode, $Perms
+            or die "failed to open $tmpfile: $!";
         $r->pool->cleanup_register(sub { unlink $tmpfile });
 
         if ($fh) {
@@ -636,7 +680,7 @@ sub size_string {
     return $size;
 }
 
-*unescape_uri = \&Apache::unescape_url;
+*unescape_uri = \&Apache::URI::unescape_url;
 
 sub escape_uri {
     my $path = shift;
@@ -660,18 +704,6 @@ sub escape_html {
     my $html = shift;
     $html =~ s/($html_escape)/$html_escapes{$1}/go;
     $html;
-}
-
-sub ht_time {
-    my($t, $fmt, $gmt) = @_;
-
-    $t   ||= time;
-    $fmt ||= '%a, %d %b %Y %H:%M:%S %Z';
-    $gmt = 1 unless @_ == 3;
-
-    my $r = Apache::compat::request('Apache::Util::ht_time');
-
-    return Apache::Util::format_time($t, $fmt, $gmt, $r->pool);
 }
 
 *parsedate = \&APR::Date::parse_http;
@@ -712,168 +744,3 @@ sub user      { shift; Apache->request->user(@_)      }
 
 1;
 __END__
-=head1 Name
-
-Apache::compat -- 1.0 backward compatibility functions deprecated in 2.0
-
-=head1 Synopsis
-
-  # either add at the very beginning of startup.pl
-  use Apache2
-  use Apache::compat;
-  # or httpd.conf
-  PerlModule Apache2
-  PerlModule Apache::compat
-
-  # override and restore compat functions colliding with mp2 API
-  Apache::compat::override_mp2_api('Apache::Connection::local_addr');
-  my ($local_port, $local_addr) = sockaddr_in($c->local_addr);
-  Apache::compat::restore_mp2_api('Apache::Connection::local_addr');
-
-=head1 Description
-
-C<Apache::compat> provides mod_perl 1.0 compatibility layer and can be
-used to smooth the transition process to mod_perl 2.0.
-
-It includes functions that have changed their API or were removed in
-mod_perl 2.0. If your code uses any of those functions, you should
-load this module at the server startup, and everything should work as
-it did in 1.0. If it doesn't please L<report the
-bug|docs::2.0::user::help::help/Reporting_Problems>, but before you
-do that please make sure that your code does work properly under
-mod_perl 1.0.
-
-However, remember, that it's implemented in pure Perl and not C,
-therefore its functionality is not optimized and it's the best to try
-to L<port your
-code|docs::2.0::user::porting::porting> not to use deprecated
-functions and stop using the compatibility layer.
-
-
-
-
-
-
-=head1 Compatibility Functions Colliding with mod_perl 2.0 API
-
-Most of the functions provided by Apache::compat don't interfere with
-mod_perl 2.0 API. However there are several functions which have the
-same name in the mod_perl 1.0 and mod_perl 2.0 API, accept the same
-number of arguments, but either the arguments themselves aren't the
-same or the return values are different. For example the mod_perl 1.0
-code:
-
-  require Socket;
-  my $sockaddr_in = $c->local_addr;
-  my ($local_port, $local_addr) = Socket::sockaddr_in($sockaddr_in);
-
-should be adjusted to be:
-
-  require Apache::Connection;
-  require APR::SocketAddr;
-  my $sockaddr = $c->local_addr;
-  my ($local_port, $local_addr) = ($sockaddr->port, $sockaddr->ip_get);
-
-to work under mod_perl 2.0.
-
-As you can see in mod_perl 1.0 API local_addr() was returning a
-SOCKADDR_IN object (see the Socket perl manpage), in mod_perl 2.0 API
-it returns an C<L<APR::SocketAddr|docs::2.0::api::APR::SocketAddr>>
-object, which is a totally different beast. If Apache::compat
-overrides the function C<local_addr()> to be back-compatible with
-mod_perl 1.0 API. Any code that relies on this function to work as it
-should under mod_perl 2.0 will be broken. Therefore the solution is
-not to override C<local_addr()> by default. Instead a special API is
-provided which overrides colliding functions only when needed and
-which can be restored when no longer needed. So for example if you
-have code from mod_perl 1.0:
-
-  my ($local_port, $local_addr) = Socket::sockaddr_in($c->local_addr);
-
-and you aren't ready to port it to to use the mp2 API:
-
-  my ($local_port, $local_addr) = ($c->local_addr->port,
-                                   $c->local_addr->ip_get);
-
-you could do the following:
-
-  Apache::compat::override_mp2_api('Apache::Connection::local_addr');
-  my ($local_port, $local_addr) = Socket::sockaddr_in($c->local_addr);
-  Apache::compat::restore_mp2_api('Apache::Connection::local_addr');
-
-Notice that you need to restore the API as soon as possible.
-
-Both C<override_mp2_api()> and C<restore_mp2_api()> accept a list of
-functions to operate on.
-
-=head2 Available Overridable Functions
-
-At the moment the following colliding functions are available for
-overriding:
-
-=over
-
-=item * C<Apache::RequestRec::notes>
-
-=item * C<Apache::RequestRec::finfo>
-
-=item * C<Apache::Connection::local_addr>
-
-=item * C<Apache::Connection::remote_addr>
-
-=back
-
-
-
-
-
-
-
-
-
-
-=head1 Use in CPAN Modules
-
-The short answer: B<Do not use> C<Apache::compat> in CPAN modules.
-
-The long answer:
-
-C<Apache::compat> is useful during the mod_perl 1.0 code
-porting. Though remember that it's implemented in pure Perl. In
-certain cases it overrides mod_perl 2.0 methods, because their API is
-very different and doesn't map 1:1 to mod_perl 1.0. So if anything,
-not under user's control, loads C<Apache::compat> user's code is
-forced to use the potentially slower method. Which is quite bad.
-
-Some users may choose to keep using C<Apache::compat> in production
-and it may perform just fine. Other users will choose not to use that
-module, by porting their code to use mod_perl 2.0 API. However it
-should be users' choice whether to load this module or not and not to
-be enforced by CPAN modules.
-
-If you port your CPAN modules to work with mod_perl 2.0, you should
-follow the porting L<Perl|docs::2.0::user::porting::porting> and
-L<XS|docs::2.0::devel::porting::porting> module guidelines.
-
-Users that are stuck with CPAN modules preloading C<Apache::compat>,
-can prevent this from happening by adding
-
-  $INC{'Apache/compat.pm'} = __FILE__;
-
-at the very beginning of their I<startup.pl>. But this will most
-certainly break the module that needed this module.
-
-=head1 API
-
-You should be reading the mod_perl 1.0 L<API
-docs|docs::1.0::api::index> for usage of the methods and functions
-in this package, since what this module is doing is providing a
-backwards compatibility and it makes no sense to duplicate
-documentation.
-
-Another important document to read is: L<Migrating from mod_perl 1.0
-to mod_perl 2.0|docs::2.0::user::porting::compat> which covers all
-mod_perl 1.0 constants, functions and methods that have changed in
-mod_perl 2.0.
-
-=cut

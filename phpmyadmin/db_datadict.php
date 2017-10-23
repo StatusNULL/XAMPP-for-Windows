@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_datadict.php,v 2.4.2.1 2003/12/22 19:37:37 lem9 Exp $ */
+/* $Id: db_datadict.php,v 2.5 2003/12/22 19:35:28 lem9 Exp $ */
 
 
 /**

@@ -1,5 +1,5 @@
 <?php
-/* $Id: serbian_latin-utf-8.inc.php,v 2.3 2003/12/02 18:03:32 lem9 Exp $ */
+/* $Id: serbian_latin-utf-8.inc.php,v 2.7.2.1 2004/02/08 13:22:31 lem9 Exp $ */
 
 /**
  * Translated by:
@@ -157,6 +157,7 @@ $strCriteria = 'Kriterijum';
 $strCroatian = 'Hrvatski';
 $strCyrillic = 'Ćirilični';
 $strCzech = 'Češki';
+$strCzechSlovak = 'Češko-slovački';
 
 $strDBComment = 'Komentar baze:';
 $strDBGContext = 'Kontekst';
@@ -266,6 +267,7 @@ $strFunction = 'Funkcija';
 $strGenBy = 'Generisao';
 $strGenTime = 'Vreme kreiranja';
 $strGeneralRelationFeat = 'Opšte osobine relacija';
+$strGeorgian = 'Gruzijski';
 $strGerman = 'Nemački';
 $strGlobal = 'globalno';
 $strGlobalPrivileges = 'Globalne privilegije';
@@ -365,6 +367,7 @@ $strMIME_transformation_note = 'Za listu dostupnih opcija transformacije i njiho
 $strMIME_transformation_options = 'Opcije transformacije';
 $strMIME_transformation_options_note = 'Molimo unesite vrednosti za opcije transformacije koristeći ovaj oblik: \'a\',\'b\',\'c\'...<br />Ako treba da unesete obrnutu kosu crtu ("\\") ili apostrof ("\'") u te vrednosti, stavite obrnutu kosu crtu ispred njih (na primer \'\\\\xyz\' ili \'a\\\'b\').';
 $strMIME_without = 'MIME-tipovi prikazani u kurzivu nemaju odvojene funkcije transformacije.';
+$strMaximumSize = 'Maksimalna večičina: %s%s';
 $strMissingBracket = 'Nedostaje zagrada';
 $strModifications = 'Izmene su sačuvane';
 $strModify = 'Promeni';
@@ -656,6 +659,7 @@ $strTotal = 'ukupno';
 $strTotalUC = 'Ukupno';
 $strTraditionalChinese = 'Tradicionalni kineski';
 $strTraffic = 'Saobraćaj';
+$strTransformation_application_octetstream__download = 'Prikazuje vezu za preuzimanje binarnih podataka za polje. Prva opcija je naziv binarne datoteke. Druga opcija je moguće ime polja reda tabele koji sadrži ime datoteke. Ako zadate drugu opciju, prva mora biti postavljena na prazan string.';
 $strTransformation_image_jpeg__inline = 'Prikazuje umanjenu sliku na koju je moguće kliknuti; opcije: širina, visina u pikselima (čuva originalni odnos)';
 $strTransformation_image_jpeg__link = 'Prikazuje link ka ovoj slici (npr. direktno preuzimanje iz BLOB-a).';
 $strTransformation_image_png__inline = 'Prikaži JPEG slike na strani';

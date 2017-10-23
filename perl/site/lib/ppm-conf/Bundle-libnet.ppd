@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOFTPKG NAME="Bundle-libnet" VERSION="1,00,0,0">
+  <IMPLEMENTATION>
+    <CODEBASE HREF="http://ppm.ActiveState.com/PPMPackages/5.8-windows/MSWin32-x86-multi-thread-5.8/Bundle-libnet.tar.gz" />
+    <DEPENDENCY NAME="libnet" VERSION="0,0,0,0" />
+    <DEPENDENCY NAME="Net-Telnet" VERSION="0,0,0,0" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    <OS NAME="MSWin32" />
+  </IMPLEMENTATION>
+  <ABSTRACT>A bundle to install all libnet related modules</ABSTRACT>
+  <AUTHOR>Graham Barr (gbarr@pobox.com)</AUTHOR>
+  <TITLE>Bundle-libnet</TITLE>
+</SOFTPKG>

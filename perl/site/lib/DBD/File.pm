@@ -5,11 +5,11 @@
 #
 #  This module is currently maintained by
 #
-#      Jeff Zucker
-#      <jeff@vpservices.com>
+#      Jeff Zucker < jzucker AT cpan.org >
 #
 #  The original author is Jochen Wiedmann.
 #
+#  Copyright (C) 2004 by Jeff Zucker
 #  Copyright (C) 1998 by Jochen Wiedmann
 #
 #  All rights reserved.
@@ -18,62 +18,43 @@
 #  General Public License or the Artistic License, as specified in
 #  the Perl README file.
 #
-
 require 5.004;
 use strict;
 
-
-require DynaLoader;
-require DBI;
-require SQL::Statement;
-require SQL::Eval;
+use DBI ();
+require DBI::SQL::Nano;
 my $haveFileSpec = eval { require File::Spec };
 
 package DBD::File;
 
-use vars qw(@ISA $VERSION $drh $err $errstr $sqlstate);
+use vars qw(@ISA $VERSION $drh $valid_attrs);
 
-@ISA = qw(DynaLoader);
+$VERSION = '0.30';      # bumped from 0.22 to 0.30 with inclusion in DBI
 
-$VERSION = '0.2001'; # FIRST JZ CHANGES (cached parser)
-
-$err = 0;		# holds error code   for DBI::err
-$errstr = "";		# holds error string for DBI::errstr
-$sqlstate = "";         # holds error state  for DBI::state
 $drh = undef;		# holds driver handle once initialised
-
 
 sub driver ($;$) {
     my($class, $attr) = @_;
-    my $drh = eval '$' . $class . "::drh";
-    if (!$drh) {
-	if (!$attr) { $attr = {} };
-	if (!exists($attr->{Attribution})) {
-	    $attr->{Attribution} = "$class by Jochen Wiedmann";
-	}
-	if (!exists($attr->{Version})) {
-	    $attr->{Version} = eval '$' . $class . '::VERSION';
-        }
-        if (!exists($attr->{Err})) {
-	    $attr->{Err} = eval '\$' . $class . '::err';
-        }
-        if (!exists($attr->{Errstr})) {
-	    $attr->{Errstr} = eval '\$' . $class . '::errstr';
-        }
-        if (!exists($attr->{State})) {
-	    $attr->{State} = eval '\$' . $class . '::state';
-        }
-        if (!exists($attr->{Name})) {
-	    my $c = $class;
-	    $c =~ s/^DBD\:\://;
-	    $attr->{Name} = $c;
-        }
+    return $drh if $drh;
 
-        $drh = DBI::_new_drh($class . "::dr", $attr);
+    DBI->setup_driver('DBD::File');
+    $attr ||= {};
+    no strict qw(refs);
+    if (!$attr->{Attribution}) {
+	$attr->{Attribution} = "$class by Jeff Zucker"
+	    if $class eq 'DBD::File';
+	$attr->{Attribution} ||= ${$class . '::ATTRIBUTION'}
+	    || "oops the author of $class forgot to define this";
     }
-    $drh;
+    $attr->{Version} ||= ${$class . '::VERSION'};
+    ($attr->{Name} = $class) =~ s/^DBD\:\:// unless $attr->{Name};
+    $drh = DBI::_new_drh($class . "::dr", $attr);
+    return $drh;
 }
 
+sub CLONE {
+    undef $drh;
+}
 
 package DBD::File::dr; # ====== DRIVER ======
 
@@ -85,7 +66,7 @@ sub connect ($$;$$$) {
     # create a 'blank' dbh
     my $this = DBI::_new_dbh($drh, {
 	'Name' => $dbname,
-	'USER' => $user, 
+	'USER' => $user,
 	'CURRENT_USER' => $user,
     });
 
@@ -105,9 +86,30 @@ sub connect ($$;$$$) {
 		$this->{$var} = $val;
 	    }
 	}
+        $this->{f_valid_attrs} = {
+            f_version    => 1  # DBD::File version
+          , f_dir        => 1  # base directory
+          , f_tables     => 1  # base directory
+        };
+        $this->{sql_valid_attrs} = {
+            sql_handler           => 1  # Nano or S:S
+          , sql_nano_version      => 1  # Nano version
+          , sql_statement_version => 1  # S:S version
+        };
     }
+    return set_versions($this);
+}
 
-    $this;
+sub set_versions {
+    my $this = shift;
+    $this->{f_version} = $DBD::File::VERSION;
+    for (qw( nano_version statement_version)) {
+        $this->{'sql_'.$_} = $DBI::SQL::Nano::versions->{$_}||'';
+    }
+    $this->{sql_handler} = ($this->{sql_statement_version})
+                         ? 'SQL::Statement'
+	                 : 'DBI::SQL::Nano';
+    return $this;
 }
 
 sub data_sources ($;$) {
@@ -116,7 +118,7 @@ sub data_sources ($;$) {
 	$attr->{'f_dir'} : $haveFileSpec ? File::Spec->curdir() : '.';
     my($dirh) = Symbol::gensym();
     if (!opendir($dirh, $dir)) {
-        DBI::set_err($drh, 1, "Cannot open directory $dir");
+        $drh->set_err(1, "Cannot open directory $dir: $!");
 	return undef;
     }
     my($file, @dsns, %names, $driver);
@@ -149,34 +151,38 @@ package DBD::File::db; # ====== DATABASE ======
 
 $DBD::File::db::imp_data_size = 0;
 
-
 sub prepare ($$;@) {
     my($dbh, $statement, @attribs)= @_;
 
-    # create a 'blank' dbh
+    # create a 'blank' sth
     my $sth = DBI::_new_sth($dbh, {'Statement' => $statement});
 
     if ($sth) {
-	$@ = '';
 	my $class = $sth->FETCH('ImplementorClass');
 	$class =~ s/::st$/::Statement/;
-###jz
-#         my($stmt) = eval { $class->new($statement) };
-#=pod
 	my($stmt);
-        my $sversion = $SQL::Statement::VERSION;
-	if ($SQL::Statement::VERSION > 1) {
+
+        # if using SQL::Statement version > 1
+        # cache the parser object if the DBD supports parser caching
+        # SQL::Nano and older SQL::Statements don't support this
+
+	if ( $dbh->{sql_handler} eq 'SQL::Statement'
+             and $dbh->{sql_statement_version} > 1)
+           {
             my $parser = $dbh->{csv_sql_parser_object};
-            $parser ||= $dbh->func('csv_cache_sql_parser_object');
-	    $stmt = eval { $class->new($statement,$parser) };
+            $parser ||= eval { $dbh->func('csv_cache_sql_parser_object') };
+            if ($@) {
+  	        $stmt = eval { $class->new($statement) };
+	    }
+            else {
+  	        $stmt = eval { $class->new($statement,$parser) };
+	    }
         }
         else {
 	    $stmt = eval { $class->new($statement) };
 	}
-#=cut
-###jzend
 	if ($@) {
-	    DBI::set_err($dbh, 1, $@);
+	    $dbh->set_err(1, $@);
 	    undef $sth;
 	} else {
 	    $sth->STORE('f_stmt', $stmt);
@@ -184,7 +190,6 @@ sub prepare ($$;@) {
 	    $sth->STORE('NUM_OF_PARAMS', scalar($stmt->params()));
 	}
     }
-
     $sth;
 }
 
@@ -198,23 +203,51 @@ sub FETCH ($$) {
 	return 1;
     } elsif ($attrib eq (lc $attrib)) {
 	# Driver private attributes are lower cased
-	return $dbh->{$attrib};
+
+        # Error-check for valid attributes
+        # not implemented yet, see STORE
+        #
+        return $dbh->{$attrib};
     }
     # else pass up to DBI to handle
-    return $dbh->DBD::_::db::FETCH($attrib);
+    return $dbh->SUPER::FETCH($attrib);
 }
 
 sub STORE ($$$) {
     my ($dbh, $attrib, $value) = @_;
+
     if ($attrib eq 'AutoCommit') {
 	return 1 if $value; # is already set
 	die("Can't disable AutoCommit");
     } elsif ($attrib eq (lc $attrib)) {
 	# Driver private attributes are lower cased
+
+  # I'm not implementing this yet becuase other drivers may be
+  # setting f_ and sql_ attrs I don't know about
+  # I'll investigate and publicize warnings to DBD authors
+  # then implement this
+  #
+        # return to implementor if not f_ or sql_
+        # not implemented yet
+        # my $class = $dbh->FETCH('ImplementorClass');
+        #
+        # if ( !$dbh->{f_valid_attrs}->{$attrib}
+        # and !$dbh->{sql_valid_attrs}->{$attrib}
+        # ) {
+	#    return $dbh->set_err( 1,"Invalid attribute '$attrib'");
+        # }
+        # else {
+  	#    $dbh->{$attrib} = $value;
+	# }
+
+        if ($attrib eq 'f_dir') {
+  	    return $dbh->set_err( 1,"No such directory '$value'")
+                unless -d $value;
+	}
 	$dbh->{$attrib} = $value;
 	return 1;
     }
-    return $dbh->DBD::_::db::STORE($attrib, $value);
+    return $dbh->SUPER::STORE($attrib, $value);
 }
 
 sub DESTROY ($) {
@@ -273,7 +306,7 @@ sub type_info_all ($) {
 	my($dir) = $dbh->{f_dir};
 	my($dirh) = Symbol::gensym();
 	if (!opendir($dirh, $dir)) {
-	    DBI::set_err($dbh, 1, "Cannot open directory $dir");
+	    $dbh->set_err(1, "Cannot open directory $dir: $!");
 	    return undef;
 	}
 	my($file, @tables, %names);
@@ -284,7 +317,7 @@ sub type_info_all ($) {
 	    }
 	}
 	if (!closedir($dirh)) {
-	    DBI::set_err($dbh, 1, "Cannot close directory $dir");
+	    $dbh->set_err(1, "Cannot close directory $dir: $!");
 	    return undef;
 	}
 
@@ -292,7 +325,7 @@ sub type_info_all ($) {
 	if (!$dbh2) {
 	    $dbh2 = $dbh->{'csv_sponge_driver'} = DBI->connect("DBI:Sponge:");
 	    if (!$dbh2) {
-	        DBI::set_err($dbh, 1, $DBI::errstr);
+	        $dbh->set_err(1, $DBI::errstr);
 		return undef;
 	    }
 	}
@@ -303,7 +336,7 @@ sub type_info_all ($) {
 	my $sth = $dbh2->prepare("TABLE_INFO", { 'rows' => \@tables,
 						 'NAMES' => $names });
 	if (!$sth) {
-	    DBI::set_err($dbh, 1, $dbh2->errstr());
+	    $dbh->set_err(1, $dbh2->errstr);
 	}
 	$sth;
     }
@@ -358,7 +391,6 @@ sub rollback ($) {
     0;
 }
 
-
 package DBD::File::st; # ====== STATEMENT ======
 
 $DBD::File::st::imp_data_size = 0;
@@ -379,10 +411,7 @@ sub execute {
     }
     my $stmt = $sth->{'f_stmt'};
     my $result = eval { $stmt->execute($sth, $params); };
-    if ($@) {
-        DBI::set_err($sth, 1, $@);
-	return undef;
-    }
+    return $sth->set_err(1,$@) if $@;
     if ($stmt->{'NUM_OF_FIELDS'}  &&  !$sth->FETCH('NUM_OF_FIELDS')) {
 	$sth->STORE('NUM_OF_FIELDS', $stmt->{'NUM_OF_FIELDS'});
     }
@@ -393,8 +422,7 @@ sub fetch ($) {
     my $sth = shift;
     my $data = $sth->{f_stmt}->{data};
     if (!$data  ||  ref($data) ne 'ARRAY') {
-	DBI::set_err($sth, 1,
-		     "Attempt to fetch row from a Non-SELECT statement");
+	$sth->set_err(1, "Attempt to fetch row from a Non-SELECT statement");
 	return undef;
     }
     my $dav = shift @$data;
@@ -429,17 +457,17 @@ sub FETCH ($$) {
 	return $sth->{$attrib};
     }
     # else pass up to DBI to handle
-    return $sth->DBD::_::st::FETCH($attrib);
+    return $sth->SUPER::FETCH($attrib);
 }
 
 sub STORE ($$$) {
     my ($sth, $attrib, $value) = @_;
     if ($attrib eq (lc $attrib)) {
 	# Private driver attributes are lower cased
-	$sth->{$attrib} = $value;
+ 	$sth->{$attrib} = $value;
 	return 1;
     }
-    return $sth->DBD::_::st::STORE($attrib, $value);
+    return $sth->SUPER::STORE($attrib, $value);
 }
 
 sub DESTROY ($) {
@@ -448,16 +476,20 @@ sub DESTROY ($) {
 
 sub rows ($) { shift->{'f_stmt'}->{'NUM_OF_ROWS'} };
 
-sub finish ($) { 1; }
-
 
 package DBD::File::Statement;
 
-my $locking = $^O ne 'MacOS'  &&
-              ($^O ne 'MSWin32' || !Win32::IsWin95())  &&
-              $^O ne 'VMS';
+# We may have a working flock() built-in but that doesn't mean that locking
+# will work on NFS (flock() may hang hard)
+my $locking = eval { flock STDOUT, 0; 1 };
 
-@DBD::File::Statement::ISA = qw(SQL::Statement);
+# Jochen's old check for flock()
+#
+# my $locking = $^O ne 'MacOS'  &&
+#               ($^O ne 'MSWin32' || !Win32::IsWin95())  &&
+#               $^O ne 'VMS';
+
+@DBD::File::Statement::ISA = qw(DBI::SQL::Nano::Statement);
 
 my $open_table_re =
     $haveFileSpec ?
@@ -466,15 +498,29 @@ my $open_table_re =
 	    quotemeta(File::Spec->updir()),
 	    quotemeta(File::Spec->rootdir()))
     : '(?:\.?\.)?\/';
-sub open_table ($$$$$) {
-    my($self, $data, $table, $createMode, $lockMode) = @_;
+
+sub get_file_name($$$) {
+    my($self,$data,$table)=@_;
+    $table =~ s/^\"//; # handle quoted identifiers
+    $table =~ s/\"$//;
     my $file = $table;
-    if ($file !~ /^$open_table_re/o) {
+    if ( $file !~ /^$open_table_re/o
+     and $file !~ m!^[/\\]!   # root
+     and $file !~ m!^[a-z]\:! # drive letter
+    ) {
 	$file = $haveFileSpec ?
 	    File::Spec->catfile($data->{Database}->{'f_dir'}, $table)
 		: $data->{Database}->{'f_dir'} . "/$table";
     }
+    return($table,$file);
+}
+
+sub open_table ($$$$$) {
+    my($self, $data, $table, $createMode, $lockMode) = @_;
+    my $file;
+    ($table,$file) = $self->get_file_name($data,$table);
     my $fh;
+    my $safe_drop = 1 if $self->{ignore_missing_table};
     if ($createMode) {
 	if (-f $file) {
 	    die "Cannot create table $table: Already exists";
@@ -487,11 +533,11 @@ sub open_table ($$$$$) {
 	}
     } else {
 	if (!($fh = IO::File->new($file, ($lockMode ? "r+" : "r")))) {
-	    die " Cannot open $file: $!";
+	    die " Cannot open $file: $!" unless $safe_drop;
 	}
     }
-    binmode($fh);
-    if ($locking) {
+    binmode($fh) if $fh;
+    if ($locking and $fh) {
 	if ($lockMode) {
 	    if (!flock($fh, 2)) {
 		die " Cannot obtain exclusive lock on $file: $!";
@@ -504,12 +550,13 @@ sub open_table ($$$$$) {
     }
     my $columns = {};
     my $array = [];
+    my $pos = $fh->tell() if $fh;
     my $tbl = {
 	file => $file,
 	fh => $fh,
 	col_nums => $columns,
 	col_names => $array,
-	first_row_pos => $fh->tell()
+	first_row_pos => $pos,
     };
     my $class = ref($self);
     $class =~ s/::Statement/::Table/;
@@ -520,13 +567,13 @@ sub open_table ($$$$$) {
 
 package DBD::File::Table;
 
-@DBD::File::Table::ISA = qw(SQL::Eval::Table);
+@DBD::File::Table::ISA = qw(DBI::SQL::Nano::Table);
 
 sub drop ($) {
     my($self) = @_;
     # We have to close the file before unlinking it: Some OS'es will
     # refuse the unlink otherwise.
-    $self->{'fh'}->close();
+    $self->{'fh'}->close() if $self->{fh};
     unlink($self->{'file'});
     return 1;
 }
@@ -558,18 +605,14 @@ __END__
 
 =head1 NAME
 
-DBD::File - Base class for writing DBI drivers for plain files
+DBD::File - Base class for writing DBI drivers
 
 =head1 SYNOPSIS
 
-    use DBI;
-    $dbh = DBI->connect("DBI:File:f_dir=/home/joe/csvdb")
-        or die "Cannot connect: " . $DBI::errstr;
-    $sth = $dbh->prepare("CREATE TABLE a (id INTEGER, name CHAR(10))")
-        or die "Cannot prepare: " . $dbh->errstr();
-    $sth->execute() or die "Cannot execute: " . $sth->errstr();
-    $sth->finish();
-    $dbh->disconnect();
+ This module is a base class for writing other DBDs.
+ It is not intended to function as a DBD itself.
+ If you want to access flatfiles, use DBD::AnyData, or DBD::CSV,
+ (both of which are subclasses of DBD::File).
 
 =head1 DESCRIPTION
 
@@ -680,28 +723,6 @@ L<Creating and dropping tables> above.
 
 =back
 
-
-=head1 TODO
-
-=over 4
-
-=item Joins
-
-The current version of the module works with single table SELECT's
-only, although the basic design of the SQL::Statement module allows
-joins and the likes.
-
-=item Table name mapping
-
-Currently it is not possible to use files with names like C<names.csv>.
-Instead you have to use soft links or rename files. As an alternative
-one might use, for example a dbh attribute 'table_map'. It might be a
-hash ref, the keys being the table names and the values being the file
-names.
-
-=back
-
-
 =head1 KNOWN BUGS
 
 =over 8
@@ -720,17 +741,16 @@ MacOS and Windows 95, as there's a single user anyways).
 
 This module is currently maintained by
 
-      Jeff Zucker
-      <jeff@vpservices.com>
+Jeff Zucker < jzucker @ cpan.org >
 
 The original author is Jochen Wiedmann.
 
+Copyright (C) 2004 by Jeff Zucker
 Copyright (C) 1998 by Jochen Wiedmann
 
 All rights reserved.
 
-You may distribute this module under the terms of either the GNU
-General Public License or the Artistic License, as specified in
+You may freely distribute and/or modify this module under the terms of either the GNU General Public License (GPL) or the Artistic License, as specified in
 the Perl README file.
 
 =head1 SEE ALSO

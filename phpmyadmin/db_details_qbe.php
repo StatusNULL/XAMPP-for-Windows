@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_details_qbe.php,v 2.3 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: db_details_qbe.php,v 2.4 2003/12/25 20:50:54 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -776,6 +776,11 @@ if (isset($Field) && count($Field) > 0) {
             $master = key($tab_wher);
         } else {
             // Now let's find out which of the tables has an index
+            // ( When the control user is the same as the normal user
+            // because he is using one of his databases as pmadb,
+            // the last db selected is not always the one where we need to work)
+            PMA_mysql_select_db($db);
+
             foreach($tab_all AS $tab) {
                 $ind_qry  = 'SHOW INDEX FROM ' . PMA_backquote($tab);
                 $ind_rs   = PMA_mysql_query($ind_qry);

@@ -1,5 +1,5 @@
 <?php
-/* $Id: charset_conversion.lib.php,v 2.2 2003/11/26 22:52:23 rabus Exp $ */
+/* $Id: charset_conversion.lib.php,v 2.3 2004/01/06 21:49:42 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -138,7 +138,8 @@ if (isset($cfg['AllowAnywhereRecoding'])
 function PMA_convert_display_charset($what) {
     global $cfg, $allow_recoding, $charset, $convcharset;
 
-    if (!(isset($cfg['AllowAnywhereRecoding']) && $cfg['AllowAnywhereRecoding'] && $allow_recoding)) {
+    if (!(isset($cfg['AllowAnywhereRecoding']) && $cfg['AllowAnywhereRecoding'] && $allow_recoding)
+        || $convcharset == $charset) { // rabus: if input and output charset are the same, we don't have to do anything...
         return $what;
     }
     else if (is_array($what)) {
@@ -207,7 +208,8 @@ function PMA_convert_display_charset($what) {
 function PMA_convert_charset($what) {
     global $cfg, $allow_recoding, $charset, $convcharset;
 
-    if (!(isset($cfg['AllowAnywhereRecoding']) && $cfg['AllowAnywhereRecoding'] && $allow_recoding)) {
+    if (!(isset($cfg['AllowAnywhereRecoding']) && $cfg['AllowAnywhereRecoding'] && $allow_recoding)
+        || $convcharset == $charset) { // rabus: if input and output charset are the same, we don't have to do anything...
         return $what;
     } else {
         switch ($GLOBALS['PMA_recoding_engine']) {

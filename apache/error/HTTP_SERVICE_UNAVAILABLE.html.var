@@ -45,15 +45,15 @@ Content-language: es
 Content-type: text/html; charset=ISO-8859-1
 Body:----------es--
 <!--#set var="CONTENT_LANGUAGE" value="es"
---><!--#set var="TITLE" value="Service unavailable!"
+--><!--#set var="TITLE" value="&iexcl;Servicio no disponible&excl;"
 --><!--#include virtual="include/top.html" -->
 
 	El servidor no puede atender su solicitud por
 	el momento debido a problemas de mantenimiento
 	o de capacidad.
 
-	Le solicitamos que porfavor repita la operaci&oacute;n
-	mas tarde.
+	Le solicitamos que por favor repita la operaci&oacute;n
+	m&aacute;s tarde.
 
 <!--#include virtual="include/bottom.html" -->
 ----------es--
@@ -73,35 +73,6 @@ Body:----------fr--
 <!--#include virtual="include/bottom.html" -->
 ----------fr--
 
-Content-language: nl
-Content-type: text/html; charset=ISO-8859-1
-Body:----------nl--
-<!--#set var="CONTENT_LANGUAGE" value="nl"
---><!--#set var="TITLE" value="Dienst niet beschikbaar!"
---><!--#include virtual="include/top.html" -->
-
-    De server kan tijdelijk uw vraag niet verwerken
-    door onderhoud of problemen met de capaciteit van de server.
-    Gelieve later nog eens opnieuw te proberen.
-
-<!--#include virtual="include/bottom.html" -->
-----------nl--
-
-Content-language: sv
-Content-type: text/html; charset=ISO-8859-1
-Body:----------sv--
-<!--#set var="CONTENT_LANGUAGE" value="sv"
---><!--#set var="TITLE" value="Tj&auml;nsten ej tillg&auml;nglig!"
---><!--#include virtual="include/top.html" -->
-
-    Servern &auml;r f&ouml;r tillf&auml;llet of&ouml;rm&ouml;gen att
-    utf&ouml;ra din f&ouml;rfr&aring;gan p&aring; grund av underh&aring;ll
-    eller kapacitetsbegr&auml;nsningar. V&auml;nligen f&ouml;rs&ouml;k
-    igen senare.
-
-<!--#include virtual="include/bottom.html" -->
-----------sv--
-
 Content-language: it
 Content-type: text/html; charset=ISO-8859-1
 Body:----------it--
@@ -116,6 +87,49 @@ Body:----------it--
 
 <!--#include virtual="include/bottom.html" -->
 ----------it--
+
+Content-language: ko
+Content-type: text/html; charset=EUC-KR
+Body:----------ko--
+<!--#set var="CONTENT_LANGUAGE" value="ko"
+--><!--#set var="TITLE" value="¼­ºñ½º ÀÏ½ÃÁßÁö!"
+--><!--#set var="CHARACTER_ENCODING" value="EUC-KR"
+--><!--#include virtual="include/top.html" -->
+
+    °ü¸® ÀÛ¾÷ÀÌ³ª ¿ë·® ¹®Á¦·Î ¼­¹ö°¡ Àá½Ãµ¿¾È ¿äÃ»À» Ã³¸®ÇÒ ¼ö ¾ø½À´Ï´Ù.
+    ³ªÁß¿¡ ´Ù½Ã ½ÃµµÇØÁÖ½Ã±â ¹Ù¶ø´Ï´Ù.
+
+<!--#include virtual="include/bottom.html" -->
+----------ko--
+
+Content-language: nl
+Content-type: text/html; charset=ISO-8859-1
+Body:----------nl--
+<!--#set var="CONTENT_LANGUAGE" value="nl"
+--><!--#set var="TITLE" value="Dienst niet beschikbaar!"
+--><!--#include virtual="include/top.html" -->
+
+    De server kan tijdelijk uw vraag niet verwerken
+    door onderhoud of problemen met de capaciteit van de server.
+    Gelieve later nog eens opnieuw te proberen.
+
+<!--#include virtual="include/bottom.html" -->
+----------nl--
+
+Content-language: pl
+Content-type: text/html; charset=ISO-8859-2
+Body:----------pl--
+<!--#set var="CONTENT_LANGUAGE" value="pl"
+--><!--#set var="TITLE" value="Serwis niedostêpny!"
+--><!--#set var="CHARACTER_ENCODING" value="ISO-8859-2"
+--><!--#include virtual="include/top.html" -->
+
+    Serwer nie mo¿e zrealizowaæ twojego ¿±dania
+    ze wzglêdu na konserwacjê lub zbyt du¿e obci±¿enie.
+    Prosimy spróbowaæ pó¼niej.
+
+<!--#include virtual="include/bottom.html" -->
+----------pl--
 
 Content-language: pt-br
 Content-type: text/html; charset=ISO-8859-1
@@ -144,3 +158,33 @@ Body:----------ro--
 
 <!--#include virtual="include/bottom.html" -->
 ----------ro--
+
+Content-language: sv
+Content-type: text/html; charset=ISO-8859-1
+Body:----------sv--
+<!--#set var="CONTENT_LANGUAGE" value="sv"
+--><!--#set var="TITLE" value="Tj&auml;nsten ej tillg&auml;nglig!"
+--><!--#include virtual="include/top.html" -->
+
+    Servern &auml;r f&ouml;r tillf&auml;llet of&ouml;rm&ouml;gen att
+    utf&ouml;ra din f&ouml;rfr&aring;gan p&aring; grund av underh&aring;ll
+    eller kapacitetsbegr&auml;nsningar. V&auml;nligen f&ouml;rs&ouml;k
+    igen senare.
+
+<!--#include virtual="include/bottom.html" -->
+----------sv--
+
+Content-language: tr
+Content-type: text/html; charset=ISO-8859-9
+Body:----------tr--
+<!--#set var="CONTENT_LANGUAGE" value="tr"
+--><!--#set var="CHARACTER_ENCODING" value="ISO-8859-9"
+--><!--#set var="TITLE" value="Service unavailable!"
+--><!--#include virtual="include/top.html" -->
+
+    Sunucu, kendi içindeki çe&#351;itli sorunlardan ötürü,
+    bir süreli&#287;ine taleplerinize cevap veremeyecek.
+    Lütfen daha sonra tekrar deneyin.
+
+<!--#include virtual="include/bottom.html" -->
+----------tr--

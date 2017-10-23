@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOFTPKG NAME="Apache-DBI" VERSION="0,94,0,0">
+  <IMPLEMENTATION>
+    <CODEBASE HREF="http://ppm.ActiveState.com/PPMPackages/5.8-windows/MSWin32-x86-multi-thread-5.8/Apache-DBI-0.94.tar.gz" />
+    <DEPENDENCY NAME="DBI" VERSION="0,0,0,0" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    <OS NAME="MSWin32" />
+  </IMPLEMENTATION>
+  <ABSTRACT>Initiate a persistent database connection</ABSTRACT>
+  <AUTHOR>Ask Bjoern Hansen (ask@perl.org)</AUTHOR>
+  <TITLE>Apache-DBI</TITLE>
+</SOFTPKG>

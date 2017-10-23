@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOFTPKG NAME="Apache-AuthenPasswd" VERSION="0,10,0,0">
+  <IMPLEMENTATION>
+    <CODEBASE HREF="http://ppm.ActiveState.com/PPMPackages/5.8-windows/MSWin32-x86-multi-thread-5.8/Apache-AuthenPasswd.tar.gz" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    <OS NAME="MSWin32" />
+  </IMPLEMENTATION>
+  <ABSTRACT>mod_perl passwd Authentication module</ABSTRACT>
+  <AUTHOR>Demetrios E. Paneras (dep@media.mit.edu)</AUTHOR>
+  <TITLE>Apache-AuthenPasswd</TITLE>
+</SOFTPKG>

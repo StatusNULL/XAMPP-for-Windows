@@ -1,5 +1,5 @@
 <?php
-/* $Id: defines.lib.php,v 2.4.2.2 2003/12/30 18:28:10 rabus Exp $ */
+/* $Id: defines.lib.php,v 2.6.2.5 2004/03/01 14:29:05 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -8,8 +8,6 @@
  *    PMA_VERSION              (string) - phpMyAdmin version string
  *    PMA_PHP_INT_VERSION      (int)    - eg: 30017 instead of 3.0.17 or
  *                                        40006 instead of 4.0.6RC3
- *    PMA_MYSQL_CLIENT_API     (int)    - the version number of the MySQL client
- *                                        API which php is built against.
  *    PMA_IS_WINDOWS           (bool)   - mark if phpMyAdmin running on windows
  *                                        server
  *    PMA_IS_GD2               (bool)   - true if GD2 is present
@@ -19,7 +17,7 @@
  */
 // phpMyAdmin release
 if (!defined('PMA_VERSION')) {
-    define('PMA_VERSION', '2.5.5-pl1');
+    define('PMA_VERSION', '2.5.6');
 }
 
 // php version
@@ -40,13 +38,6 @@ if (!defined('PMA_PHP_INT_VERSION')) {
         define('PMA_PHP_INT_VERSION', 0);
     }
     define('PMA_PHP_STR_VERSION', phpversion());
-}
-
-// MySQL client API
-if (!defined('PMA_MYSQL_CLIENT_API')) {
-    $client_api = explode('.', mysql_get_client_info());
-    define('PMA_MYSQL_CLIENT_API', (int)sprintf('%d%02d%02d', $client_api[0], $client_api[1], intval($client_api[2])));
-    unset($client_api);
 }
 
 // Whether the os php is running on is windows or not

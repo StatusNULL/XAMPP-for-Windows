@@ -26,11 +26,11 @@ sub import {
     return;
 }
 
-die "Perl lib version (v5.8.2) doesn't match executable version ($])"
+die "Perl lib version (v5.8.3) doesn't match executable version ($])"
     unless $^V;
 
-$^V eq v5.8.2
-    or die "Perl lib version (v5.8.2) doesn't match executable version (" .
+$^V eq v5.8.3
+    or die "Perl lib version (v5.8.3) doesn't match executable version (" .
 	sprintf("v%vd",$^V) . ")";
 
 ## Configured by: support@ActiveState.com
@@ -112,11 +112,11 @@ PERL_API_VERSION='8'
 PERL_CONFIG_SH='true'
 PERL_PATCHLEVEL='8'
 PERL_REVISION='5'
-PERL_SUBVERSION='2'
+PERL_SUBVERSION='3'
 PERL_VERSION='8'
 RCSfile='$RCSfile'
 Revision='$Revision'
-SUBVERSION='2'
+SUBVERSION='3'
 Source=''
 State=''
 _a='.lib'
@@ -155,7 +155,7 @@ ccsymbols=''
 ccversion=''
 cf_by='ActiveState'
 cf_email='support@ActiveState.com'
-cf_time='Tue Dec  9 10:19:27 2003'
+cf_time='Tue Feb  3 00:28:38 2004'
 charsize='1'
 chgrp=''
 chmod=''
@@ -553,7 +553,7 @@ d_tmpnam_r='undef'
 d_truncate='undef'
 d_ttyname_r='undef'
 d_tzname='define'
-d_u32align='define'
+d_u32align='undef'
 d_ualarm='undef'
 d_umask='define'
 d_uname='define'
@@ -1032,8 +1032,8 @@ vendorlib_stem=''
 vendorlibexp=''
 vendorprefix=''
 vendorprefixexp=''
-version='5.8.2'
-version_patchlevel_string='version 8 subversion 2'
+version='5.8.3'
+version_patchlevel_string='version 8 subversion 3'
 versiononly='undef'
 vi=''
 voidflags='15'

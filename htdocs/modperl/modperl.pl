@@ -7,7 +7,7 @@ print '<link href="../xampp/xampp.css" rel="stylesheet" type="text/css">';
 print '</head>';
 
 print '<body>';
-print '&nbsp;<p><h1>PERL 5.8.2 + MOD_PERL 1.99_12</h1><br>';
+print '&nbsp;<p><h1>PERL 5.8.3 + MOD_PERL 1.99_13</h1><br>';
 print 'Directory for MOD PERL => [..] \xampp\htdocs\modperl => <a href=/perl/modperl.pl>http://localhost/perl/modperl.pl</a><br><br>';
 print 'Directory for PERL ASP => [..] \xampp\htdocs\perlasp =>  <a href=/asp/loop.asp>http://localhost/asp/loop.asp</a><br><br>&nbsp;<br>&nbsp;<br>';
 use DBI;

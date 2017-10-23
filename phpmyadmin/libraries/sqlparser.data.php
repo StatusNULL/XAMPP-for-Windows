@@ -1,5 +1,5 @@
 <?php
-/* $Id: sqlparser.data.php,v 2.3 2003/12/09 14:38:53 lem9 Exp $ */
+/* $Id: sqlparser.data.php,v 2.5 2004/01/09 14:16:45 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -220,6 +220,7 @@ $PMA_SQPdata_reserved_word = array (
     'CHECK',
     'CHECKSUM',
     'CLIENT',
+    'COLLATE',
     'COLLATION',
     'COLUMN',
     'COLUMNS',
@@ -381,6 +382,7 @@ $PMA_SQPdata_reserved_word = array (
     'RESET',
     'RESTORE',
     'RESTRICT',
+    'RETURN',
     'RETURNS',
     'REVOKE',
     'RIGHT',
@@ -403,6 +405,7 @@ $PMA_SQPdata_reserved_word = array (
     'SQL_BIG_TABLES',
     'SQL_BUFFER_RESULT',
     'SQL_CACHE',
+    'SQL_CALC_FOUND_ROWS',
     'SQL_LOG_BIN',
     'SQL_LOG_OFF',
     'SQL_LOG_UPDATE',
@@ -451,7 +454,7 @@ $PMA_SQPdata_reserved_word = array (
     'YEAR_MONTH'
 );
 //$PMA_SQPdata_reserved_word_cnt = count($PMA_SQPdata_reserved_word);
-$PMA_SQPdata_reserved_word_cnt = 256;
+$PMA_SQPdata_reserved_word_cnt = 259;
 
 $PMA_SQPdata_column_type = array (
     'BIGINT',

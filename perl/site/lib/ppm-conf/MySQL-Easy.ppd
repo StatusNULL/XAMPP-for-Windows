@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOFTPKG NAME="MySQL-Easy" VERSION="1,21,0,0">
+  <IMPLEMENTATION>
+    <CODEBASE HREF="http://ppm.ActiveState.com/PPMPackages/5.8-windows/MSWin32-x86-multi-thread-5.8/MySQL-Easy-1.21.tar.gz" />
+    <DEPENDENCY NAME="DBD-mysql" VERSION="0,0,0,0" />
+    <DEPENDENCY NAME="DBI" VERSION="0,0,0,0" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    <OS NAME="MSWin32" />
+  </IMPLEMENTATION>
+  <ABSTRACT>Perl extension to make your base code kinda pretty.</ABSTRACT>
+  <AUTHOR>Jettero Heller (japh@voltar-confed.org)</AUTHOR>
+  <TITLE>MySQL-Easy</TITLE>
+</SOFTPKG>

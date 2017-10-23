@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_properties_table_info.php,v 2.2 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: tbl_properties_table_info.php,v 2.3 2003/12/29 17:15:14 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 // this should be recoded as functions, to avoid messing with global
@@ -19,7 +19,7 @@ $local_query         = 'SHOW TABLE STATUS LIKE \'' . PMA_sqlAddslashes($table, T
 $table_info_result   = PMA_mysql_query($local_query) or PMA_mysqlDie('', $local_query, '', $err_url_0);
 $showtable           = PMA_mysql_fetch_array($table_info_result);
 $tbl_type            = strtoupper($showtable['Type']);
-$tbl_charset         = empty($showtable['Charset']) ? '' : $showtable['Charset'];
+$tbl_charset         = empty($showtable['Collation']) ? '' : $showtable['Collation'];
 $table_info_num_rows = (isset($showtable['Rows']) ? $showtable['Rows'] : 0);
 $show_comment        = (isset($showtable['Comment']) ? $showtable['Comment'] : '');
 $auto_increment      = (isset($showtable['Auto_increment']) ? $showtable['Auto_increment'] : '');

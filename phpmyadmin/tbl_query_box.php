@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_query_box.php,v 2.3 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: tbl_query_box.php,v 2.4 2003/12/13 13:15:38 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 // Check parameters
@@ -196,8 +196,11 @@ if ($is_upload && (!isset($is_inside_querywindow) ||
     echo '            ' . ((isset($is_inside_querywindow) && $is_inside_querywindow == TRUE && isset($querydisplay_tab) && $querydisplay_tab == 'full') || !isset($is_inside_querywindow) ? '<i>' . $strOr . '</i>' : '') . ' ' . $strLocationTextfile . '&nbsp;:<br />' . "\n";
     ?>
             <div style="margin-bottom: 5px">
-            <input type="file" name="sql_file" class="textfield" /><br />
+            <input type="file" name="sql_file" class="textfield" />&nbsp;<?php echo PMA_displayMaximumUploadSize($max_upload_size);?><br />
     <?php
+    // some browsers should respect this :)
+    echo '        ' . PMA_generateHiddenMaxFileSize($max_upload_size) . "\n";
+
     if (isset($is_inside_querywindow) && $is_inside_querywindow == TRUE) {
     ?>
             <input type="hidden" name="focus_querywindow" value="true" />

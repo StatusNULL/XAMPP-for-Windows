@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOFTPKG NAME="XML-XSLT-Wrapper" VERSION="0,32,0,0">
+  <IMPLEMENTATION>
+    <CODEBASE HREF="http://ppm.ActiveState.com/PPMPackages/5.8-windows/MSWin32-x86-multi-thread-5.8/XML-XSLT-Wrapper.tar.gz" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    <OS NAME="MSWin32" />
+  </IMPLEMENTATION>
+  <ABSTRACT>Consistent interface to XSLT processors</ABSTRACT>
+  <AUTHOR>Colin Muller (colin@durbanet.co.za)</AUTHOR>
+  <TITLE>XML-XSLT-Wrapper</TITLE>
+</SOFTPKG>

@@ -39,10 +39,10 @@ Content-language: es
 Content-type: text/html; charset=ISO-8859-1
 Body:----------es--
 <!--#set var="CONTENT_LANGUAGE" value="es"
---><!--#set var="TITLE" value="Cannot proceed request!"
+--><!--#set var="TITLE" value="&iexcl;Solicitud no procesada&excl;"
 --><!--#include virtual="include/top.html" -->
 
-	El buscador esta solicitando una acci&oacute;n 
+	El navegador est&aacute; solicitando una acci&oacute;n 
 	que no puede ser procesada.
     
 <!--#include virtual="include/bottom.html" -->
@@ -61,6 +61,31 @@ Body:----------fr--
 <!--#include virtual="include/bottom.html" -->
 ----------fr--
 
+Content-language: it
+Content-type: text/html; charset=ISO-8859-1
+Body:----------it--
+<!--#set var="CONTENT_LANGUAGE" value="it"
+--><!--#set var="TITLE" value="La richiesta non pu&ograve; essere soddisfatta!"
+--><!--#include virtual="include/top.html" -->
+
+    Il server non supporta il tipo di azione richiesta dal browser.
+
+<!--#include virtual="include/bottom.html" -->
+----------it--
+
+Content-language: ko
+Content-type: text/html; charset=EUC-KR
+Body:----------ko--
+<!--#set var="CONTENT_LANGUAGE" value="ko"
+--><!--#set var="TITLE" value="¿äÃ» Ã³¸® ½ÇÆÐ!"
+--><!--#set var="CHARACTER_ENCODING" value="EUC-KR"
+--><!--#include virtual="include/top.html" -->
+
+    ºê¶ó¿ìÀú°¡ º¸³½ ¿äÃ»À» ÀÌ ¼­¹ö°¡ Áö¿øÇÏÁö ¾Ê½À´Ï´Ù.
+
+<!--#include virtual="include/bottom.html" -->
+----------ko--
+
 Content-language: nl
 Content-type: text/html; charset=ISO-8859-1
 Body:----------nl--
@@ -73,30 +98,18 @@ Body:----------nl--
 <!--#include virtual="include/bottom.html" -->
 ----------nl--
 
-Content-language: sv
-Content-type: text/html; charset=ISO-8859-1
-Body:----------sv--
-<!--#set var="CONTENT_LANGUAGE" value="sv"
---><!--#set var="TITLE" value="Kan ej utf&ouml;ra f&ouml;rfr&aring;gan!"
+Content-language: pl
+Content-type: text/html; charset=ISO-8859-2
+Body:----------pl--
+<!--#set var="CONTENT_LANGUAGE" value="pl"
+--><!--#set var="TITLE" value="¯±danie nieobs³ugiwane!"
+--><!--#set var="CHARACTER_ENCODING" value="ISO-8859-2"
 --><!--#include virtual="include/top.html" -->
 
-    Servern st&ouml;djer inte den handling som &ouml;nskades
-    av webbl&auml;saren.
+    Ten serwer nie obs³uguje ¿±dania przes³anego przez przegl±darkê.
 
 <!--#include virtual="include/bottom.html" -->
-----------sv--
-
-Content-language: it
-Content-type: text/html; charset=ISO-8859-1
-Body:----------it--
-<!--#set var="CONTENT_LANGUAGE" value="it"
---><!--#set var="TITLE" value="La richiesta non pu&ograve; essere soddisfatta!"
---><!--#include virtual="include/top.html" -->
-
-    Il server non supporta il tipo di azione richiesta dal browser.
-
-<!--#include virtual="include/bottom.html" -->
-----------it--
+----------pl--
 
 Content-language: pt-br
 Content-type: text/html; charset=ISO-8859-1
@@ -122,3 +135,29 @@ Body:----------ro--
 
 <!--#include virtual="include/bottom.html" -->
 ----------ro--
+
+Content-language: sv
+Content-type: text/html; charset=ISO-8859-1
+Body:----------sv--
+<!--#set var="CONTENT_LANGUAGE" value="sv"
+--><!--#set var="TITLE" value="Kan ej utf&ouml;ra f&ouml;rfr&aring;gan!"
+--><!--#include virtual="include/top.html" -->
+
+    Servern st&ouml;djer inte den handling som &ouml;nskades
+    av webbl&auml;saren.
+
+<!--#include virtual="include/bottom.html" -->
+----------sv--
+
+Content-language: tr
+Content-type: text/html; charset=ISO-8859-9
+Body:----------tr--
+<!--#set var="CONTENT_LANGUAGE" value="tr"
+--><!--#set var="CHARACTER_ENCODING" value="ISO-8859-9"
+--><!--#set var="TITLE" value="Cannot process request!"
+--><!--#include virtual="include/top.html" -->
+
+    Sunucu, gezgin taraf&#305;ndan talep edilen yöntemi desteklemiyor.
+   
+<!--#include virtual="include/bottom.html" -->
+----------tr--

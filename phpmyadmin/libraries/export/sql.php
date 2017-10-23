@@ -1,5 +1,5 @@
 <?php
-/* $Id: sql.php,v 2.4.2.1 2003/12/11 17:32:42 nijel Exp $ */
+/* $Id: sql.php,v 2.6 2004/01/02 16:11:56 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 error_reporting(E_ALL);
 /**
@@ -80,7 +80,17 @@ function PMA_exportDBCreate($db) {
     if (isset($GLOBALS['drop_database'])) {
         if (!PMA_exportOutputHandler('DROP DATABASE ' . (isset($GLOBALS['use_backquotes']) ? PMA_backquote($db) : $db) . ';' . $crlf)) return FALSE;
     }
-    if (!PMA_exportOutputHandler('CREATE DATABASE ' . (isset($GLOBALS['use_backquotes']) ? PMA_backquote($db) : $db) . ';' . $crlf)) return FALSE;
+    $create_query = 'CREATE DATABASE ' . (isset($GLOBALS['use_backquotes']) ? PMA_backquote($db) : $db);
+    if (PMA_MYSQL_INT_VERSION >= 40101) {
+        $collation = PMA_getDbCollation($db);
+        if (strpos($collation, '_')) {
+            $create_query .= ' DEFAULT CHARACTER SET ' . substr($collation, 0, strpos($collation, '_')) . ' COLLATE ' . $collation;
+        } else {
+            $create_query .= ' DEFAULT CHARACTER SET ' . $collation;
+        }
+    }
+    $create_query .= ';' . $crlf;
+    if (!PMA_exportOutputHandler($create_query)) return FALSE;
     return PMA_exportOutputHandler('USE ' . $db . ';' . $crlf);
 }
 

@@ -1,5 +1,5 @@
 <?php
-/* $Id: slovak-utf-8.inc.php,v 2.3 2003/11/26 15:03:29 lem9 Exp $ */
+/* $Id: slovak-utf-8.inc.php,v 2.7.2.1 2004/02/02 22:18:50 lem9 Exp $ */
 
 /* By: lubos klokner <erkac@vault-tec.sk> */
 
@@ -22,7 +22,7 @@ $timespanfmt = '%s dní, %s hodín, %s minút a %s sekúnd';
 
 $strAPrimaryKey = 'Bol pridaný primárny kľúč pre %s';
 $strAbortedClients = 'Prerušené';
-$strAbsolutePathToDocSqlDir = 'Prosím zadajte absolútnu cestu k adresáru docSQL na servere';
+$strAbsolutePathToDocSqlDir = 'Prosím zadajte absolútnu cestu k adresáru docSQL na serveri.';
 $strAccessDenied = 'Prístup zamietnutý';
 $strAccessDeniedExplanation = 'phpMyAdmin sa pokúsil pripojiť k MySQL serveru ale ten spojenie odmietol. Skontrolujte prosím meno serveru, používateľské meno a heslo v súbore config.inc.php a s tým, ktoré ste dostali o administrátora MySQL servera.';
 $strAction = 'Akcia';
@@ -132,6 +132,7 @@ $strCompression = 'Kompresia';
 $strConfigFileError = 'phpMyAdmin was unable to read your configuration file!<br />This might happen if php finds a parse error in it or php cannot find the file.<br />Please call the configuration file directly using the link below and read the php error message(s) that you recieve. In most cases a quote or a semicolon is missing somewhere.<br />If you recieve a blank page, everything is fine.';
 $strConfigureTableCoord = 'Prosím skonfigurujte koordináty pre tabuľku %s';
 $strConfirm = 'Skutočne si želáte toto vykonať?';
+$strConnectionError = 'Nepodarilo sa pripojiť: chybné nastavenia.';
 $strConnections = 'Spojenia';
 $strConstraintsForDumped = 'Obmedzenie pre exportované tabuľky';
 $strConstraintsForTable = 'Obmedzenie pre tabuľku';
@@ -152,6 +153,7 @@ $strCriteria = 'Kritéria';
 $strCroatian = 'Chorvátsky';
 $strCyrillic = 'Cyrilika';
 $strCzech = 'Česky';
+$strCzechSlovak = 'Čeština/Slovenčina';
 
 $strDBComment = 'Komentár k databáze: ';
 $strDBGContext = 'Kontext';
@@ -261,6 +263,7 @@ $strFunction = 'Funkcia';
 $strGenBy = 'Vygenerované';
 $strGenTime = 'Vygenerované:';
 $strGeneralRelationFeat = 'Možnosti všeobecných vzťahov';
+$strGeorgian = 'Gruzínčina';
 $strGerman = 'Nemecky';
 $strGlobal = 'globálny';
 $strGlobalPrivileges = 'Globálne práva';
@@ -360,6 +363,7 @@ $strMIME_transformation_note = 'Pre zoznam dostupných parametrov a ich MIME typ
 $strMIME_transformation_options = 'Parametre transformácie';
 $strMIME_transformation_options_note = 'Prosím zadajte hodnoty pre parametre transformácie v nasledujúcom tvare: \'a\',\'b\',\'c\'...<br />Ak potrebujete použiť spätné lomítko ("\") alebo jednoduché úvodzovky ("\'") medzi týmito hodnotami, vložte pred nich spätné lomítko (napr. \'\\\\xyz\' alebo \'a\\\'b\').';
 $strMIME_without = 'MIME typy zobrazené kurzívou nemajú vlastnú transformačnú funkciu';
+$strMaximumSize = 'Maximálna veľkosť: %s%s';
 $strMissingBracket = 'Chýba zátvorka';
 $strModifications = 'Zmeny boli uložené';
 $strModify = 'Zmeniť';
@@ -651,6 +655,7 @@ $strTotal = 'celkovo';
 $strTotalUC = 'Celkom';
 $strTraditionalChinese = 'Tradičná Čínština';
 $strTraffic = 'Prevádzka';
+$strTransformation_application_octetstream__download = 'Zobrazí odkaz na stiahnutie dát. Prvý parameter je meno súboru, druhý je meno stĺpca v tabuľke obsahujúci meno súboru. Ak zadáte druhý parameter, prvý musí byť prázdny.';
 $strTransformation_image_jpeg__inline = 'Zobrazí náhľad obrázku s odkazom na obrázok; parametre šírka a výška v bodoch (pomer strán obrázku zostane zachovaný)';
 $strTransformation_image_jpeg__link = 'Zobrazí odkaz na obrázok (napr. stiahnutie poľa blob).';
 $strTransformation_image_png__inline = 'Zobrazí image/jpeg: inline';

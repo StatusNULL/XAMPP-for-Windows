@@ -13,8 +13,8 @@
 /*
  * Package name      : perl5
  * Source directory  : 
- * Configuration time: Tue Dec  9 10:19:27 2003
- * Configured by     : cpanrun
+ * Configuration time: Tue Feb  3 00:28:38 2004
+ * Configured by     : jand
  * Target system     : 
  */
 
@@ -1338,7 +1338,7 @@
  *	This symbol contains the ~name expanded version of ARCHLIB, to be used
  *	in programs that are not prepared to deal with ~ expansion at run-time.
  */
-#define ARCHLIB "D:\\pdirect\\p4\\Apps\\Gecko\\MSI\\data\\ActivePerl\\Perl\\lib"		/**/
+#define ARCHLIB "C:\\p4view\\Apps\\Gecko\\MSI\\data\\ActivePerl\\Perl\\lib"		/**/
 /*#define ARCHLIB_EXP ""	/**/
 
 /* BIN:
@@ -1349,8 +1349,8 @@
  *	This symbol is the filename expanded version of the BIN symbol, for
  *	programs that do not want to deal with that at run-time.
  */
-#define BIN "D:\\pdirect\\p4\\Apps\\Gecko\\MSI\\data\\ActivePerl\\Perl\\bin"	/**/
-#define BIN_EXP "D:\\pdirect\\p4\\Apps\\Gecko\\MSI\\data\\ActivePerl\\Perl\\bin"	/**/
+#define BIN "C:\\p4view\\Apps\\Gecko\\MSI\\data\\ActivePerl\\Perl\\bin"	/**/
+#define BIN_EXP "C:\\p4view\\Apps\\Gecko\\MSI\\data\\ActivePerl\\Perl\\bin"	/**/
 
 /* PERL_INC_VERSION_LIST:
  *	This variable specifies the list of subdirectories in over
@@ -1377,6 +1377,18 @@
  */
 /*#define PERL_OTHERLIBDIRS ""		/**/
 
+/* INSTALL_PREFIX:
+ *	This symbol contains the "root" of installation tree for this package.
+ *	The program should be prepared to do ~ expansion.
+ */
+/* INSTALL_PREFIX_EXP:
+ *	This symbol contains the "root" of installation tree for this package
+ *	to be used in programs that are not prepared to deal with ~ expansion
+ *	at run-time.
+ */
+#define INSTALL_PREFIX "C:\\p4view\\Apps\\Gecko\\MSI\\data\\ActivePerl\\Perl"		/**/
+#define INSTALL_PREFIX_EXP "C:\\p4view\\Apps\\Gecko\\MSI\\data\\ActivePerl\\Perl"	/**/
+
 /* PRIVLIB:
  *	This symbol contains the name of the private library for this package.
  *	The library is private in the sense that it needn't be in anyone's
@@ -1387,8 +1399,8 @@
  *	This symbol contains the ~name expanded version of PRIVLIB, to be used
  *	in programs that are not prepared to deal with ~ expansion at run-time.
  */
-#define PRIVLIB "D:\\pdirect\\p4\\Apps\\Gecko\\MSI\\data\\ActivePerl\\Perl\\lib"		/**/
-#define PRIVLIB_EXP (win32_get_privlib("5.8.2"))	/**/
+#define PRIVLIB "C:\\p4view\\Apps\\Gecko\\MSI\\data\\ActivePerl\\Perl\\lib"		/**/
+#define PRIVLIB_EXP (win32_get_privlib("5.8.3"))	/**/
 
 /* SITEARCH:
  *	This symbol contains the name of the private library for this package.
@@ -1405,7 +1417,7 @@
  *	This symbol contains the ~name expanded version of SITEARCH, to be used
  *	in programs that are not prepared to deal with ~ expansion at run-time.
  */
-#define SITEARCH "D:\\pdirect\\p4\\Apps\\Gecko\\MSI\\data\\ActivePerl\\Perl\\site\\lib"		/**/
+#define SITEARCH "C:\\p4view\\Apps\\Gecko\\MSI\\data\\ActivePerl\\Perl\\site\\lib"		/**/
 /*#define SITEARCH_EXP ""	/**/
 
 /* SITELIB:
@@ -1428,8 +1440,8 @@
  *	removed.  The elements in inc_version_list (inc_version_list.U) can
  *	be tacked onto this variable to generate a list of directories to search.
  */
-#define SITELIB "D:\\pdirect\\p4\\Apps\\Gecko\\MSI\\data\\ActivePerl\\Perl\\site\\lib"		/**/
-#define SITELIB_EXP (win32_get_sitelib("5.8.2"))	/**/
+#define SITELIB "C:\\p4view\\Apps\\Gecko\\MSI\\data\\ActivePerl\\Perl\\site\\lib"		/**/
+#define SITELIB_EXP (win32_get_sitelib("5.8.3"))	/**/
 #define SITELIB_STEM ""		/**/
 
 /* PERL_VENDORARCH:
@@ -2853,7 +2865,7 @@
  *	character data through U32-aligned pointers.
  */
 #ifndef U32_ALIGNMENT_REQUIRED
-#define U32_ALIGNMENT_REQUIRED	/**/
+/*#define U32_ALIGNMENT_REQUIRED	/**/
 #endif
 
 /* HAS_UALARM:
@@ -3373,7 +3385,7 @@
 /* PERL_XS_APIVERSION:
  *	This variable contains the version of the oldest perl binary
  *	compatible with the present perl.  perl.c:incpush() and
- *	lib/lib.pm will automatically search in D:\\pdirect\\p4\\Apps\\Gecko\\MSI\\data\\ActivePerl\\Perl\\site\\lib for older
+ *	lib/lib.pm will automatically search in C:\\p4view\\Apps\\Gecko\\MSI\\data\\ActivePerl\\Perl\\site\\lib for older
  *	directories across major versions back to xs_apiversion.
  *	This is only useful if you have a perl library directory tree
  *	structured like the default one.
@@ -3392,7 +3404,7 @@
  *	compatible with the present perl.  (That is, pure perl modules
  *	written for pm_apiversion will still work for the current
  *	version).  perl.c:incpush() and lib/lib.pm will automatically
- *	search in D:\\pdirect\\p4\\Apps\\Gecko\\MSI\\data\\ActivePerl\\Perl\\site\\lib for older directories across major versions
+ *	search in C:\\p4view\\Apps\\Gecko\\MSI\\data\\ActivePerl\\Perl\\site\\lib for older directories across major versions
  *	back to pm_apiversion.  This is only useful if you have a perl
  *	library directory tree structured like the default one.  The
  *	versioned site_perl library was introduced in 5.005, so that's

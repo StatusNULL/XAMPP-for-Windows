@@ -39,6 +39,7 @@ C:\wampp2\perl\site\lib\Apache\MPM.pm
 C:\wampp2\perl\site\lib\Apache\Module.pm
 C:\wampp2\perl\site\lib\Apache\ParseSource.pm
 C:\wampp2\perl\site\lib\Apache\PerlSections.pm
+C:\wampp2\perl\site\lib\Apache\PerlSections\Dump.pm
 C:\wampp2\perl\site\lib\Apache\Process.pm
 C:\wampp2\perl\site\lib\Apache\Reload.pm
 C:\wampp2\perl\site\lib\Apache\RequestIO.pm
@@ -59,6 +60,7 @@ C:\wampp2\perl\site\lib\Apache\TestCommon.pm
 C:\wampp2\perl\site\lib\Apache\TestCommonPost.pm
 C:\wampp2\perl\site\lib\Apache\TestConfig.pm
 C:\wampp2\perl\site\lib\Apache\TestConfigC.pm
+C:\wampp2\perl\site\lib\Apache\TestConfigData.pm
 C:\wampp2\perl\site\lib\Apache\TestConfigParse.pm
 C:\wampp2\perl\site\lib\Apache\TestConfigPerl.pm
 C:\wampp2\perl\site\lib\Apache\TestHandler.pm

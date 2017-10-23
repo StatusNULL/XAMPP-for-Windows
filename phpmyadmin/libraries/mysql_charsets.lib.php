@@ -1,5 +1,5 @@
 <?php
-/* $Id: mysql_charsets.lib.php,v 2.3 2003/11/26 22:52:23 rabus Exp $ */
+/* $Id: mysql_charsets.lib.php,v 2.7.2.1 2004/02/02 09:30:01 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 if (PMA_MYSQL_INT_VERSION >= 40100){
@@ -19,24 +19,26 @@ if (PMA_MYSQL_INT_VERSION >= 40100){
     $res = PMA_mysql_query('SHOW COLLATION;', $userlink)
         or PMA_mysqlDie(PMA_mysql_error($userlink), 'SHOW COLLATION;');
 
+    $mysql_charsets_count = count($mysql_charsets);
     sort($mysql_charsets, SORT_STRING);
 
     $mysql_collations = array_flip($mysql_charsets);
-    $mysql_default_collations = array();;
+    $mysql_default_collations = $mysql_collations_flat = array();;
     while ($row = PMA_mysql_fetch_array($res, MYSQL_ASSOC)) {
         if (!is_array($mysql_collations[$row['Charset']])) {
             $mysql_collations[$row['Charset']] = array($row['Collation']);
         } else {
             $mysql_collations[$row['Charset']][] = $row['Collation'];
         }
+        $mysql_collations_flat[] = $row['Collation'];
         if ((isset($row['D']) && $row['D'] == 'Y') || (isset($row['Default']) && $row['Default'] == 'Yes')) {
             $mysql_default_collations[$row['Charset']] = $row['Collation'];
         }
     }
 
-    $mysql_collations_count = 0;
+    $mysql_collations_count = count($mysql_collations_flat);
+    sort($mysql_collations_flat, SORT_STRING);
     foreach($mysql_collations AS $key => $value) {
-        $mysql_collations_count += count($mysql_collations[$key]);
         sort($mysql_collations[$key], SORT_STRING);
         reset($mysql_collations[$key]);
     }
@@ -59,6 +61,13 @@ if (PMA_MYSQL_INT_VERSION >= 40100){
         switch ($parts[1]) {
             case 'bulgarian':
                 $descr = $GLOBALS['strBulgarian'];
+                break;
+            case 'chinese':
+                if ($parts[0] == 'gb2312' || $parts[0] == 'gbk') {
+                    $descr = $GLOBALS['strSimplifiedChinese'];
+                } elseif ($parts[0] == 'big5') {
+                    $descr = $GLOBALS['strTraditionalChinese'];
+                }
                 break;
             case 'ci':
                 $descr = $GLOBALS['strCaseInsensitive'];
@@ -90,11 +99,20 @@ if (PMA_MYSQL_INT_VERSION >= 40100){
             case 'hungarian':
                 $descr = $GLOBALS['strHungarian'];
                 break;
+            case 'japanese':
+                $descr = $GLOBALS['strJapanese'];
+                break;
             case 'lithuanian':
                 $descr = $GLOBALS['strLithuanian'];
                 break;
+            case 'korean':
+                $descr = $GLOBALS['strKorean'];
+                break;
             case 'swedish':
                 $descr = $GLOBALS['strSwedish'];
+                break;
+            case 'thai':
+                $descr = $GLOBALS['strThai'];
                 break;
             case 'turkish':
                 $descr = $GLOBALS['strTurkish'];
@@ -167,8 +185,14 @@ if (PMA_MYSQL_INT_VERSION >= 40100){
                     case 'hebrew':
                         $descr = $GLOBALS['strHebrew'];
                         break;
+                    case 'geostd8':
+                        $descr = $GLOBALS['strGeorgian'];
+                        break;
                     case 'greek':
                         $descr = $GLOBALS['strGreek'];
+                        break;
+                    case 'keybcs2':
+                        $descr = $GLOBALS['strCzechSlovak'];
                         break;
                     case 'koi8u':
                         $descr = $GLOBALS['strUkrainian'];
@@ -200,6 +224,36 @@ if (PMA_MYSQL_INT_VERSION >= 40100){
             }
         }
         return $descr;
+    }
+
+    function PMA_getDbCollation($db) {
+        global $userlink;
+
+        if (PMA_MYSQL_INT_VERSION >= 40101) {
+            // MySQL 4.1.0 does not support seperate charset settings
+            // for databases.
+
+            $sql_query = 'SHOW CREATE DATABASE ' . PMA_backquote($db) . ';';
+            $res = PMA_mysql_query($sql_query, $userlink) or PMA_mysqlDie(PMA_mysql_error($userlink), $sql_query);
+            $row = PMA_mysql_fetch_row($res);
+            mysql_free_result($res);
+            $tokenized = explode(' ', $row[1]);
+            unset($row, $res, $sql_query);
+
+            for ($i = 1; $i + 3 < count($tokenized); $i++) {
+                if ($tokenized[$i] == 'DEFAULT' && $tokenized[$i + 1] == 'CHARACTER' && $tokenized[$i + 2] == 'SET') {
+                    // We've found the character set!
+                    if (isset($tokenized[$i + 5]) && $tokenized[$i + 4] == 'COLLATE') {
+                        return $tokenized[$i + 5]; // We found the collation!
+                    } else {
+                        // We did not find the collation, so let's return the
+                        // default collation for the charset we've found.
+                        return $GLOBALS['mysql_default_collations'][$tokenized [$i + 3]];
+                    }
+                }
+            }
+        }
+        return '';
     }
 
 }

@@ -1,5 +1,5 @@
 <?php
-/* $Id: latvian-utf-8.inc.php,v 2.4 2003/11/24 16:01:14 nijel Exp $ */
+/* $Id: latvian-utf-8.inc.php,v 2.8 2003/12/30 21:34:05 nijel Exp $ */
 
 /**
  * Latvian language file by Sandis Jērics <sandisj at parks.lv>
@@ -722,4 +722,8 @@ $strYes = 'Jā';
 $strZeroRemovesTheLimit = 'Piezīme: Šo opciju uzstādīšana uz 0 (nulli) atceļ ierobežojumus.';
 $strZip = 'Arhivēts ar zip';
 
+$strGeorgian = 'Georgian';  //to translate
+$strCzechSlovak = 'Czech-Slovak';  //to translate
+$strTransformation_application_octetstream__download = 'Display a link to download the binary data of a field. First option is the filename of the binary file. Second option is a possible fieldname of a table row containing the filename. If you provide a second option you need to have the first option set to an empty string';  //to translate
+$strMaximumSize = 'Maximum size: %s%s';  //to translate
 ?>

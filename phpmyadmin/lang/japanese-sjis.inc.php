@@ -1,5 +1,5 @@
 <?php
-/* $Id: japanese-sjis.inc.php,v 2.2 2003/11/20 13:48:52 nijel Exp $ */
+/* $Id: japanese-sjis.inc.php,v 2.6 2003/12/30 21:34:05 nijel Exp $ */
 
 /**
  * Translated by Yukihiro Kawada <kawada at den.fujifilm.co.jp>
@@ -729,4 +729,8 @@ $strExcelEdition = 'Excel edition';  //to translate
 $strDelayedInserts = 'Use delayed inserts';  //to translate
 $strSQLExportType = 'Export type';  //to translate
 $strAddConstraints = 'Add constraints';  //to translate
+$strGeorgian = 'Georgian';  //to translate
+$strCzechSlovak = 'Czech-Slovak';  //to translate
+$strTransformation_application_octetstream__download = 'Display a link to download the binary data of a field. First option is the filename of the binary file. Second option is a possible fieldname of a table row containing the filename. If you provide a second option you need to have the first option set to an empty string';  //to translate
+$strMaximumSize = 'Maximum size: %s%s';  //to translate
 ?>

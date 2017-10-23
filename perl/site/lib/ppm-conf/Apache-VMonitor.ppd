@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOFTPKG NAME="Apache-VMonitor" VERSION="2,0,0,0">
+  <IMPLEMENTATION>
+    <CODEBASE HREF="http://ppm.ActiveState.com/PPMPackages/5.8-windows/MSWin32-x86-multi-thread-5.8/Apache-VMonitor-2.0.tar.gz" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    <OS NAME="MSWin32" />
+  </IMPLEMENTATION>
+  <ABSTRACT>Visual System and Apache Server Monitor</ABSTRACT>
+  <AUTHOR>Stas Bekman (stas@stason.org)</AUTHOR>
+  <TITLE>Apache-VMonitor</TITLE>
+</SOFTPKG>

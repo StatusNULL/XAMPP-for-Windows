@@ -1,5 +1,5 @@
 <?php
-/* $Id: estonian-utf-8.inc.php,v 2.4 2003/12/04 17:11:40 lem9 Exp $ */
+/* $Id: estonian-utf-8.inc.php,v 2.8.2.1 2004/02/08 18:29:40 lem9 Exp $ */
 
 $charset = 'utf-8';
 $allow_recoding = TRUE;
@@ -130,6 +130,7 @@ $strCompression = 'Pakkimine';
 $strConfigFileError = 'phpMyAdmin ei suutnud lugeda Teie konfiguratsioonifaili!<br />See võib juhtuda kui PHP leiab vea selles või PHP ei leia antud faili üles.<br />Palun kutsuge konfiguratsioonifail välja otseselt kasutades linki allpool ja lugege PHP veateadet(eid) mis teile öeldakse. Enamustel juhtudel on kuskilt puudu ülakoma või semikoolon.<br />Kui Teile kuvatakse tühi leht on kõik korras.';
 $strConfigureTableCoord = 'Palun seadke koordinaadid tabelile %s';
 $strConfirm = 'Kas Te tõesti tahate seda teha?';
+$strConnectionError = 'Ei saa ühendust: vigased seaded.';
 $strConnections = 'Ühendused';
 $strConstraintsForDumped = 'Piirangud salvestatud tabelitele';
 $strConstraintsForTable = 'Piirangud tabelile';
@@ -150,6 +151,7 @@ $strCriteria = 'Kriteerium';
 $strCroatian = 'Horvaatia';
 $strCyrillic = 'Kirillitsa';
 $strCzech = 'Tsehhi';
+$strCzechSlovak = 'Tsehhi-Slovaki';
 
 $strDBComment = 'Andmebaasi kommentaar: ';
 $strDBGContext = 'Sisu';
@@ -203,6 +205,7 @@ $strDoYouReally = 'Kas te tõesti tahate ';
 $strDocu = 'Dokumentatsioon';
 $strDrop = 'Kustuta';
 $strDropDB = 'Kustuta andmebaas ';
+$strDropDatabaseStrongWarning = 'Tähelepanu! Te HÄVITATE kogu andmebaasi!';
 $strDropSelectedDatabases = 'Kustutage valitud andmebaasid';
 $strDropTable = 'Kustuta tabel';
 $strDropUsersDb = 'Kustuta andmebaasid millel on samad nimed nagu kasutajatel.';
@@ -259,6 +262,7 @@ $strFunction = 'Funktsioon';
 $strGenBy = 'Genereerija ';
 $strGenTime = 'Tegemisaeg';
 $strGeneralRelationFeat = 'Peamised seoste võimalused';
+$strGeorgian = 'Gruusia';
 $strGerman = 'Saksa';
 $strGlobal = 'globaalne';
 $strGlobalPrivileges = 'Globaalsed privileegid';
@@ -358,6 +362,7 @@ $strMIME_transformation_note = 'Transformatsiooni võimaluste ja tema MIME-tüü
 $strMIME_transformation_options = 'Transformeerimise seaded';
 $strMIME_transformation_options_note = 'Palun sisestage transformatsiooniks vajalikud väärtused, kasutades järgmist formaati: \'a\',\'b\',\'c\'...<br />Kui teil on vaja edastada kaldkriips ("\") või ülakoma ("\'") nende väärtuste seas, varjestage see tagurpidi kaldkriipsuga (näiteks \'\\\\xyz\' või \'a\\\'b\').';
 $strMIME_without = 'MIME-tüübid kursiivis ei oma eraldi transofrmatsiooni funktsiooni';
+$strMaximumSize = 'Maksimaalne suurus: %s%s';
 $strMissingBracket = 'Puuduv ülakoma';
 $strModifications = 'Muutused salvestatud';
 $strModify = 'Muuda';
@@ -649,6 +654,7 @@ $strTotal = 'kokku';
 $strTotalUC = 'Kokku';
 $strTraditionalChinese = 'Traditsionaalne Hiina';
 $strTraffic = 'Liiklus';
+$strTransformation_application_octetstream__download = 'Näita linki millega laadida alla välja binaarne info. Esimene seade on binaarse faili nimi. Teine seade on võimalik väljanimi tabelis mis sisaldab failinime. Kui te määrate teise seade siis peab esimene seade olema tühi tekst';
 $strTransformation_image_jpeg__inline = 'Kuvab lingitud väikepildi; seaded: laius,kõrgus pikslites (hoiab alles originaalpildi laiuse-kõrguse suhte)';
 $strTransformation_image_jpeg__link = 'Kuvab lingi sellele pildile (otsene binaarne allalaadimine, jne.).';
 $strTransformation_image_png__inline = 'Vaata image/jpeg: inline';

@@ -1,5 +1,5 @@
 <?php
-/* $Id: common.lib.php,v 2.8 2003/11/26 22:52:23 rabus Exp $ */
+/* $Id: common.lib.php,v 2.10.2.4 2004/02/29 22:04:13 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -136,7 +136,7 @@ if (isset($cfg['FileRevision'])) {
 } else {
     $cfg['FileRevision'] = array(1, 1);
 }
-if ($cfg['FileRevision'][0] < 2 || ($cfg['FileRevision'][0] == 2 && $cfg['FileRevision'][1] < 1)) {
+if ($cfg['FileRevision'][0] < 2 || ($cfg['FileRevision'][0] == 2 && $cfg['FileRevision'][1] < 4)) {
     require_once('./libraries/config_import.lib.php');
 }
 
@@ -171,6 +171,83 @@ if ($is_minimum_common == FALSE) {
       }
 
     /**
+     * Maximum upload size as limited by PHP
+     * Used with permission from Moodle (http://moodle.org) by Martin Dougiamas
+     *
+     * this section generates $max_upload_size in bytes
+     */
+
+    function get_real_size($size=0) {
+    /// Converts numbers like 10M into bytes
+        if (!$size) {
+            return 0;
+        }
+        $scan['MB'] = 1048576;
+        $scan['Mb'] = 1048576;
+        $scan['M'] = 1048576;
+        $scan['m'] = 1048576;
+        $scan['KB'] = 1024;
+        $scan['Kb'] = 1024;
+        $scan['K'] = 1024;
+        $scan['k'] = 1024;
+
+        while (list($key) = each($scan)) {
+            if ((strlen($size)>strlen($key))&&(substr($size, strlen($size) - strlen($key))==$key)) {
+                $size = substr($size, 0, strlen($size) - strlen($key)) * $scan[$key];
+                break;
+            }
+        }
+        return $size;
+    } // end function
+
+
+    if (!$filesize = ini_get('upload_max_filesize')) {
+        $filesize = "5M";
+    }
+    $max_upload_size = get_real_size($filesize);
+
+    if ($postsize = ini_get('post_max_size')) {
+        $postsize = get_real_size($postsize);
+        if ($postsize < $max_upload_size) {
+            $max_upload_size = $postsize;
+        }
+    }
+    unset($filesize);
+    unset($postsize);
+
+    /**
+     * other functions for maximum upload work
+     */
+
+    /**
+     * Displays the maximum size for an upload
+     *
+     * @param   integer  the size
+     *
+     * @return  string   the message
+     *
+     * @access  public
+     */
+     function PMA_displayMaximumUploadSize($max_upload_size) {
+         list($max_size, $max_unit) = PMA_formatByteDown($max_upload_size);
+         return '(' . sprintf($GLOBALS['strMaximumSize'], $max_size, $max_unit) . ')';
+     }
+
+    /**
+     * Generates a hidden field which should indicate to the browser
+     * the maximum size for upload
+     *
+     * @param   integer  the size
+     *
+     * @return  string   the INPUT field
+     *
+     * @access  public
+     */
+     function PMA_generateHiddenMaxFileSize($max_size){
+         return '<input type="hidden" name="MAX_FILE_SIZE" value="' .$max_size . '" />';
+     }
+
+    /**
      * Charset conversion.
      */
     require_once('./libraries/charset_conversion.lib.php');
@@ -181,26 +258,6 @@ if ($is_minimum_common == FALSE) {
      * String handling
      */
     require_once('./libraries/string.lib.php');
-}
-
-if ($is_minimum_common == FALSE) {
-    /**
-     * SQL Parser data
-     */
-    require_once('./libraries/sqlparser.data.php');
-}
-
-/**
- * SQL Parser code
- */
-
-require_once('./libraries/sqlparser.lib.php');
-
-if ($is_minimum_common == FALSE) {
-    /**
-     * SQL Validator interface code
-     */
-    require_once('./libraries/sqlvalidator.lib.php');
 }
 
 // If zlib output compression is set in the php configuration file, no
@@ -239,6 +296,20 @@ if ($is_minimum_common == FALSE) {
         echo $strCantLoadMySQL . '<br />' . "\n"
              . '<a href="./Documentation.html#faqmysql" target="documentation">' . $GLOBALS['strDocu'] . '</a>' . "\n";
         exit();
+    }
+
+    /**
+     * Now that we know that MySQL is loaded, we can determine the MySQL
+     * client API version
+     */
+    if (!defined('PMA_MYSQL_CLIENT_API')) {
+        if (function_exists('mysql_get_client_info')) {
+            $client_api = explode('.', mysql_get_client_info());
+            define('PMA_MYSQL_CLIENT_API', (int)sprintf('%d%02d%02d', $client_api[0], $client_api[1], intval($client_api[2])));
+            unset($client_api);
+        } else {
+            define('PMA_MYSQL_CLIENT_API', 32332); // always expect the worst...
+        }
     }
 
 
@@ -428,10 +499,10 @@ if ($is_minimum_common == FALSE) {
         // --- Added to solve bug #641765
         // Robbat2 - 12 January 2003, 9:46PM
         // Revised, Robbat2 - 13 Janurary 2003, 2:59PM
-        if (PMA_SQP_isError()) {
-            $parsed_sql = htmlspecialchars($the_query);
+        if (!function_exists('PMA_SQP_isError') || PMA_SQP_isError()) {
+            $formatted_sql = htmlspecialchars($the_query);
         } else {
-            $parsed_sql = PMA_SQP_parse($the_query);
+            $formatted_sql = PMA_formatSql(PMA_SQP_parse($the_query), $the_query);
         }
         // ---
 
@@ -443,7 +514,7 @@ if ($is_minimum_common == FALSE) {
             // --- Added to solve bug #641765
             // Robbat2 - 12 January 2003, 9:46PM
             // Revised, Robbat2 - 13 Janurary 2003, 2:59PM
-            if (PMA_SQP_isError()) {
+            if (function_exists('PMA_SQP_isError') && PMA_SQP_isError()) {
                 echo PMA_SQP_getErrorString();
             }
             // ---
@@ -456,7 +527,7 @@ if ($is_minimum_common == FALSE) {
             } // end if
             echo '</p>' . "\n"
                     . '<p>' . "\n"
-                    . '    ' . PMA_formatSql($parsed_sql, $the_query) . "\n"
+                    . '    ' . $formatted_sql . "\n"
                     . '</p>' . "\n";
         } // end if
         if (!empty($error_message)) {
@@ -1054,6 +1125,16 @@ if ($is_minimum_common == FALSE) {
         // Gets the mysql release number
         require_once('./libraries/defines_mysql.lib.php');
 
+        /**
+         * SQL Parser code
+         */
+        require_once('./libraries/sqlparser.lib.php');
+
+        /**
+         * SQL Validator interface code
+         */
+        require_once('./libraries/sqlvalidator.lib.php');
+
         // if 'only_db' is set for the current user, there is no need to check for
         // available databases in the "mysql" db
         $dblist_cnt = count($dblist);
@@ -1328,6 +1409,8 @@ if ($is_minimum_common == FALSE) {
     function PMA_showMessage($message)
     {
         global $cfg;
+
+        require_once('./header.inc.php');
 
         // Reloads the navigation frame via JavaScript if required
         if (isset($GLOBALS['reload']) && $GLOBALS['reload']) {

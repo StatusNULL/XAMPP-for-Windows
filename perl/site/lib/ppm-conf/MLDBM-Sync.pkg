@@ -1,0 +1,6 @@
+INSTDATE: Thu Mar 25 05:00:30 2004
+INSTPACKLIST: C:\wampp2\perl\site\lib\auto\MLDBM\Sync\.packlist
+INSTROOT: C:\wampp2\perl
+LOCATION: http://ppm.ActiveState.com/cgibin/PPM/ppmserver-5.8-windows.pl?urn:/PPMServer
+dependents: @
+    : Apache-ASP

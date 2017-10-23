@@ -1,5 +1,5 @@
 <?php
-/* $Id: german-iso-8859-1.inc.php,v 2.4 2003/12/10 10:18:45 garvinhicking Exp $ */
+/* $Id: german-iso-8859-1.inc.php,v 2.7.2.1 2004/01/30 14:10:46 rabus Exp $ */
 
 /**
  * For suggestions concerning this file please contact
@@ -32,6 +32,7 @@ $strAccessDenied = 'Zugriff verweigert.';
 $strAccessDeniedExplanation = 'phpMyAdmin hat versucht eine Verbindung zum MySQL-Server aufzubauen, jedoch hat dieser die Verbindung zurückgewiesen. Sie sollten Ihre Einstellungen für Host, Benutzername und Kennwort in Ihrer config.inc.php überprüfen und sich vergewissern, dass diese den Informationen, welche sie vom Administrator erhalten haben, entsprechen.';
 $strAction = 'Aktion';
 $strAddAutoIncrement = 'AUTO_INCREMENT-Wert hinzufügen';
+$strAddConstraints = 'Constraints hinzufügen';
 $strAddDeleteColumn = 'Spalten hinzufügen/entfernen';
 $strAddDeleteRow = 'Zeilen hinzufügen/entfernen';
 $strAddDropDatabase = 'DROP DATABASE hinzufügen';
@@ -119,6 +120,7 @@ $strCharsets = 'Zeichensätze';
 $strCharsetsAndCollations = 'Zeichensätze und Sortierungstabellen';
 $strCheckAll = 'Alle auswählen';
 $strCheckDbPriv = 'Rechte einer Datenbank prüfen';
+$strCheckOverhead = 'Überhang prüfen';
 $strCheckPrivs = 'Rechte überprüfen';
 $strCheckPrivsLong = 'Überprüft die Rechte für die Datenbank &quot;%s&quot;.';
 $strCheckTable = 'Überprüfe Tabelle';
@@ -150,10 +152,12 @@ $strCreateNewDatabase = 'Neue Datenbank anlegen';
 $strCreateNewTable = 'Neue Tabelle in Datenbank %s erstellen';
 $strCreatePage = 'Neue Seite erstellen';
 $strCreatePdfFeat = 'Erzeugen von PDFs';
+$strCreationDates = 'Erzeugungs- / Aktualisierungs- / Überprüfungszeiten';
 $strCriteria = 'Kriterium';
 $strCroatian = 'Kroatisch';
 $strCyrillic = 'Kyrillisch';
 $strCzech = 'Tschechisch';
+$strCzechSlovak = 'Tschechoslowakisch';
 
 $strDBComment = 'Datenbankkommentar: ';
 $strDBGContext = 'Kontext';
@@ -263,6 +267,7 @@ $strFunction = 'Funktion';
 $strGenBy = 'Erstellt von';
 $strGenTime = 'Erstellungszeit';
 $strGeneralRelationFeat = 'Allgemeine Verknüpfungsfunktionen';
+$strGeorgian = 'Georgisch';
 $strGerman = 'Deutsch';
 $strGlobal = 'global';
 $strGlobalPrivileges = 'Globale Rechte';
@@ -362,6 +367,7 @@ $strMIME_transformation_note = 'Um eine Liste aller verfügbaren MIME-Typen-Umwan
 $strMIME_transformation_options = 'Umwandlungsoptionen';
 $strMIME_transformation_options_note = 'Bitte die Werte für die Umwandlungsoptionen in folgendem Format angeben:: \'a\',\'b\',\'c\'...<br />Wann immer Sie ein Backslash ("\") oder ein einfaches Anführungszeichen ("\'") verwenden,<br \>setzen Sie bitte ein Backslash vor das Zeichen.  (z.B.: \'\\\\xyz\' or \'a\\\'b\').';
 $strMIME_without = 'Kursiv dargestellte MIME-Typen besitzen keine untergliederten Umwandlungen.';
+$strMaximumSize = 'Maximale Dateigröße: %s%s';
 $strMissingBracket = 'Fehlende Klammer';
 $strModifications = 'Änderungen gespeichert.';
 $strModify = 'Verändern';
@@ -653,6 +659,7 @@ $strTotal = 'insgesamt';
 $strTotalUC = 'Insgesamt';
 $strTraditionalChinese = 'Traditionelles Chinesisch';
 $strTraffic = 'Traffic';
+$strTransformation_application_octetstream__download = 'Zeigt einen Link an, um die binären Daten eines Feldes downloaden zu können. Die erste Option benennt den Dateinamen. Die zweite Option kann einen Spaltennamen der Tabelle benennen, aus dem der Dateiname geholt werden soll. Sollte die zweite Option gesetzt sein ist es notwendig, die erste Option auf einen Leerstring zu setzen (\'\')';
 $strTransformation_image_jpeg__inline = 'Ein klickbares Vorschaubild anzeigen. Optionen: Breite, Höhe in Pixeln (berücksichtigt Seitenverhältnis)';
 $strTransformation_image_jpeg__link = 'Einen Link zum Bild anzeigen, z.B. zum Download von BLOB-Daten.';
 $strTransformation_image_png__inline = 'Siehe image/jpeg: inline';
@@ -720,9 +727,5 @@ $strYes = 'Ja';
 
 $strZeroRemovesTheLimit = 'Anmerkung: Der Wert 0 (null) entfernt die Beschränkung.';
 $strZip = 'Zip-komprimiert';
-
-$strAddConstraints = 'Constraints hinzufügen';
-$strCheckOverhead = 'Überhang prüfen';
-$strCreationDates = 'Erzeugungs-/Aktualisierungs-/Überprüfungszeiten';
 
 ?>

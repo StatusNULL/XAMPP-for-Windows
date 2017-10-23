@@ -1,5 +1,5 @@
 <?php
-/* $Id: czech-windows-1250.inc.php,v 2.4.2.2 2004/01/03 02:10:06 lem9 Exp $ */
+/* $Id: czech-windows-1250.inc.php,v 2.9 2003/12/30 21:46:02 nijel Exp $ */
 
 /**
  * Czech language file by
@@ -155,6 +155,7 @@ $strCriteria = 'Podmínka';
 $strCroatian = 'Chorvatsky';
 $strCyrillic = 'Cyrilika';
 $strCzech = 'Èesky';
+$strCzechSlovak = 'Èeština/Slovenština';
 
 $strDBComment = 'Komentáø k databázi: ';
 $strDBGContext = 'Kontext';
@@ -264,6 +265,7 @@ $strFunction = 'Funkce';
 $strGenBy = 'Vygeneroval';
 $strGenTime = 'Vygenerováno';
 $strGeneralRelationFeat = 'Obecné funkce relací';
+$strGeorgian = 'Gruzínština';
 $strGerman = 'Nìmecky';
 $strGlobal = 'globální';
 $strGlobalPrivileges = 'Globální oprávnìní';
@@ -363,6 +365,7 @@ $strMIME_transformation_note = 'Pro seznam dostupných parametrù transformací a j
 $strMIME_transformation_options = 'Parametry transformace';
 $strMIME_transformation_options_note = 'Zadejte parametry transformací v&nbsp;následujícím tvaru: \'a\',\'b\',\'c\'...<br />Pokud potøebujete použít zpìtné lomítko ("\") nebo jednoduché uvozovky ("\'") mezi tìmito hodnotami, vložte pøed nì zpìtné lomítko (napøíklad \'\\\\xyz\' or \'a\\\'b\').';
 $strMIME_without = 'MIME typy zobrazené kurzívou nemají vlastní transformaèní funkci';
+$strMaximumSize = 'Maximální velikost: %s%s';
 $strMissingBracket = 'Chybí závorka';
 $strModifications = 'Zmìny byly uloženy';
 $strModify = 'Úpravy';
@@ -654,6 +657,7 @@ $strTotal = 'celkem';
 $strTotalUC = 'Celkem';
 $strTraditionalChinese = 'Tradièní Èínština';
 $strTraffic = 'Provoz';
+$strTransformation_application_octetstream__download = 'Zobrazí odkaz na stáhnutí dat. První parametr je jméno souboru, druhý jméno sloupce v tabulce obsahující jméno souboru. Pokud zadáte druhý parametr, první musí být prázný.';
 $strTransformation_image_jpeg__inline = 'Zobrazí náhled obrázku s&nbsp;odkazem na obrázek; parametry šíøka a výška v&nbsp;bodech (pomìr stran obrázku zùstane zachován)';
 $strTransformation_image_jpeg__link = 'Zobrazí odkaz na obrázek (napøíklad stáhnutí pole blob).';
 $strTransformation_image_png__inline = 'Viz image/jpeg: inline';

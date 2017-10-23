@@ -22,7 +22,7 @@ use Net::Config;
 use Fcntl qw(O_WRONLY O_RDONLY O_APPEND O_CREAT O_TRUNC);
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.67"; # $Id: //depot/libnet/Net/FTP.pm#70 $
+$VERSION = "2.72"; # $Id: //depot/libnet/Net/FTP.pm#80 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -70,6 +70,7 @@ sub new
      delete $arg{Port};
 	 $fire_type = $arg{FirewallType}
 	 || $ENV{FTP_FIREWALL_TYPE}
+	 || $NetConfig{firewall_type}
 	 || undef;
     }
   }
@@ -205,7 +206,7 @@ sub size {
   my $io;
   if($ftp->supported("SIZE")) {
     return $ftp->_SIZE($file)
-	? ($ftp->message =~ /(\d+)$/)[0]
+	? ($ftp->message =~ /(\d+)\s*$/)[0]
 	: undef;
  }
  elsif($ftp->supported("STAT")) {
@@ -215,14 +216,14 @@ sub size {
    my $line;
    foreach $line (@msg) {
      return (split(/\s+/,$line))[4]
-	 if $line =~ /^[-rwx]{10}/
+	 if $line =~ /^[-rwxSsTt]{10}/
    }
  }
  else {
    my @files = $ftp->dir($file);
    if(@files) {
      return (split(/\s+/,$1))[4]
-	 if $files[0] =~ /^([-rwx]{10}.*)$/;
+	 if $files[0] =~ /^([-rwxSsTt]{10}.*)$/;
    }
  }
  undef;
@@ -394,6 +395,23 @@ sub type
  $oldval;
 }
 
+sub alloc
+{
+ my $ftp = shift;
+ my $size = shift;
+ my $oldval = ${*$ftp}{'net_ftp_allo'};
+
+ return $oldval
+	unless (defined $size);
+
+ return undef
+	unless ($ftp->_ALLO($size,@_));
+
+ ${*$ftp}{'net_ftp_allo'} = join(" ",$size,@_);
+
+ $oldval;
+}
+
 sub abort
 {
  my $ftp = shift;
@@ -465,6 +483,7 @@ sub get
    if($ref = ${*$ftp}{'net_ftp_hash'});
 
  my $blksize = ${*$ftp}{'net_ftp_blksize'};
+ local $\; # Just in case
 
  while(1)
   {
@@ -481,8 +500,7 @@ sub get
     print $hashh "#" x (int($count / $hashb));
     $count %= $hashb;
    }
-   my $written = syswrite($loc,$buf,$len);
-   unless(defined($written) && $written == $len)
+   unless(print $loc $buf)
     {
      carp "Cannot write to Local file $local: $!\n";
      $data->abort;
@@ -628,7 +646,7 @@ sub mkdir
      $path = $ftp->_extract_path($path);
     }
 
-   # If the creation of the last element was not sucessful, see if we
+   # If the creation of the last element was not successful, see if we
    # can cd to it, if so then return path
 
    unless($ftp->ok)
@@ -686,7 +704,18 @@ sub _store_cmd
    require File::Basename;
    $remote = File::Basename::basename($local);
   }
-
+ if( defined ${*$ftp}{'net_ftp_allo'} ) 
+  {
+   delete ${*$ftp}{'net_ftp_allo'};
+  } else 
+  {
+   # if the user hasn't already invoked the alloc method since the last 
+   # _store_cmd call, figure out if the local file is a regular file(not
+   # a pipe, or device) and if so get the file size from stat, and send
+   # an ALLO command before sending the STOR, STOU, or APPE command.
+   my $size = -f $local && -s _; # no ALLO if sending data from a pipe
+   $ftp->_ALLO($size) if $size;
+  }
  croak("Bad remote filename '$remote'\n")
 	if $remote =~ /[\r\n]/s;
 
@@ -729,7 +758,7 @@ sub _store_cmd
 
  while(1)
   {
-   last unless $len = sysread($loc,$buf="",$blksize);
+   last unless $len = read($loc,$buf="",$blksize);
 
    if (trEBCDIC && $ftp->type ne 'I')
     {
@@ -1149,6 +1178,7 @@ sub cmd { shift->command(@_)->response() }
 #
 
 sub _ABOR { shift->command("ABOR")->response()	 == CMD_OK }
+sub _ALLO { shift->command("ALLO",@_)->response() == CMD_OK}
 sub _CDUP { shift->command("CDUP")->response()	 == CMD_OK }
 sub _NOOP { shift->command("NOOP")->response()	 == CMD_OK }
 sub _PASV { shift->command("PASV")->response()	 == CMD_OK }
@@ -1179,7 +1209,6 @@ sub _PASS { shift->command("PASS",@_)->response() }
 sub _ACCT { shift->command("ACCT",@_)->response() }
 sub _AUTH { shift->command("AUTH",@_)->response() }
 
-sub _ALLO { shift->unsupported(@_) }
 sub _SMNT { shift->unsupported(@_) }
 sub _MODE { shift->unsupported(@_) }
 sub _SYST { shift->unsupported(@_) }
@@ -1198,10 +1227,18 @@ Net::FTP - FTP Client class
 
     use Net::FTP;
 
-    $ftp = Net::FTP->new("some.host.name", Debug => 0);
-    $ftp->login("anonymous",'-anonymous@');
-    $ftp->cwd("/pub");
-    $ftp->get("that.file");
+    $ftp = Net::FTP->new("some.host.name", Debug => 0)
+      or die "Cannot connect to some.host.name: $@";
+
+    $ftp->login("anonymous",'-anonymous@')
+      or die "Cannot login ", $ftp->message;
+
+    $ftp->cwd("/pub")
+      or die "Cannot change working directory ", $ftp->message;
+
+    $ftp->get("that.file")
+      or die "get failed ", $ftp->message;
+
     $ftp->quit;
 
 =head1 DESCRIPTION
@@ -1325,17 +1362,16 @@ Send a SITE command to the remote server and wait for a response.
 
 Returns most significant digit of the response code.
 
-=item type (TYPE [, ARGS])
+=item ascii
 
-This method will send the TYPE command to the remote FTP server
-to change the type of data transfer. The return value is the previous
-value.
+Transfer file in ASCII. CRLF translation will be done if required
 
-=item ascii ([ARGS]) binary([ARGS]) ebcdic([ARGS]) byte([ARGS])
+=item binary
 
-Synonyms for C<type> with the first arguments set correctly
+Transfer file in binary mode. No transformation will be done.
 
-B<NOTE> ebcdic and byte are not fully supported.
+B<Hint>: If both server and client machines use the same line ending for
+text files, then it will be faster to transfer all files in binary mode.
 
 =item rename ( OLDNAME, NEWNAME )
 
@@ -1368,9 +1404,10 @@ records this value and uses it when during the next data transfer. For this
 reason this method will not return an error, but setting it may cause
 a subsequent data transfer to fail.
 
-=item rmdir ( DIR )
+=item rmdir ( DIR [, RECURSE ])
 
-Remove the directory with the name C<DIR>.
+Remove the directory with the name C<DIR>. If C<RECURSE> is I<true> then
+C<rmdir> will attempt to delete everything inside the directory.
 
 =item mkdir ( DIR [, RECURSE ])
 
@@ -1380,6 +1417,20 @@ C<mkdir> will attempt to create all the directories in the given path.
 Returns the full pathname to the new directory.
 
 =item ls ( [ DIR ] )
+
+=item alloc ( SIZE [, RECORD_SIZE] )
+
+The alloc command allows you to give the ftp server a hint about the size
+of the file about to be transfered using the ALLO ftp command. Some storage
+systems use this to make intelligent decisions about how to store the file.
+The C<SIZE> argument represents the size of the file in bytes. The
+C<RECORD_SIZE> argument indicates a mazimum record or page size for files
+sent with a record or page structure.
+
+The size of the file will be determined, and sent to the server
+automatically for normal files so that this method need only be called if
+you are transfering data from a socket, named pipe, or other stream not
+associated with a normal file.
 
 Get a directory listing of C<DIR>, or the current directory.
 
@@ -1459,7 +1510,7 @@ Returns TRUE if the remote server supports the given command.
 =item hash ( [FILEHANDLE_GLOB_REF],[ BYTES_PER_HASH_MARK] )
 
 Called without parameters, or with the first argument false, hash marks
-are suppressed.  If the first argument is true but not a reference to a 
+are suppressed.  If the first argument is true but not a reference to a
 file handle glob, then \*STDERR is used.  The second argument is the number
 of bytes per hash mark printed, and defaults to 1024.  In all cases the
 return value is a reference to an array of two:  the filehandle glob reference
@@ -1629,10 +1680,6 @@ The following RFC959 commands have not been implemented:
 
 =over 4
 
-=item B<ALLO>
-
-Allocates storage for the file to be transferred.
-
 =item B<SMNT>
 
 Mount a different file system structure without changing login or
@@ -1696,7 +1743,7 @@ For an example of the use of Net::FTP see
 
 =over 4
 
-=item http://www.csh.rit.edu/~adam/Progs/autoftp-2.0.tar.gz
+=item http://www.csh.rit.edu/~adam/Progs/
 
 C<autoftp> is a program that can retrieve, send, or list files via
 the FTP protocol in a non-interactive manner.
@@ -1720,6 +1767,6 @@ under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/FTP.pm#70 $>
+I<$Id: //depot/libnet/Net/FTP.pm#80 $>
 
 =cut

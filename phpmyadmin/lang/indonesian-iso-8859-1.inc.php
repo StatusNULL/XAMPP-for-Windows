@@ -1,5 +1,5 @@
 <?php
-/* $Id: indonesian-iso-8859-1.inc.php,v 2.4 2003/11/24 15:04:48 nijel Exp $ */
+/* $Id: indonesian-iso-8859-1.inc.php,v 2.8 2003/12/18 21:12:44 lem9 Exp $ */
 
 $charset = 'iso-8859-1';
 $text_dir = 'ltr'; // ('ltr' for left to right, 'rtl' for right to left)
@@ -149,6 +149,7 @@ $strCriteria = 'Kriteria';
 $strCroatian = 'Bahasa Kroatia';
 $strCyrillic = 'Bahasa Kirilia';
 $strCzech = 'Bahasa Ceko';
+$strCzechSlovak = 'Cecko-Slovakia';
 
 $strDBComment = 'Komentar Database: ';
 $strDBGContext = 'Susunan';
@@ -258,6 +259,7 @@ $strFunction = 'Fungsi';
 $strGenBy = 'Diadakan oleh';
 $strGenTime = 'Waktu pembuatan';
 $strGeneralRelationFeat = 'Ciri-ciri dari General Relation';
+$strGeorgian = 'Georgia';
 $strGerman = 'Bahasa Jerman';
 $strGlobal = 'global';
 $strGlobalPrivileges = 'Hak Istimewa (Privileges) Global';
@@ -357,6 +359,7 @@ $strMIME_transformation_note = 'Untuk tampilan daftar tentang pilihan transforma
 $strMIME_transformation_options = 'Pilihan transformasi';
 $strMIME_transformation_options_note = 'Mohon masukkan nilai untuk pilihan transformasi dengan menggunakan format sbb.: \'a\',\'b\',\'c\'...<br />Bila sebuah Backslash ("\") atau Single Quote ("\'") diperlukan di antara nilai tersebut, mohon gunakan tanda Backslash (contoh: \'\\\\xyz\' atau \'a\\\'b\').';
 $strMIME_without = 'Jenis MIME yang dicetak dalam huruf miring tidak memiliki fungsi transformasi';
+$strMaximumSize = 'Batas ukuran: %s%s';
 $strMissingBracket = 'Kekurangan tanda kurung';
 $strModifications = 'Modifikasi telah disimpan';
 $strModify = 'Ubah';
@@ -648,6 +651,7 @@ $strTotal = 'jumlah';
 $strTotalUC = 'Jumlah';
 $strTraditionalChinese = 'Bahasa Cina tradisional';
 $strTraffic = 'Traffic';
+$strTransformation_application_octetstream__download = 'Tampilkan sebuah Link untuk men-download data binari dari Field. Pilihan pertama adalah nama dari file binari tersebut. Pilihan kedua adalah nama Field dari sebuah baris tabel yang mengandung nama file. Bila Anda menetapkan pilihan kedua, pilihan pertama harus ditepatkan ke string yang kosong';
 $strTransformation_image_jpeg__inline = 'Tampilkan sebuah Thumbnail yang bisa diklik; pilihan: lebar, tinggi dalam piksel (rasio asli dipertahankan)';
 $strTransformation_image_jpeg__link = 'Tampilkan link ke gambar ini (direct blob download, i.e.).';
 $strTransformation_image_png__inline = 'Lihat image/jpeg: inline';
@@ -715,6 +719,5 @@ $strYes = 'Ya';
 
 $strZeroRemovesTheLimit = 'Perhatian: Merubah pilihan ini ke posisi 0 (zero) akan menghapus batas yang telah ditentukan.';
 $strZip = '"Dikompress dengan Zip"';
-// To translate
 
 ?>

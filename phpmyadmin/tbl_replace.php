@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_replace.php,v 2.4.2.3 2003/12/15 21:41:44 garvinhicking Exp $ */
+/* $Id: tbl_replace.php,v 2.8 2003/12/15 21:40:22 garvinhicking Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 

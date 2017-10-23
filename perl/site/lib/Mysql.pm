@@ -316,22 +316,22 @@ Msql / Mysql - Perl interfaces to the mSQL and mysql databases
 
 
   $dbh->selectdb($database);
-	
+
   @arr = $dbh->listdbs;
   @arr = $dbh->listtables;
-	
+
   $quoted_string = $dbh->quote($unquoted_string);
   $error_message = $dbh->errmsg;
   $error_number = $dbh->errno;   # MySQL only
 
   $sth = $dbh->listfields($table);
   $sth = $dbh->query($sql_statement);
-	
+
   @arr = $sth->fetchrow;	# Array context
   $firstcol = $sth->fetchrow;	# Scalar context
   @arr = $sth->fetchcol($col_number);
   %hash = $sth->fetchhash;
-	
+
   $sth->dataseek($row_number);
 
   $sth->as_string;
@@ -560,8 +560,8 @@ Two constructor methods return a statement handle:
 
 $sth knows about all metadata that are provided by the API:
 
-  $scalar = $sth->numrows;    
-  $scalar = $sth->numfields;  
+  $scalar = $sth->numrows;
+  $scalar = $sth->numfields;
 
   @arr  = $sth->table;       the names of the tables of each column
   @arr  = $sth->name;        the names of the columns

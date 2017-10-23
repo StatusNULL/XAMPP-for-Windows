@@ -1,10 +1,10 @@
 <?php
-/* $Id: display_tbl_links.lib.php,v 2.4 2003/12/04 17:26:21 garvinhicking Exp $ */
+/* $Id: display_tbl_links.lib.php,v 2.6 2004/01/07 18:11:29 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
-if (!empty($del_url)) {
+if (!empty($del_url) && $is_display['del_lnk'] != 'kp') {
     echo '    <td width="10" align="center" valign="' . ($bookmark_go != '' ? 'top' : 'middle') . '" bgcolor="' . $bgcolor . '">' . "\n"
-       . '        <input type="checkbox" name="rows_to_delete[' . $uva_condition . ']" value="' . $del_query . '" />' . "\n"
+       . '        <input type="checkbox" id="id_rows_to_delete' . $row_no . '" name="rows_to_delete[' . $uva_condition . ']" value="' . $del_query . '" />' . "\n"
        . '    </td>' . "\n";
 }
 if (!empty($edit_url)) {

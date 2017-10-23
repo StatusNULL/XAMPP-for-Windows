@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOFTPKG NAME="Apache-HeavyCGI" VERSION="0,0133,0,0">
+  <IMPLEMENTATION>
+    <CODEBASE HREF="http://ppm.ActiveState.com/PPMPackages/5.8-windows/MSWin32-x86-multi-thread-5.8/Apache-HeavyCGI.tar.gz" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    <OS NAME="MSWin32" />
+  </IMPLEMENTATION>
+  <ABSTRACT>Framework to run complex CGI tasks on an Apache server</ABSTRACT>
+  <AUTHOR>Andreas J. Koenig (andreas.koenig@anima.de)</AUTHOR>
+  <TITLE>Apache-HeavyCGI</TITLE>
+</SOFTPKG>

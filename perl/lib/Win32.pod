@@ -264,7 +264,7 @@ be one of the following integer values:
 [EXT] In scalar context returns the name of the Win32 operating system
 being used.  In list context returns a two element list of the OS name
 and whatever edition information is known about the particular build
-(for Win9x boxes) and whatever service packs have been installed.
+(for Win9X boxes) and whatever service packs have been installed.
 The latter is roughly equivalent to the first item returned by
 GetOSVersion() in list context.
 
@@ -312,6 +312,14 @@ supplied MESSAGE, within the specified TIMEOUT interval. Forces
 closing of all documents without prompting the user if FORCECLOSE is
 true, and reboots the machine if REBOOT is true. This function works
 only on WinNT.
+
+=item Win32::IsAdminUser()
+
+[EXT] Returns non zero if the account in whose security context the
+current process/thread is running belongs to the local group of
+Administrators in the built-in system domain; returns 0 if not.
+Returns the undefined value and prints a warning if an error occurred.
+This function always returns 1 on Win9X.
 
 =item Win32::IsWinNT()
 

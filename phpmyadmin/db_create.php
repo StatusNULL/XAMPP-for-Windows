@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_create.php,v 2.3 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: db_create.php,v 2.4 2003/12/11 23:16:22 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -10,6 +10,7 @@ require_once('./libraries/grab_globals.lib.php');
 $js_to_run = 'functions.js';
 require_once('./header.inc.php');
 require_once('./libraries/common.lib.php');
+require_once('./libraries/mysql_charsets.lib.php');
 
 
 PMA_checkParameters(array('db'));
@@ -20,10 +21,15 @@ PMA_checkParameters(array('db'));
 $err_url = 'main.php?' . PMA_generate_common_url();
 
 /**
- * Executes the db creation sql query
+ * Builds and executes the db creation sql query
  */
 $sql_query = 'CREATE DATABASE ' . PMA_backquote($db);
-$result      = PMA_mysql_query('CREATE DATABASE ' . PMA_backquote($db)) or PMA_mysqlDie('', $sql_query, FALSE, $err_url);
+if (isset($db_charset) && isset($mysql_charsets) && in_array($db_charset, $mysql_charsets)) {
+    $sql_query .= ' DEFAULT CHARACTER SET ' . $db_charset;
+}
+$sql_query .= ';';
+
+$result = PMA_mysql_query($sql_query) or PMA_mysqlDie('', $sql_query, FALSE, $err_url);
 
 
 /**

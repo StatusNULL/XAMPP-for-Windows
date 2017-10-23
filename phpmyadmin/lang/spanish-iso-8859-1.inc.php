@@ -1,5 +1,5 @@
 <?php
-/* $Id: spanish-iso-8859-1.inc.php,v 2.4 2003/11/26 15:06:25 lem9 Exp $ */
+/* $Id: spanish-iso-8859-1.inc.php,v 2.9.2.1 2004/02/08 12:45:07 lem9 Exp $ */
 
 $charset = 'iso-8859-1';
 $text_dir = 'ltr';
@@ -149,6 +149,7 @@ $strCriteria = 'Criterio';
 $strCroatian = 'Croata';
 $strCyrillic = 'Cirílico';
 $strCzech = 'Checo';
+$strCzechSlovak = 'Checo-Eslovaco';
 
 $strDBComment = 'Comentario de la base de datos: ';
 $strDBGContext = 'Contexto';
@@ -245,7 +246,7 @@ $strFieldsTerminatedBy = 'Campos terminados en';
 $strFileAlreadyExists = 'El archivo %s ya existe en el servidor, cambie el nombre del archivo o revise la opción de sobreescritura.';
 $strFileCouldNotBeRead = 'No fue posible leer el archivo';
 $strFileNameTemplate = 'Plantilla del nombre del archivo';
-$strFileNameTemplateHelp = 'Use __DB__ para nombre de la base de datos, __TABLE__ para el nombre de la tabla y las opciones %sany strftime%s para especificaciones de tiempo; la extensión se añadirá automáticamente. Cualquier otro texto será conservado.';
+$strFileNameTemplateHelp = 'Use __DB__ para conservar el nombre de la base de datos, __TABLE__ para usar el nombre de la tabla y las opciones %sany strftime%s para especificaciones de tiempo; la extensión (.sql, .cvs, etc.) se añadirá automáticamente. Cualquier otro texto será conservado.';
 $strFileNameTemplateRemember = 'recuerde la plantilla';
 $strFixed = 'fijo';
 $strFlushPrivilegesNote = 'Nota: phpMyAdmin obtiene los privilegios de los usuarios \'directamente de las tablas de privilegios MySQL\'. El contenido de estas tablas puede diferir de los privilegios que usa el servidor si es que se han realizado cambios manuales en él. En este caso, deberá %scargar la página de privilegios nuevamente%s antes de continuar.';
@@ -258,6 +259,7 @@ $strFunction = 'Función';
 $strGenBy = 'Generado por';
 $strGenTime = 'Tiempo de generación';
 $strGeneralRelationFeat = 'Opciones de relación general';  //Features = ¿opciones, componentes?
+$strGeorgian = 'Georgiano';
 $strGerman = 'Alemán';
 $strGlobal = 'global';
 $strGlobalPrivileges = 'Privilegios globales';
@@ -357,6 +359,7 @@ $strMIME_transformation_note = 'Para una lista de opciones de transformación dis
 $strMIME_transformation_options = 'Opciones de transformación';
 $strMIME_transformation_options_note = 'Por favor ingrese los valores para las opciones de transformación usando este formato: \'a\',\'b\',\'c\'...<br />Si alguna vez requiere insertar un Backslash ("\") o comilla sencilla ("\'") entre esos valores, use backslash (por ejemplo \'\\\\xyz\' o \'a\\\'b\').';
 $strMIME_without = 'MIME-types impresos en itálicas no tienen una función de transformación adicional';
+$strMaximumSize = 'Tamaño máximo: %s%s';
 $strMissingBracket = 'Falta una llave (\{ o \})';
 $strModifications = 'Se han guardado las modificaciones';
 $strModify = 'Modificar';
@@ -571,7 +574,7 @@ $strSelectAll = 'Seleccione todo';
 $strSelectFields = 'Seleccionar campos (al menos uno):';
 $strSelectNumRows = 'en la consulta';
 $strSelectTables = 'Seleccionar tablas';
-$strSend = 'Enviar';
+$strSend = 'Enviar (genera un archivo descargable)';
 $strSent = 'Enviado';
 $strServer = 'Servidor %s';
 $strServerChoice = 'Elección del servidor';
@@ -648,6 +651,7 @@ $strTotal = 'total';
 $strTotalUC = 'Total';
 $strTraditionalChinese = 'Chino tradicional';
 $strTraffic = 'Tráfico';
+$strTransformation_application_octetstream__download = 'Muestre un enlace para descargar los datos binarios de un campo. La primera opción es el nombre del archivo binario.  La segunda opción es un nombre de campo factible de una fila de la tabla que contiene el nombre del campo. Si usted aporta una segunda opción, necesariamente deberá consignar la primera opción a un "string" vacío';
 $strTransformation_image_jpeg__inline = 'Muestra un thumbnail que puede abrirse mediante un clic; opciones: width, height en píxeles (mantiene la proporción original)';
 $strTransformation_image_jpeg__link = 'Muestra un enlace a esta imagen (blob download directo, i.e.).';
 $strTransformation_image_png__inline = 'Ver imagen/jpeg: inline';

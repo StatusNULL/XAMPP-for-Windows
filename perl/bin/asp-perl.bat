@@ -26,7 +26,6 @@ use Cwd;
 use Carp qw(confess);
 use Apache::ASP::CGI;
 
-=pod
 
 =head1 NAME
 
@@ -47,11 +46,11 @@ asp-perl [-hsdb] [-f asp.conf] [-o directory] file1 @arguments file2 @arguments 
 =head1 DESCRIPTION
 
 This program will run Apache::ASP scripts from the command line.
-Each file that is specified will be run, and the 
-$Request->QueryString() and $Request->Form() data will be 
-initialized by the @arguments following the script file name.  
+Each file that is specified will be run, and the
+$Request->QueryString() and $Request->Form() data will be
+initialized by the @arguments following the script file name.
 
-The @arguments will be written as space separated 
+The @arguments will be written as space separated
 words, and will be initialized as an associate array where
 %arguments = @arguments.  As an example:
 
@@ -64,7 +63,7 @@ would be similar to calling the file.asp in a web environment like
 The asp.conf script will be read from the current directory
 for parameters that would be set with PerlSetVar normally under
 mod_perl.  For more information on how to configure the asp.conf
-file, please see < http://www.apache-asp.org/cgi.html > 
+file, please see < http://www.apache-asp.org/cgi.html >
 
 =head1 SEE ALSO
 
@@ -139,20 +138,20 @@ while(@ARGV) {
     eval $Config;
     $@ && die("can't eval config error: $@");
 
-    $r->dir_config('NoState', 0) if $opt_s;
+    $r->dir_config->set('NoState', 0) if $opt_s;
     if($opt_d) {
-	$r->dir_config('Debug', -3);
-	$r->dir_config('CommandLine', 1);
+	$r->dir_config->set('Debug', -3);
+	$r->dir_config->set('CommandLine', 1);
     }
     if($opt_b) {
-	$r->dir_config('NoHeaders', 1);
+	$r->dir_config->set('NoHeaders', 1);
     }
     if($opt_p) {
-	$r->dir_config('GlobalPackage', $opt_p);
+	$r->dir_config->set('GlobalPackage', $opt_p);
     }
 
     for(keys %Config) {
-	$r->dir_config($_, $Config{$_});
+	$r->dir_config->set($_, $Config{$_});
     }
 
     &Apache::ASP::handler($r);

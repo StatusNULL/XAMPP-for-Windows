@@ -1,11 +1,12 @@
 <?php
-/* $Id: phpmyadmin.css.php,v 2.2 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: phpmyadmin.css.php,v 2.4 2003/12/30 18:24:11 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 chdir('..');
 $is_minimum_common = TRUE;
 require_once('./libraries/grab_globals.lib.php');
 require_once('./libraries/common.lib.php');
+require_once('./libraries/sqlparser.lib.php');
 
 // Gets the default font sizes
 // garvin: TODO: Should be optimized to not include the whole common.lib.php bunch
@@ -220,6 +221,7 @@ button.mult_submit {
 
 .print{font-family:arial;font-size:8pt;}
 
+/* MySQL Parser */
 .syntax {font-family: sans-serif; font-size: <?php echo $font_smaller; ?>;}
 .syntax_comment            { padding-left: 4pt; padding-right: 4pt;}
 .syntax_digit              {}
@@ -233,8 +235,9 @@ button.mult_submit {
 .syntax_alpha_reservedWord {text-transform: uppercase; font-weight: bold;}
 .syntax_alpha_functionName {text-transform: uppercase;}
 .syntax_alpha_identifier   {}
+.syntax_alpha_charset      {}
 .syntax_alpha_variable     {}
-.syntax_quote              {}
+.syntax_quote              {white-space: pre;}
 .syntax_quote_backtick     {}
     <?php
     echo PMA_SQP_buildCssData();

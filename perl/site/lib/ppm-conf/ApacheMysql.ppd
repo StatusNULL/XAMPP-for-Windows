@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOFTPKG NAME="ApacheMysql" VERSION="0,3,0,0">
+  <IMPLEMENTATION>
+    <CODEBASE HREF="http://ppm.ActiveState.com/PPMPackages/5.8-windows/MSWin32-x86-multi-thread-5.8/ApacheMysql.tar.gz" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    <OS NAME="MSWin32" />
+  </IMPLEMENTATION>
+  <ABSTRACT>Initiate a persistent database connection to Mysql</ABSTRACT>
+  <AUTHOR>Neil Jensen (njensen@habaneros.com)</AUTHOR>
+  <TITLE>ApacheMysql</TITLE>
+</SOFTPKG>

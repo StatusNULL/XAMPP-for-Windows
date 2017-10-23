@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOFTPKG NAME="XML-STX" VERSION="0,41,0,0">
+  <IMPLEMENTATION>
+    <CODEBASE HREF="http://ppm.ActiveState.com/PPMPackages/5.8-windows/MSWin32-x86-multi-thread-5.8/XML-STX-0.41.tar.gz" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    <OS NAME="MSWin32" />
+  </IMPLEMENTATION>
+  <ABSTRACT>a pure Perl STX processor</ABSTRACT>
+  <AUTHOR>Petr Cimprich (petr@gingerall.cz)</AUTHOR>
+  <TITLE>XML-STX</TITLE>
+</SOFTPKG>

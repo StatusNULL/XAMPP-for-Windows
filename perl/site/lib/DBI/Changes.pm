@@ -4,7 +4,101 @@ DBI::Changes - List of significant changes to the DBI
 
 =cut
 
-=head1 CHANGES
+Document $t->parse_trace_flags etc
+
+=head1 CHANGES in DBI 1.42 (svn rev 222),    12th March 2004
+
+  Fixed $sth->{NUM_OF_FIELDS} of non-executed statement handle
+    to be undef as per the docs (it was 0).
+  Fixed t/41prof_dump.t to work with perl5.9.1.
+  Fixed DBD_ATTRIB_DELETE macro thanks to Marco Paskamp.
+  Fixed DBI::PurePerl looks_like_number() and $DBI::rows.
+  Fixed ref($h)->can("foo") to not croak.
+
+  Changed attributes (NAME, TYPE etc) of non-executed statement
+    handle to be undef instead of triggering an error.
+  Changed ShowErrorStatement to apply to more $dbh methods.
+  Changed DBI_TRACE env var so just does this at load time:
+    DBI->trace(split '=', $ENV{DBI_TRACE}, 2);
+  Improved "invalid number of parameters" error message.
+  Added DBI::common as base class for DBI::db, DBD::st etc.
+  Moved methods common to all handles into DBI::common.
+
+  Major tracing enhancement:
+
+  Added $h->parse_trace_flags("foo|SQL|7") to map a group of
+    trace flags into the corresponding trace flag bits.
+  Added automatic calling of parse_trace_flags() if
+    setting the trace level to a non-numeric value:
+    $h->{TraceLevel}="foo|SQL|7"; $h->trace("foo|SQL|7");
+    DBI->connect("dbi:Driver(TraceLevel=SQL|foo):...", ...);
+    Currently no trace flags have been defined.
+  Added to, and reworked, the trace documentation.
+  Added dbivport.h for driver authors to use.
+
+  Major driver additions that Jeff Zucker and I have been working on:
+
+  Added DBI::SQL::Nano a 'smaller than micro' SQL parser
+    with an SQL::Statement compatible API. If SQL::Statement
+    is installed then DBI::SQL::Nano becomes an empty subclass
+    of SQL::Statement, unless the DBI_SQL_NANO env var is true.
+  Added DBD::File, modified to use DBI::SQL::Nano.
+  Added DBD::DBM, an SQL interface to DBM files using DBD::File.
+
+  Documentation changes:
+
+  Corrected typos in docs thanks to Steffen Goeldner.
+  Corrected execute_for_fetch example thanks to Dean Arnold.
+
+=head1 CHANGES in DBI 1.41 (svn rev 130),    22nd February 2004
+
+  Fixed execute_for_array() so tuple_status parameter is optional
+    as per docs, thanks to Ed Avis.
+  Fixed execute_for_array() docs to say that it returns undef if
+    any of the execute() calls fail.
+  Fixed take_imp_data() test on m68k reported by Christian Hammers.
+  Fixed write_typeinfo_pm inconsistencies in DBI::DBD::Metadata
+    thanks to Andy Hassall.
+  Fixed $h->{TraceLevel} to not return DBI->trace trace level
+    which it used to if DBI->trace trace level was higher.
+
+  Changed set_err() to append to errstr, with a leading "\n" if it's
+    not empty, so that multiple error/warning messages are recorded.
+  Changed trace to limit elements dumped when an array reference is
+    returned from a method to the max(40, $DBI::neat_maxlen/10)
+    so that fetchall_arrayref(), for example, doesn't flood the trace.
+  Changed trace level to be a four bit integer (levels 0 thru 15)
+    and a set of topic flags (no topics have been assigned yet).
+  Changed column_info() to check argument count.
+  Extended bind_param() TYPE attribute specification to imply
+    standard formating of value, eg SQL_DATE implies 'YYYY-MM-DD'.
+
+  Added way for drivers to indicate 'success with info' or 'warning'
+    by setting err to "0" for warning and "" for information.
+    Both values are false and so don't trigger RaiseError etc.
+    Thanks to Steffen Goeldner for the original idea.
+  Added $h->{HandleSetErr} = sub { ... } to be called at the
+    point that an error, warn, or info state is recorded.
+    The code can alter the err, errstr, and state values
+    (e.g., to promote an error to a warning, or the reverse).
+  Added $h->{PrintWarn} attribute to enable printing of warnings
+    recorded by the driver. Defaults to same value as $^W (perl -w).
+  Added $h->{ErrCount} attribute, incremented whenever an error is
+    recorded by the driver via set_err().
+  Added $h->{Executed} attribute, set if do()/execute() called.
+  Added \%attr parameter to foreign_key_info() method.
+  Added ref count of inner handle to "DESTROY ignored for outer" msg.
+  Added Win32 build config checks to DBI::DBD thanks to Andy Hassall.
+  Added bind_col to Driver.xst so drivers can define their own.
+  Added TYPE attribute to bind_col and specified the expected
+    driver behaviour.
+
+  Major update to signal handling docs thanks to Lincoln Baxter.
+  Corrected dbiproxy usage doc thanks to Christian Hammers.
+  Corrected type_info_all index hash docs thanks to Steffen Goeldner.
+  Corrected type_info COLUMN_SIZE to chars not bytes thanks to Dean Arnold.
+  Corrected get_info() docs to include details of DBI::Const::GetInfoType.
+  Clarified that $sth->{PRECISION} is OCTET_LENGTH for char types.
 
 =head2 Changes in DBI 1.40,    7th January 2004
 
@@ -1073,12 +1167,12 @@ DBI::Changes - List of significant changes to the DBI
     DBI scripts no longer need to be modified to make use of Apache::DBI.
   Added a ping method and an experimental connect_test_perf method.
   Added a fetchhash and fetch_all methods.
-  The func method no longer pre-clears err and errstr. 
+  The func method no longer pre-clears err and errstr.
   Added ChopBlanks attribute (currently defaults to off, that may change).
     Support for the attribute needs to be implemented by individual drivers.
   Reworked tests into standard t/*.t form.
   Added more pod text.  Fixed assorted bugs.
-  
+
 
 =head2 Changes in DBI 0.79,	7th Apr 1997
 

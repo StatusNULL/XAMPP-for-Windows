@@ -1,5 +1,5 @@
 <?php
-/* $Id: danish-iso-8859-1.inc.php,v 2.4 2003/12/06 13:07:17 lem9 Exp $ */
+/* $Id: danish-iso-8859-1.inc.php,v 2.8.2.1 2004/01/29 14:34:04 lem9 Exp $ */
 
 $charset = 'iso-8859-1';
 $text_dir = 'ltr';
@@ -150,6 +150,7 @@ $strCriteria = 'Kriterier';
 $strCroatian = 'Kroatisk';
 $strCyrillic = 'Kyrillisk';
 $strCzech = 'Tjekkisk';
+$strCzechSlovak = 'Tjekkisk-Slovakisk';
 
 $strDBComment = 'Database kommentar: ';
 $strDBGContext = 'Sammenhæng';
@@ -259,6 +260,7 @@ $strFunction = 'Funktion';
 $strGenBy = 'Genereret af';
 $strGenTime = 'Genereringstidspunkt';
 $strGeneralRelationFeat = 'Generelle relationsmuligheder';
+$strGeorgian = 'Georgisk';
 $strGerman = 'Tysk';
 $strGlobal = 'global';
 $strGlobalPrivileges = 'Globale privilegier';
@@ -347,6 +349,7 @@ $strLogin = 'Login';
 $strLoginInformation = 'Login Information';
 $strLogout = 'Log af';
 
+$strMaximumSize = 'Maksimum størrelse: %s%s';
 $strMIME_MIMEtype = 'MIME-type';
 $strMIME_available_mime = 'Tilgængelige MIME-typer';
 $strMIME_available_transform = 'Tilgængelige transformationer';
@@ -649,6 +652,7 @@ $strTotal = 'total';
 $strTotalUC = 'Total';
 $strTraditionalChinese = 'Traditionelt Kinesisk';
 $strTraffic = 'Trafik';
+$strTransformation_application_octetstream__download = 'Viser et link til at downloade et felts binære data. Første mulighed er filnavnet på den binære fil. Anden mulighed er et muligt feltnavn fra en tabelrække indeholdende filnavnet. Hvis du bruger anden mulighed, er feltet til den første mulighed nødt til at være sat til en tom streng.';
 $strTransformation_text_plain__formatted = 'Bevarer original formattering af feltet. Der laves ikke nogen Escaping.';
 $strTransformation_text_plain__unformatted = 'Viser HTML-kode som HTML-enheder. Der vises ingen HTML-formattering.';
 $strTransformation_image_jpeg__link = 'Viser et link til dette billede (f.eks. direkte blob download).';

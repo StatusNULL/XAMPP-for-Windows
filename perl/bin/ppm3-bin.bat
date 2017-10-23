@@ -32,7 +32,7 @@ PPM::Trace->import(qw(trace));
 
 my $NAME	= q{PPM - Programmer's Package Manager};
 my $SHORT_NAME	= q{PPM};
-my $VERSION	= '3.1';
+our $VERSION	= '3.1';
 
 sub dictsort(@);
 

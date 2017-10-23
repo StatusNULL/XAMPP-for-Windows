@@ -27,9 +27,9 @@
 
 --------------------------------------------------------------------------------
 
- OpenSSL 0.9.7b 10 Apr 2003
+ OpenSSL 0.9.7d 17 Mar 2004
 
- Copyright (c) 1998-2003 The OpenSSL Project
+ Copyright (c) 1998-2004 The OpenSSL Project
  Copyright (c) 1995-1998 Eric A. Young, Tim J. Hudson
  All rights reserved.
 

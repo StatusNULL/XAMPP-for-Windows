@@ -1,5 +1,5 @@
 <?php
-/* $Id: config_import.lib.php,v 2.3 2003/11/26 22:52:23 rabus Exp $ */
+/* $Id: config_import.lib.php,v 2.5.2.1 2004/02/15 01:18:53 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -536,6 +536,10 @@ if (!isset($cfg['AllowAnywhereRecoding'])) {
     $cfg['AllowAnywhereRecoding'] = FALSE;
 }
 
+if (!isset($cfg['RecodingEngine'])) {
+    $cfg['RecodingEngine'] = 'auto';
+}
+
 if (!isset($cfg['IconvExtraParams'])) {
     $cfg['IconvExtraParams'] = '';
 }
@@ -915,6 +919,10 @@ if (!isset($cfg['SQP']['fmtColor']['alpha_identifier'])) {
     $cfg['SQP']['fmtColor']['alpha_identifier'] = 'black';
 }
 
+if (!isset($cfg['SQP']['fmtColor']['alpha_charset'])) {
+    $cfg['SQP']['fmtColor']['alpha_charset'] = '#6495ed';
+}
+
 if (!isset($cfg['SQP']['fmtColor']['alpha_variable'])) {
     $cfg['SQP']['fmtColor']['alpha_variable'] = '#800000';
 }
@@ -955,6 +963,7 @@ if (!isset($cfg['AvailableCharsets'])) {
         'windows-1250',
         'windows-1251',
         'windows-1252',
+        'windows-1256',
         'windows-1257',
         'koi8-r',
         'big5',

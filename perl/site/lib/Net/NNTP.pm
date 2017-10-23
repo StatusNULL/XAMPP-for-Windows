@@ -14,7 +14,7 @@ use Carp;
 use Time::Local;
 use Net::Config;
 
-$VERSION = "2.21"; # $Id: //depot/libnet/Net/NNTP.pm#15 $
+$VERSION = "2.22"; # $Id: //depot/libnet/Net/NNTP.pm#18 $
 @ISA     = qw(Net::Cmd IO::Socket::INET);
 
 sub new
@@ -87,7 +87,7 @@ sub debug_text
  my $inout = shift;
  my $text = shift;
 
- if(($nntp->code == 350 && $text =~ /^(\S+)/)
+ if((ref($nntp) and $nntp->code == 350 and $text =~ /^(\S+)/)
     || ($text =~ /^(authinfo\s+pass)/io)) 
   {
    $text = "$1 ....\n"
@@ -745,11 +745,11 @@ empty list.
 =item article ( [ MSGID|MSGNUM ], [FH] )
 
 Retrieve the header, a blank line, then the body (text) of the
-specified article. 
+specified article.
 
 If C<FH> is specified then it is expected to be a valid filehandle
-and the result will be printed to it, on sucess a true value will be
-returned. If C<FH> is not specified then the return value, on sucess,
+and the result will be printed to it, on success a true value will be
+returned. If C<FH> is not specified then the return value, on success,
 will be a reference to an array containg the article requested, each
 entry in the array will contain one line of the article.
 
@@ -853,7 +853,7 @@ C<SINCE> is a time value and C<DISTRIBUTIONS> is either a distribution
 pattern or a reference to a list of distribution patterns.
 The result is the same as C<list>, but the
 groups return will be limited to those created after C<SINCE> and, if
-specified, in one of the distribution areas in C<DISTRIBUTIONS>. 
+specified, in one of the distribution areas in C<DISTRIBUTIONS>.
 
 =item newnews ( SINCE [, GROUPS [, DISTRIBUTIONS ]])
 
@@ -881,6 +881,10 @@ If C<MESSAGE> is not specified then the message must be sent using the
 C<datasend> and C<dataend> methods from L<Net::Cmd>
 
 C<MESSAGE> can be either an array of lines or a reference to an array.
+
+The message, either sent via C<datasend> or as the C<MESSAGE>
+parameter, must be in the format as described by RFC822 and must
+contain From:, Newsgroups: and Subject: headers.
 
 =item postfh ()
 
@@ -948,7 +952,7 @@ match C<PATTERN> and each value is the description text for the group.
 
 =item xhdr ( HEADER, MESSAGE-SPEC )
 
-Obtain the header field C<HEADER> for all the messages specified. 
+Obtain the header field C<HEADER> for all the messages specified.
 
 The return value will be a reference
 to a hash where the keys are the message numbers and each value contains
@@ -1113,6 +1117,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/NNTP.pm#15 $>
+I<$Id: //depot/libnet/Net/NNTP.pm#18 $>
 
 =cut

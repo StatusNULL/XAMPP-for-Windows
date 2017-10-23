@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOFTPKG NAME="Apache-Admin-Config" VERSION="0,91,0,0">
+  <IMPLEMENTATION>
+    <CODEBASE HREF="http://ppm.ActiveState.com/PPMPackages/5.8-windows/MSWin32-x86-multi-thread-5.8/Apache-Admin-Config.tar.gz" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    <OS NAME="MSWin32" />
+  </IMPLEMENTATION>
+  <ABSTRACT>A module to read/write Apache like configuration files</ABSTRACT>
+  <AUTHOR>Olivier Poitrey (rs-pause@rhapsodyk.net)</AUTHOR>
+  <TITLE>Apache-Admin-Config</TITLE>
+</SOFTPKG>

@@ -1,16 +1,17 @@
 <?php
-/* $Id: db_details_structure.php,v 2.2.2.2 2004/01/02 11:58:40 lem9 Exp $ */
+/* $Id: db_details_structure.php,v 2.6 2004/01/02 12:01:04 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
+
+require_once('./libraries/grab_globals.lib.php');
+require_once('./libraries/common.lib.php');
+require_once('./libraries/mysql_charsets.lib.php');
 
 /**
  * Prepares the tables list if the user where not redirected to this script
  * because there is no table in the database ($is_info is TRUE)
  */
 if (empty($is_info)) {
-    require_once('./libraries/grab_globals.lib.php');
-    require_once('./libraries/common.lib.php');
-
     // Drops/deletes/etc. multiple tables if required
     if ((!empty($submit_mult) && isset($selected_tbl))
        || isset($mult_btn)) {
@@ -35,43 +36,47 @@ if (empty($is_info)) {
     }
 }
 
+if (PMA_MYSQL_INT_VERSION >= 40100) {
+    $db_collation = PMA_getDbCollation($db);
+}
+
+
 // Display function
 function pma_TableHeader($alternate = FALSE) {
-    if ($alternate) {
-?>
-            <table border="<?php echo $GLOBALS['cfg']['Border']; ?>">
-            <tr>
-                <td></td>
-                <th>&nbsp;<?php echo $GLOBALS['strTable']; ?>&nbsp;</th>
-                <th colspan="6"><?php echo $GLOBALS['strAction']; ?></th>
-                <th><?php echo $GLOBALS['strRecords']; ?></th>
-            </tr>
-<?php
-    } else {
-?>
-            <table border="<?php echo $GLOBALS['cfg']['Border']; ?>">
-            <tr>
-                <td></td>
-                <th>&nbsp;<?php echo $GLOBALS['strTable']; ?>&nbsp;</th>
-                <th colspan="6"><?php echo $GLOBALS['strAction']; ?></th>
-                <th><?php echo $GLOBALS['strRecords']; ?></th>
-                <?php
-                if (!($GLOBALS['cfg']['PropertiesNumColumns'] > 1)) {
-                ?>
-                <th><?php echo $GLOBALS['strType']; ?></th>
-                <?php
-                }
-                ?>
-                <?php
-                if ($GLOBALS['cfg']['ShowStats']) {
-                    echo '<th>' . $GLOBALS['strSize'] . '</th>';
-                    echo '<th>' . $GLOBALS['strOverhead'] . '</th>';
-                }
-                echo "\n";
-                ?>
-            </tr>
-<?php
+    echo '            <table border="' . $GLOBALS['cfg']['Border'] . '">' . "\n"
+       . '            <tr>' . "\n"
+       . '                <td></td>' . "\n"
+       . '                <th>' . "\n"
+       . '                    &nbsp;' . $GLOBALS['strTable'] . '&nbsp;' . "\n"
+       . '                </th>' . "\n"
+       . '                <th colspan="6">' . "\n"
+       . '                    &nbsp;' . $GLOBALS['strAction'] . '&nbsp;' . "\n"
+       . '                </th>' . "\n"
+       . '                <th>' . "\n"
+       . '                    &nbsp;' .  $GLOBALS['strRecords'] . '&nbsp;' . "\n"
+       . '                </th>' . "\n";
+    if (!$alternate) {
+        if (!($GLOBALS['cfg']['PropertiesNumColumns'] > 1)) {
+            echo '                <th>' . "\n"
+               . '                    &nbsp;' . $GLOBALS['strType'] . '&nbsp;' . "\n"
+               . '                </th>' . "\n";
+            if (PMA_MYSQL_INT_VERSION >= 40100) {
+                echo '                <th>' . "\n"
+                   . '                    &nbsp;' . $GLOBALS['strCollation'] . '&nbsp;' . "\n"
+                   . '                </th>' . "\n";
+            }
+        }
+        if ($GLOBALS['cfg']['ShowStats']) {
+            echo '                <th>' . "\n"
+               . '                    &nbsp;' . $GLOBALS['strSize'] . '&nbsp;' . "\n"
+               . '                </th>' . "\n"
+               . '                <th>' . "\n"
+               . '                    &nbsp;' . $GLOBALS['strOverhead'] . '&nbsp;' . "\n"
+               . '                </th>' . "\n";
+        }
+        echo "\n";
     }
+    echo '            </tr>' . "\n";
 }
 
 
@@ -377,11 +382,14 @@ else {
                 </td>
             <?php
             if (!($cfg['PropertiesNumColumns'] > 1)) {
-            ?>
-                <td bgcolor="<?php echo $bgcolor; ?>" nowrap="nowrap">
-                    &nbsp;<?php echo (isset($sts_data['Type']) ? $sts_data['Type'] : '&nbsp;'); ?>&nbsp;
-                </td>
-            <?php
+                echo '                <td bgcolor="' . $bgcolor . '" nowrap="nowrap">' . "\n"
+                   . '                    &nbsp;' . (isset($sts_data['Type']) ? $sts_data['Type'] : '&nbsp;') . '&nbsp;' . "\n"
+                   . '                </td>' . "\n";
+                if (PMA_MYSQL_INT_VERSION >= 40100) {
+                    echo '                <td bgcolor="' . $bgcolor . '" nowrap="nowrap">' . "\n"
+                       . '                    &nbsp;' . (isset($sts_data['Collation']) ? '<dfn title="' . PMA_getCollationDescr($sts_data['Collation']) . '">' . $sts_data['Collation'] . '</dfn>' : '---') . '&nbsp;' . "\n"
+                       . '                </td>' . "\n";
+                }
             }
 
             if ($cfg['ShowStats']) {
@@ -438,11 +446,14 @@ else {
                 </th>
     <?php
     if (!($cfg['PropertiesNumColumns'] > 1)) {
-    ?>
-                <th align="center">
-                    <b>--</b>
-                </th>
-    <?php
+        echo '                <th align="center">' . "\n"
+           . '                    <b>--</b>' . "\n"
+           . '                </th>' . "\n";
+        if (PMA_MYSQL_INT_VERSION >= 40100) {
+            echo '                <th align="center">' . "\n"
+               . '                    &nbsp;<b><dfn title="' . PMA_getCollationDescr($db_collation) . '">' . $db_collation . '</dfn></b>&nbsp;' . "\n"
+               . '                </th>' . "\n";
+        }
     }
 
     if ($cfg['ShowStats']) {
@@ -588,6 +599,27 @@ echo '        ' . '&nbsp;<input type="submit" value="' . $strGo . '" />' . "\n";
     </li>
 
 <?php
+
+if (PMA_MYSQL_INT_VERSION >= 40101) {
+    // MySQL supports setting default charsets / collations for databases since
+    // version 4.1.1.
+    echo '    <!-- Change database charset -->' . "\n"
+       . '    <li>' . "\n"
+       . '        <form method="post" action="./db_details_structure.php">' . "\n"
+       . PMA_generate_common_hidden_inputs($db, $table, 3)
+       . '            ' . $strCharset . '&nbsp;:&nbsp;' . "\n"
+       . '            <select name="db_charset" style="vertical-align: middle">' . "\n";
+       $real_charset = strpos($db_collation, '_') ? substr($db_collation, 0, strpos($db_collation, '_')) : $db_collation;
+    for ($i = 1; isset($mysql_charsets[$i]); $i++) {
+        echo '                <option value="' . $mysql_charsets[$i] . '"' . ($mysql_charsets[$i] == $real_charset ? ' selected="selected"' : '') . '>' . $mysql_charsets[$i] . '</option>' . "\n";
+    }
+    unset($i, $real_charset);
+    echo '            </select>&nbsp;' . "\n"
+       . '            <input type="submit" name="submitcharset" value="' . $strGo . '" style="vertical-align: middle" />&nbsp;' . "\n"
+       . '        </form>' . "\n"
+       . '    </li>' . "\n\n";
+}
+
 if ($num_tables > 0
     && !$cfgRelation['allworks'] && $cfg['PmaNoRelation_DisableWarning'] == FALSE) {
     echo '    <li>' . "\n";

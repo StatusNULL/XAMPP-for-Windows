@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_replace_fields.php,v 2.3.2.1 2003/12/11 13:43:12 garvinhicking Exp $ */
+/* $Id: tbl_replace_fields.php,v 2.5 2003/12/11 12:45:44 garvinhicking Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 // note: grab_globals has extracted the fields from _FILES

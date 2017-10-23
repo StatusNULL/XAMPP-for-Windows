@@ -1,5 +1,5 @@
 <?php
-/* $Id: czech-utf-8.inc.php,v 2.4 2003/11/26 20:43:52 nijel Exp $ */
+/* $Id: czech-utf-8.inc.php,v 2.8 2003/12/30 21:34:04 nijel Exp $ */
 
 /**
  * Czech language file by
@@ -156,6 +156,7 @@ $strCriteria = 'Podmínka';
 $strCroatian = 'Chorvatsky';
 $strCyrillic = 'Cyrilika';
 $strCzech = 'Česky';
+$strCzechSlovak = 'Čeština/Slovenština';
 
 $strDBComment = 'Komentář k databázi: ';
 $strDBGContext = 'Kontext';
@@ -265,6 +266,7 @@ $strFunction = 'Funkce';
 $strGenBy = 'Vygeneroval';
 $strGenTime = 'Vygenerováno';
 $strGeneralRelationFeat = 'Obecné funkce relací';
+$strGeorgian = 'Gruzínština';
 $strGerman = 'Německy';
 $strGlobal = 'globální';
 $strGlobalPrivileges = 'Globální oprávnění';
@@ -364,6 +366,7 @@ $strMIME_transformation_note = 'Pro seznam dostupných parametrů transformací 
 $strMIME_transformation_options = 'Parametry transformace';
 $strMIME_transformation_options_note = 'Zadejte parametry transformací v&nbsp;následujícím tvaru: \'a\',\'b\',\'c\'...<br />Pokud potřebujete použít zpětné lomítko ("\") nebo jednoduché uvozovky ("\'") mezi těmito hodnotami, vložte před ně zpětné lomítko (například \'\\\\xyz\' or \'a\\\'b\').';
 $strMIME_without = 'MIME typy zobrazené kurzívou nemají vlastní transformační funkci';
+$strMaximumSize = 'Maximální velikost: %s%s';
 $strMissingBracket = 'Chybí závorka';
 $strModifications = 'Změny byly uloženy';
 $strModify = 'Úpravy';
@@ -655,6 +658,7 @@ $strTotal = 'celkem';
 $strTotalUC = 'Celkem';
 $strTraditionalChinese = 'Tradiční Čínština';
 $strTraffic = 'Provoz';
+$strTransformation_application_octetstream__download = 'Zobrazí odkaz na stáhnutí dat. První parametr je jméno souboru, druhý jméno sloupce v tabulce obsahující jméno souboru. Pokud zadáte druhý parametr, první musí být prázný.';
 $strTransformation_image_jpeg__inline = 'Zobrazí náhled obrázku s&nbsp;odkazem na obrázek; parametry šířka a výška v&nbsp;bodech (poměr stran obrázku zůstane zachován)';
 $strTransformation_image_jpeg__link = 'Zobrazí odkaz na obrázek (například stáhnutí pole blob).';
 $strTransformation_image_png__inline = 'Viz image/jpeg: inline';

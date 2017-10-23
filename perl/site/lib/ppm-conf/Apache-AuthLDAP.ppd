@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOFTPKG NAME="Apache-AuthLDAP" VERSION="0,21,0,0">
+  <IMPLEMENTATION>
+    <CODEBASE HREF="http://ppm.ActiveState.com/PPMPackages/5.8-windows/MSWin32-x86-multi-thread-5.8/Apache-AuthLDAP.tar.gz" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    <OS NAME="MSWin32" />
+  </IMPLEMENTATION>
+  <ABSTRACT>mod_perl LDAP Access Control and Authentication Module</ABSTRACT>
+  <AUTHOR>Clayton Donley (donley@wwa.com)</AUTHOR>
+  <TITLE>Apache-AuthLDAP</TITLE>
+</SOFTPKG>

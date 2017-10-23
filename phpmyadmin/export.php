@@ -1,5 +1,5 @@
 <?php
-/* $Id: export.php,v 2.2.2.1 2003/12/12 11:13:53 garvinhicking Exp $ */
+/* $Id: export.php,v 2.3.2.2 2004/02/18 16:12:41 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -18,10 +18,8 @@ if ($what == 'excel') {
     $type = $what;
 }
 
-/**
- * Defines the url to return to in case of error in a sql statement
- */
-require('./libraries/export/' . $type . '.php');
+// Get the functions specific to the export type
+require('./libraries/export/' . preg_replace('@\.\.*@','.',$type) . '.php');
 
 // Generate error url
 if ($export_type == 'server') {
@@ -55,8 +53,7 @@ $time_start = time();
  */
 function PMA_exportOutputHandler($line)
 {
-    global $time_start, $dump_buffer, $dump_buffer_len;
-
+    global $time_start, $dump_buffer, $dump_buffer_len, $save_filename;
     // Kanji encoding convert feature
     if (function_exists('PMA_kanji_str_conv')) {
         $line = PMA_kanji_str_conv($line, $GLOBALS['knjenc'], isset($GLOBALS['xkana']) ? $GLOBALS['xkana'] : '');
@@ -66,7 +63,6 @@ function PMA_exportOutputHandler($line)
 
         $dump_buffer .= $line;
         if ($GLOBALS['onfly_compression']) {
-
             $dump_buffer_len += strlen($dump_buffer);
 
             if ($dump_buffer_len > $GLOBALS['memory_limit']) {

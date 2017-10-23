@@ -81,22 +81,22 @@ Content-language: es
 Content-type: text/html; charset=ISO-8859-1
 Body:----------es--
 <!--#set var="CONTENT_LANGUAGE" value="es"
---><!--#set var="TITLE" value="Resource is no longer available!"
+--><!--#set var="TITLE" value="&iexcl;Recurso no disponible&excl;"
 --><!--#include virtual="include/top.html" -->
 
-	Los recursos solicitados ya no estan disponibles en
-	este servidor y no existe una direcci&oacute;n alterna.
+	Los recursos solicitados ya no est&aacute;n disponibles en
+	este servidor y no existe una direcci&oacute;n alternativa.
 
   <!--#if expr="$HTTP_REFERER" -->
 
 	Le solicitamos que comunique al autor de la 
 	<a href="<!--#echo encoding="url" var="HTTP_REFERER"
-        -->">p&aacute;gina referida</a> que el URL esta fuera de tiempo.
+        -->">p&aacute;gina referente</a> que el enlace est&aacute; obsoleto.
 
   <!--#else -->
 	
-	Si usted siguio el URL desde una p&aacute;gina externa, 
-	porfavor contacte al autor de esa p&aacute;gina.
+	Si usted sigui&oacute; el enlace desde una p&aacute;gina externa, 
+	por favor contacte con el autor de esa p&aacute;gina.
 
   <!--#endif -->
 
@@ -129,58 +129,6 @@ Body:----------fr--
 <!--#include virtual="include/bottom.html" -->
 ----------fr--
 
-Content-language: nl
-Content-type: text/html; charset=ISO-8859-1
-Body:----------nl--
-<!--#set var="CONTENT_LANGUAGE" value="nl"
---><!--#set var="TITLE" value="Dit object is niet langer beschikbaar!"
---><!--#include virtual="include/top.html" -->
-
-   De gevraagde URL is niet langer beschikbaar op deze server en er is geen
-   doorverwijsadres.
-
-  <!--#if expr="$HTTP_REFERER" -->
-
-   Gelieve aan de auteur van
-   <a href="<!--#echo encoding="url" var="HTTP_REFERER" -->">deze pagina</a>
-   te melden dat deze link niet langer actueel is.
-
-  <!--#else -->
-
-   Indien u deze link hebt gekregen van een andere pagina, gelieve
-   de auteur van deze pagina te contacteren.
-
-  <!--#endif -->
-
-<!--#include virtual="include/bottom.html" -->
-----------nl--
-
-Content-language: sv
-Content-type: text/html; charset=ISO-8859-1
-Body:----------sv--
-<!--#set var="CONTENT_LANGUAGE" value="sv"
---><!--#set var="TITLE" value="Resursen inte l&auml;ngre tillg&auml;nglig!"
---><!--#include virtual="include/top.html" -->
-
-    Den &ouml;nskade adressen &auml;r inte l&auml;ngre tillg&auml;nglig hos
-    denna server och det finns inte n&aring;gon adress f&ouml;r vidarebefodran.
-
-  <!--#if expr="$HTTP_REFERER" -->
-
-    V&auml;nligen informera f&ouml;rfattaren bakom 
-    <a href="<!--#echo encoding="url" var="HTTP_REFERER" -->">den aktuella
-    sidan</a> att l&auml;nken &auml;r inaktuell.
- 
-  <!--#else -->
-
-    Om du f&ouml;ljde en l&auml;nk fr&aring;n en extern sida, v&auml;nligen
-    kontakta f&ouml;rfattaren av den sidan.
-
-  <!--#endif -->
-
-<!--#include virtual="include/bottom.html" -->
-----------sv--
-
 Content-language: it
 Content-type: text/html; charset=ISO-8859-1
 Body:----------it--
@@ -207,6 +155,85 @@ Body:----------it--
 
 <!--#include virtual="include/bottom.html" -->
 ----------it--
+
+Content-language: ko
+Content-type: text/html; charset=EUC-KR
+Body:----------ko--
+<!--#set var="CONTENT_LANGUAGE" value="ko"
+--><!--#set var="TITLE" value="°´Ã¼°¡ ¾ø¾îÁ³À½!"
+--><!--#set var="CHARACTER_ENCODING" value="EUC-KR"
+--><!--#include virtual="include/top.html" -->
+
+   ¿äÃ»ÇÑ URLÀº ´õ ÀÌ»ó ÀÌ ¼­¹ö¿¡ ³²¾ÆÀÖÁö ¾ÊÀ¸¸ç,
+   ±× °´Ã¼°¡ ¿Å°ÜÁø ´Ù¸¥ URL ¿ª½Ã ³²¾ÆÀÖÁö ¾Ê½À´Ï´Ù.
+
+  <!--#if expr="$HTTP_REFERER" -->
+
+    <a href="<!--#echo encoding="url" var="HTTP_REFERER"-->">ÀÌÀü
+    ÆäÀÌÁö</a>ÀÇ ¸¸µçÀÌ¿¡°Ô ÁÖ¼Ò°¡ Àß¸øµÇ¾ú´Ù°í ¾Ë·ÁÁÖ½Ã±â ¹Ù¶ø´Ï´Ù.
+
+  <!--#else -->
+
+    ´Ù¸¥ ÆäÀÌÁöÀÇ ¸µÅ©¸¦ µû¶ó¿À¼Ì´Ù¸é, ±× ÆäÀÌÁöÀÇ ¸¸µçÀÌ¿¡°Ô ¿¬¶ôÀ» ÇÏ½Ã±â
+    ¹Ù¶ø´Ï´Ù.
+
+  <!--#endif -->
+
+<!--#include virtual="include/bottom.html" -->
+----------ko--
+
+Content-language: nl
+Content-type: text/html; charset=ISO-8859-1
+Body:----------nl--
+<!--#set var="CONTENT_LANGUAGE" value="nl"
+--><!--#set var="TITLE" value="Dit object is niet langer beschikbaar!"
+--><!--#include virtual="include/top.html" -->
+
+   De gevraagde URL is niet langer beschikbaar op deze server en er is geen
+   doorverwijsadres.
+
+  <!--#if expr="$HTTP_REFERER" -->
+
+   Gelieve aan de auteur van
+   <a href="<!--#echo encoding="url" var="HTTP_REFERER" -->">deze pagina</a>
+   te melden dat deze link niet langer actueel is.
+
+  <!--#else -->
+
+   Indien u deze link hebt gekregen van een andere pagina, gelieve
+   de auteur van deze pagina te contacteren.
+
+  <!--#endif -->
+
+<!--#include virtual="include/bottom.html" -->
+----------nl--
+
+Content-language: pl
+Content-type: text/html; charset=ISO-8859-2
+Body:----------pl--
+<!--#set var="CONTENT_LANGUAGE" value="pl"
+--><!--#set var="TITLE" value="Zasób usuniêty!"
+--><!--#set var="CHARACTER_ENCODING" value="ISO-8859-2"
+--><!--#include virtual="include/top.html" -->
+
+    Poszukiwany zasób nie jest ju¿ dostêpny na tym serwerze i nie
+    podano nowego adresu zasobu.
+
+  <!--#if expr="$HTTP_REFERER" -->
+
+    Prosimy poinformowaæ autora
+    <a href="<!--#echo encoding="url" var="HTTP_REFERER" -->">referuj±cej
+    strony</a> o nieaktualnym linku.
+
+  <!--#else -->
+
+    Je¶li pod±¿y³e¶ za linkiem z innej strony skontaktuj siê z jej
+    autorem.
+
+  <!--#endif -->
+
+<!--#include virtual="include/bottom.html" -->
+----------pl--
 
 Content-language: pt-br
 Content-type: text/html; charset=ISO-8859-1
@@ -260,3 +287,57 @@ Body:----------ro--
 
 <!--#include virtual="include/bottom.html" -->
 ----------ro--
+
+Content-language: sv
+Content-type: text/html; charset=ISO-8859-1
+Body:----------sv--
+<!--#set var="CONTENT_LANGUAGE" value="sv"
+--><!--#set var="TITLE" value="Resursen inte l&auml;ngre tillg&auml;nglig!"
+--><!--#include virtual="include/top.html" -->
+
+    Den &ouml;nskade adressen &auml;r inte l&auml;ngre tillg&auml;nglig hos
+    denna server och det finns inte n&aring;gon adress f&ouml;r vidarebefodran.
+
+  <!--#if expr="$HTTP_REFERER" -->
+
+    V&auml;nligen informera f&ouml;rfattaren bakom 
+    <a href="<!--#echo encoding="url" var="HTTP_REFERER" -->">den aktuella
+    sidan</a> att l&auml;nken &auml;r inaktuell.
+ 
+  <!--#else -->
+
+    Om du f&ouml;ljde en l&auml;nk fr&aring;n en extern sida, v&auml;nligen
+    kontakta f&ouml;rfattaren av den sidan.
+
+  <!--#endif -->
+
+<!--#include virtual="include/bottom.html" -->
+----------sv--
+
+Content-language: tr
+Content-type: text/html; charset=ISO-8859-9
+Body:----------tr--
+<!--#set var="CONTENT_LANGUAGE" value="tr"
+--><!--#set var="CHARACTER_ENCODING" value="ISO-8859-9"
+--><!--#set var="TITLE" value="Resource is no longer available!"
+--><!--#include virtual="include/top.html" -->
+
+    Talep etti&#287;iniz URL bu sunucu üzerinde bar&#305;nd&#305;r&#305;lm&#305;yor
+    ve herhangi bir yöneltme de mevcut de&#287;il.  
+
+  <!--#if expr="$HTTP_REFERER" -->
+  
+    Lütfen
+    <a href="<!--#echo encoding="url" var="HTTP_REFERER" -->">referans sayfan&#305;n</a>
+    yazar&#305;na, bu ba&#287;lant&#305;n&#305;n güncel
+    olmad&#305;&#287;&#305;n&#305; bildirin.
+   
+  <!--#else -->
+  
+    Yabanc&#305; bir sayfadan bu ba&#287;lant&#305;y&#305; izlediyseniz,
+    lütfen sözkonusu sayfan&#305;n yazar&#305; ile ileti&#351;ime geçin.
+   
+  <!--#endif -->
+  
+<!--#include virtual="include/bottom.html" --> 
+----------tr--

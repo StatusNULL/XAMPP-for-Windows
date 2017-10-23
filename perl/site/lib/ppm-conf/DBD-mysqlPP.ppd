@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOFTPKG NAME="DBD-mysqlPP" VERSION="0,04,0,0">
+  <IMPLEMENTATION>
+    <CODEBASE HREF="http://ppm.ActiveState.com/PPMPackages/5.8-windows/MSWin32-x86-multi-thread-5.8/DBD-mysqlPP-0.04.tar.gz" />
+    <DEPENDENCY NAME="Net-MySQL" VERSION="0,08,0,0" />
+    <DEPENDENCY NAME="DBI" VERSION="0,0,0,0" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    <OS NAME="MSWin32" />
+  </IMPLEMENTATION>
+  <ABSTRACT>Pure Perl MySQL driver for the DBI</ABSTRACT>
+  <AUTHOR>OYAMA Hiroyuki (hoyama@infoware.ne.jp)</AUTHOR>
+  <TITLE>DBD-mysqlPP</TITLE>
+</SOFTPKG>

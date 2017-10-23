@@ -41,10 +41,10 @@ Content-language: es
 Content-type: text/html; charset=ISO-8859-1
 Body:----------es--
 <!--#set var="CONTENT_LANGUAGE" value="es"
---><!--#set var="TITLE" value="Bad request!"
+--><!--#set var="TITLE" value="&iexcl;Solicitud err&oacute;nea&excl;"
 --><!--#include virtual="include/top.html" -->
 
-	El buscador ha solicitado una operaci&oacute;n
+	El navegador ha solicitado una operaci&oacute;n
 	que no puede ser procesada por el servidor.
 
 <!--#include virtual="include/bottom.html" -->
@@ -63,6 +63,33 @@ Body:----------fr--
 <!--#include virtual="include/bottom.html" -->  
 ----------fr--
 
+Content-language: it
+Content-type: text/html; charset=ISO-8859-1
+Body:----------it--
+<!--#set var="CONTENT_LANGUAGE" value="it"
+--><!--#set var="TITLE" value="Richiesta incomprensibile!"
+--><!--#include virtual="include/top.html" -->
+
+    Il tuo browser (o il proxy) ha inviato a
+    questo server una richiesta incomprensibile.
+
+<!--#include virtual="include/bottom.html" -->
+----------it--
+
+Content-language: ko
+Content-type: text/html; charset=EUC-KR
+Body:----------ko--
+<!--#set var="CONTENT_LANGUAGE" value="ko"
+--><!--#set var="TITLE" value="Àß¸øµÈ ¿äÃ»!"
+--><!--#set var="CHARACTER_ENCODING" value="EUC-KR"
+--><!--#include virtual="include/top.html" -->
+
+    ºê¶ó¿ìÀú ¶Ç´Â ÇÁ·Ï½Ã°¡
+    ÀÌ ¼­¹ö°¡ Ã³¸®ÇÒ ¼ö ¾ø´Â Àß¸øµÈ ¿äÃ»À» º¸³Â½À´Ï´Ù.
+
+<!--#include virtual="include/bottom.html" -->
+----------ko--
+
 Content-language: nl
 Content-type: text/html; charset=ISO-8859-1
 Body:----------nl--
@@ -76,31 +103,19 @@ Body:----------nl--
 <!--#include virtual="include/bottom.html" -->
 ----------nl--
 
-Content-language: sv
-Content-type: text/html; charset=ISO-8859-1
-Body:----------sv--
-<!--#set var="CONTENT_LANGUAGE" value="sv"
---><!--#set var="TITLE" value="Felaktig f&ouml;rfr&aring;gan!"
+Content-language: pl
+Content-type: text/html; charset=ISO-8859-2
+Body:----------pl--
+<!--#set var="CONTENT_LANGUAGE" value="pl"
+--><!--#set var="TITLE" value="Nieprawid³owe ¿±danie!"
+--><!--#set var="CHARACTER_ENCODING" value="ISO-8859-2"
 --><!--#include virtual="include/top.html" -->
 
-    Din webbl&auml;sare eller proxy skickade en f&ouml;rfr&aring;gan
-    som denna server inte kunde f&ouml;rst&aring;.
-
-<!--#include virtual="include/bottom.html" -->  
-----------sv--
-
-Content-language: it
-Content-type: text/html; charset=ISO-8859-1
-Body:----------it--
-<!--#set var="CONTENT_LANGUAGE" value="it"
---><!--#set var="TITLE" value="Richiesta incomprensibile!"
---><!--#include virtual="include/top.html" -->
-
-    Il tuo browser (o il proxy) ha inviato a
-    questo server una richiesta incomprensibile.
+    Twoja przegl±darka (lub serwer po¶rednicz±cy) wys³a³ ¿±danie,
+    którego ten serwer nie potrafi obs³u¿yæ.
 
 <!--#include virtual="include/bottom.html" -->
-----------it--
+----------pl--
 
 Content-language: pt-br
 Content-type: text/html; charset=ISO-8859-1
@@ -127,3 +142,31 @@ Body:----------ro--
 
 <!--#include virtual="include/bottom.html" -->
 ----------ro--
+
+Content-language: sv
+Content-type: text/html; charset=ISO-8859-1
+Body:----------sv--
+<!--#set var="CONTENT_LANGUAGE" value="sv"
+--><!--#set var="TITLE" value="Felaktig f&ouml;rfr&aring;gan!"
+--><!--#include virtual="include/top.html" -->
+
+    Din webbl&auml;sare eller proxy skickade en f&ouml;rfr&aring;gan
+    som denna server inte kunde f&ouml;rst&aring;.
+
+<!--#include virtual="include/bottom.html" -->  
+----------sv--
+
+Content-language: tr
+Content-type: text/html; charset=ISO-8859-9
+Body:----------tr--
+<!--#set var="CONTENT_LANGUAGE" value="tr"
+--><!--#set var="CHARACTER_ENCODING" value="ISO-8859-9"
+--><!--#set var="TITLE" value="Bad request!"
+--><!--#include virtual="include/top.html" -->
+
+    Gezgininiz (veya vekil sunucunuz) bu sunucunun
+    tan&#305;mad&#305;&#287;&#305;
+    bir istemde bulundu.
+
+<!--#include virtual="include/bottom.html" -->
+----------tr--

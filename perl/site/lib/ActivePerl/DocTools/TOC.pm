@@ -28,13 +28,13 @@ perlboot  perltoot  perltooc  perlbot
     __
 perlstyle
     __
-perltrap  perldebtut
+perlcheat  perltrap  perldebtut
     __
 perlfaq1  perlfaq2  perlfaq3  perlfaq4  perlfaq5  perlfaq6  perlfaq7  perlfaq8  perlfaq9
     __
 perlsyn  perldata  perlop  perlsub  perlfunc  perlopentut  perlpacktut
     __
-perlpod  perlpodspec  perlrun  perldiag  perllexwarn  perldebug  perlvar  perlre  perlref  perlform  perlobj  perltie  perldbmfilter
+perlpod  perlpodspec  perlrun  perldiag  perllexwarn  perldebug  perlvar  perlre  perlreref  perlref  perlform  perlobj  perltie  perldbmfilter
     __
 perlipc  perlfork  perlnumber
     __
@@ -60,11 +60,11 @@ perlhack
     __
 perlbook  perltodo
     __
-perlhist  perldelta  perl572delta  perl571delta  perl570delta  perl561delta  perl56delta  perl5005delta  perl5004delta
+perlhist  perldelta  perl582delta  perl581delta  perl58delta  perl573delta  perl572delta  perl571delta  perl570delta  perl561delta  perl56delta  perl5005delta  perl5004delta
     __
 perlcn  perljp  perlko  perltw
     __
-perlaix  perlamiga  perlapollo  perlbeos  perlbs2000  perlce  perlcygwin  perldgux  perldos  perlepoc  perlfreebsd  perlhpux  perlhurd  perlirix  perlmachten  perlmacos  perlmint  perlmpeix  perlnetware  perlos2  perlos390  perlplan9  perlqnx  perlsolaris  perltru64  perluts  perlvmesa  perlvms  perlvos  perlwin32
+perlaix  perlamiga  perlapollo  perlbeos  perlbs2000  perlce  perlcygwin  perldgux  perldos  perlepoc  perlfreebsd  perlhpux  perlhurd  perlirix  perlmachten  perlmacos  perlmacosx  perlmint  perlmpeix  perlnetware  perlos2  perlos390  perlos400  perlplan9  perlqnx  perlsolaris  perltru64  perluts  perlvmesa  perlvms  perlvos  perlwin32
 		);
 
 
@@ -271,6 +271,7 @@ sub _BuildHashes {
 	if ($file =~ /^[a-z]/) {  # pragmas in perl are denoted by all lowercase...
 	    if ($file ne 'perlfilter' 
 		and $file ne 'lwpcook' 
+		and $file ne 'lwptut' 
 		and $file ne 'perllocal') 
 	    {   # ... except these. sigh. Yes, Dave, it's their fault, but we ought to fix it anyway.
 		$pragmaz{$file} = $filez{$file};

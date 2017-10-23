@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOFTPKG NAME="Apache-Sybase-CTlib" VERSION="1,02,0,0">
+  <IMPLEMENTATION>
+    <CODEBASE HREF="http://ppm.ActiveState.com/PPMPackages/5.8-windows/MSWin32-x86-multi-thread-5.8/Apache-Sybase-CTlib.tar.gz" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    <OS NAME="MSWin32" />
+  </IMPLEMENTATION>
+  <ABSTRACT>Perl extension for creating persistant database connections to sybase using Apache and Sybperl.</ABSTRACT>
+  <AUTHOR>Mark A. Downing (mdowning@stratasource.com)</AUTHOR>
+  <TITLE>Apache-Sybase-CTlib</TITLE>
+</SOFTPKG>

@@ -19,6 +19,23 @@ DBD::ODBC::Changes - Log of significant changes to the DBD::ODBC
  Keep checking Oracle's ODBC drivers for Windows to fix the Date binding problem
 
 =head1 CHANGES
+
+=item Changes in DBD::ODBC 1.07 February 19, 2003
+
+ Added to Subversion version control hosted by perl.org.  Thanks Robert!  See ODBC.pm POD for more information.
+ Added contributing section to ODBC.pm POD -- see more details there!
+ Added parameter to odbc_errhandler for the NativeError -- thanks to Martin Busek.
+ Fix for Makefile.PL not having tab in front of $(NOOP) (Finally).
+ Fix for SQLForeignKeys thanks to Kevin Shepherd.
+
+=item Changes in DBD::ODBC 1.06 June 19, 2003
+
+ Fixed test in t/02simple.t to skip if the DSN defined by the user has DSN= in it.
+ Added tests for wrong DSN, ensuring the DBI::errstr is appropriately set.
+ Fixed small issue in Makefile.PL for Unix systems thanks to H.Merijn Brand.
+ Update to NOT copy user id and password to connect string if UID or PWD parameter in connect string.
+ Updated Makefile.PL for dmake, per patch by Steffen Goldner.  Thanks Steffen!
+
 =item Changes in DBD::ODBC 1.05 March 14, 2003
 
  Cleaned up Makefile.PL and added Informix support thanks to Jonathan Leffler (see README.informix)

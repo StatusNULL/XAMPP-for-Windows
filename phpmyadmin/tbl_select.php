@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_select.php,v 2.2.2.1 2003/12/30 12:25:36 lem9 Exp $ */
+/* $Id: tbl_select.php,v 2.3 2003/12/30 12:22:51 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -156,11 +156,13 @@ if (!isset($param) || $param[0] == '') {
             // <markus@noga.de>
             $field = $fields_list[$i];
 
+            // do not use require_once here
             require('./libraries/get_foreign.lib.php');
 
             echo "\n";
             // we got a bug report: in some cases, even if $disp is true,
             // there are no rows, so we add a fetch_array
+
             if ($foreigners && isset($foreigners[$field]) && isset($disp) && $disp && @PMA_mysql_fetch_array($disp)) {
                 // f o r e i g n    k e y s
                 echo '                    <select name="fields[]">' . "\n";

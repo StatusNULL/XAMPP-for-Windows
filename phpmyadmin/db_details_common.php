@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_details_common.php,v 2.2 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: db_details_common.php,v 2.3 2003/12/30 18:24:10 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -32,6 +32,16 @@ if (!isset($is_db) || !$is_db) {
         exit;
     }
 } // end if (ensures db exists)
+
+/**
+ * Changes database charset if requested by the user
+ */
+if (isset($submitcharset) && PMA_MYSQL_INT_VERSION >= 40101) {
+    $sql_query     = 'ALTER DATABASE ' . PMA_backquote($db) . ' DEFAULT CHARACTER SET ' . $db_charset;
+    $result        = PMA_mysql_query($sql_query, $userlink) or PMA_mysqlDie(PMA_mysql_error($userlink), $sql_query, '', $err_url);
+    $message       = $strSuccess;
+}
+
 // Displays headers
 if (!isset($message)) {
     $js_to_run = 'functions.js';

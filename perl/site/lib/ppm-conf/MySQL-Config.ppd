@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOFTPKG NAME="MySQL-Config" VERSION="1,03,0,0">
+  <IMPLEMENTATION>
+    <CODEBASE HREF="http://ppm.ActiveState.com/PPMPackages/5.8-windows/MSWin32-x86-multi-thread-5.8/MySQL-Config-1.03.tar.gz" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    <OS NAME="MSWin32" />
+  </IMPLEMENTATION>
+  <ABSTRACT>Parse and utilize MySQL's /etc/my.cnf and ~/.my.cnf files</ABSTRACT>
+  <AUTHOR>Darren Chamberlain (darren@cpan.org)</AUTHOR>
+  <TITLE>MySQL-Config</TITLE>
+</SOFTPKG>

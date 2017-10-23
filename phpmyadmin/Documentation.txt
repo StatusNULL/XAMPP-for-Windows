@@ -6,7 +6,7 @@
    Transformations  -  FAQ  -  Developers  -  Credits  -  Translators
    ______________________________________________________________________
 
-                       phpMyAdmin 2.5.5pl1 Documentation
+                        phpMyAdmin 2.5.6 Documentation
 
      * SourceForge phpMyAdmin project page   [ http://www.phpmyadmin.net/
        ] 
@@ -14,8 +14,8 @@
           + Version history: ChangeLog
           + General notes: README
           + License: LICENSE
-     * Documentation    version:    $Id:   Documentation.html,v   2.9.2.4
-       2004/01/03 02:19:10 lem9 Exp $
+     * Documentation    version:   $Id:   Documentation.html,v   2.14.2.5
+       2004/03/01 14:29:37 lem9 Exp $
 
 Requirements
 
@@ -1678,13 +1678,27 @@ FAQ - Frequently Asked Questions
    Instead,  it  will  still  use the character set you specified for the
    MySQL onnection.
    When  compiling  php, we strongly recommend that you manually link the
-   MySQL extension to a MySQL client library of at least the same version
-   since the one that is bundled with current php distributions is rather
-   old and might cause problems.
+   MySQL  extension  to a MySQL client library of at least the same minor
+   version  since  the one that is bundled with current php distributions
+   is rather old and might cause problems (see also FAQ 1.17a).
    Also, we do not yet support the improved MySQL extension (mysqli) that
    comes  with php 5. For the moment, the old MySQL extension should also
    work fine here, if compiled correctly.
    MySQL 5.1 is not yet supported.
+
+    [1.17a] I cannot connect to the MySQL server. It alawys returns the error
+    message, "Client does not support authentication protocol requested by
+    server; consider upgrading MySQL client"
+
+   You  tried  to  access  MySQL  with  an  old MySQL client library. The
+   version  of your MySQL client library can be checked in your phpinfo()
+   output.
+   In  general,  it  should  have at least the same minor version as your
+   server - as mentioned in FAQ 1.17.
+   The  only  way  to  fix this problem is manually compiling php and its
+   MySQL extension against a current MySQL client library.
+   If  you  still  face  this  problem,  please compile your MySQL client
+   library against the same or a newer MySQL release.
 
     [1.18] I'm running MySQL <= 4.0.1 having lower_case_table_names set to 1.
     If I create a new table with a capital letter in its name it is changed to
@@ -2598,7 +2612,8 @@ CREDITS, in chronological order
 - Marc Delisle <DelislMa_at_CollegeSherbrooke.qc.ca>
     * multi-language version
     * various fixes and improvements
-    * project co-administrator
+    * SQL analyser (most of it)
+    * current project maintainer
 
 - Olivier Müller <om_at_omnis.ch>
     * started SourceForge phpMyAdmin project in March 2001
@@ -2649,7 +2664,7 @@ CREDITS, in chronological order
     * main author of the version 2.1.0.1
     * bugfixes
 
-- Alexander M. Turek <derrabus_at_gmx.de>
+- Alexander M. Turek <me_at_derrabus.de>
     * XML exports
     * MySQL 4 related features
     * various features and fixes

@@ -50,7 +50,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw(
 async	
 );
-our $VERSION = '1.00';
+our $VERSION = '1.02';
 
 
 # || 0 to ensure compatibility with previous versions
@@ -269,7 +269,7 @@ signal handling is not threadsafe.
 
 =head1 AUTHOR and COPYRIGHT
 
-Arthur Bergman E<lt>arthur at contiller.seE<gt>
+Arthur Bergman E<lt>sky at nanisky.comE<gt>
 
 threads is released under the same license as Perl.
 
