@@ -1,5 +1,5 @@
 <?php
-/* $Id: slovak-iso-8859-2.inc.php 10430 2007-06-10 19:28:56Z lem9 $ */
+/* $Id: slovak-iso-8859-2.inc.php 10439 2007-06-15 17:13:29Z lem9 $ */
 
 /* By: lubos klokner <erkac@vault-tec.sk> */
 /* and Ivan Kuriscak <shylauda69@yahoo.com>
@@ -65,7 +65,6 @@ $strAscending = 'Vzostupne';
 $strAtBeginningOfTable = 'Na zaèiatku tabuµky';
 $strAtEndOfTable = 'Na konci tabuµky';
 $strAttr = 'Atribúty';
-$strAutodetect = 'Automaticky zisti»';
 $strAutomaticLayout = 'Automatické rozvrhnutie';
 
 $strBack = 'Spä»';

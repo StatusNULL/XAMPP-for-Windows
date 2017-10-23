@@ -1,5 +1,5 @@
 <?php
-/* $Id: tatarish-iso-8859-9.inc.php 10430 2007-06-10 19:28:56Z lem9 $ */
+/* $Id: tatarish-iso-8859-9.inc.php 10439 2007-06-15 17:13:29Z lem9 $ */
 
 $charset = 'iso-8859-9';
 $allow_recoding = TRUE;
@@ -60,7 +60,6 @@ $strAscending = 'Artýp';
 $strAtBeginningOfTable = 'Tüþämä Baþýna';
 $strAtEndOfTable = 'Tüþämä azaðýna';
 $strAttr = 'Üzençälek';
-$strAutodetect = 'Üzeñ taný';
 $strAutomaticLayout = 'Zihenle urnaþtýru';
 
 $strBack = 'Kire';

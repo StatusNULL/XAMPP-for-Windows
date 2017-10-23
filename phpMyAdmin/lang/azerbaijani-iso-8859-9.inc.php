@@ -1,5 +1,5 @@
 <?php
-/* $Id: azerbaijani-iso-8859-9.inc.php 10430 2007-06-10 19:28:56Z lem9 $ */
+/* $Id: azerbaijani-iso-8859-9.inc.php 10439 2007-06-15 17:13:29Z lem9 $ */
 
 // tercümedeki eksiklerimi ve ya sehv olduðunu düþündüyünüz yerleri shehriyari@trcomm.net adresine göndere bilersiniz...
 // Þehriyar Ýmanov 30 Avqust 2003... Shehi
@@ -56,7 +56,6 @@ $strAscending = 'Artan sýrada';
 $strAtBeginningOfTable = 'Cedvelin baþýna';
 $strAtEndOfTable = 'Cedvelin sonuna';
 $strAttr = 'Xüsusiyyetler';
-$strAutodetect = 'Avtomatik';
 $strAutomaticLayout = 'Automatik þablon';
 
 $strBack = 'Geri';

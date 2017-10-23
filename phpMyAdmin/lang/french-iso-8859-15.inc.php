@@ -1,5 +1,5 @@
 <?php
-/* $Id: french-iso-8859-15.inc.php 10430 2007-06-10 19:28:56Z lem9 $ */
+/* $Id: french-iso-8859-15.inc.php 10439 2007-06-15 17:13:29Z lem9 $ */
 
 $charset = 'iso-8859-15';
 $text_dir = 'ltr';
@@ -65,7 +65,6 @@ $strAscending = 'Croissant';
 $strAtBeginningOfTable = 'En début de table';
 $strAtEndOfTable = 'En fin de table';
 $strAttr = 'Attributs';
-$strAutodetect = 'Détection automatique';
 $strAutomaticLayout = 'Mise en page automatique';
 
 $strBack = 'Retour';

@@ -1,5 +1,5 @@
 <?php
-/* $Id: polish-iso-8859-2.inc.php 10430 2007-06-10 19:28:56Z lem9 $ */
+/* $Id: polish-iso-8859-2.inc.php 10439 2007-06-15 17:13:29Z lem9 $ */
 
 $charset = 'iso-8859-2';
 $text_dir = 'ltr';
@@ -61,7 +61,6 @@ $strAscending = 'Rosn±co';
 $strAtBeginningOfTable = 'Na pocz±tku tabeli';
 $strAtEndOfTable = 'Na koñcu tabeli';
 $strAttr = 'Atrybuty';
-$strAutodetect = 'Rozpoznaj automatycznie';
 $strAutomaticLayout = 'Uk³ad automatyczny';
 
 $strBack = 'Powrót';

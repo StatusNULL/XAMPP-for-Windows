@@ -1,5 +1,5 @@
 <?php
-/* $Id: albanian-iso-8859-1.inc.php 10430 2007-06-10 19:28:56Z lem9 $ */
+/* $Id: albanian-iso-8859-1.inc.php 10439 2007-06-15 17:13:29Z lem9 $ */
 
 /**
  * Translated by: Laurent Dhima <laurenti at users.sourceforge.net>
@@ -60,7 +60,6 @@ $strAscending = 'Ngjitje';
 $strAtBeginningOfTable = 'Në fillim të tabelës';
 $strAtEndOfTable = 'Në fund të tabelës';
 $strAttr = 'Pronësi';
-$strAutodetect = 'Zbulim automatik';
 $strAutomaticLayout = 'Faqosje automatike';
 
 $strBack = 'Mbrapa';

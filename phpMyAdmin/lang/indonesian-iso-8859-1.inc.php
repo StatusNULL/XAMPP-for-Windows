@@ -1,5 +1,5 @@
 <?php
-/* $Id: indonesian-iso-8859-1.inc.php 10430 2007-06-10 19:28:56Z lem9 $ */
+/* $Id: indonesian-iso-8859-1.inc.php 10439 2007-06-15 17:13:29Z lem9 $ */
 
 $charset = 'iso-8859-1';
 $text_dir = 'ltr'; // ('ltr' for left to right, 'rtl' for right to left)
@@ -58,7 +58,6 @@ $strAscending = 'Urutan menaik';
 $strAtBeginningOfTable = 'pada awal tabel';
 $strAtEndOfTable = 'pada akhir tabel';
 $strAttr = 'Atribut';
-$strAutodetect = 'Deteksi otomatis';
 $strAutomaticLayout = 'Layout otomatis';
 
 $strBack = 'Kembali';

@@ -1,5 +1,5 @@
 <?php
-/* $Id: estonian-iso-8859-1.inc.php 10430 2007-06-10 19:28:56Z lem9 $ */
+/* $Id: estonian-iso-8859-1.inc.php 10439 2007-06-15 17:13:29Z lem9 $ */
 
 /*
  * Translated by Marko Ellermaa, <marko.ellermaa@nlkp.net>
@@ -69,7 +69,6 @@ $strAscending = 'Kasvav';
 $strAtBeginningOfTable = 'Tabeli algusesse';
 $strAtEndOfTable = 'Tabeli lõppu';
 $strAttr = 'Parameetrid';
-$strAutodetect = 'Automaatne tuvastus';
 $strAutomaticLayout = 'Automaatne väljund';
 
 $strBack = 'Tagasi';

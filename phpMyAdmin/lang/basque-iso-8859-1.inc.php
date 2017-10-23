@@ -1,5 +1,5 @@
 <?php
-/* $Id: basque-iso-8859-1.inc.php 10430 2007-06-10 19:28:56Z lem9 $ */
+/* $Id: basque-iso-8859-1.inc.php 10439 2007-06-15 17:13:29Z lem9 $ */
 
 $charset = 'iso-8859-1';
 $text_dir = 'ltr';
@@ -52,7 +52,6 @@ $strAscending = 'Goranzko';
 $strAtBeginningOfTable = 'Taularen hasiera';
 $strAtEndOfTable = 'Taularen amaiera';
 $strAttr = 'Ezaugarriak';
-$strAutodetect = 'Autodetektatu';
 $strAutomaticLayout = 'Diseinu automatikoa';
 
 $strBack = 'Itzuli';

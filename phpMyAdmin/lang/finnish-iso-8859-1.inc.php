@@ -1,5 +1,5 @@
 <?php
-/* $Id: finnish-iso-8859-1.inc.php 10430 2007-06-10 19:28:56Z lem9 $ */
+/* $Id: finnish-iso-8859-1.inc.php 10439 2007-06-15 17:13:29Z lem9 $ */
 
 /*
  * Translated by Jouni K‰hkˆnen, <address withdrawn>
@@ -71,7 +71,6 @@ $strAscending = 'Nouseva';
 $strAtBeginningOfTable = 'Taulun alkuun';
 $strAtEndOfTable = 'Taulun loppuun';
 $strAttr = 'Attribuutit';
-$strAutodetect = 'M‰‰rit‰ automaattisesti';
 $strAutomaticLayout = 'Automaattinen ulkoasu';
 
 $strBack = 'Takaisin';

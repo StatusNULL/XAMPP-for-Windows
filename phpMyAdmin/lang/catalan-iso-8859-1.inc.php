@@ -1,5 +1,5 @@
 <?php
-/* $Id: catalan-iso-8859-1.inc.php 10430 2007-06-10 19:28:56Z lem9 $ */
+/* $Id: catalan-iso-8859-1.inc.php 10439 2007-06-15 17:13:29Z lem9 $ */
 
 $charset = 'iso-8859-1';
 $text_dir = 'ltr'; // ('ltr' d'esquerra a dreta, 'rtl' de dreta a esquerra)
@@ -62,7 +62,6 @@ $strAscending = 'Ascendent';
 $strAtBeginningOfTable = 'Al principi de la taula';
 $strAtEndOfTable = 'Al final de la taula';
 $strAttr = 'Atributs';
-$strAutodetect = 'Autodetectar';
 $strAutomaticLayout = 'Disseny automàtic';
 
 $strBack = 'Enrere';

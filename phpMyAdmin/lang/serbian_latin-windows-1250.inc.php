@@ -1,5 +1,5 @@
 <?php
-/* $Id: serbian_latin-windows-1250.inc.php 10430 2007-06-10 19:28:56Z lem9 $ */
+/* $Id: serbian_latin-windows-1250.inc.php 10439 2007-06-15 17:13:29Z lem9 $ */
 
 /**
  * Translated by:
@@ -64,7 +64,6 @@ $strAscending = 'Rastuæi';
 $strAtBeginningOfTable = 'Na poèetku tabele';
 $strAtEndOfTable = 'Na kraju tabele';
 $strAttr = 'Atributi';
-$strAutodetect = 'automatski';
 $strAutomaticLayout = 'Automatski raspored';
 
 $strBack = 'Nazad';

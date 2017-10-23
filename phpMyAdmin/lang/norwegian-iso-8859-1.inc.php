@@ -1,5 +1,5 @@
 <?php
-/* $Id: norwegian-iso-8859-1.inc.php 10430 2007-06-10 19:28:56Z lem9 $ */
+/* $Id: norwegian-iso-8859-1.inc.php 10439 2007-06-15 17:13:29Z lem9 $ */
 
 /**
  * Translated by Sven-Erik Andersen <sven DOT erik DOT andersen AT gmail DOT com>
@@ -65,7 +65,6 @@ $strAscending = 'Stigende';
 $strAtBeginningOfTable = 'Ved begynnelsen av tabellen';
 $strAtEndOfTable = 'Ved slutten av tabellen';
 $strAttr = 'Attributter';
-$strAutodetect = 'Automatisk oppdaging';
 $strAutomaticLayout = 'Automatisk disposisjon';
 
 $strBack = 'Tilbake';

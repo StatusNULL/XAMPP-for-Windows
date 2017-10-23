@@ -1,5 +1,5 @@
 <?php
-/* $Id: croatian-iso-8859-2.inc.php 10430 2007-06-10 19:28:56Z lem9 $ */
+/* $Id: croatian-iso-8859-2.inc.php 10439 2007-06-15 17:13:29Z lem9 $ */
 
 /**
  *   Croatian language file by
@@ -66,7 +66,6 @@ $strAscending = 'Uzlazno';
 $strAtBeginningOfTable = 'Pri poèetku tablice';
 $strAtEndOfTable = 'Pri zavr¹etku tablice';
 $strAttr = 'Atributi';
-$strAutodetect = 'Automatski prepoznaj';
 $strAutomaticLayout = 'Automatski raspored';
 
 $strBack = 'Nazad';

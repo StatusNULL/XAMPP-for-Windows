@@ -1,5 +1,5 @@
 <?php
-/* $Id: latvian-windows-1257.inc.php 10430 2007-06-10 19:28:56Z lem9 $ */
+/* $Id: latvian-windows-1257.inc.php 10439 2007-06-15 17:13:29Z lem9 $ */
 
 /**
  * Latvian language file by Sandis Jçrics <sandisj at parks.lv>
@@ -61,7 +61,6 @@ $strAscending = 'Augoðâ secîbâ';
 $strAtBeginningOfTable = 'Tabulas sâkumâ';
 $strAtEndOfTable = 'Tabulas beigâs';
 $strAttr = 'Atribûti';
-$strAutodetect = 'Noteikt automâtiski';
 $strAutomaticLayout = 'Automâtiskais izvietojums';
 
 $strBack = 'Atpakaï';

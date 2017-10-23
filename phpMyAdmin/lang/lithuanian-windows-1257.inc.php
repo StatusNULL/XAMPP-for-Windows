@@ -1,5 +1,5 @@
 <?php
-/* $Id: lithuanian-windows-1257.inc.php 10430 2007-06-10 19:28:56Z lem9 $ */
+/* $Id: lithuanian-windows-1257.inc.php 10439 2007-06-15 17:13:29Z lem9 $ */
 
 $charset = 'windows-1257';
 $text_dir = 'ltr'; // ('ltr' for left to right, 'rtl' for right to left)
@@ -57,7 +57,6 @@ $strAscending = 'Didëjimo tvarka';
 $strAtBeginningOfTable = 'Lentelës pradþioje';
 $strAtEndOfTable = 'Lentelës pabaigoje';
 $strAttr = 'Atributai';
-$strAutodetect = 'Automatinis nustatymas';
 $strAutomaticLayout = 'Automatinis iðdëstymas';
 
 $strBack = 'Atgal';
