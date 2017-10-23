@@ -1,5 +1,5 @@
 <?php
-/* $Id: lithuanian-windows-1257.inc.php,v 2.6 2003/12/16 18:08:32 lem9 Exp $ */
+/* $Id: lithuanian-windows-1257.inc.php,v 2.6.2.1 2004/06/07 10:09:55 rabus Exp $ */
 
 $charset = 'windows-1257';
 $text_dir = 'ltr'; // ('ltr' for left to right, 'rtl' for right to left)
@@ -720,4 +720,5 @@ $strYes = 'Taip';
 $strZeroRemovesTheLimit = 'Pastaba: nëra jokiø apribojimø jeigu reikðmë nurodyta lygi 0 (nuliui).';
 $strZip = '"zip"';
 
+$strSpanish = 'Spanish';  //to translate
 ?>

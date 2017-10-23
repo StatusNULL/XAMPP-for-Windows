@@ -1,5 +1,5 @@
 <?php
-/* $Id: french-iso-8859-1.inc.php,v 2.7 2003/12/30 21:34:04 nijel Exp $ */
+/* $Id: french-iso-8859-1.inc.php,v 2.7.2.1 2004/06/07 10:09:54 rabus Exp $ */
 
 $charset = 'iso-8859-1';
 $text_dir = 'ltr';
@@ -150,6 +150,7 @@ $strCriteria = 'Critère';
 $strCroatian = 'croate';
 $strCyrillic = 'cyrillique';
 $strCzech = 'tchèque';
+$strCzechSlovak = 'tchèque-slovaque';
 
 $strDBComment = 'Commentaire sur la base de données: ';
 $strDBGContext = 'Contexte';
@@ -259,6 +260,7 @@ $strFunction = 'Fonction';
 $strGenBy = 'Généré par';
 $strGenTime = 'Généré le ';
 $strGeneralRelationFeat = 'Fonctions relationnelles';
+$strGeorgian = 'géorgien';
 $strGerman = 'allemand';
 $strGlobal = 'global';
 $strGlobalPrivileges = 'Privilèges globaux';
@@ -358,6 +360,7 @@ $strMIME_transformation_note = 'La %sdescription des transformations%s explique 
 $strMIME_transformation_options = 'Options de transformation';
 $strMIME_transformation_options_note = 'Veuillez entrer les valeurs des options de transformation en suivant ce format: \'a\',\'b\',\'c\'...<br />Si vous devez entrer un caractère ("\") ou une apostrophe ("\'") parmi ces valeurs, faites-le précéder du caractère d\'échappement, par exemple  \'\\\\xyz\' or \'a\\\'b\').';
 $strMIME_without = 'Les types MIME affichées en italiques ne possèdent pas de fonctions de transformation.';
+$strMaximumSize = 'Taille maximum: %s%s';
 $strMissingBracket = 'Parenthèse manquante';
 $strModifications = 'Les modifications ont été sauvegardées.';
 $strModify = 'Modifier';
@@ -603,6 +606,7 @@ $strSize = 'Taille';
 $strSort = 'Tri';
 $strSortByKey = 'Trier sur l\'index';
 $strSpaceUsage = 'Espace utilisé';
+$strSpanish = 'espagnol';
 $strSplitWordsWithSpace = 'Séparer les mots par un espace (" ").';
 $strStatCheckTime = 'Dernière vérification';
 $strStatCreateTime = 'Création';
@@ -649,6 +653,7 @@ $strTotal = 'total';
 $strTotalUC = 'Total';
 $strTraditionalChinese = 'chinois traditionnel';
 $strTraffic = 'Trafic';
+$strTransformation_application_octetstream__download = 'Affiche un lien pour télécharger le contenu binaire d\'une colonne. La première option est le nom du fichier binaire. La seconde option est le nom de la colonne contenant le nom du fichier. Si vous utilisez la seconde option, veuillez laisser la première option vide.';
 $strTransformation_image_jpeg__inline = 'Affiche une image timbre-poste cliquable; les options sont: largeur,hauteur en pixels (conserve le rapport original)';
 $strTransformation_image_jpeg__link = 'Affiche un lien vers cette image';
 $strTransformation_image_png__inline = 'Voir image/jpeg: inline';
@@ -716,10 +721,5 @@ $strYes = 'Oui';
 
 $strZeroRemovesTheLimit = 'Note: Une valeur de 0 (zero) enlève la limite.';
 $strZip = '"zippé"';
-// To translate
 
-$strGeorgian = 'Georgian';  //to translate
-$strCzechSlovak = 'Czech-Slovak';  //to translate
-$strTransformation_application_octetstream__download = 'Display a link to download the binary data of a field. First option is the filename of the binary file. Second option is a possible fieldname of a table row containing the filename. If you provide a second option you need to have the first option set to an empty string';  //to translate
-$strMaximumSize = 'Maximum size: %s%s';  //to translate
 ?>

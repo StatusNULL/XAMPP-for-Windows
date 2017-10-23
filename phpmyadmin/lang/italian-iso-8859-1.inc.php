@@ -1,5 +1,5 @@
 <?php
-/* $Id: italian-iso-8859-1.inc.php,v 2.6.2.1 2004/01/29 14:27:51 lem9 Exp $ */
+/* $Id: italian-iso-8859-1.inc.php,v 2.6.2.2 2004/06/07 10:09:55 rabus Exp $ */
 
 /**
  * Translated by: Pietro Danesi <danone at users.sourceforge.net>  2002-03-29
@@ -726,4 +726,5 @@ $strYes = ' Si ';
 $strZeroRemovesTheLimit = 'N.B.: 0 (zero) significa nessun limite.';
 $strZip = '"compresso con zip"';
 
+$strSpanish = 'Spanish';  //to translate
 ?>

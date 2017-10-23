@@ -1,5 +1,5 @@
 <?php
-/* $Id: common.lib.php,v 2.10.2.4 2004/02/29 22:04:13 rabus Exp $ */
+/* $Id: common.lib.php,v 2.10.2.5 2004/06/07 11:34:49 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -1215,11 +1215,13 @@ if ($is_minimum_common == FALSE) {
      *
      * @global  array    the list of available databases
      * @global  integer  the number of available databases
+     * @global  array    current configuration
      */
     function PMA_availableDatabases($error_url = '')
     {
         global $dblist;
         global $num_dbs;
+        global $cfg;
 
         $num_dbs = count($dblist);
 
@@ -1238,10 +1240,9 @@ if ($is_minimum_common == FALSE) {
             unset($true_dblist);
             $num_dbs     = count($dblist);
         } // end if
-
         // 2. Allowed database list is empty -> gets the list of all databases
         //    on the server
-        else {
+        else if (!isset($cfg['Server']['only_db']) || $cfg['Server']['only_db'] == '') {
             $dbs          = mysql_list_dbs() or PMA_mysqlDie('', 'SHOW DATABASES;', FALSE, $error_url);
             $num_dbs      = ($dbs) ? @mysql_num_rows($dbs) : 0;
             $real_num_dbs = 0;

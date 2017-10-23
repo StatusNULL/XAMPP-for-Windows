@@ -1,5 +1,5 @@
 <?php
-/* $Id: catalan-iso-8859-1.inc.php,v 2.7.2.1 2004/01/29 14:14:49 lem9 Exp $ */
+/* $Id: catalan-iso-8859-1.inc.php,v 2.7.2.2 2004/06/07 10:09:54 rabus Exp $ */
 
 $charset = 'iso-8859-1';
 $text_dir = 'ltr';
@@ -720,4 +720,5 @@ $strYes = 'Si';
 $strZeroRemovesTheLimit = 'Nota: Establint aquestes opcions a 0 (zero) treu el limit.';
 $strZip = '"comprimit amb zip"';
 
+$strSpanish = 'Spanish';  //to translate
 ?>

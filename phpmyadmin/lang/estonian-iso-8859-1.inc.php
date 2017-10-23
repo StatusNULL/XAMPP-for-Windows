@@ -1,5 +1,5 @@
 <?php
-/* $Id: estonian-iso-8859-1.inc.php,v 2.8.2.1 2004/02/08 18:29:40 lem9 Exp $ */
+/* $Id: estonian-iso-8859-1.inc.php,v 2.8.2.2 2004/06/07 10:09:54 rabus Exp $ */
 
 $charset = 'iso-8859-1';
 $text_dir = 'ltr'; // ('ltr' for left to right, 'rtl' for right to left)
@@ -722,4 +722,5 @@ $strYes = 'Jah';
 $strZeroRemovesTheLimit = 'Märkus: Märkides antud seaded 0 (null) , eemaldate limiidi.';
 $strZip = '"zipitud"';
 
+$strSpanish = 'Spanish';  //to translate
 ?>

@@ -1,5 +1,5 @@
 <?php
-/* $Id: portuguese-iso-8859-1.inc.php,v 2.8 2004/01/12 17:14:20 lem9 Exp $ */
+/* $Id: portuguese-iso-8859-1.inc.php,v 2.8.2.1 2004/06/07 10:09:56 rabus Exp $ */
 
 /**
  * Portuguese language file by
@@ -740,4 +740,5 @@ $strViewDumpDatabases = 'View dump (schema) of databases';//to translate
 $strWildcard = 'wildcard';  //to translate
 $strWindowNotFound = 'The target browser window could not be updated. Maybe you have closed the parent window or your browser is blocking cross-window updates of your security settings';  //to translate
 
+$strSpanish = 'Spanish';  //to translate
 ?>

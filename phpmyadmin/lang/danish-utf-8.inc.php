@@ -1,5 +1,5 @@
 <?php
-/* $Id: danish-utf-8.inc.php,v 2.8.2.1 2004/01/29 14:34:04 lem9 Exp $ */
+/* $Id: danish-utf-8.inc.php,v 2.8.2.2 2004/06/07 10:09:54 rabus Exp $ */
 
 $charset = 'utf-8';
 $allow_recoding = TRUE;
@@ -722,4 +722,5 @@ $strYes = 'Ja';
 $strZeroRemovesTheLimit = 'Bemærk: Indstilling af disse værdier til 0 (nul) fjerner begrænsningen.';
 $strZip = '"zipped"';
 
+$strSpanish = 'Spanish';  //to translate
 ?>

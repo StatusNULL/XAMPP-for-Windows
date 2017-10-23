@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_replace_fields.php,v 2.5 2003/12/11 12:45:44 garvinhicking Exp $ */
+/* $Id: tbl_replace_fields.php,v 2.5.2.1 2004/03/03 20:16:32 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 // note: grab_globals has extracted the fields from _FILES
@@ -140,9 +140,9 @@ if (!$check_stop) {
                             if ($val == 'null') {
                                 // void
                             } else {
-                                // the data here is not urlencoded!
-                                //$val = "'" . PMA_sqlAddslashes(urldecode($val)) . "'";
-                                $val = "'" . PMA_sqlAddslashes($val) . "'";
+                                // the data here is urlencoded
+                                $val = "'" . PMA_sqlAddslashes(urldecode($val)) . "'";
+                                //$val = "'" . PMA_sqlAddslashes($val) . "'";
                             }
                         } else {
                             $val     = "''";
@@ -152,9 +152,9 @@ if (!$check_stop) {
                     // if we have a set, then construct the value
                     if (!empty($fval)) {
                         $val = implode(',', $fval);
-                        // the data here is not urlencoded!
-                        //$val = "'" . PMA_sqlAddslashes(urldecode($val)) . "'";
-                        $val = "'" . PMA_sqlAddslashes($val) . "'";
+                        // the data here is urlencoded
+                        $val = "'" . PMA_sqlAddslashes(urldecode($val)) . "'";
+                        //$val = "'" . PMA_sqlAddslashes($val) . "'";
                     } else {
                         $val = "''";
                     }

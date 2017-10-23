@@ -1,5 +1,5 @@
 <?php
-/* $Id: czech-windows-1250.inc.php,v 2.9 2003/12/30 21:46:02 nijel Exp $ */
+/* $Id: czech-windows-1250.inc.php,v 2.9.2.1 2004/06/07 10:09:54 rabus Exp $ */
 
 /**
  * Czech language file by
@@ -726,4 +726,5 @@ $strYes = 'Ano';
 $strZeroRemovesTheLimit = 'Poznámka: Nastavení tìchto parametrù na 0 (nulu) odstraní omezení.';
 $strZip = '"zazipováno"';
 
+$strSpanish = 'Spanish';  //to translate
 ?>

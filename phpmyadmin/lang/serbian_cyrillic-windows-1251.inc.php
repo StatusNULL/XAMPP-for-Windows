@@ -1,5 +1,5 @@
 <?php
-/* $Id: serbian_cyrillic-windows-1251.inc.php,v 2.7.2.1 2004/02/08 13:22:31 lem9 Exp $ */
+/* $Id: serbian_cyrillic-windows-1251.inc.php,v 2.7.2.2 2004/06/07 10:09:56 rabus Exp $ */
 
 /**
  * Translated by:
@@ -727,4 +727,5 @@ $strYes = 'Да';
 $strZeroRemovesTheLimit = 'Напомена: Постављање ових опција на 0 (нулу) уклања лимите.';
 $strZip = '"зиповано"';
 
+$strSpanish = 'Spanish';  //to translate
 ?>

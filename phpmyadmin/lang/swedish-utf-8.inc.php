@@ -1,5 +1,5 @@
 <?php
-/* $Id: swedish-utf-8.inc.php,v 2.7 2004/01/12 17:11:34 lem9 Exp $ */
+/* $Id: swedish-utf-8.inc.php,v 2.7.2.1 2004/06/07 10:09:56 rabus Exp $ */
 
 $charset = 'utf-8';
 $allow_recoding = TRUE;
@@ -721,4 +721,5 @@ $strYes = 'Ja';
 $strZeroRemovesTheLimit = 'Anm: Genom att sätta dessa alternativ till 0 (noll) tas begränsningarna bort.';
 $strZip = '"zippad"';
 
+$strSpanish = 'Spanish';  //to translate
 ?>

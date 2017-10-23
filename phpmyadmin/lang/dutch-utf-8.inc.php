@@ -1,5 +1,5 @@
 <?php
-/* $Id: dutch-utf-8.inc.php,v 2.6.2.1 2004/02/08 13:33:53 lem9 Exp $ */
+/* $Id: dutch-utf-8.inc.php,v 2.6.2.2 2004/06/07 10:09:54 rabus Exp $ */
 
 /*
  * Updated by "CaliMonk" <calimonk at gmx.net> on 2004/28/01.
@@ -726,4 +726,5 @@ $strYes = 'Ja';
 $strZeroRemovesTheLimit = 'Opmerking: Het instellen van deze waarden op 0 (nul) verwijderd het limiet.';
 $strZip = '"Gezipt"';
 
+$strSpanish = 'Spanish';  //to translate
 ?>

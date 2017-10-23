@@ -1,5 +1,5 @@
 <?php
-/* $Id: lithuanian-utf-8.inc.php,v 2.6 2003/12/16 18:08:32 lem9 Exp $ */
+/* $Id: lithuanian-utf-8.inc.php,v 2.6.2.1 2004/06/07 10:09:55 rabus Exp $ */
 
 $charset = 'utf-8';
 $allow_recoding = TRUE;
@@ -721,4 +721,5 @@ $strYes = 'Taip';
 $strZeroRemovesTheLimit = 'Pastaba: nėra jokių apribojimų jeigu reikšmė nurodyta lygi 0 (nuliui).';
 $strZip = '"zip"';
 
+$strSpanish = 'Spanish';  //to translate
 ?>

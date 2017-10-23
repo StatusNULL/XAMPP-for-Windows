@@ -1,5 +1,5 @@
 <?php
-/* $Id: german-iso-8859-1.inc.php,v 2.7.2.1 2004/01/30 14:10:46 rabus Exp $ */
+/* $Id: german-iso-8859-1.inc.php,v 2.7.2.3 2004/06/07 10:09:55 rabus Exp $ */
 
 /**
  * For suggestions concerning this file please contact
@@ -254,7 +254,7 @@ $strFieldsTerminatedBy = 'Felder getrennt mit';
 $strFileAlreadyExists = 'Die Datei %s besteht bereits auf dem Server. Bitte ändern Sie den Dateinamen oder wählen Sie die Überschreibungs-Option.';
 $strFileCouldNotBeRead = 'Die Datei konnte nicht gelesen werden';
 $strFileNameTemplate = 'Dateinamenskonvention';
-$strFileNameTemplateHelp = 'Benutzen Sie __DB__ für den Datenbanknamen, __TABLE__ für den Tabellennamen und %sbeliebige strftime-Optionen%s zur Angabe von Datumsvariablen. Die Erweiterung wird automagisch hinzugefügt. Jeglicher anderer Text wird beibehalten.';
+$strFileNameTemplateHelp = 'Benutzen Sie __DB__ für den Datenbanknamen, __TABLE__ für den Tabellennamen und %sbeliebige strftime-Optionen%s zur Angabe von Datumsvariablen. Die Erweiterung wird automatisch hinzugefügt. Jeglicher anderer Text wird beibehalten.';
 $strFileNameTemplateRemember = 'Konvention merken';
 $strFixed = 'starr';
 $strFlushPrivilegesNote = 'Anmerkung: phpMyAdmin liest die Benutzerprofile direkt aus den entsprechenden MySQL-Tabellen aus. Der Inhalt dieser Tabellen kann sich von den Benutzprofilen, die MySQL z.Zt. verwendet, unterscheiden, wenn manuelle Änderungen vorgenommen wurden. In diesem Fall sollten Sie  %sdie Benutzerprofile neu laden%s bevor Sie fortfahren.';
@@ -613,6 +613,7 @@ $strSize = 'Größe';
 $strSort = 'Sortierung';
 $strSortByKey = 'Nach Schlüssel sortieren';
 $strSpaceUsage = 'Speicherplatzverbrauch';
+$strSpanish = 'Spanisch';
 $strSplitWordsWithSpace = 'Die Wörter werden durch Leerzeichen (" ") getrennt.';
 $strStatCheckTime = 'Letzter Check am';
 $strStatCreateTime = 'Erzeugt am';

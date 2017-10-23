@@ -1,5 +1,5 @@
 <?php
-/* $Id: danish-iso-8859-1.inc.php,v 2.8.2.1 2004/01/29 14:34:04 lem9 Exp $ */
+/* $Id: danish-iso-8859-1.inc.php,v 2.8.2.2 2004/06/07 10:09:54 rabus Exp $ */
 
 $charset = 'iso-8859-1';
 $text_dir = 'ltr';
@@ -721,4 +721,5 @@ $strYes = 'Ja';
 $strZeroRemovesTheLimit = 'Bemærk: Indstilling af disse værdier til 0 (nul) fjerner begrænsningen.';
 $strZip = '"zipped"';
 
+$strSpanish = 'Spanish';  //to translate
 ?>

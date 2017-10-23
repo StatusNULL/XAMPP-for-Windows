@@ -1,5 +1,5 @@
 <?php
-/* $Id: sqlparser.lib.php,v 2.6.2.2 2004/02/26 16:45:28 lem9 Exp $ */
+/* $Id: sqlparser.lib.php,v 2.6.2.4 2004/03/05 18:52:54 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /** SQL Parser Functions for phpMyAdmin
@@ -149,7 +149,7 @@ if ($is_minimum_common == FALSE) {
     {
         global $SQP_errorString;
         $debugstr = 'ERROR: ' . $message . "\n";
-        $debugstr .= 'CVS: $Id: sqlparser.lib.php,v 2.6.2.2 2004/02/26 16:45:28 lem9 Exp $' . "\n";
+        $debugstr .= 'CVS: $Id: sqlparser.lib.php,v 2.6.2.4 2004/03/05 18:52:54 lem9 Exp $' . "\n";
         $debugstr .= 'MySQL: '.PMA_MYSQL_STR_VERSION . "\n";
         $debugstr .= 'USR OS, AGENT, VER: ' . PMA_USR_OS . ' ' . PMA_USR_BROWSER_AGENT . ' ' . PMA_USR_BROWSER_VER . "\n";
         $debugstr .= 'PMA: ' . PMA_VERSION . "\n";
@@ -1835,7 +1835,12 @@ if ($is_minimum_common == FALSE) {
                         //
                         // also we must not be inside a privilege list
                         if ($i > 0) {
-                            if (!$in_priv_list) {
+
+                            // the alpha_identifier condition is there to 
+                            // catch cases like
+                            // GRANT SELECT ON mydb.mytable TO myuser@localhost
+                            // (else, we get mydb.mytableTO )
+                            if (!$in_priv_list || $typearr[1] == 'alpha_identifier') {
                                 $before    .= $space_alpha_reserved_word;
                             }
                         } else {
@@ -1902,6 +1907,9 @@ if ($is_minimum_common == FALSE) {
                     }
                     if ($infunction && $typearr[3] == 'punct_bracket_close_round') {
                         $after     .= ' ';
+                    }
+                    if ($typearr[1] == 'alpha_columnAttrib') {
+                        $before .= ' ';
                     }
                     break;
                 case 'alpha_variable':

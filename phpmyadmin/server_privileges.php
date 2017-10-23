@@ -1,5 +1,5 @@
 <?php
-/* $Id: server_privileges.php,v 2.4.4.1 2004/02/11 14:23:47 lem9 Exp $ */
+/* $Id: server_privileges.php,v 2.4.4.3 2004/06/08 10:16:26 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -648,7 +648,12 @@ if (!empty($adduser_submit) || !empty($change_copy)) {
             PMA_mysql_query($real_sql_query, $userlink) or PMA_mysqlDie(PMA_mysql_error($userlink), $sql_query);
             $message = $strAddUserMessage;
         } else {
-            $queries[] = $sql_query;
+            $queries[]             = $real_sql_query;
+            // we put the query containing the hidden password in
+            // $queries_for_display, at the same position occupied
+            // by the real query in $queries
+            $tmp_count = count($queries);
+            $queries_for_display[$tmp_count - 1] = $sql_query;
         }
         unset($real_sql_query);
         mysql_free_result($res);
@@ -670,7 +675,7 @@ if (!empty($change_copy)) {
     $local_query = 'SELECT `Db`, `Table_name`, `Table_priv` FROM `mysql`.`tables_priv` WHERE `User` = "' . PMA_sqlAddslashes($old_username) . '" AND `Host` = "' . $old_hostname . '";';
     $res = PMA_mysql_query($local_query, $userlink) or PMA_mysqlDie(PMA_mysql_error($userlink), $local_query);
     while ($row = PMA_mysql_fetch_array($res, MYSQL_ASSOC)) {
-        $local_query = 'SELECT `Column_name`, `Column_priv` FROM `mysql`.`columns_priv` WHERE `User` = "' . PMA_sqlAddslashes($old_username) . '" AND `Host` = "' . $old_hostname . '" AND `Db` = "' . $row['Db'] . '";';
+        $local_query = 'SELECT `Column_name`, `Column_priv` FROM `mysql`.`columns_priv` WHERE `User` = "' . PMA_sqlAddslashes($old_username) . '" AND `Host` = "' . $old_hostname . '" AND `Db` = "' . $row['Db'] . '" AND `Table_name` = "' . $row['Table_name'] . '";';
         $res2 = PMA_mysql_query($local_query, $userlink) or PMA_mysqlDie(PMA_mysql_error($userlink), $local_query);
         $tmp_privs1 = PMA_extractPrivInfo($row);
         $tmp_privs2 = array(
@@ -866,9 +871,16 @@ if (!empty($delete) || (!empty($change_copy) && $mode < 4)) {
  * Changes / copies a user, part V
  */
 if (!empty($change_copy)) {
+    $tmp_count = -1;
     foreach ($queries as $sql_query) {
+        $tmp_count++;
         if ($sql_query{0} != '#') {
             PMA_mysql_query($sql_query, $userlink) or PMA_mysqlDie(PMA_mysql_error($userlink));
+        }
+        // when there is a query containing a hidden password, take it
+        // instead of the real query sent
+        if (isset($queries_for_display[$tmp_count])) {
+            $queries[$tmp_count] = $queries_for_display[$tmp_count];
         }
     }
     $message = $strSuccess;

@@ -1,5 +1,5 @@
 <?php
-/* $Id: mysql_charsets.lib.php,v 2.7.2.1 2004/02/02 09:30:01 rabus Exp $ */
+/* $Id: mysql_charsets.lib.php,v 2.7.2.2 2004/06/07 10:09:53 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 if (PMA_MYSQL_INT_VERSION >= 40100){
@@ -107,6 +107,9 @@ if (PMA_MYSQL_INT_VERSION >= 40100){
                 break;
             case 'korean':
                 $descr = $GLOBALS['strKorean'];
+                break;
+            case 'spanish':
+                $descr = $GLOBALS['strSpanish'];
                 break;
             case 'swedish':
                 $descr = $GLOBALS['strSwedish'];

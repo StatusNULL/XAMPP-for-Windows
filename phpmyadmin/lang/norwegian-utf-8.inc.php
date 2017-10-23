@@ -1,5 +1,5 @@
 <?php
-/* $Id: norwegian-utf-8.inc.php,v 2.7 2003/12/21 12:58:30 lem9 Exp $ */
+/* $Id: norwegian-utf-8.inc.php,v 2.7.2.1 2004/06/07 10:09:55 rabus Exp $ */
 
 /**
  * Translated by Sven-Erik Andersen <sven_erik at andersen.as>
@@ -727,4 +727,5 @@ $strZip = 'Komprimert (zip)';
 
 // To translate
 
+$strSpanish = 'Spanish';  //to translate
 ?>

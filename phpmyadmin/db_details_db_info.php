@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_details_db_info.php,v 2.2 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: db_details_db_info.php,v 2.2.4.1 2004/06/07 10:09:52 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -39,6 +39,11 @@ if ($cfg['SkipLockedTables'] == TRUE) {
                         $local_query = 'SHOW TABLE STATUS FROM ' . PMA_backquote($db) . ' LIKE \'' . addslashes($tmp[0]) . '\'';
                         $sts_result  = PMA_mysql_query($local_query) or PMA_mysqlDie('', $local_query, '', $err_url_0);
                         $sts_tmp     = PMA_mysql_fetch_array($sts_result);
+
+                        if (!isset($sts_tmp['Type']) && isset($sts_tmp['Engine'])) {
+                            $sts_tmp['Type'] =& $sts_tmp['Engine'];
+                        }
+
                         $tables[]    = $sts_tmp;
                     } else { // table in use
                         $tables[]    = array('Name' => $tmp[0]);
@@ -55,6 +60,9 @@ if (!isset($sot_ready)) {
     $db_info_result = PMA_mysql_query($local_query) or PMA_mysqlDie('', $local_query, '', $err_url_0);
     if ($db_info_result != FALSE && mysql_num_rows($db_info_result) > 0) {
         while ($sts_tmp = PMA_mysql_fetch_array($db_info_result)) {
+            if (!isset($sts_tmp['Type']) && isset($sts_tmp['Engine'])) {
+                $sts_tmp['Type'] =& $sts_tmp['Engine'];
+            }
             $tables[] = $sts_tmp;
         }
         mysql_free_result($db_info_result);

@@ -1,5 +1,5 @@
 <?php
-/* $Id: spanish-utf-8.inc.php,v 2.9.2.1 2004/02/08 12:45:07 lem9 Exp $ */
+/* $Id: spanish-utf-8.inc.php,v 2.9.2.2 2004/06/07 10:09:56 rabus Exp $ */
 
 $charset = 'utf-8';
 $allow_recoding = TRUE;
@@ -721,4 +721,5 @@ $strYes = 'Sí';
 $strZeroRemovesTheLimit = 'Nota: si cambia los parámetros de estas opciones a 0 (cero), remueve el límite.';
 $strZip = '"comprimido con zip"';
 
+$strSpanish = 'Spanish';  //to translate
 ?>

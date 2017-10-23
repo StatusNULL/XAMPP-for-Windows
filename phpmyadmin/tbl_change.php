@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_change.php,v 2.10.2.1 2004/02/03 19:06:08 lem9 Exp $ */
+/* $Id: tbl_change.php,v 2.10.2.3 2004/06/07 10:57:59 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -571,7 +571,8 @@ foreach($loop_array AS $vrowcount => $vrow) {
                     // Removes automatic MySQL escape format
                     $enum_atom = str_replace('\'\'', '\'', str_replace('\\\\', '\\', $enum[$j]));
                     echo '                ';
-                    echo '<option value="' . htmlspecialchars($enum_atom) . '"';
+                    //echo '<option value="' . htmlspecialchars($enum_atom) . '"';
+                    echo '<option value="' . urlencode($enum_atom) . '"';
                     if ($data == $enum_atom
                         || ($data == '' && (!isset($primary_key) || $row_table_def['Null'] != 'YES')
                             && isset($row_table_def['Default']) && $enum_atom == $row_table_def['Default'])) {
@@ -628,7 +629,8 @@ foreach($loop_array AS $vrowcount => $vrow) {
             echo "\n";
             for ($j = 0; $j < $countset; $j++) {
                 echo '                ';
-                echo '<option value="'. htmlspecialchars($set[$j]) . '"';
+                //echo '<option value="'. htmlspecialchars($set[$j]) . '"';
+                echo '<option value="'. urlencode($set[$j]) . '"';
                 if (isset($vset[$set[$j]]) && $vset[$set[$j]]) {
                     echo ' selected="selected"';
                 }
@@ -741,12 +743,15 @@ foreach($loop_array AS $vrowcount => $vrow) {
             // types (int or float), the length is not a limit on the values that
             // can be entered, so let's be generous (20) (we could also use the
             // real limits for each numeric type)
+            // 2004-04-07, it turned out that 20 was not generous enough
+            // for the maxlength
             if ($is_char) {
                 $fieldsize = (($len > 40) ? 40 : $len);
                 $maxlength = $len;
             }
             else {
-                $fieldsize = $maxlength = 20;
+                $fieldsize = 20;
+                $maxlength = 99;
             } // end if... else...
             echo "\n";
             ?>

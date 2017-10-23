@@ -1,5 +1,5 @@
 <?php
-/* $Id: czech-utf-8.inc.php,v 2.8 2003/12/30 21:34:04 nijel Exp $ */
+/* $Id: czech-utf-8.inc.php,v 2.8.2.1 2004/06/07 10:09:54 rabus Exp $ */
 
 /**
  * Czech language file by
@@ -727,4 +727,5 @@ $strYes = 'Ano';
 $strZeroRemovesTheLimit = 'Poznámka: Nastavení těchto parametrů na 0 (nulu) odstraní omezení.';
 $strZip = '"zazipováno"';
 
+$strSpanish = 'Spanish';  //to translate
 ?>

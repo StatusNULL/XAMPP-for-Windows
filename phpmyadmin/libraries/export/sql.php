@@ -1,5 +1,5 @@
 <?php
-/* $Id: sql.php,v 2.6 2004/01/02 16:11:56 rabus Exp $ */
+/* $Id: sql.php,v 2.6.2.1 2004/06/07 11:27:10 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 error_reporting(E_ALL);
 /**
@@ -219,7 +219,7 @@ function PMA_getTableDef($db, $table, $crlf, $error_url, $show_dates = false)
                        . (($use_backquotes) ? PMA_backquote($tmpres[0]) : $tmpres[0])
                        . substr($tmpres[1], $pos);
         $tmpres[1]     = str_replace("\n", $crlf, $tmpres[1]);
-        if (preg_match_all('((,\r?\n[\s]*(CONSTRAINT|FOREIGN[\s]*KEY)[^\r\n,]+)+)', $tmpres[1], $regs)) {
+        if (preg_match_all('((,\r?\n[\s]*(CONSTRAINT|FOREIGN[\s]*KEY)[^\r\n]+)+)', $tmpres[1], $regs)) {
             if (!isset($sql_constraints)) {
                 if (isset($GLOBALS['no_constraints_comments'])) {
                     $sql_constraints = '';
@@ -235,7 +235,7 @@ function PMA_getTableDef($db, $table, $crlf, $error_url, $show_dates = false)
             $sql_constraints .= 'ALTER TABLE ' . PMA_backquote($table) . $crlf
                              . preg_replace('/(,\r?\n|^)([\s]*)(CONSTRAINT|FOREIGN[\s]*KEY)/', '\1\2ADD \3', substr($regs[0][0], 2))
                             . ";\n";
-            $tmpres[1]     = preg_replace('((,\r?\n[\s]*(CONSTRAINT|FOREIGN[\s]*KEY)[^\r\n,]+)+)', '', $tmpres[1]);
+            $tmpres[1]     = preg_replace('((,\r?\n[\s]*(CONSTRAINT|FOREIGN[\s]*KEY)[^\r\n]+)+)', '', $tmpres[1]);
         }
         $schema_create .= $tmpres[1];
     }

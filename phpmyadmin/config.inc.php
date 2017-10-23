@@ -58,7 +58,7 @@ $cfg['PmaNoRelation_DisableWarning']  = FALSE;
  * If at least one server configuration uses 'cookie' auth_type,
  * enter here a passphrase that will be used by blowfish.
  */
-$cfg['blowfish_secret'] = '';
+$cfg['blowfish_secret'] = ''; // $cfg['blowfish_secret'] = 'password';
 
 /**
  * Server(s) configuration
@@ -73,7 +73,7 @@ $cfg['Servers'][$i]['socket']        = '';          // Path to the socket - leav
 $cfg['Servers'][$i]['connect_type']  = 'tcp';       // How to connect to MySQL server ('tcp' or 'socket')
 $cfg['Servers'][$i]['compress']      = FALSE;       // Use compressed protocol for the MySQL connection
                                                     // (requires PHP >= 4.3.0)
-$cfg['Servers'][$i]['controluser']   = '';          // MySQL control user settings
+$cfg['Servers'][$i]['controluser']   = 'pma';          // MySQL control user settings
                                                     // (this user must have read-only
 $cfg['Servers'][$i]['controlpass']   = '';          // access to the "mysql/user"
                                                     // and "mysql/db" tables)
@@ -306,6 +306,7 @@ $cfg['Export']['csv_escaped']               = '\\';
 $cfg['Export']['csv_terminated']            = 'AUTO';
 $cfg['Export']['excel_columns']             = FALSE;
 $cfg['Export']['excel_null']                = 'NULL';
+$cfg['Export']['excel_edition']             = 'win'; // win/mac
 
 $cfg['Export']['latex_structure']           = TRUE;
 $cfg['Export']['latex_data']                = TRUE;
@@ -314,6 +315,9 @@ $cfg['Export']['latex_relation']            = TRUE;
 $cfg['Export']['latex_comments']            = TRUE;
 $cfg['Export']['latex_mime']                = TRUE;
 $cfg['Export']['latex_null']                = '\textit{NULL}';
+$cfg['Export']['latex_caption']             = TRUE;
+$cfg['Export']['latex_data_label']          = 'tab:__TABLE__-data';
+$cfg['Export']['latex_structure_label']     = 'tab:__TABLE__-structure';
 
 $cfg['Export']['sql_structure']             = TRUE;
 $cfg['Export']['sql_data']                  = TRUE;
@@ -321,8 +325,11 @@ $cfg['Export']['sql_drop_database']         = FALSE;
 $cfg['Export']['sql_drop_table']            = FALSE;
 $cfg['Export']['sql_auto_increment']        = TRUE;
 $cfg['Export']['sql_backquotes']            = TRUE;
+$cfg['Export']['sql_dates']                 = FALSE;
 $cfg['Export']['sql_relation']              = FALSE;
 $cfg['Export']['sql_columns']               = FALSE;
+$cfg['Export']['sql_delayed']               = FALSE;
+$cfg['Export']['sql_type']                  = 'insert'; // insert/update/replace
 $cfg['Export']['sql_extended']              = FALSE;
 $cfg['Export']['sql_comments']              = FALSE;
 $cfg['Export']['sql_mime']                  = FALSE;
@@ -411,6 +418,7 @@ $cfg['AvailableCharsets'] = array(
     'windows-1250',
     'windows-1251',
     'windows-1252',
+    'windows-1256',
     'windows-1257',
     'koi8-r',
     'big5',
@@ -491,6 +499,14 @@ $cfg['MaxExactCount']       = 20000;        // When approximate count < this, PM
                                             // table rows.
 $cfg['WYSIWYG-PDF']         = TRUE;         // Utilize DHTML/JS capabilities to allow WYSIWYG editing of
                                             // the PDF page editor. Requires an IE6/Mozilla based browser.
+/**
+ * Default queries.
+ *  %d will be replaced by database name
+ *  %t will be replaced by table name
+ */
+$cfg['DefaultQueryTable']   = 'SELECT * FROM %t WHERE 1';
+$cfg['DefaultQueryDatabase']= '';
+
 
 /**
  * SQL Query box settings
@@ -505,12 +521,15 @@ $cfg['SQLQuery']['Validate']  = FALSE;      // Validate a query (see $cfg['SQLVa
 /**
  * web-server upload directory
  */
-$cfg['UploadDir']             = '';         // for example, './upload/'; you must end it with
-                                            // a slash, and you leave it empty for no upload
-                                            // directory
-$cfg['SaveDir']               = '';         // for example, './save/'; you must end it with
-                                            // a slash, and you leave it empty for no save
-                                            // directory
+$cfg['UploadDir']             = '';         // Directory for uploaded files that can be executed by
+                                            // phpMyAdmin. For example './upload'. Leave empty for
+                                            // no upload directory support
+$cfg['SaveDir']               = '';         // Directory where phpMyAdmin can save exported data on
+                                            // server. For example './save'. Leave empty for no save
+                                            // directory support.
+$cfg['docSQLDir']             = '';         // Directory for docSQL imports, phpMyAdmin can import
+                                            // docSQL files from that directory. For example
+                                            // './docSQL'. Leave empty for no docSQL import support.
 
 
 /**
@@ -713,6 +732,14 @@ if ($cfg['ShowFunctionFields']) {
         )
     );
     
+// Default functions for above defined groups
+    $cfg['DefaultFunctions'] = array(
+        'FUNC_CHAR'         => '',
+        'FUNC_DATE'         => '',
+        'FUNC_NUMBER'       => '',
+        'first_timestamp'   => 'NOW'
+    );
+
 } // end if
 
 
@@ -724,5 +751,5 @@ set_magic_quotes_runtime(0);
 /**
  * File Revision - do not change either!
  */
-$cfg['FileRevision'] = '$Revision: 1.198 $';
+$cfg['FileRevision'] = '$Revision: 2.5.2.1 $';
 ?>

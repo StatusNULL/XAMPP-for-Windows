@@ -2,8 +2,53 @@
 phpMyAdmin - Changelog
 ----------------------
 
-$Id: ChangeLog,v 2.111.2.27 2004/03/01 14:32:48 lem9 Exp $
+$Id: ChangeLog,v 2.111.2.45 2004/06/08 23:06:59 rabus Exp $
 $Source: /cvsroot/phpmyadmin/phpMyAdmin/ChangeLog,v $
+
+2004-06-09 Alexander M. Turek  <me@derrabus.de>
+    ### 2.5.7 released
+
+2004-06-08 Alexander M. Turek  <me@derrabus.de>
+    * server_privileges.php: typo.
+    * Documentation.html, translators.html: Updated from HEAD.
+
+2004-06-07 Alexander M. Turek  <me@derrabus.de>
+    * db_details_db_info.php, tbl_properties_tbl_info.php: Table type is called
+      "Engine" in MySQL 4.1.2 (bug #964011).
+    * lang/*.inc.php, libraries/mysql_charsets.lib.php: The new collation page
+      latin1_spanish_ci (introduced with MySQL 4.1.2) is now described
+      correctly.
+    * lang/french-*: Updates.
+    * scripts/create-release.sh, README: Merged all HEAD changes.
+
+2004-06-07 Michal Cihar  <michal@cihar.com>
+    * libraries/export/sql.php: Fix handling of multi column foreign keys (bug
+      #946861).
+    * libraries/common.lib.php: When only_db matches no database, do not show
+      any (bug #943626).
+    * lang/sync_lang.sh: I switched to utf-8 so default for czech is utf-8.
+    * export.php: Fixed syntax error.
+
+2004-06-07 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_change.php, bug 931034, big numbers data entry,
+      thanks to Dmitry (yrtimd)
+    * server_privileges.php: bug 923171, password error when copying a user
+    * server_privileges.php: bug 923227, copying a user with table privs
+
+2004-04-02 Alexander M. Turek  <me@derrabus.de>
+    * lang/german-*.inc.php: Fixed a typo.
+
+2004-03-10 Michal Cihar  <michal@cihar.com>
+    * export.php: Correctly report error when export fails, fix buffer length
+      counting, fix error detection (bug #909710).
+
+2004-03-05 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/sqlparser.lib.php: bug 909752, floating point digit
+    * libraries/sqlparser.lib.php: bug 906551, GRANT...TO
+
+2004-03-03 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_change.php, tbl_replace_fields.php: bug 907510, invalid
+      escaping of + in ENUM
 
 2004-03-01 Marc Delisle  <lem9@users.sourceforge.net>
     ### 2.5.6 released

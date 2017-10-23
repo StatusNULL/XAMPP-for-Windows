@@ -1,5 +1,5 @@
 <?php
-/* $Id: slovak-utf-8.inc.php,v 2.7.2.1 2004/02/02 22:18:50 lem9 Exp $ */
+/* $Id: slovak-utf-8.inc.php,v 2.7.2.2 2004/06/07 10:09:56 rabus Exp $ */
 
 /* By: lubos klokner <erkac@vault-tec.sk> */
 
@@ -724,4 +724,5 @@ $strYes = 'Áno';
 $strZeroRemovesTheLimit = 'Poznámka: Nastavenie týchto parametrov na 0 (nulu) odstráni obmedzenia.';
 $strZip = '"zo zipované"';
 
+$strSpanish = 'Spanish';  //to translate
 ?>

@@ -1,5 +1,5 @@
 <?php
-/* $Id: export.php,v 2.3.2.2 2004/02/18 16:12:41 lem9 Exp $ */
+/* $Id: export.php,v 2.3.2.4 2004/06/07 11:57:38 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -63,7 +63,7 @@ function PMA_exportOutputHandler($line)
 
         $dump_buffer .= $line;
         if ($GLOBALS['onfly_compression']) {
-            $dump_buffer_len += strlen($dump_buffer);
+            $dump_buffer_len += strlen($line);
 
             if ($dump_buffer_len > $GLOBALS['memory_limit']) {
                 // as bzipped
@@ -80,7 +80,7 @@ function PMA_exportOutputHandler($line)
                 }
                 if ($GLOBALS['save_on_server']) {
                     $write_result = @fwrite($GLOBALS['file_handle'], $dump_buffer);
-                    if (!$write_result || ($write_result != strlen($line))) {
+                    if (!$write_result || ($write_result != strlen($dump_buffer))) {
                         $GLOBALS['message'] = sprintf($GLOBALS['strNoSpace'], htmlspecialchars($save_filename));
                         return FALSE;
                     }
@@ -325,8 +325,12 @@ if ($export_type == 'database') {
     }
 }
 
+// Fake loop just to allow skip of remain of this code by break, I'd really
+// need exceptions here :-)
+do {
+
 // Add possibly some comments to export
-PMA_exportHeader();
+if (!PMA_exportHeader()) break;
 
 // Will we need relation & co. setup?
 $do_relation = isset($GLOBALS[$what . '_relation']);
@@ -363,23 +367,32 @@ if ($export_type == 'server') {
     foreach($dblist AS $current_db) {
         if ((isset($tmp_select) && strpos(' ' . $tmp_select, '|' . $current_db . '|'))
             || !isset($tmp_select)) {
-            PMA_exportDBHeader($current_db);
-            PMA_exportDBCreate($current_db);
+            if (!PMA_exportDBHeader($current_db)) 
+                break 2;
+            if (!PMA_exportDBCreate($current_db)) 
+                break 2;
             $tables     = PMA_mysql_list_tables($current_db);
             $num_tables = ($tables) ? @mysql_numrows($tables) : 0;
             $i = 0;
             while ($i < $num_tables) {
                 $table = PMA_mysql_tablename($tables, $i);
                 $local_query  = 'SELECT * FROM ' . PMA_backquote($current_db) . '.' . PMA_backquote($table);
-                if (isset($GLOBALS[$what . '_structure'])) PMA_exportStructure($current_db, $table, $crlf, $err_url, $do_relation, $do_comments, $do_mime, $do_dates);
-                if (isset($GLOBALS[$what . '_data'])) PMA_exportData($current_db, $table, $crlf, $err_url, $local_query);
+                if (isset($GLOBALS[$what . '_structure']))
+                    if (!PMA_exportStructure($current_db, $table, $crlf, $err_url, $do_relation, $do_comments, $do_mime, $do_dates))
+                        break 3;
+                if (isset($GLOBALS[$what . '_data'])) 
+                    if (!PMA_exportData($current_db, $table, $crlf, $err_url, $local_query))
+                        break 3;
                 $i++;
             }
-            PMA_exportDBFooter($current_db);
+            if (!PMA_exportDBFooter($current_db)) 
+                break 2;
         }
     }
 } elseif ($export_type == 'database') {
-    PMA_exportDBHeader($db);
+    if (!PMA_exportDBHeader($db))
+        break;
+
     if (isset($table_select)) {
         $tmp_select = implode($table_select, '|');
         $tmp_select = '|' . $tmp_select . '|';
@@ -391,14 +404,20 @@ if ($export_type == 'server') {
         if ((isset($tmp_select) && strpos(' ' . $tmp_select, '|' . $table . '|'))
             || !isset($tmp_select)) {
 
-            if (isset($GLOBALS[$what . '_structure'])) PMA_exportStructure($db, $table, $crlf, $err_url, $do_relation, $do_comments, $do_mime, $do_dates);
-            if (isset($GLOBALS[$what . '_data'])) PMA_exportData($db, $table, $crlf, $err_url, $local_query);
+            if (isset($GLOBALS[$what . '_structure'])) 
+                if (!PMA_exportStructure($db, $table, $crlf, $err_url, $do_relation, $do_comments, $do_mime, $do_dates))
+                    break 2;
+            if (isset($GLOBALS[$what . '_data'])) 
+                if (!PMA_exportData($db, $table, $crlf, $err_url, $local_query))
+                    break 2;
         }
         $i++;
     }
-    PMA_exportDBFooter($db);
+    if (!PMA_exportDBFooter($db)) 
+        break;
 } else {
-    PMA_exportDBHeader($db);
+    if (!PMA_exportDBHeader($db)) 
+        break;
     // We export just one table
 
     if ($limit_to > 0 && $limit_from >= 0) {
@@ -416,9 +435,35 @@ if ($export_type == 'server') {
         $local_query  = 'SELECT * FROM ' . PMA_backquote($db) . '.' . PMA_backquote($table) . $add_query;
     }
 
-    if (isset($GLOBALS[$what . '_structure'])) PMA_exportStructure($db, $table, $crlf, $err_url, $do_relation, $do_comments, $do_mime, $do_dates);
-    if (isset($GLOBALS[$what . '_data'])) PMA_exportData($db, $table, $crlf, $err_url, $local_query);
-    PMA_exportDBFooter($db);
+    if (isset($GLOBALS[$what . '_structure'])) {
+        if (!PMA_exportStructure($db, $table, $crlf, $err_url, $do_relation, $do_comments, $do_mime, $do_dates))
+            break;
+    }
+    if (isset($GLOBALS[$what . '_data'])) {
+        if (!PMA_exportData($db, $table, $crlf, $err_url, $local_query))
+            break;
+    }
+    if (!PMA_exportDBFooter($db))
+        break;
+}
+
+} while (FALSE);
+// End of fake loop
+
+if ($save_on_server && isset($message)) {
+    $js_to_run = 'functions.js';
+    require_once('./header.inc.php');
+    if ($export_type == 'server') {
+        $active_page = 'server_export.php';
+        require('./server_export.php');
+    } elseif ($export_type == 'database') {
+        $active_page = 'db_details_export.php';
+        require('./db_details_export.php');
+    } else {
+        $active_page = 'tbl_properties_export.php';
+        require('./tbl_properties_export.php');
+    }
+    exit();
 }
 
 /**

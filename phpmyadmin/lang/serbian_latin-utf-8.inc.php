@@ -1,5 +1,5 @@
 <?php
-/* $Id: serbian_latin-utf-8.inc.php,v 2.7.2.1 2004/02/08 13:22:31 lem9 Exp $ */
+/* $Id: serbian_latin-utf-8.inc.php,v 2.7.2.2 2004/06/07 10:09:56 rabus Exp $ */
 
 /**
  * Translated by:
@@ -728,4 +728,5 @@ $strYes = 'Da';
 $strZeroRemovesTheLimit = 'Napomena: Postavljanje ovih opcija na 0 (nulu) uklanja limite.';
 $strZip = '"zipovano"';
 
+$strSpanish = 'Spanish';  //to translate
 ?>

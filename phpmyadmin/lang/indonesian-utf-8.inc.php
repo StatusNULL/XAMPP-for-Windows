@@ -1,5 +1,5 @@
 <?php
-/* $Id: indonesian-utf-8.inc.php,v 2.8 2003/12/18 21:12:44 lem9 Exp $ */
+/* $Id: indonesian-utf-8.inc.php,v 2.8.2.1 2004/06/07 10:09:55 rabus Exp $ */
 
 $charset = 'utf-8';
 $allow_recoding = TRUE;
@@ -721,4 +721,5 @@ $strYes = 'Ya';
 $strZeroRemovesTheLimit = 'Perhatian: Merubah pilihan ini ke posisi 0 (zero) akan menghapus batas yang telah ditentukan.';
 $strZip = '"Dikompress dengan Zip"';
 
+$strSpanish = 'Spanish';  //to translate
 ?>

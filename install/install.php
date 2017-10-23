@@ -1,7 +1,7 @@
 <?php
 
 /* 
-#### Installer PHP  1.4 RC1  #### 
+#### Installer PHP  1.4 RC2  #### 
 #### Author: Kay Vogelgesang for www.apachefriends.org 2004 ####  
 */    
 
@@ -50,8 +50,10 @@ global $slashi;
 $slashi=1;
 global $bslashi;
 $bslashi=1;
-$awkexe="$partwampp\install\awk.exe";
-$awk="$partwampp\install\config.awk";
+$awkexe=".\install\awk.exe";
+$awk=".\install\config.awk";
+// $awkexe="$partwampp\install\awk.exe";
+// $awk="$partwampp\install\config.awk";
 $awknewdir="\"".$awkpart."\"";
 $awkslashdir="\"".$awkpartslash."\"";
 global $xamppversion;
@@ -72,8 +74,8 @@ $sysroot[]=$zeile;
 $i+=1; 
 	}
 fclose($datei);
-list ($left, $right) = split ('=', $sysroot[0]);
-$right = eregi_replace (" ","",$right);
+list ($left, $right) = split (' = ', $sysroot[0]);
+// $right = eregi_replace (" ","",$right);
 $right = eregi_replace ("\r\n","",$right);
 if (strtolower($partwampp)==strtolower($right))
 	{
@@ -122,7 +124,7 @@ if (file_exists($updatesysroot))
 	$zeile = fgets($datei,255);
 	$updatezeile[]=$zeile;
 	list ($left, $right) = split ('=', $updatezeile[0]);
-	$right = eregi_replace (" ","",$right);
+	// $right = eregi_replace (" ","",$right);
 	$left = eregi_replace (" ","",$left);
 	$left = eregi_replace ("\r\n","",$left);
 	$right = eregi_replace ("\r\n","",$right);		
@@ -159,7 +161,7 @@ if (file_exists($updatesysroot))
 					if (eregi($update,$newzeile[$z]))
 					{
 						list ($left, $right) = split ('=', $newzeile[$z]);
-						$right = eregi_replace (" ","",$right);
+						// $right = eregi_replace (" ","",$right);
 						$left = eregi_replace (" ","",$left);
 						$left = eregi_replace ("\r\n","",$left);
 						$right = eregi_replace ("\r\n","",$right);
@@ -272,7 +274,7 @@ set_time_limit(0);
 define('STDIN',fopen("php://stdin","r"));
 	while($BS == "0")
 	{
-	echo "\n  Do you want to refresh the superxampp installation?\n";
+	echo "\n  Do you want to refresh the XAMPP installation?\n";
 	echo "  Soll die XAMPP Installation jetzt aktualisiert werden?\n\n";
 	echo "  1) Refresh now! (Jetzt aktualisieren!)\n";
 	echo "  x) Exit (Beenden)\n";
@@ -309,7 +311,7 @@ if (file_exists($installsysroot))
 		{
 		$zeile = fgets($datei,255);
 		list ($left, $right) = split ('=', $zeile);
-		$right = eregi_replace (" ","",$right);
+		// $right = eregi_replace (" ","",$right);
 		$left = eregi_replace (" ","",$left);
 		$left = eregi_replace ("\r\n","",$left);
 		$right = eregi_replace ("\r\n","",$right);

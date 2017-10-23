@@ -1,15 +1,15 @@
-  ApacheFriends XAMPP (basic package) version 1.4.2 (win32)
+  ApacheFriends XAMPP (basic package) version 1.4.3 (win32)
 
   + Apache 2.0.49
-  + MySQL 4.0.18
-  + PHP 4.3.6 + PEAR
-  + mod_php 4.3.6 
+  + MySQL 4.0.20a
+  + PHP 4.3.7 + PEAR
+  + mod_php 4.3.7
   + MiniPerl 5.8.3
-  + SQLite 2.8.11
-  + PHPMyAdmin 2.5.6 
+  + SQLite 2.8.13
+  + PHPMyAdmin 2.5.7 
   + ADODB 4.21
   + Mercury Mail Transport System for Win32 and NetWare Systems v4.01a
-  + FileZilla FTP Server 0.8.9
+  + FileZilla FTP Server 0.9.0
   + Webalizer 2.01-10
  
 * System Vorrausetzungen:

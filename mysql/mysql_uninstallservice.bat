@@ -11,7 +11,7 @@ goto exit
 echo now stopping MySQL when it runs
 net stop mysql
 echo Uninstalling MySql-Service
-bin\mysqld-nt --remove
+bin\mysqld-nt --remove mysql
 if not exist %windir%\my.ini GOTO exit
 echo Remove %windir%\my.ini
 del %windir%\my.ini
