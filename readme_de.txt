@@ -1,8 +1,8 @@
-  ApacheFriends XAMPP (basic package) version 1.5.0
+  ApacheFriends XAMPP (basic package) version 1.5.0-pl1
 
   + Apache 2.0.55
-  + MySQL 5.0.15
-  + PHP 5.0.5 + PHP 4.4.1 + PEAR
+  + MySQL 5.0.15 + Bug #13783
+  + PHP 5.0.5 + PHP 4.4.1-pl1 + PEAR
   + eAccelerator 0.9.4-dev
   + PHP-Switch win32 1.0 (von Apachefriends, man nehme die "php-switch.bat") 
   + XAMPP Control Version 2.1 from www.nat32.com	

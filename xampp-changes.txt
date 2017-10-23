@@ -1,7 +1,7 @@
-26 Oct 2005, XAMPP 1.5.0
+08 Nov 2005, XAMPP 1.5.0-pl1
 - UPDATE Apache 2.0.55 (wiedmann compilation)
-- UPDATE MySQL 5.0.15 (wiedmann compilation)
-- UPDATE PHP 4.4.1 (wiedmann compilation)
+- UPDATE MySQL 5.0.15 + Bug #13783 (wiedmann compilation)
+- UPDATE PHP 4.4.1-pl1 (wiedmann compilation)
 - UPDATE OpenSSL 0.9.8a (wiedmann compilation)
 - UPDATE Mercury Mail Transport System v4.01b
 - UPDATE phpMyAdmin 2.6.4-pl3
