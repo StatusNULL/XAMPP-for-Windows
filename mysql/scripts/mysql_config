@@ -78,21 +78,21 @@ pkglibdir='/usr/local/mysql/lib/mysql'
 fix_path pkglibdir lib/mysql lib
 pkgincludedir='/usr/local/mysql/include/mysql'
 fix_path pkgincludedir include/mysql include
-version='4.1.7'
+version='4.1.8'
 socket='/tmp/mysql.sock'
 port='3306'
 ldflags=''
-client_libs='-lcrypt -lnsl -lm  -lz -L/usr/lib -lssl -lcrypto -lc -lnss_files -lnss_dns -lresolv -lc -lnss_files -lnss_dns -lresolv'
+client_libs='-lcrypt -lnsl -lm  -lz -L/usr/lib -lssl -lcrypto '
 
 # Create options
 
 libs="$ldflags -L$pkglibdir -lmysqlclient $client_libs"
 libs=`echo "$libs" | sed -e 's;  \+; ;g' | sed -e 's;^ *;;' | sed -e 's; *\$;;'`
-libs_r="$ldflags -L$pkglibdir -lmysqlclient_r -lpthread -lcrypt -lnsl -lm  -lpthread -lc -lnss_files -lnss_dns -lresolv -lc -lnss_files -lnss_dns -lresolv -L/usr/lib -lssl -lcrypto"
+libs_r="$ldflags -L$pkglibdir -lmysqlclient_r -lpthread -lcrypt -lnsl -lm  -lpthread  -L/usr/lib -lssl -lcrypto"
 libs_r=`echo "$libs_r" | sed -e 's;  \+; ;g' | sed -e 's;^ *;;' | sed -e 's; *\$;;'`
 cflags="-I$pkgincludedir -Wimplicit -Wreturn-type -Wswitch -Wtrigraphs -Wcomment -W -Wchar-subscripts -Wformat -Wparentheses -Wsign-compare -Wwrite-strings -Wunused -mcpu=pentiumpro -O3 -fno-omit-frame-pointer -g " #note: end space!
 include="-I$pkgincludedir"
-embedded_libs="$ldflags -L$pkglibdir -lmysqld -lpthread -lcrypt -lnsl -lm  -lpthread -lc -lnss_files -lnss_dns -lresolv -lc -lnss_files -lnss_dns -lresolv  -lrt $client_libs"
+embedded_libs="$ldflags -L$pkglibdir -lmysqld -lpthread -lcrypt -lnsl -lm  -lpthread   -lrt $client_libs"
 embedded_libs=`echo "$embedded_libs" | sed -e 's;  \+; ;g' | sed -e 's;^ *;;' | sed -e 's; *\$;;'`
 
 # Remove some options that a client doesn't have to care about

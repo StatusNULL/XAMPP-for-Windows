@@ -6,7 +6,7 @@
 
 machine=i686
 system=pc-linux
-version=4.1.7
+version=4.1.8
 export machine system version
 SOURCE=`pwd` 
 CP="cp -p"

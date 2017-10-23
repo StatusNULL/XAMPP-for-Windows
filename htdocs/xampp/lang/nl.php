@@ -52,6 +52,7 @@ $TEXT['navi-english']="English";
 $TEXT['navi-german']="Deutsch";
 $TEXT['navi-french']="Francais";
 $TEXT['navi-dutch']="Nederlands";
+$TEXT['navi-spanish']="Spanish";
 
 // ---------------------------------------------------------------------
 // STATUS

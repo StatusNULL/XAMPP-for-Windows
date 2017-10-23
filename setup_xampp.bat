@@ -1,8 +1,8 @@
 @ECHO OFF
 
-if exist php\phpcli.exe GOTO Normal
-if exist php\cli\php.exe GOTO Unnormal
-if not exist php\cli\php.exe GOTO Abort
+if exist php\php4\phpcli.exe GOTO Normal
+if exist php\php.exe GOTO Unnormal
+if not exist php\php.exe GOTO Abort
 
 :Abort
 echo Sorry ... cannot find php cli!
@@ -11,15 +11,13 @@ pause
 GOTO END
 
 :Unnormal
-if exist php\cli\php.exe GOTO Copy
+set PHP_BIN=php\php.exe
+set CONFIG_PHP=install\install.php
+%PHP_BIN% -n -d output_buffering=0 %CONFIG_PHP%
 GOTO END
 
-:Copy
-copy /Y php\cli\php.exe php\phpcli.exe
-GOTO Normal
-
 :Normal
-set PHP_BIN=php\phpcli.exe
+set PHP_BIN=php\php4\phpcli.exe
 set CONFIG_PHP=install\install.php
 %PHP_BIN% -n -d output_buffering=0 %CONFIG_PHP%
 GOTO END

@@ -1,6 +1,6 @@
 <?php
 /*
-V4.52 10 Aug 2004  (c) 2000-2004 John Lim. All rights reserved.
+V4.54 5 Nov 2004  (c) 2000-2004 John Lim. All rights reserved.
   Released under both BSD license and Lesser GPL library license.
   Whenever there is any discrepancy between the two licenses,
   the BSD license will take precedence.
@@ -74,7 +74,7 @@ class ADODB_informix72 extends ADOConnection {
 	    if (isset($this->version)) return $this->version;
 	
 	    $arr['description'] = $this->GetOne("select DBINFO('version','full') from systables where tabid = 1");
-	    $arr['version'] = $this->GetOne("select DBINFO('version','major')||"."||DBINFO('version','minor') from systables where tabid = 1");
+	    $arr['version'] = $this->GetOne("select DBINFO('version','major') || DBINFO('version','minor') from systables where tabid = 1");
 	    $this->version = $arr;
 	    return $arr;
 	}
@@ -342,7 +342,7 @@ class ADORecordset_informix72 extends ADORecordSet {
 
 	function _seek($row)
 	{
-		return @ifx_fetch_row($this->_queryID, $row);
+		return @ifx_fetch_row($this->_queryID, (int) $row);
 	}
 
    function MoveLast()

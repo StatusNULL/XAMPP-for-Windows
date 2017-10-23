@@ -50,6 +50,7 @@ $TEXT['navi-english']="English";
 $TEXT['navi-german']="Deutsch";
 $TEXT['navi-french']="Francais";
 $TEXT['navi-dutch']="Nederlands";
+$TEXT['navi-spanish']="Spanish";
 
 // ---------------------------------------------------------------------
 // STATUS
@@ -187,7 +188,7 @@ $TEXT['start-text3']="Avant de commencer à programmer en PHP ou en Perl (ou autr
 
 $TEXT['start-text4']="Pour le support OpenSSL, veuillez utiliser le certificat de test avec <a href='https://127.0.0.1' target='_top'>https://127.0.0.1</a> ou <a href='https://localhost' target='_top'>https://localhost</a>";
 
-$TEXT['start-text5']="Et très important! Merci pour l'aide et le support de Nemesis, KriS, Boppy, Pc-Dummy et tous les autres amis de XAMPP!";
+$TEXT['start-text5']="Et très important! Merci pour l'aide et le support de Carsten, Nemesis, KriS, Boppy, Pc-Dummy et tous les autres amis de XAMPP!";
 
 $TEXT['start-text6']="Bonne chance,<br>Kay Vogelgesang + Kai 'Oswald' Seidler";
 

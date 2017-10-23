@@ -1,6 +1,6 @@
 <?php
 /* 
-V4.52 10 Aug 2004  (c) 2000-2004 John Lim (jlim@natsoft.com.my). All rights reserved.
+V4.54 5 Nov 2004  (c) 2000-2004 John Lim (jlim@natsoft.com.my). All rights reserved.
   Released under both BSD license and Lesser GPL library license. 
   Whenever there is any discrepancy between the two licenses, 
   the BSD license will take precedence. 
@@ -145,8 +145,10 @@ class ADODB_DB2 extends ADODB_odbc {
 		$rs = new ADORecordSet_odbc($qid);
 		
 		$ADODB_FETCH_MODE = $savem;
-		if (!$rs) return false;
-		
+		if (!$rs) {
+			$false = false;
+			return $false;
+		}
 		$rs->_has_stupid_odbc_fetch_api_change = $this->_has_stupid_odbc_fetch_api_change;
 		
 		$arr =& $rs->GetArray();
@@ -274,12 +276,14 @@ class  ADORecordSet_db2 extends ADORecordSet_odbc {
 		case 'VARCHAR':
 		case 'CHAR':
 		case 'CHARACTER':
+		case 'C':
 			if ($len <= $this->blobSize) return 'C';
 		
 		case 'LONGCHAR':
 		case 'TEXT':
 		case 'CLOB':
 		case 'DBCLOB': // double-byte
+		case 'X':
 			return 'X';
 		
 		case 'BLOB':
@@ -288,10 +292,12 @@ class  ADORecordSet_db2 extends ADORecordSet_odbc {
 			return 'B';
 			
 		case 'DATE':
+		case 'D':
 			return 'D';
 		
 		case 'TIME':
 		case 'TIMESTAMP':
+		case 'T':
 			return 'T';
 		
 		//case 'BOOLEAN': 
@@ -305,6 +311,7 @@ class  ADORecordSet_db2 extends ADORecordSet_odbc {
 		case 'INTEGER':
 		case 'BIGINT':
 		case 'SMALLINT':
+		case 'I':
 			return 'I';
 			
 		default: return 'N';

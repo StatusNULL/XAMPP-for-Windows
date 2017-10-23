@@ -117,7 +117,7 @@
 	
 	if (file_exists("$partwampp\MercuryMail\MERCURY.INI"))
 	{ 
-	if (($handle = @fsockopen($host, 110, $errno, $errstr, $timeout)) == false)
+	if (($handle = @fsockopen($host, 25, $errno, $errstr, $timeout)) == false)
 		$smtp="NOK";
 		else
 		$smtp="OK";

@@ -24,8 +24,8 @@ ob_end_clean();
 /**
  * @nodep Gtk
  */
-if ('C:\xarelease149\xampp\php\pear' != '@'.'include_path'.'@') {
-    ini_set('include_path', 'C:\xarelease149\xampp\php\pear');
+if ('\xampp\php\pear' != '@'.'include_path'.'@') {
+    ini_set('include_path', '\xampp\php\pear');
 }
 ini_set('allow_url_fopen', true);
 if (!ini_get('safe_mode')) {

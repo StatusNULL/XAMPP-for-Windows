@@ -166,6 +166,12 @@ class Spreadsheet_Excel_Writer_Workbook extends Spreadsheet_Excel_Writer_BIFFwri
     var $_tmp_dir;
 
     /**
+    * number of bytes for sizeinfo of strings
+    * @var integer
+    */
+    var $_string_sizeinfo_size;
+
+    /**
     * Class constructor
     *
     * @param string filename for storing the workbook. "-" for writing to stdout.
@@ -193,7 +199,8 @@ class Spreadsheet_Excel_Writer_Workbook extends Spreadsheet_Excel_Writer_BIFFwri
         $this->_palette          = array();
         $this->_codepage         = 0x04E4; // FIXME: should change for BIFF8
         $this->_country_code     = -1;
-    
+        $this->_string_sizeinfo  = 3;
+
         // Add the default format for hyperlinks
         $this->_url_format =& $this->addFormat(array('color' => 'blue', 'underline' => 1));
         $this->_str_total       = 0;
@@ -265,7 +272,7 @@ class Spreadsheet_Excel_Writer_Workbook extends Spreadsheet_Excel_Writer_BIFFwri
             $version = 0x0600;
             $this->_BIFF_version = $version;
             // change BIFFwriter limit for CONTINUE records
-            $this->_limit = 8224;
+            $this->_limit = 8228;
             $this->_tmp_format->_BIFF_version = $version;
             $this->_url_format->_BIFF_version = $version;
             $this->_parser->_BIFF_version = $version;
@@ -501,8 +508,8 @@ class Spreadsheet_Excel_Writer_Workbook extends Spreadsheet_Excel_Writer_BIFFwri
     
         // Add Workbook globals
         $this->_storeBof(0x0005);
+        $this->_storeCodepage();
         if ($this->_BIFF_version == 0x0600) {
-            $this->_storeCodepage();
             $this->_storeWindow1();
         }
         if ($this->_BIFF_version == 0x0500) {
@@ -547,7 +554,7 @@ class Spreadsheet_Excel_Writer_Workbook extends Spreadsheet_Excel_Writer_BIFFwri
         }
         return true;
     }
- 
+    
     /**
     * Sets the temp dir used for storing the OLE file
     *
@@ -1253,7 +1260,7 @@ class Spreadsheet_Excel_Writer_Workbook extends Spreadsheet_Excel_Writer_BIFFwri
         $data              .= pack("C", 0x10);
         $this->_append($header.$data);
     }
-
+    
     /**
     * Stores the COUNTRY record for localization
     *
@@ -1269,7 +1276,7 @@ class Spreadsheet_Excel_Writer_Workbook extends Spreadsheet_Excel_Writer_BIFFwri
         $data = pack('vv', $this->_country_code, $this->_country_code);
         $this->_append($header.$data);
     }
-
+    
     /**
     * Stores the PALETTE biff record.
     *
@@ -1309,18 +1316,13 @@ class Spreadsheet_Excel_Writer_Workbook extends Spreadsheet_Excel_Writer_BIFFwri
     function _calculateSharedStringsSizes()
     {
         /* Iterate through the strings to calculate the CONTINUE block sizes.
-         The SST blocks requires a specialised CONTINUE block, so we have to
-         ensure that the maximum data block size is less than the limit used by
-         _add_continue() in BIFFwriter.pm. For simplicity we use the same size
-         for the SST and CONTINUE records:
+           For simplicity we use the same size for the SST and CONTINUE records:
            8228 : Maximum Excel97 block size
              -4 : Length of block header
              -8 : Length of additional SST header information
-             -8 : Arbitrary number to keep within _add_continue() limit
-         = 8208
+         = 8216
         */
-        $total_offset       = 12;
-        $continue_limit     = 8208;
+        $continue_limit     = 8216;
         $block_length       = 0;
         $written            = 0;
         $this->_block_sizes = array();
@@ -1336,7 +1338,6 @@ class Spreadsheet_Excel_Writer_Workbook extends Spreadsheet_Excel_Writer_BIFFwri
             // We can write the string if it doesn't cross a CONTINUE boundary
             if ($block_length < $continue_limit) {
                 $written      += $string_length;
-                $total_offset += $string_length;
                 continue;
             }
  
@@ -1361,7 +1362,7 @@ class Spreadsheet_Excel_Writer_Workbook extends Spreadsheet_Excel_Writer_BIFFwri
                     $written      += $space_remaining;
  
                     // Reduce the current block length by the amount written
-                    $block_length -= $continue_limit + $continue;
+                    $block_length -= $continue_limit - $continue;
  
                     // Store the max size for this block
                     $this->_block_sizes[] = $continue_limit;
@@ -1410,8 +1411,11 @@ class Spreadsheet_Excel_Writer_Workbook extends Spreadsheet_Excel_Writer_BIFFwri
          This length is required to set the offsets in the BOUNDSHEET records since
          they must be written before the SST records
         */
+        $total_offset = array_sum($this->_block_sizes);
+        // SST information
+        $total_offset += 8;
         if (!empty($this->_block_sizes)) {
-            $total_offset += (count($this->_block_sizes) - 1) * 4; // add CONTINUE headers
+            $total_offset += (count($this->_block_sizes)) * 4; // add CONTINUE headers
         }
         return $total_offset;
     }
@@ -1427,11 +1431,12 @@ class Spreadsheet_Excel_Writer_Workbook extends Spreadsheet_Excel_Writer_BIFFwri
     *
     * @access private
     */
-    /* FIXME: update _calcSheetOffsets() when updating this method */
     function _storeSharedStringsTable()
     {
         $record  = 0x00fc;  // Record identifier
-        $length  = 8 + array_sum($this->_block_sizes); // Number of bytes to follow
+        // sizes are upside down
+        $this->_block_sizes = array_reverse($this->_block_sizes);
+        $length = array_pop($this->_block_sizes) + 8; // First block size plus SST information
 
         // Write the SST block header information
         $header      = pack("vv", $record, $length);
@@ -1440,7 +1445,7 @@ class Spreadsheet_Excel_Writer_Workbook extends Spreadsheet_Excel_Writer_BIFFwri
 
 
         // Iterate through the strings to calculate the CONTINUE block sizes
-        $continue_limit = 8208;
+        $continue_limit = 8216;
         $block_length   = 0;
         $written        = 0;
         $continue       = 0;
@@ -1514,7 +1519,6 @@ class Spreadsheet_Excel_Writer_Workbook extends Spreadsheet_Excel_Writer_BIFFwri
                 if (!empty($this->_block_sizes)) {
                     $record  = 0x003C;
                     $length  = array_pop($this->_block_sizes);
- 
                     $header  = pack('vv', $record, $length);
                     if ($continue) {
                         $header .= pack('C', $encoding);
@@ -1528,7 +1532,6 @@ class Spreadsheet_Excel_Writer_Workbook extends Spreadsheet_Excel_Writer_BIFFwri
                 //
                 if ($block_length < $continue_limit) {
                     $this->_append($string);
- 
                     $written = $block_length;
                 }
                 else {

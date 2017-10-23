@@ -48,6 +48,7 @@ $TEXT['navi-english']="English";
 $TEXT['navi-german']="Deutsch";
 $TEXT['navi-french']="Francais";
 $TEXT['navi-dutch']="Nederlands";
+$TEXT['navi-spanish']="Spanish";
 
 // ---------------------------------------------------------------------
 // STATUS
@@ -179,13 +180,13 @@ $TEXT['start-subhead']="Congratulations:<br>You successfully installed XAMPP on 
 
 $TEXT['start-text1']="Now you can start using Apache and Co. Firstly you should try »Status« on the left navigation to make sure everything works fine.";
 
-$TEXT['start-text2']="<B>New in der current version: The security check!</B>";
+$TEXT['start-text2']="<B>Thank you to Carsten Wiedmann for his refined compilation of PHP 4.3.10 with MySQL 1.4.8 Support and his \"patched\" version of the Webalizer for win32! :-)</B>";
 
 $TEXT['start-text3']="";
 
 $TEXT['start-text4']="For OpenSSL support please use the test certificate with <a href='https://127.0.0.1' target='_top'>https://127.0.0.1</a> or <a href='https://localhost' target='_top'>https://localhost</a>";
 
-$TEXT['start-text5']="And very important! Big thanks for help and support to Nemesis, KriS, Boppy, Pc-Dummy and all other friends of XAMPP!";
+$TEXT['start-text5']="And very important! Big thanks for help and support to Carsten, Nemesis, KriS, Boppy, Pc-Dummy and all other friends of XAMPP!";
 
 $TEXT['start-text6']="Good luck, Kay Vogelgesang + Kai 'Oswald' Seidler";
 

@@ -138,7 +138,8 @@ class ADODB_Session {
 
 	/*!
 	*/
-	function persist($persist = null) {
+	function persist($persist = null) 
+	{
 		static $_persist = true;
 
 		if (!is_null($persist)) {
@@ -431,7 +432,6 @@ class ADODB_Session {
 		$user		= ADODB_Session::user();
 
 		if (!is_null($persist)) {
-			$persist = (bool) $persist;
 			ADODB_Session::persist($persist);
 		} else {
 			$persist = ADODB_Session::persist();
@@ -443,7 +443,7 @@ class ADODB_Session {
 #		assert('$host');
 
 		// cannot use =& below - do not know why...
-		$conn = ADONewConnection($driver);
+		$conn =& ADONewConnection($driver);
 
 		if ($debug) {
 			$conn->debug = true;
@@ -451,7 +451,12 @@ class ADODB_Session {
 		}
 
 		if ($persist) {
-			$ok = $conn->PConnect($host, $user, $password, $database);
+			switch($persist) {
+			default:
+			case 'P': $ok = $conn->PConnect($host, $user, $password, $database); break;
+			case 'C': $ok = $conn->Connect($host, $user, $password, $database); break;
+			case 'N': $ok = $conn->NConnect($host, $user, $password, $database); break;
+			}
 		} else {
 			$ok = $conn->Connect($host, $user, $password, $database);
 		}

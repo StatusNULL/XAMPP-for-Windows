@@ -14,7 +14,31 @@ function mysqlrootupdate($currentpass, $newpass, $renewpass)
 	{
 	mysql_select_db("mysql");
 	$update="yes";
-	mysql_query("UPDATE user SET password = PASSWORD( '$newpass' ) WHERE `User` = 'root'");
+mysql_query("UPDATE `user` SET `Select_priv` = 'Y',
+`Insert_priv` = 'Y',
+`Update_priv` = 'Y',
+`Delete_priv` = 'Y',
+`Create_priv` = 'Y',
+`Drop_priv` = 'Y',
+`Reload_priv` = 'Y',
+`Shutdown_priv` = 'Y',
+`Process_priv` = 'Y',
+`File_priv` = 'Y',
+`Grant_priv` = 'Y',
+`References_priv` = 'Y',
+`Index_priv` = 'Y',
+`Alter_priv` = 'Y',
+`Show_db_priv` = 'Y',
+`Super_priv` = 'Y',
+`Create_tmp_table_priv` = 'Y',
+`Lock_tables_priv` = 'Y',
+`Execute_priv` = 'Y',
+`Repl_slave_priv` = 'Y',
+`Repl_client_priv` = 'Y',
+`ssl_cipher` = '',
+`x509_issuer` = '',
+`x509_subject` = '' WHERE CONVERT( `Host` USING utf8 ) = '%' AND CONVERT( `User` USING utf8 ) = 'root' LIMIT 1");
+mysql_query("UPDATE user SET password = PASSWORD( '$newpass' ) WHERE `User` = 'root'");
 	// UPDATE `user` SET `User` = 'testuser', `password` = PASSWORD( 'birdbird' ) WHERE `Host` = 'localhost' AND `User` = 'tefstuser' LIMIT 1 ;
 	mysql_close;
 	

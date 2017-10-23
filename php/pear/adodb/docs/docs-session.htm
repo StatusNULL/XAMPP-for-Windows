@@ -21,7 +21,7 @@ font-size: 8pt;
 <body style="background-color: rgb(255, 255, 255);">
 <h3>ADODB Session Management Manual</h3>
 <p>
-V4.50 6 July 2004 (c) 2000-2004 John Lim (jlim#natsoft.com.my)
+V4.54 5 Nov 2004 (c) 2000-2004 John Lim (jlim#natsoft.com.my)
 </p>
 <p> <font size="1">This software is dual licensed using BSD-Style and
 LGPL. This means you can use it in compiled proprietary and commercial
@@ -38,7 +38,7 @@ change your links</b>!</font></td>
     </tr>
   </tbody>
 </table>
-</p>
+<p></p>
 <p>Useful ADOdb links: <a href="http://adodb.sourceforge.net/#download">Download</a>
 &nbsp; <a href="http://adodb.sourceforge.net/#docs">Other Docs</a>
 </p>
@@ -92,11 +92,40 @@ including adodb-cryptsession.inc.php instead of adodb-session.inc.php. </li>
 <p><pre>
  <font
  color="#004040">    include('adodb/adodb.inc.php');<br>    <br><b>    $ADODB_SESSION_DRIVER='mysql';<br>    $ADODB_SESSION_CONNECT='localhost';<br>    $ADODB_SESSION_USER ='scott';<br>    $ADODB_SESSION_PWD ='tiger';<br>    $ADODB_SESSION_DB ='sessiondb';</b><br>    <br>    <b>include('adodb/session/adodb-session.php');</b><br>    session_start();<br>    <br>    #<br>    # Test session vars, the following should increment on refresh<br>    #<br>    $_SESSION['AVAR'] += 1;<br>    print "&lt;p&gt;\$_SESSION['AVAR']={$_SESSION['AVAR']}&lt;/p&gt;";<br></font></pre>
- <p>To force non-persistent connections, call adodb_session_open first before session_start():<p>
+ 
+<p>To force non-persistent connections, call adodb_session_open() first before session_start():
+<p>
  <pre>
  <font color="#004040"><br>    include('adodb/adodb.inc.php');<br>    <br><b>    $ADODB_SESSION_DRIVER='mysql';<br>    $ADODB_SESSION_CONNECT='localhost';<br>    $ADODB_SESSION_USER ='scott';<br>    $ADODB_SESSION_PWD ='tiger';<br>    $ADODB_SESSION_DB ='sessiondb';</b><br>    <br>    <b>include('adodb/session/adodb-session.php');<br>    adodb_sess_open(false,false,false);</b><br>    session_start();<br> </font>
  </pre>
-<p> To use a encrypted sessions, simply replace the file adodb-session.php:</p>
+<p> The 3rd parameter to adodb_sess_open($path, $sessname, $connectMode)  sets the connection method. You can pass in the following:</p>
+<table width="50%" border="1">
+  <tr>
+    <td><b>$connectMode</b></td>
+    <td><b>Connection Method</b></td>
+  </tr>
+  <tr>
+    <td>true</td>
+    <td><p>PConnect( )</p></td>
+  </tr>
+  <tr>
+    <td>false</td>
+    <td>Connect( )</td>
+  </tr>
+  <tr>
+    <td>'N'</td>
+    <td>NConnect( )</td>
+  </tr>
+  <tr>
+    <td>'P'</td>
+    <td>PConnect( )</td>
+  </tr>
+  <tr>
+    <td>'C'</td>
+    <td>Connect( )</td>
+  </tr>
+</table>
+<p>To use a encrypted sessions, simply replace the file adodb-session.php:</p>
  <pre> <font
  color="#004040"><br>    include('adodb/adodb.inc.php');<br>    <br><b>    $ADODB_SESSION_DRIVER='mysql';<br>    $ADODB_SESSION_CONNECT='localhost';<br>    $ADODB_SESSION_USER ='scott';<br>    $ADODB_SESSION_PWD ='tiger';<br>    $ADODB_SESSION_DB ='sessiondb';<br>    <br>    include('adodb/session/adodb-cryptsession.php');</b><br>    session_start();</font><br>
  </pre>

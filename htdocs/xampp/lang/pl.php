@@ -46,6 +46,9 @@ $TEXT['navi-guest1']="FCKeditor";
 $TEXT['navi-languages']="Języki";
 $TEXT['navi-english']="Angielski";
 $TEXT['navi-german']="Niemiecki";
+$TEXT['navi-french']="Francais";
+$TEXT['navi-dutch']="Nederlands";
+$TEXT['navi-spanish']="Spanish";
 
 // ---------------------------------------------------------------------
 // STATUS
@@ -182,7 +185,7 @@ $TEXT['start-text3']="Dla normalnej inicjalizacji dodatku odpal 1 raz na 1 dodat
 
 $TEXT['start-text4']="Dla wsparcia OpenSSL proszę używać testu certyfikatu z <a href='https://127.0.0.1' target='_top'>https://127.0.0.1</a> lub <a href='https://localhost' target='_top'>https://localhost</a>";
 
-$TEXT['start-text5']="I najważniejsze - podziękowania dla Nemesis, KriS, Boppy, Pc-Dummy i wielu innym, którzy pomagaj rozwijać XAMPPa!<BR><BR>Polskie miniwsparcie w <a href=\"http://www.cms.rk.edu.pl\" target=\"_blank\">Bibliotece CMS Riklaunima</a>.";
+$TEXT['start-text5']="I najważniejsze - podziękowania dla Carsten, Nemesis, KriS, Boppy, Pc-Dummy i wielu innym, którzy pomagaj rozwijać XAMPPa!<BR><BR>Polskie miniwsparcie w <a href=\"http://www.cms.rk.edu.pl\" target=\"_blank\">Bibliotece CMS Riklaunima</a>.";
 
 $TEXT['start-text6']="Powodzenia, Kay Vogelgesang + Kai 'Oswald' Seidler";
 

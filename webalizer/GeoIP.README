@@ -1,0 +1,138 @@
+Webalizer + GeoIP library (aka "Geolizer")
+==========================================
+
+ * patch to original Webalizer code by Stanislaw Pusep (stanis@linuxmail.org)
+ * human readable sizes patch by Timo A. Hummel (http://www.timohummel.com/)
+
+Version this patch applies: 2.01-10
+    
+
+References:
+-----------
+
+This project:	http://sysd.org/proj/log.php#glzr
+Webalizer home:	http://www.mrunix.net/webalizer/
+GeoIP home:	http://maxmind.com/geoip/
+
+
+Description:
+------------
+
+Patch for Webalizer to generate faster and more reliable geographic statistics
+than using default DNS suffix method. In fact, if you disable DNS reversal on
+your HTTP server, it will work faster and your stats get more accuracy when
+processed by patched Webalizer.
+Side effects are: possibility to compile native Win32 port under MinGW/MSYS
+and human-readable size display.
+
+
+Robustity/Efficiency:
+---------------------
+
+ * No crashes reported since first public release on 13-Jul-2002
+   (581 days until today!).
+
+ * Extensive comparsion test results on Athlon XP 1700+:
+   o Webalizer:
+	22997341 records (5 bad) in 214.20 seconds, 107363/sec
+   o Geolizer (GEO-106 20040201 database):
+	22997341 records (5 bad) in 217.24 seconds, 105861/sec
+   o GeoIP stats:
+	processed 22997341 hits from 132864 hosts in 144 countries (2 N/A)
+
+As you see, Geolizer is only 1% slower than non-patched Webalizer.
+But while Webalizer differences no countries at all (my web server doesn't
+reverses DNS), GeoIP was unable to recognize only 2 countries from 132864
+different hosts!
+
+
+Preface:
+--------
+
+By default, Webalizer uses DNS suffix to guess country and produce geographic
+stats. Some WWW hostings (mostly free ones) has reverse DNS feature disabled,
+so there's no DNS, and consequently no geographic stats. Well, Webalizer *has*
+internal Reverse DNS feature (aka "Webazolver"). But it's too slow, even
+running 100 threads. So, is there any other way? Sure! It's GeoIP library!
+
+
+How It Works:
+-------------
+
+From GeoIP 1.3.1 package README file:
+
+"GeoIP is a C library that enables the user to find the country that any
+IP address or hostname originates from.  It uses a file based database
+that is accurate as of March 2003.  This database simply contains IP blocks
+as keys, and countries as values.  This database should be more complete and
+accurate than using reverse DNS lookups."
+
+And how to port this feature to Webalizer? At user's point of view, patched
+code takes each IP address and discovers it's country default suffix. Then,
+obtained suffix is appended to hostname (somewhat like "127.0.0.1" becoming
+"127.0.0.1.net"). After this, Webalizer normally processes such host, I mean
+it finds full country name and accounts stats on it. This is quite abstract,
+but the real process isn't too far, it's just s bit more optimized. Oh, quite
+forgot it: if processed entry isn't IP address but DNS hostname, Webalizer's
+default suffix routines are used. This method is less precise, but resolving
+DNS once again isn't a smart solution.
+
+
+Bugs:
+-----
+
+Here it comes...
+
+ * Reversed DNS aren't resolved back to IP address so GeoIP could handle them.
+   This is very slow and dumb process, you'd better turn off your server's
+   DNS reversing.
+ * GeoIP knows more countries than Webalizer so I had to patch webalizer_lang.h
+   English version. So if you compile other language support "new" countries
+   will become "Unknown/Unresolved".
+ * I hadn't made through tests. So, GeoIP patch *seems* to work fine.
+ * Additional "Country" fields text isn't localized. I hope no one cares ;)
+ * DNS names _ARE_ resolved for "Total Sites" tables. On the worst case with
+   "Top 10" setting there will be 20 DNS lookups for each page generated.
+   I don't think that's bad; at least you know countries of that "Top 10"
+   sites. Although, it won't work in offline mode, country will be "Unknown"
+   even if hostname suffix is ".ru" :P
+ * '-d' commandline switch is supposed to show which .conf file is webalizer
+   using. First, it must preceed '-c' flag to work. Second, it *ONLY* works
+   with '-c' flag; won't show default webalizer.conf file. And third, it's
+   message preceeds default "Webalizer V2.01 ..." header. Really a quick&dirty
+   hack...
+
+
+Change Log:
+-----------
+
+13-Jul-2002: First release.
+22-Aug-2002: Reorganized a lot. Now compiles on Win32 under MinGW.
+23-Aug-2002: Fixed problems with "path relativity".
+	     GeoIP_open is now verbose.
+	     Binaries are "strip"'ped by default.
+	     Fixed case for "configure" options --with-geoip-xxx.
+	     No more ETCDIR on Win32 build.
+25-Aug-2002: Removed my "fast" buggy tolower() from GeoIP suffix normalizer
+	     (caused A1 & A2 codes to be ignored; default "slow" tolower()
+	     is better here).
+	     "configure" now seeks for GeoIP first in user-specified --prefix.
+	     In debug+GeoIP mode helpful strings (address, 2-letter code,
+	     country) are being print now.
+	     Fixed a fault that caused warning on MinGW when compiling
+	     win_port.c.
+26-Aug-2002: Release of all changes since "22-Aug-2002".
+07-Nov-2002: GeoIP API changed since version 1.0.10; unresolved countries are
+	     handled now by NULL instead of "--". Older API is still supported
+	     for compatibility with Win32 version of GeoIP.
+07-Fev-2004: Now shows GeoIP database information on top of generated pages
+	     and link to official Geolizer site at bottom :)
+	     "Total Sites" & everything related now shows "Country" column,
+	     too. Static binaries are now bound with GeoIP 1.3.1 library and
+	     "GEO-106FREE 20031105 Build 1" database.
+14-Fev-2004: Merged human readable sizes patch by Timo A. Hummel.
+	     Added byte-precision to it :)
+	     Updated docs & posted extensive test results.
+16-Fev-2004: Updated 'webalizer.1' man page. Webalizer now shows which config
+             file(s) it is using. More tips&tricks in INSTALL file. Better
+             Win32 package with correct text line endings & HTMLized man page.

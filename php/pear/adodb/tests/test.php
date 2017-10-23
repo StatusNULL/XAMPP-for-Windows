@@ -1,6 +1,6 @@
 <?php
 /* 
-V4.52 10 Aug 2004  (c) 2000-2004 John Lim (jlim@natsoft.com.my). All rights reserved.
+V4.54 5 Nov 2004  (c) 2000-2004 John Lim (jlim@natsoft.com.my). All rights reserved.
   Released under both BSD license and Lesser GPL library license. 
   Whenever there is any discrepancy between the two licenses, 
   the BSD license will take precedence. 
@@ -43,7 +43,8 @@ global $ADODB_EXTENSION;
 function do_strtolower(&$arr)
 {
 	foreach($arr as $k => $v) {
-		$arr[$k] = strtolower($v);
+		if (is_object($v)) $arr[$k] = adodb_pr($v,true);
+		else $arr[$k] = strtolower($v);
 	}
 }
 
@@ -112,6 +113,8 @@ FROM `nuke_stories` `t1`, `nuke_authors` `t2`, `nuke_stories_cat` `t3`, `nuke_to
 	else $ext = '';
 	print "<h3>ADODB Version: $ADODB_vers Host: <i>$db->host</i> &nbsp; Database: <i>$db->database</i> &nbsp; PHP: $phpv $ext</h3>";
 	flush();
+
+	
 	$arr = $db->ServerInfo();
 	print_r($arr);
 	echo "<br>";
@@ -122,7 +125,7 @@ FROM `nuke_stories` `t1`, `nuke_authors` `t2`, `nuke_stories_cat` `t3`, `nuke_to
 	if ($tt == 0) echo '<br><b>$db->Time failed</b>';
 	else echo "<br>db->Time: ".date('d-m-Y H:i:s',$tt);
 	echo '<br>';
-
+	
 	echo "Date=",$db->UserDate('2002-04-07'),'<br>';
 	print "<i>date1</i> (1969-02-20) = ".$db->DBDate('1969-2-20');
 	print "<br><i>date1</i> (1999-02-20) = ".$db->DBDate('1999-2-20');
@@ -154,11 +157,6 @@ FROM `nuke_stories` `t1`, `nuke_authors` `t2`, `nuke_stories_cat` `t3`, `nuke_to
 
 	//$ADODB_COUNTRECS=false;
 	$rs=$db->Execute('select * from adoxyz order by id');
-
-	//print_r($rs);
-	//OCIFetchStatement($rs->_queryID,$rez,0,-1);//,OCI_ASSOC | OCI_FETCHSTATEMENT_BY_ROW);
-	//print_r($rez);
-	//die();
 	if($rs === false) $create = true;
 	else $rs->Close();
 		
@@ -184,7 +182,7 @@ FROM `nuke_stories` `t1`, `nuke_authors` `t2`, `nuke_stories_cat` `t3`, `nuke_to
 	print "<p>Test select on empty table, FetchField when EOF, and GetInsertSQL</p>";
 	$rs = &$db->Execute("select id,firstname from ADOXYZ where id=9999");
 	if ($rs && !$rs->EOF) print "<b>Error: </b>RecordSet returned by Execute(select...') on empty table should show EOF</p>";
-	if ($rs->EOF && ($o = $rs->FetchField(0))) {
+	if ($rs->EOF && ($o = $rs->FetchField(0) && !empty($o->name))) {
 		$record['id'] = 99;
 		$record['firstname'] = 'John';
 		$sql =  $db->GetInsertSQL($rs, $record);
@@ -277,6 +275,12 @@ FROM `nuke_stories` `t1`, `nuke_authors` `t2`, `nuke_stories_cat` `t3`, `nuke_to
 			print '</p>';
 		}
 		
+		$db->debug=0;
+		$rez = $db->MetaColumns("NOSUCHTABLEHERE");
+		if ($rez !== false) {
+			Err("MetaColumns error handling failed");
+			var_dump($rez);
+		}
 		$db->debug=1;
 		$a = $db->MetaColumns('ADOXYZ');
 		if ($a===false) print "<b>MetaColumns not supported</b></p>";
@@ -306,6 +310,15 @@ FROM `nuke_stories` `t1`, `nuke_authors` `t2`, `nuke_stories_cat` `t3`, `nuke_to
 	
 	
 	switch ($db->databaseType) {
+	case 'vfp':
+		
+		if (0) {
+			// memo test
+			$rs = $db->Execute("select data from memo");
+			rs2html($rs);
+		}
+		break;
+
 	case 'postgres7':
 	case 'postgres64':
 	case 'postgres':
@@ -376,7 +389,7 @@ GO
 		rs2html($rs);
 		
 		/*
-		Test out params - works in 4.2.3 and 4.3.3 but not 4.3.0:
+		Test out params - works in PHP 4.2.3 and 4.3.3 and 4.3.8 but not 4.3.0:
 		
 			CREATE PROCEDURE at_date_interval 
 				@days INTEGER, 
@@ -398,7 +411,7 @@ GO
 		$db->OutParameter($stmt,$begin_date,'start', 20, SQLVARCHAR ); 
 		$db->OutParameter($stmt,$end_date,'end', 20, SQLVARCHAR ); 
 		$db->Execute($stmt);
-		if (empty($begin_date) or empty($end_date)) {
+		if (empty($begin_date) or empty($end_date) or $begin_date == $end_date) {
 			Err("MSSQL SP Test for OUT Failed");
 			print "begin=$begin_date end=$end_date<p>";
 		} else print "(Today +10days) = (begin=$begin_date end=$end_date)<p>";
@@ -454,13 +467,15 @@ GO
 		print "<h4>Testing Cursor Variables</h4>";
 /*
 -- TEST PACKAGE
+-- "Set scan off" turns off substitution variables. 
+Set scan off; 
 
 CREATE OR REPLACE PACKAGE Adodb AS
 TYPE TabType IS REF CURSOR RETURN TAB%ROWTYPE;
 PROCEDURE open_tab (tabcursor IN OUT TabType,tablenames IN VARCHAR);
 PROCEDURE open_tab2 (tabcursor IN OUT TabType,tablenames IN OUT VARCHAR) ;
 PROCEDURE data_out(input IN VARCHAR, output OUT VARCHAR);
-
+PROCEDURE data_in(input IN VARCHAR);
 PROCEDURE myproc (p1 IN NUMBER, p2 OUT NUMBER);
 END Adodb;
 /
@@ -477,10 +492,16 @@ PROCEDURE open_tab (tabcursor IN OUT TabType,tablenames IN VARCHAR) IS
 		OPEN tabcursor FOR SELECT * FROM TAB WHERE tname LIKE tablenames;
 		tablenames := 'TEST';
 	END open_tab2;
-	
+
 PROCEDURE data_out(input IN VARCHAR, output OUT VARCHAR) IS
 	BEGIN
 		output := 'Cinta Hati '||input;
+	END;
+	
+PROCEDURE data_in(input IN VARCHAR) IS
+	ignore varchar(1000);
+	BEGIN
+		ignore := input;
 	END;
 
 PROCEDURE myproc (p1 IN NUMBER, p2 OUT NUMBER) AS
@@ -489,7 +510,6 @@ p2 := p1;
 END;
 END Adodb;
 /
-
 
 */
 		$rs = $db->ExecuteCursor("BEGIN adodb.open_tab(:zz,'A%'); END;",'zz');
@@ -517,13 +537,16 @@ END Adodb;
 			print "<b>Error in using Stored Procedure IN/Out Variables</b><p>";
 		}
 		
-		
 		$tname = 'A%';
 		
 		$stmt = $db->PrepareSP('select * from tab where tname like :tablename');
 		$db->Parameter($stmt,$tname,'tablename');
 		$rs = $db->Execute($stmt);
 		rs2html($rs);
+		
+		$stmt = $db->PrepareSP("begin adodb.data_in(:a1); end;");
+		$db->InParameter($stmt,$a1,'a1');
+		$db->Execute($stmt);
 		
 		$db->debug = $saved;
 		break;
@@ -644,8 +667,7 @@ END Adodb;
 	else if ($nrows != $cnt)  print "<p><b>Affected_Rows() Error: $nrows returned (should be 50) </b></p>";
 	else print "<p>Affected_Rows() passed</p>";
 	}
-	
-	
+
 	$array = array('zid'=>1,'zdate'=>date('Y-m-d',time()));
 	$id = $db->GetOne("select id from ADOXYZ 
 		where id=".$db->Param('zid')." and created>=".$db->Param('ZDATE')."",
@@ -654,7 +676,6 @@ END Adodb;
 	else echo "<br>Bind date/integer passed";
 	
 	$db->debug = false;
-	
 	$ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;
  //////////////////////////////////////////////////////////////////////////////////////////
 	
@@ -805,9 +826,8 @@ END Adodb;
 	if (trim($col[0]) != 'Alan' or trim($col[9]) != 'Yat Sun') Err("Col elements wrong");
 
 	$db->debug = true;
-	print "<p>SelectLimit Distinct Test 1: Should see Caroline, John and Mary</p>";
-	$rs = &$db->SelectLimit('select distinct * from ADOXYZ order by id',3);
 	
+		
 	echo "<p>Date Update Test</p>";
 	$zdate = date('Y-m-d',time()+3600*24);
 	$zdate = $db->DBDate($zdate);
@@ -815,18 +835,19 @@ END Adodb;
 	$row = $db->GetRow("select created,firstname from ADOXYZ where id=1");
 	print_r($row); echo "<br>";
 	
-	//$zdate = date('Y-m-d',time()+3600*24);
-	//$db->Execute("update ADOXYZ set created=? where id=2",$zdate);
-	//$zdate = $db->GetOne("select created from ADOXYZ where id=2");
-	//echo "tomorrow=",$zdate,"<br>";
-	$db->debug=false;
+	
+	
+	print "<p>SelectLimit Distinct Test 1: Should see Caroline, John and Mary</p>";
+	$rs = &$db->SelectLimit('select distinct * from ADOXYZ order by id',3);
+	
 	
 	if ($rs && !$rs->EOF) {
-		if (trim($rs->fields[1]) != 'Caroline') Err("Error 1");
+		if (trim($rs->fields[1]) != 'Caroline') Err("Error 1 (exp Caroline), ".$rs->fields[1]);
 		$rs->MoveNext();
-		if (trim($rs->fields[1]) != 'John') Err("Error 2");
+		
+		if (trim($rs->fields[1]) != 'John') Err("Error 2 (exp John), ".$rs->fields[1]);
 		$rs->MoveNext();
-		if (trim($rs->fields[1]) != 'Mary') Err("Error 3");
+		if (trim($rs->fields[1]) != 'Mary') Err("Error 3 (exp Mary),".$rs->fields[1]);
 		$rs->MoveNext();
 		if (! $rs->EOF) Err("Error EOF");
 		//rs2html($rs);
@@ -835,16 +856,16 @@ END Adodb;
 	print "<p>SelectLimit Test 2: Should see Mary, George and Mr. Alan</p>";
 	$rs = &$db->SelectLimit('select * from ADOXYZ order by id',3,2);
 	if ($rs && !$rs->EOF) {
-		if (trim($rs->fields[1]) != 'Mary') Err("Error 1");
+		if (trim($rs->fields[1]) != 'Mary') Err("Error 1 - No Mary, instead: ".$rs->fields[1]);
 		$rs->MoveNext();
-		if (trim($rs->fields[1]) != 'George')Err("Error 2");
+		if (trim($rs->fields[1]) != 'George')Err("Error 2 - No George, instead: ".$rs->fields[1]);
 		$rs->MoveNext();
-		if (trim($rs->fields[1]) != 'Mr. Alan') Err("Error 3");
+		if (trim($rs->fields[1]) != 'Mr. Alan') Err("Error 3 - No Mr. Alan, instead: ".$rs->fields[1]);
 		$rs->MoveNext();
 		if (! $rs->EOF) Err("Error EOF");
 	//	rs2html($rs);
 	}
-	 else Err("Failed SelectLimit Test 2");
+	 else Err("Failed SelectLimit Test 2 ". ($rs ? 'EOF':'no RS'));
 	
 	print "<p>SelectLimit Test 3: Should see Wai Hun and Steven</p>";
 	$db->debug=1;
@@ -1020,13 +1041,24 @@ END Adodb;
 	$rs = &$db->CacheExecute(4,"select distinct firstname,lastname from ADOXYZ");
 	if ($rs) print 'With blanks, Steven selected:'. $rs->GetMenu2('menu',('Oey')).'<BR>'; 
 	else print " Fail<BR>";
-	$rs = &$db->CacheExecute(4,"select distinct firstname,lastname from ADOXYZ");
+	$rs = &$db->CacheExecute(6,"select distinct firstname,lastname from ADOXYZ");
 	if ($rs) print ' No blanks, Steven selected: '. $rs->GetMenu2('menu',('Oey'),false).'<BR>';
 	else print " Fail<BR>";
 	}
+	echo "<h3>CacheEXecute</h3>";
+
+	$ADODB_FETCH_MODE = ADODB_FETCH_NUM;
+	$rs = &$db->CacheExecute(6,"select distinct firstname,lastname from ADOXYZ");
+	print_r($rs->fields); echo $rs->fetchMode;echo "<br>";
+	echo $rs->Fields('firstname');
 	
+	$ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;
+	$rs = &$db->CacheExecute(6,"select distinct firstname,lastname from ADOXYZ");
+	print_r($rs->fields);echo "<br>";
+	echo $rs->Fields('firstname');
 	$db->debug = false;
 	
+	$ADODB_FETCH_MODE = ADODB_FETCH_NUM;
 	// phplens
 	
 	$sql = 'select * from ADOXYZ where 0=1';
@@ -1446,6 +1478,7 @@ END Adodb;
 	print "<p>";
 	////////////////////////////////////////////////////////////////////
 	
+	if ($db->dataProvider == 'odbtp') $db->databaseType = 'odbtp';
 	$conn = NewADOConnection($db->databaseType);
 	$conn->raiseErrorFn = 'adodb_test_err';
 	@$conn->PConnect('abc');
@@ -1561,7 +1594,8 @@ echo "<br>vers=",ADOConnection::Version();
 
 
 include_once('../adodb-time.inc.php');
-if (!isset($_GET['nd'])) adodb_date_test();
+if (isset($_GET['time'])) adodb_date_test();
+
 ?>
 <p><i>ADODB Database Library  (c) 2000-2004 John Lim. All rights reserved. Released under BSD and LGPL.</i></p>
 </body>

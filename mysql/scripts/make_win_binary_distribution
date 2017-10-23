@@ -6,7 +6,7 @@
 # This is intended to be used under Cygwin, and will generate
 # an archive named in the form mysql<suffix>-<version>-noinstall.zip
 
-version=4.1.7
+version=4.1.8
 
 DEBUG=0
 SUFFIX=""

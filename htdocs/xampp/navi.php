@@ -14,7 +14,7 @@
 <tr valign=top>
 <td align=right class=navi>
 <img src=img/blank.gif width=145 height=15><br>
-<span class=nh><?=$TEXT['navi-xampp']?> <?include(".version")?></span><br>
+<span class=nh><?=$TEXT['navi-xampp']?> <?include(".version")?><br>[PHP: <?=phpversion() ?>]</span><br>
 </td></tr>
 <tr><td bgcolor=#fb7922 colspan=1 background="img/strichel.gif" class=white><img src=img/blank.gif width=1 height=1></td></tr>
 <tr valign=top><td align=right class=navi>
@@ -49,7 +49,7 @@
 <?include("naviother.inc");?>
 
 </td></tr>
-<tr><td bgcolor=#fb7922 colspan=1 class=white><img src=img/blank.gif width=1 height=1></td></tr>
+<tr><td bgcolor=#fb7922 colspan=1 class=white></td></tr>
 <tr valign=top><td align=right class=navi>
 <?include("naviguest.inc");?>
 <br>
@@ -61,7 +61,8 @@
 <a target=_parent class=n href="lang.php?en"><?=$TEXT['navi-english']?></a><br>
 <a target=_parent class=n href="lang.php?de"><?=$TEXT['navi-german']?></a><br>
 <a target=_parent class=n href="lang.php?fr"><?=$TEXT['navi-french']?></a><br>
-<a target=_parent class=n href="lang.php?nl"><?=$TEXT['navi-dutch']?></a><p>
+<a target=_parent class=n href="lang.php?nl"><?=$TEXT['navi-dutch']?></a><br>
+<a target=_parent class=n href="lang.php?es"><?=$TEXT['navi-spanish']?></a><p>
 <!-- <a target=_parent class=n href="lang.php?pl"><?=$TEXT['navi-polish']?></a><p> -->
 
 

@@ -45,10 +45,11 @@ $TEXT['navi-specialguest']="Current Guest";
 $TEXT['navi-guest1']="FCKeditor";
                                                                                                                  
 $TEXT['navi-languages']="Sprachen";
-$TEXT['navi-english']="English";
+$TEXT['navi-english']="Englisch";
 $TEXT['navi-german']="Deutsch";
-$TEXT['navi-french']="Francais";
-$TEXT['navi-dutch']="Nederlands";
+$TEXT['navi-french']="Französisch";
+$TEXT['navi-dutch']="Holländisch";
+$TEXT['navi-spanish']="Spanisch";
 
 // ---------------------------------------------------------------------
 // STATUS
@@ -178,13 +179,13 @@ $TEXT['start-subhead']="Herzlichen Glückwunsch:<br>XAMPP wurde erfolgreich auf d
 
 $TEXT['start-text1']="Nun kann es losgehen. :) Als erstes bitte einmal auf der linken Seite auf »Status« klicken. Damit bekommt man einen Überblick was alles schon funktioniert. Ein paar Funktionen werden ausgeschaltet sein. Das ist Absicht so. Es sind Funktionen, die nicht überall funktionieren oder evtl. Probleme bereiten könnten.";
 
-$TEXT['start-text-newest']="<B>Neu in der aktuellen Version ist ein XAMPP Sicherheitscheck!</B>";
+$TEXT['start-text-newest']="<B>Vielen Dank an Carsten Wiedmann, der Apachefriends seine raffinierte Kompilation  von PHP 4.3.10 u.a. mit MySQL 1.4.8 Support und eine \"gepatchte\" Version vom Webalizer für win32 zur Verfügung stellte! :-)</B>";
 
 $TEXT['start-text3']="";
 
 $TEXT['start-text4']="Für die OpenSSL Unterstützung benutzt bitte das Testzertifikat mit der URL <a href='https://127.0.0.1' target='_top'>https://127.0.0.1</a> bzw. <a href='https://localhost' target='_top'>https://localhost</a>";
 
-$TEXT['start-text5']="Und ganz wichtig! Einen großen Dank für die Mitarbeit und Mithilfe an Nemesis, KriS, Boppy, Pc-Dummy und allen anderen Freunden von XAMPP!";
+$TEXT['start-text5']="Und ganz wichtig! Einen großen Dank für die Mitarbeit und Mithilfe an Carsten, Nemesis, KriS, Boppy, Pc-Dummy und allen anderen Freunden von XAMPP!";
 
 $TEXT['start-text6']="Viel Spaß, Kay Vogelgesang + Kai 'Oswald' Seidler";
 

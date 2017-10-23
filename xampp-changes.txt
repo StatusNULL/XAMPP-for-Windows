@@ -1,0 +1,21 @@
+
+28 Dec 2004, XAMPP 1.4.11
+
+- Added PHP 4.3.10 a Carsten Wiedmann compilation with mysql client 4.1.8 [wiedmann] 
+- Added Webalizer 2.01-10 with geolizer patch from Carsten Wiedmann [wiedmann] 
+- Added mod_auth_mysql-2.8.0 from Carsten Wiedmann [wiedmann] 
+- Fixed bug: "install.php" will not supported completly by PHP 5. The "refresh" 
+  function does not work. Solution: Using PHP4 as default. [kvo]
+- Fixed bug: MySQL 4.1.8 does not work with PHP4. Solution: Added the 
+  "old-passwords" function in the my.cnf [wiedmann + kvo]
+- Fixed bug: PHP PEAR "pearcmd.php" with correct paths [kvo]
+- Changing Mysql: Log-Bin is deactivate. [kvo]
+- Added PHP 5.0.3 [kvo]
+- Update PEAR: Please visite php\pear\installed_packages.txt [kvo]
+- Added MySQL 4.1.8 [kvo]
+- Update OpenSSL: OpenSSL 0.9.7e [kvo]
+- Added Spanish (incomplete) [kvo]
+
+
+   
+

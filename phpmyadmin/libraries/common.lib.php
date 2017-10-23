@@ -1041,7 +1041,7 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
         $cfg['PmaAbsoluteUri'] .= $url['host'];
         // Add port, if it not the default one
         if (!empty($url['port']) && (($url['scheme'] == 'http' && $url['port'] != 80) || ($url['scheme'] == 'https' && $url['port'] != 443))) {
-            $cfg['PmaAbsoluteUri'] .= $url['port'];
+            $cfg['PmaAbsoluteUri'] .= ':' . $url['port'];
         }
         // And finally path, without script name
         $cfg['PmaAbsoluteUri'] .= substr($url['path'], 0, strrpos($url['path'], '/') + 1);

@@ -423,8 +423,9 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
         $this->print_colmin     = NULL;
         $this->print_colmax     = NULL;
     
-        $this->_print_gridlines = 1;
-        $this->_print_headers   = 0;
+        $this->_print_gridlines  = 1;
+        $this->_screen_gridlines = 1;
+        $this->_print_headers    = 0;
     
         $this->_fit_page        = 0;
         $this->_fit_width       = 0;
@@ -437,7 +438,7 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
         $this->_password        = NULL;
     
         $this->col_sizes        = array();
-        $this->row_sizes        = array();
+        $this->_row_sizes        = array();
     
         $this->_zoom            = 100;
         $this->_print_scale     = 100;
@@ -1016,6 +1017,16 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
         $this->_print_gridlines = 0;
     }
     
+    /**
+    * Set the option to hide gridlines on the worksheet (as seen on the screen). 
+    *
+    * @access public
+    */
+    function hideScreenGridlines()
+    {
+        $this->_screen_gridlines = 0;
+    }
+ 
     /**
     * Set the option to print the row and column headers on the printed page.
     *
@@ -2113,7 +2124,10 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
         $reserved    = 0x0000;               // Reserved
         $grbit       = 0x0000;               // Option flags
         $ixfe        = $this->_XF($format);  // XF index
-    
+
+        // set _row_sizes so _sizeRow() can use it
+        $this->_row_sizes[$row] = $height;
+
         // Use setRow($row, NULL, $XF) to set XF format without setting height
         if ($height != NULL) {
             $miyRw = $height * 20;  // row height
@@ -2198,7 +2212,7 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
     
         // The options flags that comprise $grbit
         $fDspFmla       = 0;                     // 0 - bit
-        $fDspGrid       = 1;                     // 1
+        $fDspGrid       = $this->_screen_gridlines; // 1
         $fDspRwCol      = 1;                     // 2
         $fFrozen        = $this->_frozen;        // 3
         $fDspZeros      = 1;                     // 4
@@ -2964,14 +2978,24 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
     
         $record  = 0x001b;               // Record identifier
         $cbrk    = count($breaks);       // Number of page breaks
-        $length  = 2 + 6*$cbrk;          // Bytes to follow
-    
+        if ($this->_BIFF_version == 0x0600) {
+            $length  = 2 + 6*$cbrk;      // Bytes to follow
+        }
+        else {
+            $length  = 2 + 2*$cbrk;      // Bytes to follow
+        }
+
         $header  = pack("vv", $record, $length);
         $data    = pack("v",  $cbrk);
     
         // Append each page break
         foreach($breaks as $break) {
-            $data .= pack("vvv", $break, 0x0000, 0x00ff);
+            if ($this->_BIFF_version == 0x0600) {
+                $data .= pack("vvv", $break, 0x0000, 0x00ff);
+            }
+            else {
+                $data .= pack("v", $break);
+            }
         }
     
         $this->_prepend($header.$data);
@@ -3002,14 +3026,23 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
     
         $record  = 0x001a;               // Record identifier
         $cbrk    = count($breaks);       // Number of page breaks
-        $length  = 2 + 6*$cbrk;          // Bytes to follow
+        if ($this->_BIFF_version == 0x0600)
+            $length  = 2 + 6*$cbrk;      // Bytes to follow
+        else {
+            $length  = 2 + 2*$cbrk;      // Bytes to follow
+        }
     
         $header  = pack("vv",  $record, $length);
         $data    = pack("v",   $cbrk);
     
         // Append each page break
         foreach ($breaks as $break) {
-            $data .= pack("vvv", $break, 0x0000, 0xffff);
+            if ($this->_BIFF_version == 0x0600) {
+                $data .= pack("vvv", $break, 0x0000, 0xffff);
+            }
+            else {
+                $data .= pack("v", $break);
+            }
         }
     
         $this->_prepend($header.$data);
@@ -3247,12 +3280,12 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
     function _sizeRow($row)
     {
         // Look up the cell value to see if it has been changed
-        if (isset($this->row_sizes[$row])) {
-            if ($this->row_sizes[$row] == 0) {
+        if (isset($this->_row_sizes[$row])) {
+            if ($this->_row_sizes[$row] == 0) {
                 return(0);
             }
             else {
-                return(floor(4/3 * $this->row_sizes[$row]));
+                return(floor(4/3 * $this->_row_sizes[$row]));
             }
         }
         else {
@@ -3366,8 +3399,8 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
         }
     
         // The first 2 bytes are used to identify the bitmap.
-        $identity = unpack("A2", $data);
-        if ($identity[''] != "BM") {
+        $identity = unpack("A2ident", $data);
+        if ($identity['ident'] != "BM") {
             $this->raiseError("$bitmap doesn't appear to be a valid bitmap image.\n");
         }
     
@@ -3377,8 +3410,8 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
         // Read and remove the bitmap size. This is more reliable than reading
         // the data size at offset 0x22.
         //
-        $size_array   = unpack("V", substr($data, 0, 4));
-        $size   = $size_array[''];
+        $size_array   = unpack("Vsa", substr($data, 0, 4));
+        $size   = $size_array['sa'];
         $data   = substr($data, 4);
         $size  -= 0x36; // Subtract size of bitmap header.
         $size  += 0x0C; // Add size of BIFF header.
@@ -3405,15 +3438,15 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
             $this->raiseError("$bitmap isn't a 24bit true color bitmap.\n");
         }
         if ($planes_and_bitcount[1] != 1) {
-            $this->raiseError("$bitmap: only 1 plane nupported in bitmap image.\n");
+            $this->raiseError("$bitmap: only 1 plane supported in bitmap image.\n");
         }
     
         // Read and remove the bitmap compression. Verify compression.
-        $compression = unpack("V", substr($data, 0, 4));
+        $compression = unpack("Vcomp", substr($data, 0, 4));
         $data = substr($data, 4);
       
         //$compression = 0;
-        if ($compression[""] != 0) {
+        if ($compression['comp'] != 0) {
             $this->raiseError("$bitmap: compression not supported in bitmap image.\n");
         }
     
