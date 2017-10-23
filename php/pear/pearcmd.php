@@ -18,7 +18,7 @@
 // |                                                                      |
 // +----------------------------------------------------------------------+
 //
-// $Id: pearcmd.php,v 1.38 2007/11/17 21:02:21 dufuz Exp $
+// $Id: pearcmd.php,v 1.39 2008/03/25 04:58:42 cellog Exp $
 
 ob_end_clean();
 if (!defined('PEAR_RUNTYPE')) {
@@ -29,8 +29,8 @@ define('PEAR_IGNORE_BACKTRACE', 1);
 /**
  * @nodep Gtk
  */
-if ('\xampp\php\pear' != '@'.'include_path'.'@') {
-    ini_set('include_path', '\xampp\php\pear');
+if ('D:\release168\tests\xampp\php\pear' != '@'.'include_path'.'@') {
+    ini_set('include_path', 'D:\release168\tests\xampp\php\pear');
     $raw = false;
 } else {
     // this is a raw, uninstalled pear, either a cvs checkout, or php distro
@@ -47,7 +47,7 @@ ob_implicit_flush(true);
 $_PEAR_PHPDIR = '#$%^&*';
 set_error_handler('error_handler');
 
-$pear_package_version = "1.7.1";
+$pear_package_version = "1.7.2";
 
 require_once 'PEAR.php';
 require_once 'PEAR/Frontend.php';
@@ -400,9 +400,13 @@ function cmdHelp($command)
 // }}}
 
 function error_handler($errno, $errmsg, $file, $line, $vars) {
-    if ((defined('E_STRICT') && $errno & E_STRICT) || !error_reporting()) {
+    if ((defined('E_STRICT') && $errno & E_STRICT) || (defined('E_DEPRECATED') &&
+          $errno & E_DEPRECATED) || !error_reporting()) {
         if (defined('E_STRICT') && $errno & E_STRICT) {
             return; // E_STRICT
+        }
+        if (defined('E_DEPRECATED') && $errno & E_DEPRECATED) {
+            return; // E_DEPRECATED
         }
         if ($GLOBALS['config']->get('verbose') < 4) {
             return false; // @silenced error, show all if debug is high enough

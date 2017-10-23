@@ -1710,7 +1710,7 @@ class phpDocumentor_IntermediateParser
         if ($this->templateBase) {
             $templateBase = str_replace('\\','/', $this->templateBase) . '/Converters';
         } else {
-            if ('\xampp\php\pear' != '@'.'PEAR-DIR@') {
+            if ('D:\release168\tests\xampp\php\pear' != '@'.'PEAR-DIR@') {
                 $templateBase = 'PhpDocumentor/phpDocumentor/Converters';
             } else {
                 $templateBase = str_replace('\\','/',$GLOBALS['_phpDocumentor_install_dir']) . '/phpDocumentor/Converters';

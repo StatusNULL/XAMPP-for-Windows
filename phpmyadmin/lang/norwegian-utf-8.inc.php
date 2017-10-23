@@ -1,5 +1,5 @@
 <?php
-/* $Id: norwegian-utf-8.inc.php 11113 2008-02-09 16:09:54Z lem9 $ */
+/* $Id: norwegian-utf-8.inc.php 11508 2008-08-26 16:33:00Z lem9 $ */
 
 /**
  * Translated by Sven-Erik Andersen <sven DOT erik DOT andersen AT gmail DOT com>
@@ -893,6 +893,7 @@ $strStructure = 'Struktur';
 $strStructureForView = 'Visningsstruktur';
 $strSubmit = 'Send';
 $strSuccess = 'Kommandoen/spørringen er utført';
+$strSuhosin = 'Tjeneren kjører med Suhosin. Sjekk %sdokumentasjonen%s for potensielle problemer.';
 $strSum = 'Sum';
 $strSwedish = 'svensk';
 $strSwitchToDatabase = 'Bytt til kopiert database';
@@ -1025,5 +1026,4 @@ $strYes = 'Ja';
 $strZeroRemovesTheLimit = 'Merk: Ved å sette disse til 0 (null) fjernes begrensningen.';
 $strZip = 'Komprimert (zip)';
 
-$strSuhosin = 'Server running with Suhosin. Please refer to %sdocumentation%s for possible issues.';  //to translate
 ?>

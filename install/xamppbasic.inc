@@ -3,6 +3,7 @@
 	$backslashrootreal[] = "$partwampp\php\\php5.ini";
 	$backslashrootreal[] = "$partwampp\php\php4\\php4.ini";
 	$backslashrootreal[] = "$partwampp\php\\php.ini";
+	$backslashrootreal[] = "$partwampp\php\\php-pear.ini";
 	$backslashrootreal[] = "$partwampp\php\php4\\php.ini";
 	$backslashrootreal[] = "$partwampp\php\\compatinfo.bat";
 	$backslashrootreal[] = "$partwampp\php\\pear.ini";

@@ -1,6 +1,6 @@
 <?php
 /* 
-V4.80 8 Mar 2006  (c) 2000-2008 John Lim (jlim#natsoft.com.my). All rights reserved.
+V4.80 8 Mar 2006  (c) 2000-2008 John Lim (jlim#natsoft.com). All rights reserved.
   Released under both BSD license and Lesser GPL library license. 
   Whenever there is any discrepancy between the two licenses, 
   the BSD license will take precedence. 
@@ -11,7 +11,8 @@ V4.80 8 Mar 2006  (c) 2000-2008 John Lim (jlim#natsoft.com.my). All rights reser
 
 
 if (!defined('E_STRICT')) define('E_STRICT',E_NOTICE);
-error_reporting(E_ALL|E_STRICT);
+#error_reporting(E_ALL|E_STRICT);
+error_reporting(E_ALL);
 
 $ADODB_FLUSH = true;
 
@@ -134,7 +135,7 @@ FROM `nuke_stories` `t1`, `nuke_authors` `t2`, `nuke_stories_cat` `t3`, `nuke_to
 	$arr = $db->ServerInfo();
 	print_r($arr);
 	echo E_ALL,' ',E_STRICT, "<br>";
-	$e = error_reporting(E_ALL | E_STRICT);
+	#$e = error_reporting(E_ALL | E_STRICT);
 	echo error_reporting(),'<p>';
 	flush();
 	#$db->debug=1;
@@ -1327,8 +1328,8 @@ END Adodb;
 		rs2tabout($rs);
 		print "</pre>";
 	}
-	print " CacheFlush ";
-	$db->CacheFlush();
+	#print " CacheFlush ";
+	#$db->CacheFlush();
 	
 	$date = $db->SQLDate('d-m-M-Y-\QQ h:i:s A');
 	$sql = "SELECT $date from ADOXYZ";

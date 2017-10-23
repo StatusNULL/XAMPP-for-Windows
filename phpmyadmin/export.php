@@ -2,7 +2,7 @@
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
  * @todo    too much die here, or?
- * @version $Id: export.php 11330 2008-06-20 17:53:30Z lem9 $
+ * @version $Id: export.php 11450 2008-08-01 19:15:01Z lem9 $
  */
 
 /**
@@ -344,7 +344,7 @@ if (!$save_on_server) {
         // Download
         // (avoid rewriting data containing HTML with anchors and forms;
         // this was reported to happen under Plesk)
-        ini_set('url_rewriter.tags','');
+        @ini_set('url_rewriter.tags','');
 
         if (!empty($content_encoding)) {
             header('Content-Encoding: ' . $content_encoding);
@@ -363,6 +363,11 @@ if (!$save_on_server) {
             header('Pragma: public');
         } else {
             header('Pragma: no-cache');
+            // test case: exporting a database into a .gz file with Safari
+            // would produce files not having the current time 
+            if ('SAFARI' == PMA_USR_BROWSER_AGENT) {
+                header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+            } 
         }
     } else {
         // HTML

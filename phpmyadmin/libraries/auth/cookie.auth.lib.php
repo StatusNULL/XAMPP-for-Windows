@@ -5,7 +5,7 @@
  * Thanks to Piotr Roszatycki <d3xter at users.sourceforge.net> and
  * Dan Wilson who built this patch for the Debian package.
  *
- * @version $Id: cookie.auth.lib.php 11326 2008-06-17 21:32:48Z lem9 $
+ * @version $Id: cookie.auth.lib.php 11449 2008-08-01 19:00:36Z lem9 $
  */
 
 if (! defined('PHPMYADMIN')) {
@@ -67,7 +67,6 @@ if (function_exists('mcrypt_encrypt') || PMA_dl('mcrypt')) {
  * @uses    PMA_sendHeaderLocation()
  * @uses    PMA_select_language()
  * @uses    PMA_select_server()
- * @uses    PMA_VERSION
  * @uses    file_exists()
  * @uses    sprintf()
  * @uses    count()
@@ -106,8 +105,8 @@ function PMA_auth()
     // Defines the "item" image depending on text direction
     $item_img = $GLOBALS['pmaThemeImage'] . 'item_' . $GLOBALS['text_dir'] . '.png';
 
-    /* HTML header */
-    $page_title = 'phpMyAdmin ' . PMA_VERSION;
+    /* HTML header; do not show here the PMA version to improve security  */
+    $page_title = 'phpMyAdmin ';
     require './libraries/header_meta_style.inc.php';
     ?>
 <script type="text/javascript">
@@ -155,7 +154,8 @@ if (top != self) {
     // Displays the languages form
     if (empty($GLOBALS['cfg']['Lang'])) {
         require_once './libraries/display_select_lang.lib.php';
-        PMA_select_language(true);
+        // use fieldset, don't show doc link
+        PMA_select_language(true, false);
     }
 
     // Displays the warning message and the login form
@@ -180,14 +180,8 @@ if (top != self) {
     <legend>
 <?php 
     echo $GLOBALS['strLogin']; 
-    echo '<a href="./Documentation.html" target="documentation" ' .
-        'title="' . $GLOBALS['strPmaDocumentation'] . '">';
-    if ($GLOBALS['cfg']['ReplaceHelpImg']) {
-        echo '<img class="icon" src="' . $GLOBALS['pmaThemeImage'] . 'b_help.png" width="11" height="11" alt="' . $GLOBALS['strPmaDocumentation'] . '" />';
-    } else {
-        echo '(*)';
-    }
-    echo '</a>';
+    // no real need to put a link to doc here, and it would reveal the
+    // version number
 ?>
 </legend>
 
