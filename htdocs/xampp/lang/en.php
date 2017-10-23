@@ -201,7 +201,7 @@
 	$TEXT['manuals-list1'] = "
 	<ul>
 	<li><a href=\"http://httpd.apache.org/docs/2.2/en/\">Apache 2 documentation</a>
-	<li><a href=\"http://www.php.net/manual/en/\">PHP <b>referenz </b>documentation</a>
+	<li><a href=\"http://www.php.net/manual/en/\">PHP <b>reference</b> documentation</a>
 	<li><a href=\"http://perldoc.perl.org/\">Perl documentation</a>
 	<li><a href=\"http://dev.mysql.com/doc/refman/5.0/en/index.html\">MySQL documentation</a>
 	<li><a href=\"http://phplens.com/adodb/\">ADODB</a>

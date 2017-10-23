@@ -32,6 +32,7 @@
   	$dirpartwampp=$partwampp;
   }
 	$awkpart = str_replace("&", "\\\\&", eregi_replace ("\\\\", "\\\\", $dirpartwampp)); //Fix by Wiedmann
+	$awkpartdoublebackslash = str_replace("&", "\\\\&", eregi_replace ("\\\\", "\\\\\\\\", $dirpartwampp)); //Fix by Wiedmann
 	$awkpartslash = str_replace("&", "\\\\&", ereg_replace ("\\\\", "/", $dirpartwampp)); //Fix by Wiedmann
 
   	
@@ -61,6 +62,7 @@
 
 	/// XAMPP main directrory is ...
 	$substit = "\\\\\\\\xampp";
+	$doublesubstit = "\\\\\\\\\\\\\\\\xampp";
 	$substitslash = "/xampp";
 
 	/// Globale variables
@@ -71,6 +73,7 @@
 	$awkexe = ".\install\awk.exe";
 	$awk = ".\install\config.awk";
 	$awknewdir = "\"".$awkpart."\"";
+	$awkdoublebackslashdir = "\"".$awkpartdoublebackslash."\"";
 	$awkslashdir = "\"".$awkpartslash."\"";
 	if (file_exists("$partwampp\htdocs\\xampp\.version")) {
 	$handle = fopen("$partwampp\htdocs\\xampp\.version","r");
@@ -120,6 +123,7 @@
 		} else {
 			$xamppinstaller = "newpath";
 			$substit = eregi_replace ("\\\\", "\\\\\\\\", $right);
+			$doublesubstit = eregi_replace ("\\\\", "\\\\\\\\\\\\\\\\", $right);
 			$substitslash = eregi_replace("\\\\", "/", $right);
 		}
 	} else {
@@ -305,6 +309,7 @@
 
 	$scount = count($slashrootreal);
 	$bcount = count($backslashrootreal);
+	$dbcount = count($doublebackslashrootreal);
 
 	/////////////////// xampp path is changing ///////////////////
 	if ($xamppinstaller == "newpath") {
@@ -474,6 +479,65 @@
 			}
       // echo "DEBUG: Working with $awkconfig now ... \r\n";
 			$awkrealm = $awkexe." -v DIR=".$awknewdir." -v CONFIG=".$awkconfig. " -v CONFIGNEW=".$awkconfigtemp. "  -v SUBSTIT=".$substit." -f ".$awk;
+
+			if (file_exists($awk) && file_exists($awkexe) && file_exists($configreal)) {
+				$handle = popen($awkrealm, 'w'); // Fix by Wiedmann
+				pclose($handle);
+			}
+
+			if (file_exists($configtemp) && file_exists($configreal)) {
+				if (!@copy($configtemp, $configreal)) {
+				} else {
+					unlink($configtemp);
+				}
+			}
+		}
+
+		$doublesubstit = "\"".$doublesubstit."\"";
+		$trans = array(
+			"^" => "\\\\^",
+			"." => "\\\\.",
+			"[" => "\\\\[",
+			"$" => "\\\\$",
+			"(" => "\\\\(",
+			")" => "\\\\)",
+			"+" => "\\\\+",
+			"{" => "\\\\{"
+		);
+		$doublesubstit = strtr($doublesubstit, $trans);
+		for ($i = 0; $i <= $dbcount; $i++) {
+			///// 08.08.05 Vogelgesang: For all files with identical file names /////
+			if ($doublebackslash[$i] == "") {
+				$updoublebackslashrootreal = $doublebackslashrootreal[$i];
+			} else {
+				$configname = $doublebackslash[$i];
+				$updoublebackslashrootreal = $doublebackslashrootreal[$configname].$configname;
+
+			}
+			$doublebackslashawk = eregi_replace("\\\\", "\\\\", $updoublebackslashrootreal);
+			$doublebackslashawk = "\"".$doublebackslashawk;
+
+			$awkconfig = $doublebackslashawk."\"";
+			$awkconfigtemp = $doublebackslashawk."temp\"";
+			$configreal = $updoublebackslashrootreal;
+			$configtemp = $updoublebackslashrootreal."temp";
+
+			///////////// Section SET  NEW configfiles for addons/update OR DELETE /////////////
+			$configrealnew = $updoublebackslashrootreal.".new";
+			if (!file_exists($configreal) && file_exists($configrealnew)) {
+				if (!@copy($configrealnew, $configreal)) {
+				} else {
+					unlink($configrealnew);
+				}
+			} elseif (file_exists($configrealnew)) {
+				unlink($configrealnew);
+			}
+
+			if ($updatemake == "doppelt") {
+				break;
+			}
+      // echo "DEBUG: Working with $awkconfig now ... \r\n";
+			$awkrealm = $awkexe." -v DIR=".$awkdoublebackslashdir." -v CONFIG=".$awkconfig. " -v CONFIGNEW=".$awkconfigtemp. "  -v SUBSTIT=".$doublesubstit." -f ".$awk;
 
 			if (file_exists($awk) && file_exists($awkexe) && file_exists($configreal)) {
 				$handle = popen($awkrealm, 'w'); // Fix by Wiedmann

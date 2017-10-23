@@ -14,14 +14,15 @@
   !define PRODUCT_VERSION "1.8.1"
   !define PRODUCT_PUBLISHER "Kay Vogelgesang, Kai Oswald Seidler, ApacheFriends"
   !define PRODUCT_WEB_SITE "http://www.apachefriends.org"
+  !define WORK_DIR "G:\bitnami\workspace"
   Caption "XAMPP ${PRODUCT_VERSION} win32"
   InstallDirRegKey HKLM "Software\xampp" "Install_Dir"
   Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-  OutFile "F:\xampp-dev\xampp-win32-${PRODUCT_VERSION}-VC9-installer.exe"
+  OutFile "${WORK_DIR}\dist\xampp-win32-${PRODUCT_VERSION}-VC9-installer.exe"
   RequestExecutionLevel admin
   BGGradient f87820 FFFFFF FFFFFF
   InstallColors FF8080 000030
-  CheckBitmap "${NSISDIR}\Contrib\Graphics\Checks\classic-cross.bmp"
+  CheckBitmap "${WORK_DIR}\xampp\src\xampp-nsi-installer\icons\classic-cross.bmp"
 
 ;--------------------------------
 
@@ -31,13 +32,13 @@
   !define MUI_LANGDLL_REGISTRY_VALUENAME "lang"
 
   !define MUI_ABORTWARNING
-  !define MUI_ICON "F:\xampp-dev\svn\trunk\xampp\src\xampp-nsi-installer\icons\xampp-icon.ico"
-  !define MUI_UNICON "F:\xampp-dev\svn\trunk\xampp\src\xampp-nsi-installer\icons\xampp-icon-uninstall.ico"
+  !define MUI_ICON "${WORK_DIR}\xampp\src\xampp-nsi-installer\icons\xampp-icon.ico"
+  !define MUI_UNICON "${WORK_DIR}\xampp\src\xampp-nsi-installer\icons\xampp-icon-uninstall.ico"
   !define MUI_WELCOMEPAGE
   !define MUI_CUSTOMPAGECOMMANDS
   !define MUI_COMPONENTSPAGE
   !define MUI_COMPONENTSPAGE_NODESC
-  
+
 ;Pages
   !insertmacro MUI_PAGE_WELCOME
   !insertmacro MUI_PAGE_COMPONENTS
@@ -57,7 +58,7 @@
 ;Languages
   !insertmacro MUI_LANGUAGE "English" # first language is the default language
   !insertmacro MUI_LANGUAGE "German"
- 
+
 ;--------------------------------
 ;Variables
   Var INST_MESS
@@ -73,10 +74,10 @@
   Var OPT_PERL
   Var OPT_PMA
   Var OPT_WEBA
-  
+
 InstallDir "c:\xampp"
-Icon "F:\xampp-dev\svn\trunk\xampp\src\xampp-nsi-installer\icons\xampp-icon.ico"
-UninstallIcon "F:\xampp-dev\svn\trunk\xampp\src\xampp-nsi-installer\icons\xampp-icon-uninstall.ico"
+Icon "${WORK_DIR}\xampp\src\xampp-nsi-installer\icons\xampp-icon.ico"
+UninstallIcon "${WORK_DIR}\xampp\src\xampp-nsi-installer\icons\xampp-icon-uninstall.ico"
 ShowInstDetails show
 ShowUninstDetails show
 
@@ -108,7 +109,7 @@ Function .onInit
                         IS_UACE:
                         MessageBox MB_OK "Important! Because an activated User Account Control (UAC) on your sytem some functions of XAMPP are possibly restricted. With UAC please avoid to install XAMPP to $PROGRAMFILES (missing write permisssions). Or deactivate UAC with msconfig after this setup."
                         no_vista:
-                        
+
 ; Missing MS C++ 2008 runtime library warning here
   ReadRegStr $R2 HKLM 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{FF66E9F6-83E7-3A3E-AF14-8DE9A809A6A4}' DisplayVersion
   ReadRegStr $R3 HKLM 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{350AA351-21FA-3270-8B7A-835434E766AD}' DisplayVersion
@@ -121,14 +122,14 @@ Function .onInit
   ReadRegStr $R8 HKLM 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{1F1C2DFC-2D24-3E06-BCB8-725134ADF989}' DisplayVersion
   ReadRegStr $R9 HKLM 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{4B6C7001-C7D6-3710-913E-5BC23FCE91E6}' DisplayVersion
   ReadRegStr $R0 HKLM 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{977AD349-C2A8-39DD-9273-285C08987C7B}' DisplayVersion
-  
-  
+
+
   ; VC 2010
   ;ReadRegStr $A1 HKLM 'SOFTWARE\Microsoft\VisualStudio\10.0\VC\VCRedist\x86' Installed
   ;ReadRegStr $A2 HKLM 'SOFTWARE\Microsoft\VisualStudio\10.0\VC\VCRedist\x64' Installed
   ;ReadRegStr $A3 HKLM 'SOFTWARE\Microsoft\VisualStudio\10.0\VC\VCRedist\ia64' Installed
   ;ReadRegStr $A4 HKLM 'SOFTWARE\Wow6432Node\Microsoft\VisualStudio\10.0\VC\VCRedist\x64' Installed
-  
+
   StrCmp $R2 "" vc9_test2
   GOTO init_end
   vc9_test2:
@@ -296,53 +297,53 @@ FunctionEnd
 Section "-XAMPP Files"
 SetOverwrite ifnewer
 SetOutPath "$INSTDIR"
-File "F:\release181\xampp\service.exe"
-File "F:\release181\xampp\setup_xampp.bat"
-File "F:\release181\xampp\readme_en.txt"
-File "F:\release181\xampp\xampp-control.exe"
-File "F:\release181\xampp\xampp_start.exe"
-File "F:\release181\xampp\xampp_stop.exe"
-File "F:\release181\xampp\xampp-control.exe"
-File "F:\release181\xampp\apache_start.bat"
-File "F:\release181\xampp\apache_stop.bat"
-File "F:\release181\xampp\catalina_service.bat"
-File "F:\release181\xampp\catalina_start.bat"
-File "F:\release181\xampp\catalina_stop.bat"
-File "F:\release181\xampp\filezilla_setup.bat"
-File "F:\release181\xampp\filezilla_start.bat"
-File "F:\release181\xampp\filezilla_stop.bat"
-File "F:\release181\xampp\mercury_start.bat"
-File "F:\release181\xampp\mercury_stop.bat"
-File "F:\release181\xampp\mysql_start.bat"
-File "F:\release181\xampp\mysql_stop.bat"
-File "F:\release181\xampp\passwords.txt"
-File "F:\release181\xampp\readme_de.txt"
-File "F:\release181\xampp\test_php.bat"
+File "${WORK_DIR}\xampp\service.exe"
+File "${WORK_DIR}\xampp\setup_xampp.bat"
+File "${WORK_DIR}\xampp\readme_en.txt"
+File "${WORK_DIR}\xampp\xampp-control.exe"
+File "${WORK_DIR}\xampp\xampp_start.exe"
+File "${WORK_DIR}\xampp\xampp_stop.exe"
+File "${WORK_DIR}\xampp\xampp-control.exe"
+File "${WORK_DIR}\xampp\apache_start.bat"
+File "${WORK_DIR}\xampp\apache_stop.bat"
+File "${WORK_DIR}\xampp\catalina_service.bat"
+File "${WORK_DIR}\xampp\catalina_start.bat"
+File "${WORK_DIR}\xampp\catalina_stop.bat"
+File "${WORK_DIR}\xampp\filezilla_setup.bat"
+File "${WORK_DIR}\xampp\filezilla_start.bat"
+File "${WORK_DIR}\xampp\filezilla_stop.bat"
+File "${WORK_DIR}\xampp\mercury_start.bat"
+File "${WORK_DIR}\xampp\mercury_stop.bat"
+File "${WORK_DIR}\xampp\mysql_start.bat"
+File "${WORK_DIR}\xampp\mysql_stop.bat"
+File "${WORK_DIR}\xampp\passwords.txt"
+File "${WORK_DIR}\xampp\readme_de.txt"
+File "${WORK_DIR}\xampp\test_php.bat"
 File "xampp-control.ini"
 
 SetOutPath "$INSTDIR\cgi-bin"
-File /r "F:\release181\xampp\cgi-bin\*.*"
+File /r "${WORK_DIR}\xampp\cgi-bin\*.*"
 SetOutPath "$INSTDIR\contrib"
-File /r "F:\release181\xampp\contrib\*.*"
+File /r "${WORK_DIR}\xampp\contrib\*.*"
 SetOutPath "$INSTDIR\htdocs"
-File /r "F:\release181\xampp\htdocs\*.*"
+File /r "${WORK_DIR}\xampp\htdocs\*.*"
 SetOutPath "$INSTDIR\install"
-File /r "F:\release181\xampp\install\*.*"
+File /r "${WORK_DIR}\xampp\install\*.*"
 SetOutPath "$INSTDIR\licenses"
-File /r "F:\release181\xampp\licenses\*.*"
+File /r "${WORK_DIR}\xampp\licenses\*.*"
 SetOutPath "$INSTDIR\locale"
-File /r "F:\release181\xampp\locale\*.*"
+File /r "${WORK_DIR}\xampp\locale\*.*"
 CreateDirectory "$INSTDIR\mailoutput"
 SetOutPath "$INSTDIR\mailtodisk"
-File /r "F:\release181\xampp\mailtodisk\*.*"
+File /r "${WORK_DIR}\xampp\mailtodisk\*.*"
 SetOutPath "$INSTDIR\security"
-File /r "F:\release181\xampp\security\*.*"
+File /r "${WORK_DIR}\xampp\security\*.*"
 SetOutPath "$INSTDIR\webdav"
-File /r "F:\release181\xampp\webdav\*.*"
+File /r "${WORK_DIR}\xampp\webdav\*.*"
 SetOutPath "$INSTDIR\src"
-File /r "F:\release181\xampp\src\*.*"
+File /r "${WORK_DIR}\xampp\src\*.*"
 SetOutPath "$INSTDIR\tmp"
-File /r "F:\release181\xampp\tmp\*.*"
+File /r "${WORK_DIR}\xampp\tmp\*.*"
 
 ${WriteLineToFile} `$INSTDIR\xampp-control.ini` ``
 ${WriteLineToFile} `$INSTDIR\xampp-control.ini` `[Common]`
@@ -396,7 +397,7 @@ SectionGroup "Server"
 Section "Apache"
 SetOverwrite ifnewer
 SetOutPath "$INSTDIR\apache"
-File /r "F:\release181\xampp\apache\*.*"
+File /r "${WORK_DIR}\xampp\apache\*.*"
 SectionIn RO
 ${WriteLineToFile} `$INSTDIR\xampp-control.ini` `Apache=1`
 SectionEnd
@@ -404,14 +405,14 @@ SectionEnd
 Section "MySQL"
 SetOverwrite ifnewer
 SetOutPath "$INSTDIR\mysql"
-File /r "F:\release181\xampp\mysql\*.*"
+File /r "${WORK_DIR}\xampp\mysql\*.*"
 StrCpy $OPT_MYSQL "true"
 SectionEnd
 
 Section "FileZilla FTP Server"
 SetOverwrite ifnewer
 SetOutPath "$INSTDIR\FileZillaFTP"
-File /r "F:\release181\xampp\FileZillaFTP\*.*"
+File /r "${WORK_DIR}\xampp\FileZillaFTP\*.*"
 CreateDirectory "$INSTDIR\anonymous"
 StrCpy $OPT_FTPD "true"
 SectionEnd
@@ -419,14 +420,14 @@ SectionEnd
 Section "Mercury Mail Server"
 SetOverwrite ifnewer
 SetOutPath "$INSTDIR\MercuryMail"
-File /r "F:\release181\xampp\MercuryMail\*.*"
+File /r "${WORK_DIR}\xampp\MercuryMail\*.*"
 StrCpy $OPT_MERCUR "true"
 SectionEnd
 
 Section "Tomcat"
 SetOverwrite ifnewer
 SetOutPath "$INSTDIR\tomcat"
-File /r "F:\release181\xampp\tomcat\*.*"
+File /r "${WORK_DIR}\xampp\tomcat\*.*"
 StrCpy $OPT_TOMCAT "true"
 SectionEnd
 SectionGroupEnd
@@ -436,14 +437,14 @@ SectionGroup "Program languages"
 Section "PHP"
 SetOverwrite ifnewer
 SetOutPath "$INSTDIR\php"
-File /r "F:\release181\xampp\php\*.*"
+File /r "${WORK_DIR}\xampp\php\*.*"
 SectionIn RO
 SectionEnd
 
 Section "Perl"
 SetOverwrite ifnewer
 SetOutPath "$INSTDIR\perl"
-File /r "F:\release181\xampp\perl\*.*"
+File /r "${WORK_DIR}\xampp\perl\*.*"
 StrCpy $OPT_PERL "true"
 SectionEnd
 SectionGroupEnd
@@ -453,21 +454,21 @@ SectionGroup "Tools"
 Section "phpMyAdmin"
 SetOverwrite ifnewer
 SetOutPath "$INSTDIR\phpmyadmin"
-File /r "F:\release181\xampp\phpmyadmin\*.*"
+File /r "${WORK_DIR}\xampp\phpmyadmin\*.*"
 StrCpy $OPT_PMA "true"
 SectionEnd
 
 Section "Webalizer"
 SetOverwrite ifnewer
 SetOutPath "$INSTDIR\webalizer"
-File /r "F:\release181\xampp\webalizer\*.*"
+File /r "${WORK_DIR}\xampp\webalizer\*.*"
 StrCpy $OPT_WEBA "true"
 SectionEnd
 
 Section "Fake Sendmail"
 SetOverwrite ifnewer
 SetOutPath "$INSTDIR\sendmail"
-File /r "F:\release181\xampp\sendmail\*.*"
+File /r "${WORK_DIR}\xampp\sendmail\*.*"
 SectionEnd
 
 SectionGroupEnd
@@ -617,8 +618,4 @@ yesIDIR:
 NoXaDir:
 ExitDel:
 SectionEnd
-
-
-
-
 

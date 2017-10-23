@@ -1,11 +1,11 @@
 package App::Cpan;
 
-use 5.006;
+use 5.008;
 use strict;
 use warnings;
 use vars qw($VERSION);
 
-$VERSION = '1.5902';
+$VERSION = '1.61';
 
 =head1 NAME
 
@@ -756,11 +756,12 @@ Stolen from File::Path::Expand
 
 sub _expand_filename
 	{
-    my( $path )= @_;
-    print STDERR "\tExpanding $path\n";
+    my( $path ) = @_;
+    no warnings 'uninitialized';
+    $logger->debug( "Expanding path $path\n" );
     $path =~ s{\A~([^/]+)?}{
-		_home_of( $1 || $> ) || ${^MATCH}
-    	}pe;
+		_home_of( $1 || $> ) || "~$1"
+    	}e;
     return $path;
 	}
 
@@ -1367,13 +1368,15 @@ This code is in Github:
 
 =head1 CREDITS
 
-Japheth Cleaver added the bits to allow a forced install (-f).
+Japheth Cleaver added the bits to allow a forced install (C<-f>).
 
 Jim Brandt suggest and provided the initial implementation for the
 up-to-date and Changes features.
 
-Adam Kennedy pointed out that exit() causes problems on Windows
+Adam Kennedy pointed out that C<exit()> causes problems on Windows
 where this script ends up with a .bat extension
+
+David Golden helps integrate this into the C<CPAN.pm> repos.
 
 =head1 AUTHOR
 
@@ -1381,7 +1384,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2001-2009, brian d foy, All Rights Reserved.
+Copyright (c) 2001-2013, brian d foy, All Rights Reserved.
 
 You may redistribute this under the same terms as Perl itself.
 

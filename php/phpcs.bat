@@ -13,4 +13,5 @@ REM @license   http://matrix.squiz.net/developer/tools/php_cs/licence BSD Licenc
 REM @version   CVS: $Id: phpcs.bat,v 1.3 2007-11-04 22:02:16 squiz Exp $
 REM @link      http://pear.php.net/package/PHP_CodeSniffer
 
-"\xampp\php\.\php.exe" -d auto_append_file="" -d auto_prepend_file="" -d include_path="\xampp\php\pear" "\xampp\php\phpcs" %*
+set XAMPPPHPDIR=\xampp\php
+"%XAMPPPHPDIR%\.\php.exe" -d auto_append_file="" -d auto_prepend_file="" -d include_path="%XAMPPPHPDIR%\pear" "%XAMPPPHPDIR%\phpcs" %*

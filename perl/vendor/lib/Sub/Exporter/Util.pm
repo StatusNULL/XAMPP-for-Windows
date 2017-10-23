@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Sub::Exporter::Util;
 {
-  $Sub::Exporter::Util::VERSION = '0.984';
+  $Sub::Exporter::Util::VERSION = '0.985';
 }
 # ABSTRACT: utilities to make Sub::Exporter easier
 
@@ -209,6 +209,7 @@ use Sub::Exporter -setup => {
 1;
 
 __END__
+
 =pod
 
 =head1 NAME
@@ -217,7 +218,7 @@ Sub::Exporter::Util - utilities to make Sub::Exporter easier
 
 =head1 VERSION
 
-version 0.984
+version 0.985
 
 =head1 DESCRIPTION
 
@@ -266,15 +267,15 @@ C<curry_chain> behaves like C<L</curry_method>>, but is meant for generating
 exports that will call several methods in succession.
 
   exports => {
-    reticulate => curry_chain([
-      new => gather_data => analyze => [ detail => 100 ] => results
-    ]),
+    reticulate => curry_chain(
+      new => gather_data => analyze => [ detail => 100 ] => 'results'
+    ),
   }
 
 If imported from Spliner, calling the C<reticulate> routine will be equivalent
 to:
 
-  Splinter->new->gather_data->analyze(detail => 100)->results;
+  Spliner->new->gather_data->analyze(detail => 100)->results;
 
 If any method returns something on which methods may not be called, the routine
 croaks.
@@ -351,4 +352,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

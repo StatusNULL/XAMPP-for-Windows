@@ -1,5 +1,5 @@
 @ECHO OFF
-REM $Id: DB_DataObject_createTables.bat,v 1.1 2003/09/08 20:43:31 arnaud Exp $
+REM $Id: DB_DataObject_createTables.bat,v 1.1 2003-09-08 20:43:31 arnaud Exp $
 REM BATCH FILE TO EXECUTE PEAR::DB_DATAOBJECT createTables.php script
 
 IF '%1' == '' (

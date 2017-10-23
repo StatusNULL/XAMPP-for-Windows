@@ -4,7 +4,7 @@ BEGIN {
   $Moose::Meta::Attribute::AUTHORITY = 'cpan:STEVAN';
 }
 {
-  $Moose::Meta::Attribute::VERSION = '2.0603';
+  $Moose::Meta::Attribute::VERSION = '2.0604';
 }
 
 use strict;
@@ -654,8 +654,7 @@ sub _inline_check_required {
     return (
         'if (@_ < 2) {',
             $self->_inline_throw_error(
-                '"Attribute (' . $attr_name . ') is required, so cannot '
-              . 'be set to undef"' # defined $_[1] is not good enough
+                '"Attribute (' . $attr_name . ') is required"'
             ) . ';',
         '}',
     );
@@ -1284,7 +1283,7 @@ BEGIN {
   $Moose::Meta::Attribute::Custom::Moose::AUTHORITY = 'cpan:STEVAN';
 }
 {
-  $Moose::Meta::Attribute::Custom::Moose::VERSION = '2.0603';
+  $Moose::Meta::Attribute::Custom::Moose::VERSION = '2.0604';
 }
 sub register_implementation { 'Moose::Meta::Attribute' }
 
@@ -1302,7 +1301,7 @@ Moose::Meta::Attribute - The Moose attribute metaclass
 
 =head1 VERSION
 
-version 2.0603
+version 2.0604
 
 =head1 DESCRIPTION
 

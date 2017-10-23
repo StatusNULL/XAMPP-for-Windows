@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!perl
 ##############################################################################
 # Tool for using regular expressions against the contents of files in a tar
 # archive.  See 'ptargrep --help' for more documentation.

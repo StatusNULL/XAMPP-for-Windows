@@ -1,5 +1,5 @@
 package App::cpanminus;
-our $VERSION = "1.5017";
+our $VERSION = "1.6005";
 
 =head1 NAME
 
@@ -9,7 +9,7 @@ App::cpanminus - get, unpack, build and install modules from CPAN
 
     cpanm Module
 
-Run C<cpanm -h> for more options.
+Run C<cpanm -h> or C<perldoc cpanm> for more options.
 
 =head1 DESCRIPTION
 
@@ -114,10 +114,10 @@ writing code.
 
 =head2 Zero-conf? How does this module get/parse/update the CPAN index?
 
-It queries the CPAN Meta DB site running on Google AppEngine at
-L<http://cpanmetadb.plackperl.org/>. The site is updated every hour to reflect
-the latest changes from fast syncing mirrors. The script then also falls back
-to scrape the site L<http://search.cpan.org/>.
+It queries the CPAN Meta DB site at L<http://cpanmetadb.plackperl.org/>.
+The site is updated at least every hour to reflect the latest changes
+from fast syncing mirrors. The script then also falls back to query the
+module at L<http://metacpan.org/> using its wonderful API.
 
 Fetched files are unpacked in C<~/.cpanm> and automatically cleaned up
 periodically.  You can configure the location of this with the
@@ -228,15 +228,11 @@ The standalone executable contains the following modules embedded.
 
 =item L<JSON::PP> Copyright 2007−2011 by Makamaka Hannyaharamitu
 
-=item L<CPAN::Meta> Copyright (c) 2010 by David Golden and Ricardo Signes
+=item L<CPAN::Meta>, L<CPAN::Meta::Requirements> Copyright (c) 2010 by David Golden and Ricardo Signes
 
-=item L<Try::Tiny> Copyright (c) 2009 Yuval Kogman
+=item L<CPAN::Meta::YAML> Copyright 2010 Adam Kennedy
 
-=item L<parent> Copyright (c) 2007-10 Max Maischein
-
-=item L<Version::Requirements> copyright (c) 2010 by Ricardo Signes
-
-=item L<CPAN::Meta::YAML> copyright (c) 2010 by Adam Kennedy
+=item L<File::pushd> Copyright 2012 David Golden
 
 =back
 

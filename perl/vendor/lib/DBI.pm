@@ -1,4 +1,4 @@
-# $Id: DBI.pm 15327 2012-06-06 16:37:26Z timbo $
+# $Id: DBI.pm 15542 2012-12-21 17:11:32Z REHSACK $
 # vim: ts=8:sw=4:et
 #
 # Copyright (c) 1994-2012  Tim Bunce  Ireland
@@ -11,7 +11,7 @@ package DBI;
 require 5.008_001;
 
 BEGIN {
-$VERSION = "1.622"; # ==> ALSO update the version in the pod text below!
+$VERSION = "1.623"; # ==> ALSO update the version in the pod text below!
 }
 
 =head1 NAME
@@ -125,7 +125,7 @@ Tim he is very likely to just forward it to the mailing list.
 
 =head2 NOTES
 
-This is the DBI specification that corresponds to DBI version 1.622
+This is the DBI specification that corresponds to DBI version 1.623
 (see L<DBI::Changes> for details).
 
 The DBI is evolving at a steady pace, so it's good to check that
@@ -314,6 +314,7 @@ my $dbd_prefix_registry = {
   amzn_        => { class => 'DBD::Amazon',         },
   best_        => { class => 'DBD::BestWins',       },
   csv_         => { class => 'DBD::CSV',            },
+  cubrid_      => { class => 'DBD::cubrid',         },
   db2_         => { class => 'DBD::DB2',            },
   dbi_         => { class => 'DBI',                 },
   dbm_         => { class => 'DBD::DBM',            },
@@ -390,7 +391,6 @@ my $keeperr = { O=>0x0004 };
 	'FIRSTKEY'	=> $keeperr,
 	'NEXTKEY'	=> $keeperr,
 	'STORE'		=> { O=>0x0418 | 0x4 },
-	_not_impl	=> undef,
 	can		=> { O=>0x0100 }, # special case, see dispatch
 	debug 	 	=> { U =>[1,2,'[$debug_level]'],	O=>0x0004 }, # old name for trace
 	dump_handle 	=> { U =>[1,3,'[$message [, $level]]'],	O=>0x0004 },
@@ -1017,9 +1017,7 @@ sub available_drivers {
 sub installed_versions {
     my ($class, $quiet) = @_;
     my %error;
-    my %version = ( DBI => $DBI::VERSION );
-    $version{"DBI::PurePerl"} = $DBI::PurePerl::VERSION
-	if $DBI::PurePerl;
+    my %version;
     for my $driver ($class->available_drivers($quiet)) {
 	next if $DBI::PurePerl && grep { -d "$_/auto/DBD/$driver" } @INC;
 	my $drh = eval {
@@ -1034,6 +1032,8 @@ sub installed_versions {
     if (wantarray) {
        return map { m/^DBD::(\w+)/ ? ($1) : () } sort keys %version;
     }
+    $version{"DBI"}           = $DBI::VERSION;
+    $version{"DBI::PurePerl"} = $DBI::PurePerl::VERSION if $DBI::PurePerl;
     if (!defined wantarray) {	# void context
 	require Config;		# add more detail
 	$version{OS}   = "$^O\t($Config::Config{osvers})";
@@ -1343,12 +1343,6 @@ sub _new_sth {	# called by DBD::<drivername>::db::prepare)
     use strict;
 
     # methods common to all handle types:
-
-    sub _not_impl {
-	my ($h, $method) = @_;
-	$h->trace_msg("Driver does not implement the $method method.\n");
-	return;	# empty list / undef
-    }
 
     # generic TIEHASH default methods:
     sub FIRSTKEY { }
@@ -1711,7 +1705,6 @@ sub _new_sth {	# called by DBD::<drivername>::db::prepare)
 
     sub ping {
 	my $dbh = shift;
-	$dbh->_not_impl('ping');
 	# "0 but true" is a special kind of true 0 that is used here so
 	# applications can check if the ping was a real ping or not
 	($dbh->FETCH('Active')) ?  "0 but true" : 0;
@@ -2855,7 +2848,7 @@ Added in DBI 1.49.
 
   DBI->installed_versions;
   @ary  = DBI->installed_versions;
-  %hash = DBI->installed_versions;
+  $hash = DBI->installed_versions;
 
 Calls available_drivers() and attempts to load each of them in turn
 using install_driver().  For each load that succeeds the driver
@@ -2865,12 +2858,12 @@ L<DBI::PurePerl> drivers which appear not be pure-perl are ignored.
 When called in array context the list of successfully loaded drivers
 is returned (without the 'DBD::' prefix).
 
-When called in scalar context a reference to the hash is returned
-and the hash will also contain other entries for the C<DBI> version,
-C<OS> name, etc.
+When called in scalar context an extra entry for the C<DBI> is added (and
+C<DBI::PurePerl> if appropriate) and a reference to the hash is returned.
 
 When called in a void context the installed_versions() method will
-print out a formatted list of the hash contents, one per line.
+print out a formatted list of the hash contents, one per line, along with some
+other information about the DBI version and OS.
 
 Due to the potentially high memory cost and unknown risks of loading
 in an unknown number of drivers that just happen to be installed
@@ -6812,13 +6805,13 @@ the C<DBD> backend.
 
 Type: array-ref, read-only
 
-Like L</NAME> but always returns lowercase names.
+Like C</NAME> but always returns lowercase names.
 
 =head3 C<NAME_uc>
 
 Type: array-ref, read-only
 
-Like L</NAME> but always returns uppercase names.
+Like C</NAME> but always returns uppercase names.
 
 =head3 C<NAME_hash>
 
@@ -7271,7 +7264,7 @@ See L<perlop/"Quote and Quote-like Operators"> for more details.
 Perl 5.7 and later support a new threading model called iThreads.
 (The old "5.005 style" threads are not supported by the DBI.)
 
-In the iThreads model each thread has it's own copy of the perl
+In the iThreads model each thread has its own copy of the perl
 interpreter.  When a new thread is created the original perl
 interpreter is 'cloned' to create a new copy for the new thread.
 
@@ -7593,7 +7586,7 @@ as the I<trace settings> and are stored together in a single integer.
 For normal use you only need to set the trace level, and generally
 only to a value between 1 and 4.
 
-Each handle has it's own trace settings, and so does the DBI.
+Each handle has its own trace settings, and so does the DBI.
 When you call a method the DBI merges the handles settings into its
 own for the duration of the call: the trace flags of the handle are
 OR'd into the trace flags of the DBI, and if the handle has a higher
@@ -7631,7 +7624,7 @@ drivers can define others. DBI trace flag names begin with a capital
 letter and driver specific names begin with a lowercase letter, as
 usual.
 
-Currently the DBI only defines two trace flags:
+Currently the DBI defines these trace flags:
 
   ALL - turn on all DBI and driver flags (not recommended)
   SQL - trace SQL statements executed

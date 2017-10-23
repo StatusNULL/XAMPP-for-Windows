@@ -1,13 +1,11 @@
-use 5.005;
 use strict;
-BEGIN{ if (not $] < 5.006) { require warnings; warnings->import } }
+use warnings;
 package File::pushd;
 # ABSTRACT: change directory temporarily for a limited scope
-our $VERSION = '1.002'; # VERSION
+our $VERSION = '1.004'; # VERSION
 
-use vars qw/@EXPORT @ISA/;
-@EXPORT  = qw( pushd tempd );
-@ISA     = qw( Exporter );
+our @EXPORT  = qw( pushd tempd );
+our @ISA     = qw( Exporter );
 
 use Exporter;
 use Carp;
@@ -101,14 +99,19 @@ sub DESTROY {
     chdir $orig if $orig; # should always be so, but just in case...
     if ( $self->{_tempd} &&
         !$self->{_preserve} ) {
-        eval { rmtree( $self->{_pushd} ) };
-        carp $@ if $@;
+        # don't destroy existing $@ if there is no error.
+        my $err = do {
+            local $@;
+            eval { rmtree( $self->{_pushd} ) };
+            $@;
+        };
+        carp $err if $err;
     }
 }
 
 1;
 
-
+__END__
 
 =pod
 
@@ -118,7 +121,7 @@ File::pushd - change directory temporarily for a limited scope
 
 =head1 VERSION
 
-version 1.002
+version 1.004
 
 =head1 SYNOPSIS
 
@@ -235,14 +238,14 @@ L<File::chdir>
 
 =back
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders
+=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests through the issue tracker
-at L<http://rt.cpan.org/Public/Dist/Display.html?Name=File-pushd>.
+at L<https://github.com/dagolden/file-pushd/issues>.
 You will be notified automatically of any progress on your issue.
 
 =head2 Source Code
@@ -252,23 +255,22 @@ public review and contribution under the terms of the license.
 
 L<https://github.com/dagolden/file-pushd>
 
-  git clone https://github.com/dagolden/file-pushd.git
+  git clone git://github.com/dagolden/file-pushd.git
 
 =head1 AUTHOR
 
-David A Golden <dagolden@cpan.org>
+David Golden <dagolden@cpan.org>
+
+=head1 CONTRIBUTOR
+
+Diab Jerius <djerius@cfa.harvard.edu>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2011 by David A Golden.
+This software is Copyright (c) 2013 by David A Golden.
 
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
 
 =cut
-
-
-__END__
-
-

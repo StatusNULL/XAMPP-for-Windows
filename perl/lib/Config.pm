@@ -54,11 +54,11 @@ sub import {
     return;
 }
 
-die "Perl lib version (5.16.1) doesn't match executable '$0' version ($])"
+die "Perl lib version (5.16.3) doesn't match executable '$0' version ($])"
     unless $^V;
 
-$^V eq 5.16.1
-    or die "Perl lib version (5.16.1) doesn't match executable '$0' version (" .
+$^V eq 5.16.3
+    or die "Perl lib version (5.16.3) doesn't match executable '$0' version (" .
 	sprintf("v%vd",$^V) . ")";
 
 
@@ -83,7 +83,7 @@ sub AUTOLOAD {
 
 # tie returns the object, so the value returned to require will be true.
 tie %Config, 'Config', {
-    archlibexp => 'C:\\strawberry\\perl\\lib',
+    archlibexp => '\\xampp\\perl\\lib',
     archname => 'MSWin32-x86-multi-thread',
     cc => 'gcc',
     d_readlink => undef,
@@ -95,18 +95,18 @@ tie %Config, 'Config', {
     inc_version_list => '',
     intsize => '4',
     ldlibpthname => '',
-    libpth => 'C:\\strawberry\\c\\lib C:\\strawberry\\c\\i686-w64-mingw32\\lib',
+    libpth => '\\xampp\\c\\lib \\xampp\\c\\i686-w64-mingw32\\lib',
     osname => 'MSWin32',
     osvers => '4.0',
     path_sep => ';',
-    privlibexp => 'C:\\strawberry\\perl\\lib',
-    scriptdir => 'C:\\strawberry\\perl\\bin',
-    sitearchexp => 'C:\\strawberry\\perl\\site\\lib',
-    sitelibexp => 'C:\\strawberry\\perl\\site\\lib',
+    privlibexp => '\\xampp\\perl\\lib',
+    scriptdir => '\\xampp\\perl\\bin',
+    sitearchexp => '\\xampp\\perl\\site\\lib',
+    sitelibexp => '\\xampp\\perl\\site\\lib',
     so => 'dll',
     useithreads => 'define',
     usevendorprefix => 'define',
-    version => '5.16.1',
+    version => '5.16.3',
 };
 eval {
 	require Portable;

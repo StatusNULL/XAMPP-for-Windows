@@ -14,10 +14,9 @@ use Package::Constants;
 ### for the version
 require CPANPLUS::Internals;
 
-$VERSION    = $CPANPLUS::Internals::VERSION = $CPANPLUS::Internals::VERSION;
+$VERSION = "0.9134";
 @ISA        = qw[Exporter];
 @EXPORT     = Package::Constants->list( __PACKAGE__ );
-
 
 ### OS to regex map ###
 my %OS = (
@@ -347,6 +346,8 @@ use constant REPORT_TOOLCHAIN_VERSIONS
                                     ExtUtils::ParseXS
                                     File::Spec
                                     Module::Build
+                                    Pod::Parser
+                                    Pod::Simple
                                     Test::Harness
                                     Test::More
                                     version

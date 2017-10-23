@@ -65,12 +65,13 @@
 			<DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+			<VerInfo_Release>1</VerInfo_Release>
 			<VerInfo_PreRelease>true</VerInfo_PreRelease>
-			<VerInfo_MinorVer>1</VerInfo_MinorVer>
+			<VerInfo_MinorVer>2</VerInfo_MinorVer>
 			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
 			<VerInfo_MajorVer>3</VerInfo_MajorVer>
 			<Icon_MainIcon>gfx\XAMPP.ICO</Icon_MainIcon>
-			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=3.1.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=3.2.1.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_2)'!=''">
 			<Manifest_File>None</Manifest_File>
@@ -79,6 +80,18 @@
 			<DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+			<Icon_MainIcon>gfx\XAMPP.ICO</Icon_MainIcon>
+			<DCC_MapFile>3</DCC_MapFile>
+			<DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
+			<VerInfo_MinorVer>2</VerInfo_MinorVer>
+			<DCC_RangeChecking>true</DCC_RangeChecking>
+			<VerInfo_MajorVer>3</VerInfo_MajorVer>
+			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=3.2.1.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+			<DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+			<VerInfo_Release>1</VerInfo_Release>
+			<DCC_DebugDCUs>true</DCC_DebugDCUs>
+			<VerInfo_Debug>true</VerInfo_Debug>
 			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
 		</PropertyGroup>
 		<ItemGroup>
@@ -117,12 +130,11 @@
 			<DCCReference Include="uTomcat.pas"/>
 			<DCCReference Include="uLogOptions.pas">
 				<Form>Form1</Form>
-				<FormType>dfm</FormType>
 			</DCCReference>
 			<DCCReference Include="uServiceSettings.pas">
 				<Form>fServiceSettings</Form>
-				<FormType>dfm</FormType>
 			</DCCReference>
+			<DCCReference Include="uProcesses_new.pas"/>
 			<RcItem Include="gfx\150px-Flag_of_Germany.svg.jpg">
 				<ResourceType>RCDATA</ResourceType>
 				<ResourceId>JpgImage_1</ResourceId>
@@ -202,12 +214,7 @@
 						<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 						<VersionInfoKeys Name="Comments"/>
 					</VersionInfoKeys>
-					<Excluded_Packages>
-						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\JclDeveloperTools160.bpl">JEDI Code Library Developer Tools package</Excluded_Packages>
-						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\JclContainers160.bpl">JEDI Code Library Containers package</Excluded_Packages>
-						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\Jcl160.bpl">JEDI Code Library RTL package</Excluded_Packages>
-						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\JclVcl160.bpl">JEDI Code Library VCL package</Excluded_Packages>
-					</Excluded_Packages>
+					<Excluded_Packages/>
 				</Delphi.Personality>
 				<Platforms>
 					<Platform value="Win64">False</Platform>

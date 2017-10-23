@@ -1,4 +1,4 @@
-#!C:\strawberry\perl\bin\perl.exe 
+#!perl
 
 use strict;
 use Module::Build 0.25;

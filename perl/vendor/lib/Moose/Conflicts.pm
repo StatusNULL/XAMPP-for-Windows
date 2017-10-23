@@ -58,6 +58,7 @@ use Dist::CheckConflicts
         'namespace::autoclean' => '0.08',
     },
     -also => [ qw(
+        Carp
         Class::Load
         Class::Load::XS
         Data::OptList

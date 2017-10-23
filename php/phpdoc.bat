@@ -14,6 +14,7 @@
 ::            for PHP 4.3 C:\phpdev\php-4.3-Win32\cli\php.exe
   
   SET phpCli=\xampp\php\.\php.exe
+  set XAMPPPHPDIR=\xampp\php
 
 
 
@@ -57,7 +58,7 @@ IF EXIST "%phpCli%" (
 IF '%1'=='' (
   SET doNothing=
 ) ELSE (
-  "%phpCli%" -d include_path="\xampp\php\pear" "\xampp\php\phpdoc" %*
+  "%phpCli%" -d include_path="%XAMPPPHPDIR%\pear" "%XAMPPPHPDIR%\phpdoc" %*
   GOTO :EOF
 )
 
@@ -136,9 +137,9 @@ GOTO :EOF
 GOTO :PAUSE_END
 :run
 SET found=1
-ECHO Starting: "%phpCli%" "\xampp\php\phpdoc" -c "%iniFile%"
+ECHO Starting: "%phpCli%" "%XAMPPPHPDIR%\phpdoc" -c "%iniFile%"
 ECHO.
-"%phpCli%"  -d include_path="\xampp\php\pear" "\xampp\php\phpdoc" -c "%iniFile%"
+"%phpCli%"  -d include_path="%XAMPPPHPDIR%\pear" "%XAMPPPHPDIR%\phpdoc" -c "%iniFile%"
 GOTO :EOF
 
 :PAUSE_END

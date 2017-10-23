@@ -1,6 +1,6 @@
 package DateTime::TimeZone;
 {
-  $DateTime::TimeZone::VERSION = '1.48';
+  $DateTime::TimeZone::VERSION = '1.57';
 }
 
 use 5.006;
@@ -525,7 +525,7 @@ sub names_in_category {
 
     return wantarray
         ? @{ $DateTime::TimeZone::Catalog::CATEGORIES{ $_[0] } }
-        : [ $DateTime::TimeZone::Catalog::CATEGORIES{ $_[0] } ];
+        : $DateTime::TimeZone::Catalog::CATEGORIES{ $_[0] };
 }
 
 sub countries {
@@ -551,7 +551,7 @@ sub names_in_country {
 
 # ABSTRACT: Time zone object base class and factory
 
-
+__END__
 
 =pod
 
@@ -561,7 +561,7 @@ DateTime::TimeZone - Time zone object base class and factory
 
 =head1 VERSION
 
-version 1.48
+version 1.57
 
 =head1 SYNOPSIS
 
@@ -736,9 +736,6 @@ that category, without the category portion.  So the list for the
 "Kentucky/Monticello", and "New_York". In scalar context, it returns
 an array reference, while in list context it returns an array.
 
-The list is returned in order of population by zone, which should mean
-that this order will be the best to use for most UIs.
-
 =head2 DateTime::TimeZone->countries()
 
 Returns a sorted list of all the valid country codes (in lower-case)
@@ -754,6 +751,11 @@ Given a two-letter ISO3166 country code, this method returns a list of
 time zones used in that country. The country code may be of any
 case. In scalar context, it returns an array reference, while in list
 context it returns an array.
+
+This list is returned in an order vaguely based on geography and
+population. In general, the least used zones come last, but there are not
+guarantees of a specific order from one release to the next. This order is
+probably the best option for presenting zones names to end users.
 
 =head2 DateTime::TimeZone->offset_as_seconds( $offset )
 
@@ -837,13 +839,9 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Dave Rolsky.
+This software is copyright (c) 2013 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-

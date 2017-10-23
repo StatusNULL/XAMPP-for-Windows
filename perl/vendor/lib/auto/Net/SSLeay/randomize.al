@@ -3,7 +3,7 @@
 # See AutoSplit.pm.
 package Net::SSLeay;
 
-#line 878 "blib\lib\Net\SSLeay.pm (autosplit into blib\lib\auto\Net\SSLeay\randomize.al)"
+#line 879 "blib\lib\Net\SSLeay.pm (autosplit into blib\lib\auto\Net\SSLeay\randomize.al)"
 ### Arrange some randomness for eay PRNG
 
 sub randomize (;$$$) {
@@ -12,14 +12,14 @@ sub randomize (;$$$) {
 
 	$egd_path = '';
     $egd_path = $ENV{'EGD_PATH'} if $ENV{'EGD_PATH'};
-    
+
     RAND_seed(rand() + $$);  # Stir it with time and pid
-    
+
     unless ($rnsf || -r $Net::SSLeay::random_device || $seed || -S $egd_path) {
 	my $poll_retval = Net::SSLeay::RAND_poll();
 	warn "Random number generator not seeded!!!" if $trace && !$poll_retval;
     }
-    
+
     RAND_load_file($rn_seed_file, -s _) if $rnsf;
     RAND_seed($seed) if $seed;
     RAND_seed($ENV{RND_SEED}) if $ENV{RND_SEED};

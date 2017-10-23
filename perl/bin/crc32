@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!perl
 
 # Computes and prints to stdout the CRC-32 values of the given files
 

@@ -1,6 +1,6 @@
 package DateTime::TimeZone::Floating;
 {
-  $DateTime::TimeZone::Floating::VERSION = '1.48';
+  $DateTime::TimeZone::Floating::VERSION = '1.57';
 }
 
 use strict;
@@ -47,7 +47,7 @@ sub STORABLE_thaw {
 
 # ABSTRACT: A time zone that is always local
 
-
+__END__
 
 =pod
 
@@ -57,7 +57,7 @@ DateTime::TimeZone::Floating - A time zone that is always local
 
 =head1 VERSION
 
-version 1.48
+version 1.57
 
 =head1 SYNOPSIS
 
@@ -81,13 +81,9 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Dave Rolsky.
+This software is copyright (c) 2013 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-

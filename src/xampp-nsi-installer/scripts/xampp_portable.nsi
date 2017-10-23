@@ -14,14 +14,16 @@
   !define PRODUCT_VERSION "1.8.1"
   !define PRODUCT_PUBLISHER "Kay Vogelgesang, Kai Oswald Seidler, ApacheFriends"
   !define PRODUCT_WEB_SITE "http://www.apachefriends.org"
+  !define WORK_DIR "G:\bitnami\workspace"
+  !define WORK_XAMPP_DIR "${WORK_DIR}\tmp\xampp"
   Caption "XAMPP ${PRODUCT_VERSION} win32"
   InstallDirRegKey HKLM "Software\xampp" "Install_Dir"
   Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-  OutFile "F:\xampp-dev\xampp-portable-win32-${PRODUCT_VERSION}-VC9-installer.exe"
+  OutFile "${WORK_DIR}\dist\xampp-portable-win32-${PRODUCT_VERSION}-VC9-installer.exe"
   RequestExecutionLevel admin
   BGGradient f87820 FFFFFF FFFFFF
   InstallColors FF8080 000030
-  CheckBitmap "${NSISDIR}\Contrib\Graphics\Checks\classic-cross.bmp"
+  CheckBitmap "${WORK_DIR}\xampp\src\xampp-nsi-installer\icons\classic-cross.bmp"
 
 ;--------------------------------
 
@@ -31,8 +33,7 @@
   ;!define MUI_LANGDLL_REGISTRY_VALUENAME "lang"
 
   !define MUI_ABORTWARNING
-  !define MUI_ICON "F:\xampp-dev\svn\trunk\xampp\src\xampp-nsi-installer\icons\xampp-icon.ico"
-  ;!define MUI_UNICON "F:\xampp-dev\svn\trunk\xampp\src\xampp-nsi-installer\icons\xampp-icon-uninstall.ico"
+  !define MUI_ICON "${WORK_DIR}\xampp\src\xampp-nsi-installer\icons\xampp-icon.ico"
   !define MUI_WELCOMEPAGE
   !define MUI_CUSTOMPAGECOMMANDS
   !define MUI_COMPONENTSPAGE
@@ -95,8 +96,8 @@
   Var OPT_PMA
 
 InstallDir "c:\xampp-portable"
-Icon "F:\xampp-dev\svn\trunk\xampp\src\xampp-nsi-installer\icons\xampp-icon.ico"
-UninstallIcon "F:\xampp-dev\svn\trunk\xampp\src\xampp-nsi-installer\icons\xampp-icon-uninstall.ico"
+Icon "${WORK_DIR}\xampp\src\xampp-nsi-installer\icons\xampp-icon.ico"
+UninstallIcon "${WORK_DIR}\xampp\src\xampp-nsi-installer\icons\xampp-icon-uninstall.ico"
 ShowInstDetails show
 ShowUninstDetails show
 
@@ -164,7 +165,7 @@ Function .onInit
                ; GoOut:
                ; Abort "Exit by user."
   init_end:
-  
+
                 StrCmp $LANGUAGE "1031" detection_de
                 GOTO non_de
                 detection_de:
@@ -173,7 +174,7 @@ Function .onInit
                 non_de:
                 MessageBox MB_OK "This package is removable device compatible. All configuration files have relative paths."
   usb_end:
-        
+
 FunctionEnd
 
 
@@ -256,45 +257,44 @@ FunctionEnd
 Section "-XAMPP Files"
 SetOverwrite ifnewer
 SetOutPath "$INSTDIR"
-File "F:\release181\xampp-portable\setup_xampp.bat"
-File "F:\release181\xampp-portable\readme_en.txt"
-File "F:\release181\xampp-portable\xampp-control.exe"
-File "F:\release181\xampp-portable\xampp_start.exe"
-File "F:\release181\xampp-portable\xampp_stop.exe"
-File "F:\release181\xampp-portable\xampp-control.exe"
-File "F:\release181\xampp-portable\apache_start.bat"
-File "F:\release181\xampp-portable\apache_stop.bat"
-File "F:\release181\xampp-portable\catalina_service.bat"
-File "F:\release181\xampp-portable\catalina_start.bat"
-File "F:\release181\xampp-portable\catalina_stop.bat"
-File "F:\release181\xampp-portable\mysql_start.bat"
-File "F:\release181\xampp-portable\mysql_stop.bat"
-File "F:\release181\xampp-portable\passwords.txt"
-File "F:\release181\xampp-portable\readme_de.txt"
-File "F:\release181\xampp-portable\test_php.bat"
-File "xampp-control-portable.ini"
+File "${WORK_XAMPP_DIR}\setup_xampp.bat"
+File "${WORK_XAMPP_DIR}\readme_en.txt"
+File "${WORK_XAMPP_DIR}\xampp-control.exe"
+File "${WORK_XAMPP_DIR}\xampp-control.ini"
+File "${WORK_XAMPP_DIR}\xampp_start.exe"
+File "${WORK_XAMPP_DIR}\xampp_stop.exe"
+File "${WORK_XAMPP_DIR}\apache_start.bat"
+File "${WORK_XAMPP_DIR}\apache_stop.bat"
+File "${WORK_XAMPP_DIR}\catalina_service.bat"
+File "${WORK_XAMPP_DIR}\catalina_start.bat"
+File "${WORK_XAMPP_DIR}\catalina_stop.bat"
+File "${WORK_XAMPP_DIR}\mysql_start.bat"
+File "${WORK_XAMPP_DIR}\mysql_stop.bat"
+File "${WORK_XAMPP_DIR}\passwords.txt"
+File "${WORK_XAMPP_DIR}\readme_de.txt"
+File "${WORK_XAMPP_DIR}\test_php.bat"
 
 SetOutPath "$INSTDIR\cgi-bin"
-File /r "F:\release181\xampp-portable\cgi-bin\*.*"
+File /r "${WORK_XAMPP_DIR}\cgi-bin\*.*"
 SetOutPath "$INSTDIR\contrib"
-File /r "F:\release181\xampp-portable\contrib\*.*"
+File /r "${WORK_XAMPP_DIR}\contrib\*.*"
 SetOutPath "$INSTDIR\htdocs"
-File /r "F:\release181\xampp-portable\htdocs\*.*"
+File /r "${WORK_XAMPP_DIR}\htdocs\*.*"
 SetOutPath "$INSTDIR\install"
-File /r "F:\release181\xampp-portable\install\*.*"
+File /r "${WORK_XAMPP_DIR}\install\*.*"
 SetOutPath "$INSTDIR\licenses"
-File /r "F:\release181\xampp-portable\licenses\*.*"
+File /r "${WORK_XAMPP_DIR}\licenses\*.*"
 SetOutPath "$INSTDIR\locale"
-File /r "F:\release181\xampp-portable\locale\*.*"
+File /r "${WORK_XAMPP_DIR}\locale\*.*"
 CreateDirectory "$INSTDIR\mailoutput"
 SetOutPath "$INSTDIR\mailtodisk"
-File /r "F:\release181\xampp-portable\mailtodisk\*.*"
+File /r "${WORK_XAMPP_DIR}\mailtodisk\*.*"
 SetOutPath "$INSTDIR\security"
-File /r "F:\release181\xampp-portable\security\*.*"
+File /r "${WORK_XAMPP_DIR}\security\*.*"
 SetOutPath "$INSTDIR\webdav"
-File /r "F:\release181\xampp-portable\webdav\*.*"
+File /r "${WORK_XAMPP_DIR}\webdav\*.*"
 SetOutPath "$INSTDIR\tmp"
-File /r "F:\release181\xampp-portable\tmp\*.*"
+File /r "${WORK_XAMPP_DIR}\tmp\*.*"
 
 ${WriteLineToFile} `$INSTDIR\xampp-control-portable.ini` ``
 ${WriteLineToFile} `$INSTDIR\xampp-control-portable.ini` `[Common]`
@@ -324,7 +324,7 @@ SectionGroup "Server"
 Section "Apache"
 SetOverwrite ifnewer
 SetOutPath "$INSTDIR\apache"
-File /r "F:\release181\xampp-portable\apache\*.*"
+File /r "${WORK_XAMPP_DIR}\apache\*.*"
 SectionIn RO
 ${WriteLineToFile} `$INSTDIR\xampp-control-portable.ini` `Apache=1`
 SectionEnd
@@ -332,14 +332,14 @@ SectionEnd
 Section "MySQL"
 SetOverwrite ifnewer
 SetOutPath "$INSTDIR\mysql"
-File /r "F:\release181\xampp-portable\mysql\*.*"
+File /r "${WORK_XAMPP_DIR}\mysql\*.*"
 StrCpy $OPT_MYSQL "true"
 SectionEnd
 
 Section "Tomcat"
 SetOverwrite ifnewer
 SetOutPath "$INSTDIR\tomcat"
-File /r "F:\release181\xampp-portable\tomcat\*.*"
+File /r "${WORK_XAMPP_DIR}\tomcat\*.*"
 StrCpy $OPT_TOMCAT "true"
 SectionEnd
 SectionGroupEnd
@@ -349,14 +349,14 @@ SectionGroup "Program languages"
 Section "PHP"
 SetOverwrite ifnewer
 SetOutPath "$INSTDIR\php"
-File /r "F:\release181\xampp-portable\php\*.*"
+File /r "${WORK_XAMPP_DIR}\php\*.*"
 SectionIn RO
 SectionEnd
 
 Section "Perl"
 SetOverwrite ifnewer
 SetOutPath "$INSTDIR\perl"
-File /r "F:\release181\xampp-portable\perl\*.*"
+File /r "${WORK_XAMPP_DIR}\perl\*.*"
 StrCpy $OPT_PERL "true"
 SectionEnd
 SectionGroupEnd
@@ -366,14 +366,14 @@ SectionGroup "Tools"
 Section "phpMyAdmin"
 SetOverwrite ifnewer
 SetOutPath "$INSTDIR\phpmyadmin"
-File /r "F:\release181\xampp-portable\phpmyadmin\*.*"
+File /r "${WORK_XAMPP_DIR}\phpmyadmin\*.*"
 StrCpy $OPT_PMA "true"
 SectionEnd
 
 Section "Fake Sendmail"
 SetOverwrite ifnewer
 SetOutPath "$INSTDIR\sendmail"
-File /r "F:\release181\xampp-portable\sendmail\*.*"
+File /r "${WORK_XAMPP_DIR}\sendmail\*.*"
 SectionEnd
 
 SectionGroupEnd

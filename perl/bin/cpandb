@@ -1,4 +1,4 @@
-#!usr/bin/perl -w
+#!perl -w
 
 # $Id: cpandb 33 2011-06-13 04:17:28Z stro $
 

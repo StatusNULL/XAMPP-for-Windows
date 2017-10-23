@@ -1,9 +1,13 @@
 package Package::Stash::XS;
 BEGIN {
-  $Package::Stash::XS::VERSION = '0.25';
+  $Package::Stash::XS::AUTHORITY = 'cpan:DOY';
+}
+{
+  $Package::Stash::XS::VERSION = '0.26';
 }
 use strict;
 use warnings;
+use 5.008001;
 # ABSTRACT: faster and more correct implementation of the Package::Stash API
 
 use XSLoader;
@@ -21,6 +25,7 @@ XSLoader::load(
 1;
 
 __END__
+
 =pod
 
 =head1 NAME
@@ -29,7 +34,7 @@ Package::Stash::XS - faster and more correct implementation of the Package::Stas
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 SYNOPSIS
 
@@ -112,10 +117,9 @@ Jesse Luehrs <doy at tozt dot net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by Jesse Luehrs.
+This software is copyright (c) 2013 by Jesse Luehrs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

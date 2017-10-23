@@ -1,11 +1,18 @@
 package aliased;
-$VERSION = '0.30';
+
+our $VERSION = '0.31';
+$VERSION = eval $VERSION;
 
 require Exporter;
 @ISA    = qw(Exporter);
-@EXPORT = qw(alias);
+@EXPORT = qw(alias prefix);
 
 use strict;
+
+sub _croak {
+    require Carp;
+    Carp::croak(@_);
+}
 
 sub import {
     my ( $class, $package, $alias, @import ) = @_;
@@ -16,7 +23,6 @@ sub import {
     }
 
     my $callpack = caller(0);
-
     _load_alias( $package, $callpack, @import );
     _make_alias( $package, $callpack, $alias );
 }
@@ -32,8 +38,12 @@ sub _make_alias {
 
     $alias ||= _get_alias($package);
 
+    my $destination = $alias =~ /::/
+      ? $alias
+      : "$callpack\::$alias";
+
     no strict 'refs';
-    *{ join q{::} => $callpack, $alias } = sub () { $package };
+    *{ $destination } = sub () { $package };
 }
 
 sub _load_alias {
@@ -50,7 +60,7 @@ sub _load_alias {
         eval $code;
         if ( my $error = $@ ) {
             $SIG{__DIE__} = $sigdie;
-            die $error;
+            _croak($error);
         }
         $sigdie = $SIG{__DIE__}
           if defined $SIG{__DIE__};
@@ -58,15 +68,31 @@ sub _load_alias {
 
     # Make sure a global $SIG{__DIE__} makes it out of the localization.
     $SIG{__DIE__} = $sigdie if defined $sigdie;
+    return $package;
 }
 
 sub alias {
     my ( $package, @import ) = @_;
 
     my $callpack = scalar caller(0);
-    _load_alias( $package, $callpack, @import );
+    return _load_alias( $package, $callpack, @import );
+}
 
-    return $package;
+sub prefix {
+    my ($class) = @_;
+    return sub {
+        my ($name) = @_;
+        my $callpack = caller(0);
+        if ( not @_ ) {
+            return _load_alias( $class, $callpack );
+        }
+        elsif ( @_ == 1 && defined $name ) {
+            return _load_alias( "${class}::$name", $callpack );
+        }
+        else {
+            _croak("Too many arguments to prefix('$class')");
+        }
+    };
 }
 
 1;
@@ -78,7 +104,7 @@ aliased - Use shorter versions of class names.
 
 =head1 VERSION
 
-0.30
+0.31
 
 =head1 SYNOPSIS
 
@@ -198,6 +224,10 @@ of style.
 
 =head2 alias()
 
+This function is only exported if you specify C<use aliased> with no import
+list.
+
+    use aliased;
     my $alias = alias($class);
     my $alias = alias($class, @imports);
 
@@ -230,6 +260,22 @@ exports anything you might want to ensure it is loaded at compile time with:
 
 However, since OO classes rarely export this should not be necessary.
 
+=head2 prefix() (experimental)
+
+This function is only exported if you specify C<use aliased> with no import
+list.
+
+    use aliased;
+
+Sometimes you find you have a ton of packages in the same top-level namespace
+and you want to alias them, but only use them on demand.  For example:
+
+    # instead of:
+    MailVerwaltung::Client::Exception::REST::Response->throw()
+
+    my $error = prefix('MailVerwaltung::Client::Exception');
+    $error->('REST::Response')->throw();   # same as above
+    $error->()->throw; # same as MailVerwaltung::Client::Exception->throw
 
 =head2 Why OO Only?
 

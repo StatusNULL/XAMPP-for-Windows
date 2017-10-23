@@ -1,24 +1,37 @@
 @rem = '--*-Perl-*--
 @echo off
 if "%OS%" == "Windows_NT" goto WinNT
+IF EXIST "%~dp0perl.exe" (
 "%~dp0perl.exe" -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
+) ELSE IF EXIST "%~dp0..\..\bin\perl.exe" (
+"%~dp0..\..\bin\perl.exe" -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
+) ELSE (
+perl -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
+)
+
 goto endofperl
 :WinNT
+IF EXIST "%~dp0perl.exe" (
 "%~dp0perl.exe" -x -S %0 %*
+) ELSE IF EXIST "%~dp0..\..\bin\perl.exe" (
+"%~dp0..\..\bin\perl.exe" -x -S %0 %*
+) ELSE (
+perl -x -S %0 %*
+)
+
 if NOT "%COMSPEC%" == "%SystemRoot%\system32\cmd.exe" goto endofperl
 if %errorlevel% == 9009 echo You do not have Perl in your PATH.
 if errorlevel 1 goto script_failed_so_exit_with_non_zero_val 2>nul
 goto endofperl
 @rem ';
 #!/usr/local/bin/perl
-#line 15
+#line 29
 
-use 5.006;
 use strict;
 use vars qw($VERSION);
 
-use App::Cpan;
-$VERSION = '1.5902';
+use App::Cpan '1.60_02';
+$VERSION = '1.61';
 
 my $rc = App::Cpan->run( @ARGV );
 
@@ -81,10 +94,7 @@ Show the F<Changes> files for the specified modules
 
 =item -D module [ module ... ]
 
-Show the module details. This prints one line for each out-of-date module
-(meaning, modules locally installed but have newer versions on CPAN).
-Each line has three columns: module name, local version, and CPAN
-version.
+Show the module details.
 
 =item -f
 
@@ -284,7 +294,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2001-2010, brian d foy, All Rights Reserved.
+Copyright (c) 2001-2013, brian d foy, All Rights Reserved.
 
 You may redistribute this under the same terms as Perl itself.
 

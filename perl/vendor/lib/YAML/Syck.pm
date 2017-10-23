@@ -1,29 +1,31 @@
 package YAML::Syck;
+
 # See documentation after the __END__ mark.
 
 use strict;
 use vars qw(
-    @ISA @EXPORT $VERSION
-    $Headless $SortKeys $SingleQuote
-    $ImplicitBinary $ImplicitTyping $ImplicitUnicode 
-    $UseCode $LoadCode $DumpCode
-    $DeparseObject $LoadBlessed
+  @ISA @EXPORT @EXPORT_OK $VERSION
+  $Headless $SortKeys $SingleQuote
+  $ImplicitBinary $ImplicitTyping $ImplicitUnicode
+  $UseCode $LoadCode $DumpCode
+  $DeparseObject $LoadBlessed
 );
 use 5.006;
 use Exporter;
 
 BEGIN {
-    $VERSION = '1.20';
-    @EXPORT  = qw( Dump Load DumpFile LoadFile );
-    @ISA     = qw( Exporter );
+    $VERSION   = '1.24';
+    @EXPORT    = qw( Dump Load DumpFile LoadFile );
+    @EXPORT_OK = qw( DumpInto );
+    @ISA       = qw( Exporter );
 
-    $SortKeys = 1;
+    $SortKeys    = 1;
     $LoadBlessed = 1;
 
     local $@;
     eval {
         require XSLoader;
-        XSLoader::load(__PACKAGE__, $VERSION);
+        XSLoader::load( __PACKAGE__, $VERSION );
         1;
     } or do {
         require DynaLoader;
@@ -34,26 +36,26 @@ BEGIN {
 }
 
 use constant QR_MAP => {
-    ''   => sub { qr{$_[0]}     }, 
-    x    => sub { qr{$_[0]}x    }, 
-    i    => sub { qr{$_[0]}i    }, 
-    s    => sub { qr{$_[0]}s    }, 
-    m    => sub { qr{$_[0]}m    }, 
-    ix   => sub { qr{$_[0]}ix   }, 
-    sx   => sub { qr{$_[0]}sx   }, 
-    mx   => sub { qr{$_[0]}mx   }, 
-    si   => sub { qr{$_[0]}si   }, 
-    mi   => sub { qr{$_[0]}mi   }, 
-    ms   => sub { qr{$_[0]}sm   }, 
-    six  => sub { qr{$_[0]}six  }, 
-    mix  => sub { qr{$_[0]}mix  }, 
-    msx  => sub { qr{$_[0]}msx  }, 
-    msi  => sub { qr{$_[0]}msi  }, 
-    msix => sub { qr{$_[0]}msix }, 
+    ''   => sub { qr{$_[0]} },
+    x    => sub { qr{$_[0]}x },
+    i    => sub { qr{$_[0]}i },
+    s    => sub { qr{$_[0]}s },
+    m    => sub { qr{$_[0]}m },
+    ix   => sub { qr{$_[0]}ix },
+    sx   => sub { qr{$_[0]}sx },
+    mx   => sub { qr{$_[0]}mx },
+    si   => sub { qr{$_[0]}si },
+    mi   => sub { qr{$_[0]}mi },
+    ms   => sub { qr{$_[0]}sm },
+    six  => sub { qr{$_[0]}six },
+    mix  => sub { qr{$_[0]}mix },
+    msx  => sub { qr{$_[0]}msx },
+    msi  => sub { qr{$_[0]}msi },
+    msix => sub { qr{$_[0]}msix },
 };
 
 sub __qr_helper {
-    if ($_[0] =~ /\A  \(\?  ([ixsm]*)  (?:-  (?:[ixsm]*))?  : (.*) \)  \z/x) {
+    if ( $_[0] =~ /\A  \(\?  ([ixsm]*)  (?:-  (?:[ixsm]*))?  : (.*) \)  \z/x ) {
         my $sub = QR_MAP()->{$1} || QR_MAP()->{''};
         &$sub($2);
     }
@@ -63,13 +65,14 @@ sub __qr_helper {
 }
 
 sub Dump {
-    $#_ ? join('', map { YAML::Syck::DumpYAML($_) } @_)
-        : YAML::Syck::DumpYAML($_[0]);
+    $#_
+      ? join( '', map { YAML::Syck::DumpYAML($_) } @_ )
+      : YAML::Syck::DumpYAML( $_[0] );
 }
 
 sub Load {
     if (wantarray) {
-        my ($rv) = YAML::Syck::LoadYAML($_[0]);
+        my ($rv) = YAML::Syck::LoadYAML( $_[0] );
         @{$rv};
     }
     else {
@@ -80,48 +83,63 @@ sub Load {
 
 sub _is_glob {
     my $h = shift;
-    
-    return 1 if(ref($h) eq 'GLOB');
-    return 1 if(ref(\$h) eq 'GLOB');
-    return 1 if(ref($h) =~ m/^IO::/);
 
-    return;    
+    return 1 if ( ref($h) eq 'GLOB' );
+    return 1 if ( ref( \$h ) eq 'GLOB' );
+    return 1 if ( ref($h) =~ m/^IO::/ );
+
+    return;
 }
 
 sub DumpFile {
     my $file = shift;
     if ( _is_glob($file) ) {
-        if ($#_) {
-            print {$file} YAML::Syck::DumpYAML($_) for @_;
-        }
-        else {
-            print {$file} YAML::Syck::DumpYAML($_[0]);
+        for (@_) {
+            my $err = YAML::Syck::DumpYAMLFile( $_, $file );
+            if ($err) {
+                $! = 0 + $err;
+                die "Error writing to filehandle $file: $!\n";
+            }
         }
     }
     else {
-        open(my $fh, '>', $file) or die "Cannot write to $file: $!";
-        if ($#_) {
-            print {$fh} YAML::Syck::DumpYAML($_) for @_;
+        open( my $fh, '>', $file ) or die "Cannot write to $file: $!";
+        for (@_) {
+            my $err = YAML::Syck::DumpYAMLFile( $_, $fh );
+            if ($err) {
+                $! = 0 + $err;
+                die "Error writing to file $file: $!\n";
+            }
         }
-        else {
-            print {$fh} YAML::Syck::DumpYAML($_[0]);
-        }
-        close $fh;
+        close $fh
+          or die "Error writing to file $file: $!\n";
     }
+    return 1;
 }
 
 sub LoadFile {
     my $file = shift;
     if ( _is_glob($file) ) {
-      Load(do { local $/; <$file> });
+        Load(
+            do { local $/; <$file> }
+        );
     }
     else {
-      if(!-e $file || -z $file) {
-	die("'$file' is empty or non-existant");
-      }
-        open(my $fh, '<', $file) or die "Cannot read from $file: $!";
-        Load(do { local $/; <$fh> });
+        if ( !-e $file || -z $file ) {
+            die("'$file' is empty or non-existent");
+        }
+        open( my $fh, '<', $file ) or die "Cannot read from $file: $!";
+        Load(
+            do { local $/; <$fh> }
+        );
     }
+}
+
+sub DumpInto {
+    my $bufref = shift;
+    ( ref $bufref ) or die "DumpInto not given reference to output buffer\n";
+    YAML::Syck::DumpYAMLInto( $_, $bufref ) for @_;
+    1;
 }
 
 1;
@@ -151,6 +169,10 @@ YAML::Syck - Fast, lightweight YAML loader and dumper
     # A string with multiple YAML streams in it
     $yaml = Dump(@data);
     @data = Load($yaml);
+
+    # Dumping into a pre-existing output buffer
+    my $yaml;
+    DumpInto(\$yaml, @data);
 
 =head1 DESCRIPTION
 
@@ -228,14 +250,21 @@ both C<$YAML::Syck::LoadCode> and C<$YAML::Syck::DumpCode> to true.
 
 =head2 $YAML::Syck::LoadBlessed
 
-Defaults to true. Setting this to a false value will prevent C<Load> from
-blessing tag names that do not begin with C<!!perl> or C<!perl>; see below.
+Defaults to true. Setting to false will block YAML::Syck from doing ANY
+blessing. This is an interface change since 1.21. The variable name was
+misleading, implying that no blessing would happen when in fact it did.
+
+Prior to 1.22, setting this to a false value only prevented C<Load> from
+blessing tag names that did not begin with C<!!perl> or C<!perl>;.
 
 =head1 BUGS
 
 Dumping Glob/IO values do not work yet.
 
 Dumping of Tied variables is unsupported.
+
+Dumping into tied (or other magic variables) with C<DumpInto> might not work
+properly in all cases.
 
 =head1 CAVEATS
 
@@ -250,14 +279,13 @@ the C<!hs/foo> and C<!!hs/Foo> tags are blessed into C<hs::Foo>.  Note that
 this holds true even if the tag contains non-word characters; for example,
 C<!haskell.org/Foo> is blessed into C<haskell.org::Foo>.  Please use
 L<Class::Rebless> to cast it into other user-defined packages. You can also
-set the LoadBlessed flag false to disable blessing tag names that do not begin
-with C<!!perl> or C<!perl>.
+set the LoadBlessed flag false to disable all blessing.
 
 This module has L<a lot of known
 issues|https://rt.cpan.org/Public/Dist/Display.html?Name=YAML-Syck>
 and has only been semi-actively maintained since 2007. If you
 encounter an issue with it probably won't be fixed unless you L<offer
-up a patch|http://github.com/avar/YAML-Syck> in Git that's ready for
+up a patch|http://github.com/toddr/YAML-Syck> in Git that's ready for
 release.
 
 There are still good reasons to use this module, such as better

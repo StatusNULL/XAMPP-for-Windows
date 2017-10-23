@@ -11,13 +11,13 @@ Variable::Magic - Associate user-defined magic to variables from Perl.
 
 =head1 VERSION
 
-Version 0.50
+Version 0.52
 
 =cut
 
 our $VERSION;
 BEGIN {
- $VERSION = '0.50';
+ $VERSION = '0.52';
 }
 
 =head1 SYNOPSIS
@@ -79,6 +79,12 @@ This also makes catching individual events easier than with C<tie>, where you ha
 
 =item *
 
+Magic is multivalued.
+
+You can safely apply different kinds of magics to the same variable, and each of them will be invoked successively.
+
+=item *
+
 Magic is type-agnostic.
 
 The same magic can be applied on scalars, arrays, hashes, subs or globs.
@@ -86,7 +92,7 @@ But the same hook (see below for a list) may trigger differently depending on th
 
 =item *
 
-Magic is invisible at the Perl level.
+Magic is invisible at Perl level.
 
 Magical and non-magical variables cannot be distinguished with C<ref>, C<tied> or another trick.
 
@@ -121,9 +127,12 @@ It is called for array subscripts and slices, but never for hashes.
 
 I<len>
 
-This magic only applies to scalars and arrays, and is triggered when the 'size' or the 'length' of the variable has to be known by Perl.
+This magic only applies to arrays (though it used to also apply to scalars), and is triggered when the 'size' or the 'length' of the variable has to be known by Perl.
 This is typically the magic involved when an array is evaluated in scalar context, but also on array assignment and loops (C<for>, C<map> or C<grep>).
 The length is returned from the callback as an integer.
+
+Starting from perl 5.12, this magic is no longer called by the C<length> keyword, and starting from perl 5.17.4 it is also no longer called for scalars in any situation, making this magic only meaningful on arrays.
+You can use the constants L</VMG_COMPAT_SCALAR_LENGTH_NOLEN> and L</VMG_COMPAT_SCALAR_NOLEN> to see if this magic is available for scalars or not.
 
 =item *
 
@@ -136,7 +145,8 @@ Please note that this is different from undefining the variable, even though the
 
 I<free>
 
-This magic is called when an object is destroyed as the result of the variable going out of scope (but not when the variable is undefined).
+This magic is called when a variable is destroyed as the result of going out of scope (but not when it is undefined).
+It behaves roughly like Perl object destructors (i.e. C<DESTROY> methods), except that exceptions thrown from inside a I<free> callback will always be propagated to the surrounding code.
 
 =item *
 
@@ -427,6 +437,11 @@ Initial L</VMG_UVAR> capability was introduced in perl 5.9.5, with a fully funct
 
 True for perls that don't call I<len> magic when taking the C<length> of a magical scalar.
 
+=head2 C<VMG_COMPAT_SCALAR_NOLEN>
+
+True for perls that don't call I<len> magic on scalars.
+Implies L</VMG_COMPAT_SCALAR_LENGTH_NOLEN>.
+
 =head2 C<VMG_COMPAT_ARRAY_PUSH_NOLEN>
 
 True for perls that don't call I<len> magic when you push an element in a magical array.
@@ -626,6 +641,7 @@ our %EXPORT_TAGS    = (
  'consts' => [ qw<
    MGf_COPY MGf_DUP MGf_LOCAL VMG_UVAR
    VMG_COMPAT_SCALAR_LENGTH_NOLEN
+   VMG_COMPAT_SCALAR_NOLEN
    VMG_COMPAT_ARRAY_PUSH_NOLEN VMG_COMPAT_ARRAY_PUSH_NOLEN_VOID
    VMG_COMPAT_ARRAY_UNSHIFT_NOLEN_VOID
    VMG_COMPAT_ARRAY_UNDEF_CLEAR

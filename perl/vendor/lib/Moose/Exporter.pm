@@ -3,7 +3,7 @@ BEGIN {
   $Moose::Exporter::AUTHORITY = 'cpan:STEVAN';
 }
 {
-  $Moose::Exporter::VERSION = '2.0603';
+  $Moose::Exporter::VERSION = '2.0604';
 }
 
 use strict;
@@ -140,13 +140,13 @@ sub _make_exporter {
 }
 
 {
-    my $seen = {};
+    our %_seen;
 
     sub _follow_also {
         my $class             = shift;
         my $exporting_package = shift;
 
-        local %$seen = ( $exporting_package => 1 );
+        local %_seen = ( $exporting_package => 1 );
 
         return uniq( _follow_also_real($exporting_package) );
     }
@@ -171,9 +171,9 @@ sub _make_exporter {
         for my $package (@also) {
             die
                 "Circular reference in 'also' parameter to Moose::Exporter between $exporting_package and $package"
-                if $seen->{$package};
+                if $_seen{$package};
 
-            $seen->{$package} = 1;
+            $_seen{$package} = 1;
         }
 
         return map { $_, _follow_also_real($_) } @also;
@@ -769,7 +769,7 @@ Moose::Exporter - make an import() and unimport() just like Moose.pm
 
 =head1 VERSION
 
-version 2.0603
+version 2.0604
 
 =head1 SYNOPSIS
 

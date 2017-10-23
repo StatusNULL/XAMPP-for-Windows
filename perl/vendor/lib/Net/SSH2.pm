@@ -208,7 +208,7 @@ our %EXPORT_TAGS = (
 
 our @EXPORT_OK = @{$EXPORT_TAGS{all}};
 
-our $VERSION = '0.45';
+our $VERSION = '0.48';
 
 # methods
 
@@ -664,6 +664,12 @@ Calls libssh2_trace with supplied bitmask, to enable all tracing use:
     $ssh2->trace(-1);
 
 You need a debug build of libssh2 with tracing support.
+
+=head2 timeout ( timeout_ms )
+
+Enables a global timeout (in milliseconds) which will affect every action.
+
+libssh2 version 1.2.9 or higher is required to use this method.
 
 =head2 method ( type [, values... ] )
 

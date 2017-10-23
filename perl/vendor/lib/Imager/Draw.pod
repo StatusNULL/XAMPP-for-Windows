@@ -591,14 +591,14 @@ Parameters:
 
 =item *
 
-x, y - either integers giving the co-ordinates of the pixel to set or
+C<x>, C<y> - either integers giving the co-ordinates of the pixel to set or
 array references containing a set of pixels to be set.
 
 =item *
 
-type - the type of color object to return, either C<'8bit'> for
-Imager::Color objects or C<'float'> for Imager::Color::Float objects.
-Default: C<'8bit'>.
+C<type> - the type of color object to return, either C<'8bit'> for
+L<Imager::Color> objects or C<'float'> for L<Imager::Color::Float>
+objects.  Default: C<'8bit'>.
 
 =back
 
@@ -608,6 +608,9 @@ arrayref in scalar context.
 
 If a supplied co-ordinate is outside the image then C<undef> is
 returned for the pixel.
+
+Each color is returned as an L<Imager::Color> object or as an
+L<Imager::Color::Float> object if C<type> is set to C<"float">.
 
 Possible errors conditions include:
 
@@ -880,14 +883,14 @@ color data.
 =item *
 
 C<type> - the type of pixel data supplied.  If you supply an array
-reference of object then this is determined automatically.  If you
-supply packed color data this defaults to C<'8bit'>, if your data is
-packed floating point color data then set this to C<'float'>.
+reference then this is determined automatically.  If you supply packed
+color data this defaults to C<'8bit'>, if your data is packed floating
+point color data then you need to set this to C<'float'>.
 
 You can use C<float> or C<8bit> samples with any image.
 
-If this is 'index' then pixels should be either an array of palette
-color indexes or a packed string of color indexes.
+If this is C<index> then C<pixels> should be either an array of
+palette color indexes or a packed string of color indexes.
 
 =back
 
@@ -1099,8 +1102,7 @@ Retrieve 16-bit samples:
 
 =item setsamples()
 
-This allows writing of samples back to some images.  Currently this is
-only supported for 16-bit/sample images.
+This allows writing of samples to an image.
 
 Parameters:
 
@@ -1204,6 +1206,10 @@ To produce packed 1 byte/sample pixels, use the pack C<C> template:
 To produce packed double/sample pixels, use the pack C<d> template:
 
   my $packed_float_pixel = pack("dddd", $red, $blue, $green, $alpha);
+
+Note that double/sample data is always stored using the C C<double>
+type, never C<long double>, even if C<perl> is built with
+C<-Duselongdouble>.
 
 If you use a I<type> parameter of C<index> then the values are palette
 color indexes, not sample values:

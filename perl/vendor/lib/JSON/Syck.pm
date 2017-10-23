@@ -5,41 +5,62 @@ use Exporter;
 use YAML::Syck ();
 
 BEGIN {
-    $VERSION    = '0.43';
-    @EXPORT_OK  = qw( Load Dump LoadFile DumpFile );
-    @ISA        = 'Exporter';
-    *Load       = \&YAML::Syck::LoadJSON;
-    *Dump       = \&YAML::Syck::DumpJSON;
+    $VERSION   = '1.24';
+    @EXPORT_OK = qw( Load Dump LoadFile DumpFile DumpInto );
+    @ISA       = 'Exporter';
+    *Load      = \&YAML::Syck::LoadJSON;
+    *Dump      = \&YAML::Syck::DumpJSON;
 }
 
 sub DumpFile {
     my $file = shift;
     if ( YAML::Syck::_is_glob($file) ) {
-        print {$file} YAML::Syck::DumpJSON($_[0]);
+        my $err = YAML::Syck::DumpJSONFile( $_[0], $file );
+        if ($err) {
+            $! = 0 + $err;
+            die "Error writing to filehandle $file: $!\n";
+        }
     }
     else {
-        open(my $fh, '>',  $file) or die "Cannot write to $file: $!";
-        print {$fh} YAML::Syck::DumpJSON($_[0]);
-        close $fh;
+        open( my $fh, '>', $file ) or die "Cannot write to $file: $!";
+        my $err = YAML::Syck::DumpJSONFile( $_[0], $fh );
+        if ($err) {
+            $! = 0 + $err;
+            die "Error writing to file $file: $!\n";
+        }
+        close $fh
+          or die "Error writing to file $file: $!\n";
     }
+    return 1;
 }
-
 
 sub LoadFile {
     my $file = shift;
     if ( YAML::Syck::_is_glob($file) ) {
-        YAML::Syck::LoadJSON(do { local $/; <$file> });
+        YAML::Syck::LoadJSON(
+            do { local $/; <$file> }
+        );
     }
     else {
-        if(!-e $file || -z $file) {
-	    die("'$file' is non-existant or empty");
-	}
-        open(my $fh, '<', $file) or die "Cannot read from $file: $!";
-        YAML::Syck::LoadJSON(do { local $/; <$fh> });
+        if ( !-e $file || -z $file ) {
+            die("'$file' is non-existent or empty");
+        }
+        open( my $fh, '<', $file ) or die "Cannot read from $file: $!";
+        YAML::Syck::LoadJSON(
+            do { local $/; <$fh> }
+        );
     }
 }
 
+sub DumpInto {
+    my $bufref = shift;
+    ( ref $bufref ) or die "DumpInto not given reference to output buffer\n";
+    YAML::Syck::DumpJSONInto( $_[0], $bufref );
+    1;
+}
+
 $JSON::Syck::ImplicitTyping  = 1;
+$JSON::Syck::MaxDepth        = 512;
 $JSON::Syck::Headless        = 1;
 $JSON::Syck::ImplicitUnicode = 0;
 $JSON::Syck::SingleQuote     = 0;
@@ -62,6 +83,10 @@ JSON::Syck - JSON is YAML (but consider using L<JSON::XS> instead!)
     # $file can be an IO object, or a filename
     my $data = JSON::Syck::LoadFile($file);
     JSON::Syck::DumpFile($file, $data);
+
+    # Dump into a pre-existing buffer
+    my $json;
+    JSON::Syck::DumpInto(\$json, $data);
 
 =head1 DESCRIPTION
 
@@ -118,6 +143,13 @@ as in:
   Perl (UTF-8 bytes)   => JSON (UTF-8 flagged)
   Perl (UTF-8 flagged) => JSON (UTF-8 flagged)
 
+By default, JSON::Syck::Dump will only transverse up to 512 levels of
+a datastructure in order to avoid an infinite loop when it is
+presented with an circular reference.
+
+However, you set C<$JSON::Syck::MaxLevels> to a larger value if you
+have very complex structures.
+
 Unfortunately, there's no implicit way to dump Perl UTF-8 flagged data
 structure to utf-8 encoded JSON. To do this, simply use Encode module, e.g.:
 
@@ -144,9 +176,17 @@ convenient to use single quotes.
 Set C<$JSON::Syck::SingleQuote> to 1 will make both C<Dump> and C<Load> expect
 single-quoted string literals.
 
+=head1 BUGS
+
+Dumping into tied (or other magic variables) with C<DumpInto> might not work
+properly in all cases.
+
+When dumping with C<DumpFile>, some spacing might be wrong and
+C<$JSON::Syck::SingleQuote> might be handled incorrectly.
+
 =head1 SEE ALSO
 
-L<JSON::XS>,
+L<JSON::XS>, L<YAML::Syck>
 
 =head1 AUTHORS
 

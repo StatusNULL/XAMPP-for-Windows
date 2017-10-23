@@ -1,21 +1,21 @@
-###### ApacheFriends XAMPP Version 1.8.1 ######
+###### ApacheFriends XAMPP Version 1.8.2 ######
 
 Important! PHP in this package needs the Microsoft Visual C++ 2008 Redistributable package from
 http://www.microsoft.com/en-us/download/details.aspx?id=5582. Please ensure that the VC++ 2008 runtime
 libraries are installed on your system.    
 
-  + Apache 2.4.3
-  + MySQL 5.5.27 (Community Server)
-  + PHP 5.4.7 (VC9 X86 32bit thread safe) + PEAR 
-  + phpMyAdmin 3.5.2.2
-  + OpenSSL 1.0.1c
-  + ADOdb 5.17
+  + Apache 2.4.4
+  + MySQL 5.5.32 (Community Server)
+  + PHP 5.4.16 (VC9 X86 32bit thread safe) + PEAR 
+  + phpMyAdmin 4.0.4
+  + OpenSSL 0.9.8y
+  + ADOdb 5.18
   + Mercury Mail Transport System v4.62 (not included in the portable version)
   + FileZilla FTP Server 0.9.41 (not included in the portable version)
   + Webalizer 2.23-04 (not included in the portable version) 
   + Strawberry Perl 5.16.1.1 Portable
-  + Tomcat 7.0.30 
-  + XAMPP Control Panel Version 3.1.0 by hackattack142 (Great Thanks!!))
+  + Tomcat 7.0.41
+  + XAMPP Control Panel Version 3.2.1 by hackattack142 (Great Thanks!!))
     See: http://www.apachefriends.org/f/viewtopic.php?f=16&t=46743
   + XAMPP Security
   + XAMPP mailToDisk 1.0 (write emails via PHP on local disk in <xampp>\mailoutput. Activated in the php.ini as mail default.)
@@ -163,4 +163,4 @@ So first the 'root' password is queried by the MySQL server, before phpMyAdmin m
   	    	
 ---------------------------------------------------------------    
 
-		Have a lot of fun! | Viel Spaﬂ! | Bonne Chance!
+		Have a lot of fun! | Viel Spa√ü! | Bonne Chance!

@@ -9,9 +9,9 @@
 
 /* Package name      : perl5
  * Source directory  : 
- * Configuration time: Thu Aug  9 09:55:53 2012
+ * Configuration time: Tue Mar 12 13:56:09 2013
  * Configured by     : strawberry-perl
- * Target system     : Win32 strawberry-perl 5.16.1.1 #1 Thu Aug  9 09:54:46 2012 i386
+ * Target system     : Win32 strawberry-perl 5.16.3.1 #1 Tue Mar 12 13:55:20 2013 i386
  */
 
 #ifndef _config_h_
@@ -937,7 +937,7 @@
  *	This symbol contains the ~name expanded version of ARCHLIB, to be used
  *	in programs that are not prepared to deal with ~ expansion at run-time.
  */
-#define ARCHLIB "C:\\strawberry\\perl\\lib"		/**/
+#define ARCHLIB "\\xampp\\perl\\lib"		/**/
 /*#define ARCHLIB_EXP ""	/ **/
 
 /* ARCHNAME:
@@ -960,8 +960,8 @@
  *	This symbol, if defined, indicates that we'd like to relocate entries
  *	in @INC at run time based on the location of the perl binary.
  */
-#define BIN "C:\\strawberry\\perl\\bin"	/**/
-#define BIN_EXP "C:\\strawberry\\perl\\bin"	/**/
+#define BIN "\\xampp\\perl\\bin"	/**/
+#define BIN_EXP "\\xampp\\perl\\bin"	/**/
 /*#define PERL_RELOCATABLE_INC  		/ **/
 
 /* INTSIZE:
@@ -3026,7 +3026,7 @@
  *	This symbol contains the ~name expanded version of PRIVLIB, to be used
  *	in programs that are not prepared to deal with ~ expansion at run-time.
  */
-#define PRIVLIB "C:\\strawberry\\perl\\lib"		/**/
+#define PRIVLIB "\\xampp\\perl\\lib"		/**/
 #define PRIVLIB_EXP (win32_get_privlib(PERL_VERSION_STRING, NULL))	/**/
 
 /* CAN_PROTOTYPE:
@@ -3170,7 +3170,7 @@
  *	This symbol contains the ~name expanded version of SITEARCH, to be used
  *	in programs that are not prepared to deal with ~ expansion at run-time.
  */
-#define SITEARCH "C:\\strawberry\\perl\\site\\lib"		/**/
+#define SITEARCH "\\xampp\\perl\\site\\lib"		/**/
 /*#define SITEARCH_EXP ""	/ **/
 
 /* SITELIB:
@@ -3193,7 +3193,7 @@
  *	removed.  The elements in inc_version_list (inc_version_list.U) can
  *	be tacked onto this variable to generate a list of directories to search.
  */
-#define SITELIB "C:\\strawberry\\perl\\site\\lib"		/**/
+#define SITELIB "\\xampp\\perl\\site\\lib"		/**/
 #define SITELIB_EXP (win32_get_sitelib(PERL_VERSION_STRING, NULL))	/**/
 #define SITELIB_STEM ""		/**/
 
@@ -3296,8 +3296,8 @@
  *	This symbol contains the ~name expanded version of PERL_VENDORARCH, to be used
  *	in programs that are not prepared to deal with ~ expansion at run-time.
  */
-#define PERL_VENDORARCH "C:\\strawberry\\perl\\vendor\\lib"		/**/
-#define PERL_VENDORARCH_EXP "C:\\strawberry\\perl\\vendor\\lib"		/**/
+#define PERL_VENDORARCH "\\xampp\\perl\\vendor\\lib"		/**/
+#define PERL_VENDORARCH_EXP "\\xampp\\perl\\vendor\\lib"		/**/
 
 /* PERL_VENDORLIB_EXP:
  *	This symbol contains the ~name expanded version of VENDORLIB, to be used
@@ -3308,7 +3308,7 @@
  *	removed.  The elements in inc_version_list (inc_version_list.U) can
  *	be tacked onto this variable to generate a list of directories to search.
  */
-#define PERL_VENDORLIB_EXP "C:\\strawberry\\perl\\vendor\\lib"		/**/
+#define PERL_VENDORLIB_EXP "\\xampp\\perl\\vendor\\lib"		/**/
 #define PERL_VENDORLIB_STEM ""		/**/
 
 /* VOIDFLAGS:

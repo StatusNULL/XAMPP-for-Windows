@@ -13,7 +13,7 @@ require Exporter;
 require HTTP::Request;
 use Carp();
 
-$VERSION = "6.03";
+$VERSION = "6.04";
 
 my $CRLF = "\015\012";   # "\r\n" is not portable
 
@@ -83,7 +83,7 @@ sub POST
 	    $content = $url->query;
 
 	    # HTML/4.01 says that line breaks are represented as "CR LF" pairs (i.e., `%0D%0A')
-	    $content =~ s/(?<!%0D)%0A/%0D%0A/g;
+	    $content =~ s/(?<!%0D)%0A/%0D%0A/g if defined($content);
 	}
     }
 

@@ -1,10 +1,12 @@
 package Class::Load::XS;
 {
-  $Class::Load::XS::VERSION = '0.04';
+  $Class::Load::XS::VERSION = '0.06';
 }
 
 use strict;
 use warnings;
+
+use Class::Load 0.20;
 
 use XSLoader;
 XSLoader::load(
@@ -28,7 +30,7 @@ Class::Load::XS - XS implementation of parts of Class::Load
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 SYNOPSIS
 

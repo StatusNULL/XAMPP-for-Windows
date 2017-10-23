@@ -34,5 +34,5 @@ REM ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 REM POSSIBILITY OF SUCH DAMAGE.
 REM
 
-set PHPBIN="\xampp\php\.\php.exe"
-"\xampp\php\.\php.exe" "\xampp\php\phptok" %*
+set XAMPPPHPDIR=\xampp\php
+"%XAMPPPHPDIR%\.\php.exe" "%XAMPPPHPDIR%\phptok" %*

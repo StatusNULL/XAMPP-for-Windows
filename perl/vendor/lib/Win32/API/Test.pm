@@ -5,6 +5,8 @@
 #
 
 package Win32::API::Test;
+use strict;
+use warnings;
 
 sub is_perl_64bit () {
     use Config;
@@ -12,6 +14,16 @@ sub is_perl_64bit () {
     # was $Config{archname} =~ /x64/;
     return 1 if $Config{ptrsize} == 8;
     return;
+}
+
+sub can_fork () {
+    use Config;
+
+    my $native = $Config{d_fork} || $Config{d_pseudofork};
+    my $win32 = ($^O eq 'MSWin32' || $^O eq 'NetWare');
+    my $ithr = $Config{useithreads} and $Config{ccflags} =~ /-DPERL_IMPLICIT_SYS/;
+
+    return $native || ($win32 and $ithr);
 }
 
 sub compiler_name () {
@@ -73,7 +85,7 @@ sub compiler_version_from_shell () {
 
 sub find_test_dll {
     require File::Spec;
-
+    my $dll;
     my $default_dll_name =
         is_perl_64bit()
         ? 'API_test64.dll'
@@ -87,6 +99,18 @@ sub find_test_dll {
         return $dll if -s $dll;
     }
     return (undef);
+}
+
+#const optimize
+BEGIN {
+    package main;
+    use Config;
+    eval ' sub PTR_LET () { "'
+    .($Config{ptrsize} == 8 ? 'Q' : 'L').
+    '" }';
+    eval 'sub IV_LET () { '.($] <= 5.007002 ? 'L':'J').' }';
+    eval 'sub IV_SIZE () { '.length(pack(IV_LET(),0)).' }';
+    package Win32::API::Test;
 }
 
 1;

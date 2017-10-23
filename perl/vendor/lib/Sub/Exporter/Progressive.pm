@@ -1,55 +1,56 @@
 package Sub::Exporter::Progressive;
 
-# ABSTRACT: Only use Sub::Exporter if you need it
-
 use strict;
 use warnings;
 
-our $VERSION = '0.001003'; # VERSION
+our $VERSION = '0.001008';
 
+use Carp 'croak';
 use List::Util 'first';
 
 sub import {
    my ($self, @args) = @_;
 
-   my $inner_target = caller(0);
-   my ($TOO_COMPLICATED, $export_data) = sub_export_options(@args);
+   my $inner_target = caller;
+   my $export_data = sub_export_options($inner_target, @args);
 
-   die <<'DEATH' if $TOO_COMPLICATED;
+   my $full_exporter;
+   no strict 'refs';
+   @{"${inner_target}::EXPORT_OK"} = @{$export_data->{exports}};
+   @{"${inner_target}::EXPORT"} = @{$export_data->{defaults}};
+   %{"${inner_target}::EXPORT_TAGS"} = %{$export_data->{tags}};
+   *{"${inner_target}::import"} = sub {
+      use strict;
+      my ($self, @args) = @_;
+
+      if (first { ref || !m/ \A [:-]? \w+ \z /xm } @args) {
+         croak 'your usage of Sub::Exporter::Progressive requires Sub::Exporter to be installed'
+            unless eval { require Sub::Exporter };
+         $full_exporter ||= Sub::Exporter::build_exporter($export_data->{original});
+
+         goto $full_exporter;
+      } else {
+         require Exporter;
+         s/ \A - /:/xm for @args;
+         @_ = ($self, @args);
+         goto \&Exporter::import;
+      }
+   };
+   return;
+}
+
+my $too_complicated = <<'DEATH';
 You are using Sub::Exporter::Progressive, but the features your program uses from
 Sub::Exporter cannot be implemented without Sub::Exporter, so you might as well
 just use vanilla Sub::Exporter
 DEATH
 
-   my $full_exporter;
-   no strict;
-   @{"${inner_target}::EXPORT_OK"} = @{$export_data->{exports}};
-   @{"${inner_target}::EXPORT"} = @{$export_data->{defaults}};
-   *{"${inner_target}::import"} = sub {
-      use strict;
-      my ($self, @args) = @_;
-
-      if (first { ref || !m/^\w+$/ } @args) {
-         die 'your usage of Sub::Exporter::Progressive requires Sub::Exporter to be installed'
-            unless eval { require Sub::Exporter };
-         $full_exporter ||=
-            Sub::Exporter::build_exporter($export_data->{original});
-
-         goto $full_exporter;
-      } else {
-         require Exporter;
-         goto \&Exporter::import;
-      }
-   };
-}
-
 sub sub_export_options {
-   my ($setup, $options) = @_;
-
-   my $TOO_COMPLICATED = 0;
+   my ($inner_target, $setup, $options) = @_;
 
    my @exports;
    my @defaults;
+   my %tags;
 
    if ($setup eq '-setup') {
       my %options = %$options;
@@ -58,48 +59,42 @@ sub sub_export_options {
       for my $opt (keys %options) {
          if ($opt eq 'exports') {
 
-            $TOO_COMPLICATED = 1, last OPTIONS
-               if ref $options{exports} ne 'ARRAY';
-
+            croak $too_complicated if ref $options{exports} ne 'ARRAY';
             @exports = @{$options{exports}};
-
-            $TOO_COMPLICATED = 1, last OPTIONS
-               if first { ref } @exports;
+            croak $too_complicated if first { ref } @exports;
 
          } elsif ($opt eq 'groups') {
-
-            $TOO_COMPLICATED = 1, last OPTIONS
-               if first { $_ ne 'default' } keys %{$options{groups}};
-
-            @defaults = @{$options{groups}{default} || [] };
+            %tags = %{$options{groups}};
+            for my $tagset (values %tags) {
+               croak $too_complicated if first { / \A - (?! all \b ) /x || ref } @{$tagset};
+            }
+            @defaults = @{$tags{default} || [] };
          } else {
-            $TOO_COMPLICATED = 1;
-            last OPTIONS
+            croak $too_complicated;
          }
       }
-      @defaults = @exports if @defaults && $defaults[0] eq '-all';
+      @{$_} = map { / \A  [:-] all \z /x ? @exports : $_ } @{$_} for \@defaults, values %tags;
+      $tags{all} ||= [ @exports ];
+      my %exports = map { $_ => 1 } @exports;
+      my @errors = grep { not $exports{$_} } @defaults;
+      croak join(', ', @errors) . " is not exported by the $inner_target module\n" if @errors;
    }
 
-   return $TOO_COMPLICATED, {
+   return {
       exports => \@exports,
       defaults => \@defaults,
       original => $options,
-   }
+      tags => \%tags,
+   };
 }
 
 1;
 
-
-__END__
-=pod
+=encoding utf8
 
 =head1 NAME
 
 Sub::Exporter::Progressive - Only use Sub::Exporter if you need it
-
-=head1 VERSION
-
-version 0.001003
 
 =head1 SYNOPSIS
 
@@ -131,21 +126,31 @@ if all they are doing is picking exports, but use C<Sub::Exporter> if your
 users try to use C<Sub::Exporter>'s more advanced features features, like
 renaming exports, if they try to use them.
 
-Note that this module will export C<@EXPORT> and C<@EXPORT_OK> package
-variables for C<Exporter> to work.  Additionally, if your package uses advanced
-C<Sub::Exporter> features like currying, this module will only ever use
-C<Sub::Exporter>, so you might as well use it directly.
+Note that this module will export C<@EXPORT>, C<@EXPORT_OK> and
+C<%EXPORT_TAGS> package variables for C<Exporter> to work.  Additionally, if
+your package uses advanced C<Sub::Exporter> features like currying, this module
+will only ever use C<Sub::Exporter>, so you might as well use it directly.
 
 =head1 AUTHOR
 
-Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
+frew - Arthur Axel Schmidt (cpan:FREW) <frioux+cpan@gmail.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 CONTRIBUTORS
 
-This software is copyright (c) 2012 by Arthur Axel "fREW" Schmidt.
+ilmari - Dagfinn Ilmari Mannsåker (cpan:ILMARI) <ilmari@ilmari.org>
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>
+
+leont - Leon Timmermans (cpan:LEONT) <leont@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2012 the Sub::Exporter::Progressive L</AUTHOR> and
+L</CONTRIBUTORS> as listed above.
+
+=head1 LICENSE
+
+This library is free software and may be distributed under the same terms
+as perl itself.
 
 =cut
-

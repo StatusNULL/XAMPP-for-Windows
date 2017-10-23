@@ -1,17 +1,31 @@
 @rem = '--*-Perl-*--
 @echo off
 if "%OS%" == "Windows_NT" goto WinNT
+IF EXIST "%~dp0perl.exe" (
 "%~dp0perl.exe" -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
+) ELSE IF EXIST "%~dp0..\..\bin\perl.exe" (
+"%~dp0..\..\bin\perl.exe" -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
+) ELSE (
+perl -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
+)
+
 goto endofperl
 :WinNT
+IF EXIST "%~dp0perl.exe" (
 "%~dp0perl.exe" -x -S %0 %*
+) ELSE IF EXIST "%~dp0..\..\bin\perl.exe" (
+"%~dp0..\..\bin\perl.exe" -x -S %0 %*
+) ELSE (
+perl -x -S %0 %*
+)
+
 if NOT "%COMSPEC%" == "%SystemRoot%\system32\cmd.exe" goto endofperl
 if %errorlevel% == 9009 echo You do not have Perl in your PATH.
 if errorlevel 1 goto script_failed_so_exit_with_non_zero_val 2>nul
 goto endofperl
 @rem ';
 #!perl
-#line 15
+#line 29
     eval 'exec perl -x -S "$0" ${1+"$@"}'
 	if 0;	# In case running under some shell
 
@@ -58,7 +72,14 @@ if(  defined( $OPT{'a'} )  ) {
     $head = <<EOT;
 	\@rem = '--*-Perl-*--
 	\@echo off
-	"%~dp0perl.exe" $OPT{'a'}
+	IF EXIST "\%~dp0perl.exe" (
+	"\%~dp0perl.exe" $OPT{'a'}
+	) ELSE IF EXIST "\%~dp0..\\..\\bin\\perl.exe" (
+	"\%~dp0..\\..\\bin\\perl.exe" $OPT{'a'}
+	) ELSE (
+	perl $OPT{'a'}
+	)
+	
 	goto endofperl
 	\@rem ';
 EOT
@@ -67,10 +88,24 @@ EOT
 	\@rem = '--*-Perl-*--
 	\@echo off
 	if "%OS%" == "Windows_NT" goto WinNT
-	"%~dp0perl.exe" $OPT{'o'}
+	IF EXIST "\%~dp0perl.exe" (
+	"\%~dp0perl.exe" $OPT{'o'}
+	) ELSE IF EXIST "\%~dp0..\\..\\bin\\perl.exe" (
+	"\%~dp0..\\..\\bin\\perl.exe" $OPT{'o'}
+	) ELSE (
+	perl $OPT{'o'}
+	)
+	
 	goto endofperl
 	:WinNT
-	"%~dp0perl.exe" $OPT{'n'}
+	IF EXIST "\%~dp0perl.exe" (
+	"\%~dp0perl.exe" $OPT{'n'}
+	) ELSE IF EXIST "\%~dp0..\\..\\bin\\perl.exe" (
+	"\%~dp0..\\..\\bin\\perl.exe" $OPT{'n'}
+	) ELSE (
+	perl $OPT{'n'}
+	)
+	
 	if NOT "%COMSPEC%" == "%SystemRoot%\\system32\\cmd.exe" goto endofperl
 	if %errorlevel% == 9009 echo You do not have Perl in your PATH.
 	if errorlevel 1 goto script_failed_so_exit_with_non_zero_val 2>nul

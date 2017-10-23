@@ -273,14 +273,14 @@ MyScheme::Handler object that responds to methods similar to an IO::Handle.
 
 =head1 AUTHORS
 
-Matt Sergeant, 
-Christian Glahn, 
+Matt Sergeant,
+Christian Glahn,
 Petr Pajas
 
 
 =head1 VERSION
 
-2.0003
+2.0014
 
 =head1 COPYRIGHT
 

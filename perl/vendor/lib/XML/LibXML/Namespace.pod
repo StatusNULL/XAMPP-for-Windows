@@ -123,14 +123,14 @@ Returns the string "xmlns"
 
 =head1 AUTHORS
 
-Matt Sergeant, 
-Christian Glahn, 
+Matt Sergeant,
+Christian Glahn,
 Petr Pajas
 
 
 =head1 VERSION
 
-2.0003
+2.0014
 
 =head1 COPYRIGHT
 

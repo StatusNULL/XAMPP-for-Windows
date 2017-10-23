@@ -1,4 +1,4 @@
-#!/usr/bin/env perl 
+#!perl
 #!d:\perl\bin\perl.exe 
 #
 # Filename: stubmaker.pl

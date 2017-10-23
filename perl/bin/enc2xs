@@ -1,4 +1,4 @@
-#!./perl
+#!perl
 BEGIN {
     # @INC poking  no longer needed w/ new MakeMaker and Makefile.PL's
     # with $ENV{PERL_CORE} set

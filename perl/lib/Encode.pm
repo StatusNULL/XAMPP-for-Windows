@@ -1,10 +1,10 @@
 #
-# $Id: Encode.pm,v 2.45 2012/08/05 23:08:49 dankogai Exp dankogai $
+# $Id: Encode.pm,v 2.49 2013/03/05 03:13:47 dankogai Exp dankogai $
 #
 package Encode;
 use strict;
 use warnings;
-our $VERSION = sprintf "%d.%02d", q$Revision: 2.45 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%02d", q$Revision: 2.49 $ =~ /(\d+)/g;
 use constant DEBUG => !!$ENV{PERL_ENCODE_DEBUG};
 use XSLoader ();
 XSLoader::load( __PACKAGE__, $VERSION );
@@ -61,9 +61,9 @@ eval {
 };
 
 sub encodings {
-    #my $class = shift;
     my %enc;
-    if ( @_ and $_[0] eq ":all" ) {
+    my $arg  = $_[1] || '';
+    if ( $arg eq ":all" ) {
         %enc = ( %Encoding, %ExtModule );
     }
     else {
@@ -146,7 +146,7 @@ sub clone_encoding($) {
 sub encode($$;$) {
     my ( $name, $string, $check ) = @_;
     return undef unless defined $string;
-    $string .= '' if ref $string;    # stringify;
+    $string .= '';    # stringify;
     $check ||= 0;
     unless ( defined $name ) {
         require Carp;
@@ -166,7 +166,7 @@ sub encode($$;$) {
 sub decode($$;$) {
     my ( $name, $octets, $check ) = @_;
     return undef unless defined $octets;
-    $octets .= '' if ref $octets;
+    $octets .= '';
     $check ||= 0;
     my $enc = find_encoding($name);
     unless ( defined $enc ) {
@@ -798,7 +798,7 @@ constants via C<use Encode qw(:fallback_all)>.
   Encode::LEAVE_SRC
 
 If the C<Encode::LEAVE_SRC> bit is I<not> set but I<CHECK> is set, then the
-second argument to encode() or decode() will be overwritten in place.
+source string to encode() or decode() will be overwritten in place.
 If you're not interested in this, then bitwise-OR it with the bitmask.
 
 =head2 coderef for CHECK
@@ -1011,7 +1011,7 @@ the Perl Unicode Mailing List L<http://lists.perl.org/list/perl-unicode.html>
 =head1 MAINTAINER
 
 This project was originated by the late Nick Ing-Simmons and later
-maintained by Dan Kogai I<< <dankogai@dan.co.jp> >>.  See AUTHORS
+maintained by Dan Kogai I<< <dankogai@cpan.org> >>.  See AUTHORS
 for a full list of people involved.  For any questions, send mail to
 I<< <perl-unicode@perl.org> >> so that we can all share.
 
@@ -1021,7 +1021,7 @@ who submitted code to the project.
 
 =head1 COPYRIGHT
 
-Copyright 2002-2011 Dan Kogai I<< <dankogai@dan.co.jp> >>.
+Copyright 2002-2012 Dan Kogai I<< <dankogai@cpan.org> >>.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

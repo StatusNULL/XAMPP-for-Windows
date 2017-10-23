@@ -7422,19 +7422,95 @@ B<-i>, B<-V>
 
 =back
 
-=head2 perldelta - what is new for perl v5.16.1
+=head2 perldelta - what is new for perl v5.16.3
 
 =over 4
 
 =item DESCRIPTION
 
+=item Core Enhancements
+
 =item Security
 
 =over 4
 
-=item an off-by-two error in Scalar-List-Util has been fixed
+=item CVE-2013-1667: memory exhaustion with arbitrary hash keys
+
+=item wrap-around with IO on long strings
+
+=item memory leak in Encode
 
 =back
+
+=item Incompatible Changes
+
+=item Deprecations
+
+=item Modules and Pragmata
+
+=over 4
+
+=item Updated Modules and Pragmata
+
+=back
+
+=item Known Problems
+
+=item Acknowledgements
+
+=item Reporting Bugs
+
+=item SEE ALSO
+
+=back
+
+=head2 perl5163delta, perldelta - what is new for perl v5.16.3
+
+=over 4
+
+=item DESCRIPTION
+
+=item Core Enhancements
+
+=item Security
+
+=over 4
+
+=item CVE-2013-1667: memory exhaustion with arbitrary hash keys
+
+=item wrap-around with IO on long strings
+
+=item memory leak in Encode
+
+=back
+
+=item Incompatible Changes
+
+=item Deprecations
+
+=item Modules and Pragmata
+
+=over 4
+
+=item Updated Modules and Pragmata
+
+=back
+
+=item Known Problems
+
+=item Acknowledgements
+
+=item Reporting Bugs
+
+=item SEE ALSO
+
+=back
+
+=head2 perl5162delta - what is new for perl v5.16.2
+
+=over 4
+
+=item DESCRIPTION
 
 =item Incompatible Changes
 
@@ -7448,17 +7524,21 @@ B<-i>, B<-V>
 
 =item Configuration and Compilation
 
+configuration should no longer be confused by ls colorization
+
 =item Platform Support
 
 =over 4
 
 =item Platform-Specific Notes
 
-VMS
+AIX
 
 =back
 
 =item Selected Bug Fixes
+
+fix /\h/ equivalence with /[\h]/
 
 =item Known Problems
 
@@ -7470,7 +7550,7 @@ VMS
 
 =back
 
-=head2 perl5161delta, perldelta - what is new for perl v5.16.1
+=head2 perl5161delta - what is new for perl v5.16.1
 
 =over 4
 
@@ -7983,6 +8063,76 @@ L<Version::Requirements>
 =back
 
 =item Known Problems
+
+=item Acknowledgements
+
+=item Reporting Bugs
+
+=item SEE ALSO
+
+=back
+
+=head2 perl5143delta - what is new for perl v5.14.3
+
+=over 4
+
+=item DESCRIPTION
+
+=item Core Enhancements
+
+=item Security
+
+=over 4
+
+=item C<Digest> unsafe use of eval (CVE-2011-3597)
+
+=item Heap buffer overrun in 'x' string repeat operator (CVE-2012-5195)
+
+=back
+
+=item Incompatible Changes
+
+=item Deprecations
+
+=item Modules and Pragmata
+
+=over 4
+
+=item New Modules and Pragmata
+
+=item Updated Modules and Pragmata
+
+=item Removed Modules and Pragmata
+
+=back
+
+=item Documentation
+
+=over 4
+
+=item New Documentation
+
+=item Changes to Existing Documentation
+
+=back
+
+=item Configuration and Compilation
+
+=item Platform Support
+
+=over 4
+
+=item New Platforms
+
+=item Discontinued Platforms
+
+=item Platform-Specific Notes
+
+FreeBSD, Solaris and NetBSD, HP-UX, Linux, Mac OS X, GNU/Hurd, NetBSD
+
+=back
+
+=item Bug Fixes
 
 =item Acknowledgements
 

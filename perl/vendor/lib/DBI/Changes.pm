@@ -2,11 +2,47 @@
 
 DBI::Changes - List of significant changes to the DBI
 
-(As of $Date: 2012-06-06 17:37:26 +0100 (Wed, 06 Jun 2012) $ $Revision: 15327 $)
+(As of $Date: 2012-12-21 18:15:43 +0000 (Fri, 21 Dec 2012) $ $Revision: 15545 $)
 
 =encoding ISO8859-1
 
 =cut
+
+=head2 Changes in DBI 1.623 (svn r15547) 2nd Jan 2012
+
+  Fixed RT#64330 - ping wipes out errstr (Martin J. Evans).
+  Fixed RT#75868 - DBD::Proxy shouldn't call connected() on the server.
+  Fixed RT#80474 - segfault in DESTROY with threads.
+  Fixed RT#81516 - Test failures due to hash randomisation in perl 5.17.6
+    thanks to Jens Rehsack and H.Merijn Brand and feedback on IRC
+  Fixed RT#81724 - Handle copy-on-write scalars (sprout)
+  Fixed unused variable / self-assignment compiler warnings.
+  Fixed default table_info in DBI::DBD::SqlEngine which passed NAMES
+    attribute instead of NAME to DBD::Sponge RT72343 (Martin J. Evans)
+
+  Corrected a spelling error thanks to Chris Sanders.
+  Corrected typo in DBI->installed_versions docs RT#78825
+    thanks to Jan Dubois.
+
+  Refactored table meta information management from DBD::File into
+    DBI::DBD::SqlEngine (H.Merijn Brand, Jens Rehsack)
+  Pevent undefined f_dir being used in opendir (H.Merijn Brand)
+
+  Added logic to force destruction of children before parents
+    during global destruction. See RT#75614.
+  Added DBD::File Plugin-Support for table names and data sources
+    (Jens Rehsack, #dbi Team)
+  Added new tests to 08keeperr for RT#64330
+    thanks to Kenichi Ishigaki.
+  Added extra internal handle type check, RT#79952
+    thanks to Reini Urban.
+  Added cubrid_ registered prefix for DBD::cubrid, RT#78453
+
+  Removed internal _not_impl method (Martin J. Evans).
+
+  NOTE: The "old-style" DBD::DBM attributes 'dbm_ext' and 'dbm_lockfile'
+    have been deprecated for several years and their use will now generate
+    a warning.
 
 =head2 Changes in DBI 1.622 (svn r15327) 6th June 2012
 
@@ -287,7 +323,7 @@ Jens Rehsack, Martin J. Evans, and H.Merijn Brand for all their contributions.
   Fixed DBD_ATTRIB_DELETE macro for driver authors
     and updated DBI::DBD docs thanks to Martin J. Evans.
   Fixed 64bit issues in trace messages thanks to Charles Jardine.
-  Fixed FETCH_many() method to work with drivers that incorrectly return 
+  Fixed FETCH_many() method to work with drivers that incorrectly return
     an empty list from $h->FETCH. Affected gofer.
 
   Added 'sqlite_' as registered prefix for DBD::SQLite.
@@ -463,7 +499,7 @@ Jens Rehsack, Martin J. Evans, and H.Merijn Brand for all their contributions.
 =head2 Changes in DBI 1.56 (svn rev 9660),  18th June 2007
 
   Fixed printf arg warnings thanks to JDHEDDEN.
-  Fixed returning driver-private sth attributes via gofer.   
+  Fixed returning driver-private sth attributes via gofer.
 
   Changed pod docs docs to use =head3 instead of =item
     so now in html you get links to individual methods etc.
@@ -714,7 +750,7 @@ Jens Rehsack, Martin J. Evans, and H.Merijn Brand for all their contributions.
     (driver authors who have used it should rerun it).
 
   Updated docs for NULL Value placeholders thanks to Brian Campbell.
-  
+
   Added multi-keyfield nested hash fetching to fetchall_hashref()
     thanks to Zhuang (John) Li for polishing up my draft.
   Added registered driver prefixes: amzn_ for DBD::Amazon and yaswi_ for DBD::Yaswi.
@@ -1255,7 +1291,7 @@ Jens Rehsack, Martin J. Evans, and H.Merijn Brand for all their contributions.
   : This does not affect statements that only select one column, which is
   : usually the case when fetchrow_array is called in a scalar context.
   : FYI, this change was triggered by discovering that the fetchrow_array
-  : implementation in Driver.xst (used by most compiled drivers) 
+  : implementation in Driver.xst (used by most compiled drivers)
   : didn't match the DBI specification. Rather than change the code
   : to match, and risk breaking existing applications, I've changed the
   : specification (that part was always of dubious value anyway).
@@ -1998,12 +2034,12 @@ Jens Rehsack, Martin J. Evans, and H.Merijn Brand for all their contributions.
     DBI scripts no longer need to be modified to make use of Apache::DBI.
   Added a ping method and an experimental connect_test_perf method.
   Added a fetchhash and fetch_all methods.
-  The func method no longer pre-clears err and errstr. 
+  The func method no longer pre-clears err and errstr.
   Added ChopBlanks attribute (currently defaults to off, that may change).
     Support for the attribute needs to be implemented by individual drivers.
   Reworked tests into standard t/*.t form.
   Added more pod text.  Fixed assorted bugs.
-  
+
 
 =head2 Changes in DBI 0.79,	7th Apr 1997
 

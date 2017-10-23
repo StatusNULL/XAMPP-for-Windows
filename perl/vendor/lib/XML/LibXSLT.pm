@@ -25,7 +25,7 @@ use Carp;
 
 require Exporter;
 
-$VERSION = "1.77";
+$VERSION = "1.80";
 
 require DynaLoader;
 
@@ -57,11 +57,11 @@ sub perl_dispatcher {
 	my $owner_doc = shift;
     my @params = @_;
     my @perlParams;
-    
+
     my $i = 0;
     while (@params) {
         my $type = shift(@params);
-        if ($type eq 'XML::LibXML::Literal' or 
+        if ($type eq 'XML::LibXML::Literal' or
             $type eq 'XML::LibXML::Number' or
             $type eq 'XML::LibXML::Boolean')
         {
@@ -75,7 +75,7 @@ sub perl_dispatcher {
             unshift(@perlParams, $type->new(@nodes));
         }
     }
-    
+
     $func = "main::$func" unless ref($func) || $func =~ /(.+)::/;
     no strict 'refs';
     my $res = $func->(@perlParams);
@@ -511,6 +511,7 @@ sub output_as_chars { shift->{XML_LIBXSLT_STYLESHEET}->_output_string($_[0],2) }
 sub output_fh { shift->{XML_LIBXSLT_STYLESHEET}->output_fh(@_) }
 sub output_file { shift->{XML_LIBXSLT_STYLESHEET}->output_file(@_) }
 sub media_type { shift->{XML_LIBXSLT_STYLESHEET}->media_type(@_) }
+sub output_method { shift->{XML_LIBXSLT_STYLESHEET}->output_method(@_) }
 sub output_encoding { shift->{XML_LIBXSLT_STYLESHEET}->output_encoding(@_) }
 
 1;
@@ -628,16 +629,16 @@ XML::LibXSLT - Interface to the GNOME libxslt library
 
   use XML::LibXSLT;
   use XML::LibXML;
-  
+
   my $xslt = XML::LibXSLT->new();
-  
+
   my $source = XML::LibXML->load_xml(location => 'foo.xml');
   my $style_doc = XML::LibXML->load_xml(location=>'bar.xsl', no_cdata=>1);
-  
+
   my $stylesheet = $xslt->parse_stylesheet($style_doc);
-  
+
   my $results = $stylesheet->transform($source);
-  
+
   print $stylesheet->output_as_bytes($results);
 
 =head1 DESCRIPTION
@@ -742,9 +743,9 @@ The following methods are available on the new XML::LibXSLT object:
 =item parse_stylesheet($stylesheet_doc)
 
 C<$stylesheet_doc> here is an XML::LibXML::Document object (see L<XML::LibXML>)
-representing an XSLT file. This method will return a 
+representing an XSLT file. This method will return a
 XML::LibXSLT::Stylesheet object, or undef on failure. If the XSLT is
-invalid, an exception will be thrown, so wrap the call to 
+invalid, an exception will be thrown, so wrap the call to
 parse_stylesheet in an eval{} block to trap this.
 
 IMPORTANT: C<$stylesheet_doc> should not contain CDATA sections,
@@ -838,11 +839,26 @@ Outputs the result to the file named in C<$filename>.
 
 Returns the output encoding of the results. Defaults to "UTF-8".
 
+=item output_method()
+
+Returns the value of the C<method> attribute from C<xsl:output>
+(usually C<xml>, C<html> or C<text>). If this attribute is
+unspecified, the default value is initially C<xml>. If the
+L<transform> method is used to produce an HTML document, as per the
+L<XSLT spec|http://www.w3.org/TR/xslt#output>, the default value will
+change to C<html>. To override this behavior completely, supply an
+C<xsl:output> element in the stylesheet source document.
+
 =item media_type()
 
-Returns the output media_type of the results. Defaults to "text/html".
+Returns the value of the C<media-type> attribute from
+C<xsl:output>. If this attribute is unspecified, the default media
+type is initially C<text/xml>. This default changes to C<text/html>
+under the same conditions as L<output_method>.
 
 =back
+
+=cut
 
 =head1 Parameters
 
@@ -1001,7 +1017,7 @@ number of XML::LibXSLT module itself, i.e. with
 C<$XML::LibXSLT::VERSION>). XML::LibXSLT issues a warning if the
 runtime version of the library is less then the compile-time version.
 
-=over 
+=over
 
 =item XML::LibXSLT::LIBXSLT_VERSION()
 

@@ -1,27 +1,38 @@
 @rem = '--*-Perl-*--
 @echo off
 if "%OS%" == "Windows_NT" goto WinNT
+IF EXIST "%~dp0perl.exe" (
 "%~dp0perl.exe" -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
+) ELSE IF EXIST "%~dp0..\..\bin\perl.exe" (
+"%~dp0..\..\bin\perl.exe" -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
+) ELSE (
+perl -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
+)
+
 goto endofperl
 :WinNT
+IF EXIST "%~dp0perl.exe" (
 "%~dp0perl.exe" -x -S %0 %*
+) ELSE IF EXIST "%~dp0..\..\bin\perl.exe" (
+"%~dp0..\..\bin\perl.exe" -x -S %0 %*
+) ELSE (
+perl -x -S %0 %*
+)
+
 if NOT "%COMSPEC%" == "%SystemRoot%\system32\cmd.exe" goto endofperl
 if %errorlevel% == 9009 echo You do not have Perl in your PATH.
 if errorlevel 1 goto script_failed_so_exit_with_non_zero_val 2>nul
 goto endofperl
 @rem ';
-#!perl
-#line 15
-    eval 'exec C:\strawberry\perl\bin\perl.exe -S $0 ${1+"$@"}'
-	if $running_under_some_shell;
 #!perl -w
+#line 29
 
 	## shasum: filter for computing SHA digests (ref. sha1sum/md5sum)
 	##
-	## Copyright (C) 2003-2012 Mark Shelor, All Rights Reserved
+	## Copyright (C) 2003-2013 Mark Shelor, All Rights Reserved
 	##
-	## Version: 5.71
-	## Wed Feb 29 04:06:10 MST 2012
+	## Version: 5.84
+	## Sat Mar  9 17:36:08 MST 2013
 
 	## shasum SYNOPSIS adapted from GNU Coreutils sha1sum.
 	## Add an "-a" option for algorithm selection, a "-p"
@@ -98,7 +109,7 @@ the 7-bit message I<0001100>:
 
 =head1 AUTHOR
 
-Copyright (c) 2003-2012 Mark Shelor <mshelor@cpan.org>.
+Copyright (c) 2003-2013 Mark Shelor <mshelor@cpan.org>.
 
 =head1 SEE ALSO
 
@@ -113,7 +124,7 @@ use strict;
 use Fcntl;
 use Getopt::Long;
 
-my $VERSION = "5.71";
+my $VERSION = "5.84";
 
 
 	## Try to use Digest::SHA.  If not installed, use the slower

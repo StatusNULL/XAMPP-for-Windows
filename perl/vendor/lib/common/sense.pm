@@ -245,7 +245,7 @@ sub import {
    ${^WARNING_BITS} ^= ${^WARNING_BITS} ^ "";
    # use strict, use utf8; use feature;
    $^H |= 0x1c820ec0;
-   @^H{qw(feature___SUB__ feature_fc feature_unicode feature_evalbytes feature_say feature_state feature_switch)} = (1) x 7;
+   @^H{qw(feature_fc feature___SUB__ feature_unicode feature_evalbytes feature_say feature_state feature_switch)} = (1) x 7;
 }
 
 1;

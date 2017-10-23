@@ -4,7 +4,7 @@ use warnings;
 
 package CPAN::Mini;
 {
-  $CPAN::Mini::VERSION = '1.111008';
+  $CPAN::Mini::VERSION = '1.111011';
 }
 
 # ABSTRACT: create a minimal mirror of CPAN
@@ -92,11 +92,23 @@ sub _get_mirror_list {
     or die "Cannot open details: $Compress::Zlib::gzerrno";
 
   my $inheader = 1;
+  my $file_ok  = 0;
   while ($gz->gzreadline($_) > 0) {
     if ($inheader) {
-      $inheader = 0 unless /\S/;
+      if (/\S/) {
+        my ($header, $value) = split /:\s*/, $_, 2;
+        chomp $value;
+        $file_ok = 1 if $header eq 'File'
+                    and $value eq '02packages.details.txt';
+      } else {
+        $inheader = 0;
+      }
+
       next;
     }
+
+    die "02packages.details.txt file is not a valid index\n"
+      unless $file_ok;
 
     my ($module, $version, $path) = split;
     next if $self->_filter_module({
@@ -330,6 +342,7 @@ sub __do_filter {
     for (@$filter) {
       return 1 if $self->__do_filter($_, $file);
     }
+    return;
   }
 
   if (ref($filter) eq 'CODE') {
@@ -434,7 +447,10 @@ sub log {
   $_[0]->log_unconditionally($_[1], $_[2]);
 }
 
-sub trace { my $self = shift; $self->log_info(@_); }
+sub trace {
+  my $self = shift;
+  $self->log(@_);
+}
 
 sub log_debug {
   my ($self, @rest) = @_;
@@ -484,18 +500,36 @@ sub read_config {
     or die "couldn't open config file $config_file: $!";
 
   my %config;
+  my %is_multivalue = map {; $_ => 1 }
+                      qw(also_mirror module_filters path_filters);
+
+  $config{$_} = [] for keys %is_multivalue;
+
   while (<$config_fh>) {
     chomp;
     next if /\A\s*\Z/sm;
-    if (/\A(\w+):\s*(\S.*?)\s*\Z/sm) { $config{$1} = $2; }
+
+    if (/\A(\w+):\s*(\S.*?)\s*\Z/sm) {
+      my ($key, $value) = ($1, $2);
+
+      if ($is_multivalue{ $key }) {
+        push @{ $config{$key} }, split /\s+/, $value;
+      } else {
+        $config{ $key } = $value;
+      }
+    }
   }
 
   for (qw(also_mirror)) {
-    $config{$_} = [ grep { length } split /\s+/, $config{$_} ] if $config{$_};
+    $config{$_} = [ grep { length } @{ $config{$_} } ];
   }
 
   for (qw(module_filters path_filters)) {
-    $config{$_} = [ map { qr/$_/ } split /\s+/, $config{$_} ] if $config{$_};
+    $config{$_} = [ map { qr/$_/ } @{ $config{$_} } ];
+  }
+
+  for (keys %is_multivalue) {
+    delete $config{$_} unless @{ $config{$_} };
   }
 
   return %config;
@@ -530,6 +564,7 @@ sub config_file {
 1;
 
 __END__
+
 =pod
 
 =head1 NAME
@@ -538,7 +573,7 @@ CPAN::Mini - create a minimal mirror of CPAN
 
 =head1 VERSION
 
-version 1.111008
+version 1.111011
 
 =head1 SYNOPSIS
 
@@ -860,4 +895,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

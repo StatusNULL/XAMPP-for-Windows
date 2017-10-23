@@ -1,7 +1,7 @@
 This snapshot was automatically generated on
-Wed, 12 Sep 2012 23:04:35 +0000
+Wed, 05 Jun 2013 20:21:48 +0000
 
-Version: 5.4.7
+Version: 5.4.16
 Branch: HEAD
 Build: C:\php-sdk\php54dev\vc9\x86\obj\Release_TS
 
@@ -53,8 +53,8 @@ Module: php_enchant.dll
 
 Module: php_intl.dll
 ===========================
-	icuuc46.dll
-	icuin46.dll
+	icuuc49.dll
+	icuin49.dll
 
 Module: php_ldap.dll
 ===========================

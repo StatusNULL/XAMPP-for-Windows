@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Socket );
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 use Carp;
 
@@ -235,10 +235,12 @@ either in string name or numeric form.
 
 =item GetAddrInfoFlags => INT
 
-More flags to pass to the C<getaddrinfo()> function. These flags will be
-combined with C<AI_ADDRCONFIG>, and if the C<Listen> argument is given,
-C<AI_PASSIVE>. For more information see the documentation about
-C<getaddrinfo()> in the L<Socket> module.
+More flags to pass to the C<getaddrinfo()> function. If not supplied, a
+default of C<AI_ADDRCONFIG> will be used.
+
+These flags will be combined with C<AI_PASSIVE> if the C<Listen> argument is
+given. For more information see the documentation about C<getaddrinfo()> in
+the L<Socket> module.
 
 =item Listen => INT
 
@@ -371,7 +373,12 @@ sub _configure
    my @localinfos;
    my @peerinfos;
 
-   $hints{flags} = ( $arg->{GetAddrInfoFlags} || 0 ) | $AI_ADDRCONFIG;
+   if( defined $arg->{GetAddrInfoFlags} ) {
+      $hints{flags} = $arg->{GetAddrInfoFlags};
+   }
+   else {
+      $hints{flags} = $AI_ADDRCONFIG;
+   }
 
    if( defined( my $family = $arg->{Family} ) ) {
       $hints{family} = $family;
@@ -798,6 +805,21 @@ sub socket
    CORE::socket( my $tmph, $_[0], $_[1], $_[2] ) or return undef;
 
    dup2( $tmph->fileno, $self->fileno ) or die "Unable to dup2 $tmph onto $self - $!";
+}
+
+# Versions of IO::Socket before 1.35 may leave socktype undef if from, say, an
+#   ->fdopen call. In this case we'll apply a fix
+BEGIN {
+   if( $IO::Socket::VERSION < 1.35 ) {
+      *socktype = sub {
+         my $self = shift;
+         my $type = $self->SUPER::socktype;
+         if( !defined $type ) {
+            $type = $self->sockopt( Socket::SO_TYPE() );
+         }
+         return $type;
+      };
+   }
 }
 
 =head1 NON-BLOCKING

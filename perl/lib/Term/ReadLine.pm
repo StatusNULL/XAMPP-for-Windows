@@ -214,15 +214,15 @@ sub readline {
   my $self = shift;
   my ($in,$out,$str) = @$self;
   my $prompt = shift;
-  print $out $rl_term_set[0], $prompt, $rl_term_set[1], $rl_term_set[2]; 
-  $self->register_Tk 
+  print $out $rl_term_set[0], $prompt, $rl_term_set[1], $rl_term_set[2];
+  $self->register_Tk
      if not $Term::ReadLine::registered and $Term::ReadLine::toloop;
   #$str = scalar <$in>;
   $str = $self->get_line;
   utf8::upgrade($str)
       if (${^UNICODE} & PERL_UNICODE_STDIN || defined ${^ENCODING}) &&
          utf8::valid($str);
-  print $out $rl_term_set[3]; 
+  print $out $rl_term_set[3];
   # bug in 5.000: chomping empty string creats length -1:
   chomp $str if defined $str;
   $str;
@@ -233,7 +233,7 @@ sub findConsole {
     my $console;
     my $consoleOUT;
 
-    if (-e "/dev/tty") {
+    if (-e "/dev/tty" and $^O ne 'MSWin32') {
 	$console = "/dev/tty";
     } elsif (-e "con" or $^O eq 'MSWin32') {
        $console = 'CONIN$';
@@ -327,7 +327,7 @@ sub Features { \%features }
 
 package Term::ReadLine;		# So late to allow the above code be defined?
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 my ($which) = exists $ENV{PERL_RL} ? split /\s+/, $ENV{PERL_RL} : undef;
 if ($which) {

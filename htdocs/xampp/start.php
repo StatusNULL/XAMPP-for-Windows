@@ -15,15 +15,16 @@
 	<h1><?php print $TEXT['start-head']; ?>!</h1>
 	<b><?php print $TEXT['start-subhead']; ?></b><p><p>
 
-	<b>++++ ++++ <i>A great thank you to hackattack142 for this new fine Control Panel!</i> ++++ ++++</b><p> 
-	<img src="img/xampp-site-and-control-panel.jpg" alt="New Control Panel" /><p><p>
 	<?php print $TEXT['start-text1']; ?><p>
 	<?php print $TEXT['start-text2']; ?><p>
 	<?php print $TEXT['start-text3']; ?><p>
 	<?php print $TEXT['start-text4']; ?><p>
 	<?php print $TEXT['start-text6']; ?><p>
 	
-
+	<h1>Install applications on XAMPP using BitNami</h1>
+	<p>Apache Friends and BitNami are cooperating to make dozens of open source applications available on XAMPP, for free. BitNami-packaged applications include Wordpress, Drupal, Joomla! and dozens of others and can be deployed with one-click installers. Visit the <a href="http://bitnami.com/stack/xampp?utm_source=bitnami&utm_medium=installer&utm_campaign=XAMPP%2BModule" target="_blank">BitNami XAMPP page</a> for details on the currently available apps.</p>
+      	<p><a href="http://bitnami.com/stack/xampp?utm_source=bitnami&utm_medium=installer&utm_campaign=XAMPP%2BModule" target="_blank"><img src="img/bitnami-xampp.png" alt="BitNami XAMPP page" border="0"></a></p>
+            
 
 	</body>
 </html>

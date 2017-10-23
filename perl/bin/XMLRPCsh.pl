@@ -1,4 +1,4 @@
-#!/bin/env perl 
+#!perl
 #!d:\perl\bin\perl.exe 
 
 # -- XMLRPC::Lite -- soaplite.com -- Copyright (C) 2001 Paul Kulchenko --

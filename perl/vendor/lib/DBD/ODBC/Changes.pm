@@ -4,9 +4,185 @@
 
 DBD::ODBC::Changes - Log of significant changes to the DBD::ODBC
 
-As of $LastChangedDate: 2012-07-07 13:13:39 +0100 (Sat, 07 Jul 2012) $
+As of $LastChangedDate: 2013-01-25 09:44:03 +0000 (Fri, 25 Jan 2013) $
 
 $Revision: 10667 $
+
+=head2 Changes in DBD::ODBC 1.43 March 6 2013
+
+  This is a full release of all the 1.42_* development releases.
+
+  plus:
+
+  [Bug FIXES]
+
+  Minor fix to 10handler.t test suite which relied on a native error
+  being true instead of defined.
+
+=head2 Changes in DBD::ODBC 1.42_5 January 25 2013
+
+  [BUG FIXES]
+
+  Not all modules used in test code were specified in build_requires.
+
+=head2 Changes in DBD::ODBC 1.42_4 January 21 2013
+
+  [ENHANCEMENTS]
+
+  odbc_trace and odbc_trace_file are now full connection attributes
+  so you can set them any time you like, not just in connect.
+
+=head2 Changes in DBD::ODBC 1.42_3 January 17 2013
+
+  [ENHANCEMENTS]
+
+  Added odbc_trace_file and odbc_trace attributes to the connect
+  method so you can now enable ODBC API tracing from the connect
+  method instead of having to use the ODBC Driver Manager. These also
+  only enable ODBC API tracing in the application which made the call
+  unlike the ODBC Driver Manager settings.
+
+=head2 Changes in DBD::ODBC 1.42_2 December 17 2012
+
+  [MISCELLANEOUS]
+
+  Changed any use of if SvUPGRADE to remove the if test as per email
+  from Dave Mitchell and posting at
+  http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2012-12/msg00424.html.
+
+=head2 Changes in DBD::ODBC 1.42_1 December 12 2012
+
+  [BUG FIXES]
+
+  DBD::ODBC's ExecDirect method did not return an SQLLEN so if you
+  managed to affect a massive number of rows it would be cast to an
+  int and hence precision lost.
+
+  [CHANGE IN BEHAVIOUR]
+
+  When you called DBI's execute method and odbc_exec_direct was not
+  set (the default) if you managed to affect more rows than would fit
+  into an int you would get the incorrect count (NOTE on 32 bit
+  platforms ODBC's SQLRowCount can only return a 32bit value
+  anyway). You would get whatever casting an SQLLEN to an int would
+  give you. The fix for this needs a change to DBI (see RT 81911) and
+  the change would probably impact every DBD so until then DBD::ODBC
+  will a) warn if an overflow occurs and Warn is set on the handle b)
+  return INT_MAX and c) provide a new statement method odbc_rows which
+  you can use to get the correct value.
+
+  [ENHANCEMENTS]
+
+  New odbc_rows statement method (see above).
+
+  [MISCELLANEOUS]
+
+  New rt_81911.t test case.
+
+=head2 Changes in DBD::ODBC 1.42_0 November 28 2012
+
+  [BUG FIXES]
+
+  MS Access requires a longchar column to be bound using SQL_LONGVARCHAR.
+  However, MS Access does not support SQLDescribeParam and we default to
+  SQL_VARCHAR in this case. The point at which we switch to SQL_LONGVARCHAR
+  was defaulted to 4000 (for MS SQL Server). We now default to SQL_LONGVARCHAR
+  for MS Access when data is > 255. This means you can remove those
+  {TYPE => SQL_LONGVARCHAR} from your bind_param calls for longchar columns
+  in MS Access.
+
+  I seem to have introduced a bug in the test suite for MS Access.
+  The last test in the 09bind test binds dates as varchars (by
+  default) and this cannot work in MS Access (it needs to be a
+  timestamp).  This test was skipped in the past and the skip got
+  removed.
+
+  [MISCELLANEOUS]
+
+  Steffen Goeldner reported some issues with execute_array in
+  DBD::Oracle where if ArrayTupleStatus was not specified and an error
+  occurred DBD::Oracle did not do the right thing. As I used
+  DBD::Oracle as a base when I wrote execute_for_fetch in DBD::ODBC I
+  added tests to the test suite to ensure these issues did not exist
+  in DBD::ODBC.
+
+  Minor change to sql_type_cast.t test which attempts to insert an
+  integer into a varchar. No databases so far have complained about
+  this until we ran the test against Derby. Changed to use '100'.
+
+  RT 80446 - fix spelling mistake - thanks to Xavier Guimar.
+
+=head2 Changes in DBD::ODBC 1.41 October 23 2012
+
+  A full release of the 1.40 development release series.
+
+=head2 Changes in DBD::ODBC 1.40_3 October 8 2012
+
+  [BUG FIXES]
+
+  Oops, changes to some rt tests fail when not run to MS SQL Server
+  and they should not be run for other drivers - there was a double
+  done_testing call.
+
+  [CHANGE IN BEHAVIOUR]
+
+  As I warned literally years ago DBD::ODBC's private function
+  DescribeCol has been removed. You can use DBI's statement attributes
+  like NAME, PRECISION etc, instead. All test code has been changed to
+  remove calls to DescribeCol and GetTypeInfo.
+
+  [MISCELLANEOUS]
+
+  New example sqlserver_supplementary_chrs.pl added which shows that
+  in MS SQL Server 2012 you can now store unicode characters
+  over 0xFFFF (ones which are surrogate pairs).
+
+  More documentation for odbc_out_connect_string.
+
+=head2 Changes in DBD::ODBC 1.40_2 September 6 2012
+
+  [BUG FIXES]
+
+  Fixed rt 78838 - bind_param does not correctly stringify blessed
+  objects when connected to MS SQL Server
+
+  Fix issue in dbd_bind_ph where if you passed a sql type and were
+  also attempting to change from in to out or vice versa or increasing
+  the size of an output bound param it would not spot this error.
+
+  Allowed the test cases to spot DB2 driver as libXXXdb2.
+
+  [MISCELLANEOUS]
+
+  New test cases added for some rts.
+
+  Added Test::NoWarnings to some tests where it was missing.
+
+=head2 Changes in DBD::ODBC 1.40_1 September 4 2012
+
+  [BUG FIXES]
+
+  Debian/Ubuntu have moved unixODBC into /usr/lib/i386-linux-gnu
+  so look in this dir for unixODBC as well - thanks to Meastro for finding.
+
+  Fixed rt 78838
+  I had a sequence point error which is only seen with some compilers
+  as it is sometimes optimized out. It could cause DBD::ODBC to omit
+  adding the UID/PWD to the end of the connection string when using DSN=.
+  Thanks to Zsolt Cserna for spotting it and to ilmari and Leon for
+  explaining it to me.
+
+  Fixed rt 79397
+  Output bound parameters may be incorrectly bound if changed after
+  bind_param_inout is called. If you start with an undef bound param
+  and change it to a defined string/number less than 28 characters
+  before calling execute the original undef will probably be bound.
+  Thanks to runrig on perl monks for providing an example.
+
+  [CHANGE IN BEHAVIOUR]
+
+  If you attempt to bind an rv without amagic DBD::ODBC will now
+  croak - related to rt 78838.
 
 =head2 Changes in DBD::ODBC 1.39 July 7 2012
 

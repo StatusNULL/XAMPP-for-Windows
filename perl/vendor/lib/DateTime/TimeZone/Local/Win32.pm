@@ -1,6 +1,6 @@
 package DateTime::TimeZone::Local::Win32;
 {
-  $DateTime::TimeZone::Local::Win32::VERSION = '1.48';
+  $DateTime::TimeZone::Local::Win32::VERSION = '1.57';
 }
 
 use strict;
@@ -38,6 +38,7 @@ sub EnvVars { return 'TZ' }
         'Azerbaijan Standard Time'        => 'Asia/Baku',
         'Azores'                          => 'Atlantic/Azores',
         'Azores Standard Time'            => 'Atlantic/Azores',
+        'Bahia Standard Time'             => 'America/Bahia',
         'Bangkok'                         => 'Asia/Bangkok',
         'Bangkok Standard Time'           => 'Asia/Bangkok',
         'Bangladesh Standard Time'        => 'Asia/Dhaka',
@@ -103,6 +104,7 @@ sub EnvVars { return 'TZ' }
         'Israel'                          => 'Asia/Jerusalem',
         'Israel Standard Time'            => 'Asia/Jerusalem',
         'Jordan Standard Time'            => 'Asia/Amman',
+        'Kaliningrad Standard Time'       => 'Europe/Kaliningrad',
         'Kamchatka Standard Time'         => 'Asia/Kamchatka',
         'Korea'                           => 'Asia/Seoul',
         'Korea Standard Time'             => 'Asia/Seoul',
@@ -168,6 +170,7 @@ sub EnvVars { return 'TZ' }
         'Tokyo'                           => 'Asia/Tokyo',
         'Tokyo Standard Time'             => 'Asia/Tokyo',
         'Tonga Standard Time'             => 'Pacific/Tongatapu',
+        'Turkey Standard Time'            => 'Europe/Istanbul',
         'Ulaanbaatar Standard Time'       => 'Asia/Ulaanbaatar',
         'US Eastern'                      => 'America/Indianapolis',
         'US Eastern Standard Time'        => 'America/Indianapolis',
@@ -259,7 +262,7 @@ sub _FindWindowsTZName {
 
 # ABSTRACT: Determine the local system's time zone on Windows
 
-
+__END__
 
 =pod
 
@@ -269,7 +272,7 @@ DateTime::TimeZone::Local::Win32 - Determine the local system's time zone on Win
 
 =head1 VERSION
 
-version 1.48
+version 1.57
 
 =head1 SYNOPSIS
 
@@ -332,13 +335,9 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Dave Rolsky.
+This software is copyright (c) 2013 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-

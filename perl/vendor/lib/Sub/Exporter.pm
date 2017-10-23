@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package Sub::Exporter;
 {
-  $Sub::Exporter::VERSION = '0.984';
+  $Sub::Exporter::VERSION = '0.985';
 }
 # ABSTRACT: a sophisticated exporter for custom-built routines
 
@@ -484,6 +484,7 @@ sub _setup {
 "jn8:32"; # <-- magic true value
 
 __END__
+
 =pod
 
 =head1 NAME
@@ -492,7 +493,7 @@ Sub::Exporter - a sophisticated exporter for custom-built routines
 
 =head1 VERSION
 
-version 0.984
+version 0.985
 
 =head1 SYNOPSIS
 
@@ -550,7 +551,14 @@ simple generator, you can let them do this, instead:
 
   my $value = analyze10($data);
 
-The generator for that would look something like this:
+The package with the generator for that would look something like this:
+
+  package Data::Analyze;
+  use Sub::Exporter -setup => {
+    exports => [
+      analyze => \&build_analyzer,
+    ],
+  };
 
   sub build_analyzer {
     my ($class, $name, $arg) = @_;
@@ -791,7 +799,7 @@ rewritten as:
    }
  }
 
-That would allow the import to specify global defaults for his imports:
+That would allow the importer to specify global defaults for his imports:
 
   use Data::Analyze
     'analyze',
@@ -800,7 +808,7 @@ That would allow the import to specify global defaults for his imports:
     defaults => { passes => 10 };
 
   my $A = analyze10($data);     # equivalent to analyze($data, 0.10, 10);
-  my $C = analyze50($data);     # equivalent to analyze($data, 0.15, 10);
+  my $C = analyze50($data);     # equivalent to analyze($data, 0.15, 50);
   my $B = analyze($data, 0.20); # equivalent to analyze($data, 0.20, 10);
 
 If values are provided in the C<collectors> list during exporter setup, they
@@ -1098,4 +1106,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

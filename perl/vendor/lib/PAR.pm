@@ -1,5 +1,5 @@
 package PAR;
-$PAR::VERSION = '1.005';
+$PAR::VERSION = '1.007';
 
 use 5.006;
 use strict;
@@ -384,7 +384,7 @@ sub import {
         # XXX - handle META.yml here!
         push @PAR_INC, unpar($progname, undef, undef, 1);
 
-        _extract_inc($progname) unless $ENV{PAR_CLEAN};
+        _extract_inc($progname);
         if ($LibCache{$progname}) {
           # XXX bad: this us just a good guess
           require File::Spec;
@@ -494,7 +494,7 @@ sub _import_hash_ref {
         PAR::Heavy::_init_dynaloader();
         
         # XXX - handle META.yml here!
-        _extract_inc($opt->{file}) unless $ENV{PAR_CLEAN};
+        _extract_inc($opt->{file});
         
         my $zip = $LibCache{$opt->{file}};
         my $member = _first_member( $zip,
@@ -537,7 +537,7 @@ sub _import_repository {
     my $obj;
 
     # Support existing clients passed in as objects.
-    if (ref($url) and UNIVERSAL::isa($obj, 'PAR::Repository::Client')) {
+    if (ref($url) and UNIVERSAL::isa($url, 'PAR::Repository::Client')) {
         $obj = $url;
     }
     else {
@@ -550,7 +550,7 @@ sub _import_repository {
     }
 
     if (exists($opt->{fallback}) and not $opt->{fallback}) {
-        push @PriorityRepositoryObjects, $obj; # repository beats local stuff
+        unshift @PriorityRepositoryObjects, $obj; # repository beats local stuff
     } else {
         push @RepositoryObjects, $obj; # local stuff beats repository
     }

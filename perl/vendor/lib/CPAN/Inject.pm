@@ -63,7 +63,7 @@ use CPAN::Checksums ();
 use vars qw{$VERSION $CHECK_OWNER};
 
 BEGIN {
-	$VERSION = '1.13';
+	$VERSION = '1.14';
 
 	# Attempt to determine whether or not we are capable
 	# of finding the owner of a directory.
@@ -473,7 +473,7 @@ sub install_path {
 # Support Functions
 
 sub _AUTHOR {
-	( Params::Util::_STRING( $_[0] ) and $_[0] =~ /^[A-Z]{3,}$/ ) ? $_[0] : undef;
+	( Params::Util::_STRING( $_[0] ) and $_[0] =~ /^[A-Z]{2,}$/ ) ? $_[0] : undef;
 }
 
 1;
