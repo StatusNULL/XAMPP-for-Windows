@@ -13,25 +13,24 @@
 <h1>Herzlichen Gl&uuml;ckwunsch:<br>
 Es hat geklappt!</h1>
 
-<p>Es läuft hier <A HREF="http://www.apachefriends.org/" target="_top">ApacheFriends XAMPP Version 0.9</A> mit ...<br><br>
+<p>Es läuft hier <A HREF="http://www.apachefriends.org/" target="_top">ApacheFriends XAMPP Version 1.0</A> mit ...<br><br>
 <?
 $httpd = getenv("SERVER_SOFTWARE");
 echo "<i>$httpd</i><br>";
 ?>
 <p>
 
-<h2>Was ist neu:</h2>
-<b>1) Installationsskript für den XAMPP in PHP!!!<br>
-2) Neuer FTP Server FileZilla (OpenSource unter sourceforge.net)<br>
-3) Weitere PHP Beispiele ...<br>
+<h2>Ein Danke an ...</h2>
+=> KriS, Nemesis, Boppy und allen anderen, die mit ihren Skripts, Hinweisen und gefundenen Bugs dieses Produkt verbessert haben!    
+<br><br>
 
 <?php
 $curdir = getcwd();
 list ($partXAMPP, $directorXAMPP) = split ('\\\htdocs\\\xampp', $curdir);
-echo "4) Die Logfile sind wieder unter ...<br>Verzeichnis => $partXAMPP\apache\logs\<br><br>";
+echo "Die Logfile sind wieder unter ...<br>Verzeichnis => $partXAMPP\apache\logs\<br><br>";
 ?>
 
-=> 1) Warnung: Mit der abermaligen Aktivierung der "setup_xampp.bat" versucht das "install.php" Programm im "install" Verzeichnis die zur Zeit geltenen Pfade in den bekannten Konfigurationsdateien nochmals zu aktualisieren. Diese Funktion ist aber noch nicht genügend ausgeprüft und im Alpha Stadium ... also das nur auf eigene Gefahr! Und für Entwckler: 
+Warnung: Mit der abermaligen Aktivierung der "setup_xampp.bat" versucht das "install.php" Programm im "install" Verzeichnis die zur Zeit geltenen Pfade in den bekannten Konfigurationsdateien nochmals zu aktualisieren. Diese Funktion ist aber noch nicht genügend ausgeprüft und im Alpha Stadium ... also das nur auf eigene Gefahr! Und für Entwckler: 
 Die "install.php" ist die das PHP Skript und kann und sollte natürlich verbessert werden, zumal mir die Zeit fehlte, die notwendige Straffung vorzunehmen. Ich würde Hinweise auf Verbesserungen dann gerne aufnehmen, mit Erwähnung des Autors mindenstens im Skript! 
 
 <?php

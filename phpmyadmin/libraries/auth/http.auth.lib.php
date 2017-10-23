@@ -1,5 +1,5 @@
 <?php
-/* $Id: http.auth.lib.php,v 1.10 2003/07/06 11:15:50 lem9 Exp $ */
+/* $Id: http.auth.lib.php,v 1.9 2002/10/23 04:17:26 robbat2 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 // +--------------------------------------------------------------------------+
@@ -258,7 +258,7 @@ h1       {font-family: <?php echo $right_font_family; ?>; font-size: <?php echo 
         PMA_auth();
 
         return TRUE;
-    } // end of the 'PMA_auth_fails()' function
+    } // end of the 'PMA_auth()' function
 
 } // $__PMA_HTTP_AUTH_LIB__
 ?>

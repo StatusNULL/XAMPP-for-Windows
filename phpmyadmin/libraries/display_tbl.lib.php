@@ -1,5 +1,5 @@
 <?php
-/* $Id: display_tbl.lib.php,v 1.162 2003/06/27 13:58:45 nijel Exp $ */
+/* $Id: display_tbl.lib.php,v 1.156 2003/05/22 09:58:52 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -110,7 +110,7 @@ if (!defined('PMA_DISPLAY_TBL_LIB_INCLUDED')) {
                 $do_display['nav_bar']   = (string) '0';
                 $do_display['ins_row']   = (string) '0';
                 $do_display['bkm_form']  = (string) '1';
-                $do_display['text_btn']  = (string) '1';
+                $do_display['text_btn']  = (string) '0';
                 $do_display['pview_lnk'] = (string) '1';
             }
             // 2.3 Other statements (ie "SELECT" ones) -> updates
@@ -118,12 +118,18 @@ if (!defined('PMA_DISPLAY_TBL_LIB_INCLUDED')) {
             //     $do_display['text_btn'] (keeps other default values)
             else {
                 $prev_table = $fields_meta[0]->table;
-                $do_display['text_btn']  = (string) '1';
                 for ($i = 0; $i < $GLOBALS['fields_cnt']; $i++) {
                     $is_link = ($do_display['edit_lnk'] != 'nn'
                                 || $do_display['del_lnk'] != 'nn'
                                 || $do_display['sort_lnk'] != '0'
                                 || $do_display['ins_row'] != '0');
+                    // 2.3.1 Displays text cut/expand button?
+                    if ($do_display['text_btn'] == '0' && eregi('BLOB', $fields_meta[$i]->type)) {
+                        $do_display['text_btn'] = (string) '1';
+                        if (!$is_link) {
+                            break;
+                        }
+                    } // end if (2.3.1)
                     // 2.3.2 Displays edit/delete/sort/insert links?
                     if ($is_link
                         && ($fields_meta[$i]->table == '' || $fields_meta[$i]->table != $prev_table)) {
@@ -982,7 +988,7 @@ if (!defined('PMA_DISPLAY_TBL_LIB_INCLUDED')) {
                         $uva_condition = $uva_nonprimary_condition;
                     }
                     
-                    $uva_condition     = urlencode(preg_replace('|[[:space:]]?AND$|', '', $uva_condition));
+                    $uva_condition     = urlencode(ereg_replace('[[:space:]]?AND$', '', $uva_condition));
                 } // end if (1.1)
 
                 // 1.2 Defines the urls for the modify/delete link(s)
@@ -1015,7 +1021,7 @@ if (!defined('PMA_DISPLAY_TBL_LIB_INCLUDED')) {
                                     . PMA_generate_common_hidden_inputs($row['dbase'], '')
                                     . '<input type="hidden" name="id_bookmark" value="' . $row['id'] . '" />'
                                     . '<input type="hidden" name="action_bookmark" value="0" />'
-                                    . '<input type="submit" name="SQL" value="' . $GLOBALS['strExecuteBookmarked'] . '" />'
+                                    . '<input type="submit" name="SQL" value="' . $GLOBALS['strGo'] . '" />'
                                     . '</form>';
                 } else { 
                     $bookmark_go = '';
@@ -1231,11 +1237,12 @@ if (!defined('PMA_DISPLAY_TBL_LIB_INCLUDED')) {
                         // loic1: support blanks in the key
                         $relation_id = $row[$pointer];
 
-                        // nijel: Cut all fields to $cfg['LimitChars']
-                        if (strlen($row[$pointer]) > $GLOBALS['cfg']['LimitChars'] && ($dontlimitchars != 1)) {
-                            $row[$pointer] = substr($row[$pointer], 0, $GLOBALS['cfg']['LimitChars']) . '...';
+                        // loic1: Cut text/blob fields even if $cfg['ShowBlob'] is true
+                        if (eregi('BLOB', $meta->type)) {
+                            if (strlen($row[$pointer]) > $GLOBALS['cfg']['LimitChars'] && ($dontlimitchars != 1)) {
+                                $row[$pointer] = substr($row[$pointer], 0, $GLOBALS['cfg']['LimitChars']) . '...';
+                            }
                         }
-
                         // loic1: displays special characters from binaries
                         $field_flags = PMA_mysql_field_flags($dt_result, $i);
                         if (eregi('BINARY', $field_flags)) {
@@ -1615,32 +1622,34 @@ if (!defined('PMA_DISPLAY_TBL_LIB_INCLUDED')) {
         // init map
         $map = array();
 
-        // find tables
+        if ($cfgRelation['relwork']) {
+            // find tables
+            //$pattern = '`?[[:space:]]+(((ON|on)[[:space:]]+[^,]+)?,|((NATURAL|natural)[[:space:]]+)?(INNER|inner|LEFT|left|RIGHT|right)([[:space:]]+(OUTER|outer))?[[:space:]]+(JOIN|join))[[:space:]]*`?';
+            //$target  = eregi_replace('^.*[[:space:]]+FROM[[:space:]]+`?|`?[[:space:]]*(ON[[:space:]]+[^,]+)?(WHERE[[:space:]]+.*)?$', '', $sql_query);
+            //$target = eregi_replace('`?[[:space:]]ORDER BY[[:space:]](.*)','',$target);
+            //$tabs    = '(\'' . join('\',\'', split($pattern, $target)) . '\')';
+            $target=array();
+            reset($analyzed_sql[0]['table_ref']);
+            while (list ($table_ref_position, $table_ref) = each ($analyzed_sql[0]['table_ref'])) {
+               $target[] = $analyzed_sql[0]['table_ref'][$table_ref_position]['table_true_name'];
+            }
+            $tabs    = '(\'' . join('\',\'', $target) . '\')';
 
-        $target=array();
-        reset($analyzed_sql[0]['table_ref']);
-        while (list ($table_ref_position, $table_ref) = each ($analyzed_sql[0]['table_ref'])) {
-           $target[] = $analyzed_sql[0]['table_ref'][$table_ref_position]['table_true_name'];
-        }
-        $tabs    = '(\'' . join('\',\'', $target) . '\')';
-
-        if ($cfgRelation['displaywork']) {
-            if (empty($table)) {
-                $exist_rel = FALSE;
-            } else {
-                $exist_rel = PMA_getForeigners($db, $table, '', 'both');
-                if ($exist_rel) {
-                    while (list($master_field,$rel) = each($exist_rel)) {
-                        $display_field = PMA_getDisplayField($rel['foreign_db'],$rel['foreign_table']);
-                        $map[$master_field] = array($rel['foreign_table'],
-                                              $rel['foreign_field'],
-                                              $display_field,
-                                              $rel['foreign_db']);
-                    } // end while
-                } // end if
+            $local_query = 'SELECT master_field, foreign_db, foreign_table, foreign_field'
+                         . ' FROM ' . PMA_backquote($cfgRelation['relation'])
+                         . ' WHERE master_db = \'' . PMA_sqlAddslashes($db) . '\''
+                         . ' AND master_table IN ' . $tabs;
+            $result      = @PMA_query_as_cu($local_query, FALSE);
+            if ($result) {
+                while ($rel = PMA_mysql_fetch_row($result)) {
+                    // check for display field?
+                    if ($cfgRelation['displaywork']) {
+                        $display_field = PMA_getDisplayField($rel[1], $rel[2]);
+                        $map[$rel[0]] = array($rel[2], $rel[3], $display_field, $rel[1]);
+                    } // end if
+                } // end while
             } // end if
-        } // end if
-        // end 2b
+        } // end 2b
 
         // 3. ----- Displays the results table -----
         echo '<!-- Results table -->' . "\n"

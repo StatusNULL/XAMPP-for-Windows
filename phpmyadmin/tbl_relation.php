@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_relation.php,v 1.33 2003/06/20 14:48:19 lem9 Exp $ */
+/* $Id: tbl_relation.php,v 1.32 2003/05/28 12:25:30 garvinhicking Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -24,7 +24,7 @@ $cfgRelation = PMA_getRelationsParam();
  */
 
 if ($cfgRelation['relwork']) {
-    $existrel = PMA_getForeigners($db, $table, '', 'internal');
+    $existrel = PMA_getForeigners($db, $table);
 }
 if ($cfgRelation['displaywork']) {
     $disp     = PMA_getDisplayField($db, $table);
@@ -105,7 +105,7 @@ if ($cfgRelation['commwork']
 
 // Now that we might have changed we have to see again
 if ($cfgRelation['relwork']) {
-    $existrel = PMA_getForeigners($db, $table, '', 'internal');
+    $existrel = PMA_getForeigners($db, $table);
 }
 if ($cfgRelation['displaywork']) {
     $disp     = PMA_getDisplayField($db, $table);
@@ -169,7 +169,7 @@ if ($cfgRelation['relwork']) {
     } // end while over tables
 
     // Create array of relations (Mike Beck)
-    $rel_dest = PMA_getForeigners($db, $table, '', 'internal');
+    $rel_dest = PMA_getForeigners($db, $table);
 } // end if
 
 // Now find out the columns of our $table

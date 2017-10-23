@@ -1,5 +1,5 @@
 <?php
-/* $Id: cookie.auth.lib.php,v 1.39 2003/07/07 11:10:22 lem9 Exp $ */
+/* $Id: cookie.auth.lib.php,v 1.33 2003/01/08 14:43:55 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -13,103 +13,13 @@
 if (!defined('PMA_COOKIE_AUTH_INCLUDED')) {
     define('PMA_COOKIE_AUTH_INCLUDED', 1);
 
-    // emulate array_values() for PHP 3
-    if (PMA_PHP_INT_VERSION < 40000) {
-
-        function array_values ($arr) {
-            $t = array();
-            while (list($k, $v) = each ($arr)) {
-                $t[] = $v;
-            }
-        return $t;
-        } // end function
-    } // end if
-
-    include('./libraries/blowfish.php');
-
     // Gets the default font sizes
     PMA_setFontSizes();
     // Defines the cookie path and whether the server is using https or not
     $pma_uri_parts = parse_url($cfg['PmaAbsoluteUri']);
     $cookie_path   = substr($pma_uri_parts['path'], 0, strrpos($pma_uri_parts['path'], '/'));
-    $is_https      = (isset($pma_uri_parts['scheme']) && $pma_uri_parts['scheme'] == 'https') ? 1 : 0;
+    $is_https      = ($pma_uri_parts['scheme'] == 'https') ? 1 : 0;
 
-    /**
-     * String padding
-     *
-     * @param   string  input string 
-     * @param   integer length of the result
-     * @param   string  the filling string
-     * @param   integer padding mode
-     *
-     * @return  string  the padded string
-     *
-     * @access  public
-     */
-    function full_str_pad($input, $pad_length, $pad_string = '', $pad_type = 0) {
-        $str = '';
-        $length = $pad_length - strlen($input);
-        if ($length > 0) { // str_repeat doesn't like negatives
-            if ($pad_type == STR_PAD_RIGHT) { // STR_PAD_RIGHT == 1
-                $str = $input.str_repeat($pad_string, $length);
-            } elseif ($pad_type == STR_PAD_BOTH) { // STR_PAD_BOTH == 2
-                $str = str_repeat($pad_string, floor($length/2));
-                $str .= $input;
-                $str .= str_repeat($pad_string, ceil($length/2));
-            } else { // defaults to STR_PAD_LEFT == 0
-                $str = str_repeat($pad_string, $length).$input;
-            }
-        } else { // if $length is negative or zero we don't need to do anything
-            $str = $input;
-        }
-        return $str;
-    }
-
-   /**
-     * Encryption using blowfish algorithm
-     *
-     * @param   string  original data
-     * @param   string  the secret
-     *
-     * @return  string  the encrypted result
-     *
-     * @access  public
-     *
-     * @author  lem9
-     */
-function PMA_blowfish_encrypt($data, $secret) {
-    $pma_cipher = new Horde_Cipher_blowfish;
-    $encrypt = '';
-    for ($i=0; $i<strlen($data); $i+=8) {
-        $block = substr($data, $i, 8);
-        if (strlen($block) < 8) {
-            $block = full_str_pad($block,8,"\0", 1);
-        }
-        $encrypt .= $pma_cipher->encryptBlock($block, $secret);
-    } 
-    return $encrypt;
-}
-
-   /**
-     * Decryption using blowfish algorithm
-     *
-     * @param   string  encrypted data
-     * @param   string  the secret
-     *
-     * @return  string  original data
-     *
-     * @access  public
-     *
-     * @author  lem9
-     */
-function PMA_blowfish_decrypt($data, $secret) {
-    $pma_cipher = new Horde_Cipher_blowfish;
-    $decrypt = '';
-    for ($i=0; $i<strlen($data); $i+=8) {
-        $decrypt .= $pma_cipher->decryptBlock(substr($data, $i, 8), $secret);
-    } 
-    return trim($decrypt);
-}
 
     /**
      * Sorts available languages by their true names
@@ -241,15 +151,6 @@ input.textfield {font-family: <?php echo $right_font_family; ?>; font-size: <?ph
         echo "\n\n";
 
         // Displays the warning message and the login form
-
-        if ($GLOBALS['cfg']['blowfish_secret']=='') {
-        ?>
-<p class="warning"><?php echo $GLOBALS['strSecretRequired']; ?></p>
-</body>
-</html>
-        <?php
-        exit();
-        }
         ?>
 <p class="warning"><?php echo $GLOBALS['strCookiesRequired']; ?></p>
 <br />
@@ -396,7 +297,7 @@ if (uname.value == '') {
 
         // The user wants to be logged out -> delete password cookie
         if (!empty($old_usr)) {
-            setcookie('pma_cookie_password', base64_encode(''), 0, $GLOBALS['cookie_path'], '' , $GLOBALS['is_https']);
+            setcookie('pma_cookie_password', '', 0, $GLOBALS['cookie_path'], '' , $GLOBALS['is_https']);
         }
 
         // The user just logged in
@@ -434,9 +335,6 @@ if (uname.value == '') {
             else {
                 $from_cookie   = FALSE;
             }
-            $PHP_AUTH_PW = base64_decode($PHP_AUTH_PW);
-            $PHP_AUTH_PW = PMA_blowfish_decrypt($PHP_AUTH_PW,$GLOBALS['cfg']['blowfish_secret']);
-
             if ($PHP_AUTH_PW == "\xff(blank)") {
                 $PHP_AUTH_PW   = '';
             }
@@ -502,15 +400,13 @@ if (uname.value == '') {
                 time() + (60 * 60 * 24 * 30),
                 $GLOBALS['cookie_path'], '',
                 $GLOBALS['is_https']);
-
             // Duration = till the browser is closed for password
-            // Some binary contents are now retrieved properly when stored
-            // as a cookie, so we base64_encode()
             setcookie('pma_cookie_password',
-                base64_encode(PMA_blowfish_encrypt(((!empty($cfg['Server']['password'])) ? $cfg['Server']['password'] : "\xff(blank)"), $GLOBALS['cfg']['blowfish_secret'])),
+                ((!empty($cfg['Server']['password'])) ? $cfg['Server']['password'] : "\xff(blank)"),
                 0,
                 $GLOBALS['cookie_path'], '',
                 $GLOBALS['is_https']);
+
             // loic1: workaround against a IIS 5.0 bug
             if (empty($GLOBALS['SERVER_SOFTWARE'])) {
                 if (isset($_SERVER) && !empty($_SERVER['SERVER_SOFTWARE'])) {
@@ -545,7 +441,7 @@ if (uname.value == '') {
 	global $conn_error;
 
         // Deletes password cookie and displays the login form
-        setcookie('pma_cookie_password', base64_encode(''), 0, $GLOBALS['cookie_path'], '' , $GLOBALS['is_https']);
+        setcookie('pma_cookie_password', '', 0, $GLOBALS['cookie_path'], '' , $GLOBALS['is_https']);
 
         if (PMA_mysql_error()) {
             $conn_error = PMA_mysql_error();
@@ -558,7 +454,7 @@ if (uname.value == '') {
         PMA_auth();
 
         return TRUE;
-    } // end of the 'PMA_auth_fails()' function
+    } // end of the 'PMA_auth()' function
 
 } // $__PMA_COOKIE_AUTH_LIB__
 ?>

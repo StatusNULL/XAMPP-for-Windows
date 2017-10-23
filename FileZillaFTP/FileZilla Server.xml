@@ -78,7 +78,7 @@ Please visit http://sourceforge.net/projects/filezilla/</Item>
 <Upload/>
 </SpeedLimits>
 </User>
-<User Name="xampp">
+<User Name="newuser">
 <Option Name="Pass">92eb8879a82524686acdd0058e1cd4f5</Option>
 <Option Name="Group"/>
 <Option Name="Resolve Shortcuts">0</Option>

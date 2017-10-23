@@ -1,5 +1,5 @@
 <?php
-/* $Id: read_dump.php,v 1.58 2003/06/06 13:22:52 nijel Exp $ */
+/* $Id: read_dump.php,v 1.57 2003/05/24 14:01:35 garvinhicking Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -83,8 +83,6 @@ if ($sql_file != 'none') {
         if (empty($open_basedir)) {
             $open_basedir = @get_cfg_var('open_basedir');
         }
-
-        if (!isset($sql_file_compression)) $sql_file_compression = '';
 
         // If we are on a server with open_basedir, we must move the file
         // before opening it. The doc explains how to create the "./tmp"

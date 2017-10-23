@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_details_structure.php,v 1.61 2003/06/06 13:16:28 nijel Exp $ */
+/* $Id: db_details_structure.php,v 1.60 2003/05/10 16:14:34 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -620,21 +620,9 @@ if ($cfgRelation['pdfwork'] && $num_tables > 0) {
             <select name="orientation">
                 <option value="L"><?php echo $strLandscape;?></option>
                 <option value="P"><?php echo $strPortrait;?></option>
-            </select><br />
-            <?php echo $strPaperSize; ?>
-            <select name="paper">
-            <?php
-                while (list($key,$val) = each($cfg['PDFPageSizes'])) {
-                    echo '<option value="' . $val . '"';
-                    if ($val == $cfg['PDFDefaultPageSize']) {
-                        echo ' selected="selected"';
-                    }
-                    echo ' >' . $val . '</option>' . "\n";
-                }
-            ?>
-                </select><br />
-                &nbsp;&nbsp;<input type="submit" value="<?php echo $strGo; ?>" />
-            </form>
+            </select>
+            &nbsp;&nbsp;<input type="submit" value="<?php echo $strGo; ?>" />
+        </form>
     </li>
         <?php
     }   // end if

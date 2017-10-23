@@ -1,5 +1,5 @@
 <?php
-/* $Id: mult_submits.inc.php,v 1.28 2003/06/06 10:02:58 nijel Exp $ */
+/* $Id: mult_submits.inc.php,v 1.25 2003/05/12 18:57:24 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -158,23 +158,17 @@ if (!empty($submit_mult) && !empty($what)) {
  */
 else if ($mult_btn == $strYes) {
 
-    if ($query_type == 'drop_db' || $query_type == 'drop_tbl' || $query_type == 'drop_fld') {
-        include('./libraries/relation_cleanup.lib.php');
-    }
-
     $sql_query      = '';
     $selected_cnt   = count($selected);
     for ($i = 0; $i < $selected_cnt; $i++) {
         switch ($query_type) {
             case 'drop_db':
-                PMA_relationsCleanupDatabase($selected[$i]);
                 $a_query   = 'DROP DATABASE '
                            . PMA_backquote(urldecode($selected[$i]));
                 $reload    = 1;
                 break;
 
             case 'drop_tbl':
-                PMA_relationsCleanupTable($db, $selected[$i]);
                 $sql_query .= (empty($sql_query) ? 'DROP TABLE ' : ', ')
                            . PMA_backquote(urldecode($selected[$i]))
                            . (($i == $selected_cnt-1) ? ';' : '');
@@ -202,16 +196,11 @@ else if ($mult_btn == $strYes) {
                 break;
 
             case 'empty_tbl':
-                if (PMA_MYSQL_INT_VERSION >= 40000) {
-                    $a_query .= 'TRUNCATE ';
-                } else {
-                    $a_query .= 'DELETE FROM ';
-                }
-                $a_query .= PMA_backquote(htmlspecialchars(urldecode($selected[$i])));
+                $a_query   = 'DELETE FROM '
+                           . PMA_backquote(urldecode($selected[$i]));
                 break;
 
             case 'drop_fld':
-                PMA_relationsCleanupTable($db, $table, $selected[$i]);
                 $sql_query .= (empty($sql_query) ? 'ALTER TABLE ' . PMA_backquote($table) : ',')
                            . ' DROP ' . PMA_backquote(urldecode($selected[$i]))
                            . (($i == $selected_cnt-1) ? ';' : '');

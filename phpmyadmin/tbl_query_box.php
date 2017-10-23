@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_query_box.php,v 1.45 2003/06/30 16:57:44 nijel Exp $ */
+/* $Id: tbl_query_box.php,v 1.41 2003/05/24 14:01:37 garvinhicking Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -45,19 +45,12 @@ else {
 // loic1: defines wether file upload is available or not
 // ($is_upload now defined in common.lib.php)
 
-if ($cfg['QueryFrame'] && $cfg['QueryFrameJS'] && isset($is_inside_querywindow) && $is_inside_querywindow == TRUE && isset($querydisplay_tab) && ($querydisplay_tab == 'sql' || $querydisplay_tab == 'full')) {
-    $locking   = 'onKeyPress="this.form.elements[\'LockFromUpdate\'].checked = true;"';
-} else {
-    $locking   = '';
-}
-            
 $auto_sel  = ($cfg['TextareaAutoSelect']
                // 2003-02-05 rabus: This causes big trouble with Opera 7 for
                // Windows, so let's disable it there...
                && !(PMA_USR_OS == 'Win' && PMA_USR_BROWSER_AGENT == 'OPERA' && PMA_USR_BROWSER_VER >= 7))
            ? "\n" . '             onfocus="if (typeof(document.layers) == \'undefined\' || typeof(textarea_selected) == \'undefined\') {textarea_selected = 1; this.form.elements[\'sql_query\'].select();}"'
            : '';
-$auto_sel .= ' ' . $locking;
 
 // garvin: If non-JS query window is embedded, display a list of databases to choose from.
 //         Apart from that, a non-js query window sucks badly.
@@ -86,7 +79,7 @@ if ($cfg['QueryFrame'] && (!$cfg['QueryFrameJS'] && !$db || ($cfg['QueryFrameJS'
     $queryframe_db_list = '';
 }
 
-if ($cfg['QueryFrame'] && $cfg['QueryFrameJS'] && isset($is_inside_querywindow) && $is_inside_querywindow) {
+if ($cfg['QueryFrame'] && $cfg['QueryFrameJS']) {
 ?>
         <script type="text/javascript">
         <!--
@@ -99,7 +92,7 @@ if ($cfg['QueryFrame'] && $cfg['QueryFrameJS'] && isset($is_inside_querywindow) 
 <?php
 } else {
 ?>
-        <form method="post" action="read_dump.php"<?php if ($is_upload) echo ' enctype="multipart/form-data"'; ?> onsubmit="return checkSqlQuery(this)" name="sqlform">
+        <form method="post" target="phpmain<?php echo md5($cfg['PmaAbsoluteUri']); ?>" action="read_dump.php"<?php if ($is_upload) echo ' enctype="multipart/form-data"'; ?> onsubmit="return checkSqlQuery(this)" name="sqlform">
 <?php
 }
 ?>
@@ -150,16 +143,6 @@ if (isset($is_inside_querywindow) && $is_inside_querywindow == TRUE) {
             </table>
             <input type="checkbox" name="show_query" value="1" id="checkbox_show_query" checked="checked" />&nbsp;
                 <label for="checkbox_show_query"><?php echo $strShowThisQuery; ?></label><br />
-            <?php
-            if (isset($is_inside_querywindow) && $is_inside_querywindow == TRUE) {
-            ?>
-            <script type="text/javascript">
-                document.writeln('<input type="checkbox" name="LockFromUpdate" value="1" id="checkbox_lock" />&nbsp;');
-                document.writeln('    <label for="checkbox_lock"><?php echo $strQueryWindowLock; ?></label><br />');
-            </script>
-            <?php
-            }
-            ?>
             </div>
 <?php
 } else {
@@ -171,7 +154,7 @@ if (isset($is_inside_querywindow) && $is_inside_querywindow == TRUE) {
 
 // loic1: displays import dump feature only if file upload available
 if ($is_upload && (!isset($is_inside_querywindow) ||
-    (isset($is_inside_querywindow) && $is_inside_querywindow == TRUE && isset($querydisplay_tab) && ($querydisplay_tab == 'files' || $querydisplay_tab == 'full')))) {
+    (isset($is_inside_querywindow) && $is_inside_querywindow == TRUE && isset($querydisplay_tab) && ($querydisplay_tab == 'files' || $querydisplay_tab == 'full'))) && isset($db) && $db != '') {
     echo '            ' . ((isset($is_inside_querywindow) && $is_inside_querywindow == TRUE && isset($querydisplay_tab) && $querydisplay_tab == 'full') || !isset($is_inside_querywindow) ? '<i>' . $strOr . '</i>' : '') . ' ' . $strLocationTextfile . '&nbsp;:<br />' . "\n";
     ?>
             <div style="margin-bottom: 5px">
@@ -208,10 +191,16 @@ if ($is_upload && (!isset($is_inside_querywindow) ||
 } // end if
 echo "\n";
 
+if (isset($is_inside_querywindow) && $is_inside_querywindow == TRUE && isset($querydisplay_tab) && $querydisplay_tab == 'files' && (!isset($db) || $db == '')) {
+?>
+            <b><?php echo $strNoDatabasesSelected; ?></b>
+<?php
+}
+
 // web-server upload directory
 $is_upload_dir = false;
 if ($cfg['UploadDir'] != '' && !isset($is_inside_querywindow) ||
-    ($cfg['UploadDir'] != '' && isset($is_inside_querywindow) && $is_inside_querywindow == TRUE && isset($querydisplay_tab) && ($querydisplay_tab == 'files' || $querydisplay_tab == 'full'))) {
+    ($cfg['UploadDir'] != '' && isset($is_inside_querywindow) && $is_inside_querywindow == TRUE && isset($querydisplay_tab) && ($querydisplay_tab == 'files' || $querydisplay_tab == 'full')) && isset($db) && $db != '') {
 
     if ($handle = @opendir($cfg['UploadDir'])) {
         if (isset($is_inside_querywindow) && $is_inside_querywindow == TRUE) {
@@ -313,10 +302,9 @@ if (!isset($is_inside_querywindow) ||
     }
 }
 
-if (!isset($is_inside_querywindow) || (isset($is_inside_querywindow) && $is_inside_querywindow == TRUE && isset($querydisplay_tab) && (($querydisplay_tab == 'files') || $querydisplay_tab == 'sql' || $querydisplay_tab == 'full' || ($querydisplay_tab == 'history' && $bookmark_go)))) {
+if (!isset($is_inside_querywindow) || (isset($is_inside_querywindow) && $is_inside_querywindow == TRUE && isset($querydisplay_tab) && (($querydisplay_tab == 'files' && isset($db) && $db != '') || $querydisplay_tab == 'sql' || $querydisplay_tab == 'full' || ($querydisplay_tab == 'history' && $bookmark_go)))) {
 ?>
             <input type="submit" name="SQL" value="<?php echo $strGo; ?>" />
-</form>
 <?php
 }
 
@@ -360,3 +348,4 @@ if (!isset($is_inside_querywindow) ||
 }
 echo "\n";
 ?>
+</form>

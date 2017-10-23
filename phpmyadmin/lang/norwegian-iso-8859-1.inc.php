@@ -1,5 +1,5 @@
 <?php
-/* $Id: norwegian-iso-8859-1.inc.php,v 1.115 2003/07/06 11:55:07 lem9 Exp $ */
+/* $Id: norwegian-iso-8859-1.inc.php,v 1.105 2003/05/29 16:44:02 lem9 Exp $ */
 
 /**
  * Translated by Sven-Erik Andersen <sven_erik at andersen.as>
@@ -28,8 +28,6 @@ $strAccessDenied = 'Ingen tilgang';
 $strAction = 'Handling';
 $strAddDeleteColumn = 'Legg til/Slett kolonne';
 $strAddDeleteRow = 'Legg til/Slett kriterierad';
-$strAddDropDatabase = 'Legg til DROP DATABASE';
-$strAddIntoComments = 'Legg til i kommentarer';
 $strAddNewField = 'Legg til felt';
 $strAddPriv = 'Legg til nytt privilegium';
 $strAddPrivMessage = 'Du har lagt til ett nytt privilegium.';
@@ -145,9 +143,7 @@ $strData = 'Data';
 $strDataDict = 'Dataordbok';
 $strDataOnly = 'Bare data';
 $strDatabase = 'Database ';
-$strDatabaseExportOptions = 'Database eksportinnstillinger';
 $strDatabaseHasBeenDropped = 'Databasen %s har blitt slettet';
-$strDatabaseNoTable = 'Denne databasen har ingen tabeller!';
 $strDatabaseWildcard = 'Database (jokertegn er tillatt):';
 $strDatabases = 'databaser';
 $strDatabasesDropped = '%s databasene har blitt slettet.';
@@ -200,8 +196,6 @@ $strEndCut = 'STOPP KUTT';
 $strEndRaw = 'STOPP UFORMATERT';
 $strEnglishPrivileges = 'OBS: MySQL privilegiumnavn er på engelsk';
 $strError = 'Feil';
-$strExcelOptions = 'Excel-innstillinger';
-$strExecuteBookmarked = 'Utfør lagret spørring';
 $strExplain = 'Forklar SQL';
 $strExport = 'Eksporter';
 $strExportToXML = 'Eksporter til XML format';
@@ -293,8 +287,6 @@ $strLines = 'Linjer';
 $strLinesTerminatedBy = 'Linker avsluttet med';
 $strLinkNotFound = 'Link ikke funnet';
 $strLinksTo = 'Linker til';
-$strLoadExplanation = 'Den beste måten er automatiskt valgt, men du kan endre hvis det ikke fungerer.';
-$strLoadMethod = 'LOAD metode';
 $strLocalhost = 'Lokal';
 $strLocationTextfile = 'Plassering av filen';
 $strLogPassword = 'Passord:';
@@ -379,7 +371,6 @@ $strOverwriteExisting = 'Overskriv eksisterende fil(-er)';
 $strPHP40203 = 'Du bruker PHP 4.2.3, som har en alvorlig feil med flerbyte-strenger (mbstring). Se PHP-feilrapport 19404. Denne versjonen av PHP er ikke anbefalt for bruk med phpMyAdmin.';
 $strPHPVersion = 'PHP-Versjon';
 $strPageNumber = 'Sidenummer:';
-$strPaperSize = 'Papirstørelse';
 $strPartialText = 'Delvis tekst';
 $strPassword = 'Passord';
 $strPasswordChanged = 'Passordet til %s er endret.';
@@ -451,7 +442,6 @@ $strQuerySQLHistory = 'SQL-historie';
 $strQueryStatistics = '<b>Spørrings statistikk</b>: Siden oppstart, har %s spørringer blitt sendt til tjeneren.';
 $strQueryTime = 'Spørring tok %01.4f sek';
 $strQueryType = 'Spørringstype';
-$strQueryWindowLock = 'Ikke overskriv denne spørringen fra andre vinduer';
 
 $strReType = 'Gjenta';
 $strReceived = 'Mottatt';
@@ -470,7 +460,6 @@ $strRenameTable = 'Endre tabellens navn';
 $strRenameTableOK = 'Tabellen %s har fått nytt navn %s';
 $strRepairTable = 'Reparer tabell';
 $strReplace = 'Erstatt';
-$strReplaceNULLBy = 'Erstatt NULL med';
 $strReplaceTable = 'Erstatt tabell med filen';
 $strReset = 'Tøm skjema';
 $strResourceLimits = 'Ressursbegrensninger';
@@ -634,7 +623,6 @@ $strValue = 'Verdi';
 $strVar = 'Variabler';
 $strViewDump = 'Vis dump (skjema) av tabell';
 $strViewDumpDB = 'Vis dump (skjema) av database';
-$strViewDumpDatabases = 'Vis dumpet skjema av databaser';
 
 $strWebServerUploadDirectory = 'webtjener opplastingskatalog';
 $strWebServerUploadDirectoryError = 'Katalogen du anga for opplasting kan ikke nåes';
@@ -653,10 +641,6 @@ $strZeroRemovesTheLimit = 'Merk: Ved å sette disse til 0 (null) fjerner begrensn
 $strZip = 'Komprimert (zip)';
 // To translate
 
-
-$strToggleScratchboard = 'toggle scratchboard';  //to translate
-
-$strTableOptions = 'Table options';  //to translate
-$strSecretRequired = 'The configuration file now needs a secret passphrase (blowfish_secret).';  //to translate
-$strAccessDeniedExplanation = 'phpMyAdmin tried to connect to the MySQL server, and the server rejected the connection. You should check the host, username and password in config.inc.php and make sure that they correspond to the information given by the administrator of the MySQL server.';  //to translate
+$strLoadMethod = 'LOAD method';  //to translate
+$strLoadExplanation = 'The best method is checked by default, but you can change if it fails.';  //to translate
 ?>

@@ -1,5 +1,5 @@
 <?php
-/* $Id: catalan-utf-8.inc.php,v 1.110 2003/07/06 11:55:04 lem9 Exp $ */
+/* $Id: catalan-utf-8.inc.php,v 1.100 2003/06/01 17:50:59 rabus Exp $ */
 
 $charset = 'utf-8';
 $allow_recoding = TRUE;
@@ -641,18 +641,4 @@ $strZeroRemovesTheLimit = 'Nota: Establint aquestes opcions a 0 (zero) treu el l
 $strZip = '"comprimit amb zip"';
 // To translate
 
-$strExecuteBookmarked = 'Execute bookmarked query';  //to translate
-$strExcelOptions = 'Excel options';  //to translate
-$strReplaceNULLBy = 'Replace NULL by';  //to translate
-$strQueryWindowLock = 'Do not overwrite this query from outside the window';  //to translate
-$strPaperSize = 'Paper size';  //to translate
-$strDatabaseNoTable = 'This database contains no table!';//to translate
-$strViewDumpDatabases = 'View dump (schema) of databases';//to translate
-$strAddIntoComments = 'Add into comments';//to translate
-$strDatabaseExportOptions = 'Database export options';//to translate
-$strAddDropDatabase = 'Add DROP DATABASE';//to translate
-$strToggleScratchboard = 'toggle scratchboard';  //to translate
-$strTableOptions = 'Table options';  //to translate
-$strSecretRequired = 'The configuration file now needs a secret passphrase (blowfish_secret).';  //to translate
-$strAccessDeniedExplanation = 'phpMyAdmin tried to connect to the MySQL server, and the server rejected the connection. You should check the host, username and password in config.inc.php and make sure that they correspond to the information given by the administrator of the MySQL server.';  //to translate
 ?>

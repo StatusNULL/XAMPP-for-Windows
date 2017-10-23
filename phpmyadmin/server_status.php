@@ -1,5 +1,5 @@
 <?php
-/* $Id: server_status.php,v 1.8 2003/06/02 08:49:35 rabus Exp $ */
+/* $Id: server_status.php,v 1.7 2003/03/18 13:33:23 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -146,27 +146,8 @@ unset($tmp_array);
     <br />
     <li>
         <!-- Queries -->
-        <?php echo sprintf($strQueryStatistics, number_format($serverStatus['Questions'], 0, $number_decimal_separator, $number_thousands_separator)) . "\n"; ?>
+        <?php echo sprintf($strQueryStatistics, number_format($serverStatus['Questions'], 0, $number_decimal_separator, $number_thousands_separator)); ?><br />
         <table border="0">
-            <tr>
-                <td colspan="2">
-                    <br />
-                    <table border="0" align="right">
-                        <tr>
-                            <th>&nbsp;<?php echo $strTotalUC; ?>&nbsp;</th>
-                            <th>&nbsp;&oslash;&nbsp;<?php echo $strPerHour; ?>&nbsp;</th>
-                            <th>&nbsp;&oslash;&nbsp;<?php echo $strPerMinute; ?>&nbsp;</th>
-                            <th>&nbsp;&oslash;&nbsp;<?php echo $strPerSecond; ?>&nbsp;</th>
-                        </tr>
-                        <tr>
-                            <td bgcolor="<?php echo $cfg['BgcolorOne']; ?>" align="right">&nbsp;<?php echo number_format($serverStatus['Questions'], 0, $number_decimal_separator, $number_thousands_separator); ?>&nbsp;</td>
-                            <td bgcolor="<?php echo $cfg['BgcolorOne']; ?>" align="right">&nbsp;<?php echo number_format(($serverStatus['Questions'] * 3600 / $serverStatus['Uptime']), 2, $number_decimal_separator, $number_thousands_separator); ?>&nbsp;</td>
-                            <td bgcolor="<?php echo $cfg['BgcolorOne']; ?>" align="right">&nbsp;<?php echo number_format(($serverStatus['Questions'] * 60 / $serverStatus['Uptime']), 2, $number_decimal_separator, $number_thousands_separator); ?>&nbsp;</td>
-                            <td bgcolor="<?php echo $cfg['BgcolorOne']; ?>" align="right">&nbsp;<?php echo number_format(($serverStatus['Questions'] / $serverStatus['Uptime']), 2, $number_decimal_separator, $number_thousands_separator); ?>&nbsp;</td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
             <tr>
                 <td valign="top">
                     <table border="0">
@@ -210,6 +191,26 @@ unset($useBgcolorOne);
                     </table>
                 </td>
             </tr>
+            <tr>
+                <td colspan="2">
+                    <br />
+                    <table border="0" align="right">
+                        <tr>
+                            <th>&nbsp;<?php echo $strTotalUC; ?>&nbsp;</th>
+                            <th>&nbsp;&oslash;&nbsp;<?php echo $strPerHour; ?>&nbsp;</th>
+                            <th>&nbsp;&oslash;&nbsp;<?php echo $strPerMinute; ?>&nbsp;</th>
+                            <th>&nbsp;&oslash;&nbsp;<?php echo $strPerSecond; ?>&nbsp;</th>
+                        </tr>
+
+                        <tr>
+                            <td bgcolor="<?php echo $cfg['BgcolorOne']; ?>" align="right">&nbsp;<?php echo number_format($serverStatus['Questions'], 0, $number_decimal_separator, $number_thousands_separator); ?>&nbsp;</td>
+                            <td bgcolor="<?php echo $cfg['BgcolorOne']; ?>" align="right">&nbsp;<?php echo number_format(($serverStatus['Questions'] * 3600 / $serverStatus['Uptime']), 2, $number_decimal_separator, $number_thousands_separator); ?>&nbsp;</td>
+                            <td bgcolor="<?php echo $cfg['BgcolorOne']; ?>" align="right">&nbsp;<?php echo number_format(($serverStatus['Questions'] * 60 / $serverStatus['Uptime']), 2, $number_decimal_separator, $number_thousands_separator); ?>&nbsp;</td>
+                            <td bgcolor="<?php echo $cfg['BgcolorOne']; ?>" align="right">&nbsp;<?php echo number_format(($serverStatus['Questions'] / $serverStatus['Uptime']), 2, $number_decimal_separator, $number_thousands_separator); ?>&nbsp;</td>
+                        </tr>
+
+                    </table>
+                </td>
         </table>
     </li>
 <?php

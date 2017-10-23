@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_properties_export.php,v 1.33 2003/06/26 01:04:01 lem9 Exp $ */
+/* $Id: tbl_properties_export.php,v 1.31 2003/03/12 15:21:43 garvinhicking Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -27,13 +27,7 @@ if (isset($sql_query)) {
 
     $parsed_sql = PMA_SQP_parse($sql_query);
     $analyzed_sql = PMA_SQP_analyze($parsed_sql);
-    $sql_query = 'SELECT '; 
-
-    if (isset($analyzed_sql[0]['queryflags']['distinct'])) {
-        $sql_query .= ' DISTINCT ';
-    }
-
-    $sql_query .= $analyzed_sql[0]['select_expr_clause'];
+    $sql_query = 'SELECT ' . $analyzed_sql[0]['select_expr_clause'];
 
     if (!empty($analyzed_sql[0]['from_clause'])) {
         $sql_query .= ' FROM ' . $analyzed_sql[0]['from_clause'];
@@ -55,7 +49,7 @@ if (isset($sql_query)) {
     PMA_showMessage($GLOBALS['strSQLQuery']);
 }
 
-$export_type = 'table';
+$tbl_dump_form_name = 'tbl_dump';
 require('./libraries/display_export.lib.php');
 
 

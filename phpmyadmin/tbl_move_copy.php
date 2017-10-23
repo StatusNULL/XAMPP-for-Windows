@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_move_copy.php,v 1.30 2003/06/10 12:35:21 nijel Exp $ */
+/* $Id: tbl_move_copy.php,v 1.29 2003/05/13 09:33:39 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -140,7 +140,7 @@ if (isset($new_name) && trim($new_name) != '') {
         if (empty($target_db)) $target_db = $db;
         $target = PMA_backquote($target_db) . '.' . PMA_backquote($new_name);
 
-        include('./libraries/export/sql.php');
+        include('./libraries/build_dump.lib.php');
 
         $sql_structure = PMA_getTableDef($db, $table, "\n", $err_url);
         $parsed_sql =  PMA_SQP_parse($sql_structure);

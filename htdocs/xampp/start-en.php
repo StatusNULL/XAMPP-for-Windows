@@ -13,7 +13,7 @@
 <h1>Congratulations:<br>
 It is working!</h1>
 
-<p>It is running <A HREF="http://www.apachefriends.org/" target="_top">ApacheFriends XAMPP Version 0.9</A> with ...<br><br>
+<p>It is running <A HREF="http://www.apachefriends.org/" target="_top">ApacheFriends XAMPP Version 1.0</A> with ...<br><br>
 <?
 $httpd = getenv("SERVER_SOFTWARE");
 echo "<i>$httpd</i><br>";

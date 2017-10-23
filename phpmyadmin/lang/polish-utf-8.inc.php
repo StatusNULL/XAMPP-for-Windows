@@ -1,5 +1,5 @@
 <?php
-/* $Id: polish-utf-8.inc.php,v 1.116 2003/07/06 12:14:39 lem9 Exp $ */
+/* $Id: polish-utf-8.inc.php,v 1.104 2003/05/30 16:42:48 lem9 Exp $ */
 
 $charset = 'utf-8';
 $allow_recoding = TRUE;
@@ -25,8 +25,6 @@ $strAccessDenied = 'Brak dostępu';
 $strAction = 'Działanie';
 $strAddDeleteColumn = 'Dodanie/usunięcie pól';
 $strAddDeleteRow = 'Dodanie/usunięcie wierszy kryteriów';
-$strAddDropDatabase = 'Dodanie DROP DATABASE';
-$strAddIntoComments = 'Dodanie do komentarzy';
 $strAddNewField = 'Dodanie nowego pola';
 $strAddPriv = 'Dodanie nowych uprawnien';
 $strAddPrivMessage = 'Nowe uprawnienia zostały dodane.';
@@ -64,7 +62,7 @@ $strAutomaticLayout = 'Układ automatyczny';
 
 $strBack = 'Powrót';
 $strBeginCut = 'TNIJ STĄD';
-$strBeginRaw = 'SUROWE DANE STĄD';
+$strBeginRaw = 'TNIJ STĄD';
 $strBinary = ' Binarne ';
 $strBinaryDoNotEdit = ' Binarne - nie do edycji ';
 $strBookmarkDeleted = 'Zapamiętane zapytanie SQL zostało usunięte.';
@@ -142,9 +140,7 @@ $strData = 'Dane';
 $strDataDict = 'Słownik danych';
 $strDataOnly = 'Tylko dane';
 $strDatabase = 'Baza danych ';
-$strDatabaseExportOptions = 'Opcje eksportu bazy danych';
 $strDatabaseHasBeenDropped = 'Baza danych %s została usunięta.';
-$strDatabaseNoTable = 'Ta baza danych nie zawiera żadnej tabeli!';
 $strDatabaseWildcard = 'Baza danych (dozwolone maski):';
 $strDatabases = 'bazy danych';
 $strDatabasesDropped = '%s baz danych zostało pomyślnie usuniętych.';
@@ -194,11 +190,9 @@ $strEmptyResultSet = 'MySQL zwrócił pusty wynik (np. zero rekordów).';
 $strEnabled = 'włączone';
 $strEnd = 'Koniec';
 $strEndCut = 'TNIJ DOTĄD';
-$strEndRaw = 'SUROWE DANE DOTĄD';
+$strEndRaw = 'TNIJ DODĄD';
 $strEnglishPrivileges = ' Uwaga: Uprawnienia MySQL są oznaczone w jęz. angielskim ';
 $strError = 'Błąd';
-$strExcelOptions = 'Opcje Excela';
-$strExecuteBookmarked = 'Wykonanie zapamiętanego zapytania';
 $strExplain = 'Wyjaśnienie SQL';
 $strExport = 'Eksport';
 $strExportToXML = 'Eksport do formatu XML';
@@ -376,7 +370,6 @@ $strOverwriteExisting = 'Nadpisywanie istniejących plików';
 $strPHP40203 = 'Używasz PHP w wersji 4.2.3, która ma poważny błąd w obsłudze napisów wielobajtowych (mbstring). Zobacz raport na temat błędów PHP nr 19404. Nie zaleca się używania tej wersji PHP z phpMyAdminem.';
 $strPHPVersion = 'Wersja PHP';
 $strPageNumber = 'Numer strony:';
-$strPaperSize = 'Rozmiar papieru';
 $strPartialText = 'Skrócony tekst';
 $strPassword = 'Hasło';
 $strPasswordChanged = 'Hasło dla %s zostało pomyślnie zmienione.';
@@ -416,9 +409,9 @@ $strPrivDescGrant = 'Pozwala dodawać użytkowników i nadawać uprawnienia bez 
 $strPrivDescIndex = 'Pozwala tworzyć i usuwać indeksy.';
 $strPrivDescInsert = 'Pozwala wstawiać i zamieniać dane.';
 $strPrivDescLockTables = 'Pozwala blokować tabele dla aktualnego wątku.';
-$strPrivDescMaxConnections = 'Ogranicza liczbę nowych połączeń, które może otworzyć użytkownik w ciągu godziny.';
-$strPrivDescMaxQuestions = 'Ogranicza liczbę zapytań, które może wysłać użytkownik w ciągu godziny.';
-$strPrivDescMaxUpdates = 'Ogranicza liczbę poleceń zmieniających jakąkolwiek tabelę lub bazę danych, które może wykonać użytkownik w ciągu godziny.';
+$strPrivDescMaxConnections = 'Limits the number of new connections the user may open per hour.';
+$strPrivDescMaxQuestions = 'Limits the number of queries the user may send to the server per hour.';
+$strPrivDescMaxUpdates = 'Limits the number of commands that change any table or database the user may execute per hour.';
 $strPrivDescProcess3 = 'Pozwala unicestwiać procesy innych użytkowników.';
 $strPrivDescProcess4 = 'Pozwala zobaczyć pełną listę zapytań na liście procesów.';
 $strPrivDescReferences = 'Nie ma żadnych skutków w tej wersji MySQL.';
@@ -448,7 +441,6 @@ $strQuerySQLHistory = 'Historia SQL';
 $strQueryStatistics = '<b>Statystyki zapytań</b>: Od rozpoczęcia jego pracy, do serwera zostało wysłanych %s zapytań.';
 $strQueryTime = 'Wykonanie zapytania trwało %01.4f sekund(y)';
 $strQueryType = 'Rodzaj zapytania';
-$strQueryWindowLock = 'Nie nadpisuj tego zapytania spoza okna';
 
 $strReType = 'Ponownie';
 $strReceived = 'Otrzymane';
@@ -467,7 +459,6 @@ $strRenameTable = 'Zmiana nazwy tabeli na';
 $strRenameTableOK = 'Tabela %s ma zmienioną nazwę na %s';
 $strRepairTable = 'Naprawienie tabeli';
 $strReplace = 'Zamiana';
-$strReplaceNULLBy = 'Zamienienie NULL przez';
 $strReplaceTable = 'Zamiana danych tabeli z plikiem';
 $strReset = 'Reset';
 $strResourceLimits = 'Ograniczenia zasobów';
@@ -493,8 +484,8 @@ $strRunning = 'uruchomiony na %s';
 
 $strSQL = 'SQL';
 $strSQLOptions = 'Opcje SQL';
-$strSQLParserBugMessage = 'Istnieje szanse, że właśnie znalazłeś błąd w analizatorze składni SQL. Zbadaj bliżej swoje zapytanie i sprawdź, czy cudzysłowy są poprawne i dobrze sparowane. Inną możliwą przyczyną niepowodzenia może być to, że wysyłasz plik ze znakami binarnymi poza obszarem tekstu ujętego w cudzysłowy. Możesz również sprawdzić swoje zapytanie SQL poprzez linię poleceń MySQL. W znalezieniu przyczyny problemu może pomóc także - jeśli się pojawi - poniższy opis błędu serwera MySQL. Jeśli nadam masz problemy lub analizator składni zgłasza usterkę a linia poleceń - nie, ogranicz sekwencję zapytań SQL do pojedynczego, które powoduje problemy i zgłość błąd, dołączając fragment danych zawarty w poniższej sekcji TNIJ:';
-$strSQLParserUserError = 'Wygląda na to, że w twoim zapytaniu SQL jest błąd. W znalezieniu przyczyny problemu może pomóc także - jeśli się pojawi - poniższy opis błędu serwera MySQL.';
+$strSQLParserBugMessage = 'Istnieje szanse, że właśnie znalazłeś błąd w analizatorze składni SQL. Zbadaj bliżej swoje zapytanie i sprawdź, czy cudzysłowy są poprawne i dobrze sparowane. Inną możliwą przyczyną niepowodzenia może być to, że wysyłasz plik ze znakami binarnymi poza obszarem tekstu ujętego w cudzysłowy. Możesz również sprawdzić swoje zapytanie SQL poprzez linię poleceń MySQL. W znalezieniu przyczyny problemu może pomóć także - jeśli się pojawi - poniższy opis błędu serwera MySQL. Jeśli nadam masz problemy lub analizator składni zgłasza usterkę a linia poleceń - nie, ogranicz sekwencję zapytań SQL do pojedynczego, które powoduje problemy i zgłość błąd, dołączając fragment danych zawarty w poniższej sekcji CUT:';
+$strSQLParserUserError = 'Wygląda na to, że w twoim zapytaniu SQL jest błąd. W znalezieniu przyczyny problemu może pomóć także - jeśli się pojawi - poniższy opis błędu serwera MySQL.';
 $strSQLQuery = 'zapytanie SQL';
 $strSQLResult = 'Rezultat SQL';
 $strSQPBugInvalidIdentifer = 'Nieprawidłowy identyfikator';
@@ -513,7 +504,6 @@ $strSearchOption3 = 'cała fraza';
 $strSearchOption4 = 'jako wyrażenie regularne';
 $strSearchResultsFor = 'Szukaj w rezultatach dla "<i>%s</i>" %s:';
 $strSearchType = 'Znajdź:';
-$strSecretRequired = 'Plik konfiguracyjny wymaga teraz tajnej frazy kodującej (blowfish_secret).';
 $strSelect = 'Wybór';
 $strSelectADb = 'Proszę wybrać bazę danych';
 $strSelectAll = 'Zaznaczenie wszystkich';
@@ -575,7 +565,6 @@ $strTableHasBeenEmptied = 'Tabela %s została opróżniona';
 $strTableHasBeenFlushed = 'Tabela %s została przeładowana';
 $strTableMaintenance = 'Zarządzanie tabelą';
 $strTableOfContents = 'Spis treści';
-$strTableOptions = 'Opcje tabeli';
 $strTableStructure = 'Struktura tabeli dla ';
 $strTableType = 'Typ tabeli';
 $strTables = '%s tabel(a)';
@@ -588,7 +577,6 @@ $strThisHost = 'Ten host';
 $strThisNotDirectory = 'To nie był katalog';
 $strThreadSuccessfullyKilled = 'Wątek %s został pomyślnie unicestwiony.';
 $strTime = 'Czas';
-$strToggleScratchboard = 'włącz / wyłącz scratchboard';
 $strTotal = 'wszystkich';
 $strTotalUC = 'Sumarycznie';
 $strTraffic = 'Ruch';
@@ -626,7 +614,7 @@ $strUserNotFound = 'Wybrany użytkownik nie został znaleziony w tabeli uprawnie
 $strUserOverview = 'Opis użytkownika';
 $strUsers = 'Użytkownicy';
 $strUsersDeleted = 'Wybrani użytkownicy zostali pomyślnie usunięci.';
-$strUsersHavingAccessToDb = 'Użytkownicy mający dostęp do &quot;%s&quot;';
+$strUsersHavingAccessToDb = 'Użytkownicy mający dostęp do &quot;%s&quot;'; 
 
 $strValidateSQL = 'Sprawdzanie proprawności SQL';
 $strValidatorError = 'Analizator składni SQL nie mógł zostać zainicjalizowany. Sprawdź, czy zainstalowane są niezbędne rozszerzenia php, tak jak zostało to opisane w %sdokumentacji%s.';
@@ -634,7 +622,6 @@ $strValue = 'Wartość';
 $strVar = 'Zmienna';
 $strViewDump = 'Zrzut tabeli';
 $strViewDumpDB = 'Zrzut bazy danych';
-$strViewDumpDatabases = 'Zobacz zrzut (schemat) baz danych';
 
 $strWebServerUploadDirectory = 'katalog serwera www dla uploadu';
 $strWebServerUploadDirectoryError = 'Katalog ustalony dla uploadu jest nieosiągalny';
@@ -652,7 +639,5 @@ $strYes = 'Tak';
 $strZeroRemovesTheLimit = 'Uwaga: Ustawienie tych opcji na 0 (zero) usuwa ograniczenie.';
 $strZip = '".zip"';
 // To translate
-
-$strAccessDeniedExplanation = 'phpMyAdmin tried to connect to the MySQL server, and the server rejected the connection. You should check the host, username and password in config.inc.php and make sure that they correspond to the information given by the administrator of the MySQL server.';  //to translate
 
 ?>

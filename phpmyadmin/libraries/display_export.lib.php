@@ -1,56 +1,48 @@
 <?php
-/* $Id: display_export.lib.php,v 1.17 2003/06/25 18:15:24 nijel Exp $ */
+/* $Id: display_export.lib.php,v 1.12 2003/05/14 13:22:04 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
-// Get relations & co. status 
-require('./libraries/relation.lib.php');
-$cfgRelation = PMA_getRelationsParam();
-
-function PMA_exportCheckboxCheck($str) {
-    if (isset($GLOBALS['cfg']['Export'][$str]) && $GLOBALS['cfg']['Export'][$str]) {
-        echo ' checked="checked"';
-    }
-}
-
-function PMA_exportIsActive($what, $val) {
-    if (isset($GLOBALS['cfg']['Export'][$what]) &&  $GLOBALS['cfg']['Export'][$what] == $val) {
-        echo ' checked="checked"';
-    }
-}
-
+/*
+ * Whether we export single table or more
+ */
+$export_single = (!isset($multi_tables) || $multi_tables == '') && (isset($table));
 ?>
-<form method="post" action="export.php" name="dump">
-<?php 
-$hide_structure = false;
-$hide_sql       = false;
-if ($export_type == 'server') {
-    echo PMA_generate_common_hidden_inputs('', '', 1);
-} elseif ($export_type == 'database') {
-    echo PMA_generate_common_hidden_inputs($db, '', 1);
+
+<form method="post" action="tbl_dump.php" name="<?php echo $tbl_dump_form_name; ?>">
+    <?php 
+if ($export_single) {
+    echo '    ' . PMA_generate_common_hidden_inputs($db, $table);
 } else {
-    echo PMA_generate_common_hidden_inputs($db, $table, 1);
-    if (!isset($single_table)) {
-        $hide_structure = true;
-        $hide_sql       = true;
-    }
+    echo '    ' . PMA_generate_common_hidden_inputs($db);
 }
-echo '    <input type="hidden" name="export_type" value="' . $export_type . '" />';
 
 if (isset($sql_query)) {
-    echo '    <input type="hidden" name="sql_query" value="' . htmlspecialchars($sql_query) . '" />';
+    echo '    <input type="hidden" name="sql_query" value="' . urlencode($sql_query) . '" />';
 }
     ?>
 
     <script type="text/javascript">
     <!--
+    /* DHTML functions */
+    d=document;l=(d.layers)?1:0;op=navigator.userAgent.toLowerCase().indexOf('opera')!=-1;
+    /* Get Element    */    function gE(e,f){if(l){f=(f)?f:self;V=f.document.layers;if(V[e])return V[e];for(W=0;i<W.length;W++)return(gE(e,V[W]));}if(d.all)return d.all[e];return d.getElementById(e);}
+    /* Show Element   */    function sE(e){if(l)e.visibility='show';else e.style.visibility='visible';}
+    /* Hide Element   */    function hE(e){if(l)e.visibility='hide';else e.style.visibility='hidden';}
+    /* Set Position X */    function sX(e,x){if(l)e.left=x;else if(op)e.style.pixelLeft=x;else e.style.left=x+'px';}
+    /* Get Position X */    function gX(e){if(l)return e.left;else if(op)return e.style.pixelLeft;else return parseInt(e.style.left);}
+    /* Set Position Y */    function sY(e,y){if(l)e.top=y;else if(op)e.style.pixelTop=y;else e.style.top=y+'px';}
+    /* Get Position Y */    function gY(e){if(l)return e.top;else if(op)return e.style.pixelTop;else return parseInt(e.style.top);}
+    /* Set Width      */    function sW(e,w){if(l)e.clip.width=w;else if(op)e.style.pixelWidth=w;else e.style.width=w;}
+    /* Get Width      */    function gW(e){if(l)return e.clip.width;else if(op)return e.style.pixelWidth;else return parseInt(e.style.width);}
+    /* Set Height     */    function sH(e,h){if(l)e.clip.height=h;else if(op)e.style.pixelHeight=h;else e.style.height=h;}
+    /* Get Height     */    function gH(e){if(l)return e.clip.height;else if(op)return e.style.pixelHeight;else return parseInt(e.style.height);}
+    /* Write h to e   */    function wH(e,h){if(l){Y=e.document;Y.write(h);Y.close();}if(e.innerHTML)e.innerHTML=h;}
+    
     function hide_them_all() {
-        getElement("csv_options").style.display = 'none';
-        getElement("excel_options").style.display = 'none';
-        getElement("latex_options").style.display = 'none';
-<?php if (!$hide_sql) { ?>
-        getElement("sql_options").style.display = 'none';
-<?php } ?>
-        getElement("none_options").style.display = 'none';
+        gE("csv_options").style.display = 'none';
+        gE("latex_options").style.display = 'none';
+        gE("sql_options").style.display = 'none';
+        gE("none_options").style.display = 'none';
     }
     //-->
     </script>
@@ -60,190 +52,152 @@ if (isset($sql_query)) {
 
         <!-- Formats to export to -->
         <td nowrap="nowrap" valign="top">
-            <fieldset <?php echo ((!isset($multi_values) || isset($multi_values) && $multi_values == '') ? 'style="height: 220px;"' : ''); ?>>
+            <fieldset <?php echo ((!isset($multi_tables) || isset($multi_tables) && $multi_tables == '') ? 'style="height: 220px;"' : ''); ?>>
             <legend><?php echo $strExport; ?></legend>
             <br>
             <?php
-            if (isset($multi_values) && $multi_values != '') {
-                echo $multi_values;
+            if (isset($multi_tables) && $multi_tables != '') {
+                echo $multi_tables;
             }
             ?>
             
-<?php if (!$hide_sql) { ?>
             <!-- SQL -->
-            <input type="radio" name="what" value="sql" id="radio_dump_sql" onclick="if(this.checked) { hide_them_all(); getElement('sql_options').style.display = 'block'; }; return true" <?php PMA_exportIsActive('format', 'sql'); ?> />
+            <input type="radio" name="what" value="sql" id="radio_dump_sql" checked="checked" onclick="if(this.checked) { hide_them_all(); gE('sql_options').style.display = 'block'; }; return true" />
             <label for="radio_dump_sql"><?php echo $strSQL; ?></label>
             <br /><br />
-<?php } ?>
 
             <!-- LaTeX table -->
-            <input type="radio" name="what" value="latex" id="radio_dump_latex"  onclick="if(this.checked) { hide_them_all(); getElement('latex_options').style.display = 'block'; }; return true" <?php PMA_exportIsActive('format', 'latex'); ?> />
+            <input type="radio" name="what" value="latex" id="radio_dump_latex"  onclick="if(this.checked) { hide_them_all(); gE('latex_options').style.display = 'block'; }; return true" />
             <label for="radio_dump_latex"><?php echo $strLaTeX; ?></label>
             <br /><br />
 
             <!-- Excel CSV -->
-            <input type="radio" name="what" value="excel" id="radio_dump_excel"  onclick="if(this.checked) { hide_them_all(); getElement('excel_options').style.display = 'block'; }; return true" <?php PMA_exportIsActive('format', 'excel'); ?> />
+            <input type="radio" name="what" value="excel" id="radio_dump_excel"  onclick="if(this.checked) { hide_them_all(); gE('none_options').style.display = 'block'; }; return true" />
             <label for="radio_dump_excel"><?php echo $strStrucExcelCSV; ?></label>
             <br /><br />
             <!-- General CSV -->
-            <input type="radio" name="what" value="csv" id="radio_dump_csv"  onclick="if(this.checked) { hide_them_all(); getElement('csv_options').style.display = 'block'; }; return true" <?php PMA_exportIsActive('format', 'csv'); ?> />
+            <input type="radio" name="what" value="csv" id="radio_dump_csv"  onclick="if(this.checked) { hide_them_all(); gE('csv_options').style.display = 'block'; }; return true" />
             <label for="radio_dump_csv"><?php echo $strStrucCSV;?></label>
             <br /><br />
 
             <!-- XML -->
-            <input type="radio" name="what" value="xml" id="radio_dump_xml" onclick="if(this.checked) { hide_them_all(); getElement('none_options').style.display = 'block'; }; return true" <?php PMA_exportIsActive('format', 'xml'); ?> />
+            <input type="radio" name="what" value="xml" id="radio_dump_xml" onclick="if(this.checked) { hide_them_all(); gE('none_options').style.display = 'block'; }; return true" />
             <label for="radio_dump_xml"><?php echo $strXML; ?></label>&nbsp;&nbsp;
             </fieldset>
         </td>
         <!-- Options -->
         <td valign="top" id="options_td" width="400">
         
-<?php if (!$hide_sql) { ?>
             <!-- SQL options -->
             <fieldset id="sql_options">
                 <legend><?php echo $strSQLOptions; ?> (<a href="./Documentation.html#faqexport" target="documentation"><?php echo $strDocu; ?></a>)</legend>
-<?php
-if ($export_type == 'server') {
-?>
-                <!-- For databases -->
-                <fieldset>
-                    <legend>
-                        <?php echo $strDatabaseExportOptions; ?>
-                    </legend>
-                    <input type="checkbox" name="drop_database" value="yes" id="checkbox_drop_database" <?php PMA_exportCheckboxCheck('sql_drop_database'); ?> />
-                    <label for="checkbox_drop_database"><?php echo $strAddDropDatabase; ?></label><br />
-                </fieldset>
-<?php
-}
-?>
-<?php if (!$hide_structure) { ?>
+
                 <!-- For structure -->
                 <fieldset>
                     <legend>
-                        <input type="checkbox" name="sql_structure" value="structure" id="checkbox_sql_structure" <?php PMA_exportCheckboxCheck('sql_structure'); ?> onclick="if(!this.checked && !getElement('checkbox_sql_data').checked) return false; else return true;" />
+                        <input type="checkbox" name="sql_structure" value="structure" id="checkbox_sql_structure" checked="checked" onclick="if(!this.checked && !gE('checkbox_sql_data').checked) return false; else return true;" />
                         <label for="checkbox_sql_structure"><?php echo $strStructure; ?></label><br />
                     </legend>
-                    <input type="checkbox" name="drop" value="1" id="checkbox_dump_drop" <?php PMA_exportCheckboxCheck('sql_drop_table'); ?> />
+                    <input type="checkbox" name="drop" value="1" id="checkbox_dump_drop" />
                     <label for="checkbox_dump_drop"><?php echo $strStrucDrop; ?></label><br />
 <?php
 // Add backquotes checkbox
 if (PMA_MYSQL_INT_VERSION >= 32306) {
     ?>
-                    <input type="checkbox" name="use_backquotes" value="1" id="checkbox_dump_use_backquotes" <?php PMA_exportCheckboxCheck('sql_backquotes'); ?> />
+                    <input type="checkbox" name="use_backquotes" value="1" id="checkbox_dump_use_backquotes" checked="checked" />
                     <label for="checkbox_dump_use_backquotes"><?php echo $strUseBackquotes; ?></label><br />
     <?php
 } // end backquotes feature
-?>
-                    <fieldset>
-                        <legend><?php echo $strAddIntoComments; ?></legend>
-<?php                 
-if (!empty($cfgRelation['relation'])) {
-?>
-                        <input type="checkbox" name="sql_relation" value="yes" id="checkbox_sql_use_relation" <?php PMA_exportCheckboxCheck('sql_relation'); ?> />
-                        <label for="checkbox_sql_use_relation"><?php echo $strRelations; ?></label><br />
-<?php
- } // end relation
- 
+echo "\n";
+
+// garvin: whether to show column comments
+require('./libraries/relation.lib.php');
+$cfgRelation = PMA_getRelationsParam();
+
 if ($cfgRelation['commwork']) {
-     ?>
-                        <input type="checkbox" name="sql_comments" value="yes" id="checkbox_sql_use_comments" <?php PMA_exportCheckboxCheck('sql_comments'); ?> />
-                        <label for="checkbox_sql_use_comments"><?php echo $strComments; ?></label><br />
-<?php
-} // end comments
- 
-if ($cfgRelation['mimework']) {
-     ?>
-                        <input type="checkbox" name="sql_mime" value="yes" id="checkbox_sql_use_mime" <?php PMA_exportCheckboxCheck('sql_mime'); ?> />
-                        <label for="checkbox_sql_use_mime"><?php echo $strMIME_MIMEtype; ?></label><br />
-<?php
-} // end MIME
+    ?>
+                    <input type="checkbox" name="use_comments" value="1" id="checkbox_dump_use_comments" />
+                    <label for="checkbox_dump_use_comments"><?php echo $strDumpComments; ?></label><br />
+    <?php
+} // end dump comments
+echo "\n";
 ?>
-                     </fieldset>
                 </fieldset>
-<?php } ?>
 
                 <!-- For data -->
                 <fieldset>
                     <legend>
-                        <input type="checkbox" name="sql_data" value="data" id="checkbox_sql_data" <?php PMA_exportCheckboxCheck('sql_data'); ?> onclick="if(!this.checked && (!getElement('checkbox_sql_structure') || !getElement('checkbox_sql_structure').checked)) return false; else return true;" />
+                        <input type="checkbox" name="sql_data" value="data" id="checkbox_sql_data" checked="checked" onclick="if(!this.checked && !gE('checkbox_sql_structure').checked) return false; else return true;" />
                         <label for="checkbox_sql_data"><?php echo $strData; ?></label><br />
                     </legend>
-                    <input type="checkbox" name="showcolumns" value="yes" id="checkbox_dump_showcolumns" <?php PMA_exportCheckboxCheck('sql_columns'); ?> />
+                    <input type="checkbox" name="showcolumns" value="yes" id="checkbox_dump_showcolumns" />
                     <label for="checkbox_dump_showcolumns"><?php echo $strCompleteInserts; ?></label><br />
-                    <input type="checkbox" name="extended_ins" value="yes" id="checkbox_dump_extended_ins" <?php PMA_exportCheckboxCheck('sql_extended'); ?> />
+                    <input type="checkbox" name="extended_ins" value="yes" id="checkbox_dump_extended_ins" />
                     <label for="checkbox_dump_extended_ins"><?php echo $strExtendedInserts; ?></label><br />
                 </fieldset>
             </fieldset>
-<?php } ?>
              
              <!-- LaTeX options -->
              <fieldset id="latex_options">
                  <legend><?php echo $strLaTeXOptions; ?></legend>
  
-<?php if (!$hide_structure) { ?>
                  <!-- For structure -->
                  <fieldset>
                      <legend>
-                         <input type="checkbox" name="latex_structure" value="structure" id="checkbox_latex_structure" <?php PMA_exportCheckboxCheck('latex_structure'); ?> onclick="if(!this.checked && !getElement('checkbox_latex_data').checked) return false; else return true;" />
-                         <label for="checkbox_latex_structure"><?php echo $strStructure; ?></label><br />
+                         <input type="checkbox" name="ltx_structure" value="structure" id="checkbox_ltx_structure" checked="checked" onclick="if(!this.checked && !gE('checkbox_ltx_data').checked) return false; else return true;" />
+                         <label for="checkbox_ltx_structure"><?php echo $strStructure; ?></label><br />
                      </legend>
-<?php
-if (!empty($cfgRelation['relation'])) {
-?>
-                     <input type="checkbox" name="latex_relation" value="yes" id="checkbox_latex_use_relation" <?php PMA_exportCheckboxCheck('latex_relation'); ?> />
-                     <label for="checkbox_latex_use_relation"><?php echo $strRelations; ?></label><br />
-<?php
+ <?php
+ 
+ // garvin: whether to show column comments
+ require('./libraries/relation.lib.php');
+ $cfgRelation = PMA_getRelationsParam();
+ 
+ if (!empty($cfgRelation['relation'])) {
+     ?>
+                     <input type="checkbox" name="ltx_relation" value="yes" id="checkbox_ltx_use_relation" checked="checked" />
+                     <label for="checkbox_ltx_use_relation"><?php echo $strRelations; ?></label><br />
+     <?php
  } // end relation
  
-if ($cfgRelation['commwork']) {
+ if ($cfgRelation['commwork']) {
      ?>
-                     <input type="checkbox" name="latex_comments" value="yes" id="checkbox_latex_use_comments" <?php PMA_exportCheckboxCheck('latex_comments'); ?> />
-                     <label for="checkbox_latex_use_comments"><?php echo $strComments; ?></label><br />
-<?php
-} // end comments
+                     <input type="checkbox" name="ltx_comments" value="yes" id="checkbox_ltx_use_comments" checked="checked" />
+                     <label for="checkbox_ltx_use_comments"><?php echo $strComments; ?></label><br />
+     <?php
+ } // end comments
  
-if ($cfgRelation['mimework']) {
+ if ($cfgRelation['mimework']) {
      ?>
-                     <input type="checkbox" name="latex_mime" value="yes" id="checkbox_latex_use_mime" <?php PMA_exportCheckboxCheck('latex_mime'); ?> />
-                     <label for="checkbox_latex_use_mime"><?php echo $strMIME_MIMEtype; ?></label><br />
-<?php
-} // end MIME
-?>
+                     <input type="checkbox" name="ltx_mime" value="yes" id="checkbox_ltx_use_mime" checked="checked" />
+                     <label for="checkbox_ltx_use_mime"><?php echo $strMIME_MIMEtype; ?></label><br />
+     <?php
+ } // end MIME
+ echo "\n";
+ ?>
                  </fieldset>
-<?php } ?>
  
                  <!-- For data -->
                  <fieldset>
                      <legend>
-                         <input type="checkbox" name="latex_data" value="data" id="checkbox_latex_data" <?php PMA_exportCheckboxCheck('latex_data'); ?> onclick="if(!this.checked && (!getElement('checkbox_latex_structure') || !getElement('checkbox_latex_structure').checked)) return false; else return true;" />
-                         <label for="checkbox_latex_data"><?php echo $strData; ?></label><br />
+                         <input type="checkbox" name="ltx_data" value="data" id="checkbox_ltx_data" checked="checked" onclick="if(!this.checked && !gE('checkbox_ltx_structure').checked) return false; else return true;" />
+                         <label for="checkbox_ltx_data"><?php echo $strData; ?></label><br />
                      </legend>
-                     <input type="checkbox" name="latex_showcolumns" value="yes" id="ch_latex_showcolumns" <?php PMA_exportCheckboxCheck('latex_columns'); ?> />
-                     <label for="ch_latex_showcolumns"><?php echo $strColumnNames; ?></label><br />
-                    <table border="0" cellspacing="1" cellpadding="0">
-                        <tr>
-                            <td>
-                                <?php echo $strReplaceNULLBy; ?>&nbsp;
-                            </td>
-                            <td>
-                                <input type="text" name="latex_replace_null" size="20" value="<?php echo $cfg['Export']['latex_null']; ?>" class="textfield" />
-                            </td>
-                        </tr>
-                    </table>
+                     <input type="checkbox" name="ltx_showcolumns" value="yes" id="ch_ltx_showcolumns" checked="checked" />
+                     <label for="ch_ltx_showcolumns"><?php echo $strColumnNames; ?></label><br />
                  </fieldset>
              </fieldset>
-            
+             
              <!-- CSV options -->
             <fieldset id="csv_options">
                 <legend><?php echo $strCSVOptions; ?></legend>
-                <input type="hidden" name="csv_data" value="csv_data" />
                 <table border="0" cellspacing="1" cellpadding="0">
                     <tr>
                         <td>
                             <?php echo $strFieldsTerminatedBy; ?>&nbsp;
                         </td>
                         <td>
-                            <input type="text" name="separator" size="2" value="<?php echo $cfg['Export']['csv_separator']; ?>" class="textfield" />
+                            <input type="text" name="separator" size="2" value=";" class="textfield" />
                         </td>
                     </tr>
                     <tr>
@@ -251,7 +205,7 @@ if ($cfgRelation['mimework']) {
                             <?php echo $strFieldsEnclosedBy; ?>&nbsp;
                         </td>
                         <td>
-                            <input type="text" name="enclosed" size="2" value="<?php echo $cfg['Export']['csv_enclosed']; ?>" class="textfield" />
+                            <input type="text" name="enclosed" size="2" value="&quot;" class="textfield" />
                         </td>
                     </tr>
                     <tr>
@@ -259,74 +213,40 @@ if ($cfgRelation['mimework']) {
                             <?php echo $strFieldsEscapedBy; ?>&nbsp;
                         </td>
                         <td>
-                            <input type="text" name="escaped" size="2" value="<?php echo $cfg['Export']['csv_escaped']; ?>" class="textfield" />
+                            <input type="text" name="escaped" size="2" value="\" class="textfield" />
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <?php echo $strLinesTerminatedBy; ?>&nbsp;
+                            <?php echo $strFieldsTerminatedBy; ?>&nbsp;
                         </td>
                         <td>
-                            <input type="text" name="add_character" size="2" value="<?php if ($cfg['Export']['csv_terminated'] == 'AUTO') echo ((PMA_whichCrlf() == "\n") ? '\n' : '\r\n'); else echo $cfg['Export']['csv_terminated']; ?>" class="textfield" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <?php echo $strReplaceNULLBy; ?>&nbsp;
-                        </td>
-                        <td>
-                            <input type="text" name="csv_replace_null" size="20" value="<?php echo $cfg['Export']['csv_null']; ?>" class="textfield" />
+                            <input type="text" name="add_character" size="2" value="<?php echo ((PMA_whichCrlf() == "\n") ? '\n' : '\r\n'); ?>" class="textfield" />
                         </td>
                     </tr>
                 </table>
-                <input type="checkbox" name="showcsvnames" value="yes" id="checkbox_dump_showcsvnames" <?php PMA_exportCheckboxCheck('csv_columns'); ?> />
+                <input type="checkbox" name="showcsvnames" value="yes" id="checkbox_dump_showcsvnames" />
                 <label for="checkbox_dump_showcsvnames"><?php echo $strPutColNames; ?></label>
-            </fieldset>
-            
-            <!-- Excel options -->
-            <fieldset id="excel_options">
-                <legend><?php echo $strExcelOptions; ?></legend>
-                <input type="hidden" name="excel_data" value="excel_data" />
-                <table border="0" cellspacing="1" cellpadding="0">
-                    <tr>
-                        <td>
-                            <?php echo $strReplaceNULLBy; ?>&nbsp;
-                        </td>
-                        <td>
-                            <input type="text" name="excel_replace_null" size="20" value="<?php echo $cfg['Export']['excel_null']; ?>" class="textfield" />
-                        </td>
-                    </tr>
-                </table>
             </fieldset>
             
             <fieldset id="none_options">
                 <legend><?php echo $strNoOptions; ?></legend>
-                <input type="hidden" name="xml_data" value="xml_data" />
             </fieldset>
 
             <script type="text/javascript">
             <!--
-                hide_them_all();
-                if (getElement('radio_dump_latex').checked) {
-                    getElement('latex_options').style.display = 'block';
-<?php if (!$hide_sql) { ?>
-                } else if (getElement('radio_dump_sql').checked) {
-                    getElement('sql_options').style.display = 'block';
-<?php } ?>
-                } else if (getElement('radio_dump_csv').checked) {
-                    getElement('csv_options').style.display = 'block';
-                } else if (getElement('radio_dump_excel').checked) {
-                    getElement('excel_options').style.display = 'block';
+                gE('csv_options').style.display = 'none';
+                gE('latex_options').style.display = 'none';
+                gE('sql_options').style.display = 'none';
+                gE('none_options').style.display = 'none';
+                if (document.getElementById('radio_dump_sql').checked) {
+                    gE('sql_options').style.display = 'block';
+                } else if (document.getElementById('radio_dump_latex').checked) {
+                    gE('latex_options').style.display = 'block';
+                } else if (document.getElementById('radio_dump_csv').checked) {
+                    gE('csv_options').style.display = 'block';
                 } else {
-                    if (getElement('radio_dump_sql')) {
-                        getElement('radio_dump_sql').checked = true;
-                        getElement('sql_options').style.display = 'block';
-                    } else if (getElement('radio_dump_csv')) {
-                        getElement('radio_dump_csv').checked = true;
-                        getElement('csv_options').style.display = 'block';
-                    } else {
-                        getElement('none_options').style.display = 'block';
-                    }
+                    gE('none_options').style.display = 'block';
                 }
             //-->
             </script>
@@ -352,14 +272,14 @@ if (isset($table) && !empty($table) && !isset($num_tables)) {
         <td colspan="2">
             <fieldset>
                 <legend>
-                    <input type="checkbox" name="asfile" value="sendit" id="checkbox_dump_asfile" <?php PMA_exportCheckboxCheck('asfile'); ?> />
+                    <input type="checkbox" name="asfile" value="sendit" id="checkbox_dump_asfile" />
                     <label for="checkbox_dump_asfile"><?php echo $strSend; ?></label>
                 </legend>
                 
                 <?php if (isset($cfg['SaveDir']) && !empty($cfg['SaveDir'])) { ?>
-                <input type="checkbox" name="onserver" value="saveit" id="checkbox_dump_onserver"  onclick="getElement('checkbox_dump_asfile').checked = true;" <?php PMA_exportCheckboxCheck('onserver'); ?> />
+                <input type="checkbox" name="onserver" value="saveit" id="checkbox_dump_onserver"  onclick="gE('checkbox_dump_asfile').checked = true;" />
                 <label for="checkbox_dump_onserver"><?php echo sprintf($strSaveOnServer, htmlspecialchars($cfg['SaveDir'])); ?></label>,
-                <input type="checkbox" name="onserverover" value="saveitover" id="checkbox_dump_onserverover"  onclick="getElement('checkbox_dump_onserver').checked = true;getElement('checkbox_dump_asfile').checked = true;" <?php PMA_exportCheckboxCheck('onserver_overwrite'); ?> />
+                <input type="checkbox" name="onserverover" value="saveitover" id="checkbox_dump_onserverover"  onclick="gE('checkbox_dump_onserver').checked = true;gE('checkbox_dump_asfile').checked = true;" />
                 <label for="checkbox_dump_onserverover"><?php echo $strOverwriteExisting; ?></label>
                 <br />
                 <?php } ?>
@@ -368,7 +288,7 @@ if (isset($table) && !empty($table) && !isset($num_tables)) {
                 <input type="text" name="filename_template"
                 <?php 
                     echo ' value="';
-                    if ($export_type == 'database') {
+                    if (!$export_single) {
                         if (isset($_COOKIE) && !empty($_COOKIE['pma_db_filename_template'])) {
                             echo $_COOKIE['pma_db_filename_template'];
                         } elseif (isset($HTTP_COOKIE_VARS) && !empty($HTTP_COOKIE_VARS['pma_db_filename_template'])) {
@@ -376,7 +296,7 @@ if (isset($table) && !empty($table) && !isset($num_tables)) {
                         } else {
                             echo '__DB__'; 
                         }
-                    } elseif ($export_type == 'table') {
+                    } else {
                         if (isset($_COOKIE) && !empty($_COOKIE['pma_table_filename_template'])) {
                             echo $_COOKIE['pma_table_filename_template'];
                         } elseif (isset($HTTP_COOKIE_VARS) && !empty($HTTP_COOKIE_VARS['pma_table_filename_template'])) {
@@ -384,20 +304,12 @@ if (isset($table) && !empty($table) && !isset($num_tables)) {
                         } else {
                             echo '__TABLE__'; 
                         }
-                    } else {
-                        if (isset($_COOKIE) && !empty($_COOKIE['pma_server_filename_template'])) {
-                            echo $_COOKIE['pma_server_filename_template'];
-                        } elseif (isset($HTTP_COOKIE_VARS) && !empty($HTTP_COOKIE_VARS['pma_server_filename_template'])) {
-                            echo $HTTP_COOKIE_VARS['pma_server_filename_template'];
-                        } else {
-                            echo '__SERVER__'; 
-                        }
                     }
                     echo '" ';
                 ?>
                 />
                 (
-                <input type="checkbox" name="remember_template" id="checkbox_remember_template" <?php PMA_exportCheckboxCheck('remember_file_template'); ?> />
+                <input type="checkbox" name="remember_template" checked="checked" id="checkbox_remember_template" />
                 <label for="checkbox_remember_template"><?php echo $strFileNameTemplateRemember; ?></label>
                 )*
 
@@ -429,7 +341,7 @@ if (isset($table) && !empty($table) && !isset($num_tables)) {
                 <fieldset>
                     <legend><?php echo $strCompression; ?></legend>
 
-                    <input type="radio" name="compression" value="none" id="radio_compression_none" onclick="getElement('checkbox_dump_asfile').checked = true;" <?php PMA_exportIsActive('compression', 'none'); ?> />
+                    <input type="radio" name="compression" value="none" id="radio_compression_none" checked="checked" onclick="gE('checkbox_dump_asfile').checked = true;" />
                     <label for="radio_compression_none"><?php echo $strNone; ?></label>&nbsp;
 
 <?php
@@ -442,21 +354,21 @@ if (PMA_PHP_INT_VERSION >= 40004) {
     if ($is_zip || $is_gzip || $is_bzip) {
         if ($is_zip) {
             ?>
-                    <input type="radio" name="compression" value="zip" id="radio_compression_zip" onclick="getElement('checkbox_dump_asfile').checked = true;" <?php PMA_exportIsActive('compression', 'zip'); ?> />
+                    <input type="radio" name="compression" value="zip" id="radio_compression_zip" onclick="gE('checkbox_dump_asfile').checked = true;" />
                     <label for="radio_compression_zip"><?php echo $strZip; ?></label><?php echo (($is_gzip || $is_bzip) ? '&nbsp;' : ''); ?>
             <?php
         }
         if ($is_gzip) {
             echo "\n"
             ?>
-                    <input type="radio" name="compression" value="gzip" id="radio_compression_gzip" onclick="getElement('checkbox_dump_asfile').checked = true;" <?php PMA_exportIsActive('compression', 'gzip'); ?> />
+                    <input type="radio" name="compression" value="gzip" id="radio_compression_gzip" onclick="gE('checkbox_dump_asfile').checked = true;" />
                     <label for="radio_compression_gzip"><?php echo $strGzip; ?></label><?php echo ($is_bzip ? '&nbsp;' : ''); ?>
             <?php
         }
         if ($is_bzip) {
             echo "\n"
             ?>
-                    <input type="radio" name="compression" value="bzip" id="radio_compression_bzip" onclick="getElement('checkbox_dump_asfile').checked = true;" <?php PMA_exportIsActive('compression', 'bzip'); ?> />
+                    <input type="radio" name="compression" value="bzip" id="radio_compression_bzip" onclick="gE('checkbox_dump_asfile').checked = true;" />
                     <label for="radio_compression_bzip"><?php echo $strBzip; ?></label>
             <?php
         }

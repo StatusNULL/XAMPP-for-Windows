@@ -1,5 +1,5 @@
 <?php
-/* $Id: phpmyadmin.css.php,v 1.6 2003/07/06 19:05:07 nijel Exp $ */
+/* $Id: phpmyadmin.css.php,v 1.4 2003/05/02 10:03:26 garvinhicking Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 chdir('..');
@@ -125,10 +125,10 @@ body {
     <?php
     if ($GLOBALS['cfg']['RightBgImage'] == '') {
         // calls from a css file are relative to itself, so use ../images
-        echo '    background-image: url(../images/vertical_line.png);' . "\n"
+        echo '    background-image: url(\'../images/vertical_line.png\');' . "\n"
              . '    background-repeat: repeat-y;' . "\n";
     } else {
-        echo '    background-image: url(' . $GLOBALS['cfg']['RightBgImage'] . ');' . "\n";
+        echo '    background-image: url(\'' . $GLOBALS['cfg']['RightBgImage'] . '\');' . "\n";
     } // end if... else...
     ?>
     background-color: <?php echo $GLOBALS['cfg']['RightBgColor'] . "\n"; ?>
@@ -188,29 +188,6 @@ fieldset {
 }
 fieldset fieldset {
     margin:     0.8em;
-}
-
-.pdflayout {
-    overflow:         hidden;
-    clip:             inherit;
-    background-color: #FFFFFF;
-    display:          none;
-    border:           1px solid #000000;
-    position:         relative;
-}
-
-.pdflayout_table {
-    background:       <?php echo $GLOBALS['cfg']['ThBgcolor']; ?>;
-    color:            #000000;
-    overflow:         hidden;
-    clip:             inherit;
-    z-index:          2;
-    display:          inline;
-    visibility:       inherit;
-    cursor:           move;
-    position:         absolute; 
-    font-size:        <?php echo $font_smaller; ?>;
-    border:           1px dashed #000000;
 }
 
 .print{font-family:arial;font-size:8pt;}

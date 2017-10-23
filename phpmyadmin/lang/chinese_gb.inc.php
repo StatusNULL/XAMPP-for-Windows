@@ -1,5 +1,5 @@
 <?php
-/* $Id: chinese_gb.inc.php,v 1.255 2003/07/06 11:55:05 lem9 Exp $ */
+/* $Id: chinese_gb.inc.php,v 1.245 2003/06/01 12:33:51 lem9 Exp $ */
 
 /**
  * Last translation by: Funda Wang <fundawang@en2china.com>
@@ -642,18 +642,4 @@ $strYes = '是';
 
 $strZeroRemovesTheLimit = '注意：将这些选项设为 0 (零)将删除限制。';
 $strZip = '"zipped"';
-$strExecuteBookmarked = 'Execute bookmarked query';  //to translate
-$strExcelOptions = 'Excel options';  //to translate
-$strReplaceNULLBy = 'Replace NULL by';  //to translate
-$strQueryWindowLock = 'Do not overwrite this query from outside the window';  //to translate
-$strPaperSize = 'Paper size';  //to translate
-$strDatabaseNoTable = 'This database contains no table!';//to translate
-$strViewDumpDatabases = 'View dump (schema) of databases';//to translate
-$strAddIntoComments = 'Add into comments';//to translate
-$strDatabaseExportOptions = 'Database export options';//to translate
-$strAddDropDatabase = 'Add DROP DATABASE';//to translate
-$strToggleScratchboard = 'toggle scratchboard';  //to translate
-$strTableOptions = 'Table options';  //to translate
-$strSecretRequired = 'The configuration file now needs a secret passphrase (blowfish_secret).';  //to translate
-$strAccessDeniedExplanation = 'phpMyAdmin tried to connect to the MySQL server, and the server rejected the connection. You should check the host, username and password in config.inc.php and make sure that they correspond to the information given by the administrator of the MySQL server.';  //to translate
 ?>

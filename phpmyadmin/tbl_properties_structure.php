@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_properties_structure.php,v 1.42 2003/06/26 08:56:41 nijel Exp $ */
+/* $Id: tbl_properties_structure.php,v 1.38 2003/05/30 14:17:13 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -140,27 +140,19 @@ while ($row = PMA_mysql_fetch_array($fields_rs)) {
     }
 
     // rabus: Devide charset from the rest of the type definition (MySQL >= 4.1)
-    unset($field_charset);
-    if (PMA_MYSQL_INT_VERSION >= 40100) {
-        if ((substr($type, 0, 4) == 'char'
-            || substr($type, 0, 7) == 'varchar'
-            || substr($type, 0, 4) == 'text'
-            || substr($type, 0, 8) == 'tinytext'
-            || substr($type, 0, 10) == 'mediumtext'
-            || substr($type, 0, 8) == 'longtext'
-            || substr($type, 0, 3) == 'set'
-            || substr($type, 0, 4) == 'enum'
-            ) && !$binary) {
-            if (strpos($type, ' character set ')) {
-                $type = substr($type, 0, strpos($type, ' character set '));
-            }
-            if (!empty($row['Collation'])) {
-                $field_charset = $row['Collation'];
-            } else {
-                $field_charset = '';
-            }
-        } else {
-            $field_charset = '';
+    if (PMA_MYSQL_INT_VERSION >= 40100 && (
+        substr($type, 0, 4) == 'char'
+        || substr($type, 0, 7) == 'varchar'
+        || substr($type, 0, 4) == 'text'
+        || substr($type, 0, 8) == 'tinytext'
+        || substr($type, 0, 10) == 'mediumtext'
+        || substr($type, 0, 8) == 'longtext'
+        ) && !$binary) {
+        if (strpos($type, ' character set ')) {
+            $type = substr($type, 0, strpos($type, ' character set '));
+        }
+        if (!empty($row['Collation'])) {
+            $field_charset = $row['Collation'];
         }
     }
 
@@ -516,7 +508,7 @@ if ($cfg['ShowStats']) {
             <td bgcolor="<?php echo $bgcolor; ?>"><?php echo $strCharset; ?></td>
             <td bgcolor="<?php echo $bgcolor; ?>" align="<?php echo $cell_align_left; ?>" nowrap="nowrap">
             <?php
-            echo $tbl_charset;
+            echo $showtable['Charset'];
             ?>
             </td>
         </tr>

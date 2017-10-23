@@ -1,5 +1,5 @@
 <?php
-/* $Id: bulgarian-koi8-r.inc.php,v 1.98 2003/07/06 11:55:04 lem9 Exp $ */
+/* $Id: bulgarian-koi8-r.inc.php,v 1.88 2003/05/30 11:19:58 rabus Exp $ */
 
 /**
  * Translated by Stanislav Yordanov <stan at webthoughts.net>
@@ -30,8 +30,6 @@ $strAccessDenied = 'Отказан достъп';
 $strAction = 'Действие';
 $strAddDeleteColumn = 'Добави/изтрий колона по критерий';
 $strAddDeleteRow = 'Добави/изтрий ред по критерий';
-$strAddDropDatabase = 'Добави DROP DATABASE';
-$strAddIntoComments = 'Добави в коментарите';
 $strAddNewField = 'Добави ново поле';
 $strAddPriv = 'Добавяне на нова привилегия';
 $strAddPrivMessage = 'Вие добавихте нова привилегия.';
@@ -74,7 +72,7 @@ $strBinary = ' Двоично ';
 $strBinaryDoNotEdit = ' Двоично - не се редактира ';
 $strBookmarkDeleted = 'Bookmark беше изтрит.';
 $strBookmarkLabel = 'Етикет';
-$strBookmarkQuery = 'Запазване на SQL-запитване';
+$strBookmarkQuery = 'Запазваме на SQL-запитване';
 $strBookmarkThis = 'Запази това SQL-запитване';
 $strBookmarkView = 'Само показване';
 $strBrowse = 'Прелисти';
@@ -147,9 +145,7 @@ $strData = 'Данни';
 $strDataDict = 'Речник на данните';
 $strDataOnly = 'Само данни';
 $strDatabase = 'БД';
-$strDatabaseExportOptions = 'Опции за експортиране на база данни';
 $strDatabaseHasBeenDropped = 'Базата данни %s беше изтрита.';
-$strDatabaseNoTable = 'Базата данни не съдържа таблица!';
 $strDatabaseWildcard = 'База данни (може и с wildcard):';
 $strDatabases = 'Бази от Данни';
 $strDatabasesDropped = '%s бази данни бяха изтрити успешно.';
@@ -202,8 +198,6 @@ $strEndCut = 'END CUT';
 $strEndRaw = 'END RAW';
 $strEnglishPrivileges = ' Забележка: Имената на привилегиите на MySQL са показани на английски. ';
 $strError = 'Грешка';
-$strExcelOptions = 'Опции на Excel';  
-$strExecuteBookmarked = 'Стартиране на запазена SQL-заявка';
 $strExplain = 'Explain SQL';
 $strExport = 'Експортиране';
 $strExportToXML = 'Експортиране в XML формат';
@@ -295,8 +289,6 @@ $strLines = 'Редове';
 $strLinesTerminatedBy = 'Редовете завършват с';
 $strLinkNotFound = 'Връзките не са намерени';
 $strLinksTo = 'Сочи към';
-$strLoadExplanation = 'Този метод е избран по подразбиране, но можете да го промените ако не работи коректно.';
-$strLoadMethod = 'LOAD метод';
 $strLocalhost = 'Локален';
 $strLocationTextfile = 'Местоположение на текстовия файл';
 $strLogPassword = 'Парола:';
@@ -381,7 +373,6 @@ $strOverwriteExisting = 'Препокриване на съществуващите файлове';
 $strPHP40203 = 'Вие използвате PHP 4.2.3, който има сериозен бъг с много-байтови стрингове (mbstring). Вижте сведението за PHP бъга 19404. Не е препоръчително да използвате тази версия на PHP с phpMyAdmin.';
 $strPHPVersion = 'Версия на PHP';
 $strPageNumber = 'Номер на страницата:';
-$strPaperSize = 'Размер на хартията';
 $strPartialText = 'Частични текстове';
 $strPassword = 'Парола';
 $strPasswordChanged = 'Паролата на %s беше променена успешно.';
@@ -453,7 +444,6 @@ $strQuerySQLHistory = 'SQL-хронология';
 $strQueryStatistics = '<b>Статистика на заявките</b>: От както е стартиран, %s заявки за изпратени към сървъра.';
 $strQueryTime = 'Заявката отне %01.4f секунди';
 $strQueryType = 'Тип на заявката';
-$strQueryWindowLock = 'Не препокривайте тази заявка извън този прозореца';
 
 $strReType = 'Отново';
 $strReceived = 'Получени';
@@ -472,7 +462,6 @@ $strRenameTable = 'Преименуване на наблицата на';
 $strRenameTableOK = 'Таблица %s беше преименувана на %s';
 $strRepairTable = 'Поправяне на таблицата';
 $strReplace = 'Замести';
-$strReplaceNULLBy = 'Заменяй NULL с';
 $strReplaceTable = 'Замести данните от таблицата с данните от файла';
 $strReset = 'Изчисти';
 $strResourceLimits = 'Ресурсни ограничения';
@@ -636,7 +625,6 @@ $strValue = 'Стойност';
 $strVar = 'Променлива';
 $strViewDump = 'Дъмп (схема) на таблицата';
 $strViewDumpDB = 'Дъмп (схема) на БД';
-$strViewDumpDatabases = 'Преглед на дъмп (схема) на база данни';
 
 $strWebServerUploadDirectory = 'директорията за upload на уеб сървъра';
 $strWebServerUploadDirectoryError = 'Директорията която сте указали за upload не може да бъде достигната';
@@ -653,12 +641,9 @@ $strYes = 'да';
 
 $strZeroRemovesTheLimit = 'Забележка: Установяването на тези опции с 0 (нула) премахва ограничението.';
 $strZip = '"zip-нато"';
+
 // To translate
+$strLoadMethod = 'LOAD method';  //to translate
+$strLoadExplanation = 'The best method is checked by default, but you can change if it fails.';  //to translate
 
-
-$strToggleScratchboard = 'toggle scratchboard';  //to translate
-
-$strTableOptions = 'Table options';  //to translate
-$strSecretRequired = 'The configuration file now needs a secret passphrase (blowfish_secret).';  //to translate
-$strAccessDeniedExplanation = 'phpMyAdmin tried to connect to the MySQL server, and the server rejected the connection. You should check the host, username and password in config.inc.php and make sure that they correspond to the information given by the administrator of the MySQL server.';  //to translate
 ?>

@@ -1,14 +1,14 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US">
-<!-- $Id: Documentation.html,v 1.469 2003/07/07 11:16:34 lem9 Exp $ -->
+<!-- $Id: Documentation.html,v 1.452 2003/06/02 00:40:13 lem9 Exp $ -->
 <!--
     vim: expandtab ts=4 sw=4 sts=4 tw=78
 -->
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-    <title>phpMyAdmin 2.5.2-rc1 - Documentation</title>
+    <title>phpMyAdmin 2.5.1 - Documentation</title>
     <link rel="stylesheet" type="text/css" href="docs.css" />
 </head>
 
@@ -31,7 +31,7 @@
 <hr noshade="noshade" width="100%" />
 </div>
 
-<h1>phpMyAdmin 2.5.2-rc1 Documentation</h1>
+<h1>phpMyAdmin 2.5.1 Documentation</h1>
 
 
 <!-- TOP MENU -->
@@ -51,7 +51,7 @@
     </li>
     <li>
         Documentation version:
-        <i>$Id: Documentation.html,v 1.469 2003/07/07 11:16:34 lem9 Exp $</i>
+        <i>$Id: Documentation.html,v 1.452 2003/06/02 00:40:13 lem9 Exp $</i>
     </li>
 </ul>
 
@@ -402,15 +402,6 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
         <br /><br />
     </dd>
 
-    <dt><b>$cfg['blowfish_secret']</b> string</dt>
-    <dd>
-        Starting with version 2.5.2, the 'cookie' auth_type uses blowfish 
-        algorithm to encrypt the password.
-        <br />
-        If at least one server configuration uses 'cookie' auth_type,
-        enter here a passphrase that will be used by blowfish.
-     </dd>
-
     <dt><b>$cfg['Servers']</b> array</dt>
     <dd>
         Since version 1.4.2, phpMyAdmin supports the administration of multiple
@@ -648,20 +639,15 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
            <li>
               display in an optional tool-tip the &quot;display field&quot;
               when browsing the master table, if you move the mouse to a column
-              containing a foreign key (use also the 'table_info' table);<br />
-              (see FAQ 6.7)
+              containing a foreign key (use also the 'table_info' table);
            </li>
-           <li>
-              in edit/insert mode, display a drop-down list of possible
-              foreign keys (key value and &quot;display field&quot; are
-              shown)<br />
-              (see FAQ 6.21)
            <li>
               display links on the table properties page, to check referential
               integrity (display missing foreign keys) for each described key;
            </li>
            <li>
-              in query-by-example, create automatic joins (see FAQ 6.6)
+              in query-by-example, create automatic joins (see an example in
+              the FAQ, section &quot;Using phpMyAdmin&quot;);
            </li>
            <li>
               enable you to get a PDF schema of your database (also uses the
@@ -1495,7 +1481,7 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
 
     <dt><b>$cfg['LimitChars'] </b>integer</dt>
     <dd>
-        Maximal number of Chars showed in any non-numeric
+        Maximal number of Chars showed in a <tt>TEXT</tt> OR a <tt>BLOB</tt>
         field on browse view. Can be turned off by a toggle button on the
         browse page.
         <br /><br />
@@ -1580,14 +1566,6 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
         <br /><br />
     </dd>
 
-    <dt><b>$cfg['Export'] </b>array</dt>
-    <dd>
-        In this array are defined default parameters for export, names of
-        items are simmilar to texts seen on export page, so you can easily
-        identify what they mean.
-        <br /><br />
-    </dd>
-
     <dt><b>$cfg['RepeatCells'] </b>integer</dt>
     <dd>
         Repeat the headers every X cells, or 0 to deactivate.
@@ -1621,13 +1599,7 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
         as your window is opened they remain saved.<br /><br />
         When using the JavaScript based query window, it will always get updated when you
         click on a new table/db to browse and will focus if you click on "Edit SQL" after
-        using a query. You can suppress updating the query window by checking the box
-        "Do not overwrite this query from outside the window" below the query textarea. Then
-        you can browse tables/databases in the background without losing the contents of the
-        textarea, so this is especially useful when composing a query with tables you first
-        have to look in. The checkbox will get automatically checked whenever you change the
-        contents of the textarea. Please uncheck the button whenever you definitely want the
-        query window to get updated even though you have made alterations.<br /><br />
+        using a query.<br /><br />
         If $cfg['QueryHistoryDB'] is set to TRUE you can specify the amount of saved
         history items using $cfg['QueryHistoryMax'].<br /><br />
         The query window also has a custom tabbed look to group the features. Using the
@@ -1651,31 +1623,6 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
     <code>SELECT COUNT</code>. If approximate row count is smaller than this
     value, <code>SELECT COUNT</code> will be used, otherwise only value
     returned by <code>SHOW TABLE STATUS</code>.
-    <br /><br />
-    </dd>
-
-    <dt><b>$cfg['WYSIWYG-PDF'] </b>boolean</dt>
-    <dd>
-        Utilizes a WYSIWYG editing control to easily place elements of a PDF page.
-        By clicking on the button 'toggle scratchboard' on the page where you
-        edit x/y coordinates of those elements you can activate a scratchboard where
-        all your elements are placed. By clicking on an element, you can move them
-        around in the pre-defined area and the x/y coordinates will get updated
-        dynamically. Likewise, when entering a new position directly into the
-        input field, the new position in the scratchboard changes after your
-        cursors leaves the input field.<br />
-        You have to click on the 'OK'-button below the tables to save the new positions.
-        If you want to place a new element, first add it to the table of elements and
-        then you can drag the new element around.<br />
-        By changing the paper size and the orientation you can change the size of the
-        scratchboard as well. You can do so by just changing the dropdown field below,
-        and the scratchboard will resize automatically, without interfering with the
-        current placement of the elements.<br />
-        If ever an element gets out of range you can either enlarge the paper size
-        or click on the 'reset' button to place all elements below each other.<br />
-        <b>NOTE:</b> You have to use a recent browser like IE6 or Mozilla to get this control
-        to work. The basic Drag&amp;Drop script functionality was kindly borrowed from www.youngpup.net and
-        is underlying so specific license.
     <br /><br />
     </dd>
 
@@ -2015,7 +1962,6 @@ To create a new, empty mimetype please see libraries/transformations/template_ge
 <a href="#faqbrowsers">Browsers</a> &nbsp;-&nbsp;
 <a href="#faqusing">Usage tips</a> &nbsp;-&nbsp;
 <a href="#faqproject">Project</a> &nbsp;-&nbsp;
-<a href="#faqsecurity">Security</a>
 </p>
 
 <a name="faqserver"></a><br />
@@ -3015,9 +2961,6 @@ To create a new, empty mimetype please see libraries/transformations/template_ge
     Starting from the previous example, create the PMA_table_info as explained
     in the configuration section, then browse your persons table,
     and move the mouse over a town code or country code.
-    <br /><br />
-    See also FAQ 6.21 for an additionnal feature that &quot;display field&quot;
-    enables: drop-down list of possible values.
 </p>
 
 <a name="faqpdf"></a><br />
@@ -3177,7 +3120,7 @@ To create a new, empty mimetype please see libraries/transformations/template_ge
 
 <a name="faqbookmark"></a>
 <h4>
-    [6.18] Bookmarks: Where can I store bookmarks? Why can't I see any bookmarks below the query box?
+    [6.17] Bookmarks: Where can I store bookmarks? Why can't I see any bookmarks below the query box?
      What is this variable for?
 </h4>
 <p>
@@ -3215,48 +3158,6 @@ To create a new, empty mimetype please see libraries/transformations/template_ge
     comments.
 </p>
 
-<h4>
-    [6.19] How can I create simple LaTeX document to include exported table?
-</h4>
-<p>
-    You can simply include table in your LaTeX documents, minimal sample
-    document should look like following one (assuming you have table
-    exported in file <code>table.tex</code>):
-    <br />
-    <br />
-<pre>
-<font color="#a52a2a"><b>\documentclass</b></font><font color="#6a5acd">{</font><font color="#a020f0">article</font><font color="#6a5acd">}</font>
-<font color="#a52a2a"><b>\usepackage</b></font><font color="#6a5acd">{</font><font color="#6a5acd">longtable</font><font color="#6a5acd">}</font>
-
-<font color="#a52a2a"><b>\begin</b></font><font color="#6a5acd">{</font><font color="#a020f0">document</font><font color="#6a5acd">}</font>
-
-<font color="#a52a2a"><b>\include</b></font><font color="#6a5acd">{</font><font color="#6a5acd">table</font><font color="#6a5acd">}</font>
-
-<font color="#a52a2a"><b>\end</b></font><font color="#6a5acd">{</font><font color="#a020f0">document</font><font color="#6a5acd">}</font>
-</pre>
-</p>
-
-<h4>
-    [6.20] In MySQL 4, I see a lot of databases which are not mine, and cannot
-    access them.
-</h4>
-<p>
-    Upgrading to MySQL 4 usually gives users a global privilege: CREATE
-    TEMPORARY TABLES. This privilege also enables users to see all the
-    database names. See this <a href="http://bugs.mysql.com/179">bug report</a>.    <br /><br />
-    So if your users do not need this privilege, you can remove it and their
-    databases list will shorten.
-</p>
-<h4>
-    [6.21] In edit/insert mode, how can I see a list of possible values for
-    a field, based on some foreign table?
-</h4>
-<p>
-    You have to setup appropriate links between the tables, and also
-    setup the &quot;display field&quot; in the foreign table. See FAQ
-    6.6 for an example. Then, if there are 200 values or less in the
-    foreign table, a drop-down list of values will be available.
-</p>
 <a name="faqproject"></a><br />
 <h3>[7. phpMyAdmin project]</h3>
 
@@ -3327,63 +3228,6 @@ To create a new, empty mimetype please see libraries/transformations/template_ge
     have already contributed something useful to phpMyAdmin.<br />
     Also, have a look at the
     <a href="#developers">Developers section</a>.
-</p>
-<a name="faqsecurity"></a><br />
-<h3>[8. Security ]</h3>
-
-<h4>
-    [8.1] Security alert, dated 2003-06-18.
-</h4>
-<p>
-    Last update of this FAQ: 2003-07-02.
-    <br /><br />
-    The phpMyAdmin development team received notice of this security alert:
-    <a href="http://www.securityfocus.com/archive/1/325641" target="_blank">http://www.securityfocus.com/archive/1/325641.</a>
-    <br /><br />
-
-    The team regrets that the author did not communicate with us before
-    sending this alert. However, here is our current reply to the points mentionned:
-    <br /><br />
-    <ul>
-        <li>&quot;Directory transversal attack&quot;
-        <br /><br />
-
-        This problem had been fixed in version 2.5.0, even if the author reports
-        the 2.5.2 development version as vulnerable, which we could not reproduce.
-        <br /><br />
-        </li>
-        <li>&quot;Remote local file retrieving&quot;
-        <br /><br />
-        This is a misleading title, as the author tells in his text:
-        &quot;Note that you can't request files ( only dirs )&quot;.
-        <br /><br />
-        </li>
-
-        <li>&quot;Remote internal directory listing&quot;
-        <br /><br />
-        It was possible to retrieve the list of phpMyAdmin's directory (which we
-        doubt can cause any damage), but we fixed this in the upcoming
-        2.5.2 version.
-        <br /><br />
-        </li>
-
-        <li>&quot;XSS and Path disclosures&quot;
-        <br /><br />
-        Most of the XSS problems have been fixed in version 2.5.0. The rest
-        have been fixed in the upcoming 2.5.2 version.
-        <br /><br />
-        We are currently looking at the Path disclosure issue.
-        <br /><br />
-        </li>
-        <li>&quot;Information encoding weakness&quot;
-        <br /><br />
-        We believe that an exploit for this weakness would be difficult 
-        to achieve.  However version 2.5.2-dev now encrypts the password
-        with the well-known blowfish algorithm.
-        <br /><br />
-        </li>
-    </ul>
-
 </p>
 
 <!-- DEVELOPERS -->
@@ -3517,10 +3361,10 @@ CREDITS, in chronological order
     * main author of the version 2.1.0.1
     * bugfixes
 
-- Alexander M. Turek &lt;derrabus_at_gmx.de&gt;
+- Alexander M. Turek &lt;rabus_at_bugfixes.info&gt;
     * XML exports
     * MySQL 4 related features
-    * various features and fixes
+    * various small features and fixes
     * German language file updates
 
 - Mike Beck &lt;mike.beck_at_ibmiller.de&gt;
@@ -3562,11 +3406,8 @@ CREDITS, in chronological order
 - Olof Edlund &lt;olof.edlund_at_upright.se&gt;
     * SQL validator server
 
-- Ivan R. Lanin &lt;ivanlanin_at_users.sourceforge.net&gt;
+- Ivan R. Lanin &lt;ivanlanin_at_users.sourceforfe.net&gt;
     * phpMyAdmin logo
-
-- Mike Cochrane &lt;mike_at_graftonhall.co.nz&gt;
-    * blowfish library from the Horde project
 
 And also to the following people who have contributed minor changes,
 enhancements, bugfixes or support for a new language since version 2.1.0:

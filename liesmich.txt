@@ -1,0 +1,94 @@
+Verwendete Version xampp für Windows Version 0.9 vom 21. Juli 2003 (von einem User)
+
+-Tolles System, ein dickes Lob an die Mitwirkenden- 
+
+Diese Kurzanleitung zur Installation soll dem Neueinsteiger bei die ersten "möglichen" Problemen helfen.
+Die beiliegenden Dokumentationen sind durchaus hilfreich, wenn man sie liest.
+
+1.	WEB-Server soll z. B. auf Festplatte h:\ definiert werden!
+
+2.	xampp-win32-1.0.exe anklicken und h:\ eintragen es erfolgt das entpacken nach h:\xampp
+
+3.	h:\xampp\setup_xampp.bat ausführen und 1 oder 2 wählen, bei 2 dauert der Serverstart länger
+
+
+	Apache automatisch als Dienst starten  (XP-Pro)
+	_________________________________________________
+	Lästige "Handstarts" entfallen. 
+	Nachteil: Dienste werden nur unter Windows NT, Windows 2000 oder XP Professional unterstützt. 
+
+	In vielen der jeweiligen Serververzeichnisse sind vorgefertigte Batch-Dateien, 
+	die den jeweiligen Server als Dienst installieren oder deinstallieren, z.B.: 
+
+4.	h:\xampp\apache\apache_installservice.bat => Apache installieren als Dienst 
+
+	h:\xampp\apache\apache_uninstallservice.bat => Apache deinstallieren als Dienst 
+
+
+	Wichtiger Hinweis zur Deinstallation 
+	====================================
+	Damit die "apache_uninstallservice.bat" wirken kann, den Apache Server zuvor stoppen! und den Dienst 
+	Apache2 kontrollieren, evtl. per Hand deaktivieren.
+
+
+	zusätzliche Erfahrungen
+	- - - - - - - - - - - -
+	Unter Programme - Autostart eine Verknüpfung auf H:\XAMPP\APACHE\BIN\ ApacheMonitor.exe einbinden
+	So sieht man unten rechts (Infobereich der Taskleiste) den Zustand des Apache Servers (Pfeil grün oder rot)
+
+
+	Mysql automatisch als Dienst starten   (XP-Pro)
+	_________________________________________________
+
+5.	h:\xampp\mysql\mysql_installservice.bat => MySQL installieren als Dienst 
+
+	h:\xampp\mysql\mysql_uninstallservice.bat => MySQL deinstallieren als Dienst 
+
+
+	Wichtiger Hinweis zur Deinstallation 
+	====================================
+	Damit die "mysql_uninstallservice.bat" wirken kann, den MySQL Server zuvor stoppen! und den Dienst
+	mysql kontrollieren, evtl. per Hand deaktivieren
+
+	zusätzliche Erfahrungen
+	- - - - - - - - - - - - 
+	Unter Programme - Autostart eine Verknüpfung auf H:\XAMPP\MYSQL\BIN\ winmysqladmin.exe einbinden
+	So sieht man unten rechts (Infobereich der Taskleiste) den Zustand des MySQL-Servers (Ampel grün oder rot)
+
+	Wichtig unter C:\Windows die Datei my.ini anpassen, die wird beim Start abgefragt, siehe 6.
+
+
+6.	Unter c:\windows die Datei my.ini anpassen, wenn man in der Taskleiste den Mysql Server mit WinMysqladmin
+	überwachen will. my.ini sollte mind. diesen Inhalt haben oder nach den Vorlagen aus ..mysql angepasst sein.
+
+	#This File was made using the WinMySQLAdmin 1.4 Tool
+	#15.02.2003 22:20:15
+	#Uncomment or Add only the keys that you know how works.
+	#Read the MySQL Manual for instructions
+	[mysqld]
+	basedir=H:/xampp/mysql
+	#bind-address=192.168.0.100                 <oder localhost>
+	datadir=H:/xampp/mysql/data
+	language=H:/xampp/mysql/share/german
+	#slow query log#=
+	tmpdir=H:/xampp/tmp
+	port=3306
+	#set-variable=key_buffer=16M
+	[WinMySQLadmin]
+	Server=H:/xampp/mysql/bin/mysqld-nt.exe
+	#user= <Benutzername z.B. root aus dem ersten Start von WinMysqlAdmin>
+	#password=<Passwort das für obigen User vergeben wurde>
+	QueryInterval=10
+
+
+7.	Kontrolle der Dienste unter START-Einstellungen-Systemsteuerung-Verwaltung-Dienste und dort die 
+	gewünschte Startart einstellen z. B. Automatisch usw.
+
+
+8.	Zum Test Browser starten und localhost eintragen und es sollte alles richtig angezeigt werden.
+
+
+Neustart des gesamten Systems könnte nicht schaden.
+
+Nun viel Spaß
+dw

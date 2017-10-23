@@ -1,5 +1,5 @@
 <?php
-/* $Id: polish-iso-8859-2.inc.php,v 1.115 2003/07/06 12:14:39 lem9 Exp $ */
+/* $Id: polish-iso-8859-2.inc.php,v 1.103 2003/05/30 16:42:48 lem9 Exp $ */
 
 $charset = 'iso-8859-2';
 $text_dir = 'ltr';
@@ -24,8 +24,6 @@ $strAccessDenied = 'Brak dostêpu';
 $strAction = 'Dzia³anie';
 $strAddDeleteColumn = 'Dodanie/usuniêcie pól';
 $strAddDeleteRow = 'Dodanie/usuniêcie wierszy kryteriów';
-$strAddDropDatabase = 'Dodanie DROP DATABASE';
-$strAddIntoComments = 'Dodanie do komentarzy';
 $strAddNewField = 'Dodanie nowego pola';
 $strAddPriv = 'Dodanie nowych uprawnien';
 $strAddPrivMessage = 'Nowe uprawnienia zosta³y dodane.';
@@ -63,7 +61,7 @@ $strAutomaticLayout = 'Uk³ad automatyczny';
 
 $strBack = 'Powrót';
 $strBeginCut = 'TNIJ ST¡D';
-$strBeginRaw = 'SUROWE DANE ST¡D';
+$strBeginRaw = 'TNIJ ST¡D';
 $strBinary = ' Binarne ';
 $strBinaryDoNotEdit = ' Binarne - nie do edycji ';
 $strBookmarkDeleted = 'Zapamiêtane zapytanie SQL zosta³o usuniête.';
@@ -141,9 +139,7 @@ $strData = 'Dane';
 $strDataDict = 'S³ownik danych';
 $strDataOnly = 'Tylko dane';
 $strDatabase = 'Baza danych ';
-$strDatabaseExportOptions = 'Opcje eksportu bazy danych';
 $strDatabaseHasBeenDropped = 'Baza danych %s zosta³a usuniêta.';
-$strDatabaseNoTable = 'Ta baza danych nie zawiera ¿adnej tabeli!';
 $strDatabaseWildcard = 'Baza danych (dozwolone maski):';
 $strDatabases = 'bazy danych';
 $strDatabasesDropped = '%s baz danych zosta³o pomy¶lnie usuniêtych.';
@@ -193,11 +189,9 @@ $strEmptyResultSet = 'MySQL zwróci³ pusty wynik (np. zero rekordów).';
 $strEnabled = 'w³±czone';
 $strEnd = 'Koniec';
 $strEndCut = 'TNIJ DOT¡D';
-$strEndRaw = 'SUROWE DANE DOT¡D';
+$strEndRaw = 'TNIJ DOD¡D';
 $strEnglishPrivileges = ' Uwaga: Uprawnienia MySQL s± oznaczone w jêz. angielskim ';
 $strError = 'B³±d';
-$strExcelOptions = 'Opcje Excela';
-$strExecuteBookmarked = 'Wykonanie zapamiêtanego zapytania';
 $strExplain = 'Wyja¶nienie SQL';
 $strExport = 'Eksport';
 $strExportToXML = 'Eksport do formatu XML';
@@ -375,7 +369,6 @@ $strOverwriteExisting = 'Nadpisywanie istniej±cych plików';
 $strPHP40203 = 'U¿ywasz PHP w wersji 4.2.3, która ma powa¿ny b³±d w obs³udze napisów wielobajtowych (mbstring). Zobacz raport na temat b³êdów PHP nr 19404. Nie zaleca siê u¿ywania tej wersji PHP z phpMyAdminem.';
 $strPHPVersion = 'Wersja PHP';
 $strPageNumber = 'Numer strony:';
-$strPaperSize = 'Rozmiar papieru';
 $strPartialText = 'Skrócony tekst';
 $strPassword = 'Has³o';
 $strPasswordChanged = 'Has³o dla %s zosta³o pomy¶lnie zmienione.';
@@ -415,9 +408,9 @@ $strPrivDescGrant = 'Pozwala dodawaæ u¿ytkowników i nadawaæ uprawnienia bez prze
 $strPrivDescIndex = 'Pozwala tworzyæ i usuwaæ indeksy.';
 $strPrivDescInsert = 'Pozwala wstawiaæ i zamieniaæ dane.';
 $strPrivDescLockTables = 'Pozwala blokowaæ tabele dla aktualnego w±tku.';
-$strPrivDescMaxConnections = 'Ogranicza liczbê nowych po³±czeñ, które mo¿e otworzyæ u¿ytkownik w ci±gu godziny.';
-$strPrivDescMaxQuestions = 'Ogranicza liczbê zapytañ, które mo¿e wys³aæ u¿ytkownik w ci±gu godziny.';
-$strPrivDescMaxUpdates = 'Ogranicza liczbê poleceñ zmieniaj±cych jak±kolwiek tabelê lub bazê danych, które mo¿e wykonaæ u¿ytkownik w ci±gu godziny.';
+$strPrivDescMaxConnections = 'Limits the number of new connections the user may open per hour.';
+$strPrivDescMaxQuestions = 'Limits the number of queries the user may send to the server per hour.';
+$strPrivDescMaxUpdates = 'Limits the number of commands that change any table or database the user may execute per hour.';
 $strPrivDescProcess3 = 'Pozwala unicestwiaæ procesy innych u¿ytkowników.';
 $strPrivDescProcess4 = 'Pozwala zobaczyæ pe³n± listê zapytañ na li¶cie procesów.';
 $strPrivDescReferences = 'Nie ma ¿adnych skutków w tej wersji MySQL.';
@@ -447,7 +440,6 @@ $strQuerySQLHistory = 'Historia SQL';
 $strQueryStatistics = '<b>Statystyki zapytañ</b>: Od rozpoczêcia jego pracy, do serwera zosta³o wys³anych %s zapytañ.';
 $strQueryTime = 'Wykonanie zapytania trwa³o %01.4f sekund(y)';
 $strQueryType = 'Rodzaj zapytania';
-$strQueryWindowLock = 'Nie nadpisuj tego zapytania spoza okna';
 
 $strReType = 'Ponownie';
 $strReceived = 'Otrzymane';
@@ -466,7 +458,6 @@ $strRenameTable = 'Zmiana nazwy tabeli na';
 $strRenameTableOK = 'Tabela %s ma zmienion± nazwê na %s';
 $strRepairTable = 'Naprawienie tabeli';
 $strReplace = 'Zamiana';
-$strReplaceNULLBy = 'Zamienienie NULL przez';
 $strReplaceTable = 'Zamiana danych tabeli z plikiem';
 $strReset = 'Reset';
 $strResourceLimits = 'Ograniczenia zasobów';
@@ -492,8 +483,8 @@ $strRunning = 'uruchomiony na %s';
 
 $strSQL = 'SQL';
 $strSQLOptions = 'Opcje SQL';
-$strSQLParserBugMessage = 'Istnieje szanse, ¿e w³a¶nie znalaz³e¶ b³±d w analizatorze sk³adni SQL. Zbadaj bli¿ej swoje zapytanie i sprawd¼, czy cudzys³owy s± poprawne i dobrze sparowane. Inn± mo¿liw± przyczyn± niepowodzenia mo¿e byæ to, ¿e wysy³asz plik ze znakami binarnymi poza obszarem tekstu ujêtego w cudzys³owy. Mo¿esz równie¿ sprawdziæ swoje zapytanie SQL poprzez liniê poleceñ MySQL. W znalezieniu przyczyny problemu mo¿e pomóc tak¿e - je¶li siê pojawi - poni¿szy opis b³êdu serwera MySQL. Je¶li nadam masz problemy lub analizator sk³adni zg³asza usterkê a linia poleceñ - nie, ogranicz sekwencjê zapytañ SQL do pojedynczego, które powoduje problemy i zg³o¶æ b³±d, do³±czaj±c fragment danych zawarty w poni¿szej sekcji TNIJ:';
-$strSQLParserUserError = 'Wygl±da na to, ¿e w twoim zapytaniu SQL jest b³±d. W znalezieniu przyczyny problemu mo¿e pomóc tak¿e - je¶li siê pojawi - poni¿szy opis b³êdu serwera MySQL.';
+$strSQLParserBugMessage = 'Istnieje szanse, ¿e w³a¶nie znalaz³e¶ b³±d w analizatorze sk³adni SQL. Zbadaj bli¿ej swoje zapytanie i sprawd¼, czy cudzys³owy s± poprawne i dobrze sparowane. Inn± mo¿liw± przyczyn± niepowodzenia mo¿e byæ to, ¿e wysy³asz plik ze znakami binarnymi poza obszarem tekstu ujêtego w cudzys³owy. Mo¿esz równie¿ sprawdziæ swoje zapytanie SQL poprzez liniê poleceñ MySQL. W znalezieniu przyczyny problemu mo¿e pomóæ tak¿e - je¶li siê pojawi - poni¿szy opis b³êdu serwera MySQL. Je¶li nadam masz problemy lub analizator sk³adni zg³asza usterkê a linia poleceñ - nie, ogranicz sekwencjê zapytañ SQL do pojedynczego, które powoduje problemy i zg³o¶æ b³±d, do³±czaj±c fragment danych zawarty w poni¿szej sekcji CUT:';
+$strSQLParserUserError = 'Wygl±da na to, ¿e w twoim zapytaniu SQL jest b³±d. W znalezieniu przyczyny problemu mo¿e pomóæ tak¿e - je¶li siê pojawi - poni¿szy opis b³êdu serwera MySQL.';
 $strSQLQuery = 'zapytanie SQL';
 $strSQLResult = 'Rezultat SQL';
 $strSQPBugInvalidIdentifer = 'Nieprawid³owy identyfikator';
@@ -512,7 +503,6 @@ $strSearchOption3 = 'ca³a fraza';
 $strSearchOption4 = 'jako wyra¿enie regularne';
 $strSearchResultsFor = 'Szukaj w rezultatach dla "<i>%s</i>" %s:';
 $strSearchType = 'Znajd¼:';
-$strSecretRequired = 'Plik konfiguracyjny wymaga teraz tajnej frazy koduj±cej (blowfish_secret).';
 $strSelect = 'Wybór';
 $strSelectADb = 'Proszê wybraæ bazê danych';
 $strSelectAll = 'Zaznaczenie wszystkich';
@@ -574,7 +564,6 @@ $strTableHasBeenEmptied = 'Tabela %s zosta³a opró¿niona';
 $strTableHasBeenFlushed = 'Tabela %s zosta³a prze³adowana';
 $strTableMaintenance = 'Zarz±dzanie tabel±';
 $strTableOfContents = 'Spis tre¶ci';
-$strTableOptions = 'Opcje tabeli';
 $strTableStructure = 'Struktura tabeli dla ';
 $strTableType = 'Typ tabeli';
 $strTables = '%s tabel(a)';
@@ -587,7 +576,6 @@ $strThisHost = 'Ten host';
 $strThisNotDirectory = 'To nie by³ katalog';
 $strThreadSuccessfullyKilled = 'W±tek %s zosta³ pomy¶lnie unicestwiony.';
 $strTime = 'Czas';
-$strToggleScratchboard = 'w³±cz / wy³±cz scratchboard';
 $strTotal = 'wszystkich';
 $strTotalUC = 'Sumarycznie';
 $strTraffic = 'Ruch';
@@ -625,7 +613,7 @@ $strUserNotFound = 'Wybrany u¿ytkownik nie zosta³ znaleziony w tabeli uprawnieñ.
 $strUserOverview = 'Opis u¿ytkownika';
 $strUsers = 'U¿ytkownicy';
 $strUsersDeleted = 'Wybrani u¿ytkownicy zostali pomy¶lnie usuniêci.';
-$strUsersHavingAccessToDb = 'U¿ytkownicy maj±cy dostêp do &quot;%s&quot;';
+$strUsersHavingAccessToDb = 'U¿ytkownicy maj±cy dostêp do &quot;%s&quot;'; 
 
 $strValidateSQL = 'Sprawdzanie proprawno¶ci SQL';
 $strValidatorError = 'Analizator sk³adni SQL nie móg³ zostaæ zainicjalizowany. Sprawd¼, czy zainstalowane s± niezbêdne rozszerzenia php, tak jak zosta³o to opisane w %sdokumentacji%s.';
@@ -633,7 +621,6 @@ $strValue = 'Warto¶æ';
 $strVar = 'Zmienna';
 $strViewDump = 'Zrzut tabeli';
 $strViewDumpDB = 'Zrzut bazy danych';
-$strViewDumpDatabases = 'Zobacz zrzut (schemat) baz danych';
 
 $strWebServerUploadDirectory = 'katalog serwera www dla uploadu';
 $strWebServerUploadDirectoryError = 'Katalog ustalony dla uploadu jest nieosi±galny';
@@ -651,7 +638,5 @@ $strYes = 'Tak';
 $strZeroRemovesTheLimit = 'Uwaga: Ustawienie tych opcji na 0 (zero) usuwa ograniczenie.';
 $strZip = '".zip"';
 // To translate
-
-$strAccessDeniedExplanation = 'phpMyAdmin tried to connect to the MySQL server, and the server rejected the connection. You should check the host, username and password in config.inc.php and make sure that they correspond to the information given by the administrator of the MySQL server.';  //to translate
 
 ?>

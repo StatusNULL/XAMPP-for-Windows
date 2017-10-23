@@ -1,5 +1,5 @@
 <?php
-/* $Id: german-iso-8859-1.inc.php,v 1.128 2003/07/06 14:41:58 rabus Exp $ */
+/* $Id: german-iso-8859-1.inc.php,v 1.117 2003/05/29 17:44:10 garvinhicking Exp $ */
 
 /**
  * For suggestions concerning this file please contact
@@ -646,18 +646,4 @@ $strNoSpace = 'Zu wenig Speicherplatz um die Datei %s zu speichern.';
 $strInsertedRowId = 'Letzte automatisch eingefügte ID:';
 $strLoadMethod = 'LOAD-Methode';
 $strLoadExplanation = 'Die beste Methode zur Verarbeitung der hochgeladenen Datei durch MySQL ist standardmäßig aktiviert.  Wählen Sie bei Problemen bitte die andere Methode.';
-$strExecuteBookmarked = 'Gespeicherte SQL-Anfrage ausführen';
-$strExcelOptions = 'Excel-Optionen';
-$strReplaceNULLBy = 'Ersetze NULL mit';
-$strQueryWindowLock = 'Abfrage vor Änderungen ausserhalb des Fensters schützen';
-$strPaperSize = 'Papiergröße';
-$strDatabaseNoTable = 'Diese Datenbank enthält keine Tabelle!';
-$strViewDumpDatabases = 'Dump (Schema) der Datenbanken anzeigen';
-$strAddIntoComments = 'In Kommentarbereich einbeziehen';
-$strDatabaseExportOptions = 'Export-Optionen der Datenbank';
-$strAddDropDatabase = 'DROP DATABASE hinzufügen';
-$strToggleScratchboard = 'Klemmbrett anzeigen';
-$strTableOptions = 'Tabellenoptionen';
-$strSecretRequired = 'Ab sofort muss ein geheimes Passwort zur Verschlüsselung in der Konfigurationsdatei gesetzt werden (blowfish_secret).';
-$strAccessDeniedExplanation = 'phpMyAdmin hat versucht eine Verbindung zum MySQL-Server aufzubauen, jedoch hat dieser die Verbindung zurückgewiesen. Sie sollten Ihre Einstellungen für Host, Benutzername und Kennwort in Ihrer config.inc.php überprüfen und sich vergewissern, dass diese den Informationen, welche sie vom Administrator erhalten haben, entsprechen.';
 ?>

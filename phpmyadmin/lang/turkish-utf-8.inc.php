@@ -1,5 +1,5 @@
 <?php
-/* $Id: turkish-utf-8.inc.php,v 1.102 2003/07/06 11:55:08 lem9 Exp $ */
+/* $Id: turkish-utf-8.inc.php,v 1.91 2003/05/29 16:44:04 lem9 Exp $ */
 
 //çeviride eksik veya hatalı olduğunu düşündüğünüz kısımları bora@ktu.edu.tr adresine gönderebilirsiniz...
 //bora alioğlu 02.08.2002...tempus fugit...
@@ -25,8 +25,6 @@ $strAccessDenied = 'Erişim engellendi';
 $strAction = 'Eylem';
 $strAddDeleteColumn = 'Sütun alanı Ekle/Sil';
 $strAddDeleteRow = 'Kriter satırı Ekle/Sil';
-$strAddDropDatabase = 'DROP DATABASE ekle(veritabanını kaldır)'; 
-$strAddIntoComments = 'Yorumlara ekle'; 
 $strAddNewField = 'Yeni alan ekle';
 $strAddPriv = 'Yeni ayrıcalık ekle';
 $strAddPrivMessage = 'Yeni ayrıcalık eklediniz..';
@@ -104,9 +102,7 @@ $strCriteria = 'Kriter';
 $strData = 'Veri';
 $strDataOnly = 'Sadece veri';
 $strDatabase = 'Veritabanı ';
-$strDatabaseExportOptions = 'Veritabanı export ayarları'; 
 $strDatabaseHasBeenDropped = '%s veritabanı kaldırıldı.';
-$strDatabaseNoTable = 'Bu veritabanı tablo içermiyor!'; 
 $strDatabaseWildcard = 'Veritabanı (* izin verili):';
 $strDatabases = 'veritabanları';
 $strDatabasesStats = 'Veritabanı istatistikleri';
@@ -143,8 +139,6 @@ $strEnabled = 'Etkin';
 $strEnd = 'Son';
 $strEnglishPrivileges = ' Not: mySQL  öncelik adları İngilizce olarak belirtilmiştir ';
 $strError = 'Hata';
-$strExcelOptions = 'Excel ayarları'; 
-$strExecuteBookmarked = 'İşaretlenmiş sorguyu çalıştır'; 
 $strExplain = 'SQL\'i açıkla';
 $strExport = 'Dönüştür';
 $strExportToXML = 'XML formatına dönüştür';
@@ -279,7 +273,6 @@ $strOverwriteExisting = 'Mevcut dosyaların üzerine yaz!';
 
 $strPHPVersion = 'PHP Sürümü';
 $strPageNumber = 'Sayfa numarası:';
-$strPaperSize = 'Kağıt boyu'; 
 $strPartialText = 'Bölümsel Metinler';
 $strPassword = 'Şifre';
 $strPasswordEmpty = 'Şifre alanı doldurulmadı!';
@@ -309,7 +302,6 @@ $strQBEDel = 'Del';
 $strQBEIns = 'Ins';
 $strQueryOnDb = 'Veritabanı üzerinde SQL-sorgusu&nbsp;<b>%s</b>:';
 $strQueryStatistics = '<b>Query statistics</b>: Since its startup, %s queries have been sent to the server.';
-$strQueryWindowLock = 'Pencere dışından bu sorgunun üzerine yazma'; 
 
 $strReType = 'Yeniden gir';
 $strRecords = 'Kayıtlar';
@@ -324,7 +316,6 @@ $strRenameTable = 'Tablonun ismini şuna değiştir';
 $strRenameTableOK = '%s tablosu %s olarak yeniden adlandırıldı';
 $strRepairTable = 'Tablo\'yu onar';
 $strReplace = 'Yerdeğiştir';
-$strReplaceNULLBy = 'NULL u yerdeğiştir'; 
 $strReplaceTable = 'Tablo verisini bir dosyadaki ile değiştir';
 $strReset = 'Sıfırla';
 $strRevoke = 'Geçersiz kıl';
@@ -360,7 +351,6 @@ $strSearchOption3 = 'tam eşleşim';
 $strSearchOption4 = 'normal deyim gibi';
 $strSearchResultsFor = ' "%s" %s için arama sonuçları:';
 $strSearchType = 'Bul:';
-$strSecretRequired = 'Ayar dosyası için gizli bir şifre gerekiyor (blowfish_secret).'; 
 $strSelect = 'Seç';
 $strSelectADb = ' Lütfen bir veritaban&#305; seçiniz';
 $strSelectAll = 'Tümünü seç';
@@ -406,7 +396,6 @@ $strTableHasBeenDropped = '%s tablosu kaldırılmıştır';
 $strTableHasBeenEmptied = '%s tablosu boşaltılmıştır';
 $strTableHasBeenFlushed = '%s tablosu ba&#351;ar&#305;yla kapat&#305;lm&#305;&#351;t&#305;r.';
 $strTableMaintenance = 'Tablo bakımı';
-$strTableOptions = 'Tablo ayarları'; 
 $strTableStructure = 'Tablo için tablo yapısı';
 $strTableType = 'Tablo tipi';
 $strTables = '%s tablo';
@@ -414,7 +403,6 @@ $strTextAreaLength = 'Boyutu nedeniyle,<br /> bu alan düzenlenmeyebilir ';
 $strTheContent = 'Dosyanızın içeriği eklendi.';
 $strTheContents = 'Dosyanın içeriği tablonun içeriğini aynı birincil veya unique anahtar değerli sütunlar için yer değiştirir..';
 $strTheTerminator = 'Alan bitimini belirten işaret.';
-$strToggleScratchboard = 'toggle scratchboard'; 
 $strTotal = 'toplam';
 $strType = 'Tip';
 
@@ -437,7 +425,6 @@ $strValidateSQL = 'SQL\'i doğrula';
 $strValue = 'Değer';
 $strViewDump = 'Tablo\'nun döküm(şema)\'ünü göster';
 $strViewDumpDB = 'Veritabanı\'nın döküm(şema)\'ünü göster';
-$strViewDumpDatabases = 'Veritabanlarının şemalarını (dump) gör'; 
 
 $strWelcome = '%s \'e HOŞGELDİNİZ....';
 $strWithChecked = 'seçilileri:';
@@ -536,8 +523,6 @@ $strJustDeleteDescr = 'The &quot;deleted&quot; users will still be able to acces
 
 $strLaTeX = 'LaTeX';  //to translate
 $strLandscape = 'Landscape';  //to translate
-$strLoadExplanation = 'The best method is checked by default, but you can change if it fails.';  //to translate
-$strLoadMethod = 'LOAD method';  //to translate
 $strLoginInformation = 'Login Information'; //to translate
 
 $strMIME_MIMEtype = 'MIME-type';//to translate
@@ -675,5 +660,6 @@ $strWritingRelationNotPossible = 'Writing of relation not possible';  //to trans
 $strXML = 'XML';//to translate
 
 $strZeroRemovesTheLimit = 'Note: Setting these options to 0 (zero) removes the limit.'; //to translate
-$strAccessDeniedExplanation = 'phpMyAdmin tried to connect to the MySQL server, and the server rejected the connection. You should check the host, username and password in config.inc.php and make sure that they correspond to the information given by the administrator of the MySQL server.';  //to translate
+$strLoadMethod = 'LOAD method';  //to translate
+$strLoadExplanation = 'The best method is checked by default, but you can change if it fails.';  //to translate
 ?>

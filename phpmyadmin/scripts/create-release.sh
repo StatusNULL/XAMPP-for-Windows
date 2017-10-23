@@ -1,10 +1,6 @@
 #!/bin/sh
 #
-# $Id: create-release.sh,v 1.31 2003/06/26 00:36:58 lem9 Exp $
-#
-# 2003-06-22, robbat2@users.sourceforge.net:
-# - Moved to using updatedocs.sh for updating documentation
-# - Make tarring faster by re-arranging ops
+# $Id: create-release.sh,v 1.27 2003/02/01 16:27:39 nijel Exp $
 #
 # 2003-01-17, rabus@users.sourceforge.net:
 # - Changed the CVS hostname to cvs1 because cvs1.sourceforge.net is now blocked
@@ -63,7 +59,7 @@ Please ensure you have:
           " <h1>phpMyAdmin $1 Documentation</h1> "
      - in translators.html
   2. built the new "Documentation.txt" version using:
-       "./scripts/updatedocs.sh"
+       lynx --dont_wrap_pre --nolist --dump Documentation.html > Documentation.txt
   3. synchronized the language files:
        cd lang
        ./sync_lang.sh
@@ -75,53 +71,33 @@ END
 printf "\a"
 read do_release
 
-if [ "$do_release" != 'y' ]; then
+if [ $do_release != 'y' ]
+then
   exit
 fi
 
-# Move old cvs dir
+
 if [ -e cvs ];
 then
     mv cvs cvs-`date +%s`
 fi
-# Do CVS checkout
 mkdir cvs
 cd cvs
 echo "Press [ENTER]!"
 cvs -d:pserver:anonymous@cvs1:/cvsroot/phpmyadmin login
-if [ $? -ne 0 ] ; then
-    echo "CVS login failed, bailing out"
-    exit 1
-fi
 cvs -z3 -d:pserver:anonymous@cvs1:/cvsroot/phpmyadmin co -P $branch phpMyAdmin
-if [ $? -ne 0 ] ; then
-    echo "CVS checkout failed, bailing out"
-    exit 2
-fi
 
-# Cleanup release dir
-LC_ALL=C date -u > phpMyAdmin/RELEASE-DATE-$1
-find phpMyAdmin \( -name .cvsignore -o -name CVS \) -print0 | xargs -0 rm -rf 
-find phpMyAdmin -type d -print0 | xargs -0 chmod 755
-find phpMyAdmin -type f -print0 | xargs -0 chmod 644
-find phpMyAdmin \( -name '*.sh' -o -name '*.pl' \) -print0 | xargs -0 chmod 755
+date > phpMyAdmin/RELEASE-DATE-$1
 mv phpMyAdmin phpMyAdmin-$1
-
-# Roll up '.php3' release
 zip -9 -r phpMyAdmin-$1-php3.zip phpMyAdmin-$1
-tar cvf phpMyAdmin-$1-php3.tar phpMyAdmin-$1
-bzip2 -9kv phpMyAdmin-$1-php3.tar
-gzip -9v phpMyAdmin-$1-php3.tar
-
-# Setup for '.php' release
+tar cvzf phpMyAdmin-$1-php3.tar.gz phpMyAdmin-$1
+tar cvjf phpMyAdmin-$1-php3.tar.bz2 phpMyAdmin-$1
 cd phpMyAdmin-$1
 ./scripts/extchg.sh php3 php
 cd ..
-# Roll up '.php' release
 zip -9 -r phpMyAdmin-$1-php.zip phpMyAdmin-$1
-tar cvf phpMyAdmin-$1-php.tar phpMyAdmin-$1
-bzip2 -9kv phpMyAdmin-$1-php.tar
-gzip -9v phpMyAdmin-$1-php.tar
+tar cvzf phpMyAdmin-$1-php.tar.gz phpMyAdmin-$1
+tar cvjf phpMyAdmin-$1-php.tar.bz2 phpMyAdmin-$1
 
 echo ""
 echo ""
@@ -131,8 +107,7 @@ echo "------"
 
 ls -la *.gz *.zip *.bz2
 cd ..
-find cvs -type d -print0 | xargs -0 chmod 775
-find cvs -type f -print0 | xargs -0 chmod 664
+chmod -R 775 cvs
 
 
 cat <<END

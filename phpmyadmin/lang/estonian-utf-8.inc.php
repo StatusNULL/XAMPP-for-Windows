@@ -1,5 +1,5 @@
 <?php
-/* $Id: estonian-utf-8.inc.php,v 1.104 2003/07/06 11:55:06 lem9 Exp $ */
+/* $Id: estonian-utf-8.inc.php,v 1.94 2003/05/29 16:44:01 lem9 Exp $ */
 
 $charset = 'utf-8';
 $allow_recoding = TRUE;
@@ -640,18 +640,4 @@ $strZip = '"zipitud"';
 
 $strLoadMethod = 'LOAD method';  //to translate
 $strLoadExplanation = 'The best method is checked by default, but you can change if it fails.';  //to translate
-$strExecuteBookmarked = 'Execute bookmarked query';  //to translate
-$strExcelOptions = 'Excel options';  //to translate
-$strReplaceNULLBy = 'Replace NULL by';  //to translate
-$strQueryWindowLock = 'Do not overwrite this query from outside the window';  //to translate
-$strPaperSize = 'Paper size';  //to translate
-$strDatabaseNoTable = 'This database contains no table!';//to translate
-$strViewDumpDatabases = 'View dump (schema) of databases';//to translate
-$strAddIntoComments = 'Add into comments';//to translate
-$strDatabaseExportOptions = 'Database export options';//to translate
-$strAddDropDatabase = 'Add DROP DATABASE';//to translate
-$strToggleScratchboard = 'toggle scratchboard';  //to translate
-$strTableOptions = 'Table options';  //to translate
-$strSecretRequired = 'The configuration file now needs a secret passphrase (blowfish_secret).';  //to translate
-$strAccessDeniedExplanation = 'phpMyAdmin tried to connect to the MySQL server, and the server rejected the connection. You should check the host, username and password in config.inc.php and make sure that they correspond to the information given by the administrator of the MySQL server.';  //to translate
 ?>

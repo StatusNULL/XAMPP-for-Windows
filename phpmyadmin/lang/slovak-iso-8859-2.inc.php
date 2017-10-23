@@ -1,5 +1,5 @@
 <?php
-/* $Id: slovak-iso-8859-2.inc.php,v 1.107 2003/07/06 11:55:07 lem9 Exp $ */
+/* $Id: slovak-iso-8859-2.inc.php,v 1.96 2003/05/29 16:44:03 lem9 Exp $ */
 
 /* By: lubos klokner <erkac@vault-tec.sk> */
 
@@ -116,7 +116,6 @@ $strConnections = 'Spojenia';
 $strCookiesRequired = 'Cookies musia by» povolené, pokiaµ chcete pokraèova».';
 $strCopyTable = 'Skopírova» tabuµku do (databáza<b>.</b>tabuµka):';
 $strCopyTableOK = 'Tabuµka %s bola skorírovaná do %s.';
-$strCopyTableSameNames = 'Nedá sa skopírova» tabuµka sama do seba!';
 $strCouldNotKill = 'Neporadilo za zabi» vlákno %s. Jeho beh bol pravdepodobne u¾ ukonèený.';
 $strCreate = 'Vytvori»';
 $strCreateIndex = 'Vytvori» index na&nbsp;%s&nbsp;ståpcoch';
@@ -177,7 +176,6 @@ $strDropSelectedDatabases = 'Zru¹i» vybrané databázy';
 $strDropTable = 'Zru¹i» tabuµku';
 $strDropUsersDb = 'Odstráni» databázy s rovnakým menom ako majú pou¾ívatelia.';
 $strDumpComments = 'Vlo¾i» komentáre ståpcov ako SQL komentáre';
-$strDumpSaved = 'Dump (schéma) bol ulo¾ený do súboru %s.';
 $strDumpXRows = 'Zobrazi» %s riadkov od riadku %s.';
 $strDumpingData = 'S»ahujem dáta pre tabuµku';
 $strDynamic = 'dynamický';
@@ -194,8 +192,6 @@ $strEndCut = 'KONIEC VÝSEKU';
 $strEndRaw = 'KONIEC TOKU';
 $strEnglishPrivileges = ' Poznámka: názvy MySQL oprávnení sú uvádzané v angliètine. ';
 $strError = 'Chyba';
-$strExcelOptions = 'Nastavenie exportu do Excelu';
-$strExecuteBookmarked = 'Spusti» obµúbený dotaz';
 $strExplain = 'Vysvetli» SQL';
 $strExport = 'Exportova»';
 $strExportToXML = 'Exportova» do formátu XML';
@@ -210,7 +206,6 @@ $strFieldsEmpty = ' Poèet polí je prázdny! ';
 $strFieldsEnclosedBy = 'Polia uzatvorené';
 $strFieldsEscapedBy = 'Polia uvedené pomocou';
 $strFieldsTerminatedBy = 'Polia ukonèené';
-$strFileAlreadyExists = 'Súbor %s u¾ existuje na servery, zmente názov súboru alebo zvolte prepísanie súboru.';
 $strFileCouldNotBeRead = 'Súbor sa nedá preèíta»';
 $strFileNameTemplate = 'Vzor pre názov súboru';
 $strFileNameTemplateHelp = 'Pou¾ite __DB__ ako názov databázy, __TABLE__ ako názov tabuµky a akékoµvek parametre pre %sfunkciu strftime%s pre vlo¾enie dát. Prípona súboru bude pridaná automaticky podµa typu. Akýkoµvek iný text zostane zachovaný.';
@@ -263,7 +258,6 @@ $strInsert = 'Vlo¾i»';
 $strInsertAsNewRow = 'Vlo¾i» ako nový riadok';
 $strInsertNewRow = 'Vlo¾i» nový riadok';
 $strInsertTextfiles = 'Vlo¾i» textové súbory do tabuµky';
-$strInsertedRowId = 'Id vlo¾eného riadku:';
 $strInsertedRows = 'Vlo¾ené riadky:';
 $strInstructions = 'In¹trukcie';
 $strInvalidName = '"%s" je rezervované slovo, nemô¾e by» pou¾ité ako názov databázy/tabuµky/poµa.';
@@ -287,8 +281,6 @@ $strLines = 'Riadky';
 $strLinesTerminatedBy = 'Riadky ukonèené';
 $strLinkNotFound = 'Linka nebola nájdená';
 $strLinksTo = 'Linkova» na';
-$strLoadExplanation = 'Automaticky sú nastavené najlep¹ie hodnoty, ak toto nastavenie nebude fungova», mô¾ete skúsi» druhú mo¾nos».';
-$strLoadMethod = 'Parametre pre príkaz LOAD';
 $strLocalhost = 'Lokálny';
 $strLocationTextfile = 'Lokácia textového súboru';
 $strLogPassword = 'Heslo:';
@@ -315,8 +307,6 @@ $strModifyIndexTopic = 'Modifikova» index';
 $strMoreStatusVars = 'Ïal¹ie informácie o stave';
 $strMoveTable = 'Presunú» tabuµku do (databáza<b>.</b>tabuµka):';
 $strMoveTableOK = 'Tabuµka %s bola presunutá do %s.';
-$strMoveTableSameNames = 'Nedá sa presunú» tabuµka sama do seba!';
-$strMustSelectFile = 'Zvolte prosím súbor, ktorý si ¾eláte vlo¾i».';
 $strMySQLCharset = 'Znaková sada v MySQL';
 $strMySQLReloaded = 'MySQL znovu-naèítaná.';
 $strMySQLSaid = 'MySQL hlási: ';
@@ -339,12 +329,10 @@ $strNoIndexPartsDefined = 'Èasti indexu neboli definované!';
 $strNoModification = '®iadna zmena';
 $strNoOptions = 'Tento formát nemá ¾iadne nastavenia';
 $strNoPassword = '®iadne heslo';
-$strNoPermission = 'Web server nemá oprávenia na ulo¾enie do súboru %s.';
 $strNoPhp = 'bez PHP kódu';
 $strNoPrivileges = '®iadne oprávnenia';
 $strNoQuery = '®iadny SQL dotaz!';
 $strNoRights = 'Nemáte dostatoèné práva na vykonanie tejto akcie!';
-$strNoSpace = 'Nedostatok miesta pre ulo¾enie súboru %s.';
 $strNoTablesFound = 'Neboli nájdené ¾iadne tabuµky v tejto datábaze.';
 $strNoUsersFound = 'Nebol nájdený ¾iadny pou¾ívateµ.';
 $strNoUsersSelected = 'Nebol vybraný ¾iaden pou¾ívateµ.';
@@ -368,7 +356,6 @@ $strOptionally = 'Voliteµne';
 $strOptions = 'Voµby';
 $strOr = 'alebo';
 $strOverhead = 'Naviac';
-$strOverwriteExisting = 'Prepísa» existujúci súbor(y)';
 
 $strPHP40203 = 'Pou¾ívate PHP 4.2.3, ktoré ma vá¾nu chybu pri práci s viac bajtovými znakmi (mbstring). V PHP je táto chyba zdokumentovaná pod èíslom 19404. Nedoporuèuje sa pou¾íva» túto verziu PHP s phpMyAdminom.';
 $strPHPVersion = 'Verzia PHP';
@@ -462,7 +449,6 @@ $strRenameTable = 'Premenova» tabuµku na';
 $strRenameTableOK = 'Tabuµka %s bola premenovaná na %s';
 $strRepairTable = 'Opravi» tabuµku';
 $strReplace = 'Nahradi»';
-$strReplaceNULLBy = 'Nahradi» NULL hodnoty';
 $strReplaceTable = 'Nahradi» dáta v tabuµke súborom';
 $strReset = 'Pôvodné (Reset)';
 $strResourceLimits = 'Obmedzenie zdrojov';
@@ -496,7 +482,6 @@ $strSQPBugInvalidIdentifer = 'Neplatný identifikátor';
 $strSQPBugUnclosedQuote = 'Neuzatvorené úvodzovky';
 $strSQPBugUnknownPunctuation = 'Neznámy interpunkèný re»azec';
 $strSave = 'Ulo¾i»';
-$strSaveOnServer = 'Ulo¾i» na server do adresára %s';
 $strScaleFactorSmall = 'Mierka je príli¹ mala na roztiahnutie schémy na stránku';
 $strSearch = 'Hµada»';
 $strSearchFormTitle = 'Hµada» v databáze';
@@ -643,16 +628,24 @@ $strYes = 'Áno';
 $strZeroRemovesTheLimit = 'Poznámka: Nastavenie týchto parametrov na 0 (nulu) odstráni obmedzenia.';
 $strZip = '"zo zipované"';
 
-$strQueryWindowLock = 'Do not overwrite this query from outside the window';  //to translate
+$strCopyTableSameNames = 'Can\'t copy table to same one!';  //to translate
 
-$strPaperSize = 'Paper size';  //to translate
-$strDatabaseNoTable = 'This database contains no table!';//to translate
-$strViewDumpDatabases = 'View dump (schema) of databases';//to translate
-$strAddIntoComments = 'Add into comments';//to translate
-$strDatabaseExportOptions = 'Database export options';//to translate
-$strAddDropDatabase = 'Add DROP DATABASE';//to translate
-$strToggleScratchboard = 'toggle scratchboard';  //to translate
-$strTableOptions = 'Table options';  //to translate
-$strSecretRequired = 'The configuration file now needs a secret passphrase (blowfish_secret).';  //to translate
-$strAccessDeniedExplanation = 'phpMyAdmin tried to connect to the MySQL server, and the server rejected the connection. You should check the host, username and password in config.inc.php and make sure that they correspond to the information given by the administrator of the MySQL server.';  //to translate
+$strDumpSaved = 'Dump has been saved to file %s.';  //to translate
+
+$strFileAlreadyExists = 'File %s already exists on server, change filename or check overwrite option.';  //to translate
+
+$strInsertedRowId = 'Inserted row id:';  //to translate
+
+$strMoveTableSameNames = 'Can\'t move table to same one!';  //to translate
+$strMustSelectFile = 'You should select file which you want to insert.';  //to translate
+
+$strNoPermission = 'The web server does not have permission to save the file %s.';  //to translate
+$strNoSpace = 'Insufficient space to save the file %s.';  //to translate
+
+$strOverwriteExisting = 'Overwrite existing file(s)';  //to translate
+
+$strSaveOnServer = 'Save on server in %s directory';  //to translate
+
+$strLoadMethod = 'LOAD method';  //to translate
+$strLoadExplanation = 'The best method is checked by default, but you can change if it fails.';  //to translate
 ?>

@@ -32,6 +32,8 @@ flock($fp,3);
 fclose($fp);
 ?>
 </td></tr>
+<tr><td align=left>&nbsp;<p><a href="cds-en.php">NEW! Oswalds CD Collection v0.2 for win32!</a>
+</td></tr>
 <tr><td align=left>&nbsp;<p><a href="gd-en.html">(1) Dynamic graphs with GD 2</a>
 </td></tr>
 <tr><td align=left><a href="freetype-en.html">(2) Dynamic buttons with Freetype</a>

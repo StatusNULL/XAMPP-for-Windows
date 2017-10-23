@@ -1,5 +1,5 @@
 <?php
-/* $Id: server_privileges.php,v 1.33 2003/06/08 16:26:46 rabus Exp $ */
+/* $Id: server_privileges.php,v 1.32 2003/04/29 13:43:53 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -194,7 +194,7 @@ function PMA_displayPrivTable($db = '*', $table = '*', $submit = TRUE, $indent =
         unset($sql_query);
         $row1 = PMA_mysql_fetch_array($res, MYSQL_ASSOC);
         mysql_free_result($res);
-        $av_grants = explode ('\',\'' , substr($row1['Type'], strpos($row1['Type'], '(') + 2, strpos($row1['Type'], ')') - strpos($row1['Type'], '(') - 3));
+        $av_grants = explode ('\',\'' , substr($row1['Type'], 5, strlen($row1['Type']) - 7));
         unset($row1);
         $users_grants = explode(',', $row['Table_priv']);
         while (list(, $current_grant) = each($av_grants)) {

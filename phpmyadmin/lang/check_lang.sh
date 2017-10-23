@@ -1,5 +1,5 @@
 #!/bin/bash
-# $Id: check_lang.sh,v 1.3 2003/06/25 17:12:22 nijel Exp $
+# $Id: check_lang.sh,v 1.2 2003/01/01 22:26:36 nijel Exp $
 ##
 # Shell script to check that all language files are syncronized
 # Catches duplicate/missing strings
@@ -24,7 +24,6 @@ do
     egrep "$STRINGSTRING" $f | \
     grep -v 'allow_recoding' | \
     cut -d= -f1 | cut -d'$' -f2 | \
-    grep -Ev 'strEncto|strKanjiEncodConvert|strXkana' | \
     sort > $TMPDIR/$f
 done;
 

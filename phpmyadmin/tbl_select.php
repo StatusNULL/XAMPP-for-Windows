@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_select.php,v 1.58 2003/06/19 19:56:23 lem9 Exp $ */
+/* $Id: tbl_select.php,v 1.57 2003/05/20 13:12:28 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -65,10 +65,7 @@ if (!isset($param) || $param[0] == '') {
         // <markus@noga.de>
         // retrieve keys into foreign fields, if any
         $cfgRelation = PMA_getRelationsParam();
-        // check also foreigners even if relwork is FALSE (to get
-        // foreign keys from innodb)
-        //$foreigners  = ($cfgRelation['relwork'] ? PMA_getForeigners($db, $table) : FALSE);
-        $foreigners  = PMA_getForeigners($db, $table);
+        $foreigners  = ($cfgRelation['relwork'] ? PMA_getForeigners($db, $table) : FALSE);
         ?>
 <form method="post" action="tbl_select.php">
     <?php echo PMA_generate_common_hidden_inputs($db, $table); ?>

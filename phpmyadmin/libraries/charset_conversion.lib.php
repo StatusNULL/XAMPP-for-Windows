@@ -1,5 +1,5 @@
 <?php
-/* $Id: charset_conversion.lib.php,v 1.17 2003/06/13 07:37:23 nijel Exp $ */
+/* $Id: charset_conversion.lib.php,v 1.15 2003/05/11 17:29:53 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -13,10 +13,24 @@ if (!defined('PMA_CHARSET_CONVERSION_LIB_INCLUDED')){
 
     /**
      * Loads the recode or iconv extensions if any of it is not loaded yet
+     *
+     * (do not put a "@" before the dl() because we want to see the error
+     * message: multithreaded web servers don't support dl() but we cannot
+     * detect if the server is multithreaded, and under PHP 4.2.1 at least,
+     * it reports that the function dl exists...)
      */
     if (isset($cfg['AllowAnywhereRecoding'])
         && $cfg['AllowAnywhereRecoding']
-        && $allow_recoding) {
+        && $allow_recoding
+        && ((PMA_PHP_INT_VERSION >= 40000 && !@ini_get('safe_mode') && @ini_get('enable_dl'))
+        || (PMA_PHP_INT_VERSION < 40000 && PMA_PHP_INT_VERSION > 30009 && !@get_cfg_var('safe_mode')))
+        && @function_exists('dl')) {
+
+        if (PMA_IS_WINDOWS) {
+            $suffix = '.dll';
+        } else {
+            $suffix = '.so';
+        }
 
         // Initializes configuration for default, if not set:
         if (!isset($cfg['RecodingEngine'])) {
@@ -25,7 +39,7 @@ if (!defined('PMA_CHARSET_CONVERSION_LIB_INCLUDED')){
 
         if ($cfg['RecodingEngine'] == 'recode') {
             if (!@extension_loaded('recode')) {
-                PMA_dl('recode');
+                @dl('recode' . $suffix);
                 if (!@extension_loaded('recode')) {
                     echo $strCantLoadRecodeIconv;
                     exit();
@@ -34,7 +48,7 @@ if (!defined('PMA_CHARSET_CONVERSION_LIB_INCLUDED')){
             $PMA_recoding_engine             = 'recode';
         } else if ($cfg['RecodingEngine'] == 'iconv') {
             if (!@extension_loaded('iconv')) {
-                PMA_dl('iconv');
+                @dl('iconv' . $suffix);
                 if (!@extension_loaded('iconv')) {
                     echo $strCantLoadRecodeIconv;
                     exit();
@@ -47,9 +61,9 @@ if (!defined('PMA_CHARSET_CONVERSION_LIB_INCLUDED')){
             } else if (@extension_loaded('recode')) {
                 $PMA_recoding_engine         = 'recode';
             } else {
-                PMA_dl('iconv');
+                @dl('iconv' . $suffix);
                 if (!@extension_loaded('iconv')) {
-                    PMA_dl('recode');
+                    @dl('recode' . $suffix);
                     if (!@extension_loaded('recode')) {
                         echo $strCantLoadRecodeIconv;
                         exit();
@@ -69,7 +83,7 @@ if (!defined('PMA_CHARSET_CONVERSION_LIB_INCLUDED')){
     define('PMA_CHARSET_RECODE', 3);
 
     if (!isset($cfg['IconvExtraParams'])) {
-        $cfg['IconvExtraParams'] = '';
+        $cfg['IconvExtraParams'] = '//IGNORE';
     }
 
     // Finally detects which function will we use:

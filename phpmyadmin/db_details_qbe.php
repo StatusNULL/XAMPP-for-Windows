@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_details_qbe.php,v 1.21 2003/06/20 19:56:49 lem9 Exp $ */
+/* $Id: db_details_qbe.php,v 1.19 2003/03/26 14:02:09 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -1000,12 +1000,6 @@ if (isset($Field) && count($Field) > 0) {
 
 } // end count($Field) > 0
 
-// In case relations are not defined, just generate the FROM clause
-// from the list of tables, however we don't generate any JOIN
-
-if (empty($qry_from) && isset($tab_all)) {
-    $qry_from = implode(', ', $tab_all);
-}
 // Now let's see what we got
 if (!empty($qry_from)) {
     $encoded_qry  .= urlencode('FROM ' . $qry_from . "\n");

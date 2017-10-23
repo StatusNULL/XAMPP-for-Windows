@@ -1,5 +1,5 @@
 <?php
-/* $Id: server_links.inc.php,v 1.8 2003/06/10 12:35:20 nijel Exp $ */
+/* $Id: server_links.inc.php,v 1.7 2003/03/18 13:33:22 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -53,7 +53,6 @@ if ($is_superuser) {
     echo PMA_printTab($strPrivileges, 'server_privileges.php', $url_query);
 }
 echo PMA_printTab($strServerTabProcesslist, 'server_processlist.php', $url_query);
-echo PMA_printTab($strExport, 'server_export.php', $url_query);
 ?>
     </tr>
 </table>

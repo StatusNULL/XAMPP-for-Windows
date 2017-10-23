@@ -1,11 +1,11 @@
-  ApacheFriends XAMPP for windows Version 0.9 
+  ApacheFriends XAMPP for windows Version 1.0 
 
 * WindowsApache + MySQL +PHP + Perl
 
   + Apache 2.0.47
   + MySQL 4.0.14
-  + PHP 4.3.3 rc2 + PEAR
-  + mod_php 4.3.3 rc2 
+  + PHP 4.3.3 + PEAR
+  + mod_php 4.3.3 
   + Perl 5.8.0 
   + mod_perl 1.99_10 dev
   + mod_ssl 2.0.47
@@ -14,11 +14,12 @@
 
 * Features
 
-  + PHPMyAdmin 2.5.2 rc1
+  + PHPMyAdmin 2.5.1
   + Webalizer 2.01-10
   + Mercury Mail Transport System for Win32 and NetWare Systems v3.32
   + JpGraph 1.12.1 (only for non-commercial, open-source and educational use)
   + FileZilla FTP Server 0.8.5
+  + Oswalds CD Collection v0.2 (!)
   
 * System Requirements:
   

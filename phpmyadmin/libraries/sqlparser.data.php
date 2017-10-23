@@ -1,5 +1,5 @@
 <?php
-/* $Id: sqlparser.data.php,v 1.17 2003/06/13 13:03:42 lem9 Exp $ */
+/* $Id: sqlparser.data.php,v 1.16 2003/05/30 19:55:41 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -391,6 +391,7 @@ if (!defined('PMA_SQP_DATA_INCLUDED')) {
         'SECOND',
         'SELECT',
         'SERIALIZABLE',
+        'SESSION',
         'SHARE',
         'SHOW',
         'SHUTDOWN',
@@ -450,7 +451,7 @@ if (!defined('PMA_SQP_DATA_INCLUDED')) {
         'YEAR_MONTH'
     );
     //$PMA_SQPdata_reserved_word_cnt = count($PMA_SQPdata_reserved_word);
-    $PMA_SQPdata_reserved_word_cnt = 249;
+    $PMA_SQPdata_reserved_word_cnt = 250;
 
     $PMA_SQPdata_column_type = array (
         'BIGINT',

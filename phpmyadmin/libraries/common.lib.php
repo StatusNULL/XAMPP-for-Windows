@@ -1,5 +1,5 @@
 <?php
-/* $Id: common.lib.php,v 1.257 2003/07/01 21:24:32 lem9 Exp $ */
+/* $Id: common.lib.php,v 1.251 2003/05/30 20:54:02 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 error_reporting(E_ALL);
@@ -138,7 +138,7 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
      * Includes compatibility code for older config.inc.php revisions
      * if necessary
      */
-    if (!isset($cfg['FileRevision']) || (int) substr($cfg['FileRevision'], 13, 3) < 189) {
+    if (!isset($cfg['FileRevision']) || (int) substr($cfg['FileRevision'], 13, 3) < 181) {
         include('./libraries/config_import.lib.php');
     }
 
@@ -250,15 +250,30 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
 
         /**
          * Loads the mysql extensions if it is not loaded yet
+         * staybyte - 26. June 2001
          */
-        if (!@function_exists('mysql_connect')) {
+        if (((PMA_PHP_INT_VERSION >= 40000 && !@ini_get('safe_mode') && @ini_get('enable_dl'))
+            || (PMA_PHP_INT_VERSION < 40000 && PMA_PHP_INT_VERSION > 30009 && !@get_cfg_var('safe_mode')))
+            && @function_exists('dl')) {
             if (PMA_PHP_INT_VERSION < 40000) {
                 $extension = 'MySQL';
             } else {
                 $extension = 'mysql';
             }
-            PMA_dl($extension . $suffix);
-        }
+            if (PMA_IS_WINDOWS) {
+                $suffix = '.dll';
+            } else {
+                $suffix = '.so';
+            }
+            if (!@extension_loaded($extension)) {
+                @dl($extension . $suffix);
+            }
+            if (!@extension_loaded($extension)) {
+                echo $strCantLoadMySQL . '<br />' . "\n"
+                     . '<a href="./Documentation.html#faqmysql" target="documentation">' . $GLOBALS['strDocu'] . '</a>' . "\n";
+                exit();
+            }
+        } // end load mysql extension
 
         // check whether mysql is available
         if (!@function_exists('mysql_connect')) {
@@ -411,7 +426,7 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
             // Robbat2 - 12 January 2003, 9:46PM
             // Revised, Robbat2 - 13 Janurary 2003, 2:59PM
             if (PMA_SQP_isError()) {
-                $parsed_sql = htmlspecialchars($the_query);
+                $parsed_sql = $the_query;
             } else {
                 $parsed_sql = PMA_SQP_parse($the_query);
             }

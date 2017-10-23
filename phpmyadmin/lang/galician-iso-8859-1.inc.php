@@ -1,5 +1,5 @@
 <?php
-/* $Id: galician-iso-8859-1.inc.php,v 1.119 2003/07/07 10:21:37 lem9 Exp $ */
+/* $Id: galician-iso-8859-1.inc.php,v 1.108 2003/05/29 16:44:01 lem9 Exp $ */
 
 /**
  * Translated by Xosé Calvo <xosecalvo at terra.es>
@@ -26,7 +26,6 @@ $strAPrimaryKey = 'Adicionouse unha chave primaria a %s';
 $strAbortedClients = 'Cancelado';
 $strAbsolutePathToDocSqlDir = 'Introduza a rota absoluta completa ao directorio docSQL no servidor';
 $strAccessDenied = 'Acceso Negado';
-$strAccessDeniedExplanation = 'O phpMyAdmin tentouse conectar ao servidor de MySQL, mais o servidor rexeitou a conexión. Deberá comprobar o nome do servidor, o nome de usuario e o contrasinal no ficheiro config.inc.php e asegurarse de que corresponden coa información proporcionada polo administrador do servidor do MySQL.';
 $strAction = 'Acción';
 $strAddDeleteColumn = 'Adicionar/Eliminar columnas de campo';
 $strAddDeleteRow = 'Adicionar/Eliminar filas de criterios';
@@ -641,32 +640,10 @@ $strZeroRemovesTheLimit = 'Nota: Se estas opcións se configuran como 0 (cero) el
 $strZip = 'comprimido no formato "zip"';
 // To translate
 
-$strAddDropDatabase = 'Add DROP DATABASE';//to translate
-$strAddIntoComments = 'Add into comments';//to translate
-
 $strCharset = 'Charset';  //to translate
 
-$strDatabaseExportOptions = 'Database export options';//to translate
-$strDatabaseNoTable = 'This database contains no table!';//to translate
-
-$strExcelOptions = 'Excel options';  //to translate
-$strExecuteBookmarked = 'Execute bookmarked query';  //to translate
-
-$strLoadExplanation = 'The best method is checked by default, but you can change if it fails.';  //to translate
-$strLoadMethod = 'LOAD method';  //to translate
-
-$strPaperSize = 'Paper size';  //to translate
-
-$strQueryWindowLock = 'Do not overwrite this query from outside the window';  //to translate
-
-$strReplaceNULLBy = 'Replace NULL by';  //to translate
-
-$strSecretRequired = 'The configuration file now needs a secret passphrase (blowfish_secret).';  //to translate
 $strSwitchToTable = 'Switch to copied table';  //to translate
 
-$strTableOptions = 'Table options';  //to translate
-$strToggleScratchboard = 'toggle scratchboard';  //to translate
-
-$strViewDumpDatabases = 'View dump (schema) of databases';//to translate
-
+$strLoadMethod = 'LOAD method';  //to translate
+$strLoadExplanation = 'The best method is checked by default, but you can change if it fails.';  //to translate
 ?>

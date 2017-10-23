@@ -1,5 +1,5 @@
 <?php
-/* $Id: footer.inc.php,v 1.27 2003/06/03 14:37:20 garvinhicking Exp $ */
+/* $Id: footer.inc.php,v 1.26 2003/05/29 14:07:37 garvinhicking Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 // In this file you may add PHP or HTML statements that will be used to define
@@ -41,17 +41,15 @@ if ($cfg['QueryFrame'] && $cfg['QueryFrameJS']) {
             <?php
             if (!isset($error_message) || $error_message == '') {
             ?>
-            if (!top.frames.queryframe.querywindow.document.sqlform.LockFromUpdate.checked) {
-                top.frames.queryframe.querywindow.document.querywindow.db.value = "<?php echo (isset($db) ? addslashes($db) : '') ?>";
-                top.frames.queryframe.querywindow.document.querywindow.query_history_latest_db.value = "<?php echo (isset($db) ? addslashes($db) : '') ?>";
-                top.frames.queryframe.querywindow.document.querywindow.table.value = "<?php echo (isset($table) ? addslashes($table) : '') ?>";
-                top.frames.queryframe.querywindow.document.querywindow.query_history_latest_table.value = "<?php echo (isset($table) ? addslashes($table) : '') ?>";
-        
-                <?php echo (isset($sql_query) ? 'top.frames.queryframe.querywindow.document.querywindow.query_history_latest.value = "' . urlencode($sql_query) . '";' : '// no sql query update') . "\n"; ?>
-        
-                <?php echo ($cfg['QueryFrameDebug'] ? 'alert(\'Querywindow submits. Last chance to check variables.\');' : '') . "\n"; ?>
-                top.frames.queryframe.querywindow.document.querywindow.submit();
-            }
+            top.frames.queryframe.querywindow.document.querywindow.db.value = "<?php echo (isset($db) ? addslashes($db) : '') ?>";
+            top.frames.queryframe.querywindow.document.querywindow.query_history_latest_db.value = "<?php echo (isset($db) ? addslashes($db) : '') ?>";
+            top.frames.queryframe.querywindow.document.querywindow.table.value = "<?php echo (isset($table) ? addslashes($table) : '') ?>";
+            top.frames.queryframe.querywindow.document.querywindow.query_history_latest_table.value = "<?php echo (isset($table) ? addslashes($table) : '') ?>";
+    
+            <?php echo (isset($sql_query) ? 'top.frames.queryframe.querywindow.document.querywindow.query_history_latest.value = "' . urlencode($sql_query) . '";' : '// no sql query update') . "\n"; ?>
+    
+            <?php echo ($cfg['QueryFrameDebug'] ? 'alert(\'Querywindow submits. Last chance to check variables.\');' : '') . "\n"; ?>
+            top.frames.queryframe.querywindow.document.querywindow.submit();
             <?php
             } else {
             ?>

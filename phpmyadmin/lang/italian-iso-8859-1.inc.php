@@ -1,5 +1,5 @@
 <?php
-/* $Id: italian-iso-8859-1.inc.php,v 1.133 2003/07/07 10:35:38 lem9 Exp $ */
+/* $Id: italian-iso-8859-1.inc.php,v 1.118 2003/05/29 16:44:02 lem9 Exp $ */
 
 /**
  * Translated by: Pietro Danesi <danone at users.sourceforge.net>  2002-03-29
@@ -26,12 +26,9 @@ $strAPrimaryKey = 'Una chiave primaria è stata aggiunta in %s';
 $strAbortedClients = 'Fallito';
 $strAbsolutePathToDocSqlDir = 'Prego, immettere il path assoluto sul webserver alla directory di docSQL';
 $strAccessDenied = 'Accesso negato';
-$strAccessDeniedExplanation = 'phpMyAdmin ha provato a connettersi al server MySQL, e il server ha rifiutato la connessione. Si dovrebbe controllare il nome dell\'host, l\'username e la password nel file config.inc.php ed assicurarsi che corrispondano alle informazioni fornite dall\'amministratore del server MySQL.';
 $strAction = 'Azione';
 $strAddDeleteColumn = 'Aggiungi/Cancella campo';
 $strAddDeleteRow = 'Aggiungi/Cancella criterio';
-$strAddDropDatabase = 'Aggiungi DROP DATABASE';
-$strAddIntoComments = 'Aggiungi nei commenti';
 $strAddNewField = 'Aggiungi un nuovo campo';
 $strAddPriv = 'Aggiungi un nuovo privilegio';
 $strAddPrivMessage = 'Hai aggiunto un nuovo privilegio.';
@@ -147,9 +144,7 @@ $strData = 'Dati';
 $strDataDict = 'Data Dictionary';
 $strDataOnly = 'Solo dati';
 $strDatabase = 'Database ';
-$strDatabaseExportOptions = 'Opzioni di esportazione del database';
 $strDatabaseHasBeenDropped = 'Il Database %s è stato eliminato.';
-$strDatabaseNoTable = 'Questo database non contiene tabelle!';
 $strDatabaseWildcard = 'Database (wildcards permesse):';
 $strDatabases = 'Database';
 $strDatabasesDropped = '%s databases sono stati cancellati correttamente.';
@@ -202,8 +197,6 @@ $strEndCut = 'FINE CUT';
 $strEndRaw = 'FINE RAW';
 $strEnglishPrivileges = 'Nota: i nomi dei privilegi di MySQL sono in Inglese';
 $strError = 'Errore';
-$strExcelOptions = 'Opzioni di Excel';
-$strExecuteBookmarked = 'Esegue la query dalle preferite';
 $strExplain = 'Spiega SQL';
 $strExport = 'Esporta';
 $strExportToXML = 'Esporta in formato XML';
@@ -295,8 +288,6 @@ $strLines = 'Record';
 $strLinesTerminatedBy = 'Linee terminate da';
 $strLinkNotFound = 'Link non trovato';
 $strLinksTo = 'Collegamenti a';
-$strLoadExplanation = 'Il metodo migliore è selezionato di default, ma lo potete cambiare se fallisce.';
-$strLoadMethod = 'Metodo di CARICAMENTO';
 $strLocalhost = 'Locale';
 $strLocationTextfile = 'Percorso del file';
 $strLogPassword = 'Password:';
@@ -381,7 +372,6 @@ $strOverwriteExisting = 'Sovrascrivi file(s) esistente/i';
 $strPHP40203 = 'Si sta utilizzando PHP 4.2.3, che presenta un serio bug con le stringhe multi-byte (mbstring). Vedi report PHP 19404. Questa versione di PHP non è raccomandata per l\'utilizzo con phpMyAdmin.';
 $strPHPVersion = 'Versione PHP';
 $strPageNumber = 'Numero pagina:';
-$strPaperSize = 'Dimensioni carta';
 $strPartialText = 'Testo parziale';
 $strPassword = 'Password';
 $strPasswordChanged = 'La password per l\'utente %s è cambiata con successo.';
@@ -453,7 +443,6 @@ $strQuerySQLHistory = 'Storico dell\'SQL';
 $strQueryStatistics = '<b>Statistiche delle Query</b>: Dal suo avvio, sono state inviate al server %s queries.';
 $strQueryTime = 'La query ha impiegato %01.4f sec';
 $strQueryType = 'Tipo di Query';
-$strQueryWindowLock = 'Non sovrascrivere questa query da fuori della finestra';
 
 $strReType = 'Reinserisci';
 $strReceived = 'Ricevuti';
@@ -472,7 +461,6 @@ $strRenameTable = 'Rinomina la tabella in';
 $strRenameTableOK = 'La tabella %s è stata rinominata %s';
 $strRepairTable = 'Ripara tabella';
 $strReplace = 'Sostituisci';
-$strReplaceNULLBy = 'Sostituisci NULL con';
 $strReplaceTable = 'Sostituisci i dati della tabella col file';
 $strReset = 'Riavvia';
 $strResourceLimits = 'Limiti di risorse';
@@ -518,7 +506,6 @@ $strSearchOption3 = 'la frase esatta';
 $strSearchOption4 = 'come espressione regolare';
 $strSearchResultsFor = 'Cerca i risultati per "<i>%s</i>" %s:';
 $strSearchType = 'Trova:';
-$strSecretRequired = 'Adesso c\'è bisogno di una password per il file di configurazione (blowfish_secret).';
 $strSelect = 'Seleziona';
 $strSelectADb = 'Prego, selezionare un database';
 $strSelectAll = 'Seleziona Tutto';
@@ -580,7 +567,6 @@ $strTableHasBeenEmptied = 'La tabella %s è stata svuotata';
 $strTableHasBeenFlushed = 'La tabella %s è stata inizializzata';
 $strTableMaintenance = 'Amministrazione tabella';
 $strTableOfContents = 'Tabella dei contenuti';
-$strTableOptions = 'Opzioni della tabella';
 $strTableStructure = 'Struttura della tabella';
 $strTableType = 'Tipo tabella';
 $strTables = '%s tabella(e)';
@@ -593,7 +579,6 @@ $strThisHost = 'Questo Host';
 $strThisNotDirectory = 'Questa non è una directory';
 $strThreadSuccessfullyKilled = 'Il thread %s è stato terminato con successo.';
 $strTime = 'Tempo';
-$strToggleScratchboard = '(dis)attiva scratchboard';
 $strTotal = 'Totali';
 $strTotalUC = 'Totale';
 $strTraffic = 'Traffico';
@@ -639,7 +624,6 @@ $strValue = 'Valore';
 $strVar = 'Variabile';
 $strViewDump = 'Visualizza dump (schema) della tabella';
 $strViewDumpDB = 'Visualizza dump (schema) del database';
-$strViewDumpDatabases = 'Visualizza il dump (schema) dei databases';
 
 $strWebServerUploadDirectory = 'directory di upload del web-server';
 $strWebServerUploadDirectoryError = 'La directory impostata per l\'upload non può essere trovata';
@@ -658,4 +642,6 @@ $strZeroRemovesTheLimit = 'N.B.: 0 (zero) significa nessun limite.';
 $strZip = '"compresso con zip"';
 // To translate
 
+$strLoadMethod = 'LOAD method';  //to translate
+$strLoadExplanation = 'The best method is checked by default, but you can change if it fails.';  //to translate
 ?>
