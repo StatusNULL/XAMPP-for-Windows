@@ -1,0 +1,90 @@
+This snapshot was automatically generated on
+Wed,  8 Dec 2004 10:42:56 +0100
+
+Version: 5.0.3RC2-dev
+Branch: HEAD
+Build: Release_TS
+
+Built-in Extensions
+===========================
+bcmath
+calendar
+com_dotnet
+ctype
+ftp
+iconv
+odbc
+pcre
+session
+SPL
+SQLite
+standard
+tokenizer
+zlib
+libxml
+dom
+SimpleXML
+wddx
+xml
+
+
+Dependency information:
+Module: php_curl.dll
+===========================
+	ssleay32.dll
+	libeay32.dll
+
+Module: php_fdf.dll
+===========================
+	fdftk.dll
+
+Module: php_imap.dll
+===========================
+	crypt32.dll
+
+Module: php_ifx.dll
+===========================
+	isqlt09a.dll
+
+Module: php_interbase.dll
+===========================
+	gds32.dll
+
+Module: php_ldap.dll
+===========================
+	ssleay32.dll
+	libeay32.dll
+
+Module: php_mcrypt.dll
+===========================
+	libmcrypt.dll
+
+Module: php_mhash.dll
+===========================
+	libmhash.dll
+
+Module: php_msql.dll
+===========================
+	msql.dll
+
+Module: php_mssql.dll
+===========================
+	ntwdblib.dll
+
+Module: php_mysql.dll
+===========================
+	libmysql.dll
+
+Module: php_mysqli.dll
+===========================
+	libmysql.dll
+
+Module: php_openssl.dll
+===========================
+	ssleay32.dll
+	libeay32.dll
+
+Module: php_pspell.dll
+===========================
+	aspell-15.dll
+

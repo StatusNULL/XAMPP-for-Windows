@@ -12,7 +12,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;
-; About this file ;
+; About php.ini   ;
 ;;;;;;;;;;;;;;;;;;;
 ; This file controls many aspects of PHP's behavior.  In order for PHP to
 ; read it, it must be named 'php.ini'.  PHP looks for it in the current
@@ -55,6 +55,10 @@
 ; dynamically loaded extension (either a PHP extension or a Zend extension),
 ; you may only use these constants *after* the line that loads the extension.
 ;
+;
+;;;;;;;;;;;;;;;;;;;
+; About this file ;
+;;;;;;;;;;;;;;;;;;;
 ; All the values in the php.ini-dist file correspond to the builtin
 ; defaults (that is, if no php.ini is used, or if you delete these lines,
 ; the builtin defaults will be identical).
@@ -106,6 +110,8 @@ output_buffering = Off
 ;       is doing.
 ; Note: You cannot use both "mb_output_handler" with "ob_iconv_handler"
 ;       and you cannot use both "ob_gzhandler" and "zlib.output_compression".
+; Note: output_handler must be empty if this is set 'On' !!!!
+;       Instead you must use zlib.output_handler.
 ;output_handler =
 
 ; Transparent output compression using the zlib library
@@ -131,7 +137,7 @@ zlib.output_compression = Off
 ; implications and is generally recommended for debugging purposes only.
 implicit_flush = Off
 
-; The unserialize callback function will called (with the undefind class'
+; The unserialize callback function will be called (with the undefined class'
 ; name as parameter), if the unserializer finds an undefined class
 ; which should be instanciated.
 ; A warning appears if the specified function is not defined, or if the
@@ -156,6 +162,7 @@ serialize_precision = 100
 ; reference).
 allow_call_time_pass_reference = On
 
+;
 ; Safe Mode
 ;
 safe_mode = Off
@@ -234,13 +241,14 @@ max_execution_time = 30     ; Maximum execution time of each script, in seconds
 max_input_time = 60	; Maximum amount of time each script may spend parsing request data
 memory_limit = 8M      ; Maximum amount of memory a script may consume (8MB)
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Error handling and logging ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; error_reporting is a bit-field.  Or each number up to get desired error
 ; reporting level
-; E_ALL             - All errors and warnings
+; E_ALL             - All errors and warnings (doesn't include E_STRICT)
 ; E_ERROR           - fatal run-time errors
 ; E_WARNING         - run-time warnings (non-fatal errors)
 ; E_PARSE           - compile-time parse errors
@@ -251,7 +259,7 @@ memory_limit = 8M      ; Maximum amount of memory a script may consume (8MB)
 ;                     empty string)
 ; E_STRICT			- run-time notices, enable to have PHP suggest changes
 ;                     to your code which will ensure the best interoperability
-;                     and forward compatability of your code
+;                     and forward compatibility of your code
 ; E_CORE_ERROR      - fatal errors that occur during PHP's initial startup
 ; E_CORE_WARNING    - warnings (non-fatal errors) that occur during PHP's
 ;                     initial startup
@@ -262,6 +270,10 @@ memory_limit = 8M      ; Maximum amount of memory a script may consume (8MB)
 ; E_USER_NOTICE     - user-generated notice message
 ;
 ; Examples:
+;
+;   - Show all errors, except for notices and coding standards warnings
+;
+;error_reporting = E_ALL & ~E_NOTICE & ~E_STRICT
 ;
 ;   - Show all errors, except for notices
 ;
@@ -549,11 +561,11 @@ default_socket_timeout = 60
 ;extension=php_filepro.dll
 ;extension=php_gd2.dll
 ;extension=php_gettext.dll
-;extension=php_iconv.dll
 ;extension=php_ifx.dll
 ;extension=php_iisfunc.dll
 ;extension=php_imap.dll
 ;extension=php_interbase.dll
+;extension=php_java.dll
 ;extension=php_ldap.dll
 ;extension=php_mbstring.dll
 ;extension=php_mcrypt.dll
@@ -604,7 +616,7 @@ smtp_port = 25
 ; Force the addition of the specified parameters to be passed as extra parameters
 ; to the sendmail binary. These parameters will always replace the value of
 ; the 5th parameter to mail(), even in safe mode.
-;mail.force_extra_paramaters =
+;mail.force_extra_parameters =
 
 [SQL]
 sql.safe_mode = Off
@@ -668,11 +680,11 @@ mysql.default_user =
 ; file will be able to reveal the password as well.
 mysql.default_password =
 
-; Maximum time (in secondes) for connect timeout. -1 means no limimt
+; Maximum time (in secondes) for connect timeout. -1 means no limit
 mysql.connect_timeout = 60
 
 ; Trace mode. When trace_mode is active (=On), warnings for table/index scans and
-; SQL-Erros will be displayed.
+; SQL-Errors will be displayed.
 mysql.trace_mode = Off
 
 [MySQLI]
@@ -720,7 +732,8 @@ msql.max_links = -1
 ; Allow or prevent persistent links.
 pgsql.allow_persistent = On
 
-; Detect broken persistent links always with pg_pconnect(). Need a little overhead.
+; Detect broken persistent links always with pg_pconnect().
+; Auto reset feature requires a little overheads.
 pgsql.auto_reset_persistent = Off
 
 ; Maximum number of persistent links.  -1 means no limit.
@@ -730,6 +743,7 @@ pgsql.max_persistent = -1
 pgsql.max_links = -1
 
 ; Ignore PostgreSQL backends Notice message or not.
+; Notice message logging require a little overheads.
 pgsql.ignore_notice = 0
 
 ; Log PostgreSQL backends Noitce message or not.
@@ -912,7 +926,7 @@ session.gc_maxlifetime = 1440
 ; PHP 4.2 and less have an undocumented feature/bug that allows you to
 ; to initialize a session variable in the global scope, albeit register_globals
 ; is disabled.  PHP 4.3 and later will warn you, if this feature is used.
-; You can disable the feature and the warning seperately. At this time,
+; You can disable the feature and the warning separately. At this time,
 ; the warning is only displayed, if bug_compat_42 is enabled.
 
 session.bug_compat_42 = 1

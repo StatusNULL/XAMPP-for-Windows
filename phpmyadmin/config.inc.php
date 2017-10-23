@@ -1,5 +1,5 @@
 <?php
-/* $Id: config.inc.php,v 1.198 2003/08/05 14:08:22 nijel Exp $ */
+/* $Id: config.inc.php,v 2.41 2004/09/23 10:10:37 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -36,9 +36,8 @@ if (!isset($old_error_reporting)) {
  * If the auto-detection code does work properly, you can set to TRUE the
  * $cfg['PmaAbsoluteUri_DisableWarning'] variable below.
  */
-
 $cfg['PmaAbsoluteUri'] = '';
-/* change this for your security into 'http://IP|FQDN/phpmyadmin */
+
 
 /**
  * Disable the default warning about $cfg['PmaAbsoluteUri'] not being set
@@ -54,11 +53,11 @@ $cfg['PmaAbsoluteUri_DisableWarning'] = TRUE;
 $cfg['PmaNoRelation_DisableWarning']  = FALSE;
 
 /**
- * The 'cookie' auth_type uses blowfish algorithm to encrypt the password.
- * If at least one server configuration uses 'cookie' auth_type,
- * enter here a passphrase that will be used by blowfish.
+ * The 'cookie' auth_type uses blowfish algorithm to encrypt the password. If
+ * at least one server configuration uses 'cookie' auth_type, enter here a
+ * passphrase that will be used by blowfish.
  */
-$cfg['blowfish_secret'] = 'xampp'; 
+$cfg['blowfish_secret'] = 'xampp';
 
 /**
  * Server(s) configuration
@@ -71,21 +70,23 @@ $cfg['Servers'][$i]['host']          = 'localhost'; // MySQL hostname or IP addr
 $cfg['Servers'][$i]['port']          = '';          // MySQL port - leave blank for default port
 $cfg['Servers'][$i]['socket']        = '';          // Path to the socket - leave blank for default socket
 $cfg['Servers'][$i]['connect_type']  = 'tcp';       // How to connect to MySQL server ('tcp' or 'socket')
+$cfg['Servers'][$i]['extension']     = 'mysql';     // The php MySQL extension to use ('mysql' or 'mysqli')
 $cfg['Servers'][$i]['compress']      = FALSE;       // Use compressed protocol for the MySQL connection
                                                     // (requires PHP >= 4.3.0)
 $cfg['Servers'][$i]['controluser']   = 'pma';          // MySQL control user settings
                                                     // (this user must have read-only
 $cfg['Servers'][$i]['controlpass']   = '';          // access to the "mysql/user"
-                                                    // and "mysql/db" tables)
+                                                    // and "mysql/db" tables).
+                                                    // The controluser is also
+                                                    // used for all relational
+                                                    // features (pmadb)
 $cfg['Servers'][$i]['auth_type']     = 'config';    // Authentication method (config, http or cookie based)?
 $cfg['Servers'][$i]['user']          = 'root';      // MySQL user
 $cfg['Servers'][$i]['password']      = '';          // MySQL password (only needed
                                                     // with 'config' auth_type)
 $cfg['Servers'][$i]['only_db']       = '';          // If set to a db-name, only
-                                                    // this db is displayed
-                                                    // at left frame
-                                                    // It may also be an array
-                                                    // of db-names
+                                                    // this db is displayed in left frame
+                                                    // It may also be an array of db-names, where sorting order is relevant.
 $cfg['Servers'][$i]['verbose']       = '';          // Verbose name for this host - leave blank to show the hostname
 
 $cfg['Servers'][$i]['pmadb']         = 'phpmyadmin';          // Database used for Relation, Bookmark and PDF Features
@@ -94,26 +95,26 @@ $cfg['Servers'][$i]['pmadb']         = 'phpmyadmin';          // Database used f
                                                     //     DEFAULT: 'phpmyadmin'
 $cfg['Servers'][$i]['bookmarktable'] = 'PMA_bookmark';          // Bookmark table
                                                     //   - leave blank for no bookmark support
-                                                    //     DEFAULT: 'PMA_bookmark'
+                                                    //     DEFAULT: 'pma_bookmark'
 $cfg['Servers'][$i]['relation']      = 'PMA_relation';          // table to describe the relation between links (see doc)
                                                     //   - leave blank for no relation-links support
-                                                    //     DEFAULT: 'PMA_relation'
+                                                    //     DEFAULT: 'pma_relation'
 $cfg['Servers'][$i]['table_info']    = 'PMA_table_info';          // table to describe the display fields
                                                     //   - leave blank for no display fields support
-                                                    //     DEFAULT: 'PMA_table_info'
+                                                    //     DEFAULT: 'pma_table_info'
 $cfg['Servers'][$i]['table_coords']  = 'PMA_table_coords';          // table to describe the tables position for the PDF schema
                                                     //   - leave blank for no PDF schema support
-                                                    //     DEFAULT: 'PMA_table_coords'
+                                                    //     DEFAULT: 'pma_table_coords'
 $cfg['Servers'][$i]['pdf_pages']     = 'PMA_pdf_pages';          // table to describe pages of relationpdf
                                                     //   - leave blank if you don't want to use this
-                                                    //     DEFAULT: 'PMA_pdf_pages'
+                                                    //     DEFAULT: 'pma_pdf_pages'
 $cfg['Servers'][$i]['column_info']   = 'PMA_column_info';          // table to store column information
                                                     //   - leave blank for no column comments/mime types
-                                                    //     DEFAULT: 'PMA_column_info'
+                                                    //     DEFAULT: 'pma_column_info'
 $cfg['Servers'][$i]['history']       = 'PMA_history';          // table to store SQL history
                                                     //   - leave blank for no SQL query history
-                                                    //     DEFAULT: 'PMA_history'
-$cfg['Servers'][$i]['verbose_check'] = TRUE;        // set to FALSE if you know that your PMA_* tables
+                                                    //     DEFAULT: 'pma_history'
+$cfg['Servers'][$i]['verbose_check'] = TRUE;        // set to FALSE if you know that your pma_* tables
                                                     // are up to date. This prevents compatibility
                                                     // checks and thereby increases performance.
 $cfg['Servers'][$i]['AllowDeny']['order']           // Host authentication order, leave blank to not use
@@ -127,6 +128,7 @@ $cfg['Servers'][$i]['host']            = '';
 $cfg['Servers'][$i]['port']            = '';
 $cfg['Servers'][$i]['socket']          = '';
 $cfg['Servers'][$i]['connect_type']    = 'tcp';
+$cfg['Servers'][$i]['extension']       = 'mysql';
 $cfg['Servers'][$i]['compress']        = FALSE;
 $cfg['Servers'][$i]['controluser']     = '';
 $cfg['Servers'][$i]['controlpass']     = '';
@@ -136,13 +138,13 @@ $cfg['Servers'][$i]['password']        = '';
 $cfg['Servers'][$i]['only_db']         = '';
 $cfg['Servers'][$i]['verbose']         = '';
 $cfg['Servers'][$i]['pmadb']           = ''; // 'phpmyadmin' - see scripts/create_tables.sql
-$cfg['Servers'][$i]['bookmarktable']   = ''; // 'PMA_bookmark'
-$cfg['Servers'][$i]['relation']        = ''; // 'PMA_relation'
-$cfg['Servers'][$i]['table_info']      = ''; // 'PMA_table_info'
-$cfg['Servers'][$i]['table_coords']    = ''; // 'PMA_table_coords'
-$cfg['Servers'][$i]['pdf_pages']       = ''; // 'PMA_pdf_pages'
-$cfg['Servers'][$i]['column_info']     = ''; // 'PMA_column_info'
-$cfg['Servers'][$i]['history']         = ''; // 'PMA_history'
+$cfg['Servers'][$i]['bookmarktable']   = ''; // 'pma_bookmark'
+$cfg['Servers'][$i]['relation']        = ''; // 'pma_relation'
+$cfg['Servers'][$i]['table_info']      = ''; // 'pma_table_info'
+$cfg['Servers'][$i]['table_coords']    = ''; // 'pma_table_coords'
+$cfg['Servers'][$i]['pdf_pages']       = ''; // 'pma_pdf_pages'
+$cfg['Servers'][$i]['column_info']     = ''; // 'pma_column_info'
+$cfg['Servers'][$i]['history']         = ''; // 'pma_history'
 $cfg['Servers'][$i]['verbose_check']   = TRUE;
 $cfg['Servers'][$i]['AllowDeny']['order']
                                        = '';
@@ -154,6 +156,7 @@ $cfg['Servers'][$i]['host']            = '';
 $cfg['Servers'][$i]['port']            = '';
 $cfg['Servers'][$i]['socket']          = '';
 $cfg['Servers'][$i]['connect_type']    = 'tcp';
+$cfg['Servers'][$i]['extension']       = 'mysql';
 $cfg['Servers'][$i]['compress']        = FALSE;
 $cfg['Servers'][$i]['controluser']     = '';
 $cfg['Servers'][$i]['controlpass']     = '';
@@ -163,13 +166,13 @@ $cfg['Servers'][$i]['password']        = '';
 $cfg['Servers'][$i]['only_db']         = '';
 $cfg['Servers'][$i]['verbose']         = '';
 $cfg['Servers'][$i]['pmadb']           = ''; // 'phpmyadmin' - see scripts/create_tables.sql
-$cfg['Servers'][$i]['bookmarktable']   = ''; // 'PMA_bookmark'
-$cfg['Servers'][$i]['relation']        = ''; // 'PMA_relation'
-$cfg['Servers'][$i]['table_info']      = ''; // 'PMA_table_info'
-$cfg['Servers'][$i]['table_coords']    = ''; // 'PMA_table_coords'
-$cfg['Servers'][$i]['pdf_pages']       = ''; // 'PMA_pdf_pages'
-$cfg['Servers'][$i]['column_info']     = ''; // 'PMA_column_info'
-$cfg['Servers'][$i]['history']         = ''; // 'PMA_history'
+$cfg['Servers'][$i]['bookmarktable']   = ''; // 'pma_bookmark'
+$cfg['Servers'][$i]['relation']        = ''; // 'pma_relation'
+$cfg['Servers'][$i]['table_info']      = ''; // 'pma_table_info'
+$cfg['Servers'][$i]['table_coords']    = ''; // 'pma_table_coords'
+$cfg['Servers'][$i]['pdf_pages']       = ''; // 'pma_pdf_pages'
+$cfg['Servers'][$i]['column_info']     = ''; // 'pma_column_info'
+$cfg['Servers'][$i]['history']         = ''; // 'pma_history'
 $cfg['Servers'][$i]['verbose_check']   = TRUE;
 $cfg['Servers'][$i]['AllowDeny']['order']
                                        = '';
@@ -198,6 +201,7 @@ $cfg['ShowSQL']                 = TRUE;   // show SQL queries as run
 $cfg['AllowUserDropDatabase']   = FALSE;  // show a 'Drop database' link to normal users
 $cfg['Confirm']                 = TRUE;   // confirm 'DROP TABLE' & 'DROP DATABASE'
 $cfg['LoginCookieRecall']       = TRUE;   // recall previous login in cookie auth. mode or not
+$cfg['LoginCookieValidity']     = 1800;   // validity of cookie login (in seconds)
 $cfg['UseDbSearch']             = TRUE;   // whether to enable the "database search" feature
                                           // or not
 $cfg['IgnoreMultiSubmitErrors'] = FALSE;  // if set to true, PMA continues computing multiple-statement queries
@@ -205,21 +209,24 @@ $cfg['IgnoreMultiSubmitErrors'] = FALSE;  // if set to true, PMA continues compu
 $cfg['VerboseMultiSubmit']      = TRUE;   // if set to true, PMA will show the affected rows of EACH statement on
                                           // multiple-statement queries. See the read_dump.php file for hardcoded
                                           // defaults on how many queries a statement may contain!
+$cfg['AllowArbitraryServer']    = FALSE;  // allow login to any user entered server in cookie based auth
 
 // Left frame setup
-$cfg['LeftFrameLight']        = TRUE;   // use a select-based menu and display only the
-                                        // current tables in the left frame.
-$cfg['LeftFrameTableSeparator']= '__';  // Which string will be used to generate table prefixes
-                                        // to split tables into multiple categories
-$cfg['LeftFrameTableLevel']   = '1';    // How many sublevels should be displayed when splitting
-                                        // up tables by the above Separator
-$cfg['ShowTooltip']           = TRUE;   // display table comment as tooltip in left frame
-$cfg['ShowTooltipAliasDB']    = FALSE;  // if ShowToolTip is enabled, this defines that table/db comments
-$cfg['ShowTooltipAliasTB']    = FALSE;  // are shown (in the left menu and db_details_structure) instead of
-                                        // table/db names
+$cfg['LeftFrameLight']        = TRUE;    // use a select-based menu and display only the
+                                         // current tables in the left frame.
+$cfg['LeftFrameTableSeparator']= '__';   // Which string will be used to generate table prefixes
+                                         // to split/nest tables into multiple categories
+$cfg['LeftFrameTableLevel']   = '1';     // How many sublevels should be displayed when splitting
+                                         // up tables by the above Separator
+$cfg['ShowTooltip']           = TRUE;    // display table comment as tooltip in left frame
+$cfg['ShowTooltipAliasDB']    = FALSE;   // if ShowToolTip is enabled, this defines that table/db comments
+$cfg['ShowTooltipAliasTB']    = FALSE;   // are shown (in the left menu and db_details_structure) instead of
+                                         // table/db names. Setting ShowTooltipAliasTB to 'nested' will only
+                                         // use the Aliases for nested descriptors, not the table itself.
 
 $cfg['LeftDisplayLogo']       = TRUE;   // display logo at top of left frame
 $cfg['LeftDisplayServers']    = FALSE;  // display server choice at top of left frame
+$cfg['DisplayServersList']    = FALSE;  // server choice as links
 
 // In the main frame, at startup...
 $cfg['ShowStats']             = TRUE;   // allow to display statistics and space usage in
@@ -253,6 +260,7 @@ $cfg['CharEditing']           = 'input';
                                         // Which editor should be used for CHAR/VARCHAR fields:
                                         //  input - allows limiting of input length
                                         //  textarea - allows newlines in fields
+$cfg['InsertRows']            = 2;      // How many rows can be inserted at one time
 
 // For the export features...
 $cfg['ZipDump']               = TRUE;   // Allow the use of zip/gzip/bzip
@@ -295,13 +303,16 @@ $cfg['DefaultTabTable']       = 'tbl_properties_structure.php';
  * Export defaults
  */
 
-$cfg['Export']['format']                    = 'sql';  // sql/latex/excel/csv/xml
+$cfg['Export']['format']                    = 'sql';  // sql/latex/excel/csv/xml/xls
 $cfg['Export']['compression']               = 'none'; // none/zip/gzip/bzip2
 
 $cfg['Export']['asfile']                    = FALSE;
 $cfg['Export']['onserver']                  = FALSE;
 $cfg['Export']['onserver_overwrite']        = FALSE;
 $cfg['Export']['remember_file_template']    = TRUE;
+
+$cfg['Export']['xls_columns']               = FALSE;
+$cfg['Export']['xls_null']                  = 'NULL';
 
 $cfg['Export']['csv_columns']               = FALSE;
 $cfg['Export']['csv_null']                  = 'NULL';
@@ -326,26 +337,32 @@ $cfg['Export']['latex_structure_label']     = 'tab:__TABLE__-structure';
 
 $cfg['Export']['sql_structure']             = TRUE;
 $cfg['Export']['sql_data']                  = TRUE;
+$cfg['Export']['sql_disable_fk']            = FALSE;
+$cfg['Export']['sql_use_transaction']       = FALSE;
 $cfg['Export']['sql_drop_database']         = FALSE;
 $cfg['Export']['sql_drop_table']            = FALSE;
+$cfg['Export']['sql_if_not_exists']         = FALSE;
 $cfg['Export']['sql_auto_increment']        = TRUE;
 $cfg['Export']['sql_backquotes']            = TRUE;
 $cfg['Export']['sql_dates']                 = FALSE;
 $cfg['Export']['sql_relation']              = FALSE;
 $cfg['Export']['sql_columns']               = FALSE;
 $cfg['Export']['sql_delayed']               = FALSE;
+$cfg['Export']['sql_ignore']                = FALSE;
+$cfg['Export']['sql_hex_for_binary']        = TRUE;
 $cfg['Export']['sql_type']                  = 'insert'; // insert/update/replace
 $cfg['Export']['sql_extended']              = FALSE;
 $cfg['Export']['sql_comments']              = FALSE;
 $cfg['Export']['sql_mime']                  = FALSE;
+$cfg['Export']['sql_header_comment']        = ''; // \n is replaced by new line
 
 /**
  * Link to the official MySQL documentation.
  * Be sure to include no trailing slash on the path.
- * See http://www.mysql.com/documentation/index.html for more information
+ * See http://dev.mysql.com/doc/ for more information
  * about MySQL manuals and their types.
  */
-$cfg['MySQLManualBase'] = 'http://www.mysql.com/doc/en';
+$cfg['MySQLManualBase'] = 'http://dev.mysql.com/doc/mysql/en';
 
 /**
  * Type of MySQL documentation:
@@ -397,7 +414,7 @@ $cfg['RecodingEngine'] = 'auto';
 
 // Specify some parameters for iconv used in charset conversion. See iconv
 // documentation for details:
-// http://www.gnu.org/software/libiconv/documentation/libiconv/iconv_open.3.html 
+// http://www.gnu.org/software/libiconv/documentation/libiconv/iconv_open.3.html
 $cfg['IconvExtraParams'] = '';
 
 // Available charsets for MySQL conversion. currently contains all which could
@@ -437,29 +454,25 @@ $cfg['AvailableCharsets'] = array(
     'SHIFT_JIS'
 );
 
-// Loads language file
-require('./libraries/select_lang.lib.php');
-
-
 /**
  * Customization & design
+ *
+ * The graphical settings are now located in themes/themename/layout.inc.php
  */
-$cfg['LeftWidth']           = 150;          // left frame width
-$cfg['LeftBgColor']         = '#D0DCE0';    // background color for the left frame
-$cfg['RightBgColor']        = '#F5F5F5';    // background color for the right frame
-$cfg['RightBgImage']        = '';           // path to a background image for the right frame
-                                            // (leave blank for no background image)
-$cfg['LeftPointerColor']    = '#CCFFCC';    // color of the pointer in left frame
-                                            // (blank for no pointer)
-$cfg['Border']              = 0;            // border width on tables
-$cfg['ThBgcolor']           = '#D3DCE3';    // table header row colour
-$cfg['BgcolorOne']          = '#CCCCCC';    // table data row colour
-$cfg['BgcolorTwo']          = '#DDDDDD';    // table data row colour, alternate
-$cfg['BrowsePointerColor']  = '#CCFFCC';    // color of the pointer in browse mode
-                                            // (blank for no pointer)
-$cfg['BrowseMarkerColor']   = '#FFCC99';    // color of the marker (visually marks row
-                                            // by clicking on it) in browse mode
-                                            // (blank for no marker)
+
+$cfg['LeftPointerEnable']   = TRUE;         // enable the left panel pointer
+                                            // (used when LeftFrameLight is FALSE)
+                                            // see also LeftPointerColor
+                                            // in layout.inc.php
+
+$cfg['BrowsePointerEnable'] = TRUE;        // enable the browse pointer
+                                            // see also BrowsePointerColor
+                                            // in layout.inc.php
+
+$cfg['BrowseMarkerEnable'] = TRUE;         // enable the browse marker
+                                            // see also BrowseMarkerColor
+                                            // in layout.inc.php
+
 $cfg['TextareaCols']        = 40;           // textarea size (columns) in edit mode
                                             // (this value will be emphasized (*2) for sql
                                             // query textareas and (*1.25) for query window)
@@ -486,10 +499,9 @@ $cfg['ShowBrowseComments']  = TRUE;         // shows stored relation-comments in
 $cfg['ShowPropertyComments']= TRUE;         // shows stored relation-comments in 'table property' mode.
 $cfg['RepeatCells']         = 100;          // repeat header names every X cells? (0 = deactivate)
 
-$cfg['QueryFrame']          = TRUE;         // displays a new frame where a link to a querybox is always displayed.
+$cfg['QueryFrame']          = TRUE;         // displays a link or icon in the left frame to open the querybox, and activates the querybox when clicking on [Edit] on the results page.
 $cfg['QueryFrameJS']        = TRUE;         // whether to use JavaScript functions for opening a new window for SQL commands.
                                             // if set to 'false', the target of the querybox is always the right frame.
-$cfg['QueryFrameDebug']     = FALSE;        // display JS debugging link (DEVELOPERS only)
 $cfg['QueryWindowWidth']    = 550;          // Width of Query window
 $cfg['QueryWindowHeight']   = 310;          // Height of Query window
 $cfg['QueryHistoryDB']      = FALSE;         // Set to TRUE if you want DB-based query history.
@@ -504,14 +516,46 @@ $cfg['MaxExactCount']       = 20000;        // When approximate count < this, PM
                                             // table rows.
 $cfg['WYSIWYG-PDF']         = TRUE;         // Utilize DHTML/JS capabilities to allow WYSIWYG editing of
                                             // the PDF page editor. Requires an IE6/Mozilla based browser.
-/**
- * Default queries.
- *  %d will be replaced by database name
- *  %t will be replaced by table name
- */
-$cfg['DefaultQueryTable']   = 'SELECT * FROM %t WHERE 1';
-$cfg['DefaultQueryDatabase']= '';
 
+$cfg['NaturalOrder']        = TRUE;         // Sort table and database in natural order
+
+
+//-----------------------------------------------------------------------------
+// custom-setup by mkkeck: 2004-05-04
+//    some specials for new icons and scrollings
+// FIXME:
+// 2004-05-08 rabus: We need to rearrange these variables.
+
+$cfg['ShowHttpHostTitle']   = TRUE;            // show HttpHost in browsers window title (true|false)?
+$cfg['SetHttpHostTitle']    = '';              // if ShowHttpHostTitle=true, please set your host (server)
+                                             // or an other string, wich should be shown in browsers window title.
+                                             // If not set (or empty), the PMA will get your real Host-Adress.
+
+$cfg['ErrorIconic']          = TRUE;    // show some icons for warnings, errors and informations (true|false)?
+$cfg['MainPageIconic']       = TRUE;    // show icons in list on main page, on right panel top menu (server db table)  and on menu tabs (true|false)?
+$cfg['ReplaceHelpImg']       = TRUE;    // show help button instead of strDocumentation (true|false)?
+
+// theme manager
+$cfg['ThemePath']           = './themes';    // using themes manager please set up here the path to 'themes'
+                                             // else leave empty
+$cfg['ThemeManager']        = TRUE;          // if you want to use selectable themes and if ThemesPath not empty
+                                             // set it to true, else set it to false (default is false);
+$cfg['ThemeDefault']        = 'original';         // set up default theme, if ThemePath not empty
+                                             // you can set up here an valid path to themes or 'original' for
+                                             // the original pma-theme
+
+//-----------------------------------------------------------------------------
+
+
+/**
+ * Default queries
+ * %d will be replaced by the database name.
+ * %t will be replaced by the table name.
+ * %f will be replaced by a list of field names.
+ * (%t and %f only applies to DefaultQueryTable)
+ */
+$cfg['DefaultQueryTable']    = 'SELECT * FROM %t WHERE 1';
+$cfg['DefaultQueryDatabase'] = '';
 
 /**
  * SQL Query box settings
@@ -521,10 +565,11 @@ $cfg['SQLQuery']['Edit']      = TRUE;       // Edit link to change a query
 $cfg['SQLQuery']['Explain']   = TRUE;       // EXPLAIN on SELECT queries
 $cfg['SQLQuery']['ShowAsPHP'] = TRUE;       // Wrap a query in PHP
 $cfg['SQLQuery']['Validate']  = FALSE;      // Validate a query (see $cfg['SQLValidator'] as well)
+$cfg['SQLQuery']['Refresh']   = TRUE;       // Refresh the results page
 
 
 /**
- * web-server upload directory
+ * Webserver upload/save/import directories
  */
 $cfg['UploadDir']             = '';         // Directory for uploaded files that can be executed by
                                             // phpMyAdmin. For example './upload'. Leave empty for
@@ -535,6 +580,9 @@ $cfg['SaveDir']               = '';         // Directory where phpMyAdmin can sa
 $cfg['docSQLDir']             = '';         // Directory for docSQL imports, phpMyAdmin can import
                                             // docSQL files from that directory. For example
                                             // './docSQL'. Leave empty for no docSQL import support.
+$cfg['TempDir']               = '';         // Directory where phpMyAdmin can save temporary files.
+                                            // This is needed for MS Excel export, see documentation
+                                            // how to enable that.
 
 
 /**
@@ -550,30 +598,7 @@ $cfg['GD2Available']          = 'auto';     // Is GD >= 2 available? Set to yes/
 $cfg['SQP']['fmtType']      = 'html';       // Pretty-printing style to use on queries (html, text, none)
 $cfg['SQP']['fmtInd']       = '1';          // Amount to indent each level (floats ok)
 $cfg['SQP']['fmtIndUnit']   = 'em';         // Units for indenting each level (CSS Types - {em,px,pt})
-$cfg['SQP']['fmtColor']     = array(        // Syntax colouring data
-    'comment'            => '#808000',
-    'comment_mysql'      => '',
-    'comment_ansi'       => '',
-    'comment_c'          => '',
-    'digit'              => '',
-    'digit_hex'          => 'teal',
-    'digit_integer'      => 'teal',
-    'digit_float'        => 'aqua',
-    'punct'              => 'fuchsia',
-    'alpha'              => '',
-    'alpha_columnType'   => '#FF9900',
-    'alpha_columnAttrib' => '#0000FF',
-    'alpha_reservedWord' => '#990099',
-    'alpha_functionName' => '#FF0000',
-    'alpha_identifier'   => 'black',
-    'alpha_charset'      => '#6495ed',
-    'alpha_variable'     => '#800000',
-    'quote'              => '#008000',
-    'quote_double'       => '',
-    'quote_single'       => '',
-    'quote_backtick'     => ''
-);
-
+// The graphical settings are now located in themes/themename/layout.inc.php
 
 /**
  * If you wish to use the SQL Validator service, you should be
@@ -629,7 +654,7 @@ $cfg['ColumnTypes'] = array(
    'SET'
 );
 
-// Atributes
+// Attributes
 $cfg['AttributeTypes'] = array(
    '',
    'BINARY',
@@ -648,6 +673,7 @@ if ($cfg['ShowFunctionFields']) {
        'NOW',
        'PASSWORD',
        'MD5',
+       'SHA1',
        'ENCRYPT',
        'RAND',
        'LAST_INSERT_ID',
@@ -666,7 +692,7 @@ if ($cfg['ShowFunctionFields']) {
        'WEEKDAY',
        'CONCAT'
     );
-    
+
     // Which column types will be mapped to which Group?
     $cfg['RestrictColumnTypes'] = array(
        'VARCHAR'      => 'FUNC_CHAR',
@@ -706,6 +732,7 @@ if ($cfg['ShowFunctionFields']) {
             'UCASE',
             'PASSWORD',
             'MD5',
+            'SHA1',
             'ENCRYPT',
             'LAST_INSERT_ID',
             'USER',
@@ -729,6 +756,7 @@ if ($cfg['ShowFunctionFields']) {
             'ASCII',
             'CHAR',
             'MD5',
+            'SHA1',
             'ENCRYPT',
             'RAND',
             'LAST_INSERT_ID',
@@ -737,8 +765,8 @@ if ($cfg['ShowFunctionFields']) {
             'SUM'
         )
     );
-    
-// Default functions for above defined groups
+
+    // Default functions for above defined groups
     $cfg['DefaultFunctions'] = array(
         'FUNC_CHAR'         => '',
         'FUNC_DATE'         => '',
@@ -746,8 +774,45 @@ if ($cfg['ShowFunctionFields']) {
         'first_timestamp'   => 'NOW'
     );
 
+
 } // end if
 
+// Search operators
+$cfg['NumOperators'] = array(
+   '=',
+   '>',
+   '>=',
+   '<',
+   '<=',
+   '!=',
+   'LIKE',
+   'NOT LIKE'
+);
+
+$cfg['TextOperators'] = array(
+   'LIKE',
+   'LIKE %...%',
+   'NOT LIKE',
+   '=',
+   '!=',
+   'REGEXP',
+   'NOT REGEXP'
+);
+
+$cfg['EnumOperators'] = array(
+   '=',
+   '!='
+);
+
+$cfg['NullOperators'] = array(
+   'IS NULL',
+   'IS NOT NULL'
+);
+
+$cfg['UnaryOperators'] = array(
+   'IS NULL'     => 1,
+   'IS NOT NULL' => 1
+);
 
 /**
  * Unset magic_quotes_runtime - do not change!
@@ -757,5 +822,5 @@ set_magic_quotes_runtime(0);
 /**
  * File Revision - do not change either!
  */
-$cfg['FileRevision'] = '$Revision: 2.5.2.1 $';
+$cfg['FileRevision'] = '$Revision: 2.41 $';
 ?>

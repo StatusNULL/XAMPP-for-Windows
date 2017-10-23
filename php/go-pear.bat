@@ -1,4 +1,4 @@
 @ECHO OFF
-set PHP_BIN=phpcli.exe
-%PHP_BIN% -n -d output_buffering=0 pear\go-pear.php
+set PHP_BIN=php.exe
+%PHP_BIN% -n -d output_buffering=0 PEAR\go-pear.php
 pause
