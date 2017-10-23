@@ -14,7 +14,7 @@
 /**
 	\mainpage 	
 	
-	 @version V4.80 8 Mar 2006  (c) 2000-2006 John Lim (jlim#natsoft.com.my). All rights reserved.
+	 @version V4.91 2 Aug 2006  (c) 2000-2006 John Lim (jlim#natsoft.com.my). All rights reserved.
 
 	Released under both BSD license and Lesser GPL library license. You can choose which license
 	you prefer.
@@ -171,7 +171,7 @@
 		/**
 		 * ADODB version as a string.
 		 */
-		$ADODB_vers = 'V4.80 8 Mar 2006  (c) 2000-2006 John Lim (jlim#natsoft.com.my). All rights reserved. Released BSD & LGPL.';
+		$ADODB_vers = 'V4.91 2 Aug 2006  (c) 2000-2006 John Lim (jlim#natsoft.com.my). All rights reserved. Released BSD & LGPL.';
 	
 		/**
 		 * Determines whether recordset->RecordCount() is used. 
@@ -314,6 +314,7 @@
 	var $_evalAll = false;
 	var $_affected = false;
 	var $_logsql = false;
+	var $_transmode = ''; // transaction mode
 	
 	/**
 	 * Constructor
@@ -553,6 +554,7 @@
 
 	function q(&$s)
 	{
+		#if (!empty($this->qNull)) if ($s == 'null') return $s;
 		$s = $this->qstr($s,false);
 	}
 	
@@ -822,7 +824,10 @@
 							$sql .= str_replace(',','.',$v); // locales fix so 1.1 does not get converted to 1,1
 						else if ($typ == 'boolean')
 							$sql .= $v ? $this->true : $this->false;
-						else if ($v === null)
+						else if ($typ == 'object') {
+							if (method_exists($v, '__toString')) $sql .= $this->qstr($v->__toString());
+							else $sql .= $this->qstr((string) $v);
+						} else if ($v === null)
 							$sql .= 'NULL';
 						else
 							$sql .= $v;
@@ -864,7 +869,7 @@
 	{
 		if ($this->debug) {
 			global $ADODB_INCLUDED_LIB;
-			if (empty($ADODB_INCLUDED_LIB)) include_once(ADODB_DIR.'/adodb-lib.inc.php');
+			if (empty($ADODB_INCLUDED_LIB)) include(ADODB_DIR.'/adodb-lib.inc.php');
 			$this->_queryID = _adodb_debug_execute($this, $sql,$inputarr);
 		} else {
 			$this->_queryID = @$this->_query($sql,$inputarr);
@@ -1110,7 +1115,7 @@
 						$sql = preg_replace(
 						'/(^\s*select\s+(distinctrow|distinct)?)/i','\\1 '.$this->hasTop.' '.((integer)$nrows).' ',$sql);
 
-						if ($secs2cache>0) {
+						if ($secs2cache >= 0) {
 							$ret =& $this->CacheExecute($secs2cache, $sql,$inputarr);
 						} else {
 							$ret =& $this->Execute($sql,$inputarr);
@@ -1143,10 +1148,10 @@
 		$ADODB_COUNTRECS = false;
 			
 		if ($offset>0){
-			if ($secs2cache>0) $rs = &$this->CacheExecute($secs2cache,$sql,$inputarr);
+			if ($secs2cache >= 0) $rs = &$this->CacheExecute($secs2cache,$sql,$inputarr);
 			else $rs = &$this->Execute($sql,$inputarr);
 		} else {
-			if ($secs2cache>0) $rs = &$this->CacheExecute($secs2cache,$sql,$inputarr);
+			if ($secs2cache >= 0) $rs = &$this->CacheExecute($secs2cache,$sql,$inputarr);
 			else $rs = &$this->Execute($sql,$inputarr);
 		}
 		$ADODB_COUNTRECS = $savec;
@@ -1343,7 +1348,6 @@
 		return  '('.$date.'+'.$dayFraction.')';
 	}
 	
-	
 	/**
 	*
 	* @param sql			SQL statement
@@ -1461,7 +1465,7 @@
 	function Replace($table, $fieldArray, $keyCol, $autoQuote=false, $has_autoinc=false)
 	{
 		global $ADODB_INCLUDED_LIB;
-		if (empty($ADODB_INCLUDED_LIB)) include_once(ADODB_DIR.'/adodb-lib.inc.php');
+		if (empty($ADODB_INCLUDED_LIB)) include(ADODB_DIR.'/adodb-lib.inc.php');
 		
 		return _adodb_replace($this, $table, $fieldArray, $keyCol, $autoQuote, $has_autoinc);
 	}
@@ -1528,7 +1532,7 @@
       } 
       
       global $ADODB_INCLUDED_CSV;
-      if (empty($ADODB_INCLUDED_CSV)) include_once(ADODB_DIR.'/adodb-csvlib.inc.php');
+      if (empty($ADODB_INCLUDED_CSV)) include(ADODB_DIR.'/adodb-csvlib.inc.php');
       
       $f = $this->_gencachename($sql.serialize($inputarr),false);
       adodb_write_file($f,''); // is adodb_write_file needed?
@@ -1580,7 +1584,7 @@
 		} 
 		
 		global $ADODB_INCLUDED_CSV;
-		if (empty($ADODB_INCLUDED_CSV)) include_once(ADODB_DIR.'/adodb-csvlib.inc.php');
+		if (empty($ADODB_INCLUDED_CSV)) include(ADODB_DIR.'/adodb-csvlib.inc.php');
 		
 		$f = $this->_gencachename($sql.serialize($inputarr),false);
 		adodb_write_file($f,''); // is adodb_write_file needed?
@@ -1655,7 +1659,7 @@
 			$sqlparam = $sql;
 			
 		global $ADODB_INCLUDED_CSV;
-		if (empty($ADODB_INCLUDED_CSV)) include_once(ADODB_DIR.'/adodb-csvlib.inc.php');
+		if (empty($ADODB_INCLUDED_CSV)) include(ADODB_DIR.'/adodb-csvlib.inc.php');
 		
 		$md5file = $this->_gencachename($sql.serialize($inputarr),true);
 		$err = '';
@@ -1731,15 +1735,16 @@
 	 */
 	function& AutoExecute($table, $fields_values, $mode = 'INSERT', $where = FALSE, $forceUpdate=true, $magicq=false) 
 	{
+		$false = false;
 		$sql = 'SELECT * FROM '.$table;  
 		if ($where!==FALSE) $sql .= ' WHERE '.$where;
 		else if ($mode == 'UPDATE' || $mode == 2 /* DB_AUTOQUERY_UPDATE */) {
 			ADOConnection::outp('AutoExecute: Illegal mode=UPDATE with empty WHERE clause');
-			return false;
+			return $false;
 		}
 
 		$rs =& $this->SelectLimit($sql,1);
-		if (!$rs) return false; // table does not exist
+		if (!$rs) return $false; // table does not exist
 		$rs->tableName = $table;
 		
 		switch((string) $mode) {
@@ -1753,7 +1758,7 @@
 			break;
 		default:
 			ADOConnection::outp("AutoExecute: Unknown mode=$mode");
-			return false;
+			return $false;
 		}
 		$ret = false;
 		if ($sql) $ret = $this->Execute($sql);
@@ -1786,7 +1791,7 @@
 		}
 		//********************************************************//
 
-		if (empty($ADODB_INCLUDED_LIB)) include_once(ADODB_DIR.'/adodb-lib.inc.php');
+		if (empty($ADODB_INCLUDED_LIB)) include(ADODB_DIR.'/adodb-lib.inc.php');
 		return _adodb_getupdatesql($this,$rs,$arrFields,$forceUpdate,$magicq,$force);
 	}
 
@@ -1806,7 +1811,7 @@
 			$force = $ADODB_FORCE_TYPE;
 			
 		}
-		if (empty($ADODB_INCLUDED_LIB)) include_once(ADODB_DIR.'/adodb-lib.inc.php');
+		if (empty($ADODB_INCLUDED_LIB)) include(ADODB_DIR.'/adodb-lib.inc.php');
 		return _adodb_getinsertsql($this,$rs,$arrFields,$magicq,$force);
 	}
 	
@@ -1973,7 +1978,7 @@
 		
 		
 		if (!isset($_ADODB_ACTIVE_DBS)) {
-			include_once(ADODB_DIR.'/adodb-active-record.inc.php');
+			include(ADODB_DIR.'/adodb-active-record.inc.php');
 		}	
 		if (!class_exists($class)) {
 			ADOConnection::outp("Unknown class $class in GetActiveRcordsClass()");
@@ -2016,6 +2021,57 @@
 	 */
 	function BeginTrans() {return false;}
 	
+	/* set transaction mode */
+	function SetTransactionMode( $transaction_mode ) 
+	{
+		$transaction_mode = $this->MetaTransaction($transaction_mode, $this->dataProvider);
+		$this->_transmode  = $transaction_mode;
+	}
+/*
+http://msdn2.microsoft.com/en-US/ms173763.aspx
+http://dev.mysql.com/doc/refman/5.0/en/innodb-transaction-isolation.html
+http://www.postgresql.org/docs/8.1/interactive/sql-set-transaction.html
+http://www.stanford.edu/dept/itss/docs/oracle/10g/server.101/b10759/statements_10005.htm
+*/
+	function MetaTransaction($mode,$db)
+	{
+		$mode = strtoupper($mode);
+		$mode = str_replace('ISOLATION LEVEL ','',$mode);
+		
+		switch($mode) {
+
+		case 'READ UNCOMMITTED':
+			switch($db) { 
+			case 'oci8':
+			case 'oracle':
+				return 'ISOLATION LEVEL READ COMMITTED';
+			default:
+				return 'ISOLATION LEVEL READ UNCOMMITTED';
+			}
+			break;
+					
+		case 'READ COMMITTED':
+				return 'ISOLATION LEVEL READ COMMITTED';
+			break;
+			
+		case 'REPEATABLE READ':
+			switch($db) {
+			case 'oci8':
+			case 'oracle':
+				return 'ISOLATION LEVEL SERIALIZABLE';
+			default:
+				return 'ISOLATION LEVEL REPEATABLE READ';
+			}
+			break;
+			
+		case 'SERIALIZABLE':
+				return 'ISOLATION LEVEL SERIALIZABLE';
+			break;
+			
+		default:
+			return $mode;
+		}
+	}
 	
 	/**
 	 * If database does not support transactions, always return true as data always commited
@@ -2207,7 +2263,7 @@
 	 *
 	 * @return  array of column names for current table.
 	 */ 
-	function &MetaColumnNames($table, $numIndexes=false) 
+	function &MetaColumnNames($table, $numIndexes=false,$useattnum=false /* only for postgres */) 
 	{
 		$objarr =& $this->MetaColumns($table);
 		if (!is_array($objarr)) {
@@ -2217,7 +2273,12 @@
 		$arr = array();
 		if ($numIndexes) {
 			$i = 0;
-			foreach($objarr as $v) $arr[$i++] = $v->name;
+			if ($useattnum) {
+				foreach($objarr as $v) 
+					$arr[$v->attnum] = $v->name;
+				
+			} else
+				foreach($objarr as $v) $arr[$i++] = $v->name;
 		} else
 			foreach($objarr as $v) $arr[strtoupper($v->name)] = $v->name;
 		
@@ -2259,6 +2320,22 @@
 		}
 
 		return adodb_date($this->fmtDate,$d);
+	}
+	
+	function BindDate($d)
+	{
+		$d = $this->DBDate($d);
+		if (strncmp($d,"'",1)) return $d;
+		
+		return substr($d,1,strlen($d)-2);
+	}
+	
+	function BindTimeStamp($d)
+	{
+		$d = $this->DBTimeStamp($d);
+		if (strncmp($d,"'",1)) return $d;
+		
+		return substr($d,1,strlen($d)-2);
 	}
 	
 	
@@ -2463,7 +2540,7 @@
 	function &PageExecute($sql, $nrows, $page, $inputarr=false, $secs2cache=0) 
 	{
 		global $ADODB_INCLUDED_LIB;
-		if (empty($ADODB_INCLUDED_LIB)) include_once(ADODB_DIR.'/adodb-lib.inc.php');
+		if (empty($ADODB_INCLUDED_LIB)) include(ADODB_DIR.'/adodb-lib.inc.php');
 		if ($this->pageExecuteCountRows) $rs =& _adodb_pageexecute_all_rows($this, $sql, $nrows, $page, $inputarr, $secs2cache);
 		else $rs =& _adodb_pageexecute_no_last_page($this, $sql, $nrows, $page, $inputarr, $secs2cache);
 		return $rs;
@@ -2535,7 +2612,7 @@
 	//==============================================================================================	
 	// DATE AND TIME FUNCTIONS
 	//==============================================================================================	
-	include_once(ADODB_DIR.'/adodb-time.inc.php');
+	if (!defined('ADODB_DATE_VERSION')) include(ADODB_DIR.'/adodb-time.inc.php');
 	
 	//==============================================================================================	
 	// CLASS ADORecordSet
@@ -2646,7 +2723,7 @@
 			$size=0, $selectAttr='',$compareFields0=true)
 	{
 		global $ADODB_INCLUDED_LIB;
-		if (empty($ADODB_INCLUDED_LIB)) include_once(ADODB_DIR.'/adodb-lib.inc.php');
+		if (empty($ADODB_INCLUDED_LIB)) include(ADODB_DIR.'/adodb-lib.inc.php');
 		return _adodb_getmenu($this, $name,$defstr,$blank1stItem,$multiple,
 			$size, $selectAttr,$compareFields0);
 	}
@@ -2673,7 +2750,7 @@
 			$size=0, $selectAttr='')
 	{
 		global $ADODB_INCLUDED_LIB;
-		if (empty($ADODB_INCLUDED_LIB)) include_once(ADODB_DIR.'/adodb-lib.inc.php');
+		if (empty($ADODB_INCLUDED_LIB)) include(ADODB_DIR.'/adodb-lib.inc.php');
 		return _adodb_getmenu_gp($this, $name,$defstr,$blank1stItem,$multiple,
 			$size, $selectAttr,false);
 	}
@@ -2790,7 +2867,17 @@
 			if ($ADODB_EXTENSION) {
 				if ($numIndex) {
 					while (!$this->EOF) {
-						$results[trim($this->fields[0])] = array_slice($this->fields, 1);
+						// $results[trim($this->fields[0])] = array_slice($this->fields, 1);
+						// Fix for array_slice re-numbering numeric associative keys in PHP5
+						$keys = array_slice(array_keys($this->fields), 1);
+						$sliced_array = array();
+
+						foreach($keys as $key) {
+							$sliced_array[$key] = $this->fields[$key];
+						}
+						
+						$results[trim(reset($this->fields))] = $sliced_array;
+
 						adodb_movenext($this);
 					}
 				} else {
@@ -2802,7 +2889,16 @@
 			} else {
 				if ($numIndex) {
 					while (!$this->EOF) {
-						$results[trim($this->fields[0])] = array_slice($this->fields, 1);
+						//$results[trim($this->fields[0])] = array_slice($this->fields, 1);
+						// Fix for array_slice re-numbering numeric associative keys in PHP5
+						$keys = array_slice(array_keys($this->fields), 1);
+						$sliced_array = array();
+
+						foreach($keys as $key) {
+							$sliced_array[$key] = $this->fields[$key];
+						}
+						
+						$results[trim(reset($this->fields))] = $sliced_array;
 						$this->MoveNext();
 					}
 				} else {
@@ -3360,6 +3456,7 @@
 		'BPCHAR' => 'C',
 		'CHARACTER' => 'C',
 		'INTERVAL' => 'C',  # Postgres
+		'MACADDR' => 'C', # postgres
 		##
 		'LONGCHAR' => 'X',
 		'TEXT' => 'X',
@@ -3386,6 +3483,7 @@
 		'DATETIME' => 'T',
 		'TIMESTAMPTZ' => 'T',
 		'T' => 'T',
+		'TIMESTAMP WITHOUT TIME ZONE' => 'T', // postgresql
 		##
 		'BOOL' => 'L',
 		'BOOLEAN' => 'L', 
@@ -3952,7 +4050,7 @@
 		$path = ADODB_DIR."/datadict/datadict-$drivername.inc.php";
 
 		if (!file_exists($path)) {
-			ADOConnection::outp("Database driver '$path' not available");
+			ADOConnection::outp("Dictionary driver '$path' not available");
 			return $false;
 		}
 		include_once($path);
@@ -3998,7 +4096,7 @@
 	function adodb_backtrace($printOrArr=true,$levels=9999)
 	{
 		global $ADODB_INCLUDED_LIB;
-		if (empty($ADODB_INCLUDED_LIB)) include_once(ADODB_DIR.'/adodb-lib.inc.php');
+		if (empty($ADODB_INCLUDED_LIB)) include(ADODB_DIR.'/adodb-lib.inc.php');
 		return _adodb_backtrace($printOrArr,$levels);
 	}
 

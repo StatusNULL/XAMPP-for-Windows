@@ -1,5 +1,5 @@
 <?php
-/* $Id: common.lib.php,v 2.266.2.23.2.1 2006/05/14 16:46:51 nijel Exp $ */
+/* $Id: common.lib.php,v 2.266.2.27.2.2 2006/08/21 11:45:16 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -1082,7 +1082,9 @@ if (!defined('PMA_MINIMUM_COMMON')) {
                 }
             } else {
                 session_write_close();
-                if (PMA_IS_IIS) {
+                // bug #1523784, IE6 does not like 'Refresh: 0', it
+                // results in a blank page
+                if (PMA_IS_IIS && defined('PMA_COMING_FROM_COOKIE_LOGIN')) {
                     header('Refresh: 0; ' . $uri);
                 } else {
                     header('Location: ' . $uri);
@@ -2584,7 +2586,9 @@ window.parent.updateTableTitle('<?php echo $uni_tbl; ?>', '<?php echo PMA_jsForm
             if (strtoupper($default) == 'NULL') {
                 $query .= ' DEFAULT NULL';
             } else {
-                $query .= ' DEFAULT \'' . PMA_sqlAddslashes($default) . '\'';
+                if (!empty($default) || $default == '0') {
+                    $query .= ' DEFAULT \'' . PMA_sqlAddslashes($default) . '\'';
+                }
             }
         }
 
@@ -2932,6 +2936,9 @@ if (!isset($_REQUEST['token']) || $_SESSION['PMA_token'] != $_REQUEST['token']) 
             unset($_GET[$key]);
             unset($_POST[$key]);
             unset($GLOBALS[$key]);
+        } else {
+            // allowed stuff could be compromised so escape it
+            $_REQUEST[$key] = htmlspecialchars($_REQUEST[$key], ENT_QUOTES);
         }
     }
 }

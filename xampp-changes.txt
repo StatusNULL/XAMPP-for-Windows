@@ -1,3 +1,30 @@
+09 Sept. 2006 XAMPP  1.5.4 Release
+
+- UPDATE MySQL 5.0.24a
+- UPDATE OpenSSL 0.9.8c
+
+25 August 2006 XAMPP  1.5.4 Beta 3
+
+- UPDATE PHP 5.1.6 (plus PECL)
+
+24 August 2006 XAMPP  1.5.4 Beta 2
+
+- UPDATE PHP 5.1.5 (plus PECL)
+- UPDATE PHP 4.4.4
+- UPDATE phpMyAdmin 2.8.2.4
+
+14 August 2006 XAMPP  1.5.4 Beta 1
+- UPDATE Apache 2.2.3
+- UPDATE MySQL 5.0.24
+- UPDATE PHP 4.4.3
+- UPDATE phpMyAdmin 2.8.2.1
+- UPDATE FileZilla FTP Server 0.9.18
+- UPDATE Zend Optimizer 3.0.1
+- Upgrade PHP 5.1.4 apache2handler for Apache 2.2.3
+- Upgrade PHP 4.4.3 apache2handler for Apache 2.2.3
+- Upgrade PHP mysql(i) extension for MySQL 5.0.24
+- ADD eAccelerator 0.9.6-svn260-dev (not active)
+
 31 Mai 2006 XAMPP Release 1.5.3a Release
 - Fix problem for ssi support in httpd.conf
 

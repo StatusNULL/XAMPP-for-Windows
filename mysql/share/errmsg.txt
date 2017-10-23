@@ -5475,7 +5475,7 @@ ER_SP_DUP_HANDLER 42000
 	eng "Duplicate handler declared in the same block"
 	ger "Doppelter Handler im selben Block deklariert"
 ER_SP_NOT_VAR_ARG 42000
-	eng "OUT or INOUT argument %d for routine %s is not a variable"
+	eng "OUT or INOUT argument %d for routine %s is not a variable or NEW pseudo-variable in BEFORE trigger"
 	ger "OUT- oder INOUT-Argument %d für Routine %s ist keine Variable"
 ER_SP_NO_RETSET 0A000
 	eng "Not allowed to return a result set from a %s"
@@ -5615,3 +5615,15 @@ ER_MAX_PREPARED_STMT_COUNT_REACHED 42000
         eng "Can't create more than max_prepared_stmt_count statements (current value: %lu)"
 ER_VIEW_RECURSIVE
         eng "`%-.64s`.`%-.64s` contains view recursion"
+ER_NON_GROUPING_FIELD_USED 42000
+	eng "non-grouping field '%-.64s' is used in %-.64s clause"
+ER_TABLE_CANT_HANDLE_SPKEYS
+        eng "The used table type doesn't support SPATIAL indexes"
+ER_NO_TRIGGERS_ON_SYSTEM_SCHEMA
+	eng "Triggers can not be created on system tables"
+ER_USERNAME
+	eng "user name"
+ER_HOSTNAME
+	eng "host name"
+ER_WRONG_STRING_LENGTH
+	eng "String '%-.70s' is too long for %s (should be no longer than %d)"

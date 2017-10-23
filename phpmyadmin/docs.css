@@ -1,4 +1,4 @@
-/* $Id: docs.css,v 2.0 2003/11/18 15:20:37 nijel Exp $ */
+/* $Id: docs.css,v 2.0.22.1 2006/08/02 16:48:53 lem9 Exp $ */
 /* Stylesheet for phpMyAdmin documentation */
 /* vim: expandtab ts=4 sw=4 sts=4 tw=78
 */
@@ -127,8 +127,11 @@ ul {
 }
 
 pre {
-    margin: 2px 5% 2px 5%;
-
+    margin: 1em 5% 1em 5%;
+    border: 1px solid silver;
+    color: #000000;
+    background-color: #eeeeee;
+    padding: 0.5em;
 }
 pre.wrap {
     white-space: normal;

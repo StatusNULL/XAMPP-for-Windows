@@ -1,4 +1,4 @@
-<p align="center"><b><u>FileZilla Server version 0.9.16c beta</u></b></p>
+<p align="center"><b><u>FileZilla Server version 0.9.18 beta</u></b></p>
 <p align="center">Copyright 2001-2006<br>
 by <a href="mailto:Tim.Kosse@gmx.de">Tim Kosse</a><a href="http://sourceforge.net/projects/filezilla/"><br>
 http://sourceforge.net/projects/filezilla/</a></p>
@@ -67,6 +67,24 @@ as restoring it to normal size.</p>
 </table>
 <p align="left"><b><u>Version History:</u></b></p>
 <p>For a more detailed list of changes, please have a look at the CVS changelog located at <a href="http://filezilla-project.org/changelog.php?type=2">http://filezilla-project.org/changelog.php?type=2</a>.</p>
+<p><b>Version 0.9.18</b></p>
+<blockquote>
+  <u>Fixed bugs:</u>
+  <ul>
+    <li>Fix MLSD command not displaying all aliases</li>
+    <li>Fix keyboard nagivation in settings dialog</li>
+    <li>Added OPTS UTF8 OFF command</li>
+  </ul>
+</blockquote>
+<p><b>Version 0.9.17</b></p>
+<blockquote>
+  <u>Fixed bugs:</u>
+  <ul>
+    <li>Fix critical buffer overflow in admin interface. Remote code execution with the rights of the user running the admin interface might have been possible. Only the interface was affected, the service was unaffected.</li>
+    <li>Fix memory leak in service</li>
+    <li>Compatibility fixes for systems with more than one CPU</li>
+  </ul>
+</blockquote>
 <p><b>Version 0.9.16</b></p>
 <blockquote>
   <u>Fixed bugs:</u>

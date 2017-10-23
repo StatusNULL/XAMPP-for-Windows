@@ -1,5 +1,5 @@
 <?php
-/* $Id: Config.class.php,v 1.21.2.15.2.1 2006/05/20 17:15:21 lem9 Exp $ */
+/* $Id: Config.class.php,v 1.21.2.18.2.8 2006/08/22 17:00:00 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 class PMA_Config
@@ -76,7 +76,7 @@ class PMA_Config
      */
     function checkSystem()
     {
-        $this->set('PMA_VERSION', '2.8.1');
+        $this->set('PMA_VERSION', '2.8.2.4');
         /**
          * @deprecated
          */
@@ -289,14 +289,15 @@ class PMA_Config
      */
     function __wakeup()
     {
-        if (file_exists($this->getSource()) && $this->source_mtime !== filemtime($this->getSource())
+        if (! $this->checkConfigSource()
+          || $this->source_mtime !== filemtime($this->getSource())
           || $this->default_source_mtime !== filemtime($this->default_source)
-          || $this->error_config_file || $this->error_config_default_file) {
+          || $this->error_config_file
+          || $this->error_config_default_file) {
             $this->settings = array();
-            $this->load($this->getSource());
+            $this->load();
             $this->checkSystem();
         }
-
         // check for https needs to be done everytime,
         // as https and http uses same session so this info can not be stored
         // in session
@@ -420,6 +421,11 @@ class PMA_Config
      */
     function checkConfigSource()
     {
+        if (! $this->getSource()) {
+            // no configuration file set at all
+            return false;
+        }
+
         if ( ! file_exists($this->getSource()) ) {
             // do not trigger error here
             // https://sf.net/tracker/?func=detail&aid=1370269&group_id=23067&atid=377408

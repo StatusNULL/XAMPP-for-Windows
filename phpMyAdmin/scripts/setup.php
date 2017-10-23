@@ -1,5 +1,5 @@
 <?php
-/* $Id: setup.php,v 1.23.2.8.2.2 2006/05/15 07:57:09 nijel Exp $ */
+/* $Id: setup.php,v 1.23.2.10.2.4 2006/08/22 17:36:34 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 // phpMyAdmin setup script by Michal Čihař <michal@cihar.com>
@@ -10,11 +10,13 @@ chdir('..');
 require_once('./libraries/common.lib.php');
 
 // Grab configuration defaults
-$PMA_Config = new PMA_Config();
+// Do not use $PMA_Config, it interferes with the one in $_SESSION
+// on servers with register_globals enabled
+$PMA_Config_Setup = new PMA_Config();
 
 // Script information
-$script_info = 'phpMyAdmin ' . $PMA_Config->get('PMA_VERSION') . ' setup script by Michal Čihař <michal@cihar.com>';
-$script_version = '$Id: setup.php,v 1.23.2.8.2.2 2006/05/15 07:57:09 nijel Exp $';
+$script_info = 'phpMyAdmin ' . $PMA_Config_Setup->get('PMA_VERSION') . ' setup script by Michal Čihař <michal@cihar.com>';
+$script_version = '$Id: setup.php,v 1.23.2.10.2.4 2006/08/22 17:36:34 lem9 Exp $';
 
 // Grab action
 if (isset($_POST['action'])) {
@@ -60,7 +62,7 @@ echo '<?xml version="1.0" encoding="utf-8"?>' . "\n";
 <head>
     <link rel="icon" href="../favicon.ico" type="image/x-icon" />
     <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon" />
-    <title>phpMyAdmin <?php echo $PMA_Config->get('PMA_VERSION'); ?> setup</title>
+    <title>phpMyAdmin <?php echo $PMA_Config_Setup->get('PMA_VERSION'); ?> setup</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
     <script type="text/javascript" language="javascript">
@@ -214,7 +216,7 @@ echo '<?xml version="1.0" encoding="utf-8"?>' . "\n";
 </head>
 
 <body>
-<h1>phpMyAdmin <?php echo $PMA_Config->get('PMA_VERSION'); ?> setup</h1>
+<h1>phpMyAdmin <?php echo $PMA_Config_Setup->get('PMA_VERSION'); ?> setup</h1>
 <?php
 } // end show html header
 
@@ -369,19 +371,19 @@ function footer() {
  * @return  string  authentication method description
  */
 function get_server_auth($val) {
-    global $PMA_Config;
+    global $PMA_Config_Setup;
 
     if (isset($val['auth_type'])) {
         $auth = $val['auth_type'];
     } else {
-        $auth = $PMA_Config->default_server['auth_type'];
+        $auth = $PMA_Config_Setup->default_server['auth_type'];
     }
     $ret = $auth;
     if ($auth == 'config') {
         if (isset($val['user'])) {
             $ret .= ':' . $val['user'];
         } else {
-            $ret .= ':' . $PMA_Config->default_server['user'];
+            $ret .= ':' . $PMA_Config_Setup->default_server['user'];
         }
     }
     return $ret;
@@ -395,18 +397,55 @@ function get_server_auth($val) {
  *
  * @return  string  fancy server name
  */
-function get_server_name($val, $id = FALSE) {
+function get_server_name($val, $id = FALSE, $escape = true) {
     if (!empty($val['verbose'])) {
-        $ret = htmlspecialchars($val['verbose']);
+        $ret = $val['verbose'];
     } else {
-        $ret = htmlspecialchars($val['host']);
+        $ret = $val['host'];
     }
     $ret .= ' (' . get_server_auth($val) . ')';
     if ($id !== FALSE) {
         $ret .= ' [' . ($id + 1) . ']' ;
     }
-    return $ret;
+    if ($escape) {
+        return htmlspecialchars($ret);
+    } else {
+        return $ret;
+    }
 }
+
+
+/**
+ * Exports variable to PHP code, very limited version of var_export
+ *
+ * @param   string  data to export
+ *
+ * @see var_export
+ *
+ * @return  string  PHP code containing variable value
+ */
+function PMA_var_export($input) {
+    $output = '';
+    if (is_null($input)) {
+        $output .= 'NULL';
+    } elseif (is_array($input)) {
+        $output .= "array (\n";
+        foreach($input as $key => $value) {
+            $output .= PMA_var_export($key) . ' => ' . PMA_var_export($value);
+            $output .= ",\n";
+        }
+        $output .= ')';
+    } elseif (is_string($input)) {
+        $output .= '\'' . addslashes($input) . '\'';
+    } elseif (is_int($input) || is_double($input)) {
+        $output .= (string) $input;
+    } elseif (is_bool($input)) {
+        $output .= $input ? 'true' : 'false';
+    } else {
+        die('Unknown type for PMA_var_export: ' . $input);
+    }
+    return $output;
+}	
 
 /**
  * Creates configuration code for one variable
@@ -429,23 +468,26 @@ function get_cfg_val($name, $val) {
                     $ret .= $name . " = array(\n";
                 } else {
                     // Something unknown...
-                    $ret .= $name. ' = ' . var_export($val, TRUE) . ";\n";
+                    $ret .= $name. ' = ' . PMA_var_export($val) . ";\n";
                     break;
                 }
             }
             if ($type == 'string') {
-                $ret .= $name. "['$k'] = " . var_export($v, TRUE) . ";\n";
+                $ret .= get_cfg_val($name . "['$k']", $v);
             } elseif ($type == 'int') {
-                $ret .= "    " . var_export($v, TRUE) . ",\n";
+                $ret .= "    " . PMA_var_export($v) . ",\n";
             }
         }
-        if ($type == 'int') {
+        if (!isset($type)) {
+            /* Empty array */
+            $ret .= $name . " = array();\n";
+        } elseif ($type == 'int') {
             $ret .= ");\n";
         }
         $ret .= "\n";
         unset($type);
     } else {
-        $ret .= $name . ' = ' . var_export($val, TRUE) . ";\n";
+        $ret .= $name . ' = ' . PMA_var_export($val) . ";\n";
     }
     return $ret;
 }
@@ -466,7 +508,7 @@ function get_cfg_string($cfg) {
     if (count($c['Servers']) > 0) {
         $ret .= "/* Servers configuration */\n\$i = 0;\n";
         foreach ($c['Servers'] as $cnt => $srv) {
-            $ret .= "\n/* Server " . get_server_name($srv, $cnt) . " */\n\$i++;\n";
+            $ret .= "\n/* Server " . strtr(get_server_name($srv, $cnt, false), '*', '-') . " */\n\$i++;\n";
             foreach ($srv as $key => $val) {
                 $ret .= get_cfg_val("\$cfg['Servers'][\$i]['$key']", $val);
             }
@@ -592,7 +634,7 @@ function show_overview($title, $list, $buttons = '') {
 }
 
 /**
- * Displays configuration, fallback defaults are taken from global $PMA_Config
+ * Displays configuration, fallback defaults are taken from global $PMA_Config_Setup
  *
  * @param   array   list of values to display (each element is array of two or
  *                  three values - desription, name and optional type
@@ -608,7 +650,7 @@ function show_overview($title, $list, $buttons = '') {
  * @return  nothing
  */
 function show_config_form($list, $legend, $help, $defaults = array(), $save = '', $prefix = '') {
-    global $PMA_Config;
+    global $PMA_Config_Setup;
 
     if (empty($save)) {
         $save = 'Update';
@@ -637,7 +679,7 @@ function show_config_form($list, $legend, $help, $defaults = array(), $save = ''
                 if (isset($defaults[$val[1]])) {
                     echo ' value="' . htmlspecialchars($defaults[$val[1]]) . '"';
                 } else {
-                    echo ' value="' . htmlspecialchars($PMA_Config->get($val[1])) . '"';
+                    echo ' value="' . htmlspecialchars($PMA_Config_Setup->get($val[1])) . '"';
                 }
                 echo ' />';
                 break;
@@ -648,7 +690,7 @@ function show_config_form($list, $legend, $help, $defaults = array(), $save = ''
                         echo ' checked="checked"';
                     }
                 } else {
-                    if ($PMA_Config->get($val[1])) {
+                    if ($PMA_Config_Setup->get($val[1])) {
                         echo ' checked="checked"';
                     }
                 }
@@ -671,7 +713,7 @@ function show_config_form($list, $legend, $help, $defaults = array(), $save = ''
                             }
                         }
                     } else {
-                        $def_val = $PMA_Config->get($val[1]);
+                        $def_val = $PMA_Config_Setup->get($val[1]);
                         if (is_bool($val)) {
                             if (($def_val && $opt == 'TRUE') || (!$def_val && $opt == 'FALSE')) {
                                 echo ' selected="selected"';
@@ -764,7 +806,7 @@ function show_manual_form($defaults = array()) {
  * @return  nothing
  */
 function show_charset_form($defaults = array()) {
-    global $PMA_Config;
+    global $PMA_Config_Setup;
     ?>
 <form method="post" action="">
     <input type="hidden" name="token" value="<?php echo $_SESSION['PMA_token']; ?>" />
@@ -773,7 +815,7 @@ function show_charset_form($defaults = array()) {
         echo get_hidden_cfg();
         show_config_form(array(
             array('Allow charset conversion', 'AllowAnywhereRecoding', 'If you want to use such functions.', FALSE),
-            array('Default charset', 'DefaultCharset', 'Default charset for conversion.', $PMA_Config->get('AvailableCharsets')),
+            array('Default charset', 'DefaultCharset', 'Default charset for conversion.', $PMA_Config_Setup->get('AvailableCharsets')),
             array('Recoding engine', 'RecodingEngine', 'PHP can contain iconv and/or recode, select which one to use or keep autodetection.', array('auto', 'iconv', 'recode')),
             array('Extra params for iconv', 'IconvExtraParams', 'Iconv can get some extra parameters for conversion see man iconv_open.'),
             ),
@@ -818,7 +860,7 @@ function show_extensions_form($defaults = array()) {
  * @return  nothing
  */
 function show_relation_form($defaults = array()) {
-    global $PMA_Config;
+    global $PMA_Config_Setup;
     ?>
 <form method="post" action="">
     <input type="hidden" name="token" value="<?php echo $_SESSION['PMA_token']; ?>" />
@@ -829,7 +871,7 @@ function show_relation_form($defaults = array()) {
             array('Permanent query history', 'QueryHistoryDB', 'Store history into database.', FALSE),
             array('Maximal history size', 'QueryHistoryMax', 'How many queries are kept in history.'),
             array('Use MIME transformations', 'BrowseMIME', 'Use MIME transformations while browsing.', TRUE),
-            array('PDF default page size', 'PDFDefaultPageSize', 'Default page size for PDF, you can change this while creating page.', $PMA_Config->get('PDFPageSizes')),
+            array('PDF default page size', 'PDFDefaultPageSize', 'Default page size for PDF, you can change this while creating page.', $PMA_Config_Setup->get('PDFPageSizes')),
             ),
             'Configure MIME/relation/history',
             'phpMyAdmin can provide additional featrues like MIME transformation, internal relations, permanent history and PDF pages generating. You have to configure database and tables that will store such information on server page. Behaviour of those functions is configured here.',
@@ -1299,7 +1341,7 @@ switch ($action) {
     case 'addserver':
         if (count($configuration['Servers']) == 0) {
             // First server will use defaults as in config.default.php
-            $defaults = $PMA_Config->default_server;
+            $defaults = $PMA_Config_Setup->default_server;
             unset($defaults['AllowDeny']); // Ignore this for now
         } else {
             $defaults = array();
@@ -1351,7 +1393,7 @@ switch ($action) {
                     $data[] = array('Verbose name', $srv['verbose']);
                 }
                 $data[] = array('Host', $srv['host']);
-                $data[] = array('MySQL extension', isset($srv['extension']) ? $srv['extension'] : $PMA_Config->default_server['extension']);
+                $data[] = array('MySQL extension', isset($srv['extension']) ? $srv['extension'] : $PMA_Config_Setup->default_server['extension']);
                 $data[] = array('Authentication type', get_server_auth($srv));
                 $data[] = array('phpMyAdmin advanced features', empty($srv['pmadb']) || empty($srv['controluser']) || empty($srv['controlpass']) ? 'disabled' : 'enabled, db: ' . $srv['pmadb'] . ', user: ' . $srv['controluser']);
                 $buttons =
@@ -1766,7 +1808,7 @@ switch ($action) {
             break;
         }
 
-        $version_local = version_to_int( $GLOBALS['PMA_Config']->get('PMA_VERSION') );
+        $version_local = version_to_int( $PMA_Config_Setup->get('PMA_VERSION') );
         if ($version_local === FALSE) {
             message('error', 'Unparsable version string.');
             break;
@@ -1791,7 +1833,7 @@ switch ($action) {
     case '':
         message('notice', 'You want to configure phpMyAdmin using web interface. Please note that this only allows basic setup, please read <a href="../Documentation.html#config">documentation</a> to see full description of all configuration directives.', 'Welcome');
 
-        if ( $GLOBALS['PMA_Config']->get( 'PMA_PHP_INT_VERSION' ) < 40100) {
+        if ( $PMA_Config_Setup->get( 'PMA_PHP_INT_VERSION' ) < 40100) {
             message('warning', 'Please upgrade to PHP 4.1.0, it is required for phpMyAdmin.', 'Too old PHP');
         }
 

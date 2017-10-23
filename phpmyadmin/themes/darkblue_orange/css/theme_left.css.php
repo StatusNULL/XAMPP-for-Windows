@@ -8,7 +8,7 @@
 /* general tags */
 body {
     font-family:      Verdana, Arial, Helvetica, sans-serif;
-    font-size:        10px;
+    font-size:        12px;
     background-color: #666699;
     color:            #ffffff;
     margin: 0;

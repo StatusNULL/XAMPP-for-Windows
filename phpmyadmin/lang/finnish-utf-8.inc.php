@@ -1,8 +1,8 @@
 <?php
-/* $Id: finnish-utf-8.inc.php,v 2.124.2.4 2006/03/23 17:42:12 lem9 Exp $ */
+/* $Id: finnish-utf-8.inc.php,v 2.124.2.4.4.1 2006/08/02 17:00:56 lem9 Exp $ */
 
 /*
- * Translated by Jouni Kähkönen, <yoneh at users.sourceforge.net>
+ * Translated by Jouni Kähkönen, <address withdrawn>
  * Previous translations by Visa Kopu, <visa@visakopu.net>
  * 
  * Nov 2005: Several changes and fixes done (by Jouni Kähkönen)

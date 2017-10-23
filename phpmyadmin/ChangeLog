@@ -2,11 +2,76 @@
 phpMyAdmin - Changelog
 ----------------------
 
-$Id: ChangeLog,v 2.1929.2.130.2.4 2006/05/20 17:16:21 lem9 Exp $
+$Id: ChangeLog,v 2.1929.2.142.2.13 2006/08/22 18:01:45 lem9 Exp $
 $Source: /cvsroot/phpmyadmin/phpMyAdmin/ChangeLog,v $
+
+2006-08-22 Marc Delisle  <lem9@users.sourceforge.net>
+    * scripts/setup.php: bug #1536112, better fix (in case of 
+      register_globals enabled), thanks to Michal
+    ### 2.8.2.3 released from MAINT_2_8_2
+    * scripts/setup.php: bug #1544692, version 2.8.2.3 breaks setup.php
+      on a server with register_globals enabled, thanks to Juergen Windkiel
+    ### 2.8.2.4 released from MAINT_2_8_2
+
+2006-08-21 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/common.lib.php, libraries/auth/cookie.auth.lib.php:
+      bug #1542875, Cookie auth on IIS
+
+2006-08-14 Marc Delisle  <lem9@users.sourceforge.net>
+    ### 2.8.2.2 released from MAINT_2_8_2
+
+2006-08-11 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/auth/config.auth.lib.php: bug #1536112, config not loaded
+      (MySQL error 2002 or 2003)
+
+2006-08-02 Marc Delisle  <lem9@users.sourceforge.net>
+    ### 2.8.2.1 released from MAINT_2_8_2
+
+2006-08-01 Marc Delisle  <lem9@users.sourceforge.net>
+    * themes/darkblue_orange/css/theme_right.css.php, theme_left.css.php:
+      darkblue_orange was not readable, thanks to Juergen Windkiel
+    * Documentation.html: patch #1532493 + light editing from me,
+      thanks to Isaac Bennetch
+
+2006-07-28 Michal Čihař  <michal@cihar.com>
+    * scripts/setup.php: Include setup from HEAD:
+        - Protect against php code input from user (bug #1530370).
+        - Implement own var_export.
+
+2006-07-26 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/common.lib.php: bug #1523784, blank page after Edit
+      in IE6 via IIS
+
+2006-07-04 Sebastian Mendel <cybot_tm@users.sourceforge.net>
+     * libraries/Config.class.php: reload default configuration if
+       config.inc.php is removed
+
+2006-06-30 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/common.lib.php: escape also single quotes 
+    ### 2.8.2 released from QA_2_8 
+
+2006-06-28 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/common.lib.php: escape allowed parameters from non-token 
+      requests
+
+2006-06-15 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/display_export.lib.php: reenable XML option in export
+
+2006-06-02 Marc Delisle  <lem9@users.sourceforge.net>
+    * Documentation.html: requirements: web browser with cookies enabled
+
+2006-05-29 Marc Delisle  <lem9@users.sourceforge.net>
+    * main.php: bug #1496881, CVS link broken in main.php
 
 2006-05-20 Marc Delisle  <lem9@users.sourceforge.net>
     ### 2.8.1 released from MAINT_2_8_1
+
+2006-05-17 Marc Delisle  <lem9@users.sourceforge.net>
+    * server_privileges.php: bug #1478812, Add user (password containing 
+      a backslash; also minor optimization
+
+2006-05-15 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/common.lib.php, bug #1475949, removing the default value
 
 2006-05-15 Michal Čihař  <michal@cihar.com>
     * scripts/setup.php: Compatibility with security tokens (bug #1488453).

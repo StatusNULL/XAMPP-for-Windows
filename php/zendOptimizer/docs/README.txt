@@ -1,5 +1,5 @@
-                       Zend Optimizer(TM), version 3.0
-                       ===============================
+                       Zend Optimizer(TM), version 3.0.1
+                       =================================
 
 
 This package contains the Zend Optimizer from Zend Technologies Ltd.
@@ -16,8 +16,7 @@ For more technical information on the Zend Optimizer.
 Getting Support
 -=-=-=-=-=-=-=-
 
-If you have purchased the Zend Guard, you can submit free questions about Zend Optimizer setup 
-and installation support through Zend Support.
+If you have purchased the Zend Guard, you can submit free questions about Zend Optimizer setup and installation support through Zend Support.
 
 Answers to technical and operating system related questions can be found in the Zend Knowledge Base. 
 Here you will find a repository of articles that address know issues and how to deal with them:

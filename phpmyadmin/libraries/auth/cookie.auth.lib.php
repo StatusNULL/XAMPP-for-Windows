@@ -1,5 +1,5 @@
 <?php
-/* $Id: cookie.auth.lib.php,v 2.55.2.1 2006/04/11 16:33:33 cybot_tm Exp $ */
+/* $Id: cookie.auth.lib.php,v 2.55.2.1.4.1 2006/08/21 11:45:16 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 // +--------------------------------------------------------------------------+
@@ -477,6 +477,7 @@ function PMA_auth_set_user()
             $url_params['target'] = $GLOBALS['target'];
         }
 
+        define('PMA_COMING_FROM_COOKIE_LOGIN',1);
         PMA_sendHeaderLocation( $redirect_url . PMA_generate_common_url( $url_params, '&' ) );
         exit();
     } // end if
