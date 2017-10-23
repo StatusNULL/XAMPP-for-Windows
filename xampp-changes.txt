@@ -1,3 +1,22 @@
+15. Feb 2007 XAMPP 1.6.0
+- UPDATE PHP 4.4.5
+- UPDATE PEAR
+- Bugfix PEAR install in XAMPP
+- UPDATE eAccelerator PHP 5.2.1
+
+09. Feb 2007 XAMPP 1.6 beta 2
+- UPDATE PHP 5.2.1
+- UPDATE Zend Optimizer 3.2.2
+
+08. Feb 2007 XAMPP 1.6 beta 1
+- UPDATE Apache 2.2.4
+- UPDATE MySQL 5.0.33
+- UPDATE phpMyAdmin 2.9.2
+- UPDATE FileZilla FTP Server 0.9.22
+- UPDATE ADOdb 4.93a
+- UPDATE Apache & MySQL Modules for PHP
+- UPDATE Control Panel from from www.nat32.com
+
 20. Nov 2006 XAMPP 1.5.5 beta 2
 - UPDATE FileZilla FTP Server 0.9.20
 - UPDATE XAMPP Web Style 

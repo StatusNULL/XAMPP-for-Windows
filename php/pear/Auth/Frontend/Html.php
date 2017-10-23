@@ -18,7 +18,7 @@
  * @author     Adam Ashley <aashley@php.net>
  * @copyright  2001-2006 The PHP Group
  * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
- * @version    CVS: $Id: Html.php,v 1.9 2006/03/02 06:53:08 aashley Exp $
+ * @version    CVS: $Id: Html.php,v 1.10 2006/08/10 02:15:40 aashley Exp $
  * @link       http://pear.php.net/package/Auth
  * @since      File available since Release 1.3.0
  */
@@ -32,7 +32,7 @@
  * @author     Adam Ashley <aashley@php.net>
  * @copyright  2001-2006 The PHP Group
  * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
- * @version    Release: 1.3.0  File: $Revision: 1.9 $
+ * @version    Release: 1.5.0  File: $Revision: 1.10 $
  * @link       http://pear.php.net/package/Auth
  * @since      Class available since Release 1.3.0
  */
@@ -132,6 +132,7 @@ class Auth_Frontend_Html {
         // Might be a good idea to make the variable name variable 
         print '<input type="hidden" id="authsecret" name="authsecret" value="" />';
         print '</form>'."\n";
+        print '</center>'."\n";
     }
 
     // }}}

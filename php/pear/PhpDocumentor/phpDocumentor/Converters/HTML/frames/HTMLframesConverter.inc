@@ -1,31 +1,43 @@
 <?php
-//
-// +------------------------------------------------------------------------+
-// | phpDocumentor                                                          |
-// +------------------------------------------------------------------------+
-// | Copyright (c) 2000-2003 Joshua Eichorn, Gregory Beaver                 |
-// | Email         jeichorn@phpdoc.org, cellog@phpdoc.org                   |
-// | Web           http://www.phpdoc.org                                    |
-// | Mirror        http://phpdocu.sourceforge.net/                          |
-// | PEAR          http://pear.php.net/package-info.php?pacid=137           |
-// +------------------------------------------------------------------------+
-// | This source file is subject to version 3.00 of the PHP License,        |
-// | that is available at http://www.php.net/license/3_0.txt.               |
-// | If you did not receive a copy of the PHP license and are unable to     |
-// | obtain it through the world-wide-web, please send a note to            |
-// | license@php.net so we can mail you a copy immediately.                 |
-// +------------------------------------------------------------------------+
-//
 /**
  * HTML original framed output converter, modified to use Smarty Template.
  * This Converter takes output from the {@link Parser} and converts it to HTML-ready output for use with {@link Smarty}.
  *
- * @package Converters
+ * phpDocumentor :: automatic documentation generator
+ * 
+ * PHP versions 4 and 5
+ *
+ * Copyright (c) 2002-2006 Gregory Beaver
+ * 
+ * LICENSE:
+ * 
+ * This library is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation;
+ * either version 2.1 of the License, or (at your option) any
+ * later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ *
+ * @package    Converters
  * @subpackage HTMLframes
- * @see parserDocBlock, parserInclude, parserPage, parserClass, parserDefine, parserFunction, parserMethod, parserVar
- * @author Greg Beaver <cellog@users.sourceforge.net>
- * @since 1.0rc1
- * @version $Id: HTMLframesConverter.inc,v 1.79.2.6 2003/08/20 21:04:29 mvonballmo Exp $
+ * @author     Gregory Beaver <cellog@php.net>
+ * @copyright  2002-2006 Gregory Beaver
+ * @license    http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @version    CVS: $Id: HTMLframesConverter.inc,v 1.12 2006/05/01 04:23:25 cellog Exp $
+ * @filesource
+ * @link       http://www.phpdoc.org
+ * @link       http://pear.php.net/PhpDocumentor
+ * @see        parserDocBlock, parserInclude, parserPage, parserClass
+ * @see        parserDefine, parserFunction, parserMethod, parserVar
+ * @since      1.2
  */
 /**
  * HTML output converter.
@@ -36,10 +48,16 @@
  * @see parserDocBlock, parserInclude, parserPage, parserClass, parserDefine, parserFunction, parserMethod, parserVar
  * @author Greg Beaver <cellog@users.sourceforge.net>
  * @since 1.2
- * @version $Id: HTMLframesConverter.inc,v 1.79.2.6 2003/08/20 21:04:29 mvonballmo Exp $
+ * @version $Id: HTMLframesConverter.inc,v 1.12 2006/05/01 04:23:25 cellog Exp $
  */
 class HTMLframesConverter extends Converter
 {
+    /**
+     * This converter knows about the new root tree processing
+     * In order to fix PEAR Bug #6389
+     * @var boolean
+     */
+    var $processSpecialRoots = true;
     /**
      * Smarty Converter wants elements sorted by type as well as alphabetically
      * @see Converter::$sort_page_contents_by_type
@@ -172,7 +190,7 @@ class HTMLframesConverter extends Converter
         phpDocumentor_out("\n");
         $this->writefile('exsource_'.$path.'.html',$templ->fetch('examplesource.tpl'));
     }
-    
+
     function getExampleLink($path, $title)
     {
         return $this->returnLink('{$subdir}__examplesource' . PATH_DELIMITER . 'exsource_'.$path.'.html',$title);
@@ -180,22 +198,10 @@ class HTMLframesConverter extends Converter
     
     function getSourceLink($path)
     {
-        return $this->returnLink($this->getFileSourcePath('{$subdir}') .
-        PATH_DELIMITER . $this->getFileSourceName($path).'.html','Source Code for this file');
+        return $this->returnLink('{$subdir}__filesource/' .
+        $this->getFileSourceName($path).'.html','Source Code for this file');
     }
-    
-    /**
-     * Used to convert the <<code>> tag in a docblock
-     * @param string
-     * @param boolean
-     * @return string
-     */
-    function ProgramExample($example, $tutorial = false, $inlinesourceparse = null/*false*/,
-                            $class = null/*false*/, $linenum = null/*false*/, $filesourcepath = null/*false*/)
-    {
-        return $this->PreserveWhiteSpace(parent::ProgramExample($example, $tutorial, $inlinesourceparse, $class, $linenum, $filesourcepath));
-    }
-    
+
     /**
      * Retrieve a Converter-specific anchor to a segment of a source code file
      * parsed via a {@tutorial tags.filesource.pkg} tag.
@@ -208,11 +214,71 @@ class HTMLframesConverter extends Converter
      */
     function getSourceAnchor($sourcefile,$anchor,$text = '',$link = false)
     {
-        if ($link)
-        return $this->returnLink($this->getFileSourcePath('{$subdir}') .
-        PATH_DELIMITER . $this->getFileSourceName($sourcefile).'.html#a'.$anchor, $text);
-        else
-        return '<a name="a'.$anchor.'"></a>';
+        if ($link) {
+            return $this->returnLink('{$subdir}__filesource/' .
+                $this->getFileSourceName($sourcefile) . '.html#a' . $anchor, $text);
+        } else {
+            return '<a name="a'.$anchor.'"></a>';
+        }
+    }
+
+    /**
+     * Return a line of highlighted source code with formatted line number
+     *
+     * If the $path is a full path, then an anchor to the line number will be
+     * added as well
+     * @param integer line number
+     * @param string highlighted source code line
+     * @param false|string full path to @filesource file this line is a part of,
+     *        if this is a single line from a complete file.
+     * @return string formatted source code line with line number
+     */
+    function sourceLine($linenumber, $line, $path = false)
+    {
+        $extra = '';
+        if (strlen(str_replace("\n", '', $line)) == 0) {
+            $extra = '&nbsp;';
+        }
+        if ($path)
+        {
+            return '<li><div class="src-line">' . $this->getSourceAnchor($path, $linenumber) .
+                   str_replace("\n",'',$line) . $extra .
+                   "</div></li>\n";
+        } else
+        {
+            return '<li><div class="src-line">' . str_replace("\n",'',$line) .
+                "$extra</div></li>\n";
+        }
+    }
+    
+    /**
+     * Used to convert the <<code>> tag in a docblock
+     * @param string
+     * @param boolean
+     * @return string
+     */
+    function ProgramExample($example, $tutorial = false, $inlinesourceparse = null/*false*/,
+                            $class = null/*false*/, $linenum = null/*false*/, $filesourcepath = null/*false*/)
+    {
+        return '<div class="src-code"><ol>' . parent::ProgramExample($example, $tutorial, $inlinesourceparse, $class, $linenum, $filesourcepath)
+               .'</ol></div>';
+    }
+    
+    /**
+     * @param string
+     */
+    function TutorialExample($example)
+    {
+        $trans = $this->template_options['desctranslate'];
+        $this->template_options['desctranslate'] = array();
+        $example = '<ol>' . parent::TutorialExample($example)
+               .'</ol>';
+        $this->template_options['desctranslate'] = $trans;
+        if (!isset($this->template_options['desctranslate'])) return $example;
+        if (!isset($this->template_options['desctranslate']['code'])) return $example;
+        $example = $this->template_options['desctranslate']['code'] . $example;
+        if (!isset($this->template_options['desctranslate']['/code'])) return $example;
+        return $example . $this->template_options['desctranslate']['/code'];
     }
     
     function getCurrentPageLink()
@@ -225,6 +291,10 @@ class HTMLframesConverter extends Converter
      */
     function postProcess($text)
     {
+        if ($this->highlightingSource) {
+            return str_replace(array(' ',"\t"), array('&nbsp;', '&nbsp;&nbsp;&nbsp;'),
+                htmlspecialchars($text));
+        }
         return htmlspecialchars($text);
     }
     
@@ -320,25 +390,39 @@ class HTMLframesConverter extends Converter
                 }
             }
         }
+        $interfaces = $classes = false;
         foreach($this->class_elements as $package => $o1)
         {
             foreach($o1 as $subpackage => $links)
             {
                 for($i=0;$i<count($links);$i++)
                 {
-										$class = $this->classes->getClassByPackage($links[$i]->name, $links[$i]->package);
-										if ($class && isset($class->docblock) && $class->docblock->hasaccess)
-												$left[$package][$subpackage]['classes'][] =
-												array("link" => $this->getId($links[$i]), 
-															"title" => $links[$i]->name,
-															"access" => $class->docblock->tags['access'][0]->value,
-															"abstract" => isset ($class->docblock->tags['abstract'][0]));
-										else
-												$left[$package][$subpackage]['classes'][] =
-												array("link" => $this->getId($links[$i]), 
-															"title" => $links[$i]->name,
-															"access" => 'public',
-															"abstract" => isset ($class->docblock->tags['abstract'][0]));
+                    $class = $this->classes->getClassByPackage($links[$i]->name, $links[$i]->package);
+                    $isinterface = $isclass = false;
+                    if ($class->isInterface()) {
+                        $isinterface = true;
+                        $interfaces = true;
+                    } else {
+                        $isclass = true;
+                        $classes = true;
+                    }
+                    if ($class && isset($class->docblock) && $class->docblock->hasaccess) {
+                        $left[$package][$subpackage]['classes'][] =
+                            array("link" => $this->getId($links[$i]), 
+                                  "title" => $links[$i]->name,
+                                  'is_interface' => $isinterface,
+                                  'is_class' => $isclass,
+                                  "access" => $class->docblock->tags['access'][0]->value,
+                                  "abstract" => isset ($class->docblock->tags['abstract'][0]));
+                    } else {
+                        $left[$package][$subpackage]['classes'][] =
+                            array("link" => $this->getId($links[$i]), 
+                                  "title" => $links[$i]->name,
+                                  'is_interface' => $isinterface,
+                                  'is_class' => $isclass,
+                                  "access" => 'public',
+                                  "abstract" => isset ($class->docblock->tags['abstract'][0]));
+                    }
                 }
             }
         }
@@ -372,8 +456,10 @@ class HTMLframesConverter extends Converter
                 $tutes = array();
                 foreach($this->tutorial_tree as $root => $tr)
                 {
-                    if ($tr['tutorial']->package == $package && $tr['tutorial']->subpackage == $subpackage)
-                    $tutes[$tr['tutorial']->tutorial_type][] = $this->getTutorialTree($tr['tutorial']);
+                    if ($tr['tutorial']->package == $package && $tr['tutorial']->subpackage == '') {
+                        $tutes[$tr['tutorial']->tutorial_type][] =
+                            $this->getTutorialTree($tr['tutorial']);
+                    }
                 }
                 if (isset($this->childless_tutorials[$package][$subpackage]))
                 {
@@ -449,6 +535,8 @@ class HTMLframesConverter extends Converter
                 $my['files'] = $info['files'];
                 if (isset($info['classes']))
                 $my['classes'] = $info['classes'];
+                $my['hasclasses'] = $classes;
+                $my['hasinterfaces'] = $interfaces;
                 if (isset($info['functions']))
                 $my['functions'] = $info['functions'];
                 $ret[$package][] = $my;
@@ -579,7 +667,7 @@ class HTMLframesConverter extends Converter
         {
             $index->assign("blank","blank");
             $blank = &$this->newSmarty();
-            $blank->assign('package',$phpDocumentor_DefaultPackageName);
+            $blank->assign('package',$this->package);
             $this->setTargetDir($this->base_dir);
             $this->writefile("blank.html",$blank->fetch('blank.tpl'));
         }
@@ -670,6 +758,7 @@ class HTMLframesConverter extends Converter
             // Create class tree page
             $template = &$this->newSmarty();
             $template->assign("classtrees",$this->generateFormattedClassTrees($package));
+            $template->assign("interfaces",$this->generateFormattedInterfaceTrees($package));
             $template->assign("package",$package);
             $template->register_outputfilter('HTMLframes_outputfilter');
             $this->writefile("classtrees_$package.html",$template->fetch('classtrees.tpl'));
@@ -691,7 +780,7 @@ class HTMLframesConverter extends Converter
      */
     function returnSee(&$element, $eltext = false, $with_a = true)
     {
-        if (!$element) return false;
+        if (!is_object($element) || !$element) return false;
         if (!$with_a) return $this->getId($element, false);
         if (!$eltext)
         {
@@ -703,6 +792,7 @@ class HTMLframesConverter extends Converter
                 break;
                 case 'method' :
                 case 'var' :
+                case 'const' :
                 $eltext .= $element->class.'::';
                 case 'page' :
                 case 'define' :
@@ -720,7 +810,7 @@ class HTMLframesConverter extends Converter
     
     function getId($element, $fullpath = true)
     {
-        if (get_class($element) == 'parserdata')
+        if (phpDocumentor_get_class($element) == 'parserdata')
         {
             $element = $this->addLink($element->parent);
             $elp = $element->parent;
@@ -756,6 +846,7 @@ class HTMLframesConverter extends Converter
             break;
             case 'method' :
             case 'var' :
+            case 'const' :
             if ($fullpath)
             return $b.$element->package.$c.'/'.$element->class.'.html#'.$element->type.$element->name;
             return $element->type.$element->name;
@@ -960,6 +1051,16 @@ class HTMLframesConverter extends Converter
     }
 
     /**
+     * Converts class variables for template output
+     * @see prepareDocBlock(), getFormattedConflicts()
+     * @param parserDefine
+     */
+    function convertConst(&$element)
+    {
+        parent::convertConst($element, array('const_dest' => $this->getId($element,false)));
+    }
+
+    /**
      * Converts class methods for template output
      * @see prepareDocBlock(), getFormattedConflicts()
      * @param parserDefine
@@ -1027,7 +1128,7 @@ class HTMLframesConverter extends Converter
     
     function getPageName(&$element)
     {
-        if (get_class($element) == 'parserpage') return '_'.$element->getName();
+        if (phpDocumentor_get_class($element) == 'parserpage') return '_'.$element->getName();
         return '_'.$element->parent->getName();
     }
 
@@ -1050,12 +1151,15 @@ class HTMLframesConverter extends Converter
             $distance[] = '';
             while ($parent)
             {
-                $subpackage = $parent->docblock->subpackage;
-                $package = $parent->docblock->package;
                 $x = $parent;
                 if (is_object($parent))
-                $x = $parent->getLink($this);
-                if (!$x) $x = $parent->getName();
+                {
+                    $subpackage = $parent->docblock->subpackage;
+                    $package = $parent->docblock->package;
+                    $x = $parent;
+                    $x = $parent->getLink($this);
+                    if (!$x) $x = $parent->getName();
+                }
                 $result[] = 
                     $x;
                 $distance[] =
@@ -1102,12 +1206,102 @@ class HTMLframesConverter extends Converter
      */
     function generateFormattedClassTrees($package)
     {
-        if (!isset($this->roots[$package])) return array();
-        $roots = $trees = array();
-        $roots = $this->roots[$package];
-        for($i=0;$i<count($roots);$i++)
-        {
-            $trees[] = array('class' => $roots[$i],'class_tree' => "<ul>\n".$this->getRootTree($this->getSortedClassTreeFromClass($roots[$i],$package,''),$package)."</ul>\n");
+        if (!isset($this->roots['normal'][$package]) &&
+              !isset($this->roots['special'][$package])) {
+            return array();
+        }
+        $trees = array();
+        if (isset($this->roots['normal'][$package])) {
+            $roots = $this->roots['normal'][$package];
+            for($i=0;$i<count($roots);$i++)
+            {
+                $root = $this->classes->getClassByPackage($roots[$i], $package);
+                if ($root && $root->isInterface()) {
+                    continue;
+                }
+                $trees[] = array('class' => $roots[$i],'class_tree' => "<ul>\n".$this->getRootTree($this->getSortedClassTreeFromClass($roots[$i],$package,''),$package)."</ul>\n");
+            }
+        }
+        if (isset($this->roots['special'][$package])) {
+            $roots = $this->roots['special'][$package];
+            foreach ($roots as $parent => $classes) {
+                $thistree = '';
+                foreach ($classes as $classinfo) {
+                    $root = $this->classes->getClassByPackage($classinfo, $package);
+                    if ($root && $root->isInterface()) {
+                        continue;
+                    }
+                    $thistree .=
+                        $this->getRootTree(
+                            $this->getSortedClassTreeFromClass(
+                                $classinfo,
+                                $package,
+                                ''),
+                            $package,
+                            true);
+                }
+                if (!$thistree) {
+                    continue;
+                }
+                $trees[] = array(
+                    'class' => $parent,
+                    'class_tree' => "<ul>\n" . $thistree . "</ul>\n"
+                );
+            }
+        }
+        return $trees;
+    }
+
+    /**
+     * returns a template-enabled array of interface inheritance trees
+     * 
+     * @param    string    $package    package to generate a class tree for
+     * @see $roots, HTMLConverter::getRootTree()
+     */
+    function generateFormattedInterfaceTrees($package)
+    {
+        if (!isset($this->roots['normal'][$package]) &&
+              !isset($this->roots['special'][$package])) {
+            return array();
+        }
+        $trees = array();
+        if (isset($this->roots['normal'][$package])) {
+            $roots = $this->roots['normal'][$package];
+            for($i=0;$i<count($roots);$i++)
+            {
+                $root = $this->classes->getClassByPackage($roots[$i], $package);
+                if ($root && !$root->isInterface()) {
+                    continue;
+                }
+                $trees[] = array('class' => $roots[$i],'class_tree' => "<ul>\n".$this->getRootTree($this->getSortedClassTreeFromClass($roots[$i],$package,''),$package)."</ul>\n");
+            }
+        }
+        if (isset($this->roots['special'][$package])) {
+            $roots = $this->roots['special'][$package];
+            foreach ($roots as $parent => $classes) {
+                $thistree = '';
+                foreach ($classes as $classinfo) {
+                    $root = $this->classes->getClassByPackage($classinfo, $package);
+                    if ($root && !$root->isInterface()) {
+                        continue;
+                    }
+                    $thistree .=
+                        $this->getRootTree(
+                            $this->getSortedClassTreeFromClass(
+                                $classinfo,
+                                $package,
+                                ''),
+                            $package,
+                            true);
+                }
+                if (!$thistree) {
+                    continue;
+                }
+                $trees[] = array(
+                    'class' => $parent,
+                    'class_tree' => "<ul>\n" . $thistree . "</ul>\n"
+                );
+            }
         }
         return $trees;
     }
@@ -1116,10 +1310,12 @@ class HTMLframesConverter extends Converter
      * return formatted class tree for the Class Trees page
      *
      * @param array $tree output from {@link getSortedClassTreeFromClass()}
+     * @param string $package  package
+     * @param boolean $nounknownparent if true, an object's parent will not be checked
      * @see Classes::$definitechild, generateFormattedClassTrees()
      * @return string
      */
-    function getRootTree($tree,$package)
+    function getRootTree($tree, $package, $noparent = false)
     {
         if (!$tree) return '';
         $my_tree = '';
@@ -1127,7 +1323,7 @@ class HTMLframesConverter extends Converter
         $lastcur = array(false);
         $kids = array();
         $dopar = false;
-        if ($tree[$cur]['parent'])
+        if (!$noparent && $tree[$cur]['parent'])
         {
             $dopar = true;
             if (!is_object($tree[$cur]['parent']))
@@ -1138,6 +1334,8 @@ class HTMLframesConverter extends Converter
             else
             {
 //                        debug("parent ".$this->returnSee($tree[$cur]['parent'])." in other package");
+                $root = $this->classes->getClassByPackage($tree[$cur]['parent']->name,
+                    $package);
                 $my_tree .= '<li>' . $this->returnSee($tree[$cur]['parent']);
                 if ($tree[$cur]['parent']->package != $package) $my_tree .= ' <b>(Different package)</b><ul>';
             }
@@ -1152,7 +1350,24 @@ class HTMLframesConverter extends Converter
                 {
 //                    debug("set $cur kids");
                     $kids[$cur] = 1;
-                    $my_tree .= '<li>'.$this->returnSee($tree[$cur]['link']);
+                    $root = $this->classes->getClassByPackage(
+                        $tree[$cur]['link']->name,
+                        $tree[$cur]['link']->package);
+                    if ($implements = $root->getImplements()) {
+                        $my_tree .= '<li>'.$this->returnSee($tree[$cur]['link']) .
+                            ' (implements ';
+                        foreach ($implements as $i => $interface) {
+                            if ($i && $i != count($implements) - 1) $my_tree .= ', ';
+                            if ($link = $this->getLink('object ' .  $interface)) {
+                                $my_tree .= $this->returnSee($link);
+                            } else {
+                                $my_tree .= $interface;
+                            }
+                        }
+                        $my_tree .= ')';
+                    } else {
+                        $my_tree .= '<li>'.$this->returnSee($tree[$cur]['link']);
+                    }
                     $my_tree .= '<ul>'."\n";
                 }
                 array_push($lastcur,$cur);
@@ -1182,115 +1397,126 @@ class HTMLframesConverter extends Converter
         } while ($cur);
         return $my_tree;
     }
-        /**
-         * Generate indexing information for given element
-         * 
-         * @param parserElement descendant of parserElement
-         * @see generateElementIndex()
-         * @return array
-         */
-        function getIndexInformation($elt)
+
+    /**
+     * Generate indexing information for given element
+     * 
+     * @param parserElement descendant of parserElement
+     * @see generateElementIndex()
+     * @return array
+     */
+    function getIndexInformation($elt)
+    {
+        $Result['type'] = $elt->type;
+        $Result['file_name'] = $elt->file;
+        $Result['path'] = $elt->getPath();
+        
+        if (isset($elt->docblock))
+					{
+						$Result['description'] = $elt->docblock->getSDesc($this);
+						
+						if ($elt->docblock->hasaccess)
+							$Result['access'] = $elt->docblock->tags['access'][0]->value;
+						else
+							$Result['access'] = 'public';
+
+						$Result['abstract'] = isset ($elt->docblock->tags['abstract'][0]);
+					}
+        else
+            $Result['description'] = '';
+        
+        $aa = $Result['description'];
+        if (!empty($aa)) $aa = "<br>&nbsp;&nbsp;&nbsp;&nbsp;$aa";
+
+        switch($elt->type)
         {
-            $Result['type'] = $elt->type;
-            $Result['file_name'] = $elt->file;
-            $Result['path'] = $elt->getPath();
-            
-            if (isset($elt->docblock))
-						{
-							$Result['description'] = $elt->docblock->getSDesc($this);
-							
-							if ($elt->docblock->hasaccess)
-								$Result['access'] = $elt->docblock->tags['access'][0]->value;
-							else
-								$Result['access'] = 'public';
-
-							$Result['abstract'] = isset ($elt->docblock->tags['abstract'][0]);
-						}
-            else
-                $Result['description'] = '';
-            
-            $aa = $Result['description'];
-            if (!empty($aa)) $aa = "<br>&nbsp;&nbsp;&nbsp;&nbsp;$aa";
-
-            switch($elt->type)
-            {
-                    case 'class':
-                            $Result['name'] = $elt->getName();
-                            $Result['title'] = 'Class';
-                            $Result['link'] = $this->getClassLink($elt->getName(),
-                                                                  $elt->docblock->package,
-                                                                  $elt->getPath(),
-                                                                  $elt->getName());
-                            $Result['listing'] = 'in file '.$elt->file.', class '.$Result['link']."$aa";
-                    break;
-                    case 'define':
-                            $Result['name'] = $elt->getName();
-                            $Result['title'] = 'Constant';
-                            $Result['link'] = $this->getDefineLink($elt->getName(),
-                                                                   $elt->docblock->package,
-                                                                   $elt->getPath(),
-                                                                   $elt->getName());
-                            $Result['listing'] = 'in file '.$elt->file.', constant '.$Result['link']."$aa";
-                    break;
-                    case 'global':
-                            $Result['name'] = $elt->getName();
-                            $Result['title'] = 'Global';
-                            $Result['link'] = $this->getGlobalLink($elt->getName(),
-                                                                   $elt->docblock->package,
-                                                                   $elt->getPath(),
-                                                                   $elt->getName());
-                            $Result['listing'] = 'in file '.$elt->file.', global variable '.$Result['link']."$aa";
-                    break;
-                    case 'function':
-                            $Result['name'] = $elt->getName();
-                            $Result['title'] = 'Function';
-                            $Result['link'] = $this->getFunctionLink($elt->getName(),
-                                                                     $elt->docblock->package,
-                                                                     $elt->getPath(),
-                                                                     $elt->getName().'()');
-                            $Result['listing'] = 'in file '.$elt->file.', function '.$Result['link']."$aa";
-                    break;
-                    case 'method':
-                            $Result['name'] = $elt->getName();
-                            $Result['title'] = 'Method';
-                            $Result['link'] = $this->getMethodLink($elt->getName(),
-                                                                   $elt->class,
-                                                                   $elt->docblock->package,
-                                                                   $elt->getPath(),
-                                                                   $elt->class.'::'.$elt->getName().'()'
-                                                                             );
-														if ($elt->isConstructor) $Result['constructor'] = 1;
-                            $Result['listing'] = 'in file '.$elt->file.', method '.$Result['link']."$aa";
-                    break;
-                    case 'var':
-                            $Result['name'] = $elt->getName();
-                            $Result['title'] = 'Variable';
-                            $Result['link'] = $this->getVarLink($elt->getName(),
-                                                                $elt->class,
-                                                                $elt->docblock->package,
-                                                                $elt->getPath(),
-                                                                $elt->class.'::'.$elt->getName());
-                            $Result['listing'] = 'in file '.$elt->file.', variable '.$Result['link']."$aa";
-                    break;
-                    case 'page':
-                            $Result['name'] = $elt->getFile();
-                            $Result['title'] = 'Page';
-                            $Result['link'] = $this->getPageLink($elt->getFile(),
-                                                                 $elt->package,
+                case 'class':
+                        $Result['name'] = $elt->getName();
+                        $Result['title'] = 'Class';
+                        $Result['link'] = $this->getClassLink($elt->getName(),
+                                                              $elt->docblock->package,
+                                                              $elt->getPath(),
+                                                              $elt->getName());
+                        $Result['listing'] = 'in file '.$elt->file.', class '.$Result['link']."$aa";
+                break;
+                case 'define':
+                        $Result['name'] = $elt->getName();
+                        $Result['title'] = 'Constant';
+                        $Result['link'] = $this->getDefineLink($elt->getName(),
+                                                               $elt->docblock->package,
+                                                               $elt->getPath(),
+                                                               $elt->getName());
+                        $Result['listing'] = 'in file '.$elt->file.', constant '.$Result['link']."$aa";
+                break;
+                case 'global':
+                        $Result['name'] = $elt->getName();
+                        $Result['title'] = 'Global';
+                        $Result['link'] = $this->getGlobalLink($elt->getName(),
+                                                               $elt->docblock->package,
+                                                               $elt->getPath(),
+                                                               $elt->getName());
+                        $Result['listing'] = 'in file '.$elt->file.', global variable '.$Result['link']."$aa";
+                break;
+                case 'function':
+                        $Result['name'] = $elt->getName();
+                        $Result['title'] = 'Function';
+                        $Result['link'] = $this->getFunctionLink($elt->getName(),
+                                                                 $elt->docblock->package,
                                                                  $elt->getPath(),
-                                                                 $elt->getFile());
-                            $Result['listing'] = 'procedural page '.$Result['link'];
-                    break;
-                    case 'include':
-                            $Result['name'] = $elt->getName();
-                            $Result['title'] = 'Include';
-                            $Result['link'] = $elt->getValue();
-                            $Result['listing'] = 'include '.$Result['name'];
-                    break;
-            }
-
-            return $Result;
+                                                                 $elt->getName().'()');
+                        $Result['listing'] = 'in file '.$elt->file.', function '.$Result['link']."$aa";
+                break;
+                case 'method':
+                        $Result['name'] = $elt->getName();
+                        $Result['title'] = 'Method';
+                        $Result['link'] = $this->getMethodLink($elt->getName(),
+                                                               $elt->class,
+                                                               $elt->docblock->package,
+                                                               $elt->getPath(),
+                                                               $elt->class.'::'.$elt->getName().'()'
+                                                                         );
+													if ($elt->isConstructor) $Result['constructor'] = 1;
+                        $Result['listing'] = 'in file '.$elt->file.', method '.$Result['link']."$aa";
+                break;
+                case 'var':
+                        $Result['name'] = $elt->getName();
+                        $Result['title'] = 'Variable';
+                        $Result['link'] = $this->getVarLink($elt->getName(),
+                                                            $elt->class,
+                                                            $elt->docblock->package,
+                                                            $elt->getPath(),
+                                                            $elt->class.'::'.$elt->getName());
+                        $Result['listing'] = 'in file '.$elt->file.', variable '.$Result['link']."$aa";
+                break;
+                case 'const':
+                        $Result['name'] = $elt->getName();
+                        $Result['title'] = 'Class Constant';
+                        $Result['link'] = $this->getConstLink($elt->getName(),
+                                                            $elt->class,
+                                                            $elt->docblock->package,
+                                                            $elt->getPath(),
+                                                            $elt->class.'::'.$elt->getName());
+                        $Result['listing'] = 'in file '.$elt->file.', class constant '.$Result['link']."$aa";
+                break;
+                case 'page':
+                        $Result['name'] = $elt->getFile();
+                        $Result['title'] = 'Page';
+                        $Result['link'] = $this->getPageLink($elt->getFile(),
+                                                             $elt->package,
+                                                             $elt->getPath(),
+                                                             $elt->getFile());
+                        $Result['listing'] = 'procedural page '.$Result['link'];
+                break;
+                case 'include':
+                        $Result['name'] = $elt->getName();
+                        $Result['title'] = 'Include';
+                        $Result['link'] = $elt->getValue();
+                        $Result['listing'] = 'include '.$Result['name'];
+                break;
         }
+
+        return $Result;
+    }
     /**
      * Generate alphabetical index of all elements
      *
@@ -1331,6 +1557,9 @@ class HTMLframesConverter extends Converter
     
     function copyMediaRecursively($media,$targetdir,$subdir = '')
     {
+        if (!is_array($media)) {
+            return;
+        }
         foreach($media as $dir => $files)
         {
             if ($dir === '/')
@@ -1571,6 +1800,23 @@ class HTMLframesConverter extends Converter
     function getVarLink($expr,$class,$package, $file = false,$text = false)
     {
         $a = Converter::getVarLink($expr,$class,$package,$file);
+        if (!$a) return false;
+        return $this->returnSee($a, $text);
+    }
+
+    /**
+     * @param string name of class constant
+     * @param string class containing class constant
+     * @param string package name
+     * @param string full path to look in (used in index generation)
+     * @param boolean deprecated
+     * @param boolean return just the URL, or enclose it in an html a tag
+     * @return mixed false if not found, or an html a link to the var's documentation
+     * @see parent::getVarLink()
+     */
+    function getConstLink($expr,$class,$package, $file = false,$text = false)
+    {
+        $a = Converter::getConstLink($expr,$class,$package,$file);
         if (!$a) return false;
         return $this->returnSee($a, $text);
     }

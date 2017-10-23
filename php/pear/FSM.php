@@ -21,7 +21,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * $Id: FSM.php,v 1.14 2006/01/19 06:36:19 jon Exp $
+ * $Id: FSM.php,v 1.15 2006/04/19 05:40:05 jon Exp $
  */
 
 /**
@@ -37,7 +37,7 @@
  *      http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/146262
  *
  * @author  Jon Parise <jon@php.net>
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.15 $
  * @package FSM
  * @license http://www.opensource.org/licenses/mit-license.php MIT License
  *
@@ -167,6 +167,25 @@ class FSM
     }
 
     /**
+     * This method adds an array of transitions.  Each transition is itself
+     * defined as an array of values which will be passed to addTransition()
+     * as parameters.
+     *
+     * @param   array   $transitions    An array of transitions.
+     *
+     * @see     addTransition
+     * @see     addTransitions
+     *
+     * @since 1.2.4
+     */
+    function addTransitionsArray($transitions)
+    {
+        foreach ($transitions as $transition) {
+            call_user_func_array(array($this, 'addTransition'), $transition);
+        }
+    }
+
+    /**
      * This method adds a new transition that associates:
      *
      *      (currentState) --> (nextState, action)
@@ -291,5 +310,3 @@ class FSM
         }
     }
 }
-
-?>

@@ -32,7 +32,7 @@
 // | Author: Richard Heyes <richard@phpguru.org>                           |
 // +-----------------------------------------------------------------------+
 //
-// $Id: SearchReplace.php,v 1.12 2005/03/11 20:32:40 techtonik Exp $
+// $Id: SearchReplace.php,v 1.14 2006/07/12 09:35:09 techtonik Exp $
 //
 // Search and Replace Utility
 //
@@ -318,7 +318,7 @@ class File_SearchReplace
 
         clearstatcache();
 
-        $file          = fread($fp = fopen($filename, 'r'), filesize($filename)); fclose($fp);
+        $file          = fread($fp = fopen($filename, 'r'), max(1, filesize($filename))); fclose($fp);
         $local_find    = array_values((array) $this->find);
         $local_replace = (is_array($this->replace)) ? array_values($this->replace) : $this->replace;
 
@@ -367,7 +367,7 @@ class File_SearchReplace
 
         clearstatcache();
 
-        $file       = fread($fp = fopen($filename, 'r'), filesize($filename)); fclose($fp);
+        $file       = fread($fp = fopen($filename, 'r'), max(1, filesize($filename))); fclose($fp);
         $local_find    = array_values((array) $this->find);
         $local_replace = (is_array($this->replace)) ? array_values($this->replace) : $this->replace;
 
@@ -404,7 +404,7 @@ class File_SearchReplace
 
         clearstatcache();
 
-        $file = fread($fp = fopen($filename, 'r'), filesize($filename)); fclose($fp);
+        $file = fread($fp = fopen($filename, 'r'), max(1, filesize($filename))); fclose($fp);
         $local_find    = array_values((array) $this->find);
         $local_replace = (is_array($this->replace)) ? array_values($this->replace) : $this->replace;
 
@@ -511,13 +511,28 @@ class File_SearchReplace
     // {{{ doSearch()
     
     /**
-     * This starts the search/replace off. Call this to do the search.
+     * This starts the search/replace off. The behavior of this function will likely
+     * to be changed in future versions to work in read only mode. If you want to do
+     * actual replace with writing files - use doReplace method instead. 
+     *
+     * @access public
+     */
+    function doSearch()
+    {
+        $this->doReplace();
+    }
+    
+    // }}}
+    // {{{ doReplace()
+    
+    /**
+     * This starts the search/replace off. Call this to do the replace.
      * First do whatever files are specified, and/or if directories are specified,
      * do those too.
      *
      * @access public
      */
-    function doSearch()
+    function doReplace()
     {
         $this->occurences = 0;
         if ($this->find != '') {

@@ -1,28 +1,40 @@
 <?php
-//
-// +------------------------------------------------------------------------+
-// | phpDocumentor                                                          |
-// +------------------------------------------------------------------------+
-// | Copyright (c) 2000-2003 Joshua Eichorn, Gregory Beaver                 |
-// | Email         jeichorn@phpdoc.org, cellog@phpdoc.org                   |
-// | Web           http://www.phpdoc.org                                    |
-// | Mirror        http://phpdocu.sourceforge.net/                          |
-// | PEAR          http://pear.php.net/package-info.php?pacid=137           |
-// +------------------------------------------------------------------------+
-// | This source file is subject to version 3.00 of the PHP License,        |
-// | that is available at http://www.php.net/license/3_0.txt.               |
-// | If you did not receive a copy of the PHP license and are unable to     |
-// | obtain it through the world-wide-web, please send a note to            |
-// | license@php.net so we can mail you a copy immediately.                 |
-// +------------------------------------------------------------------------+
-//
-
 /**
  * Parser Elements, all classes representing documentable elements
- * @package phpDocumentor
+ * 
+ * phpDocumentor :: automatic documentation generator
+ * 
+ * PHP versions 4 and 5
+ *
+ * Copyright (c) 2002-2006 Gregory Beaver
+ * 
+ * LICENSE:
+ * 
+ * This library is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation;
+ * either version 2.1 of the License, or (at your option) any
+ * later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ *
+ * @package    phpDocumentor
  * @subpackage ParserElements
- * @since 1.1
- * @version $Id: ParserElements.inc,v 1.45.2.4 2003/08/13 20:01:56 CelloG Exp $
+ * @author     Gregory Beaver <cellog@php.net>
+ * @copyright  2002-2006 Gregory Beaver
+ * @license    http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @version    CVS: $Id: ParserElements.inc,v 1.15 2006/08/17 02:36:50 cellog Exp $
+ * @link       http://www.phpdoc.org
+ * @link       http://pear.php.net/PhpDocumentor
+ * @see        Parser, WordParser
+ * @since      1.1
  */
 
 /**
@@ -32,7 +44,7 @@
  * @subpackage ParserElements
  * @author Greg Beaver <cellog@users.sourceforge.net>
  * @since 1.0rc1
- * @version $Id: ParserElements.inc,v 1.45.2.4 2003/08/13 20:01:56 CelloG Exp $
+ * @version $Id: ParserElements.inc,v 1.15 2006/08/17 02:36:50 cellog Exp $
  */
 class parserElement extends parserBase
 {
@@ -185,12 +197,12 @@ class parserElement extends parserBase
  * @subpackage ParserElements
  * @author Greg Beaver <cellog@users.sourceforge.net>
  * @since 1.0rc1
- * @version $Id: ParserElements.inc,v 1.45.2.4 2003/08/13 20:01:56 CelloG Exp $
+ * @version $Id: ParserElements.inc,v 1.15 2006/08/17 02:36:50 cellog Exp $
  */
 class parserInclude extends parserElement
 {
     /**
-     * Type is used by many functions to skip the hassle of if get_class($blah) == 'parserBlah'
+     * Type is used by many functions to skip the hassle of if phpDocumentor_get_class($blah) == 'parserBlah'
      * @var string always 'include'
      */
     var $type = 'include';
@@ -201,12 +213,12 @@ class parserInclude extends parserElement
  * @subpackage ParserElements
  * @author Greg Beaver <cellog@users.sourceforge.net>
  * @since 1.1
- * @version $Id: ParserElements.inc,v 1.45.2.4 2003/08/13 20:01:56 CelloG Exp $
+ * @version $Id: ParserElements.inc,v 1.15 2006/08/17 02:36:50 cellog Exp $
  */
 class parserGlobal extends parserElement
 {
     /**
-     * Type is used by many functions to skip the hassle of if get_class($blah) == 'parserBlah'
+     * Type is used by many functions to skip the hassle of if phpDocumentor_get_class($blah) == 'parserBlah'
      * @var string always 'global'
      */
     var $type = 'global';
@@ -219,13 +231,6 @@ class parserGlobal extends parserElement
 
     /**
      * quick way to link to this element
-     * {@internal
-     * There comes a time in every programmer's life when he or she must show
-     * off.  Now is such a time.  Check out the amazing use of assigning to
-     * $this!  No please, you're too kind, hold your applause until after the
-     * demonstration.
-     *
-     * {@source}}}
      * @return mixed converter-specific link to this global variable
      * @param Converter
      * @param string text to display for the link or false for default text
@@ -233,12 +238,8 @@ class parserGlobal extends parserElement
     function getLink(&$c, $text = false, $returnobj = false)
     {
         if ($returnobj)
-        { /// !!!! crazy stuff, this PHP business
-            $save = $this;
-            $this = &$c;
-            $a = Converter::getGlobalLink($save->name, $save->docblock->package, $save->path, $text);
-            $this = &$save;
-            return $a;
+        {
+            return $c->getLink('global ' . $this->name, $this->docblock->package);
         }
         return $c->getGlobalLink($this->name, $this->docblock->package, $this->path, $text);
     }
@@ -279,11 +280,12 @@ class parserGlobal extends parserElement
         $converted_datatype = $this->datatype;
         if (strpos($this->datatype,'|'))
         {
+            $my_types = '';
             $types = explode('|',$this->datatype);
             foreach($types as $returntype)
             {
                 $a = $converter->getLink($returntype);
-                if (is_object($a) && get_class($a) == 'classlink')
+                if (is_object($a) && phpDocumentor_get_class($a) == 'classlink')
                 {
                     if (!empty($my_types)) $my_types .= '|';
                     $my_types .= $converter->returnSee($a,$converter->type_adjust($returntype));
@@ -297,7 +299,7 @@ class parserGlobal extends parserElement
         } else
         {
             $a = $converter->getLink($this->datatype);
-            if (is_object($a) && get_class($a) == 'classlink')
+            if (is_object($a) && phpDocumentor_get_class($a) == 'classlink')
             {
                 $converted_datatype = $converter->returnSee($a,$converter->type_adjust($this->datatype));
             } else
@@ -315,12 +317,12 @@ class parserGlobal extends parserElement
  * @subpackage ParserElements
  * @author Greg Beaver <cellog@users.sourceforge.net>
  * @since 1.0rc1
- * @version $Id: ParserElements.inc,v 1.45.2.4 2003/08/13 20:01:56 CelloG Exp $
+ * @version $Id: ParserElements.inc,v 1.15 2006/08/17 02:36:50 cellog Exp $
  */
 class parserFunction extends parserElement
 {
     /**
-     * Type is used by many functions to skip the hassle of if get_class($blah) == 'parserBlah'
+     * Type is used by many functions to skip the hassle of if phpDocumentor_get_class($blah) == 'parserBlah'
      * @var string always 'function'
      */
     var $type = 'function';
@@ -355,14 +357,20 @@ class parserFunction extends parserElement
     var $statics = false;
     
     var $source = '';
+    
     /**
      * @param string
      * @param string default value parsed from function definition
      * @param boolean indicates whether this parameter has a default value
+     * @param null|string class type hint
      */
-    function addParam($name, $value, $has_default = true)
+    function addParam($name, $value, $has_default = true, $typehint = null)
     {
         $this->params[$name] = array($value, $has_default);
+        if (isset($typehint))
+        {
+            $this->params[$name][2] = $typehint;
+        }
     }
     
     /**
@@ -401,12 +409,8 @@ class parserFunction extends parserElement
     function getLink($c, $text = false, $returnobj = false)
     {
         if ($returnobj)
-        { /// !!!! crazy stuff, this PHP business
-            $save = $this;
-            $this = &$c;
-            $a = Converter::getFunctionLink($save->name, $save->docblock->package, $save->path, $text);
-            $this = &$save;
-            return $a;
+        {
+            return $c->getLink('function ' . $this->name, $this->docblock->package);
         }
         return $c->getFunctionLink($this->name, $this->docblock->package, $this->path, $text);
     }
@@ -484,10 +488,20 @@ class parserFunction extends parserElement
             {
                 if ($val[1])
                 {
-                    $ret[] = array($key,$val[0]);
+                    $arr = array($key,$val[0]);
+                    if (isset($val[2]))
+                    {
+                        $arr[2] = $val[2];
+                    }
+                    $ret[$key] = $arr;
                 } else
                 {
-                    $ret[] = array($key,false);
+                    $arr = array($key,false);
+                    if (isset($val[2]))
+                    {
+                        $arr[2] = $val[2];
+                    }
+                    $ret[$key] = $arr;
                 }
             }
             return $ret;
@@ -626,8 +640,18 @@ class parserFunction extends parserElement
                 $b['description'] = $paramtags[substr($param[0],1)]['data'];
                 unset($paramtags[substr($param[0],1)]);
             }
+            if (isset($param[2]))
+            {
+                $link = $converter->getLink('object ' . $param[2]);
+                if ($link) {
+                    $link = $converter->returnSee($link, $param[2], true);
+                    $b['type'] = $link;
+                } else {
+                    $b['type'] = $param[2];
+                }
+            }
             $b['name'] = $param[0];
-            $b['default'] = $param[1];
+            $b['default'] = $converter->postProcess($param[1]);
             $b['hasdefault'] = ($param[1] !== false);
             $a['params'][] = $b;
         }
@@ -654,12 +678,12 @@ class parserFunction extends parserElement
  * @subpackage ParserElements
  * @author Greg Beaver <cellog@users.sourceforge.net>
  * @since 1.0rc1
- * @version $Id: ParserElements.inc,v 1.45.2.4 2003/08/13 20:01:56 CelloG Exp $
+ * @version $Id: ParserElements.inc,v 1.15 2006/08/17 02:36:50 cellog Exp $
  */
 class parserClass extends parserElement
 {
     /**
-     * Type is used by many functions to skip the hassle of if get_class($blah) == 'parserBlah'
+     * Type is used by many functions to skip the hassle of if phpDocumentor_get_class($blah) == 'parserBlah'
      * @var string always 'class'
      */
     var $type = 'class';
@@ -670,6 +694,20 @@ class parserClass extends parserElement
      * @var mixed false or contents of extends clause in class declaration
      */
     var $extends = false;
+    /**
+     * @var array a list of interfaces this class implements
+     */
+    var $_implements = array();
+    /**
+     * @var array a list of interfaces this class implements
+     * @access private
+     */
+    var $_modifiers = false;
+    /**
+     * @var boolean determines whether a class is considered to be an interface
+     * @access private
+     */
+    var $_isInterface = false;
     /**
      * Format: array(file, parent) where parent class is found or false if no parent
      * @var mixed
@@ -690,6 +728,26 @@ class parserClass extends parserElement
      * @var tutorialLink|false either a link to the tutorial associated with this class, or false
      */
     var $tutorial = false;
+    
+    /**
+     * Get the PHP5+ modifiers for this class
+     * (abstract/final/static/private/protected/public)
+     * @return array|false
+     */
+    function getModifiers()
+    {
+        return $this->_modifiers;
+    }
+
+    /**
+     * Set the PHP5+ modifiers for this class
+     * (abstract/final/static/private/protected/public)
+     * @param string $m
+     */
+    function setModifiers($m)
+    {
+        $this->_modifiers = $m;
+    }
     
     /**
      * @param parserTutorial
@@ -732,12 +790,8 @@ class parserClass extends parserElement
     function getLink($c, $text = false, $returnobj = false)
     {
         if ($returnobj)
-        { /// !!!! crazy stuff, this PHP business
-            $save = $this;
-            $this = &$c;
-            $a = Converter::getClassLink($save->name, $save->docblock->package, $save->curfile, $text);
-            $this = &$save;
-            return $a;
+        {
+            return $c->getLink('object ' . $this->name, $this->docblock->package);
         }
         return $c->getClassLink($this->name, $this->docblock->package, $this->curfile, $text);
     }
@@ -804,13 +858,39 @@ class parserClass extends parserElement
     }
     
     /**
+     * Use this method to set the type of class to be an interface
+     */
+    function setInterface()
+    {
+        $this->_isInterface = true;
+    }
+    
+    /**
+     * @return boolean true if this is an interface class
+     */
+    function isInterface()
+    {
+        return $this->_isInterface;
+    }
+    
+    /**
+     * Use this method to set access modifiers for a class
+     * @param array 
+     */
+    function setAccessModifiers($modifiers)
+    {
+        $this->_modifiers = $modifiers;
+    }
+    
+    /**
      * retrieve object that represents the parent class
      * @param Converter this function will not work before the Conversion stage of parsing
      * @return mixed returns the {@link parserClass} representation of the parent class, or false if no parent class
      */
     function &getParent(&$c)
     {
-        if (!$this->parent) return false;
+        $a = false;
+        if (!$this->parent) return $a;
         if (is_array($this->parent))
         {
             return $c->classes->getClass($this->parent[1],$this->parent[0]);
@@ -830,10 +910,21 @@ class parserClass extends parserElement
      * @return mixed {@link parserMethod} or false if not found
      * @param Converter this function will not work before the Conversion stage of parsing
      * @param string method name in this class
+     * @param boolean determines whether to search inherited methods as well
      */
-    function getMethod(&$c, $name)
+    function getMethod(&$c, $name, $inherited = false)
     {
-        return $c->classes->getMethod($this->name,$this->curfile,$name);
+        $ret = $c->classes->getMethod($this->name, $this->curfile, $name);
+        if ($ret) return $ret;
+        if ($inherited) {
+            $x = $this;
+            while ($x->parent && is_array($x->parent)) {
+                $par = $x->getParent($c);
+                $x = $par;
+                if ($meth = $x->getMethod($c, $name)) return $meth;
+            }
+        }
+        return false;
     }
     
     /**
@@ -865,11 +956,22 @@ class parserClass extends parserElement
     /**
      * @param Converter this function will not work before the Conversion stage of parsing
      * @param string method name
+     * @param boolean determines whether to search inherited methods as well
      * @return boolean whether this class has a method of name $name
      */
-    function hasMethod(&$c,$name)
+    function hasMethod(&$c, $name, $inherited = false)
     {
-        return $c->classes->hasMethod($this->name, $this->curfile, $name);
+        $ret = $c->classes->hasMethod($this->name, $this->curfile, $name);
+        if ($ret) return $ret;
+        if ($inherited) {
+            $x = $this;
+            while ($x->parent && is_array($x->parent)) {
+                $par = $x->getParent($c);
+                $x = $par;
+                if ($x->hasMethod($c, $name)) return true;
+            }
+        }
+        return false;
     }
     
     /**
@@ -884,11 +986,30 @@ class parserClass extends parserElement
     
     /**
      * @param Converter this function will not work before the Conversion stage of parsing
+     * @param string class constant name
+     * @return boolean whether this class has a constant of name $name
+     */
+    function hasConst(&$c,$name)
+    {
+        return $c->classes->hasConst($this->name, $this->curfile, $name);
+    }
+    
+    /**
+     * @param Converter this function will not work before the Conversion stage of parsing
      * @return array returns a simple array of var objects
      */
     function getVars(&$c)
     {
         return $c->classes->getVars($this->name,$this->curfile);
+    }
+    
+    /**
+     * @param Converter this function will not work before the Conversion stage of parsing
+     * @return array returns a simple array of const objects
+     */
+    function getConsts(&$c)
+    {
+        return $c->classes->getConsts($this->name,$this->curfile);
     }
     
     /**
@@ -909,12 +1030,28 @@ class parserClass extends parserElement
     
     /**
      * @param Converter this function will not work before the Conversion stage of parsing
+     * @return array returns a simple array of const name strings
+     */
+    function getConstNames(&$c)
+    {
+        if (!$c->classes->hasConsts($this->curfile, $this->name)) return array();
+        $arr = array();
+        $arr1 = $this->getConsts($c);
+        for($i=0; $i < count($arr1); $i++)
+        {
+            $arr[] = $arr1[$i]->name;
+        }
+        return $arr;
+    }
+    
+    /**
+     * @param Converter this function will not work before the Conversion stage of parsing
      * @param boolean determines whether overriden methods should be included in the list of inherited methods
      * @return array returns an array of methods by parent classname array(name => array(method1,method2..),name2 => array(method1....))
      */
     function getInheritedMethods(&$c,$override = false)
     {
-        $x = $this;
+        $x = $oldx = $this;
         $methods = array();
         $arr = array();
         while ($x->parent && is_array($x->parent))
@@ -949,7 +1086,58 @@ class parserClass extends parserElement
                     $arr[$par->getName()]['file'] = $par->curfile;
                 }
             }
+            $oldx = $x;
             $x = &$par;
+        }
+        if (is_a($oldx, 'parserClass') && is_a($oldx->getExtends(true), 'ReflectionClass')) {
+            $extends = $oldx->getExtends(true);
+            foreach ($extends->getMethods() as $method) {
+                $var = new parserMethod($oldx->getExtends());
+                if ($method->returnsReference()) {
+                    $var->setReturnsReference();
+                }
+                $doc = new parserDocBlock;
+                foreach ($method->getParameters() as $param) {
+                    $value = $param->isDefaultValueAvailable() ? var_export($param->getDefaultValue(), true) : null;
+                    if ($param->isPassedByReference()) {
+                        $var->addParam('&$' . $param->getName(), $value, $param->isOptional(),
+                            $param->getClass());
+                    } else {
+                        $var->addParam('$' . $param->getName(), $value, $param->isOptional(),
+                            $param->getClass());
+                    }
+                }
+                $var->setName($method->getName());
+                $doc->addPackage('package', $oldx->getPackage());
+                $var->setDocBlock($doc);
+                $par = $method->getDeclaringClass();
+                $var->setLineNumber($par->getStartLine());
+                $modifiers = array();
+                if ($method->isPrivate()) {
+                    $modifiers[] = 'private';
+                }
+                if ($method->isAbstract()) {
+                    $modifiers[] = 'abstract';
+                }
+                if ($method->isFinal()) {
+                    $modifiers[] = 'final';
+                }
+                if ($method->isProtected()) {
+                    $modifiers[] = 'protected';
+                }
+                if ($method->isPublic()) {
+                    $modifiers[] = 'public';
+                }
+                if ($method->isStatic()) {
+                    $modifiers[] = 'static';
+                }
+                if ($method->isConstructor()) {
+                    $var->setConstructor();
+                }
+                $var->setModifiers($modifiers);
+                $arr[$oldx->getExtends()]['methods'][] = $var;
+                $arr[$oldx->getExtends()]['file'] = '(internal)';
+            }
         }
         return $arr;
     }
@@ -961,7 +1149,7 @@ class parserClass extends parserElement
      */
     function getInheritedVars(&$c,$override = true, $vars = false)
     {
-        $x = $this;
+        $x = $oldx = $this;
         $vars = array();
         $arr = array();
         while ($x->parent && is_array($x->parent))
@@ -996,7 +1184,101 @@ class parserClass extends parserElement
                     $arr[$par->getName()]['file'] = $par->curfile;
                 }
             }
+            $oldx = $x;
             $x = &$par;
+        }
+        if (is_a($oldx, 'parserClass') && is_a($oldx->getExtends(true), 'ReflectionClass')) {
+            $extends = $oldx->getExtends(true);
+            foreach ($extends->getProperties() as $property) {
+                $var = new parserVar($oldx->getExtends());
+                $doc = new parserDocBlock;
+                $var->setName('$' . $property->getName());
+                $doc->addPackage('package', $oldx->getPackage());
+                $par = $property->getDeclaringClass();
+                $var->setLineNumber($par->getStartLine());
+                $modifiers = array();
+                if ($property->isPrivate()) {
+                    $modifiers[] = 'private';
+                    $doc->addAccess('private');
+                }
+                if ($property->isProtected()) {
+                    $modifiers[] = 'protected';
+                    $doc->addAccess('protected');
+                }
+                if ($property->isPublic()) {
+                    $modifiers[] = 'public';
+                    $doc->addAccess('public');
+                }
+                $var->setDocBlock($doc);
+                $var->setModifiers($modifiers);
+                $arr[$oldx->getExtends()]['vars'][] = $var;
+                $arr[$oldx->getExtends()]['file'] = '(internal)';
+            }
+        }
+        return $arr;
+    }
+    
+    /**
+     * @param Converter this function will not work before the Conversion stage of parsing
+     * @param boolean determines whether overriden vars should be included in the list of inherited vars
+     * @return array returns an array of consts by parent classname array(name => array(const1,const2..),name2 => array(const1....))
+     */
+    function getInheritedConsts(&$c,$override = false, $consts = false)
+    {
+        $x = $oldx = $this;
+        $consts = array();
+        $arr = array();
+        while ($x->parent && is_array($x->parent))
+        {
+            $consts = array_merge($consts,$x->getConstNames($c));
+            $par = $x->getParent($c);
+            $parvarnames = $par->getConstNames($c);
+            $parvars = $par->getConsts($c);
+            for($i=0; $i<count($parvarnames); $i++)
+            {
+                if ($override)
+                {
+                    if (!in_array($parvarnames[$i],$consts))
+                    {
+                        // fix for bug 587733
+                        if ($parvars[$i]->docblock && $parvars[$i]->docblock->hasaccess && !$c->parseprivate && $parvars[$i]->docblock->tags['access'][0]->value == 'private')
+                        {
+                            continue;
+                        }
+                        $consts[] = $parvarnames[$i];
+                        $arr[$par->getName()]['consts'][] = $parvars[$i];
+                        $arr[$par->getName()]['file'] = $par->curfile;
+                    }
+                } else
+                {
+                    // fix for bug 587733
+                    if ($parvars[$i]->docblock && $parvars[$i]->docblock->hasaccess && !$c->parseprivate && $parvars[$i]->docblock->tags['access'][0]->value == 'private')
+                    {
+                        continue;
+                    }
+                    $arr[$par->getName()]['consts'][] = $parvars[$i];
+                    $arr[$par->getName()]['file'] = $par->curfile;
+                }
+            }
+            $oldx = $x;
+            $x = &$par;
+        }
+        if (is_a($oldx, 'parserClass') && is_a($oldx->getExtends(true), 'ReflectionClass')) {
+            $extends = $oldx->getExtends(true);
+            if (!$extends->getConstants()) {
+                return $arr;
+            }
+            foreach ($extends->getConstants() as $property => $value) {
+                $var = new parserConst($oldx->getExtends());
+                $doc = new parserDocBlock;
+                $var->setName($property);
+                $var->setValue(var_export($value, true));
+                $doc->addPackage('package', $oldx->getPackage());
+                $var->setLineNumber($extends->getStartLine());
+                $var->setDocBlock($doc);
+                $arr[$oldx->getExtends()]['consts'][] = $var;
+                $arr[$oldx->getExtends()]['file'] = '(internal)';
+            }
         }
         return $arr;
     }
@@ -1066,7 +1348,7 @@ class parserClass extends parserElement
                 return $sl;
             } else
             {
-                return str_replace($_phpDocumentor_options['Program_Root'] . PATH_DELIMITER,'',$sl);
+                return $sl;
             }
             return $sl;
         }
@@ -1080,15 +1362,45 @@ class parserClass extends parserElement
     function setExtends($extends)
     {
         $this->extends = $extends;
+        if (!class_exists('ReflectionClass') || !class_exists($extends)) {
+            return;
+        }
+        // this may throw an exception.  Hopefully it won't if the class exists
+        $parent = new ReflectionClass($extends);
+        if (!$parent->isInternal()) {
+            return;
+        }
+        $this->extends = $parent;
+    }
+    
+    /**
+     * @param string
+     */
+    function addImplements($implements)
+    {
+        $this->_implements[] = $implements;
+    }
+    
+    /**
+     * @return array
+     */
+    function getImplements()
+    {
+        return $this->_implements;
     }
     
     /**
      * @return boolean
      * @see $extends
      */
-    function getExtends()
+    function getExtends($raw = false)
     {
         if (!isset($this->extends)) return false;
+        if (!$raw) {
+            if (is_a($this->extends, 'ReflectionClass')) {
+                return $this->extends->getName();
+            }
+        }
         return $this->extends;
     }
 }
@@ -1098,17 +1410,19 @@ class parserClass extends parserElement
  * @subpackage ParserElements
  * @author Greg Beaver <cellog@users.sourceforge.net>
  * @since 1.0rc1
- * @version $Id: ParserElements.inc,v 1.45.2.4 2003/08/13 20:01:56 CelloG Exp $
+ * @version $Id: ParserElements.inc,v 1.15 2006/08/17 02:36:50 cellog Exp $
  */
 class parserVar extends parserElement
 {
     /**
-     * Type is used by many functions to skip the hassle of if get_class($blah) == 'parserBlah'
+     * Type is used by many functions to skip the hassle of if phpDocumentor_get_class($blah) == 'parserBlah'
      * @var string always 'var'
      */
     var $type = 'var';
     /** @var string class that contains this var */
     var $class = '';
+    /** @var array */
+    var $_modifiers;
     
     /**
      * @param string
@@ -1126,6 +1440,24 @@ class parserVar extends parserElement
     {
         return $this->class;
     }
+    
+    /**
+     * Return a list of access modifiers (static/private/etc.)
+     * @return array
+     */
+    function getModifiers()
+    {
+        return $this->_modifiers;
+    }
+    
+    /**
+     * Return name of the class that contains this method
+     * @return string
+     */
+    function setModifiers($m)
+    {
+        $this->_modifiers = $m;
+    }
 
     /**
      * quick way to link to this element
@@ -1136,12 +1468,8 @@ class parserVar extends parserElement
     function getLink($c, $text = false, $returnobj = false)
     {
         if ($returnobj)
-        { /// !!!! crazy stuff, this PHP business
-            $save = $this;
-            $this = &$c;
-            $a = Converter::getVarLink($save->name, $save->class, $save->docblock->package, false, $text);
-            $this = &$save;
-            return $a;
+        {
+            return $c->getLink($this->class . '::' . $this->name, $this->docblock->package);
         }
         return $c->getVarLink($this->name, $this->class, $this->docblock->package, false, $text);
     }
@@ -1155,15 +1483,51 @@ class parserVar extends parserElement
         $class = $c->classes->getClass($this->class,$this->path);
         $par = $class->getParent($c);
         
+        if (!is_object($par)) {
+            if (is_a($class->getExtends(true), 'ReflectionClass')) {
+                $pare = $class->getExtends(true);
+                if (method_exists($pare, 'hasProperty') &&
+                      $pare->hasProperty(substr($this->name, 1))) {
+                    $par = $pare;
+                    $property = $par->getProperty(substr($this->name, 1));
+                    $ret = new parserVar($par->getName());
+                    $doc = new parserDocBlock;
+                    $ret->setName('$' . $property->getName());
+                    $doc->addPackage('package', $class->getPackage());
+                    $ret->setLineNumber($par->getStartLine());
+                    $modifiers = array();
+                    if ($property->isPrivate()) {
+                        if ($c->parseprivate) {
+                            return false;
+                        }
+                        $modifiers[] = 'private';
+                        $doc->addAccess('private');
+                    }
+                    if ($property->isProtected()) {
+                        $modifiers[] = 'protected';
+                        $doc->addAccess('protected');
+                    }
+                    if ($property->isPublic()) {
+                        $modifiers[] = 'public';
+                        $doc->addAccess('public');
+                    }
+                    $ret->setDocBlock($doc);
+                    $ret->setModifiers($modifiers);
+                    return $ret;
+                }
+            }
+        }
         while (is_object($par))
         {
-          if ($par->hasVar($c,$this->name))
-					{
-						$var = $par->getVar($c,$this->name);
-						if (!($var->docblock && $var->docblock->hasaccess && !$c->parseprivate && $var->docblock->tags['access'][0]->value == 'private'))
-							return $var;
-					}
-          $par = $par->getParent($c);
+            if ($par->hasVar($c,$this->name))
+            {
+                $var = $par->getVar($c,$this->name);
+                if (!($var->docblock && $var->docblock->hasaccess &&
+                      !$c->parseprivate && $var->docblock->tags['access'][0]->value == 'private')) {
+                    return $var;
+                }
+            }
+            $par = $par->getParent($c);
         }
         
         return false;
@@ -1209,13 +1573,62 @@ class parserVar extends parserElement
  * @package phpDocumentor
  * @subpackage ParserElements
  * @author Greg Beaver <cellog@users.sourceforge.net>
+ * @since 1.2.4
+ */
+class parserConst extends parserElement
+{
+    /**
+     * Type is used by many functions to skip the hassle of if phpDocumentor_get_class($blah) == 'parserBlah'
+     * @var string always 'const'
+     */
+    var $type = 'const';
+    /** @var string class that contains this var */
+    var $class = '';
+    
+    /**
+     * @param string
+     */
+    function parserConst($class)
+    {
+        $this->class = $class;
+    }
+    
+    /**
+     * Retrieve the class name
+     * @return string Class name that this var belongs to
+     */
+    function getClass()
+    {
+        return $this->class;
+    }
+
+    /**
+     * quick way to link to this element
+     * @return mixed converter-specific link to this var
+     * @param Converter $c
+     * @param string $text text to display for the link or false for default text
+     */
+    function getLink($c, $text = false, $returnobj = false)
+    {
+        if ($returnobj)
+        {
+            return $c->getLink($this->class . '::'. $this->name, $this->docblock->package);
+        }
+        return $c->getConstLink($this->name, $this->class, $this->docblock->package, false, $text);
+    }
+}
+
+/**
+ * @package phpDocumentor
+ * @subpackage ParserElements
+ * @author Greg Beaver <cellog@users.sourceforge.net>
  * @since 1.0rc1
- * @version $Id: ParserElements.inc,v 1.45.2.4 2003/08/13 20:01:56 CelloG Exp $
+ * @version $Id: ParserElements.inc,v 1.15 2006/08/17 02:36:50 cellog Exp $
  */
 class parserMethod extends parserFunction
 {
     /**
-     * Type is used by many functions to skip the hassle of if get_class($blah) == 'parserBlah'
+     * Type is used by many functions to skip the hassle of if phpDocumentor_get_class($blah) == 'parserBlah'
      * @var string always 'method'
      */
     var $type = 'method';
@@ -1225,6 +1638,7 @@ class parserMethod extends parserFunction
     var $isDestructor = false;
     /** @var string class that contains this method */
     var $class = '';
+    var $_modifiers = array();
     
     /**
      * @param string
@@ -1232,6 +1646,21 @@ class parserMethod extends parserFunction
     function parserMethod($class)
     {
         $this->class = $class;
+    }
+    
+    /**
+     * @param string
+     * @param string default value parsed from function definition
+     * @param boolean indicates whether this parameter has a default value
+     * @param null|string class type hint
+     */
+    function addParam($name, $value, $has_default = true, $typehint = null)
+    {
+        $this->params[$name] = array($value, $has_default);
+        if (isset($typehint))
+        {
+            $this->params[$name][2] = $typehint;
+        }
     }
     
     /**
@@ -1264,28 +1693,217 @@ class parserMethod extends parserFunction
     }
     
     /**
+     * Return name of the class that contains this method
+     * @return string
+     */
+    function getModifiers()
+    {
+        return $this->_modifiers;
+    }
+    
+    /**
+     * Return name of the class that contains this method
+     * @return string
+     */
+    function setModifiers($m)
+    {
+        $this->_modifiers = $m;
+    }
+    
+    /**
      * @param Converter
-     * @return mixed {@link parserMethod} representing method this method overrides from the parent class, or false if none
+     * @return mixed {@link parserMethod} representing method this method
+     * overrides from the parent class, or false if none
      */
     function getOverrides(&$c)
     {
         $class = $c->classes->getClass($this->class,$this->path);
         
         $par = $class->getParent($c);
-        
+        if (!is_object($par)) {
+            if (is_a($class->getExtends(true), 'ReflectionClass')) {
+                $pare = $class->getExtends(true);
+                if (method_exists($pare, 'hasMethod') && $pare->hasMethod($this->name)) {
+                    $par = $pare;
+                    $method = $par->getMethod($this->name);
+                    $var = new parserMethod($par->getName());
+                    if ($method->returnsReference()) {
+                        $var->setReturnsReference();
+                    }
+                    $doc = new parserDocBlock;
+                    foreach ($method->getParameters() as $param) {
+                        $value = $param->isOptional() ? var_export($param->getDefaultValue(), true) : null;
+                        if ($param->isPassedByReference()) {
+                            $var->addParam('&$' . $param->getName(), $value, $param->isOptional(),
+                                $param->getClass());
+                        } else {
+                            $var->addParam('$' . $param->getName(), $value, $param->isOptional(),
+                                $param->getClass());
+                        }
+                    }
+                    $var->setName($method->getName());
+                    $doc->addPackage('package', $this->getPackage());
+                    $par = $method->getDeclaringClass();
+                    $var->setLineNumber($par->getStartLine());
+                    $modifiers = array();
+                    if ($method->isPrivate()) {
+                        $modifiers[] = 'private';
+                        $doc->addAccess('private');
+                    }
+                    $blank = new parserStringWithInlineTags;
+                    if ($method->isAbstract()) {
+                        $modifiers[] = 'abstract';
+                        $doc->addKeyword('abstract', $blank);
+                    }
+                    if ($method->isFinal()) {
+                        $modifiers[] = 'final';
+                        $doc->addKeyword('final', $blank);
+                    }
+                    if ($method->isProtected()) {
+                        $modifiers[] = 'protected';
+                        $doc->addAccess('protected');
+                    }
+                    if ($method->isPublic()) {
+                        $modifiers[] = 'public';
+                        $doc->addAccess('public');
+                    }
+                    if ($method->isStatic()) {
+                        $modifiers[] = 'static';
+                        $doc->addKeyword('static', $blank);
+                    }
+                    if ($method->isConstructor()) {
+                        $var->setConstructor();
+                    }
+                    $var->setDocBlock($doc);
+                    $var->setModifiers($modifiers);
+                    return $var;
+                }
+            }
+        }
+
         while (is_object($par))
         {
-          if ($par->hasMethod($c,$this->name))
-					{
-						$meth = $par->getMethod($c,$this->name);
-						if (!($meth->docblock && $meth->docblock->hasaccess && !$c->parseprivate && $meth->docblock->tags['access'][0]->value == 'private'))
-							return $meth;
-					}
-
-          $par = $par->getParent($c);
+            if ($par->hasMethod($c,$this->name))
+            {
+                $meth = $par->getMethod($c,$this->name);
+                if (!($meth->docblock && $meth->docblock->hasaccess &&
+                      !$c->parseprivate && $meth->docblock->tags['access'][0]->value == 'private')) {
+                    return $meth;
+                }
+            }
+            
+            $par = $par->getParent($c);
         }
         
         return false;
+    }
+    /**
+     * @param Converter
+     * @return mixed {@link parserMethod} representing method this method implements
+     * from an interface, or false if none
+     */
+    function getImplements(&$c)
+    {
+        $class = $c->classes->getClass($this->class,$this->path);
+        
+        $implements = $class->getImplements();
+        if (!count($implements)) {
+            return false;
+        }
+        $ret = array();
+        $haveAlready = array();
+        foreach ($implements as $interface) {
+            $interface_link = $c->getLink('object ' . $interface);
+            if (is_a($interface_link, 'classlink')) {
+                $par = $c->classes->getClass($interface_link->name,
+                    $interface_link->path);
+                if (is_object($par)) {
+                    if ($par->hasMethod($c, $this->name, true))
+                    {
+                        $meth = $par->getMethod($c, $this->name);
+                        if (!$meth) {
+                            $meth = $par->getMethod($c, $this->name, true);
+                        }
+                        if (!($meth->docblock && $meth->docblock->hasaccess &&
+                              !$c->parseprivate && $meth->docblock->tags['access'][0]->value == 'private')) {
+                            if (isset($haveAlready[$meth->getClass()])) {
+                                // this ensures extended interfaces don't cause
+                                // 2 links to the same method
+                                if ($haveAlready[$meth->getClass()] == $this->name) {
+                                    continue;
+                                }
+                            }
+                            $ret[] = $meth;
+                            $haveAlready = array($meth->getClass() => $this->name);
+                        }
+                    }
+                }
+                continue;
+            }
+            if (class_exists('ReflectionClass')) {
+                if (interface_exists($interface)) {
+                    $info = new ReflectionClass($interface);
+                    if (method_exists($info, 'hasMethod') && $info->hasMethod($this->name)) {
+                        $par = $info;
+                        $method = $par->getMethod($this->name);
+                        $var = new parserMethod($par->getName());
+                        if ($method->returnsReference()) {
+                            $var->setReturnsReference();
+                        }
+                        $doc = new parserDocBlock;
+                        foreach ($method->getParameters() as $param) {
+                            $value = $param->isOptional() ? var_export($param->getDefaultValue(), true) : null;
+                            if ($param->isPassedByReference()) {
+                                $var->addParam('&$' . $param->getName(), $value, $param->isOptional(),
+                                    $param->getClass());
+                            } else {
+                                $var->addParam('$' . $param->getName(), $value, $param->isOptional(),
+                                    $param->getClass());
+                            }
+                        }
+                        $var->setName($method->getName());
+                        $doc->addPackage('package', $this->getPackage());
+                        $par = $method->getDeclaringClass();
+                        $var->setLineNumber($par->getStartLine());
+                        $modifiers = array();
+                        if ($method->isPrivate()) {
+                            $modifiers[] = 'private';
+                            $doc->addAccess('private');
+                        }
+                        $blank = new parserStringWithInlineTags;
+                        if ($method->isAbstract()) {
+                            $modifiers[] = 'abstract';
+                            $doc->addKeyword('abstract', $blank);
+                        }
+                        if ($method->isFinal()) {
+                            $modifiers[] = 'final';
+                            $doc->addKeyword('final', $blank);
+                        }
+                        if ($method->isProtected()) {
+                            $modifiers[] = 'protected';
+                            $doc->addAccess('protected');
+                        }
+                        if ($method->isPublic()) {
+                            $modifiers[] = 'public';
+                            $doc->addAccess('public');
+                        }
+                        if ($method->isStatic()) {
+                            $modifiers[] = 'static';
+                            $doc->addKeyword('static', $blank);
+                        }
+                        if ($method->isConstructor()) {
+                            $var->setConstructor();
+                        }
+                        $var->setDocBlock($doc);
+                        $var->setModifiers($modifiers);
+                        $ret[] = $var;
+                        continue;
+                    }
+                }
+            }
+        }
+        
+        return $ret;
     }
     
     /**
@@ -1297,12 +1915,8 @@ class parserMethod extends parserFunction
     function getLink($c, $text = false, $returnobj = false)
     {
         if ($returnobj)
-        { /// !!!! crazy stuff, this PHP business
-            $save = $this;
-            $this = &$c;
-            $a = Converter::getMethodLink($save->name, $save->class, $save->docblock->package, false, $text);
-            $this = &$save;
-            return $a;
+        {
+            return $c->getLink($this->class . '::' . $this->name . '()', $this->docblock->package);
         }
         return $c->getMethodLink($this->name, $this->class, $this->docblock->package, false, $text);
     }
@@ -1364,12 +1978,12 @@ class parserMethod extends parserFunction
  * @subpackage ParserElements
  * @author Greg Beaver <cellog@users.sourceforge.net>
  * @since 1.0rc1
- * @version $Id: ParserElements.inc,v 1.45.2.4 2003/08/13 20:01:56 CelloG Exp $
+ * @version $Id: ParserElements.inc,v 1.15 2006/08/17 02:36:50 cellog Exp $
  */
 class parserDefine extends parserElement
 {
     /**
-     * Type is used by many functions to skip the hassle of if get_class($blah) == 'parserBlah'
+     * Type is used by many functions to skip the hassle of if phpDocumentor_get_class($blah) == 'parserBlah'
      * @var string always 'define'
      */
     var $type = 'define';
@@ -1383,12 +1997,8 @@ class parserDefine extends parserElement
     function getLink($c, $text = false, $returnobj = false)
     {
         if ($returnobj)
-        { /// !!!! crazy stuff, this PHP business
-            $save = $this;
-            $this = &$c;
-            $a = Converter::getDefineLink($save->name, $save->docblock->package, false, $text);
-            $this = &$save;
-            return $a;
+        {
+            return $c->getLink('constant ' . $this->name, $this->docblock->package);
         }
         return $c->getDefineLink($this->name, $this->docblock->package, false, $text);
     }
@@ -1412,12 +2022,12 @@ class parserDefine extends parserElement
  * @subpackage ParserElements
  * @author Greg Beaver <cellog@users.sourceforge.net>
  * @since 1.0rc1
- * @version $Id: ParserElements.inc,v 1.45.2.4 2003/08/13 20:01:56 CelloG Exp $
+ * @version $Id: ParserElements.inc,v 1.15 2006/08/17 02:36:50 cellog Exp $
  */
 class parserPackagePage extends parserStringWithInlineTags
 {
     /**
-     * Type is used by many functions to skip the hassle of if get_class($blah) == 'parserBlah'
+     * Type is used by many functions to skip the hassle of if phpDocumentor_get_class($blah) == 'parserBlah'
      * @var string always 'packagepage'
      */
     var $type = 'packagepage';
@@ -1449,7 +2059,7 @@ class parserPackagePage extends parserStringWithInlineTags
 class parserTutorial extends parserPackagePage
 {
     /**
-     * Type is used by many functions to skip the hassle of if get_class($blah) == 'parserBlah'
+     * Type is used by many functions to skip the hassle of if phpDocumentor_get_class($blah) == 'parserBlah'
      * @var string always 'tutorial'
      */
     var $type = 'tutorial';
@@ -1612,7 +2222,7 @@ class parserTutorial extends parserPackagePage
      */
     function setNext($next,&$c)
     {
-        if (get_class($next) == 'tutoriallink') return $this->next = $next;
+        if (phpDocumentor_get_class($next) == 'tutoriallink') return $this->next = $next;
         $this->next = new tutorialLink;
         $this->next->addLink('', $next->path, $next->name, $next->package, $next->subpackage, $next->getTitle($c));
     }
@@ -1634,7 +2244,7 @@ class parserTutorial extends parserPackagePage
      */
     function setPrev($prev,&$c)
     {
-        if (get_class($prev) == 'tutoriallink') return $this->prev = $prev;
+        if (phpDocumentor_get_class($prev) == 'tutoriallink') return $this->prev = $prev;
         $this->prev = new tutorialLink;
         $this->prev->addLink('', $prev->path, $prev->name, $prev->package, $prev->subpackage, $prev->getTitle($c));
     }

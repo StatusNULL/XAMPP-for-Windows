@@ -1,29 +1,41 @@
 <?php
-//
-// +------------------------------------------------------------------------+
-// | phpDocumentor                                                          |
-// +------------------------------------------------------------------------+
-// | Copyright (c) 2000-2003 Joshua Eichorn, Gregory Beaver                 |
-// | Email         jeichorn@phpdoc.org, cellog@phpdoc.org                   |
-// | Web           http://www.phpdoc.org                                    |
-// | Mirror        http://phpdocu.sourceforge.net/                          |
-// | PEAR          http://pear.php.net/package-info.php?pacid=137           |
-// +------------------------------------------------------------------------+
-// | This source file is subject to version 3.00 of the PHP License,        |
-// | that is available at http://www.php.net/license/3_0.txt.               |
-// | If you did not receive a copy of the PHP license and are unable to     |
-// | obtain it through the world-wide-web, please send a note to            |
-// | license@php.net so we can mail you a copy immediately.                 |
-// +------------------------------------------------------------------------+
-//
 /**
  * CHM (Compiled Help Manual) output converter for Smarty Template.
  *
- * @package Converters
+ * phpDocumentor :: automatic documentation generator
+ * 
+ * PHP versions 4 and 5
+ *
+ * Copyright (c) 2003-2006 Andrew Eddie, Greg Beaver
+ * 
+ * LICENSE:
+ * 
+ * This library is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation;
+ * either version 2.1 of the License, or (at your option) any
+ * later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ *
+ * @package    Converters
  * @subpackage CHMdefault
- * @author Greg Beaver <cellog@users.sourceforge.net>
- * @since 1.0rc1
- * @version $Id: CHMdefaultConverter.inc,v 1.33.2.8 2003/07/30 00:39:45 CelloG Exp $
+ * @author     Joshua Eichorn <jeichorn@phpdoc.org>
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  2000-2006 Joshua Eichorn, Gregory Beaver
+ * @license    http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @version    CVS: $Id: CHMdefaultConverter.inc,v 1.8 2006/10/23 03:49:02 cellog Exp $
+ * @filesource
+ * @link       http://www.phpdoc.org
+ * @link       http://pear.php.net/PhpDocumentor
+ * @since      1.0rc1
  */
 /**
  * Generates files that MS HTML Help Worshop can use to create a MS Windows
@@ -39,7 +51,7 @@
  * @subpackage CHMdefault
  * @author Greg Beaver <cellog@users.sourceforge.net>
  * @since 1.0rc1
- * @version $Revision: 1.33.2.8 $
+ * @version $Revision: 1.8 $
  */
 class CHMdefaultConverter extends Converter
 {
@@ -183,7 +195,7 @@ class CHMdefaultConverter extends Converter
         phpDocumentor_out("\n");
         $this->writefile('exsource_'.$path.'.html',$templ->fetch('examplesource.tpl'));
     }
-    
+
     function getExampleLink($path, $title)
     {
         return $this->returnLink('{$subdir}__examplesource' . PATH_DELIMITER . 'exsource_'.$path.'.html',$title);
@@ -191,10 +203,60 @@ class CHMdefaultConverter extends Converter
     
     function getSourceLink($path)
     {
-        return $this->returnLink($this->getFileSourcePath('{$subdir}') .
-        PATH_DELIMITER . $this->getFileSourceName($path).'.html','Source Code for this file');
+        return $this->returnLink('{$subdir}__filesource/' .
+        $this->getFileSourceName($path).'.html','Source Code for this file');
+    }
+
+    /**
+     * Retrieve a Converter-specific anchor to a segment of a source code file
+     * parsed via a {@tutorial tags.filesource.pkg} tag.
+     * @param string full path to source file
+     * @param string name of anchor
+     * @param string link text, if this is a link
+     * @param boolean returns either a link or a destination based on this
+     *                parameter
+     * @return string link to an anchor, or the anchor
+     */
+    function getSourceAnchor($sourcefile,$anchor,$text = '',$link = false)
+    {
+        if ($link) {
+            return $this->returnLink('{$subdir}__filesource/' .
+                $this->getFileSourceName($sourcefile) . '.html#a' . $anchor, $text);
+        } else {
+            return '<a name="a'.$anchor.'"></a>';
+        }
     }
     
+
+    /**
+     * Return a line of highlighted source code with formatted line number
+     *
+     * If the $path is a full path, then an anchor to the line number will be
+     * added as well
+     * @param integer line number
+     * @param string highlighted source code line
+     * @param false|string full path to @filesource file this line is a part of,
+     *        if this is a single line from a complete file.
+     * @return string formatted source code line with line number
+     */
+    function sourceLine($linenumber, $line, $path = false)
+    {
+        $extra = '';
+        if (strlen(str_replace("\n", '', $line)) == 0) {
+            $extra = '&nbsp;';
+        }
+        if ($path)
+        {
+            return '<li><div class="src-line">' . $this->getSourceAnchor($path, $linenumber) .
+                   str_replace("\n",'',$line) . $extra .
+                   "</div></li>\n";
+        } else
+        {
+            return '<li><div class="src-line">' . str_replace("\n",'',$line) .
+                "$extra</div></li>\n";
+        }
+    }
+
     /**
      * Used to convert the <<code>> tag in a docblock
      * @param string
@@ -208,22 +270,20 @@ class CHMdefaultConverter extends Converter
     }
     
     /**
-     * Retrieve a Converter-specific anchor to a segment of a source code file
-     * parsed via a {@tutorial tags.filesource.pkg} tag.
-     * @param string full path to source file
-     * @param string name of anchor
-     * @param string link text, if this is a link
-     * @param boolean returns either a link or a destination based on this
-     *                parameter
-     * @return string link to an anchor, or the anchor
+     * @param string
      */
-    function getSourceAnchor($sourcefile,$anchor,$text = '',$link = false)
+    function TutorialExample($example)
     {
-        if ($link)
-        return $this->returnLink($this->getFileSourcePath('{$subdir}') .
-        PATH_DELIMITER . $this->getFileSourceName($sourcefile).'.html#a'.$anchor, $text);
-        else
-        return '<a name="a'.$anchor.'"></a>';
+        $trans = $this->template_options['desctranslate'];
+        $this->template_options['desctranslate'] = array();
+        $example = '<ol>' . parent::TutorialExample($example)
+               .'</ol>';
+        $this->template_options['desctranslate'] = $trans;
+        if (!isset($this->template_options['desctranslate'])) return $example;
+        if (!isset($this->template_options['desctranslate']['code'])) return $example;
+        $example = $this->template_options['desctranslate']['code'] . $example;
+        if (!isset($this->template_options['desctranslate']['/code'])) return $example;
+        return $example . $this->template_options['desctranslate']['/code'];
     }
     
     function getCurrentPageLink()
@@ -236,6 +296,10 @@ class CHMdefaultConverter extends Converter
      */
     function postProcess($text)
     {
+        if ($this->highlightingSource) {
+            return str_replace(array(' ',"\t"), array('&nbsp;', '&nbsp;&nbsp;&nbsp;'),
+                htmlspecialchars($text));
+        }
         return htmlspecialchars($text);
     }
     
@@ -508,6 +572,7 @@ class CHMdefaultConverter extends Converter
                 break;
                 case 'method' :
                 case 'var' :
+                case 'const' :
                 $eltext .= $element->class.'::';
                 case 'page' :
                 case 'define' :
@@ -525,7 +590,7 @@ class CHMdefaultConverter extends Converter
     
     function getId($element, $fullpath = true)
     {
-        if (get_class($element) == 'parserdata')
+        if (phpDocumentor_get_class($element) == 'parserdata')
         {
             $element = $this->addLink($element->parent);
             $elp = $element->parent;
@@ -561,6 +626,7 @@ class CHMdefaultConverter extends Converter
             break;
             case 'method' :
             case 'var' :
+            case 'const' :
             if ($fullpath)
             return $b.$element->package.$c.'/'.$element->class.'.html#'.$element->type.$element->name;
             return $element->type.$element->name;
@@ -787,6 +853,18 @@ class CHMdefaultConverter extends Converter
     }
 
     /**
+     * Converts class constants for template output
+     * @see prepareDocBlock(), getFormattedConflicts()
+     * @param parserDefine
+     */
+    function convertConst(&$element)
+    {
+        parent::convertConst($element, array('const_dest' => $this->getId($element,false)));
+        $this->setTargetDir($this->base_dir . PATH_DELIMITER . $this->class_dir);
+        $this->addKLink($element->name, $this->class_dir . PATH_DELIMITER .$this->class, $this->getId($element,false), $element->class.' Constants');
+    }
+
+    /**
      * Converts class methods for template output
      * @see prepareDocBlock(), getFormattedConflicts()
      * @param parserDefine
@@ -866,7 +944,7 @@ class CHMdefaultConverter extends Converter
     
     function getPageName(&$element)
     {
-        if (get_class($element) == 'parserpage') return '_'.$element->getName();
+        if (phpDocumentor_get_class($element) == 'parserpage') return '_'.$element->getName();
         return '_'.$element->parent->getName();
     }
 
@@ -889,12 +967,15 @@ class CHMdefaultConverter extends Converter
             $distance[] = '';
             while ($parent)
             {
-                $subpackage = $parent->docblock->subpackage;
-                $package = $parent->docblock->package;
                 $x = $parent;
                 if (is_object($parent))
-                $x = $parent->getLink($this);
-                if (!$x) $x = $parent->getName();
+                {
+                    $subpackage = $parent->docblock->subpackage;
+                    $package = $parent->docblock->package;
+                    $x = $parent;
+                    $x = $parent->getLink($this);
+                    if (!$x) $x = $parent->getName();
+                }
                 $result[] = 
                     $x;
                 $distance[] =
@@ -941,12 +1022,102 @@ class CHMdefaultConverter extends Converter
      */
     function generateFormattedClassTrees($package)
     {
-        if (!isset($this->roots[$package])) return array();
-        $roots = $trees = array();
-        $roots = $this->roots[$package];
-        for($i=0;$i<count($roots);$i++)
-        {
-            $trees[] = array('class' => $roots[$i],'class_tree' => "<ul>\n".$this->getRootTree($this->getSortedClassTreeFromClass($roots[$i],$package,''),$package)."</ul>\n");
+        if (!isset($this->roots['normal'][$package]) &&
+              !isset($this->roots['special'][$package])) {
+            return array();
+        }
+        $trees = array();
+        if (isset($this->roots['normal'][$package])) {
+            $roots = $this->roots['normal'][$package];
+            for($i=0;$i<count($roots);$i++)
+            {
+                $root = $this->classes->getClassByPackage($roots[$i], $package);
+                if ($root && $root->isInterface()) {
+                    continue;
+                }
+                $trees[] = array('class' => $roots[$i],'class_tree' => "<ul>\n".$this->getRootTree($this->getSortedClassTreeFromClass($roots[$i],$package,''),$package)."</ul>\n");
+            }
+        }
+        if (isset($this->roots['special'][$package])) {
+            $roots = $this->roots['special'][$package];
+            foreach ($roots as $parent => $classes) {
+                $thistree = '';
+                foreach ($classes as $classinfo) {
+                    $root = $this->classes->getClassByPackage($classinfo, $package);
+                    if ($root && $root->isInterface()) {
+                        continue;
+                    }
+                    $thistree .=
+                        $this->getRootTree(
+                            $this->getSortedClassTreeFromClass(
+                                $classinfo,
+                                $package,
+                                ''),
+                            $package,
+                            true);
+                }
+                if (!$thistree) {
+                    continue;
+                }
+                $trees[] = array(
+                    'class' => $parent,
+                    'class_tree' => "<ul>\n" . $thistree . "</ul>\n"
+                );
+            }
+        }
+        return $trees;
+    }
+
+    /**
+     * returns a template-enabled array of interface inheritance trees
+     * 
+     * @param    string    $package    package to generate a class tree for
+     * @see $roots, HTMLConverter::getRootTree()
+     */
+    function generateFormattedInterfaceTrees($package)
+    {
+        if (!isset($this->roots['normal'][$package]) &&
+              !isset($this->roots['special'][$package])) {
+            return array();
+        }
+        $trees = array();
+        if (isset($this->roots['normal'][$package])) {
+            $roots = $this->roots['normal'][$package];
+            for($i=0;$i<count($roots);$i++)
+            {
+                $root = $this->classes->getClassByPackage($roots[$i], $package);
+                if ($root && !$root->isInterface()) {
+                    continue;
+                }
+                $trees[] = array('class' => $roots[$i],'class_tree' => "<ul>\n".$this->getRootTree($this->getSortedClassTreeFromClass($roots[$i],$package,''),$package)."</ul>\n");
+            }
+        }
+        if (isset($this->roots['special'][$package])) {
+            $roots = $this->roots['special'][$package];
+            foreach ($roots as $parent => $classes) {
+                $thistree = '';
+                foreach ($classes as $classinfo) {
+                    $root = $this->classes->getClassByPackage($classinfo, $package);
+                    if ($root && !$root->isInterface()) {
+                        continue;
+                    }
+                    $thistree .=
+                        $this->getRootTree(
+                            $this->getSortedClassTreeFromClass(
+                                $classinfo,
+                                $package,
+                                ''),
+                            $package,
+                            true);
+                }
+                if (!$thistree) {
+                    continue;
+                }
+                $trees[] = array(
+                    'class' => $parent,
+                    'class_tree' => "<ul>\n" . $thistree . "</ul>\n"
+                );
+            }
         }
         return $trees;
     }
@@ -955,10 +1126,12 @@ class CHMdefaultConverter extends Converter
      * return formatted class tree for the Class Trees page
      *
      * @param array $tree output from {@link getSortedClassTreeFromClass()}
+     * @param string $package  package
+     * @param boolean $nounknownparent if true, an object's parent will not be checked
      * @see Classes::$definitechild, generateFormattedClassTrees()
      * @return string
      */
-    function getRootTree($tree,$package)
+    function getRootTree($tree, $package, $noparent = false)
     {
         if (!$tree) return '';
         $my_tree = '';
@@ -966,7 +1139,7 @@ class CHMdefaultConverter extends Converter
         $lastcur = array(false);
         $kids = array();
         $dopar = false;
-        if ($tree[$cur]['parent'])
+        if (!$noparent && $tree[$cur]['parent'])
         {
             $dopar = true;
             if (!is_object($tree[$cur]['parent']))
@@ -1035,14 +1208,16 @@ class CHMdefaultConverter extends Converter
             $Result['path'] = $elt->getPath();
             
             if (isset($elt->docblock))
-			{
-                $Result['description'] = $elt->docblock->getSDesc($this);
+						{
+							$Result['description'] = $elt->docblock->getSDesc($this);
+							
+							if ($elt->docblock->hasaccess)
+								$Result['access'] = $elt->docblock->tags['access'][0]->value;
+							else
+								$Result['access'] = 'public';
 
-                if ($elt->docblock->hasaccess)
-                    $Result['access'] = $elt->docblock->tags['access'][0]->value;
-                else
-                    $Result['access'] = 'public';
-                }
+							$Result['abstract'] = isset ($elt->docblock->tags['abstract'][0]);
+						}
             else
                 $Result['description'] = '';
             
@@ -1109,6 +1284,16 @@ class CHMdefaultConverter extends Converter
                                                                 $elt->class.'::'.$elt->getName());
                             $Result['listing'] = 'in file '.$elt->file.', variable '.$Result['link']."$aa";
                     break;
+                    case 'const':
+                            $Result['name'] = $elt->getName();
+                            $Result['title'] = 'Variable';
+                            $Result['link'] = $this->getConstLink($elt->getName(),
+                                                                $elt->class,
+                                                                $elt->docblock->package,
+                                                                $elt->getPath(),
+                                                                $elt->class.'::'.$elt->getName());
+                            $Result['listing'] = 'in file '.$elt->file.', class constant '.$Result['link']."$aa";
+                    break;
                     case 'page':
                             $Result['name'] = $elt->getFile();
                             $Result['title'] = 'Page';
@@ -1174,6 +1359,9 @@ class CHMdefaultConverter extends Converter
     
     function copyMediaRecursively($media,$targetdir,$subdir = '')
     {
+        if (!is_array($media)) {
+            return;
+        }
         foreach($media as $dir => $files)
         {
             if ($dir === '/')
@@ -1417,6 +1605,23 @@ class CHMdefaultConverter extends Converter
         if (!$a) return false;
         return $this->returnSee($a, $text);
     }
+
+    /**
+     * @param string name of class constant
+     * @param string class containing class constant
+     * @param string package name
+     * @param string full path to look in (used in index generation)
+     * @param boolean deprecated
+     * @param boolean return just the URL, or enclose it in an html a tag
+     * @return mixed false if not found, or an html a link to the var's documentation
+     * @see parent::getVarLink()
+     */
+    function getConstLink($expr,$class,$package, $file = false,$text = false)
+    {
+        $a = Converter::getConstLink($expr,$class,$package,$file);
+        if (!$a) return false;
+        return $this->returnSee($a, $text);
+    }
     
     /**
      * does a nat case sort on the specified second level value of the array
@@ -1482,6 +1687,7 @@ class CHMdefaultConverter extends Converter
      */
     function addHHP($file)
     {
+        $file = str_replace($this->base_dir . PATH_DELIMITER, '', $file);
         $file = str_replace('\\',PATH_DELIMITER,$file);
         $file = str_replace('//',PATH_DELIMITER,$file);
         $file = str_replace(PATH_DELIMITER,'\\',$file);
@@ -1542,7 +1748,8 @@ class CHMdefaultConverter extends Converter
     
     function addSourceTOC($name, $file, $package, $subpackage, $source = false)
     {
-        $file = $this->targetDir . PATH_DELIMITER . $file . '.html';
+        $file = str_replace($this->base_dir . PATH_DELIMITER, '', $this->targetDir)
+             . PATH_DELIMITER . $file . '.html';
         $file = str_replace('\\',PATH_DELIMITER,$file);
         $file = str_replace('//',PATH_DELIMITER,$file);
         $file = str_replace(PATH_DELIMITER,'\\',$file);
@@ -1552,10 +1759,12 @@ class CHMdefaultConverter extends Converter
     
     function addTOC($name,$file,$package,$subpackage,$class = false,$tutorial = false)
     {
-        $file = $this->targetDir . PATH_DELIMITER . $file . '.html';
+        $file = str_replace($this->base_dir . PATH_DELIMITER, '', $this->targetDir . PATH_DELIMITER)
+             . $file . '.html';
         $file = str_replace('\\',PATH_DELIMITER,$file);
         $file = str_replace('//',PATH_DELIMITER,$file);
         $file = str_replace(PATH_DELIMITER,'\\',$file);
+        $file = str_replace($this->base_dir . '\\', '', $file);
         $sub = $class ? 'Classes' : 'Files';
         if ($tutorial) $sub = 'Manual';
         $this->TOC[$package][$subpackage][$sub][] = array($name,$file);
@@ -1572,7 +1781,7 @@ class CHMdefaultConverter extends Converter
      */
     function addKLink($name, $file, $bookmark='', $group='')
     {
-        $file = $this->base_dir . PATH_DELIMITER . $file . '.html';
+        $file = $file . '.html';
         $file = str_replace('\\',PATH_DELIMITER,$file);
         $file = str_replace('//',PATH_DELIMITER,$file);
         $file = str_replace(PATH_DELIMITER,'\\',$file);
@@ -1597,7 +1806,7 @@ class CHMdefaultConverter extends Converter
 		$templ->assign('entry', array());
         foreach($this->KLinks as $group=>$link)
         {
-			if (isset($group['grouplink'])) {
+			if (isset($link['grouplink'])) {
 				$templg = &$this->newSmarty();
 				$templg->assign('entry', array());
 				foreach($link as $k=>$sublink)
@@ -1638,10 +1847,6 @@ class CHMdefaultConverter extends Converter
     function Output()
     {
         $templ = &$this->newSmarty();
-        $file = $this->base_dir . PATH_DELIMITER;
-        $file = str_replace('\\',PATH_DELIMITER,$file);
-        $file = str_replace('//',PATH_DELIMITER,$file);
-        $file = str_replace(PATH_DELIMITER,'\\',$file);
         $templ->assign('files',$this->hhp_files);
         $this->setTargetDir($this->base_dir);
         Converter::writefile('phpdoc.hhp',$templ->fetch('hhp.tpl'));
@@ -1651,7 +1856,7 @@ class CHMdefaultConverter extends Converter
 		$templ->assign('klinks',$this->generateKLinks());
         Converter::writefile('index.hhk',$templ->fetch('index.hhk.tpl'));
         phpDocumentor_out("NOTE: to create the documentation.chm file, you must now run Microsoft Help Workshop on phpdoc.hhp\n");
-        phpDocumentor_out("To get the free Microsoft Help Workshop, browse to: http://go.microsoft.com/fwlink/?LinkId=14498\n");
+        phpDocumentor_out("To get the free Microsoft Help Workshop, browse to: http://go.microsoft.com/fwlink/?LinkId=14188\n");
         flush();
     }
 }

@@ -15,7 +15,7 @@
  * @author     Hartmut Holzgraefe <hartmut@php.net>
  * @copyright  2005 Hartmut Holzgraefe
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Method.php,v 1.14 2006/02/17 09:58:58 hholzgra Exp $
+ * @version    CVS: $Id: Method.php,v 1.18 2006/06/25 15:17:45 hholzgra Exp $
  * @link       http://pear.php.net/package/CodeGen
  */
 
@@ -40,7 +40,7 @@ require_once "CodeGen/PECL/Element/Class.php";
     class CodeGen_PECL_Element_Method
       extends CodeGen_PECL_Element_Function
     {
-        function __construct(Codegen_PECL_Element_Class $class) 
+        function __construct(Codegen_PECL_Element_ObjectInterface $class) 
         {
             $this->class     = $class;
             $this->classname = $class->getName(); 
@@ -261,6 +261,7 @@ require_once "CodeGen/PECL/Element/Class.php";
         {
             $code = "";
 
+			// TODO catch arg #2->type == void
             $arginfo = (count($this->params)>1) ? ($this->getFullName()."_args") : "NULL";
 
             if ($this->isAbstract || $this->isInterface) {
@@ -299,7 +300,8 @@ require_once "CodeGen/PECL/Element/Class.php";
                 return "";
             }
 
-            return "    PHP_FALIAS({$this->proceduralName}, {$this->classname}_{$this->name}, NULL)\n";      
+			// TODO arg_info?
+            return "    PHP_MALIAS({$this->classname}, {$this->proceduralName}, {$this->name}, NULL, ZEND_ACC_PUBLIC)\n";
         }
         /**
          * Create proto line for method 
@@ -424,6 +426,48 @@ require_once "CodeGen/PECL/Element/Class.php";
             
             return $test;
         }
+
+        /**
+         * Code needed ahead of the method table 
+         *
+         * Abstract/Interface methods need to define their argument
+         * list ahead of the method table
+         *
+         * @returns string
+         */
+        function argInfoCode() {
+            $code = "";
+
+            if (count($this->params) > 0) {
+                $code.= "ZEND_BEGIN_ARG_INFO(".$this->getFullName()."_args, 0)\n";
+
+                $params = $this->params;
+                array_shift($params);
+
+                $useTypeHints = true;
+
+                foreach($params as $param) {
+                    if ($param['type'] != "object" || !isset($param['subtype'])) {
+                        $useTypeHints = false;
+                        break;
+                    }
+                }
+
+                // TODO optional paramteres?
+                foreach($params as $param) {
+                    $byRef = empty($param["byRef"]) ? 0 : 1;
+                    if ($useTypeHints) {
+                        $code.= "  ZEND_ARG_OBJ_INFO(0, $param[name], $param[subtype], 0)\n";
+                    } else {
+                        $code.= "  ZEND_ARG_INFO($byRef, $param[name])\n";
+                    }
+                }                
+                
+                $code.= "ZEND_END_ARG_INFO()\n";
+            }
+
+            return $code;
+        } 
 
     }
 

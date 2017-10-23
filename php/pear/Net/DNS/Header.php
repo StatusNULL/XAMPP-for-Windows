@@ -3,7 +3,7 @@
  *  License Information:
  *
  *    Net_DNS:  A resolver library for PHP
- *    Copyright (C) 2002 Eric Kilfoil eric@ypass.net
+ *    Copyright (c) 2002-2003 Eric Kilfoil eric@ypass.net
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -140,30 +140,30 @@ class Net_DNS_Header
      * @return  object  Net_DNS_Header
      * @access public
      */
-    function Net_DNS_Header($data = "")
+    function Net_DNS_Header($data = '')
     {
-        if ($data != "") {
+        if ($data != '') {
             /*
              * The header MUST be at least 12 bytes.
              * Passing the full datagram to this constructor
              * will examine only the header section of the DNS packet
              */
             if (strlen($data) < 12)
-                return(0);
+                return false;
 
-            $a = unpack("nid/C2flags/n4counts", $data);
-            $this->id      = $a["id"];
-            $this->qr      = ($a["flags1"] >> 7) & 0x1;
-            $this->opcode  = ($a["flags1"] >> 3) & 0xf;
-            $this->aa      = ($a["flags1"] >> 2) & 0x1;
-            $this->tc      = ($a["flags1"] >> 1) & 0x1;
-            $this->rd      = $a["flags1"] & 0x1;
-            $this->ra      = ($a["flags2"] >> 7) & 0x1;
-            $this->rcode   = $a["flags2"] & 0xf;
-            $this->qdcount = $a["counts1"];
-            $this->ancount = $a["counts2"];
-            $this->nscount = $a["counts3"];
-            $this->arcount = $a["counts4"];
+            $a = unpack('nid/C2flags/n4counts', $data);
+            $this->id      = $a['id'];
+            $this->qr      = ($a['flags1'] >> 7) & 0x1;
+            $this->opcode  = ($a['flags1'] >> 3) & 0xf;
+            $this->aa      = ($a['flags1'] >> 2) & 0x1;
+            $this->tc      = ($a['flags1'] >> 1) & 0x1;
+            $this->rd      = $a['flags1'] & 0x1;
+            $this->ra      = ($a['flags2'] >> 7) & 0x1;
+            $this->rcode   = $a['flags2'] & 0xf;
+            $this->qdcount = $a['counts1'];
+            $this->ancount = $a['counts2'];
+            $this->nscount = $a['counts3'];
+            $this->arcount = $a['counts4'];
         }
         else {
             $this->id      = Net_DNS_Resolver::nextid();
@@ -212,31 +212,31 @@ class Net_DNS_Header
      */
     function string()
     {
-        $retval = ";; id = " . $this->id . "\n";
-        if ($this->opcode == "UPDATE") {
-            $retval .= ";; qr = " . $this->qr . "    " .
-                "opcode = " . $this->opcode . "    "   .
-                "rcode = " . $this->rcode . "\n";
-            $retval .= ";; zocount = " . $this->qdcount . "  " .  
-                "prcount = " . $this->ancount . "  "           .
-                "upcount = " . $this->nscount . "  "           .
-                "adcount = " . $this->arcount . "\n";
+        $retval = ';; id = ' . $this->id . "\n";
+        if ($this->opcode == 'UPDATE') {
+            $retval .= ';; qr = ' . $this->qr . '    ' .
+                'opcode = ' . $this->opcode . '    '   .
+                'rcode = ' . $this->rcode . "\n";
+            $retval .= ';; zocount = ' . $this->qdcount . '  ' .  
+                'prcount = ' . $this->ancount . '  '           .
+                'upcount = ' . $this->nscount . '  '           .
+                'adcount = ' . $this->arcount . "\n";
         } else {
-            $retval .= ";; qr = " . $this->qr . "    " .
-                "opcode = " . $this->opcode . "    "   .
-                "aa = " . $this->aa . "    "           .
-                "tc = " . $this->tc . "    "           .
-                "rd = " . $this->rd . "\n";
+            $retval .= ';; qr = ' . $this->qr . '    ' .
+                'opcode = ' . $this->opcode . '    '   .
+                'aa = ' . $this->aa . '    '           .
+                'tc = ' . $this->tc . '    '           .
+                'rd = ' . $this->rd . "\n";
 
-            $retval .= ";; ra = " . $this->ra . "    " .
-                "rcode  = " . $this->rcode . "\n";
+            $retval .= ';; ra = ' . $this->ra . '    ' .
+                'rcode  = ' . $this->rcode . "\n";
 
-            $retval .= ";; qdcount = " . $this->qdcount . "  " .
-                "ancount = " . $this->ancount . "  "    .
-                "nscount = " . $this->nscount . "  "    .
-                "arcount = " . $this->arcount . "\n";
+            $retval .= ';; qdcount = ' . $this->qdcount . '  ' .
+                'ancount = ' . $this->ancount . '  '    .
+                'nscount = ' . $this->nscount . '  '    .
+                'arcount = ' . $this->arcount . "\n";
         }
-        return($retval);
+        return $retval;
     }
 
     /* }}} */
@@ -263,7 +263,7 @@ class Net_DNS_Header
 
         $byte3 = ($this->ra << 7) | $rcode;
 
-        return pack("nC2n4", $this->id,
+        return pack('nC2n4', $this->id,
                 $byte2,
                 $byte3,
                 $this->qdcount,

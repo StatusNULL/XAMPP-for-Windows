@@ -15,7 +15,7 @@
  * @author     Hartmut Holzgraefe <hartmut@php.net>
  * @copyright  2005 Hartmut Holzgraefe
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Global.php,v 1.4 2006/02/17 11:49:18 hholzgra Exp $
+ * @version    CVS: $Id: Global.php,v 1.5 2006/04/25 20:40:09 hholzgra Exp $
  * @link       http://pear.php.net/package/CodeGen
  */
 
@@ -167,7 +167,8 @@ class CodeGen_PECL_Element_Global
         $array = explode(" ", str_replace('*',' ',$type));
         foreach ($array as $name) {
             if (empty($name)) continue;
-            if (!$this->isName($name)) return false;
+            // TODO :: should only be allowed for C++, not C extensions
+            if (!$this->isName(str_replace("::","", $name))) return false; 
         }
         return true;
     }

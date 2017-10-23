@@ -13,9 +13,9 @@
  * @category   pear
  * @package    PEAR
  * @author     Greg Beaver <cellog@php.net>
- * @copyright  1997-2005 The PHP Group
+ * @copyright  1997-2006 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: 11.php,v 1.2 2005/10/27 05:54:37 cellog Exp $
+ * @version    CVS: $Id: 11.php,v 1.4.2.3 2006/08/15 21:25:12 pajoye Exp $
  * @link       http://pear.php.net/package/PEAR
  * @since      File available since Release 1.4.3
  */
@@ -31,9 +31,9 @@ require_once 'PEAR/REST.php';
  * @category   pear
  * @package    PEAR
  * @author     Greg Beaver <cellog@php.net>
- * @copyright  1997-2005 The PHP Group
+ * @copyright  1997-2006 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    Release: 1.4.5
+ * @version    Release: 1.4.11
  * @link       http://pear.php.net/package/PEAR
  * @since      Class available since Release 1.4.3
  */
@@ -56,7 +56,7 @@ class PEAR_REST_11
             return $categorylist;
         }
         $ret = array();
-        if (!is_array($categorylist['c'])) {
+        if (!is_array($categorylist['c']) || !isset($categorylist['c'][0])) {
             $categorylist['c'] = array($categorylist['c']);
         }
         PEAR::pushErrorHandling(PEAR_ERROR_RETURN);
@@ -137,14 +137,17 @@ class PEAR_REST_11
                 }
                 if ($latest) {
                     if (isset($packageinfo['deps'])) {
-                        if (!isset($packageinfo['deps'][0])) {
+                        if (!is_array($packageinfo['deps']) ||
+                              !isset($packageinfo['deps'][0])) {
                             $packageinfo['deps'] = array($packageinfo['deps']);
                         }
                     }
                     $d = false;
-                    foreach ($packageinfo['deps'] as $dep) {
-                        if ($dep['v'] == $latest) {
-                            $d = unserialize($dep['d']);
+                    if (isset($packageinfo['deps']) && is_array($packageinfo['deps'])) {
+                        foreach ($packageinfo['deps'] as $dep) {
+                            if ($dep['v'] == $latest) {
+                                $d = unserialize($dep['d']);
+                            }
                         }
                     }
                     if ($d) {

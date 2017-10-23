@@ -1,24 +1,40 @@
 <?php
-//
-// +------------------------------------------------------------------------+
-// | phpDocumentor                                                          |
-// +------------------------------------------------------------------------+
-// | Copyright (c) 2000-2003 Joshua Eichorn, Gregory Beaver                 |
-// | Email         jeichorn@phpdoc.org, cellog@phpdoc.org                   |
-// | Web           http://www.phpdoc.org                                    |
-// | Mirror        http://phpdocu.sourceforge.net/                          |
-// | PEAR          http://pear.php.net/package-info.php?pacid=137           |
-// +------------------------------------------------------------------------+
-// | This source file is subject to version 3.00 of the PHP License,        |
-// | that is available at http://www.php.net/license/3_0.txt.               |
-// | If you did not receive a copy of the PHP license and are unable to     |
-// | obtain it through the world-wide-web, please send a note to            |
-// | license@php.net so we can mail you a copy immediately.                 |
-// +------------------------------------------------------------------------+
-//
 /**
- * @package Converters
+ * Outputs documentation in PDF format
+ *
+ * phpDocumentor :: automatic documentation generator
+ * 
+ * PHP versions 4 and 5
+ *
+ * Copyright (c) 2002-2006 Gregory Beaver
+ * 
+ * LICENSE:
+ * 
+ * This library is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation;
+ * either version 2.1 of the License, or (at your option) any
+ * later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ *
+ * @package    Converters
  * @subpackage PDFdefault
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  2002-2006 Gregory Beaver
+ * @license    http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @version    CVS: $Id: PDFdefaultConverter.inc,v 1.3 2006/04/30 22:18:14 cellog Exp $
+ * @filesource
+ * @link       http://www.phpdoc.org
+ * @link       http://pear.php.net/PhpDocumentor
+ * @since      1.2
  */
 /**
  * The Cezpdf class library
@@ -33,7 +49,7 @@ include_once('phpDocumentor/Converters/PDF/default/class.phpdocpdf.php');
  * @subpackage PDFdefault
  * @author Greg Beaver <cellog@users.sourceforge.net>
  * @since 1.1
- * @version $Id: PDFdefaultConverter.inc,v 1.43.2.7 2003/07/29 07:28:12 CelloG Exp $
+ * @version $Id: PDFdefaultConverter.inc,v 1.3 2006/04/30 22:18:14 cellog Exp $
  * @todo Implement links to conflicts/inheritance
  */
 class PDFdefaultConverter extends Converter
@@ -178,6 +194,7 @@ class PDFdefaultConverter extends Converter
                 break;
                 case 'method' :
                 case 'var' :
+                case 'const' :
                 $eltext .= $element->class.'::';
                 case 'page' :
                 case 'define' :
@@ -203,6 +220,7 @@ class PDFdefaultConverter extends Converter
             return '<c:ilink:'.urlencode($element->type.$element->package.$element->name).'>'.$eltext.'</c:ilink>';
             case 'method' :
             case 'var' :
+            case 'const' :
             return '<c:ilink:'.urlencode($element->type.$element->package.$element->class.'::'.$element->name).'>'.$eltext.'</c:ilink>';
         }
         return $element;
@@ -257,7 +275,7 @@ class PDFdefaultConverter extends Converter
                 $global = $a;
             }
             $b = Converter::getLink($val[0]);
-            if (is_object($b) && get_class($b) == 'classlink')
+            if (is_object($b) && phpDocumentor_get_class($b) == 'classlink')
             {
                 $val[0] = $this->returnSee($b);
             }
@@ -376,7 +394,12 @@ class PDFdefaultConverter extends Converter
         $template->assign('slink',$this->getSourceAnchor($element->getPath(),$element->getLineNumber(),$element->getLineNumber(),true));
         else
         $template->assign('slink',false);
-        $template->assign('return',$element->docblock->return->returnType);
+        $ret = 'void';
+        if (isset($element->docblock->return))
+        {
+            $ret = $element->docblock->return->returnType;
+        }
+        $template->assign('return',$ret);
         $template->assign('functioncall',$element->getFunctionCall());
         $template->assign('intricatefunctioncall',$element->getIntricateFunctionCall($this,$params));
         $template->assign('sdesc',$sdesc);
@@ -404,6 +427,28 @@ class PDFdefaultConverter extends Converter
         $template->assign('value',$element->value);
         $template->assign('sdesc',$sdesc);
         $this->pdf->ezText($template->fetch('var.tpl'));
+        $this->convertDocBlock($element);
+    }
+    
+    function convertConst(&$element)
+    {
+        $sdesc = '';
+        if ($element->docblock->sdesc)
+        {
+            $sdesc = $element->docblock->sdesc->Convert($this);
+        }
+        $template = &$this->newSmarty();
+        $template->assign('class',$this->class);
+        $template->assign('linenumber',$element->getLineNumber());
+        if ($this->hasSourceCode($element->getPath()))
+        $template->assign('slink',$this->getSourceAnchor($element->getPath(),$element->getLineNumber(),$element->getLineNumber(),true));
+        else
+        $template->assign('slink',false);
+        $template->assign('name',$element->name);
+        $template->assign('dest', urlencode($element->type.$element->docblock->package.$element->class.'::'.$element->name));
+        $template->assign('value',$element->value);
+        $template->assign('sdesc',$sdesc);
+        $this->pdf->ezText($template->fetch('const.tpl'));
         $this->convertDocBlock($element);
     }
     
@@ -567,7 +612,7 @@ class PDFdefaultConverter extends Converter
 
     function getPageName(&$element)
     {
-        if (get_class($element) == 'parserpage') return $element->getName();
+        if (phpDocumentor_get_class($element) == 'parserpage') return $element->getName();
         return $element->parent->getName();
     }
 
@@ -885,6 +930,23 @@ class PDFdefaultConverter extends Converter
     function getVarLink($expr,$class,$package, $file = false,$text = false)
     {
         $a = Converter::getVarLink($expr,$class,$package,$file);
+        if (!$a) return false;
+        return $this->returnSee($a, $text);
+    }
+
+    /**
+     * @param string name of class constant
+     * @param string class containing class constant
+     * @param string package name
+     * @param string full path to look in (used in index generation)
+     * @param boolean deprecated
+     * @param boolean return just the URL, or enclose it in an html a tag
+     * @return mixed false if not found, or an html a link to the var's documentation
+     * @see parent::getConstLink()
+     */
+    function getConstLink($expr,$class,$package, $file = false,$text = false)
+    {
+        $a = Converter::getConstLink($expr,$class,$package,$file);
         if (!$a) return false;
         return $this->returnSee($a, $text);
     }

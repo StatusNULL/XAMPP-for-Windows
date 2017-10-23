@@ -1,25 +1,40 @@
 <?php
-//
-// +------------------------------------------------------------------------+
-// | phpDocumentor                                                          |
-// +------------------------------------------------------------------------+
-// | Copyright (c) 2000-2003 Joshua Eichorn, Gregory Beaver                 |
-// | Email         jeichorn@phpdoc.org, cellog@phpdoc.org                   |
-// | Web           http://www.phpdoc.org                                    |
-// | Mirror        http://phpdocu.sourceforge.net/                          |
-// | PEAR          http://pear.php.net/package-info.php?pacid=137           |
-// +------------------------------------------------------------------------+
-// | This source file is subject to version 3.00 of the PHP License,        |
-// | that is available at http://www.php.net/license/3_0.txt.               |
-// | If you did not receive a copy of the PHP license and are unable to     |
-// | obtain it through the world-wide-web, please send a note to            |
-// | license@php.net so we can mail you a copy immediately.                 |
-// +------------------------------------------------------------------------+
-//
-
 /**
- * @package     phpDocumentor
+ * Base parser for all parsers
+ * 
+ * phpDocumentor :: automatic documentation generator
+ * 
+ * PHP versions 4 and 5
+ *
+ * Copyright (c) 2000-2006 Joshua Eichorn, Gregory Beaver
+ * 
+ * LICENSE:
+ * 
+ * This library is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation;
+ * either version 2.1 of the License, or (at your option) any
+ * later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ *
+ * @package    phpDocumentor
  * @subpackage Parsers
+ * @author     Joshua Eichorn <jeichorn@phpdoc.org>
+ * @author     Gregory Beaver <cellog@php.net>
+ * @copyright  2000-2006 Joshua Eichorn, Gregory Beaver
+ * @license    http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @version    CVS: $Id: Parser.inc,v 1.6 2006/08/17 03:23:26 cellog Exp $
+ * @link       http://www.phpdoc.org
+ * @link       http://pear.php.net/PhpDocumentor
+ * @since      0.1
  */
 /** used when a backslash is encountered in parsing a string or other escapable entity */ 
 define("PARSER_EVENT_ESCAPE"        ,    900);
@@ -38,10 +53,12 @@ define("PHPDOCUMENTOR_EVENT_VAR"        ,    803);
 define("PHPDOCUMENTOR_EVENT_PAGE"        ,    804);
 /** Constant (define) published to IntermediateParser with this event */
 define("PHPDOCUMENTOR_EVENT_DEFINE"        ,    805);
+/** Class Constant published to IntermediateParser with this event */
+define("PHPDOCUMENTOR_EVENT_CONST"        ,    806);
 /** @deprecated */
-define("PHPDOCUMENTOR_EVENT_MESSAGE"        ,    806);
+define("PHPDOCUMENTOR_EVENT_MESSAGE"        ,    807);
 /** use to inform IntermediateParser of a new element being parsed */
-define("PHPDOCUMENTOR_EVENT_NEWSTATE"        ,    807);
+define("PHPDOCUMENTOR_EVENT_NEWSTATE"        ,    808);
 /**
  * used to inform phpDocumentor_IntermediateParser that the current file has been completely parsed.
  * Render then flushes all buffers for functions/classes/defines/includes on the current page
@@ -256,13 +273,64 @@ define("PARSER_EVENT_QUOTE_VAR"    ,    138);
 /** currently parsing a {$encapsed_var} using the {@link HighlightParser} */
 define("STATE_QUOTE_VAR"    ,    238);
 
+/** used when parsing an access modifier */
+define("PARSER_EVENT_ACCESS_MODIFIER"    ,    139);
+/** currently parsing an access modifier */
+define("STATE_ACCESS_MODIFIER"    ,    239);
+
+/** used when a class implements interfaces */
+define("PARSER_EVENT_IMPLEMENTS"    ,    140);
+/** currently parsing an implements clause */
+define("STATE_IMPLEMENTS"    ,    240);
+
+/** used when a class implements interfaces */
+define("PARSER_EVENT_CLASS_CONSTANT"    ,    141);
+/** currently parsing a class constant */
+define("STATE_CLASS_CONSTANT"    ,    241);
+
+/** used when a variable value is an array */
+define("PARSER_EVENT_VAR_ARRAY"    ,    142);
+/** currently parsing a variable value is an array */
+define("STATE_VAR_ARRAY"    ,    242);
+
+/** used when a comment is found in a variable array value */
+define("PARSER_EVENT_VAR_ARRAY_COMMENT"    ,    143);
+/** currently parsing a comment in a variable array value */
+define("STATE_VAR_ARRAY_COMMENT"    ,    243);
+
+/** used when a $param is encountered in a function definition */
+define("PARSER_EVENT_FUNCTION_PARAM_VAR", 144);
+/** currently parsing a $param in a function definition */
+define("STATE_FUNCTION_PARAM_VAR", 244);
+
+if (!defined('T_INTERFACE'))
+{
+    define('T_INTERFACE', 'foo');
+    if (!defined('T_CONST')) {
+        define('T_CONST', 'foo');
+    }
+    define('T_ABSTRACT', 'foo');
+    define('T_PRIVATE', 'foo');
+    define('T_PUBLIC', 'foo');
+    define('T_PROTECTED', 'foo');
+    define('T_FINAL', 'foo');
+    define('T_IMPLEMENTS', 'foo');
+}
+if (!defined('T_ML_COMMENT'))
+{
+    define('T_ML_COMMENT', T_COMMENT);
+}
+if (!defined('T_DOC_COMMENT'))
+{
+    define('T_DOC_COMMENT', T_ML_COMMENT);
+}
 /**
  * PHP Parser for PHP 4.2.3-
  *
  * This parser is slower than the tokenizer-based parser, and is deprecated.
  * @author    Joshua Eichorn <jeichorn@phpdoc.org>
  * @author    Gregory Beaver <cellog@users.sourceforge.net>
- * @version    $Id: Parser.inc,v 1.183.2.7 2003/08/19 15:47:14 CelloG Exp $
+ * @version    $Id: Parser.inc,v 1.6 2006/08/17 03:23:26 cellog Exp $
  * @package     phpDocumentor
  * @subpackage Parsers
  * @deprecated in favor of {@link phpDocumentorTParser}
@@ -481,9 +549,9 @@ class Parser extends Publisher
         $this->publishEvent(PHPDOCUMENTOR_EVENT_NEWFILE,basename($path));
         //$name = str_replace("/","_",dirname($path)) . "_" . array_shift(explode(".",$page->getFile()));
         // fc@fc.clever-soft.com 11/29/2001
-        $name = str_replace(PATH_DELIMITER,"_",dirname($path)) . "_" .  str_replace(".","_",$page->getFile());
-        $tmp = explode("_",$name);
-        $name = str_replace(':','_',implode("_",array_slice($tmp,$base)));
+        $name = str_replace( ':', '', dirname($path) . PATH_DELIMITER . $page->getFile() );
+        $tmp = explode( PATH_DELIMITER, $name );
+        $name = implode( "---", array_slice( $tmp, $base ) );
         // if base is '', drive letter is present in windows
 
         $page->setName($name);
@@ -899,7 +967,8 @@ class Parser extends Publisher
                 $this->p_vars['var']->setValue($word);
             }
         }
-        if (isset($this->p_vars['quote_data']) && $this->p_vars['last_pevent'] == PARSER_EVENT_QUOTE || $this->p_vars['last_pevent'] == PARSER_EVENT_SINGLEQUOTE)
+        // fix 1202772
+        if (isset($this->p_vars['quote_data']) && ($this->p_vars['last_pevent'] == PARSER_EVENT_QUOTE || $this->p_vars['last_pevent'] == PARSER_EVENT_SINGLEQUOTE))
         {
             $this->p_vars['var']->setValue($this->p_vars['quote_data']);
             unset($this->p_vars['quote_data']);
@@ -1797,11 +1866,21 @@ class Parser extends Publisher
         if ($this->checkEventPush( $word, $pevent)) return;
         if ($this->p_vars['last_word'] == '@' && !$this->p_flags['startline'] && $this->p_flags['in_desc'])
         {
+            // fix 1203445
+            if (!isset($this->p_vars['line'][$this->p_vars['linecount']]))
+            {
+                $this->p_vars['line'][$this->p_vars['linecount']] = new parserStringWithInlineTags;
+            }
             $this->p_vars['event_stack']->popEvent();
             $this->p_vars['line'][$this->p_vars['linecount']]->add('@');
             return $this->handleDesc($word, $pevent);
         } elseif($this->p_vars['last_word'] == '@' && !strlen(trim($word)) && empty($this->p_vars['tagname']) && $this->p_flags['in_desc'])
         {
+            // fix 1203445
+            if (!isset($this->p_vars['line'][$this->p_vars['linecount']]))
+            {
+                $this->p_vars['line'][$this->p_vars['linecount']] = new parserStringWithInlineTags;
+            }
             $pevent = $this->p_vars['event_stack']->popEvent();
             $this->p_vars['line'][$this->p_vars['linecount']]->add('@');
             return $this->handleDesc($word, $pevent);
@@ -1850,6 +1929,12 @@ class Parser extends Publisher
                         if ($this->p_flags['in_desc'])
                         {
                             $this->p_flags['in_tag'] = false;
+                            // fix 1203445
+                            if (!isset($this->p_vars['line'][$this->p_vars['linecount']]))
+                            {
+                                $this->p_vars['line'][$this->p_vars['linecount']] =
+                                    new parserStringWithInlineTags;
+                            }
                             $this->p_vars['line'][$this->p_vars['linecount']]->add('@');
                             $this->p_vars['event_stack']->popEvent();
                             $this->handleCR($word);
@@ -2239,10 +2324,19 @@ class Parser extends Publisher
             } else {
                 if ($this->p_flags['in_desc'])
                 {
+                    // fix 1203445
+                    if (!isset($this->p_vars['line'][$this->p_vars['linecount']]))
+                    {
+                        $this->p_vars['line'][$this->p_vars['linecount']] =
+                            new parserStringWithInlineTags;
+                    }
                     if ($word == '}')
-                    $this->p_vars['line'][$this->p_vars['linecount']]->add('{@');
-                    else
-                    $this->p_vars['line'][$this->p_vars['linecount']]->add('{@'.$word);
+                    {
+                        $this->p_vars['line'][$this->p_vars['linecount']]->add('{@');
+                    } else
+                    {
+                        $this->p_vars['line'][$this->p_vars['linecount']]->add('{@'.$word);
+                    }
                 } elseif($this->p_flags['in_tag'])
                 {
                     if ($word == '}')
@@ -2504,7 +2598,9 @@ class Parser extends Publisher
         $this->tokens[STATE_DEFINE_PARAMS_PARENTHESIS]    = array("(","'","\"",")");
         $this->tokens[STATE_FUNCTION_PARAMS]        = array("/*","//","#","\"",",",")","="," ","'","(");
         $this->tokens[STATE_SINGLEQUOTE]        = array("'","\\'","\\\\");
-        $this->tokens[STATE_CLASS]            = array(" ","\t","?>","</script>",";","}","{","/**#@+","/**#@-*/","/**","//","/*","#","\r\n","\n","\r","(");
+        $this->tokens[STATE_CLASS]            = array(" ", "\t", "?>", "</script>", ";", "}", "{",
+                                                      "/**#@+", "/**#@-*/", "/**", "//", "/*", "#",
+                                                      "\r\n", "\n", "\r","(");
         $this->tokens[STATE_DOCBLOCK]            = array("*/","*","@","\r\n","\n","\r",". ",".\n",".\t",'{@');
         $this->tokens[STATE_DOCBLOCK_TEMPLATE]            = array("*/","*","@","\r\n","\n","\r",". ",".\n",".\t",'{@');
         $this->tokens[STATE_DOCKEYWORD]            = array("@","*/","*","\n","\r\n","\r","\t"," ","<",">",'{@');
@@ -2864,6 +2960,11 @@ class Parser extends Publisher
             PARSER_EVENT_CLASS_MEMBER => 'PARSER_EVENT_CLASS_MEMBER',
             PARSER_EVENT_METHOD => 'PARSER_EVENT_METHOD',
             PARSER_EVENT_QUOTE_VAR => 'PARSER_EVENT_QUOTE_VAR',
+            PARSER_EVENT_ACCESS_MODIFIER => 'PARSER_EVENT_ACCESS_MODIFIER',
+            PARSER_EVENT_IMPLEMENTS => 'PARSER_EVENT_IMPLEMENTS',
+            PARSER_EVENT_CLASS_CONSTANT => 'PARSER_EVENT_CLASS_CONSTANT',
+            PARSER_EVENT_VAR_ARRAY => 'PARSER_EVENT_VAR_ARRAY',
+            PARSER_EVENT_VAR_ARRAY_COMMENT =>'PARSER_EVENT_VAR_ARRAY_COMMENT',
         );
         if (isset($lookup[$value]))
         return $lookup[$value];
@@ -2924,11 +3025,13 @@ class ppageParser extends Parser
      * @param    int    $subpackage
      * @return    mixed    false or parsed data
      */
-    function parse (&$parse_data,$xml,$package = 'default',$subpackage = '',$tutorial = '',$category='default')
+    function parse (&$parse_data,$xml,$package = 'default',$subpackage = '',$tutorial = '',
+                    $category='default', $path='')
     {
         $this->setupStates();
         $this->p_vars['total'] = new parserPackagePage($package,$xml);
         $this->p_vars['tutorial'] = $tutorial;
+        $this->_path = $path;
         $this->category = $category;
         $this->package = $package;
         if (!isset($subpackage) || !$subpackage) $subpackage = '';
@@ -3089,7 +3192,15 @@ class ppageParser extends Parser
             {
                 $this->p_vars['inline_dockeyword_data'] = new parserTocInlineTag();
             }
-            $this->p_vars['total']->add($this->p_vars['inline_dockeyword_data']);
+            if ($this->p_vars['inline_dockeyword_type'] == 'example')
+            {
+                $example =
+                    new parserExampleInlineTag($this->p_vars['inline_dockeyword_data'], $this->_path, true);
+                $this->p_vars['total']->add($example->getProgramListing());
+            } else
+            {
+                $this->p_vars['total']->add($this->p_vars['inline_dockeyword_data']);
+            }
             $this->p_vars['inline_dockeyword_type'] = false;
             $this->p_vars['inline_dockeyword_data'] = '';
         }

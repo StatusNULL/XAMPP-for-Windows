@@ -11,11 +11,11 @@
  * send a note to license@php.net so we can mail you a copy immediately.
  *
  * @category   Tools and Utilities
- * @package    CodeGen
+ * @package    CodeGen_PECL
  * @author     Hartmut Holzgraefe <hartmut@php.net>
  * @copyright  2005 Hartmut Holzgraefe
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Test.php,v 1.9 2006/02/17 10:03:47 hholzgra Exp $
+ * @version    CVS: $Id: Test.php,v 1.10 2006/03/10 20:07:28 hholzgra Exp $
  * @link       http://pear.php.net/package/CodeGen
  */
 
@@ -28,7 +28,7 @@ require_once "CodeGen/PECL/Element.php";
  * Class for testfile generation as needed for 'make test'
  *
  * @category   Tools and Utilities
- * @package    CodeGen
+ * @package    CodeGen_PECL
  * @author     Hartmut Holzgraefe <hartmut@php.net>
  * @copyright  2005 Hartmut Holzgraefe
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0

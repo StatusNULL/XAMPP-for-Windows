@@ -1,28 +1,41 @@
 <?php
-//
-// +------------------------------------------------------------------------+
-// | phpDocumentor                                                          |
-// +------------------------------------------------------------------------+
-// | Copyright (c) 2000-2003 Joshua Eichorn, Gregory Beaver                 |
-// | Email         jeichorn@phpdoc.org, cellog@phpdoc.org                   |
-// | Web           http://www.phpdoc.org                                    |
-// | Mirror        http://phpdocu.sourceforge.net/                          |
-// | PEAR          http://pear.php.net/package-info.php?pacid=137           |
-// +------------------------------------------------------------------------+
-// | This source file is subject to version 3.00 of the PHP License,        |
-// | that is available at http://www.php.net/license/3_0.txt.               |
-// | If you did not receive a copy of the PHP license and are unable to     |
-// | obtain it through the world-wide-web, please send a note to            |
-// | license@php.net so we can mail you a copy immediately.                 |
-// +------------------------------------------------------------------------+
-//
-
 /**
  * Intermediate class parsing structure.
- * @package phpDocumentor
- * @author Greg Beaver <cellog@users.sourceforge.net>
- * @since 1.0rc1
- * @version $Id: Classes.inc,v 1.52.2.3 2003/08/13 20:01:51 CelloG Exp $
+ *
+ * phpDocumentor :: automatic documentation generator
+ * 
+ * PHP versions 4 and 5
+ *
+ * Copyright (c) 2001-2006 Gregory Beaver
+ * 
+ * LICENSE:
+ * 
+ * This library is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation;
+ * either version 2.1 of the License, or (at your option) any
+ * later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ *
+ * @package    phpDocumentor
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  2001-2006 Gregory Beaver
+ * @license    http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @version    CVS: $Id: Classes.inc,v 1.9 2006/04/30 22:18:13 cellog Exp $
+ * @filesource
+ * @link       http://www.phpdoc.org
+ * @link       http://pear.php.net/PhpDocumentor
+ * @see        parserDocBlock, parserInclude, parserPage, parserClass
+ * @see        parserDefine, parserFunction, parserMethod, parserVar
+ * @since      1.0rc1
  */
 /**
  * Intermediate class parsing structure.
@@ -43,7 +56,7 @@
  * @package phpDocumentor
  * @author Greg Beaver <cellog@users.sourceforge.net>
  * @since 1.0rc1
- * @version $Id: Classes.inc,v 1.52.2.3 2003/08/13 20:01:51 CelloG Exp $
+ * @version $Id: Classes.inc,v 1.9 2006/04/30 22:18:13 cellog Exp $
  */
 class Classes
 {
@@ -120,6 +133,14 @@ class Classes
      * @var array
      */
     var $varsbyfile = array();
+    /**
+     * array of parsed class constants organized by the file that contains them.
+     *
+     * Format:
+     * array(filename => array(classname => array({@link parserConst} 1, {@link parserConst} 2,...))
+     * @var array
+     */
+    var $constsbyfile = array();
     /**
      * keeps track of extend declarations by file, used to find inheritance
      *
@@ -202,8 +223,8 @@ class Classes
      * format:<pre>
      * array(packagename =>
      *         array(classname =>
-     *                array(variablename1 => {@link parserMethod} class,
-     *                      variablename2 => {@link parserMethod} class,...
+     *                array(variablename1 => {@link parserVar} class,
+     *                      variablename2 => {@link parserVar} class,...
      *                     )
      *              )
      *      )</pre>
@@ -211,6 +232,22 @@ class Classes
      * @see Converter
      */
     var $vars = array();
+    
+    /**
+     * array of class variables by package and class
+     *
+     * format:<pre>
+     * array(packagename =>
+     *         array(classname =>
+     *                array(constname1 => {@link parserConst} class,
+     *                      constname2 => {@link parserConst} class,...
+     *                     )
+     *              )
+     *      )</pre>
+     * @var array
+     * @see Converter
+     */
+    var $consts = array();
     /**
      * Reverse class_packages_by_file, used to prevent duplicates
      * @var array Format: array(packagename => 1)
@@ -226,6 +263,15 @@ class Classes
      * @var array
      */
     var $roots = array();
+    /**
+     * All classes with a parent that was not parsed are included in this array
+     *
+     * Format:<pre>
+     * array(classname => array(name of file1 that contains root classname,
+     *                          name of file2 that contains root classname,...))</pre>
+     * @var array
+     */
+    var $specialRoots = array();
     
     /**
      * array of all files that contain classes with the same name
@@ -296,6 +342,18 @@ class Classes
     {
         if (!$this->curclass) return;
         $this->varsbyfile[$this->curfile][$this->curclass][] = $element;
+    }
+    
+    /**
+     * While parsing, add a variable to the list of parsed variables
+     *
+     * sets up the {@link $constsbyfile} array using {@link $curfile} and {@link $curclass}
+     * @param parserConst &$element element is a {@link parserConst}
+     */
+    function addConst(&$element)
+    {
+        if (!$this->curclass) return;
+        $this->constsbyfile[$this->curfile][$this->curclass][] = $element;
     }
     
     /**
@@ -499,16 +557,26 @@ class Classes
             if ($db->docblock->hasaccess)
             {
                 $aaa = $db->docblock->getKeyword('access');
-                if ($aaa->getString() == 'private')
+                if (is_object($aaa) && $aaa->getString() == 'private')
                 {
-                    if (isset($this->varsbyfile[$file]) && isset($this->varsbyfile[$file][$class])) unset($this->varsbyfile[$file][$class]);
-                    unset($this->methodsbyfile[$file][$class]);
+                    if (isset($this->varsbyfile[$file]) && isset($this->varsbyfile[$file][$class]))
+                    {
+                        unset($this->varsbyfile[$file][$class]);
+                    }
+                    if (isset($this->methodsbyfile[$file]) && isset($this->methodsbyfile[$file][$class]))
+                    {
+                        unset($this->methodsbyfile[$file][$class]);
+                    }
+                    if (isset($this->constsbyfile[$file]) && isset($this->constsbyfile[$file][$class]))
+                    {
+                        unset($this->constsbyfile[$file][$class]);
+                    }
                     $this->classesbyfile[$file][$class]->ignore = true;
                     // if this is a root class, remove it from the roots array
                     if (isset($this->roots[$class]))
                     foreach($this->roots[$class] as $i => $files)
                     {
-                        // find the file kkey and unset
+                        // find the file key and unset
                         if ($files == $file) unset($this->roots[$class][$i]);
                     }
                     // if this is a child, remove it from the list of child classes of its parent
@@ -521,10 +589,18 @@ class Classes
         {
             if (!in_array($db->docblock->package,$render->packageoutput))
             {
-                if (isset($this->varsbyfile[$file][$class]))
-                unset($this->varsbyfile[$file][$class]);
-                if (isset($this->methodsbyfile[$file][$class]))
-                unset($this->methodsbyfile[$file][$class]);
+                if (isset($this->varsbyfile[$file]) && isset($this->varsbyfile[$file][$class]))
+                {
+                    unset($this->varsbyfile[$file][$class]);
+                }
+                if (isset($this->methodsbyfile[$file]) && isset($this->methodsbyfile[$file][$class]))
+                {
+                    unset($this->methodsbyfile[$file][$class]);
+                }
+                if (isset($this->constsbyfile[$file]) && isset($this->constsbyfile[$file][$class]))
+                {
+                    unset($this->constsbyfile[$file][$class]);
+                }
                 $this->classesbyfile[$file][$class]->ignore = true;
                 if (isset($this->roots[$class]))
                 foreach($this->roots[$class] as $i => $files)
@@ -540,7 +616,7 @@ class Classes
         if ($furb && !is_array($db->parent))
         {
 //            debug("furb adding $class $file to roots");
-            $this->roots[$class][] = $file;
+            $this->specialRoots[$db->parent][] = array($class, $file);
         }
         // fix for 591396
         if (!$db->docblock->getExplicitPackage())
@@ -562,7 +638,8 @@ class Classes
         $render->addPageIfNecessary($file, $db);
         if ($access = $db->docblock->getKeyword('access'))
         {
-            if (!is_string($access)) $access = $access->getString();
+            if (!is_string($access) && is_object($access)) $access = $access->getString();
+            if (!is_string($access)) $access = 'public';
             if (($access == 'private') && (!$render->parsePrivate))
             {
                 if (isset($this->varsbyfile[$file]) && isset($this->varsbyfile[$file][$class]))
@@ -576,6 +653,12 @@ class Classes
                 {
                     $vr->docblock->addKeyword('access','private');
                     $this->methodsbyfile[$file][$class][$i] = $vr;
+                }
+                if (isset($this->constsbyfile[$file]) && isset($this->constsbyfile[$file][$class]))
+                foreach($this->constsbyfile[$file][$class] as $i => $vr)
+                {
+                    $vr->docblock->addKeyword('access','private');
+                    $this->constsbyfile[$file][$class][$i] = $vr;
                 }
             }
         }
@@ -601,6 +684,16 @@ class Classes
             $render->addElementToPage($vr,$file);
             $render->addUses($vr,$file);
             $this->methodsbyfile[$file][$class][$i] = $vr;
+            $this->methods[$db->docblock->package][$class][$vr->getName()] = $vr;
+        }
+        if (isset($this->constsbyfile[$file]) && isset($this->constsbyfile[$file][$class]))
+        foreach($this->constsbyfile[$file][$class] as $i => $vr)
+        {
+            $vr->docblock->package = $db->docblock->package;
+            $vr->docblock->subpackage = $db->docblock->subpackage;
+            $render->addElementToPage($vr,$file);
+            $render->addUses($vr,$file);
+            $this->constsbyfile[$file][$class][$i] = $vr;
             $this->methods[$db->docblock->package][$class][$vr->getName()] = $vr;
         }
         $this->classpackages[$class][] = array($db->docblock->package,$db->docblock->subpackage);
@@ -707,9 +800,31 @@ class Classes
      * @param string $file
      * @param string $class
      */
-    function &hasMethods($file,$class)
+    function hasMethods($file,$class)
     {
         return isset($this->methodsbyfile[$file][$class]);
+    }
+    
+    /**
+     * called by {@link parserClass::hasConsts()}.  Should not be directly called
+     * @access private
+     * @param string $file
+     * @param string $class
+     */
+    function hasConsts($file,$class)
+    {
+        return isset($this->constsbyfile[$file][$class]);
+    }
+    
+    /**
+     * called by {@link parserClass::hasVars()}.  Should not be directly called
+     * @access private
+     * @param string $file
+     * @param string $class
+     */
+    function hasVars($file, $class)
+    {
+        return isset($this->varsbyfile[$file][$class]);
     }
     
     /**
@@ -747,14 +862,20 @@ class Classes
     }
     
     /**
-     * called by {@link parserClass::hasVars()}.  Should not be directly called
-     * @access private
+     * called by {@link parserClass::hasConst()}.  Should not be directly called
      * @param string $file
      * @param string $class
+     * @param string $name var name
+     * @access private
      */
-    function &hasVars($file, $class)
+    function hasConst($class, $file, $name)
     {
-        return isset($this->varsbyfile[$file][$class]);
+        if (!$this->hasConsts($file, $class)) return false;
+        for($i=0; $i<count($this->constsbyfile[$file][$class]); $i++)
+        {
+            if ($this->constsbyfile[$file][$class][$i]->getName() == $name) return true;
+        }
+        return false;
     }
     
     /**
@@ -765,7 +886,10 @@ class Classes
      */
     function &getMethods($class, $file)
     {
-        if (!isset($this->methodsbyfile[$file][$class])) return false;
+        if (!isset($this->methodsbyfile[$file][$class])) {
+            $flag = false;
+            return $flag;
+        }
         return $this->methodsbyfile[$file][$class];
     }
     
@@ -777,8 +901,26 @@ class Classes
      */
     function &getVars($class, $file)
     {
-        if (!isset($this->varsbyfile[$file][$class])) return false;
+        if (!isset($this->varsbyfile[$file][$class])) {
+            $flag = false;
+            return $flag;
+        }
         return $this->varsbyfile[$file][$class];
+    }
+    
+    /**
+     * called by {@link parserClass::getConsts()}.  Should not be directly called
+     * @access private
+     * @param string $class
+     * @param string $file
+     */
+    function &getConsts($class, $file)
+    {
+        if (!isset($this->constsbyfile[$file][$class])) {
+            $flag = false;
+            return $flag;
+        }
+        return $this->constsbyfile[$file][$class];
     }
     
     /**
@@ -814,6 +956,22 @@ class Classes
     }
     
     /**
+     * called by {@link parserClass::getConst()}.  Should not be directly called
+     * @param string $class
+     * @param string $file
+     * @param string $name var name
+     * @access private
+     */
+    function getConst($class, $file, $name)
+    {
+        if (!$this->hasConst($class, $file, $name)) return false;
+        for($i=0; $i<count($this->constsbyfile[$file][$class]); $i++)
+        {
+            if ($this->constsbyfile[$file][$class][$i]->getName() == $name) return $this->constsbyfile[$file][$class][$i];
+        }
+    }
+    
+    /**
      * Search for a class in a package
      * @return mixed returns false if no class in $package, otherwise returns a {@link parserClass}
      * @param string $class classname
@@ -824,17 +982,19 @@ class Classes
         if (!isset($this->classesbynamefile[$class]))
         {
 //            addWarning(PDERROR_CLASS_NOT_IN_PACKAGE,$class,$package); // removed, too many warnings, not very useful
-            return false;
+            $flag = false;
+            return $flag;
         }
         for($i=0; $i < count($this->classesbynamefile[$class]); $i++)
         {
-						$cls = $this->classesbyfile[$this->classesbynamefile[$class][$i]][$class];
-						$pkg = $cls->getPackage();
+            $cls = $this->classesbyfile[$this->classesbynamefile[$class][$i]][$class];
+            $pkg = $cls->getPackage();
             if ($pkg == $package)
 								return $cls;
         }
 //        addWarning(PDERROR_CLASS_NOT_IN_PACKAGE,$class,$package);
-        return false;
+        $flag = false;
+        return $flag;
     }
     
     /**
@@ -892,6 +1052,12 @@ class Classes
             }
         } else
         {
+            if (class_exists('ReflectionClass') && class_exists($ex)) {
+                $r = new ReflectionClass($ex);
+                if ($r->isInternal()) {
+                    return $ex; // no warning
+                }
+            }
             addWarning(PDERROR_PARENT_NOT_FOUND, $class, $ex);
             return $ex;
         }
@@ -900,12 +1066,22 @@ class Classes
     /**
      * Get a list of all root classes indexed by package.  Used to generate
      * class trees by {@link Converter}
+     * @param boolean $all [since phpDocumentor 1.3.0RC6] determines whether to
+     *                     return class trees that extend non-parsed classes
      * @return array array(package => array(rootclassname, rootclassname,...),...)
      */
-    function getRoots()
+    function getRoots($all = false)
     {
         $roots = array();
-        foreach($this->roots as $class => $files)
+        $temproots = $this->roots;
+        if (!$all) {
+            foreach ($this->specialRoots as $package => $root) {
+                foreach ($root as $parent => $info) {
+                    $temproots[$info[0]][] = $info[1];
+                }
+            }
+        }
+        foreach($temproots as $class => $files)
         {
             if (count($files))
             {
@@ -919,6 +1095,25 @@ class Classes
         foreach($roots as $package => $root)
         {
             usort($roots[$package],"strnatcasecmp");
+        }
+        if ($all) {
+            $specialRoots = array();
+            foreach ($this->specialRoots as $parent => $classinfo) {
+                if (count($classinfo)) {
+                    foreach ($classinfo as $i => $info) {
+                        $x = $this->getClass($info[0], $info[1]);
+                        $specialRoots[$x->getPackage()][$parent][] = $info[0];
+                    }
+                }
+            }
+            foreach($specialRoots as $package => $root)
+            {
+                uksort($specialRoots[$package],"strnatcasecmp");
+                foreach ($specialRoots[$package] as $parent => $classes) {
+                    usort($specialRoots[$package][$parent], 'strnatcasecmp');
+                }
+            }
+            return array('special' => $specialRoots, 'normal' => $roots);
         }
         return $roots;
     }

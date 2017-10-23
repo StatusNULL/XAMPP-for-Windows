@@ -25,7 +25,7 @@
  * @see parserDocBlock, parserInclude, parserPage, parserClass, parserDefine, parserFunction, parserMethod, parserVar
  * @author Greg Beaver <cellog@users.sourceforge.net>
  * @since 1.0
- * @version $Id: XMLDocBookConverter.inc,v 1.38.2.2 2003/07/30 00:39:45 CelloG Exp $
+ * @version $Id: XMLDocBookConverter.inc,v 1.1 2005/10/17 18:37:36 jeichorn Exp $
  */
 /**
  * XML DocBook converter.
@@ -36,7 +36,7 @@
  * @see parserDocBlock, parserInclude, parserPage, parserClass, parserDefine, parserFunction, parserMethod, parserVar
  * @author Greg Beaver <cellog@users.sourceforge.net>
  * @since 1.0
- * @version $Id: XMLDocBookConverter.inc,v 1.38.2.2 2003/07/30 00:39:45 CelloG Exp $
+ * @version $Id: XMLDocBookConverter.inc,v 1.1 2005/10/17 18:37:36 jeichorn Exp $
  * @todo indexes for other DocBook converters not based on peardoc
  * @todo templates
  */
@@ -190,13 +190,13 @@ class XMLDocBookConverter extends Converter
         $a = $this->getLink($typename);
         if (is_object($a))
         {
-            if (get_class($a) == 'classlink')
+            if (phpDocumentor_get_class($a) == 'classlink')
             return '<classname>'.$typename.'</classname>';
-            if (get_class($a) == 'functionlink' || get_class($a) == 'methodlink')
+            if (phpDocumentor_get_class($a) == 'functionlink' || phpDocumentor_get_class($a) == 'methodlink')
             return '<function>'.$typename.'</function>';
-            if (get_class($a) == 'definelink')
+            if (phpDocumentor_get_class($a) == 'definelink')
             return '<constant>'.$typename.'</constant>';
-            if (get_class($a) == 'varlink')
+            if (phpDocumentor_get_class($a) == 'varlink')
             return '<varname>'.$typename.'</varname>';
         }
         return $typename;
@@ -573,7 +573,7 @@ class XMLDocBookConverter extends Converter
      */
     function getId(&$el)
     {
-        if (get_class($el) == 'parserdata')
+        if (phpDocumentor_get_class($el) == 'parserdata')
         {
             $element = $this->addLink($el->parent);
             $elp = $el->parent;

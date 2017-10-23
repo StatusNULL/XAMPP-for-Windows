@@ -15,7 +15,7 @@
  * @author     Hartmut Holzgraefe <hartmut@php.net>
  * @copyright  2005 Hartmut Holzgraefe
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Header.php,v 1.1 2006/02/02 22:14:57 hholzgra Exp $
+ * @version    CVS: $Id: Header.php,v 1.3 2006/05/04 21:32:27 hholzgra Exp $
  * @link       http://pear.php.net/package/CodeGen
  */
 
@@ -125,18 +125,6 @@ class CodeGen_Dependency_Header
         return "#include <{$this->name}>\n";
     }
 
-    /**
-     * return config.m4 code snippet for unix builds
-     *
-     * @param   string  Extension name
-     * @param   string  --with option name
-     * @return  string
-     */
-    function configm4($extname, $withname)
-    {
-        $upname = strtoupper($extname);
-        return "  AC_CHECK_HEADER([\$PHP_{$upname}_DIR/{$this->path}/{$this->name}], [], AC_MSG_ERROR('{$this->name}' header not found))\n";
-    }
 }
 
 ?>

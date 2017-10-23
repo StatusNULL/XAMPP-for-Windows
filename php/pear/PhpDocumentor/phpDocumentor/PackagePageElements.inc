@@ -1,22 +1,4 @@
 <?php
-//
-// +------------------------------------------------------------------------+
-// | phpDocumentor                                                          |
-// +------------------------------------------------------------------------+
-// | Copyright (c) 2000-2003 Joshua Eichorn, Gregory Beaver                 |
-// | Email         jeichorn@phpdoc.org, cellog@phpdoc.org                   |
-// | Web           http://www.phpdoc.org                                    |
-// | Mirror        http://phpdocu.sourceforge.net/                          |
-// | PEAR          http://pear.php.net/package-info.php?pacid=137           |
-// +------------------------------------------------------------------------+
-// | This source file is subject to version 3.00 of the PHP License,        |
-// | that is available at http://www.php.net/license/3_0.txt.               |
-// | If you did not receive a copy of the PHP license and are unable to     |
-// | obtain it through the world-wide-web, please send a note to            |
-// | license@php.net so we can mail you a copy immediately.                 |
-// +------------------------------------------------------------------------+
-//
-
 /**
  * Data structures used in parsing XML DocBook-based tutorials
  *
@@ -32,9 +14,40 @@
  * Note that an entire tutorial is contained in a single parserXMLDocBookTag,
  * matching the document model for DocBook.  The top-level tag, <refentry>,
  * contains every other tag and all text.
- * @tutorial tutorials.pkg
- * @package phpDocumentor
+ * 
+ * phpDocumentor :: automatic documentation generator
+ * 
+ * PHP versions 4 and 5
+ *
+ * Copyright (c) 2002-2006 Gregory Beaver
+ * 
+ * LICENSE:
+ * 
+ * This library is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation;
+ * either version 2.1 of the License, or (at your option) any
+ * later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ *
+ * @package    phpDocumentor
  * @subpackage Tutorial
+ * @author     Gregory Beaver <cellog@php.net>
+ * @copyright  2002-2006 Gregory Beaver
+ * @license    http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @version    CVS: $Id: PackagePageElements.inc,v 1.4 2006/05/22 01:07:28 cellog Exp $
+ * @tutorial tutorials.pkg
+ * @link       http://www.phpdoc.org
+ * @link       http://pear.php.net/PhpDocumentor
+ * @since      1.2.0
  */
 /**
  * Represents <![CDATA[ ]]> sections.
@@ -191,11 +204,13 @@ class parserXMLDocBookTag extends parserStringWithInlineTags
         $this->attributes[$name] = $value;
         if ($name == 'id')
         {
+            // fix 1153593
             if (is_string($value))
             {
-                addErrorDie(PDERROR_ID_MUST_BE_INLINE,$this->name,$value,$this->name,$value);
+                addWarning(PDERROR_ID_MUST_BE_INLINE,$this->name,$value,$this->name,$value);
+            } else {
+                $this->setId($value);
             }
-            $this->setId($value);
         }
     }
     
@@ -264,13 +279,13 @@ class parserXMLDocBookTag extends parserStringWithInlineTags
         {
             foreach($this->value as $tag)
             {
-                if (is_object($tag) && $tag->name == 'refname')
+                if (is_object($tag) && is_a($tag, 'parserXMLDocBookTag') && $tag->name == 'refname')
                 {
                     $t = new parserStringWithInlineTags;
                     foreach($tag->value as $val) $t->add($val);
                     $this->_title = $t;
                 }
-                if (is_object($tag) && $tag->name == 'refpurpose')
+                if (is_object($tag) && is_a($tag, 'parserXMLDocBookTag') && $tag->name == 'refpurpose')
                 {
                     $t = new parserStringWithInlineTags;
                     foreach($tag->value as $val) $t->add($val);
@@ -280,9 +295,14 @@ class parserXMLDocBookTag extends parserStringWithInlineTags
         }
         if (isset($this->_title))
         return $this->_title->Convert($c);
-        if (is_object($this->value[0])) return $this->value[0]->getTitle($c);
-        if (isset($this->value[1]))
-        if (is_object($this->value[1])) return $this->value[1]->getTitle($c);
+        if (is_object($this->value[0]) && is_a($tag, 'parserXMLDocBookTag')) {
+            return $this->value[0]->getTitle($c);
+        }
+        if (isset($this->value[1])) {
+            if (is_object($this->value[1]) && is_a($tag, 'parserXMLDocBookTag')) {
+                return $this->value[1]->getTitle($c);
+            }
+        }
         return '';
     }
     
@@ -296,13 +316,16 @@ class parserXMLDocBookTag extends parserStringWithInlineTags
      */
     function getSubsection(&$c,$subsection)
     {
-        $search = $this->_id;
+        if (!is_object($this->_id)) {
+            return false;
+        }
+        $search = phpDocumentor_clone($this->_id);
         if (is_string($this->_id)) return false;
-        if (get_class($search) != 'parseridinlinetag') return false;
+        if (phpDocumentor_get_class($search) != 'parseridinlinetag') return false;
         $search->id = $subsection;
         foreach($this->value as $el)
         {
-            if (get_class($el) == 'parserxmldocbooktag')
+            if (phpDocumentor_get_class($el) == 'parserxmldocbooktag')
             {
                 if ($el->getId($c) == $search->Convert($c))
                 {
@@ -333,7 +356,7 @@ class parserXMLDocBookTag extends parserStringWithInlineTags
     function add($el)
     {
         if (is_string($el)) return parent::add($el);
-        if (get_class($el) == 'parserxmldocbooktag')
+        if (phpDocumentor_get_class($el) == 'parserxmldocbooktag')
         {
             if ($el->name == 'title')
             {

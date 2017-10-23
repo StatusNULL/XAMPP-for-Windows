@@ -34,7 +34,7 @@
  * @author     Lorenzo Alberton <l dot alberton at quipo dot it>
  * @copyright  2003-2006 Wolfram Kriesing, Paolo Panto, Lorenzo Alberton
  * @license    http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version    CVS: $Id: Result.php,v 1.9 2006/01/26 17:27:46 quipo Exp $
+ * @version    CVS: $Id: Result.php,v 1.10 2006/05/01 15:47:27 quipo Exp $
  * @link       http://pear.php.net/package/DB_QueryTool
  */
 
@@ -239,11 +239,9 @@ class DB_QueryTool_Result
 	 */
 	function fetchRow()
 	{
-		if ($this->hasMore()) {
-    		$arr = $this->getNext();
-    		if (!PEAR::isError($arr)) {
-    		    return $arr;
-    		}
+		$arr = $this->getNext();
+    	if (!PEAR::isError($arr)) {
+    	   return $arr;
     	}
     	return false;
 	}

@@ -3,7 +3,7 @@
  *  License Information:
  *
  *    Net_DNS:  A resolver library for PHP
- *    Copyright (C) 2002 Eric Kilfoil eric@ypass.net
+ *    Copyright (c) 2002-2003 Eric Kilfoil eric@ypass.net
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -38,8 +38,8 @@ class Net_DNS_RR_PTR extends Net_DNS_RR
     var $ptrdname;
 
     /* }}} */
-    /* class constructor - RR(&$rro, $data, $offset = "") {{{ */
-    function Net_DNS_RR_PTR(&$rro, $data, $offset = "")
+    /* class constructor - RR(&$rro, $data, $offset = '') {{{ */
+    function Net_DNS_RR_PTR(&$rro, $data, $offset = '')
     {
         $this->name = $rro->name;
         $this->type = $rro->type;
@@ -55,7 +55,7 @@ class Net_DNS_RR_PTR extends Net_DNS_RR
                 $this->ptrdname = $ptrdname;
             }
         } else {
-            $this->ptrdname = ereg_replace("[ \t]+(.+)[ \t]*$", "\\1", $data);
+            $this->ptrdname = ereg_replace("[ \t]+(.+)[ \t]*$", '\\1', $data);
         }
     }
 
@@ -64,9 +64,9 @@ class Net_DNS_RR_PTR extends Net_DNS_RR
     function rdatastr()
     {
         if (strlen($this->ptrdname)) {
-            return($this->ptrdname);
+            return $this->ptrdname . '.';
         }
-        return("; no data");
+        return '; no data';
     }
 
     /* }}} */
@@ -74,9 +74,9 @@ class Net_DNS_RR_PTR extends Net_DNS_RR
     function rr_rdata($packet, $offset)
     {
         if (strlen($this->ptrdname)) {
-            return($packet->dn_comp($this->ptrdname, $offset));
+            return $packet->dn_comp($this->ptrdname, $offset);
         }
-        return(NULL);
+        return null;
     }
 
     /* }}} */

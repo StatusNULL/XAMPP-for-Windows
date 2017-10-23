@@ -30,9 +30,9 @@
  * @category   HTML
  * @package    Pager
  * @author     Lorenzo Alberton <l dot alberton at quipo dot it>
- * @copyright  2003-2005 Lorenzo Alberton
+ * @copyright  2003-2006 Lorenzo Alberton
  * @license    http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version    CVS: $Id: Sliding.php,v 1.8 2005/07/22 16:28:11 quipo Exp $
+ * @version    CVS: $Id: Sliding.php,v 1.11 2006/04/18 20:01:47 quipo Exp $
  * @link       http://pear.php.net/package/Pager
  */
 
@@ -59,7 +59,7 @@ class Pager_Sliding extends Pager_Common
     /**
      * Constructor
      *
-     * @param mixed $options    An associative array of option names
+     * @param array $options    An associative array of option names
      *                          and their values
      * @access public
      */
@@ -76,10 +76,27 @@ class Pager_Sliding extends Pager_Common
         $this->_curPageSpanPost       = '</u></b>';
 
         //set custom options
-        $err = $this->_setOptions($options);
+        $err = $this->setOptions($options);
         if ($err !== PAGER_OK) {
             return $this->raiseError($this->errorMessage($err), $err);
         }
+        $this->build();
+    }
+
+    // }}}
+    // {{{ build()
+
+    /**
+     * Generate or refresh the links and paged data after a call to setOptions()
+     *
+     * @access public
+     */
+    function build()
+    {
+        //reset
+        $this->_pageData = array();
+        $this->links = '';
+
         $this->_generatePageData();
         $this->_setFirstLastText();
 

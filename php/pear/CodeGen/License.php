@@ -15,7 +15,7 @@
  * @author     Hartmut Holzgraefe <hartmut@php.net>
  * @copyright  2005 Hartmut Holzgraefe
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: License.php,v 1.4 2005/08/14 16:47:54 hholzgra Exp $
+ * @version    CVS: $Id: License.php,v 1.5 2006/06/24 12:37:03 hholzgra Exp $
  * @link       http://pear.php.net/package/CodeGen
  */
 
@@ -54,7 +54,7 @@ abstract class CodeGen_License
      * @access  public
      * @param   string  License shortname, e.g. PHP, BSD, LGPL
      * @param   array   License options
-     * @returns object  License instance
+     * @returns object  License instance or PEAR error object
      */
     static function factory($name, $options=array()) 
     {
@@ -69,7 +69,7 @@ abstract class CodeGen_License
         return 
             class_exists($classname) 
             ? new $classname($options) 
-            : false;
+            : PEAR::raiseError("Unknown license '$name'");
     }
 
     /**

@@ -1,27 +1,24 @@
 <?php
-//
-// +------------------------------------------------------------------------+
-// | PEAR :: Package File Manager                                           |
-// +------------------------------------------------------------------------+
-// | Copyright (c) 2003-2004 Gregory Beaver                                 |
-// | Email         cellog@phpdoc.org                                        |
-// +------------------------------------------------------------------------+
-// | This source file is subject to version 3.00 of the PHP License,        |
-// | that is available at http://www.php.net/license/3_0.txt.               |
-// | If you did not receive a copy of the PHP license and are unable to     |
-// | obtain it through the world-wide-web, please send a note to            |
-// | license@php.net so we can mail you a copy immediately.                 |
-// +------------------------------------------------------------------------+
-// | Portions of this code based on phpDocumentor                           |
-// | Web           http://www.phpdoc.org                                    |
-// | Mirror        http://phpdocu.sourceforge.net/                          |
-// +------------------------------------------------------------------------+
-// $Id: File.php,v 1.21 2005/03/28 06:37:35 cellog Exp $
-//
 /**
- * Retrieve the files from a directory listing
- * @package PEAR_PackageFileManager
+ * The File list plugin generator for both PEAR_PackageFileManager,
+ * and PEAR_PackageFileManager2 classes.
+ *
+ * LICENSE: This source file is subject to version 3.01 of the PHP license
+ * that is available through the world-wide-web at the following URI:
+ * http://www.php.net/license/3_01.txt.  If you did not receive a copy of
+ * the PHP License and are unable to obtain it through the web, please
+ * send a note to license@php.net so we can mail you a copy immediately.
+ *
+ * @category   pear
+ * @package    PEAR_PackageFileManager
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  2003-2006 The PHP Group
+ * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
+ * @version    CVS: $Id: File.php,v 1.27 2006/10/14 11:18:19 farell Exp $
+ * @link       http://pear.php.net/package/PEAR_PackageFileManager
+ * @since      File available since Release 0.1
  */
+
 /**
  * Retrieve the files from a directory listing
  *
@@ -29,14 +26,24 @@
  * listing.  Use the {@link PEAR_PackageFileManager_CVS}
  * class to only retrieve the contents of a cvs
  * repository when generating the package.xml
- * @package PEAR_PackageFileManager
+ *
+ * @category   pear
+ * @package    PEAR_PackageFileManager
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  2003-2006 The PHP Group
+ * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
+ * @version    Release: 1.6.0
+ * @link       http://pear.php.net/package/PEAR_PackageFileManager
+ * @since      Class available since Release 0.1
  */
-class PEAR_PackageFileManager_File {
+
+class PEAR_PackageFileManager_File
+{
     /**
      * @var array
      * @access private
      */
-    var $_options = 
+    var $_options =
             array(
                  );
 
@@ -50,7 +57,7 @@ class PEAR_PackageFileManager_File {
      * @access private
      * @var array|false
      */
-    var $_ignore = false;
+    var $ignore = false;
 
     /**
      * Set up the File filelist generator
@@ -66,7 +73,7 @@ class PEAR_PackageFileManager_File {
         $this->_parent = &$parent;
         $this->_options = array_merge($this->_options, $options);
     }
-    
+
     /**
      * Generate the <filelist></filelist> section
      * of the package file.
@@ -94,22 +101,23 @@ class PEAR_PackageFileManager_File {
             return $allfiles;
         }
         if (!count($allfiles)) {
-            return PEAR_PackageFileManager::raiseError(PEAR_PACKAGEFILEMANAGER_NO_FILES,
+            return $this->_parent->raiseError(PEAR_PACKAGEFILEMANAGER_NO_FILES,
                 substr($package_directory, 0, strlen($package_directory) - 1));
         }
         $struc = array();
-        foreach($allfiles as $file) {
-        	$path = substr(dirname($file), strlen(str_replace(DIRECTORY_SEPARATOR, 
+        foreach ($allfiles as $file) {
+            $path = substr(dirname($file), strlen(str_replace(DIRECTORY_SEPARATOR,
                                                               '/',
                                                               realpath($package_directory))) + 1);
-        	if (!$path) {
+            if (!$path) {
                 $path = '/';
             }
-        	$ext = array_pop(explode('.', $file));
-        	if (strlen($ext) == strlen($file)) {
+            $stupidassphp5_1 = explode('.', $file);
+            $ext = array_pop($stupidassphp5_1);
+            if (strlen($ext) == strlen($file)) {
                 $ext = '';
             }
-        	$struc[$path][] = array('file' => basename($file),
+            $struc[$path][] = array('file' => basename($file),
                                     'ext' => $ext,
                                     'path' => (($path == '/') ? basename($file) : $path . '/' . basename($file)),
                                     'fullpath' => $file);
@@ -119,10 +127,10 @@ class PEAR_PackageFileManager_File {
             return PEAR_PackageFileManager::raiseError(PEAR_PACKAGEFILEMANAGER_IGNORED_EVERYTHING,
                 substr($package_directory, 0, strlen($package_directory) - 1), $newig);
         }
-        uksort($struc,'strnatcasecmp');
-        foreach($struc as $key => $ind) {
-        	usort($ind, array($this, 'sortfiles'));
-        	$struc[$key] = $ind;
+        uksort($struc, 'strnatcasecmp');
+        foreach ($struc as $key => $ind) {
+            usort($ind, array($this, 'sortfiles'));
+            $struc[$key] = $ind;
         }
 
         $tempstruc = $struc;
@@ -131,18 +139,17 @@ class PEAR_PackageFileManager_File {
         }
         $struc = array('/' => $tempstruc['/']);
         $bv = 0;
-        foreach($tempstruc as $key => $ind) {
-        	$save = $key;
-        	if ($key != '/')
-        	{
-                $struc['/'] = $this->_setupDirs($struc['/'], explode('/',$key), $tempstruc[$key]);
-        	}
+        foreach ($tempstruc as $key => $ind) {
+            $save = $key;
+            if ($key != '/') {
+                $struc['/'] = $this->_setupDirs($struc['/'], explode('/', $key), $tempstruc[$key]);
+            }
         }
         uksort($struc['/'], array($this, 'mystrucsort'));
 
         return $struc;
     }
-    
+
     /**
      * Retrieve a listing of every file in $directory and
      * all subdirectories.
@@ -159,7 +166,7 @@ class PEAR_PackageFileManager_File {
         if (@is_dir($directory)) {
             $ret = array();
             $d = @dir($directory); // thanks to Jason E Sweat (jsweat@users.sourceforge.net) for fix
-            while($d && false !== ($entry=$d->read())) {
+            while ($d && false !== ($entry = $d->read())) {
                 if ($this->_testFile($directory, $entry)) {
                     if (is_file($directory . '/' . $entry)) {
                         // if include option was set, then only pass included files
@@ -179,7 +186,7 @@ class PEAR_PackageFileManager_File {
                     if (is_dir($directory . '/' . $entry)) {
                         $tmp = $this->dirList($directory . '/' . $entry);
                         if (is_array($tmp)) {
-                            foreach($tmp as $ent) {
+                            foreach ($tmp as $ent) {
                                 $ret[] = $ent;
                             }
                         }
@@ -194,10 +201,10 @@ class PEAR_PackageFileManager_File {
         }
         return $ret;
     }
-    
+
     /**
      * Test whether an entry should be processed.
-     * 
+     *
      * Normally, it ignores all files and directories that begin with "."  addhiddenfiles option
      * instead only ignores "." and ".." entries
      * @access private
@@ -232,11 +239,11 @@ class PEAR_PackageFileManager_File {
             $path = realpath($path);
         }
         if (is_array($this->ignore[$return])) {
-            foreach($this->ignore[$return] as $match) {
+            foreach ($this->ignore[$return] as $match) {
                 // match is an array if the ignore parameter was a /path/to/pattern
                 if (is_array($match)) {
                     // check to see if the path matches with a path delimiter appended
-                    preg_match('/^' . strtoupper($match[0]).'$/', strtoupper($path) . '/',$find);
+                    preg_match('/^' . strtoupper($match[0]).'$/', strtoupper($path) . '/', $find);
                     if (!count($find)) {
                         // check to see if it matches without an appended path delimiter
                         preg_match('/^' . strtoupper($match[0]).'$/', strtoupper($path), $find);
@@ -271,9 +278,10 @@ class PEAR_PackageFileManager_File {
         }
         return !$return;
     }
-    
+
     /**
      * Construct the {@link $ignore} array
+     *
      * @param array strings of files/paths/wildcards to ignore
      * @param 0|1 0 = files to include, 1 = files to ignore
      * @access private
@@ -282,9 +290,9 @@ class PEAR_PackageFileManager_File {
     {
         $ig = array();
         if (is_array($ignore)) {
-            for($i=0; $i<count($ignore);$i++) {
+            for ($i=0; $i<count($ignore);$i++) {
                 $ignore[$i] = strtr($ignore[$i], "\\", "/");
-                $ignore[$i] = str_replace('//','/',$ignore[$i]);
+                $ignore[$i] = str_replace('//', '/', $ignore[$i]);
 
                 if (!empty($ignore[$i])) {
                     if (!is_numeric(strpos($ignore[$i], '/'))) {
@@ -306,9 +314,10 @@ class PEAR_PackageFileManager_File {
             }
         } else $this->ignore[$index] = false;
     }
-    
+
     /**
      * Converts $s into a string that can be used with preg_match
+     *
      * @param string $s string with wildcards ? and *
      * @return string converts * to .*, ? to ., etc.
      * @access private
@@ -320,15 +329,15 @@ class PEAR_PackageFileManager_File {
             $y = '\\\\';
         }
         $s = str_replace('/', DIRECTORY_SEPARATOR, $s);
-        $x = strtr($s, array('?' => '.','*' => '.*','.' => '\\.','\\' => '\\\\','/' => '\\/',
-                                '[' => '\\[',']' => '\\]','-' => '\\-'));
+        $x = strtr($s, array('?' => '.', '*' => '.*', '.' => '\\.', '\\' => '\\\\', '/' => '\\/',
+                             '[' => '\\[', ']' => '\\]', '-' => '\\-'));
         if (strpos($s, DIRECTORY_SEPARATOR) !== false &&
               strrpos($s, DIRECTORY_SEPARATOR) === strlen($s) - 1) {
             $x = "(?:.*$y$x?.*|$x.*)";
         }
         return $x;
     }
-    
+
     /**
      * Recursively move contents of $struc into associative array
      *
@@ -345,7 +354,7 @@ class PEAR_PackageFileManager_File {
     function _setupDirs($struc, $dir, $contents)
     {
         if (!count($dir)) {
-            foreach($contents as $dir => $files) {
+            foreach ($contents as $dir => $files) {
                 if (is_string($dir)) {
                     if (strpos($dir, '/')) {
                         $test = true;
@@ -371,7 +380,6 @@ class PEAR_PackageFileManager_File {
         return $struc;
     }
 
-    
     /**
      * Recursively add all the subdirectories of $contents to $dir without erasing anything in
      * $dir
@@ -382,7 +390,7 @@ class PEAR_PackageFileManager_File {
      */
     function _setDir($dir, $contents)
     {
-        while(list($one,$two) = each($contents)) {
+        while (list($one,$two) = each($contents)) {
             if (isset($dir[$one])) {
                 $dir[$one] = $this->_setDir($dir[$one], $contents[$one]);
             } else {
@@ -392,7 +400,6 @@ class PEAR_PackageFileManager_File {
         return $dir;
     }
 
-    
     /**#@+
      * Sorting functions for the file list
      * @param string
@@ -401,20 +408,19 @@ class PEAR_PackageFileManager_File {
      */
     function sortfiles($a, $b)
     {
-        return strnatcasecmp($a['file'],$b['file']);
+        return strnatcasecmp($a['file'], $b['file']);
     }
-    
+
     function mystrucsort($a, $b)
     {
         if (is_numeric($a) && is_string($b)) return 1;
         if (is_numeric($b) && is_string($a)) return -1;
-        if (is_numeric($a) && is_numeric($b))
-        {
+        if (is_numeric($a) && is_numeric($b)) {
             if ($a > $b) return 1;
             if ($a < $b) return -1;
             if ($a == $b) return 0;
         }
-        return strnatcasecmp($a,$b);
+        return strnatcasecmp($a, $b);
     }
     /**#@-*/
 }

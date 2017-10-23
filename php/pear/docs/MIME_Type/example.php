@@ -21,7 +21,7 @@ if (MIME_Type::isVendor($type2)) {
     print "Type is not vendor-specific\n";
 }
 
-$file = '\xampp\php\pear\docs/MIME_Type/example.php';
+$file = 'C:\php5\pear\docs/MIME_Type/example.php';
 print "\nChecking type of: $file\n";
 print MIME_Type::autoDetect($file)."\n";
 

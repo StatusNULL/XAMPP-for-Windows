@@ -30,9 +30,9 @@
  * @category   Database
  * @package    MDB_QueryTool
  * @author     Lorenzo Alberton <l dot alberton at quipo dot it>
- * @copyright  2004-2006 Lorenzo Alberton
+ * @copyright  2004-2007 Lorenzo Alberton
  * @license    http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version    CVS: $Id: Query.php,v 1.50 2006/01/26 17:08:51 quipo Exp $
+ * @version    CVS: $Id: Query.php,v 1.66 2007/01/10 15:07:46 quipo Exp $
  * @link       http://pear.php.net/package/MDB_QueryTool
  */
 
@@ -40,7 +40,6 @@
  * require the PEAR and MDB classes
  */
 require_once 'PEAR.php';
-require_once 'MDB.php';
 
 /**
  * MDB_QueryTool_Query class
@@ -50,7 +49,7 @@ require_once 'MDB.php';
  * @category   Database
  * @package    MDB_QueryTool
  * @author     Lorenzo Alberton <l dot alberton at quipo dot it>
- * @copyright  2004-2006 Lorenzo Alberton
+ * @copyright  2004-2007 Lorenzo Alberton
  * @license    http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  * @link       http://pear.php.net/package/MDB_QueryTool
  */
@@ -74,7 +73,7 @@ class MDB_QueryTool_Query
     var $sequenceName = null;
 
     /**
-     * @var object  the db-object, a PEAR::Mdb-object instance
+     * @var object  the db-object, a PEAR::MDB[2] object instance
      */
     var $db = null;
 
@@ -158,25 +157,26 @@ class MDB_QueryTool_Query
      *              i.e. 'raw' means no quoting before saving/updating data
      * @access private
      */
-    var $options = array(   'raw'       =>  false,
-                            'verbose'   =>  true,       // set this to false in a productive environment
-                                                        // it will produce error-logs if set to true
-                            'useCache' =>  false,
-                            'logFile'  =>  false
-
-                        );
+    var $options = array(
+        'raw'      =>  false,
+        'verbose'  =>  true,    // set this to false in a productive environment
+                                // it will produce error-logs if set to true
+        'useCache' =>  false,
+        'logFile'  =>  false,
+    );
 
     /**
      * this array contains information about the tables
      * those are
-     *         'name' -        the real table name
-     *         'shortName' -   the short name used, so that when moving the table i.e.
-     *                         onto a provider's db and u have to rename the tables to longer names
-     *                         this name will be relevant, i.e. when autoJoining, i.e. a table name
-     *                         on your local machine is: 'user' but online it has to be 'applName_user'
-     *                         then the shortName will be used to determine if a column refers to another
-     *                         table, if the colName is 'user_id', it knows the shortName 'user' refers to the table
-     *                         'applName_user'
+     * - 'name' => the real table name
+     * - 'shortName' => the short name used, so that when moving the table i.e.
+     *                  onto a provider's db and u have to rename the tables to
+     *                  longer names this name will be relevant, i.e. when
+     *                  autoJoining, i.e. a table name on your local machine is:
+     *                  'user' but online it has to be 'applName_user' then the
+     *                  shortName will be used to determine if a column refers to
+     *                  another table, if the colName is 'user_id', it knows the
+     *                  shortName 'user' refers to the table 'applName_user'
      */
     var $tableSpec = array();
 
@@ -191,12 +191,11 @@ class MDB_QueryTool_Query
     var $_tableNameToShortNamePreg = '/^.*_/';
 
     /**
-     * var array  this array caches queries that have already been built once
+     * @var array  this array caches queries that have already been built once
      *            to reduce the execution time
      * @access private
      */
     var $_queryCache = array();
-
 
     /**
      * The object that contains the log-instance
@@ -210,8 +209,20 @@ class MDB_QueryTool_Query
      */
     var $_logData = array();
 
+    /**
+     * MDB version
+     * @access private
+     */
+    var $_MDBversion = 1;
+
+    /**
+     * Name of class to return when object is used
+     * @access private
+     */
+    var $_returnclass = 'MDB_QueryTool_Result_Row';
+
     // }}}
-    // {{{ __construct
+    // {{{ __construct()
 
     /**
      * this is the constructor, as it will be implemented in ZE2 (php5)
@@ -252,11 +263,12 @@ class MDB_QueryTool_Query
     // {{{ MDB_QueryTool_Query()
 
     /**
-     * @param mixed $dsn DSN string, DSN array or MDB object
+     * @param mixed $dsn DSN string, DSN array or MDB[2] object
      * @param array $options
+     * @param integer $MDBversion 1=MDB, 2=MDB2
      * @access  public
      */
-    function MDB_QueryTool_Query($dsn=false, $options=array())
+    function MDB_QueryTool_Query($dsn = false, $options = array(), $MDBversion = 1)
     {
         //$this->__construct($dsn, $options);
 
@@ -280,7 +292,7 @@ class MDB_QueryTool_Query
         }
 
         if ($autoConnect && $dsn) {
-            $this->connect($dsn, $options);
+            $this->connect($dsn, $options, $MDBversion);
         }
 
         if (is_null($this->sequenceName)) {
@@ -293,22 +305,30 @@ class MDB_QueryTool_Query
 
     /**
      * use this method if you want to connect manually
-     * @param mixed $dsn DSN string, DSN array or MDB object
+     * @param mixed $dsn DSN string, DSN array or MDB[2] object
      * @param array $options
+     * @param integer $MDBversion 1=MDB, 2=MDB2
      */
-    function connect($dsn, $options=array())
+    function connect($dsn, $options = array(), $MDBversion = 1)
     {
         if (is_object($dsn)) {
-            $res = $this->db =& $dsn;
+            $res =& $dsn;
+        } elseif ($MDBversion == 2) {
+            require_once 'MDB2.php';
+            if (!isset($options['idxname_format'])) {
+                $options['idxname_format'] = '%s';
+            }
+            $res = &MDB2::connect($dsn, $options);
         } else {
-            $res = $this->db = &MDB::connect($dsn, $options);
+            require_once 'MDB.php';
+            $res = &MDB::connect($dsn, $options);
         }
-        if (MDB::isError($res)) {
+        if (PEAR::isError($res)) {
     // FIXXME what shall we do here?
             $this->_errorLog($res->getUserInfo());
-        } else {
-            $this->db->setFetchMode(MDB_FETCHMODE_ASSOC);
+            return;
         }
+        $this->setDbInstance($res);
     }
 
     // }}}
@@ -337,7 +357,12 @@ class MDB_QueryTool_Query
     function setDbInstance(&$dbh)
     {
         $this->db =& $dbh;
-        $this->db->setFetchMode(MDB_FETCHMODE_ASSOC);
+        $this->_MDBversion = is_a($this->db, 'mdb2_driver_common') ? 2 : 1;
+        if ($this->_MDBversion == 2) {
+            $this->db->setFetchMode(MDB2_FETCHMODE_ASSOC);
+        } else {
+            $this->db->setFetchMode(MDB_FETCHMODE_ASSOC);
+        }
     }
 
     // }}}
@@ -359,7 +384,9 @@ class MDB_QueryTool_Query
      */
     function get($id, $column='')
     {
-        $id     = trim($id);
+        if (is_string($id)) {
+            $id = trim($id);
+        }
         $column = trim($column);
         $table  = $this->table;
         $getMethod = 'getRow';
@@ -382,9 +409,9 @@ class MDB_QueryTool_Query
     /**
      * gets the data of the given ids
      *
-     * @param   array   this is an array of ids to retreive
+     * @param   array   this is an array of ids to retrieve
      * @param   string  the column to search in for
-     * @return  mixed   an array of the retreived data, or false in case of failure
+     * @return  mixed   an array of the retrieved data, or false in case of failure
      *                  when failing an error is set in $this->_error
      * @access  public
      */
@@ -404,6 +431,22 @@ class MDB_QueryTool_Query
     }
 
     // }}}
+    // {{{ getOne()
+
+    /**
+     * get the first value of the first row
+     *
+     * @access     public
+     * @return     mixed   (1) a scalar value in case of success
+     *                     (2) false in case of failure
+     */
+    function getOne()
+    {
+        $queryString = $this->getQueryString();
+        return $this->execute($queryString, 'queryOne');
+    }
+
+    // }}}
     // {{{ getAll()
 
     /**
@@ -412,6 +455,7 @@ class MDB_QueryTool_Query
      *
      * @param   int     to start from
      * @param   int     the number of rows to show
+     * @param   string  the MDB-method to use, i dont know if we should leave this param here ...
      * @return  mixed   an array of the retrieved data, or false in case of failure
      *                  when failing an error is set in $this->_error
      * @access  public
@@ -438,17 +482,17 @@ class MDB_QueryTool_Query
      *     $ids = $table->getCol('id');
      * so ids will be an array with all the id's
      *
-     * @param   string  the column that shall be retreived
+     * @param   string  the column that shall be retrieved
      * @param   int     to start from
      * @param   int     the number of rows to show
-     * @return  mixed   an array of the retreived data, or false in case of failure
+     * @return  mixed   an array of the retrieved data, or false in case of failure
      *                  when failing an error is set in $this->_error
      * @access  public
      */
     function getCol($column=null, $from=0, $count=0)
     {
         $query = array();
-        if ($column != null) {
+        if (!is_null($column)) {
             // by using _buildSelect() I can be sure that the table name will not be ambiguous
             // i.e. in a join, where all the joined tables have a col 'id'
             // _buildSelect() will put the proper table name in front in case there is none
@@ -467,7 +511,7 @@ class MDB_QueryTool_Query
     /**
      * get the number of entries
      *
-     * @return  mixed   an array of the retreived data, or false in case of failure
+     * @return  mixed   an array of the retrieved data, or false in case of failure
      *                  when failing an error is set in $this->_error
      * @access  public
      */
@@ -554,6 +598,46 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     }
 
     // }}}
+    // {{{ _floatToStringNoLocale()
+
+    /**
+     * If a double number was "localized", restore its decimal separator to "."
+     * @see http://pear.php.net/bugs/bug.php?id=3021
+     * @param float
+     * @access private
+     */
+    function _floatToStringNoLocale($float)
+    {
+        $precision = strlen($float) - strlen(intval($float));
+        if ($precision) {
+            --$precision; // don't count decimal seperator
+        }
+        return number_format($float, $precision, '.', '');
+    }
+
+    // }}}
+    // {{{ _localeSafeImplode()
+
+    /**
+     * New "implode()" implementation to bypass float locale formatting:
+     * the SQL decimal separator is and must be ".".  Always.
+     * @param string $glue
+     * @param array $array
+     * @access private
+     */
+    function _localeSafeImplode($glue, $array)
+    {
+        $str = '';
+        foreach ($array as $value) {
+            if (!empty($str)) {
+                $str .= $glue;
+            }
+            $str .= is_double($value) ? $this->_floatToStringNoLocale($value) : $value;
+        }
+        return $str;
+    }
+
+    // }}}
     // {{{ save()
 
     /**
@@ -598,17 +682,17 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
         if (isset($newData[$this->primaryCol])) {
             //$this->_errorSet('Error updating the new member.');
             //return false;
-            $query['where'] = $this->primaryCol.'='.$this->_quote($newData[$this->primaryCol]);
+            $query['where'] = $this->db->quoteIdentifier($this->primaryCol).'='.$this->_quote($newData[$this->primaryCol]);
         }
 
         $newData = $this->_checkColumns($newData, 'update');
         $values = array();
         foreach ($newData as $key => $aData) {   // quote the data
             //$values[] = "{$this->table}.$key=" . $this->_quote($aData);
-            $values[] = "$key=" . $this->_quote($aData);
+            $values[] = $this->db->quoteIdentifier($key) . '=' . $this->_quote($aData);
         }
 
-        $query['set'] = implode(',', $values);
+        $query['set'] = $this->_localeSafeImplode(',', $values);
         $updateString = $this->_buildUpdateQuery($query);
         return $this->execute($updateString, 'query') ? true : false;
     }
@@ -630,7 +714,9 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
             if ($this->primaryCol) {
                 // do only use the sequence if a primary column is given
                 // otherwise the data are written as given
-                $id = (int)$this->db->nextId($this->sequenceName);
+                $nextid_func = ($this->_MDBversion == 2) ? 'nextID' : 'nextId';
+                //$id = (int)$this->db->$nextid_func($this->sequenceName);
+                $id = $this->db->$nextid_func($this->sequenceName);
                 $newData[$this->primaryCol] = $id;
             } else {
                 // if no primary col is given return true on success
@@ -644,11 +730,20 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
 
         $newData = $this->_checkColumns($newData, 'add');
         $newData = $this->_quoteArray($newData);
+        
+        //quoting the columns
+        $tmpData = array();
+        foreach ($newData as $key=>$val) {
+            $tmpData[$this->db->quoteIdentifier($key)] = $val;
+        }
+        $newData = $tmpData;
+        unset($tmpData);
 
-        $query = sprintf('INSERT INTO %s (%s) VALUES (%s)',
+        $query = sprintf(
+            'INSERT INTO %s (%s) VALUES (%s)',
             $this->table,
             implode(', ', array_keys($newData)),
-            implode(', ', $newData)
+            $this->_localeSafeImplode(', ', $newData)
         );
         return $this->execute($query, 'query') ? $id : false;
     }
@@ -669,33 +764,64 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
         if (!sizeof($data)) {
             return false;
         }
+        $ret = true;
         // the inserted ids which will be returned or if no primaryCol is given
         // we return true by default
         $retIds = $this->primaryCol ? array() : true;
-        $allData = array();                     // each row that will be inserted
-        foreach ($data as $key => $aData) {
-            $aData = $this->_checkColumns($aData,'add');
-            $aData = $this->_quoteArray($aData);
+        $dbtype = $this->db->phptype;
+        if ($dbtype == 'mysql') { //Optimise for MySQL
+            $allData = array();                     // each row that will be inserted
+            foreach ($data as $key => $aData) {
+                $aData = $this->_checkColumns($aData,'add');
+                $aData = $this->_quoteArray($aData);
 
-            if (empty($aData[$this->primaryCol])) {
-                if ($this->primaryCol) {
-                    // do only use the sequence if a primary column is given
-                    // otherwise the data are written as given
-                    $retIds[] = $id = (int)$this->db->nextId($this->sequenceName);
-                    $aData[$this->primaryCol] = $id;
+                if (empty($aData[$this->primaryCol])) {
+                    if ($this->primaryCol) {
+                        // do only use the sequence if a primary column is given
+                        // otherwise the data are written as given
+                        $func = ($this->_MDBversion == 2) ? 'nextID' : 'nextId';
+                        $retIds[] = $id = (int)$this->db->$func($this->sequenceName);
+                        $aData[$this->primaryCol] = $id;
+                    }
+                } else {
+                    $retIds[] = $aData[$this->primaryCol];
                 }
-            } else {
-                $retIds[] = $aData[$this->primaryCol];
+                $allData[] = '('.$this->_localeSafeImplode(', ', $aData).')';
             }
-            $allData[] = '('.implode(', ', $aData).')';
+
+            //quoting the columns
+            $tmpData = array();
+            foreach ($aData as $key=>$val) {
+                $tmpData[$this->db->quoteIdentifier($key)] = $val;
+            }
+            $newData = $tmpData;
+            unset($tmpData);
+
+            $query = sprintf(
+                'INSERT INTO %s (%s) VALUES %s',
+                $this->table ,
+                implode(', ', array_keys($aData)) ,
+                $this->_localeSafeImplode(', ', $allData)
+            );
+            return $this->execute($query, 'query') ? $retIds : false;
         }
 
-        $query = sprintf( 'INSERT INTO %s (%s) VALUES %s',
-                          $this->table ,
-                          implode(', ', array_keys($aData)) ,
-                          implode(', ', $allData)
-                        );
-        return $this->execute($query, 'query') ? $retIds : false;
+        //Executing for every entry the add method
+        foreach ($data as $entity) {
+            if ($ret) {
+                $res = $this->add($entity);
+                if (!$res) {
+                    $ret = false;
+                } else {
+                    $retIds[] = $res;
+                }
+            }
+        }
+        //Setting the return value to the array with ids
+        if ($ret) {
+            $ret = $retIds;
+        }
+        return $ret;
     }
 
     // }}}
@@ -718,20 +844,21 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
 //FIXXME check $data if it only contains columns that really exist in the table
             $wheres = array();
             foreach ($data as $key => $val) {
-                $wheres[] = $key .'='. $this->_quote($val);
+                if (is_null($val)) {
+                    $wheres[] = $this->db->quoteIdentifier($key) .' IS NULL';
+                } else {
+                    $wheres[] = $this->db->quoteIdentifier($key) .'='. $this->_quote($val);
+                }
             }
             $whereClause = implode(' AND ', $wheres);
         } else {
-            if ($whereCol=='') {
+            if (empty($whereCol)) {
                 $whereCol = $this->primaryCol;
             }
-            $whereClause = $whereCol.'='. $this->_quote($data);
+            $whereClause = $this->db->quoteIdentifier($whereCol).'='. $this->_quote($data);
         }
 
-        $query = sprintf( 'DELETE FROM %s WHERE %s',
-                          $this->table,
-                          $whereClause
-                          );
+        $query = 'DELETE FROM '. $this->table .' WHERE '. $whereClause;
         return $this->execute($query, 'query') ? true : false;
 // i think this method should return the ID's that it removed, this way we could simply use the result
 // for further actions that depend on those id ... or? make stuff easier, see ignaz::imail::remove
@@ -764,7 +891,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      */
     function removeMultiple($ids, $colName='')
     {
-        if ($colName == '') {
+        if (empty($colName)) {
             $colName = $this->primaryCol;
         }
         $ids = $this->_quoteArray($ids);
@@ -773,7 +900,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
             'DELETE FROM %s WHERE %s IN (%s)',
             $this->table,
             $colName,
-            implode(',', $ids)
+            $this->_localeSafeImplode(',', $ids)
         );
         return $this->execute($query, 'query') ? true : false;
     }
@@ -1037,11 +1164,13 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      */
     function setJoin($table=null, $where=null, $joinType='default')
     {
-//FIXXME make it possible to pass a table name as a string like this too 'user u' where u is the string that can be used
-// to refer to this table in a where/order or whatever condition
+//FIXXME make it possible to pass a table name as a string like this too 'user u'
+// where u is the string that can be used to refer to this table in a where/order
+// or whatever condition
 // this way it will be possible to join tables with itself, like setJoin(array('user u', 'user u1'))
 // this wouldnt work yet, but for doing so we would need to change the _build methods too!!!
-// because they use getJoin('tables') and this simply returns all the tables in use but dont take care of the mentioned syntax
+// because they use getJoin('tables') and this simply returns all the tables in use
+// but don't take care of the mentioned syntax
 
         if (is_null($table) || is_null($where)) {   // remove the join if not sufficient parameters are given
             $this->_join[$joinType] = array();
@@ -1159,16 +1288,16 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * you can also call
      *     setJoin(table1,'<where clause1>')
      *     addJoin(table2,'<where clause2>')
-     * or where it makes more sense is to build a query which is build out of a
+     * or where it makes more sense is to build a query which is made out of a
      * left join and a standard join
      *     setLeftJoin(table1,'<where clause1>')
      *     // results in ... FROM $this->table LEFT JOIN table ON <where clause1>
      *     addJoin(table2,'<where clause2>')
      *     // results in ...  FROM $this->table,table2 LEFT JOIN table ON <where clause1> WHERE <where clause2>
      *
-     * @param   array   $table
-     * @param   string  $where
-     * @param   string  $type
+     * @param      string the table to be joined
+     * @param      string the where clause for the join
+     * @param      string the join type
      * @access  public
      */
     function addJoin($table, $where, $type='default')
@@ -1223,8 +1352,8 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     function setGroup($group='')
     {
         $this->_group = $group;
-//FIXXME parse the condition and replace ambigious column names, such as "name='Deutschland'" with "country.name='Deutschland'"
-// then the users dont have to write that explicitly and can use the same name as in the setOrder i.e. setOrder('name,_net_name,_netPrefix_prefix');
+//FIXXME parse the condition and replace ambiguous column names, such as "name='Deutschland'" with "country.name='Deutschland'"
+// then the users don't have to write that explicitly and can use the same name as in the setOrder i.e. setOrder('name,_net_name,_netPrefix_prefix');
     }
 
     // }}}
@@ -1246,6 +1375,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
 
     /**
      * limit the result to return only the columns given in $what
+     * @param string fields that shall be selected
      * @access public
      */
     function setSelect($what='*')
@@ -1265,7 +1395,6 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      *
      * @param   string  the string that shall be added to the select-part
      * @param   string  the string to connect the new string with the existing one
-     * @return  void
      * @access  public
      */
     function addSelect($what='*', $connectString=',')
@@ -1282,6 +1411,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     // {{{ getSelect()
 
     /**
+     * @return  string
      * @access  public
      */
     function getSelect()
@@ -1293,6 +1423,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     // {{{ setDontSelect()
 
     /**
+     * @param   string
      * @access  public
      */
     function setDontSelect($what='')
@@ -1304,6 +1435,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     // {{{ getDontSelect()
 
     /**
+     * @return  string
      * @access  public
      */
     function getDontSelect()
@@ -1315,25 +1447,27 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     // {{{ reset()
 
     /**
-     * reset all the set* settings, with no parameter given it resets them all.
+     * reset all the set* settings; with no parameter given, it resets them all.
      *
-     * @return  void
+     * @param array $what
      * @access  public
      */
     function reset($what=array())
     {
         if (!sizeof($what)) {
-            $what = array('select',
-                          'dontSelect',
-                          'group',
-                          'having',
-                          'limit',
-                          'where',
-                          'index',
-                          'order',
-                          'join',
-                          'leftJoin',
-                          'rightJoin');
+            $what = array(
+                'select',
+                'dontSelect',
+                'group',
+                'having',
+                'limit',
+                'where',
+                'index',
+                'order',
+                'join',
+                'leftJoin',
+                'rightJoin'
+            );
         }
 
         foreach ($what as $aReset) {
@@ -1351,7 +1485,6 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      *
      * @param   string   the mode to be set
      * @param   mixed    the value of the mode
-     * @return  void
      * @access  public
      */
     function setOption($option, $value)
@@ -1364,6 +1497,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
 
     /**
      * @param   string name of the option to retrieve
+     * @return  string value of the option
      * @access  public
      */
     function getOption($option)
@@ -1403,6 +1537,14 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     {
         if ($this->getOption('raw')) {
             return $data;
+        }
+        if ($this->_MDBversion == 2) {
+            switch(gettype($data)) {
+                case 'array':
+                    return $this->_quoteArray($data);
+                default:
+                    return $this->db->quote($data);
+            }
         } else {
             switch(gettype($data)) {
                 case 'array':
@@ -1427,10 +1569,10 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * checks if the columns which are given as the array's indexes really exist
      * if not it will be unset anyway
      *
-     * @access  public
      * @param   string  the actual message, first word should always be the method name,
      *                  to build the message like this: className::methodname
      * @param   integer the line number
+     * @access  public
      */
     function _checkColumns($newData, $method='unknown')
     {
@@ -1440,7 +1582,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
         }
         foreach ($newData as $colName => $x) {
             if (!isset($meta[$colName])) {
-                $this->_errorLog("$method, column {$this->table}.$colName doesnt exist, value was removed before '$method'",__LINE__);
+                $this->_errorLog("$method, column {$this->table}.$colName doesn't exist, value was removed before '$method'", __LINE__);
                 unset($newData[$colName]);
             } else {
                 // if the current column exists, check the length too, not to write content that is too long
@@ -1488,7 +1630,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * @return resultSet or false on error
      * @access public
      */
-    function metadata($table='')
+    function metadata($table = '')
     {
         // is there an alias in the table name, then we have something like this: 'user ua'
         // cut of the alias and return the table name
@@ -1506,7 +1648,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
             return $this->_metadata[$table];
         }
 // FIXXXME use oci8 implementation of newer PEAR::DB-version
-        if ($this->db->phptype=='oci8') {
+        if ($this->db->phptype == 'oci8') {
             $count = 0;
             $id    = 0;
             $res   = array();
@@ -1517,7 +1659,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
             ////                                          // your own class
             //// $table->show_results($this->db->query(see query vvvvvv))
             ////
-            $res = $this->db->getAll("SELECT T.column_name,T.table_name,T.data_type,".
+            $res = $this->db->queryAll("SELECT T.column_name,T.table_name,T.data_type,".
                 "T.data_length,T.data_precision,T.data_scale,T.nullable,".
                 "T.char_col_decl_length,I.index_name".
                 " FROM ALL_TAB_COLUMNS T,ALL_IND_COLUMNS I".
@@ -1525,12 +1667,12 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
                 " AND T.table_name=I.table_name (+)".
                 " AND T.table_name=UPPER('$table') ORDER BY T.column_id");
 
-            if (MDB::isError($res)) {
+            if (PEAR::isError($res)) {
                 //$this->_errorSet( $res->getMessage() );
                 // i think we only need to log here, since this method is never used
                 // directly for the user's functionality, which means if it fails it
                 // is most probably an appl error
-                $this->_errorLog($this->db->getUserInfo($res));
+                $this->_errorLog($res->getUserInfo($res));
                 return false;
             }
             foreach ($res as $key=>$val) {
@@ -1540,8 +1682,13 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
             if (!is_object($this->db)) {
                 return false;
             }
-            $res = $this->db->tableInfo($table);
-            if (MDB::isError($res)) {
+            if ($this->_MDBversion == 2) {
+                $this->db->loadModule('Reverse');
+                $res = $this->db->reverse->tableInfo($table);
+            } else {
+                $res = $this->db->tableInfo($table);
+            }
+            if (PEAR::isError($res)) {
                 $this->_errorSet($res->getUserInfo());
                 return false;
             }
@@ -1551,16 +1698,53 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
         foreach ($res as $key => $val) {
             $ret[$val['name']] = $val;
         }
-        if ($this->db->options['optimize'] == 'portability') {
-            $ret = array_change_key_case($ret, CASE_LOWER);
+        if ($this->_MDBversion == 2) {
+            if ($this->db->options['portability'] & MDB2_PORTABILITY_FIX_CASE) {
+                $ret = array_change_key_case($ret, $this->db->options['field_case']);
+            }
+        } else {
+            if ($this->db->options['optimize'] == 'portability') {
+                $ret = array_change_key_case($ret, CASE_LOWER);
+            }
         }
         $this->_metadata[$table] = $ret;
         return $ret;
     }
 
+    // }}}
+
     //
     //  methods for building the query
     //
+
+    // {{{ _prependTableName()
+
+    /**
+     * replace 'column' by 'table.column' if the column is defined for the table
+     *
+     * @param string $fieldlist
+     * @param string $table table name
+     * @return string $fieldlist
+     * @see http://pear.php.net/bugs/bug.php?id=9734
+     * @access private
+     */
+    function _prependTableName($fieldlist, $table) {
+        if (!$meta = $this->metadata($table)) {
+            return $fieldlist;
+        }
+        $fields = explode(',', $fieldlist);
+        foreach (array_keys($meta) as $column) {
+            //$fieldlist = preg_replace('/(^\s*|\s+|,)'.$column.'\s*(,)?/U', "$1{$table}.$column$2", $fieldlist);
+            $pattern = '/^'.$column.'\b.*/U';
+            foreach (array_keys($fields) as $k) {
+                $fields[$k] = trim($fields[$k]);
+                if (!strpos($fields[$k], '.') && preg_match($pattern, $fields[$k])) {
+                    $fields[$k] = $table.'.'.$fields[$k];
+                }
+            }
+        }
+        return implode(',', $fields);
+    }
 
     // }}}
     // {{{ _buildFrom()
@@ -1581,7 +1765,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
         }
         // handle the standard join thingy
         if (isset($join['default']) && count($join['default'])) {
-            $from .= ','.implode(',',array_keys($join['default']));
+            $from .= ',' . implode(',', array_keys($join['default']));
         }
 
         // handle left/right/inner joins
@@ -1648,10 +1832,10 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * returns the array for the tables given as parameter or if no
      * parameter given for all tables that exist in the tableSpec
      *
-     * @param   array   table names (not the short names!)
-     * @param   boolean if true the table is returned indexed by the shortName
-     *                  otherwise indexed by the name
-     * @return  array   the tableSpec indexed
+     * @param  array   table names (not the short names!)
+     * @param  boolean if true the table is returned indexed by the shortName
+     *                 otherwise indexed by the name
+     * @return array   the tableSpec indexed
      * @access public
      */
     function getTableSpec($shortNameIndexed=true, $tables=array())
@@ -1684,7 +1868,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
         // what has preference, that means if what is set it is used
         // this is only because the methods like 'get' pass an individually built value, which
         // is supposed to be used, but usually it's generically build using the 'getSelect' values
-        if (!$what && $this->getSelect()) {
+        if (empty($what) && $this->getSelect()) {
             $what = $this->getSelect();
         }
 
@@ -1725,13 +1909,12 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
                         // build the AS clauses
                         // put " around them to enable use of reserved words, i.e. SELECT table.option as option FROM...
                         // and 'option' actually is a reserved word, at least in mysql
-                        // put double quotes around them, since pgsql doesnt work with single quotes
                         // but don't do this for ibase because it doesn't work!
                         if ($aTable == $this->table) {
                             if ($this->db->phptype == 'ibase') {
                                 $cols[$aTable][] = $this->table. '.' .$colName . ' AS '. $colName;
                             } else {
-                                $cols[$aTable][] = $this->table. '.' .$colName . ' AS "'. $colName .'"';
+                                $cols[$aTable][] = $this->table. '.' .$colName . ' AS '. $this->db->quoteIdentifier($colName);
                             }
                         } else {
                             if ($this->db->phptype == 'ibase') {
@@ -1742,7 +1925,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
                                 //an "invalid token" error
                                 $cols[$aTable][] = $aTable. '.' .$colName . ' AS t_'. $this->getTableShortName($aTable) .'_'. $colName;
                             } else {
-                                $cols[$aTable][] = $aTable. '.' .$colName . ' AS "_'. $this->getTableShortName($aTable) .'_'. $colName .'"';
+                                $cols[$aTable][] = $aTable. '.' .$colName . ' AS '. $this->db->quoteIdentifier('_'. $this->getTableShortName($aTable) .'_'. $colName);
                             }
                         }
                     }
@@ -1771,7 +1954,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
         }
 
         if ($this->getJoin()) {
-            // replace all 'column' by '$this->table.column' to prevent ambigious errors
+            // replace all 'column' by '$this->table.column' to prevent ambiguous errors
             $metadata = $this->metadata();
             if (is_array($metadata)) {
                 foreach ($metadata as $aCol => $x) {
@@ -1805,7 +1988,49 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
                 }
             }
         }
-        return $what;
+
+        // quotations of columns
+        $columns    = explode(',', $what);
+        $identifier = substr($this->db->quoteIdentifier(''), 0, 1);
+        for ($i=0; $i<sizeof($columns); $i++) {
+            $column = trim($columns[$i]);
+            // Uppercasing "as"
+            $column = str_replace(' as ', ' AS ', $column);
+            if (strpos($column, ' AS ') !== false) {
+                $column = explode(' AS ', $column);
+                if (strpos($column[0], '(') !== false) {
+                    //do not quote function calls, COUNT(), etc.
+                    $column[1] = $this->db->quoteIdentifier($column[1]);
+                } elseif (strpos($column[0], '.') !== false) {
+                    $column[0] = explode('.', $column[0]);
+                    $column[0][1] = $this->db->quoteIdentifier($column[0][1]);
+                    $column[0] = implode('.', $column[0]);
+                } else {
+                    $column[0] = $this->db->quoteIdentifier($column[0]);
+                }
+                $column = implode(' AS ', $column);
+            } else {
+                if (strpos($column[0], '(') !== false) {
+                    //do not quote function calls, COUNT(), etc.
+                } elseif (strpos($column, '.') !== false) {
+                    $column = explode('.', $column);
+                    $column[1] = $this->db->quoteIdentifier($column[1]);
+                    $column = implode('.', $column);
+                } else {
+                    $column = $this->db->quoteIdentifier($column);
+                }
+            }
+            // Clean up if a function was used in the query
+            if (substr($column, -2) == ')'.$identifier) {
+                $column = substr($column, 0, -2).$identifier.')';
+                // Some like spaces in the function
+                while (strpos($column, ' '.$identifier) !== false) {
+                    $column = str_replace(' '.$identifier, $identifier.' ', $column);
+                }
+            }
+            $columns[$i] = $column;
+        }
+        return implode(',', $columns);
     }
 
     // }}}
@@ -1871,67 +2096,49 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     // {{{ _buildOrder()
 
     /**
+     * Build the "ORDER BY" clause, replace 'column' by 'table.column'.
      *
-     * @return string $order
+     * @return string  the rendered "ORDER BY" clause
      * @access private
      */
     function _buildOrder()
     {
-        $order = $this->getOrder();
-        // replace 'column' by '$this->table.column' if the column is defined for $this->table
-        if ($meta = $this->metadata()) {
-            foreach ($meta as $aCol=>$x) {
-                $order = preg_replace('/(^\s*|\s+|,)'.$aCol.'\s*(,)?/U', "$1{$this->table}.$aCol$2", $order);
-            }
-        }
-        return $order;
+        return $this->_prependTableName($this->getOrder(), $this->table);
     }
 
     // }}}
     // {{{ _buildGroup()
 
     /**
-     * Build the group-clause, replace 'column' by 'table.column'.
+     * Build the "GROUP BY" clause, replace 'column' by 'table.column'.
      *
-     * @return string the rendered group clause
+     * @return string the rendered "GROUP BY" clause
      * @access private
      */
     function _buildGroup()
     {
-        $group = $this->getGroup();
-        // replace 'column' by '$this->table.column' if the column is defined for $this->table
-        if ($meta = $this->metadata()) {
-            foreach ($meta as $aCol=>$x) {
-                $group = preg_replace('/(^\s*|\s+|,)'.$aCol.'\s*(,)?/U', "$1{$this->table}.$aCol$2", $group);
-            }
-        }
-        return $group;
+        return $this->_prependTableName($this->getGroup(), $this->table);
     }
 
     // }}}
     // {{{ _buildHaving()
 
     /**
+     * Build the "HAVING" clause, replace 'column' by 'table.column'.
      *
-     * @return string the having clause
+     * @return string the rendered "HAVING" clause
      * @access private
      */
     function _buildHaving()
     {
-        $having = $this->getHaving();
-        // replace 'column' by '$this->table.column' if the column is defined for $this->table
-        if ($meta = $this->metadata()) {
-            foreach ($meta as $aCol=>$x) {
-                $having = preg_replace('/(^\s*|\s+|,)'.$aCol.'\s*(,)?/U', "$1{$this->table}.$aCol$2", $having);
-            }
-        }
-        return $having;
+        return $this->_prependTableName($this->getHaving(), $this->table);
     }
 
     // }}}
     // {{{ _buildSelectQuery()
 
     /**
+     * Build the "SELECT" query
      *
      * @param  array   this array contains the elements of the query,
      *                 indexed by their key, which are: 'select','from','where', etc.
@@ -1957,30 +2164,31 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
         if ($having) {
             $having = 'HAVING '.$having;
         }
-        $queryString = sprintf( 'SELECT %s FROM %s %s %s %s %s',
-                                isset($query['select']) ? $query['select'] : $this->_buildSelect(),
-                                isset($query['from'])   ? $query['from']   : $this->_buildFrom(),
-                                $where,
-                                $group,
-                                $having,
-                                $order
-                                );
+        $queryString = sprintf(
+            'SELECT %s FROM %s %s %s %s %s',
+            isset($query['select']) ? $query['select'] : $this->_buildSelect(),
+            isset($query['from'])   ? $query['from']   : $this->_buildFrom(),
+            $where,
+            $group,
+            $having,
+            $order
+        );
         // $query['limit'] has preference!
         $limit = isset($query['limit']) ? $query['limit'] : $this->_limit;
-        if (!$isCalledViaGetCount && !empty($limit[1])) {    // is there a count set?
-            if (MDB::isError($error = $this->db->setSelectedRowRange($limit[0], $limit[1]))) {
-                $this->_errorSet('MDB_QueryTool_Common::_buildSelectQuery setSelectedRowRange failed '.$error->getMessage());
+        if (!$isCalledViaGetCount && !empty($limit[1])) {
+            // is there a count set?
+            if ($this->_MDBversion == 2) {
+                $func = 'setLimit';
+                $error = $this->db->setLimit($limit[1], $limit[0]);
+            } else {
+                $func = 'setSelectedRowRange';
+                $error = $this->db->setSelectedRowRange($limit[0], $limit[1]);
+            }
+            if (PEAR::isError($error)) {
+                $this->_errorSet('MDB_QueryTool_Common::_buildSelectQuery '.$func.' failed '.$error->getMessage());
                 $this->_errorLog($error->getUserInfo());
                 return false;
             }
-            /*
-            $queryString = $this->db->modifyLimitQuery($queryString, $limit[0], $limit[1]);
-            if (DB::isError($queryString)) {
-                $this->_errorSet('DB_QueryTool::db::modifyLimitQuery failed '.$queryString->getMessage());
-                $this->_errorLog($queryString->getUserInfo());
-                return false;
-            }
-            */
         }
         return $queryString;
     }
@@ -2007,11 +2215,12 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
             $where = 'WHERE '.$where;
         }
 
-        $updateString = sprintf('UPDATE %s SET %s %s',
-                                $this->table,
-                                $query['set'],
-                                $where
-                            );
+        $updateString = sprintf(
+            'UPDATE %s SET %s %s',
+            $this->table,
+            $query['set'],
+            $where
+        );
         return $updateString;
     }
 
@@ -2025,7 +2234,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * @return resultSet or false on error
      * @access public
      */
-    function execute($query=null, $method='getAll')
+    function execute($query=null, $method='queryAll')
     {
         $this->writeLog();
         if (is_null($query)) {
@@ -2038,8 +2247,11 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
 
         $this->debug($query);
         $this->writeLog('start query');
-        if (MDB::isError($res = $this->db->$method($query))) {
-
+        if ((substr($method, 0, 3) == 'get') && ($method != 'getAssoc')) {
+            $method = 'query'.substr($method, 3);
+        }
+        if (PEAR::isError($res = $this->db->$method($query))) {
+            $this->writeLog('end query (failed)');
             if ($this->getOption('verbose')) {
                 //$this->_errorSet($this->db->errorMessage($res->getCode()));
                 $this->_errorSet($res->getMessage() .'-'. $res->getUserInfo());
@@ -2083,28 +2295,28 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
             $this->_logObject =& Log::factory('file', $this->options['logfile']);
         }
 
-        if ($text == 'start query' || $text === 'end query') {
-            $bytesSent = $this->db->getAll("SHOW STATUS like 'Bytes_sent'");
+        if ($text === 'start query' || $text === 'end query') {
+            $bytesSent = $this->db->queryAll("SHOW STATUS like 'Bytes_sent'");
             $bytesSent = $bytesSent[0]['Value'];
         }
         if ($text === 'START') {
-            $startTime = split(" ", microtime());
+            $startTime = split(' ', microtime());
             $this->_logData['startTime'] = $startTime[1] + $startTime[0];
         }
         if ($text === 'start query') {
             $this->_logData['startBytesSent'] = $bytesSent;
-            $startTime = split(" ", microtime());
+            $startTime = split(' ', microtime());
             $this->_logData['startQueryTime'] = $startTime[1] + $startTime[0];
             return;
         }
         if ($text === 'end query') {
             $text .= ' result size: '.((int)$bytesSent-(int)$this->_logData['startBytesSent']).' bytes';
-            $endTime = split(" ", microtime());
+            $endTime = split(' ', microtime());
             $endTime = $endTime[1] + $endTime[0];
             $text .= ', took: '.(($endTime - $this->_logData['startQueryTime'])).' seconds';
         }
         if (strpos($text, 'query built') === 0) {
-            $endTime = split(" ", microtime());
+            $endTime = split(' ', microtime());
             $endTime = $endTime[1] + $endTime[0];
             $this->writeLog('query building took: '.(($endTime - $this->_logData['startTime'])).' seconds');
         }
@@ -2138,10 +2350,30 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
         }
         //what about allowing other (custom) result types?
         switch (strtolower($this->_resultType)) {
-            case 'object':  return new MDB_QueryTool_Result_Object($result);
+            case 'object':  return new MDB_QueryTool_Result_Object($result, $this);
             case 'array':
             default:        return new MDB_QueryTool_Result($result);
         }
+    }
+
+    // }}}
+    // {{{ setReturnClass()
+
+    /**
+     * Sets the name of the class to use as result object
+     *
+     * @param string Name of class
+     * @return boolean true on success, false otherwise
+     * @access public
+     */
+    function setReturnClass($name)
+    {
+        $test = new $name(array(), $this);
+        if (is_a($test, 'MDB_QueryTool_Result_Row')) {
+            $this->_returnclass = $name;
+            return true;
+        }
+        return false;
     }
 
     // }}}
@@ -2158,7 +2390,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
         // we can only return an indexed result if the result has a number of columns
         if (is_array($data) && sizeof($data) && $key=$this->getIndex()) {
             // build the string to evaluate which might be made up out of multiple indexes of a result-row
-            $evalString = '$val[\''.implode('\'].\',\'.$val[\'',explode(',',$key)).'\']';   //"
+            $evalString = '$val[\''.implode('\'].\',\'.$val[\'', explode(',', $key)) .'\']';   //"
 
             $indexedData = array();
 //FIXXME actually we also need to check ONCE if $val is an array, so to say if $data is 2-dimensional
@@ -2203,10 +2435,9 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     function setIndex($key=null)
     {
         if ($this->getJoin()) {  // is join set?
-
             // replace TABLENAME.COLUMNNAME by _TABLENAME_COLUMNNAME
             // since this is only the result-keys can be used for indexing :-)
-            $regExp = '/('.implode('|',$this->getJoin('tables')).')\.([^\s]+)/';
+            $regExp = '/('. implode('|', $this->getJoin('tables')) .')\.([^\s]+)/';
             $key = preg_replace($regExp, '_$1_$2', $key);
 
             // remove the table name if it is in front of '<$this->table>.columnname'
@@ -2270,6 +2501,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
 
     /**
      * set both callbacks
+     * @param string
      * @access public
      */
     function setErrorCallback($param='')
@@ -2365,6 +2597,23 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
         } //else {
             // ?????
         //}
+    }
+
+    // }}}
+    // {{{ newEntity()
+
+    /**
+     * Returns a new entity including an instance to QueryTool
+     *
+     * @return new entity
+     * @access public
+     */
+    function newEntity()
+    {
+        if (strtolower($this->_resultType) == 'object') {
+            $result = new MDB_QueryTool_Result_Object(array(), $this);
+            return $result->newEntity();
+        }
     }
 
     // }}}

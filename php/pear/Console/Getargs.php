@@ -16,7 +16,7 @@
 // | Author: Bertrand Mansion <bmansion@mamasam.com>                      |
 // +----------------------------------------------------------------------+
 //
-// $Id: Getargs.php,v 1.17 2005/04/08 07:11:37 wenz Exp $
+// $Id: Getargs.php,v 1.23 2006/11/07 13:53:36 scottmattocks Exp $
 
 require_once 'PEAR.php';
 
@@ -237,6 +237,12 @@ class Console_Getargs
         if ($err !== true) {
             return $err;
         }
+
+        // Double check that all required options have been passed.
+        $err = $obj->checkRequired();
+        if ($err !== true) {
+            return $err;
+        }
         
         // All is good.
         return $obj;
@@ -273,9 +279,10 @@ class Console_Getargs
      * @param  string the footer for the help. This could be used
      *                to supply a description of the error the user made
      * @param  int    help lines max length
+     * @param  int    the indent for the options
      * @return string the formatted help text
      */
-    function getHelp($config, $helpHeader = null, $helpFooter = '', $maxlength = 78)
+    function getHelp($config, $helpHeader = null, $helpFooter = '', $maxlength = 78, $indent = 0)
     {
         // Start with an empty help message and build it piece by piece
         $help = '';
@@ -285,13 +292,37 @@ class Console_Getargs
             // Get the optional, required and "paramter" names for this config.
             list($optional, $required, $params) = Console_Getargs::getOptionalRequired($config);
             // Start with the file name.
-            $helpHeader = 'Usage: '. basename($_SERVER['SCRIPT_NAME']) . ' ';
+            if (isset($_SERVER['SCRIPT_NAME'])) {
+                $filename = basename($_SERVER['SCRIPT_NAME']);
+            } else {
+                $filename = $argv[0];
+            }
+            $helpHeader = 'Usage: '. $filename . ' ';
             // Add the optional arguments and required arguments.
             $helpHeader.= $optional . ' ' . $required . ' ';
             // Add any parameters that are needed.
             $helpHeader.= $params . "\n\n";
         }
         
+        // Create an indent string to be prepended to each option row.
+        $indentStr = str_repeat(' ', (int)$indent);
+
+        // Go through all of the short options to get a padding value.
+        $v = array_values($config);
+        $shortlen = 0;
+        foreach ($v as $item) {
+            if (isset($item['short'])) {
+                $shortArr = explode('|', $item['short']);
+
+                if (strlen($shortArr[0]) > $shortlen) {
+                    $shortlen = strlen($shortArr[0]);
+                }
+            }
+        }
+
+        // Add two to account for the extra characters we add automatically.
+        $shortlen += 2;
+
         // Build the list of options and definitions.
         $i = 0;
         foreach ($config as $long => $def) {
@@ -304,14 +335,17 @@ class Console_Getargs
             $longArr = explode('|', $long);
             
             // Column one is the option name displayed as "-short, --long [additional info]"
+            // Start with the indent string.
+            $col1[$i] = $indentStr;
             // Add the short option name.
-            $col1[$i] = !empty($shortArr) ? '-'.$shortArr[0].' ' : '';
+            $col1[$i] .= str_pad(!empty($shortArr) ? '-' . $shortArr[0] . ' ' : '', $shortlen);
             // Add the long option name.
             $col1[$i] .= '--'.$longArr[0];
             
             // Get the min and max to show needed/optional values.
-            $max = $def['max'];
-            $min = isset($def['min']) ? $def['min'] : $max;
+            // Cast to int to avoid complications elsewhere.
+            $max = (int)$def['max'];
+            $min = isset($def['min']) ? (int)$def['min'] : $max;
             
             if ($max === 1 && $min === 1) {
                 // One value required.
@@ -415,14 +449,18 @@ class Console_Getargs
         foreach ($config as $long => $def) {
             
             // We only really care about the first option name.
-            $long = reset(explode('|', $long));
+            $long = explode('|', $long);
+            $long = reset($long);
             
             // Treat the "parameters" specially.
             if ($long == CONSOLE_GETARGS_PARAMS) {
                 continue;
             }
-            // We only really care about the first option name.
-            $def['short'] = reset(explode('|', $def['short']));
+            if (isset($def['short'])) {
+                // We only really care about the first option name.
+                $def['short'] = explode('|', $def['short']);
+                $def['short'] = reset($def['short']);
+            }
             
             if (!isset($def['min']) || $def['min'] == 0 || isset($def['default'])) {
                 // This argument is optional.
@@ -758,9 +796,9 @@ class Console_Getargs_Options
                                     E_USER_WARNING, 'Console_Getargs_Options::setValue()');
         }
         
-        $max = $this->_config[$optname]['max'];
-        $min = isset($this->_config[$optname]['min']) ? $this->_config[$optname]['min']: $max;
-        
+        $max = (int)$this->_config[$optname]['max'];
+        $min = isset($this->_config[$optname]['min']) ? (int)$this->_config[$optname]['min']: $max;
+
         // A value was passed after the option.
         if ($value !== '') {
             // Argument is like -v5
@@ -1051,6 +1089,23 @@ class Console_Getargs_Options
             default:
                 return $this->_longLong;
         }
+    }
+
+    function checkRequired()
+    {
+        foreach ($this->_config as $optName => $opt) {
+            if (isset($opt['min']) && $opt['min'] == 1 &&
+                $this->getValue($optName) === null
+                ) {
+                $err = PEAR::raiseError($optName . ' is required', 
+                                        CONSOLE_GETARGS_ERROR_USER,
+                                        PEAR_ERROR_RETURN, null,
+                                        'Console_Getargs_Options::parseArgs()'
+                                        );
+                return $err;
+            }
+        }        
+        return true;
     }
 } // end class Console_Getargs_Options
 /*

@@ -12,7 +12,7 @@
 * 
 * @license http://www.gnu.org/copyleft/lesser.html LGPL
 * 
-* @version $Id: QuickForm.php,v 1.28 2005/09/13 14:46:08 wiesemann Exp $
+* @version $Id: QuickForm.php,v 1.40 2006/11/06 15:48:23 wiesemann Exp $
 *
 */
 
@@ -33,6 +33,15 @@ if (! isset($GLOBALS['_DB_TABLE']['qf_rules'])) {
     );
 }
 
+/**
+* If you want to use an extended HTML_QuickForm object, you can specify the
+* class name in $_DB_TABLE['qf_class_name'].
+* ATTENTION: You have to include the class file yourself, DB_Table does
+* not take care of this!
+*/
+if (!isset($GLOBALS['_DB_TABLE']['qf_class_name'])) {
+    $GLOBALS['_DB_TABLE']['qf_class_name'] = 'HTML_QuickForm';
+}
 
 /**
 * 
@@ -154,10 +163,15 @@ class DB_Table_QuickForm {
     * 
     */
     
-    function &createForm($args = array(), $clientValidate = null)
+    function &createForm($args = array())
     {
-        $formName = isset($args['formName'])
-            ? $args['formName'] : $this->table;
+        if (isset($args['formName'])) {
+            $formName = $args['formName'];
+        } elseif (isset($this)) {
+            $formName = $this->table;
+        } else {
+            $formName = '_db_table_form_';
+        }
             
         $method = isset($args['method'])
             ? $args['method'] : 'post';
@@ -174,9 +188,9 @@ class DB_Table_QuickForm {
         $trackSubmit = isset($args['trackSubmit'])
             ? $args['trackSubmit'] : false;
         
-        $form =& new HTML_QuickForm($formName, $method, $action, $target, 
-            $attributes, $trackSubmit);
-        
+        $form =& new $GLOBALS['_DB_TABLE']['qf_class_name']($formName, $method,
+            $action, $target, $attributes, $trackSubmit);
+
         return $form;
     }
     
@@ -232,13 +246,19 @@ class DB_Table_QuickForm {
                    
                 // set the element name
                 if ($arrayName) {
-                    $name  = $arrayName . '[' . $cols_keys[$k] . ']';
+                    $name = $arrayName . '[' . $cols_keys[$k] . ']';
                 } else {
                 	$name = $cols_keys[$k];
                 }
-                
+
+                // fix the column definition temporarily to get the separator
+                // for the group
+                $col = $cols[$cols_keys[$k]];
+                DB_Table_QuickForm::fixColDef($col, $name);
+
                 // done
-                $group =& $form->addGroup($element, $name, $label);
+                $group =& $form->addGroup($element, $name, $label,
+                                          $col['qf_groupsep']);
 
                 // set default value (if given) for radio elements
                 // (reason: QF "resets" the checked state, when adding a group)
@@ -272,7 +292,7 @@ class DB_Table_QuickForm {
     * $arrayName, the column names will become keys in an array named
     * for this parameter.
     * 
-    * @return void
+    * @return array Form elements
     * 
     */
     
@@ -448,7 +468,7 @@ class DB_Table_QuickForm {
                     $col['qf_type'],
                     null, // elemname not added because this is a group
                     null,
-                    $btnlabel . $col['qf_radiosep'],
+                    $btnlabel,
                     $btnvalue,
                     $col['qf_attrs']
                 );
@@ -503,6 +523,108 @@ class DB_Table_QuickForm {
                 (isset($setval) ? $setval : '')
             );
             break;
+
+        case 'hierselect':
+
+            $element =& HTML_QuickForm::createElement(
+                $col['qf_type'],
+                $elemname,
+                $col['qf_label'],
+                $col['qf_attrs'],
+                $col['qf_groupsep']
+            );
+
+            if (isset($setval)) {
+                $element->setValue($setval);
+            }
+
+            break;
+
+        case 'jscalendar':
+
+            $element =& HTML_QuickForm::createElement(
+                $col['qf_type'],
+                $elemname,
+                $col['qf_label'],
+                $col['qf_opts'],
+                $col['qf_attrs']
+            );
+
+            if (isset($setval)) {
+                $element->setValue($setval);
+            }
+
+            break;
+
+        case 'header':
+
+            $element =& HTML_QuickForm::createElement(
+                $col['qf_type'],
+                $elemname
+            );
+
+            if (isset($setval)) {
+                $element->setValue($setval);
+            }
+
+            break;
+
+        case 'static':
+
+            $element =& HTML_QuickForm::createElement(
+                $col['qf_type'],
+                $elemname,
+                $col['qf_label']
+            );
+
+            if (isset($setval)) {
+                $element->setValue($setval);
+            }
+
+            break;
+
+        case 'reset':
+        case 'submit':
+
+            $element =& HTML_QuickForm::createElement(
+                $col['qf_type'],
+                $elemname,
+                null,
+                $col['qf_attrs']
+            );
+
+            if (isset($setval)) {
+                $element->setValue($setval);
+            }
+
+            break;
+
+        case 'callback':  // custom QF elements that need more than
+                          // the standard parameters
+                          // code from Arne Bippes <arne.bippes@brandao.de>
+
+            if (is_callable(array($col['qf_callback'], 'createElement'))) {
+                // Does an object with name from $col['qf_callback'] and
+                // a method with name 'createElement' exist?
+                $ret_value = call_user_func_array(
+                    array($col['qf_callback'], 'createElement'),
+                    array(&$element, &$col, &$elemname, &$setval));
+            }
+            elseif (is_callable($col['qf_callback'])) {
+                // Does a method with name from $col['qf_callback'] exist?
+                $ret_value = call_user_func_array(
+                    $col['qf_callback'],
+                    array(&$element, &$col, &$elemname, &$setval));
+            }
+            if ($ret_value) {
+                break;
+            }
+            // fall into default block of switch statement:
+            // - if $col['qf_callback'] is ...
+            //   - not a valid object
+            //   - a valid object, but a method 'createElement' doesn't exist
+            //   - not a valid method name
+            // - if an error occured in 'createElement' or in the method
             
         default:
             
@@ -578,6 +700,44 @@ class DB_Table_QuickForm {
         }
         
         return $group;
+    }
+    
+    
+    /**
+    * 
+    * Adds static form elements like 'header', 'static', 'submit' or 'reset' to
+    * a pre-existing HTML_QuickForm object.
+    * 
+    * @static
+    * 
+    * @access public
+    * 
+    * @param object &$form An HTML_QuickForm object.
+    * 
+    * @param array $elements A sequential array of form element definitions.
+    * 
+    * @return void
+    * 
+    */
+    
+    function addStaticElements(&$form, $elements)
+    {
+        foreach ($elements as $name => $elemDef) {
+
+            DB_Table_QuickForm::fixColDef($elemDef, $name);
+
+            $element =& DB_Table_QuickForm::getElement($elemDef, $name);
+
+            if (!is_object($element)) {
+                continue;
+            }
+
+            if (isset($elemDef['before']) && !empty($elemDef['before'])) {
+                $form->insertElementBefore($element, $elemDef['before']);
+            } else {
+                $form->addElement($element);
+            }
+        }
     }
     
     
@@ -698,10 +858,12 @@ class DB_Table_QuickForm {
             // loop through the rules and add them
             foreach ($col['qf_rules'] as $type => $opts) {
                 
-                // override the onlyServer types so that we don't attempt
-                // client-side validation at all.
+                // some rules (e.g. rules for file elements) can only be
+                // checked on the server; therefore, don't use client-side
+                // validation for these rules
+                $ruleValidate = $validate;
                 if (in_array($type, $onlyServer)) {
-                    $validate = 'server';
+                    $ruleValidate = 'server';
                 }
                 
                 switch ($type) {
@@ -757,12 +919,12 @@ class DB_Table_QuickForm {
                 case 'timestamp':
                     // date "elements" are groups ==> use addGroupRule()
                     $form->addGroupRule($elemname, $message, $type, $format,
-                        null, $validate);
+                        null, $ruleValidate);
                     break;
 
                 default:  // use addRule() for all other elements
                     $form->addRule($elemname, $message, $type, $format,
-                        $validate);
+                        $ruleValidate);
                     break;
 
                 }
@@ -821,6 +983,13 @@ class DB_Table_QuickForm {
         // values, in which case the type is 'select')
         if (! isset($col['qf_type'])) {
         
+            // if $col['type'] is not set, set it to null
+            // ==> in the switch statement below, the
+            //     default case will be used
+            if (!isset($col['type'])) {
+                $col['type'] = null;
+            }
+
             switch ($col['type']) {
             
             case 'boolean':
@@ -890,48 +1059,67 @@ class DB_Table_QuickForm {
             return;
         }
         
-        // add a separator for radio elements
-        if (! isset($col['qf_radiosep'])) {
-            $col['qf_radiosep'] = '<br />';
+        // code to keep BC for the separator for grouped QF elements
+        if (isset($col['qf_radiosep'])) {
+            $col['qf_groupsep'] = $col['qf_radiosep'];
+        }
+
+        // add a separator for grouped elements
+        if (!isset($col['qf_groupsep'])) {
+            $col['qf_groupsep'] = '<br />';
         }
         
-        
+        // $col['qf_set_default_rules'] === false allows to turn off
+        // the automatic creation of QF rules for this "column"
+        // (suggested by Arne Bippes)
+        if (isset($col['qf_set_default_rules']) &&
+                  $col['qf_set_default_rules'] === false) {
+            return;
+        }        
+
         // the element is required
-        if (! isset($col['qf_rules']['required']) && $col['require']) {
-            
-            $col['qf_rules']['required'] = sprintf(
+        // ==> set 'uploadedfile' (for file elements) or 'required' (for all
+        // other elements) rule if it is was not already set
+        $req_rule_name = ($col['qf_type'] == 'file') ? 'uploadedfile' : 'required';
+        if (!isset($col['qf_rules'][$req_rule_name]) && $col['require']) {
+
+            $col['qf_rules'][$req_rule_name] = sprintf(
                 $GLOBALS['_DB_TABLE']['qf_rules']['required'],
                 $col['qf_label']
             );
-            
+
         }
-        
+
+        // for file elements the 'numeric' and 'maxlength' rules must not be set
+        if ($col['qf_type'] == 'file') {
+            return;
+        }
+
         $numeric = array('smallint', 'integer', 'bigint', 'decimal', 
             'single', 'double');
-        
+
         // the element is numeric
-        if (! isset($col['qf_rules']['numeric']) &&
+        if (!isset($col['qf_rules']['numeric']) && isset($col['type']) &&
             in_array($col['type'], $numeric)) {
-            
+
             $col['qf_rules']['numeric'] = sprintf(
                 $GLOBALS['_DB_TABLE']['qf_rules']['numeric'],
                 $col['qf_label']
             );
-            
+
         }
-        
+
         // the element has a maximum length
-        if (! isset($col['qf_rules']['maxlength']) &&
-            isset($col['size'])) {
-        
+        if (!isset($col['qf_rules']['maxlength']) && isset($col['size'])) {
+
             $max = $col['size'];
-            
+
             $msg = sprintf(
                 $GLOBALS['_DB_TABLE']['qf_rules']['maxlength'],
                 $col['qf_label'],
                 $max
             );
-            
+
             $col['qf_rules']['maxlength'] = array($msg, $max);
         }
     }

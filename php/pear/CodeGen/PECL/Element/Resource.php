@@ -15,7 +15,7 @@
  * @author     Hartmut Holzgraefe <hartmut@php.net>
  * @copyright  2005 Hartmut Holzgraefe
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Resource.php,v 1.7 2006/02/17 19:01:08 hholzgra Exp $
+ * @version    CVS: $Id: Resource.php,v 1.9 2006/07/08 21:29:49 hholzgra Exp $
  * @link       http://pear.php.net/package/CodeGen
  */
 
@@ -254,7 +254,7 @@ le_{$this->name} = zend_register_list_destructors_ex({$this->name}_dtor,
 
 ";
 
-        $dtor .= CodeGen_Tools_Indent::indent(4, $this->destruct);
+        $dtor .= $extension->codegen->varblock($this->destruct);
 
         if ($this->alloc) {
             $dtor .= "\n\tefree(resource);\n";

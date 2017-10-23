@@ -15,7 +15,7 @@
  * @author     Hartmut Holzgraefe <hartmut@php.net>
  * @copyright  2005 Hartmut Holzgraefe
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Interface.php,v 1.2 2005/08/13 09:47:20 hholzgra Exp $
+ * @version    CVS: $Id: Interface.php,v 1.3 2006/06/25 15:17:45 hholzgra Exp $
  * @link       http://pear.php.net/package/CodeGen
  */
 
@@ -24,6 +24,7 @@
  */
 require_once "CodeGen/PECL/Element.php";
 require_once "CodeGen/PECL/Element/Method.php";
+require_once "CodeGen/PECL/Element/ObjectInterface.php";
 
 require_once "CodeGen/Tools/Indent.php";
 
@@ -41,6 +42,7 @@ require_once "CodeGen/Tools/Indent.php";
 
     class CodeGen_PECL_Element_Interface
       extends CodeGen_PECL_Element 
+	  implements CodeGen_PECL_Element_ObjectInterface
     {
         /**
          * The class name
@@ -286,7 +288,10 @@ require_once "CodeGen/Tools/Indent.php";
             return $xml;
         }
 
-        
+        function getPayloadType() 
+        {
+		    return "";
+        }
     }
 
 ?>

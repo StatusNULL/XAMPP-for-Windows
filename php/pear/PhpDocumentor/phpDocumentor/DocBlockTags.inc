@@ -1,28 +1,43 @@
 <?php
-//
-// +------------------------------------------------------------------------+
-// | phpDocumentor                                                          |
-// +------------------------------------------------------------------------+
-// | Copyright (c) 2000-2003 Joshua Eichorn, Gregory Beaver                 |
-// | Email         jeichorn@phpdoc.org, cellog@phpdoc.org                   |
-// | Web           http://www.phpdoc.org                                    |
-// | Mirror        http://phpdocu.sourceforge.net/                          |
-// | PEAR          http://pear.php.net/package-info.php?pacid=137           |
-// +------------------------------------------------------------------------+
-// | This source file is subject to version 3.00 of the PHP License,        |
-// | that is available at http://www.php.net/license/3_0.txt.               |
-// | If you did not receive a copy of the PHP license and are unable to     |
-// | obtain it through the world-wide-web, please send a note to            |
-// | license@php.net so we can mail you a copy immediately.                 |
-// +------------------------------------------------------------------------+
-//
-
 /**
  * All abstract representations of DocBlock tags are defined
  * by the classes in this file
- * @package phpDocumentor
+ *
+ * phpDocumentor :: automatic documentation generator
+ * 
+ * PHP versions 4 and 5
+ *
+ * Copyright (c) 2002-2006 Gregory Beaver
+ * 
+ * LICENSE:
+ * 
+ * This library is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation;
+ * either version 2.1 of the License, or (at your option) any
+ * later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ *
+ * @package    phpDocumentor
  * @subpackage DocBlockTags
- * @since separate file since version 1.2
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  2002-2006 Gregory Beaver
+ * @license    http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @version    CVS: $Id: DocBlockTags.inc,v 1.8 2006/10/24 04:18:14 cellog Exp $
+ * @filesource
+ * @link       http://www.phpdoc.org
+ * @link       http://pear.php.net/PhpDocumentor
+ * @see        parserDocBlock, parserInclude, parserPage, parserClass
+ * @see        parserDefine, parserFunction, parserMethod, parserVar
+ * @since      separate file since version 1.2
  */
 /**
  * used to represent standard tags like @access, etc.
@@ -32,12 +47,12 @@
  * @subpackage DocBlockTags
  * @author Greg Beaver <cellog@users.sourceforge.net>
  * @since 1.0rc1
- * @version $Id: DocBlockTags.inc,v 1.22.2.11 2003/07/26 05:55:26 CelloG Exp $
+ * @version $Id: DocBlockTags.inc,v 1.8 2006/10/24 04:18:14 cellog Exp $
  */
 class parserTag extends parserStringWithInlineTags
 {
     /**
-     * Type is used by many functions to skip the hassle of if get_class($blah) == 'parserBlah'
+     * Type is used by many functions to skip the hassle of if phpDocumentor_get_class($blah) == 'parserBlah'
      * always '_tag'
      * @var string
      */
@@ -77,16 +92,17 @@ class parserTag extends parserStringWithInlineTags
         {
             if (count($this->value) == 1)
             {
-                list(,$val) = each($this->value);
                 reset($this->value);
-                return $val->Convert($converter);
+                list(,$val) = each($this->value);
+                $a = $val->Convert($converter);
+                return $a;
             }
             $result = '';
             foreach($this->value as $val)
             {
                 // this is only true if we processed the description in
                 // the constructor
-                if (get_class($val) == 'parserstringwithinlinetags')
+                if (phpDocumentor_get_class($val) == 'parserstringwithinlinetags')
                 $result .= $converter->EncloseParagraph($val->Convert($converter));
                 else
                 $result .= $val->Convert($converter);
@@ -94,7 +110,8 @@ class parserTag extends parserStringWithInlineTags
             return $result;
         } else
         {
-            return $this->value->Convert($converter);
+            $a = $this->value->Convert($converter);
+            return $a;
         }
     }
     
@@ -256,7 +273,7 @@ class parserAccessTag extends parserTag
  * @subpackage DocBlockTags
  * @author Greg Beaver <cellog@users.sourceforge.net>
  * @since 1.0rc1
- * @version $Id: DocBlockTags.inc,v 1.22.2.11 2003/07/26 05:55:26 CelloG Exp $
+ * @version $Id: DocBlockTags.inc,v 1.8 2006/10/24 04:18:14 cellog Exp $
  */
 class parserReturnTag extends parserTag
 {
@@ -315,7 +332,7 @@ class parserReturnTag extends parserTag
             foreach($types as $returntype)
             {
                 $a = $converter->getLink($returntype);
-                if (is_object($a) && get_class($a) == 'classlink')
+                if (is_object($a) && phpDocumentor_get_class($a) == 'classlink')
                 {
                     if (!empty($my_types)) $my_types .= '|';
                     $my_types .= $converter->returnSee($a,$converter->type_adjust($returntype));
@@ -329,7 +346,7 @@ class parserReturnTag extends parserTag
         } else
         {
             $a = $converter->getLink($this->returnType);
-            if (is_object($a) && get_class($a) == 'classlink')
+            if (is_object($a) && phpDocumentor_get_class($a) == 'classlink')
             {
                 $this->converted_returnType = $converter->returnSee($a,$converter->type_adjust($this->returnType));
             } else
@@ -348,7 +365,7 @@ class parserReturnTag extends parserTag
  * @subpackage DocBlockTags
  * @author Greg Beaver <cellog@users.sourceforge.net>
  * @since 1.0rc1
- * @version $Id: DocBlockTags.inc,v 1.22.2.11 2003/07/26 05:55:26 CelloG Exp $
+ * @version $Id: DocBlockTags.inc,v 1.8 2006/10/24 04:18:14 cellog Exp $
  */
 class parserVarTag extends parserReturnTag
 {
@@ -401,7 +418,7 @@ class parserStaticvarTag extends parserParamTag
  * @subpackage DocBlockTags
  * @author Greg Beaver <cellog@users.sourceforge.net>
  * @since 1.0rc1
- * @version $Id: DocBlockTags.inc,v 1.22.2.11 2003/07/26 05:55:26 CelloG Exp $
+ * @version $Id: DocBlockTags.inc,v 1.8 2006/10/24 04:18:14 cellog Exp $
  */
 class parserLinkTag extends parserTag
 {
@@ -437,7 +454,7 @@ class parserLinkTag extends parserTag
  * @subpackage DocBlockTags
  * @author Greg Beaver <cellog@users.sourceforge.net>
  * @since 1.0rc1
- * @version $Id: DocBlockTags.inc,v 1.22.2.11 2003/07/26 05:55:26 CelloG Exp $
+ * @version $Id: DocBlockTags.inc,v 1.8 2006/10/24 04:18:14 cellog Exp $
  */
 class parserSeeTag extends parserLinkTag
 {
@@ -552,6 +569,9 @@ class parserUsesTag extends parserSeeTag
      */
     function parserUsesTag($seeel, $description)
     {
+        if ($seeel->hasInlineTag()) {
+            addErrorDie(PDERROR_DUMB_USES);
+        }
         parent::parserSeeTag($seeel);
         $this->_description = $description;
     }
@@ -731,11 +751,7 @@ class parserFileSourceTag extends parserTag
      */
     function Convert(&$c)
     {
-        if (!isset($this->_converted[$c->name]))
-        {
-            $this->ConvertSource($c);
-            $this->_converted[$c->name] = true;
-        }
+        $this->ConvertSource($c);
         return $this->getSourceLink($c);
     }
 
@@ -932,6 +948,7 @@ class parserExampleTag extends parserFileSourceTag
                     $obj = new phpDocumentorTWordParser;
                     $obj->setup($example);
                     $this->source = $obj->getFileSource();
+                    $this->origsource = $example;
                     unset($obj);
                 } else
                 {
@@ -948,7 +965,8 @@ class parserExampleTag extends parserFileSourceTag
      */
     function ConvertSource(&$c)
     {
-        $this->writeSource($c, $c->ProgramExample($this->source, true));
+        $this->writeSource($c, $c->ProgramExample($this->source, true, null,
+                            null, null, null, $this->origsource));
         return;
         $parser = new phpDocumentor_HighlightParser;
         $return = '';

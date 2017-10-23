@@ -1,27 +1,40 @@
 <?php
-//
-// +------------------------------------------------------------------------+
-// | phpDocumentor                                                          |
-// +------------------------------------------------------------------------+
-// | Copyright (c) 2000-2003 Joshua Eichorn, Gregory Beaver                 |
-// | Email         jeichorn@phpdoc.org, cellog@phpdoc.org                   |
-// | Web           http://www.phpdoc.org                                    |
-// | Mirror        http://phpdocu.sourceforge.net/                          |
-// | PEAR          http://pear.php.net/package-info.php?pacid=137           |
-// +------------------------------------------------------------------------+
-// | This source file is subject to version 3.00 of the PHP License,        |
-// | that is available at http://www.php.net/license/3_0.txt.               |
-// | If you did not receive a copy of the PHP license and are unable to     |
-// | obtain it through the world-wide-web, please send a note to            |
-// | license@php.net so we can mail you a copy immediately.                 |
-// +------------------------------------------------------------------------+
-//
-
 /**
- * @package phpDocumentor
+ * Parser for XML DocBook-based phpDocumentor tutorials
+ * 
+ * phpDocumentor :: automatic documentation generator
+ * 
+ * PHP versions 4 and 5
+ *
+ * Copyright (c) 2002-2006 Gregory Beaver
+ * 
+ * LICENSE:
+ * 
+ * This library is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation;
+ * either version 2.1 of the License, or (at your option) any
+ * later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ *
+ * @package    phpDocumentor
  * @subpackage Parsers
- * @author Greg Beaver <cellog@users.sourceforge.net>
- * @since 1.2
+ * @author     Gregory Beaver <cellog@php.net>
+ * @copyright  2002-2006 Gregory Beaver
+ * @license    http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @version    CVS: $Id: XMLpackagePageParser.inc,v 1.10 2006/05/22 01:07:28 cellog Exp $
+ * @tutorial   tutorials.pkg
+ * @link       http://www.phpdoc.org
+ * @link       http://pear.php.net/PhpDocumentor
+ * @since      1.2
  */
 /** when <programlisting> is found */
 define('PHPDOCUMENTOR_PDP_EVENT_PROGRAMLISTING', 600);
@@ -53,6 +66,7 @@ define('PHPDOCUMENTOR_PDP_STATE_ENTITY', 704);
  */
 class XMLPackagePageParser extends Parser
 {
+    /** @var array */
     var $eventHandlers = array(
                                PHPDOCUMENTOR_PDP_EVENT_TAG => 'handleTag',
                                PHPDOCUMENTOR_PDP_EVENT_ATTRIBUTES => 'handleAttributes',
@@ -105,7 +119,8 @@ class XMLPackagePageParser extends Parser
     function parse ($parse_data, $tutorial)
     {
         $tempparse = new ppageParser;
-        $parse_data = $tempparse->parse($parse_data,true,$tutorial['package'],$tutorial['subpackage'],basename($tutorial['path'],$tutorial['category']));
+        $parse_data = $tempparse->parse($parse_data,true,$tutorial['package'],$tutorial['subpackage'],
+                                        basename($tutorial['path']),$tutorial['category'], $tutorial['path']);
         unset($tempparse);
         static $endrecur = 0;
         if (!is_array($parse_data) || count($parse_data) == 0)
@@ -211,24 +226,26 @@ class XMLPackagePageParser extends Parser
             $this->p_vars['quote_data'] = "";
         }
         if (!is_object($word)) $this->checkEventPush( $word, $pevent);
-        if ($word != "\"")
+        if (is_object($word))
         {
-            if (is_object($word))
-            {
-                $this->p_vars['quote_data'] = $word;
-            }
-            else
+            $this->p_vars['quote_data'] = $word;
+        } else
+        {
+            if ($word != "\"")
             {
                 if (!is_object($this->p_vars['quote_data']))
-                $this->p_vars['quote_data'] .= $word;
+                {
+                    $this->p_vars['quote_data'] .= $word;
+                }
             }
-        }
-        if (!is_object($word))
-        {
             if ($word == '>')
             {
-                if (is_object($this->p_vars['quote_data'])) $this->p_vars['quote_data'] = '{@id '.$this->p_vars['quote_data']->id.'}';
-                addErrorDie(PDERROR_UNTERMINATED_ATTRIB,$this->curtag->name,$this->p_vars['attrname'],$this->p_vars['quote_data']);
+                if (is_object($this->p_vars['quote_data']))
+                {
+                    $this->p_vars['quote_data'] = '{@id '.$this->p_vars['quote_data']->id.'}';
+                }
+                addErrorDie(PDERROR_UNTERMINATED_ATTRIB,
+                    $this->curtag->name,$this->p_vars['attrname'],$this->p_vars['quote_data']);
             }
             if ($this->checkEventPop($word,$pevent))
             {
@@ -261,9 +278,14 @@ class XMLPackagePageParser extends Parser
                 array_push($this->pars,$this->curtag);
             }
             $this->curtag = new parserXMLDocBookTag($word);
-        } elseif ($this->p_vars['last_word'] == '</')
+        } elseif ($this->p_vars['last_word'] == '</' || $word == '/>')
         {
             $tag = array_pop($this->context);
+            if ($word == '/>') {
+                // all is OK
+                $this->checkEventPop($word, $pevent);
+                $word = $tag;
+            }
             if ($tag != $word)
             {
                 addErrorDie(PDERROR_UNMATCHED_TUTORIAL_TAG,$tag,$word,$this->curtag->getString());
@@ -324,7 +346,7 @@ class XMLPackagePageParser extends Parser
      */
     function handleCData($word, $pevent)
     {
-        if ($this->curtag->name == 'refentry' && get_class($word) == 'parsertocinlinetag')
+        if ($this->curtag->name == 'refentry' && phpDocumentor_get_class($word) == 'parsertocinlinetag')
         {
             $this->p_vars['toc'] = $this->curtag->getTOC();
         }
@@ -339,11 +361,11 @@ class XMLPackagePageParser extends Parser
                 return;
             }
         }
-        if ($word == '<![CDATA[')
+        if (is_string($word) && $word == '<![CDATA[')
         {
             $this->curtag->startCData();
             $this->p_flags['in_cdata'] = true;
-        } elseif ($this->p_flags['in_cdata'] && $word == ']]>')
+        } elseif ($this->p_flags['in_cdata'] && is_string($word) && $word == ']]>')
         {
             $this->curtag->endCData();
             $this->p_flags['in_cdata'] = false;
@@ -397,7 +419,7 @@ class XMLPackagePageParser extends Parser
                 if (isset($this->p_vars['attrname']))
                 {
                     $value = $this->p_vars['quote_data'];
-                    if (get_class($value) == 'parseridinlinetag')
+                    if (phpDocumentor_get_class($value) == 'parseridinlinetag')
                     { // "inherit" the parent section's id, so
                       // <refsect1 id="{@id test"}> <!-- id is 'test' -->
                       // ...
@@ -436,7 +458,15 @@ class XMLPackagePageParser extends Parser
                     }
                     $this->curtag->addAttribute($this->p_vars['attrname'],$value);
                     unset($this->p_vars['attrname']);
-                    $this->p_flags['end_attr'] = false;
+                    if (is_string($word) && $this->checkEventPop($word, $pevent))
+                    {
+                        $this->p_flags['start_attr'] = true;
+                        $this->p_flags['end_attr'] = false;
+                        $this->wp->setPos($this->wp->getPos() - strlen($word));
+                    } else {
+                        $this->wp->setPos($this->wp->getPos() - strlen($word));
+                    }
+                    return;
                 }
             }
         }
@@ -461,23 +491,24 @@ class XMLPackagePageParser extends Parser
         $this->_cursection = 0;
         if (isset($this->p_vars['toc'])) unset($this->p_vars['toc']);
         
-        $this->tokens[STATE_NOEVENTS]                     = array('</','<','<!--','<?');
+        $this->tokens[STATE_NOEVENTS]                     = array('</','<!--','<!','<?','<');
         $this->tokens[STATE_COMMENTBLOCK]                 = array('-->');
-        $this->tokens[STATE_OUTPHP]                       = array('?>');
+        $this->tokens[STATE_OUTPHP]                       = array('?>','>');
         $this->tokens[STATE_QUOTE]                        = array("\\\"","\\\\","\"",'>');
         $this->tokens[STATE_ESCAPE]                       = false;// this tells the word parser to just cycle
-        $this->tokens[PHPDOCUMENTOR_PDP_STATE_TAG]        = array('>',' ');
+        $this->tokens[PHPDOCUMENTOR_PDP_STATE_TAG]        = array('>',' ','/>');
         $this->tokens[PHPDOCUMENTOR_PDP_STATE_CDATA]      = array('&','<!--','</','<![CDATA[','<',']]>');
-        $this->tokens[PHPDOCUMENTOR_PDP_STATE_ATTRIBUTES] = array('=','>','"');
+        $this->tokens[PHPDOCUMENTOR_PDP_STATE_ATTRIBUTES] = array('=','>','/>','"');
         $this->tokens[PHPDOCUMENTOR_PDP_STATE_ENTITY]     = array(';');
 
         // For each event word to event mapings
         $this->pushEvent[PARSER_EVENT_NOEVENTS] = 
             array(
-                "<" => PHPDOCUMENTOR_PDP_EVENT_TAG,
-                "</" => PHPDOCUMENTOR_PDP_EVENT_TAG,
                 '<!--' => PARSER_EVENT_COMMENTBLOCK,
+                '<!' => PARSER_EVENT_OUTPHP,
+                "</" => PHPDOCUMENTOR_PDP_EVENT_TAG,
                 '<?' => PARSER_EVENT_OUTPHP,
+                "<" => PHPDOCUMENTOR_PDP_EVENT_TAG,
                 '&' => PHPDOCUMENTOR_PDP_EVENT_ENTITY,
             );
 ##########################
@@ -487,14 +518,14 @@ class XMLPackagePageParser extends Parser
                 ' ' => PHPDOCUMENTOR_PDP_EVENT_ATTRIBUTES,
             );
          
-        $this->popEvent[PHPDOCUMENTOR_PDP_EVENT_TAG] = array(">");
+        $this->popEvent[PHPDOCUMENTOR_PDP_EVENT_TAG] = array(">","/>");
 ##########################
         $this->pushEvent[PHPDOCUMENTOR_PDP_EVENT_ATTRIBUTES] =
             array(
                 '"' => PARSER_EVENT_QUOTE,
             );
 
-        $this->popEvent[PHPDOCUMENTOR_PDP_EVENT_ATTRIBUTES] = array(">");
+        $this->popEvent[PHPDOCUMENTOR_PDP_EVENT_ATTRIBUTES] = array(">","/>");
 ##########################
 
         $this->popEvent[PARSER_EVENT_COMMENTBLOCK] = array("-->");
@@ -506,7 +537,7 @@ class XMLPackagePageParser extends Parser
         $this->popEvent[PARSER_EVENT_QUOTE] = array("\"");
 ##########################
 
-        $this->popEvent[PARSER_EVENT_OUTPHP] = array("?>");
+        $this->popEvent[PARSER_EVENT_OUTPHP] = array("?>",">");
 ##########################
 
         $this->popEvent[PHPDOCUMENTOR_PDP_EVENT_ENTITY] = array(";");
@@ -538,6 +569,8 @@ class XMLPackagePageParser extends Parser
             PHPDOCUMENTOR_PDP_EVENT_LIST    => "PHPDOCUMENTOR_PDP_EVENT_LIST",
             PARSER_EVENT_QUOTE  => "PARSER_EVENT_QUOTE",
             PHPDOCUMENTOR_PDP_EVENT_ENTITY => "PHPDOCUMENTOR_PDP_EVENT_ENTITY",
+            PHPDOCUMENTOR_PDP_EVENT_COMMENT => "PHPDOCUMENTOR_PDP_EVENT_COMMENT",
+            PHPDOCUMENTOR_PDP_EVENT_PI => "PHPDOCUMENTOR_PDP_EVENT_PI",
         );
         if (isset($lookup[$value]))
         return $lookup[$value];

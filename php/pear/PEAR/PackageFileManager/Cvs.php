@@ -1,39 +1,44 @@
 <?php
-//
-// +------------------------------------------------------------------------+
-// | PEAR :: Package File Manager                                           |
-// +------------------------------------------------------------------------+
-// | Copyright (c) 2003-2004 Gregory Beaver                                 |
-// | Email         cellog@phpdoc.org                                        |
-// +------------------------------------------------------------------------+
-// | This source file is subject to version 3.00 of the PHP License,        |
-// | that is available at http://www.php.net/license/3_0.txt.               |
-// | If you did not receive a copy of the PHP license and are unable to     |
-// | obtain it through the world-wide-web, please send a note to            |
-// | license@php.net so we can mail you a copy immediately.                 |
-// +------------------------------------------------------------------------+
-// | Portions of this code based on phpDocumentor                           |
-// | Web           http://www.phpdoc.org                                    |
-// | Mirror        http://phpdocu.sourceforge.net/                          |
-// +------------------------------------------------------------------------+
-// $Id: Cvs.php,v 1.9 2005/03/25 22:37:15 cellog Exp $
-//
 /**
- * @package PEAR_PackageFileManager
+ * The CVS list plugin generator for both PEAR_PackageFileManager,
+ * and PEAR_PackageFileManager2 classes.
+ *
+ * LICENSE: This source file is subject to version 3.01 of the PHP license
+ * that is available through the world-wide-web at the following URI:
+ * http://www.php.net/license/3_01.txt.  If you did not receive a copy of
+ * the PHP License and are unable to obtain it through the web, please
+ * send a note to license@php.net so we can mail you a copy immediately.
+ *
+ * @category   pear
+ * @package    PEAR_PackageFileManager
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  2003-2006 The PHP Group
+ * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
+ * @version    CVS: $Id: Cvs.php,v 1.14 2006/10/14 11:18:19 farell Exp $
+ * @link       http://pear.php.net/package/PEAR_PackageFileManager
+ * @since      File available since Release 0.1
  */
-/**
- * The PEAR_PackageFileManager_File class
- */
+
 require_once 'PEAR/PackageFileManager/File.php';
 
 /**
- * Generate a file list from a CVS checkout
+ * Generate a file list from a CVS checkout.
  *
  * Note that this will <b>NOT</b> work on a
  * repository, only on a checked out CVS module
- * @package PEAR_PackageFileManager
+ *
+ * @category   pear
+ * @package    PEAR_PackageFileManager
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  2003-2006 The PHP Group
+ * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
+ * @version    Release: 1.6.0
+ * @link       http://pear.php.net/package/PEAR_PackageFileManager
+ * @since      Class available since Release 0.1
  */
-class PEAR_PackageFileManager_CVS extends PEAR_PackageFileManager_File {
+
+class PEAR_PackageFileManager_CVS extends PEAR_PackageFileManager_File
+{
     /**
      * List of CVS-specific files that may exist in CVS but should be
      * ignored when building the package's file list.
@@ -72,11 +77,16 @@ class PEAR_PackageFileManager_CVS extends PEAR_PackageFileManager_File {
             return parent::dirList($directory);
         }
         if (!$entries || !is_array($entries)) {
-            return PEAR_PackageFileManager::raiseError(PEAR_PACKAGEFILEMANAGER_NOCVSENTRIES, $directory);
+            if (strcasecmp(get_class($this->_parent), 'PEAR_PackageFileManager') == 0) {
+                $code = PEAR_PACKAGEFILEMANAGER_NOCVSENTRIES;
+            } else {
+                $code = PEAR_PACKAGEFILEMANAGER2_NOCVSENTRIES;
+            }
+            return $this->_parent->raiseError($code, $directory);
         }
         return $this->_readCVSEntries($entries);
     }
-    
+
     /**
      * Iterate over the CVS Entries files, and retrieve every
      * file in the repository
@@ -95,7 +105,7 @@ class PEAR_PackageFileManager_CVS extends PEAR_PackageFileManager_File {
         $this->ignore = array(false, false);
         $this->_setupIgnore($ignore, 1);
         $this->_setupIgnore($include, 0);
-        foreach($entries as $cvsentry) {
+        foreach ($entries as $cvsentry) {
             $directory = @dirname(@dirname($cvsentry));
             if (!$directory) {
                 continue;
@@ -104,18 +114,16 @@ class PEAR_PackageFileManager_CVS extends PEAR_PackageFileManager_File {
             if (!is_array($d)) {
                 continue;
             }
-            foreach($d as $entry) {
+            foreach ($d as $entry) {
                 if ($ignore) {
-                	if ($this->_checkIgnore($this->_getCVSFileName($entry),
+                    if ($this->_checkIgnore($this->_getCVSFileName($entry),
                           $directory . '/' . $this->_getCVSFileName($entry), 1)) {
-    //                    print 'Ignoring '.$file."<br>\n";
                         continue;
                     }
                 }
                 if ($include) {
                     if ($this->_checkIgnore($this->_getCVSFileName($entry),
                           $directory . '/' . $this->_getCVSFileName($entry), 0)) {
-    //                    print 'Including '.$file."<br\n";
                         continue;
                     }
                 }
@@ -126,7 +134,7 @@ class PEAR_PackageFileManager_CVS extends PEAR_PackageFileManager_File {
         }
         return $ret;
     }
-    
+
     /**
      * Retrieve the filename from an entry
      *
@@ -142,7 +150,7 @@ class PEAR_PackageFileManager_CVS extends PEAR_PackageFileManager_File {
         array_shift($stuff);
         return array_shift($stuff);
     }
-    
+
     /**
      * Retrieve the entries in a CVS/Entries file
      * @return array each line of the entries file, output of file()
@@ -159,7 +167,7 @@ class PEAR_PackageFileManager_CVS extends PEAR_PackageFileManager_File {
             return false;
         }
     }
-    
+
     /**
      * Check whether an entry is a file or a directory
      * @return boolean

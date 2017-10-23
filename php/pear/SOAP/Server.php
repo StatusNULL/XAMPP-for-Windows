@@ -78,9 +78,17 @@ class SOAP_Server extends SOAP_Base
 
     var $service = ''; //soapaction header
     var $method_namespace = null;
-    var $__options = array('use' => 'encoded',
-                           'style' => 'rpc',
-                           'parameters' => 0);
+
+    /**
+     * Options.
+     *
+     * @var array
+     */
+    var $_options = array('use' => 'encoded',
+                          'style' => 'rpc',
+                          'parameters' => 0,
+                          'http_status_success' => '200 OK',
+                          'http_status_fault' => '500 SOAP Fault');
 
     function SOAP_Server($options = null)
     {
@@ -89,18 +97,18 @@ class SOAP_Server extends SOAP_Base
 
         if (is_array($options)) {
             if (isset($options['use'])) {
-                $this->__options['use'] = $options['use'];
+                $this->_options['use'] = $options['use'];
             }
             if (isset($options['style'])) {
-                $this->__options['style'] = $options['style'];
+                $this->_options['style'] = $options['style'];
             }
             if (isset($options['parameters'])) {
-                $this->__options['parameters'] = $options['parameters'];
+                $this->_options['parameters'] = $options['parameters'];
             }
         }
         // assume we encode with section 5
         $this->_section5 = true;
-        if ($this->__options['use']=='literal') {
+        if ($this->_options['use']=='literal') {
             $this->_section5 = false;
         }
     }
@@ -118,8 +126,9 @@ class SOAP_Server extends SOAP_Base
     {
         /* The error handler should ignore '0' errors, eg. hidden by @ - see
          * the set_error_handler manual page. (thanks to Alan Knowles). */
-        if (!$errno || $errno == E_NOTICE) {
-            return;
+        if (!$errno || !error_reporting() || $errno == E_NOTICE ||
+            (defined('E_STRICT') && $errno == constant('E_STRICT'))) {
+            return false;
         }
 
         $this->fault =& new SOAP_Fault($errmsg, 'Server', 'PHP', "Errno: $errno\nFilename: $filename\nLineno: $linenum\n");
@@ -146,9 +155,16 @@ class SOAP_Server extends SOAP_Base
 
 
     /**
-     * Parses request and posts response.
+     * Parses the request and posts or returns the response.
+     *
+     * @param string $data      The SOAP request data.
+     * @param string $endpoint  The service endpoint. Determined automatically
+     *                          if left empty.
+     * @param boolean $test
+     * @param boolean $return   Whether to return the SOAP response data
+     *                          instead of sending it to the client.
      */
-    function service($data, $endpoint = '', $test = false)
+    function service($data, $endpoint = '', $test = false, $return = false)
     {
         $response = null;
         $attachments = array();
@@ -207,7 +223,7 @@ class SOAP_Server extends SOAP_Base
             /* Handle Mime or DIME encoding. */
             /* TODO: DIME decoding should move to the transport, do it here
              * for now and for ease of getting it done. */
-            if (count($this->__attachments)) {
+            if (count($this->_attachments)) {
                 if ($useEncoding == 'Mime') {
                     $soap_msg = $this->_makeMimeMessage($soap_msg);
                 } else {
@@ -216,7 +232,7 @@ class SOAP_Server extends SOAP_Base
                     $this->headers['Content-Type'] = 'application/dime';
                 }
                 if (PEAR::isError($soap_msg)) {
-                    return $this->raiseSoapFault($soap_msg);
+                    return $this->_raiseSoapFault($soap_msg);
                 }
             }
 
@@ -228,6 +244,13 @@ class SOAP_Server extends SOAP_Base
             } else {
                 $response = $soap_msg;
             }
+        }
+
+        if ($return) {
+            if ($this->fault) {
+                $response = $this->fault->message();
+            }
+            return $response;
         }
 
         $this->_sendResponse($response);
@@ -253,10 +276,10 @@ class SOAP_Server extends SOAP_Base
         }
 
         if ($this->fault) {
-            $hdrs = "$hdrs_type 500 Soap Fault\r\n";
-            $response = $this->fault->message();
+            $hdrs = $hdrs_type . ' ' . $this->_options['http_status_fault'] . "\r\n";
+            $response = $this->fault->message($this->response_encoding);
         } else {
-            $hdrs = "$hdrs_type 200 OK\r\n";
+            $hdrs = $hdrs_type . ' ' . $this->_options['http_status_success'] . "\r\n";
         }
         header($hdrs);
 
@@ -279,7 +302,8 @@ class SOAP_Server extends SOAP_Base
     function &callMethod($methodname, &$args)
     {
         if ($this->callHandler) {
-            return @call_user_func_array($this->callHandler, array($methodname, $args));
+            $ret = @call_user_func_array($this->callHandler, array($methodname, $args));
+            return $ret;
         }
 
         set_error_handler(array($this, '_errorHandler'));
@@ -287,16 +311,16 @@ class SOAP_Server extends SOAP_Base
         if ($args) {
             /* Call method with parameters. */
             if (isset($this->soapobject) && is_object($this->soapobject)) {
-                $ret = @call_user_func_array(array(&$this->soapobject, $methodname), $args);
+                $ret = call_user_func_array(array(&$this->soapobject, $methodname), $args);
             } else {
-                $ret = @call_user_func_array($methodname, $args);
+                $ret = call_user_func_array($methodname, $args);
             }
         } else {
             /* Call method withour parameters. */
             if (is_object($this->soapobject)) {
-                $ret = @call_user_func(array(&$this->soapobject, $methodname));
+                $ret = call_user_func(array(&$this->soapobject, $methodname));
             } else {
-                $ret = @call_user_func($methodname);
+                $ret = call_user_func($methodname);
             }
         }
 
@@ -306,8 +330,15 @@ class SOAP_Server extends SOAP_Base
     }
 
     /**
-     * Creates SOAP_Value object with return values from method.
+     * Creates SOAP_Value objects with return values from method.
      * Uses method signature to determine type.
+     *
+     * @param mixed $method_response  The result(s).
+     * @param array|string $type      The type(s) of the return value(s).
+     * @param string $return_name     The name of the return value.
+     * @param string $namespace       The namespace of the return value.
+     *
+     * @return array  List of SOAP_Value objects.
      */
     function buildResult(&$method_response, &$return_type,
                          $return_name = 'return', $namespace = '')
@@ -322,8 +353,8 @@ class SOAP_Server extends SOAP_Base
                     if (is_numeric($key)) {
                         $key = 'item';
                     }
-                    if (is_a($method_response[$i],'soap_value')) {
-                        $return_val[] = $method_response[$i++];
+                    if (is_a($method_response[$i], 'SOAP_Value')) {
+                        $return_val[] =& $method_response[$i++];
                     } else {
                         $qn =& new QName($key, $namespace);
                         $return_val[] =& new SOAP_Value($qn->fqn(), $type, $method_response[$i++]);
@@ -339,8 +370,7 @@ class SOAP_Server extends SOAP_Base
                     $return_type = $values[0];
                 }
                 $qn =& new QName($return_name, $namespace);
-                $return_val = array();
-                $return_val[] =& new SOAP_Value($qn->fqn(), $return_type, $method_response);
+                $return_val = array(new SOAP_Value($qn->fqn(), $return_type, $method_response));
             }
         }
         return $return_val;
@@ -390,7 +420,12 @@ class SOAP_Server extends SOAP_Base
                         $header_data = array($this->_decode($header_val));
                         /* If there are parameters to pass. */
                         $hr =& $this->callMethod($header_method, $header_data);
-                        $header_results[] = array_shift($this->buildResult($hr, $this->return_type, $header_method, $header_val->namespace));
+                        if (PEAR::isError($hr)) {
+                            $this->_raiseSoapFault($hr);
+                            return null;
+                        }
+                        $results = $this->buildResult($hr, $this->return_type, $header_method, $header_val->namespace);
+                        $header_results[] = $results[0];
                     }
                 }
             }
@@ -411,15 +446,17 @@ class SOAP_Server extends SOAP_Base
 
             $this->_portName = $this->_wsdl->getPortName($this->methodname);
             if (PEAR::isError($this->_portName)) {
-                return $this->_raiseSoapFault($this->_portName);
+                $this->_raiseSoapFault($this->_portName);
+                return null;
             }
             $opData = $this->_wsdl->getOperationData($this->_portName, $this->methodname);
             if (PEAR::isError($opData)) {
-                return $this->_raiseSoapFault($opData);
+                $this->_raiseSoapFault($opData);
+                return null;
             }
-            $this->__options['style'] = $opData['style'];
-            $this->__options['use'] = $opData['output']['use'];
-            $this->__options['parameters'] = $opData['parameters'];
+            $this->_options['style'] = $opData['style'];
+            $this->_options['use'] = $opData['output']['use'];
+            $this->_options['parameters'] = $opData['parameters'];
         }
 
         /* Does method exist? */
@@ -448,13 +485,18 @@ class SOAP_Server extends SOAP_Base
          * differentiate between no params passed, and an error decoding. */
         $request_data = $this->__decodeRequest($request_val);
         if (PEAR::isError($request_data)) {
-            return $this->_raiseSoapFault($request_data);
+            $this->_raiseSoapFault($request_data);
+            return null;
         }
         $method_response =& $this->callMethod($this->call_methodname, $request_data);
+        if (PEAR::isError($method_response)) {
+            $this->_raiseSoapFault($method_response);
+            return null;
+        }
 
-        if ($this->__options['parameters'] ||
+        if ($this->_options['parameters'] ||
             !$method_response ||
-            $this->__options['style']=='rpc') {
+            $this->_options['style']=='rpc') {
             /* Get the method result. */
             if (is_null($method_response)) {
                 $return_val = null;
@@ -467,32 +509,36 @@ class SOAP_Server extends SOAP_Base
         } else {
             $methodValue =& $method_response;
         }
-        return $this->_makeEnvelope($methodValue, $header_results, $this->response_encoding);
+        return $this->makeEnvelope($methodValue, $header_results, $this->response_encoding);
     }
 
     function &__decodeRequest($request, $shift = false)
     {
         if (!$request) {
-            return null;
+            $decoded = null;
+            return $decoded;
         }
 
         /* Check for valid response. */
         if (PEAR::isError($request)) {
-            return $this->_raiseSoapFault($request);
+            $fault = &$this->_raiseSoapFault($request);
+            return $fault;
         } else if (!is_a($request, 'SOAP_Value')) {
-            return $this->_raiseSoapFault('Invalid data in server::__decodeRequest');
+            $fault = &$this->_raiseSoapFault('Invalid data in server::__decodeRequest');
+            return $fault;
         }
 
         /* Decode to native php datatype. */
         $requestArray = $this->_decode($request);
         /* Fault? */
         if (PEAR::isError($requestArray)) {
-            return $this->_raiseSoapFault($requestArray);
+            $fault = &$this->_raiseSoapFault($requestArray);
+            return $fault;
         }
         if (is_object($requestArray) &&
             get_class($requestArray) == 'stdClass') {
             $requestArray = get_object_vars($requestArray);
-        } elseif ($this->__options['style'] == 'document') {
+        } elseif ($this->_options['style'] == 'document') {
             $requestArray = array($requestArray);
         }
         if (is_array($requestArray)) {
@@ -513,11 +559,13 @@ class SOAP_Server extends SOAP_Base
                         $faultactor = $v;
                     }
                 }
-                return $this->_raiseSoapFault($faultstring, $faultdetail, $faultactor, $faultcode);
+                $fault = &$this->_raiseSoapFault($faultstring, $faultdetail, $faultactor, $faultcode);
+                return $fault;
             }
             /* Return array of return values. */
             if ($shift && count($requestArray) == 1) {
-                return array_shift($requestArray);
+                $decoded = array_shift($requestArray);
+                return $decoded;
             }
             return $requestArray;
         }
@@ -558,7 +606,12 @@ class SOAP_Server extends SOAP_Base
         /* If there are input parameters required. */
         if ($sig = $map['in']) {
             $this->input_value = count($sig);
-            $this->return_type = is_array($map['out']) ? $map['out'] : false;
+            $this->return_type = false;
+            if (is_array($map['out'])) {
+                $this->return_type = count($map['out']) > 1
+                    ? $map['out']
+                    : array_shift($map['out']);
+            }
             if (is_array($params)) {
                 /* Validate the number of parameters. */
                 if (count($params) == count($sig)) {
@@ -701,7 +754,7 @@ class SOAP_Server extends SOAP_Base
      */
     function addToMap($methodname, $in, $out, $namespace = null, $alias = null)
     {
-        if (!function_exists($methodname)) {
+        if (!$this->callHandler && !function_exists($methodname)) {
             $this->_raiseSoapFault('Error mapping function', '', '', 'Server');
             return false;
         }

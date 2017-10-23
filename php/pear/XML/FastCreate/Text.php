@@ -20,7 +20,7 @@
  * @author     Guillaume Lecanu <Guillaume@dev.fr>
  * @copyright  1997-2005 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Text.php,v 1.3 2005/03/31 14:37:50 guillaume Exp $
+ * @version    CVS: $Id: Text.php,v 1.5 2005/12/15 16:37:26 guillaume Exp $
  * @link       http://pear.php.net/package/XML_FastCreate
  * @see        XML_Tree
  */
@@ -48,7 +48,7 @@ require_once 'XML/FastCreate.php';
  * @author     Guillaume Lecanu <Guillaume@dev.fr>
  * @copyright  1997-2005 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Text.php,v 1.3 2005/03/31 14:37:50 guillaume Exp $
+ * @version    CVS: $Id: Text.php,v 1.5 2005/12/15 16:37:26 guillaume Exp $
  * @link       http://pear.php.net/package/XML_FastCreate
  * @see        XML_Tree
  */
@@ -165,7 +165,7 @@ class XML_FastCreate_Text extends XML_FastCreate
                 $element = "<$tag$attTxt />";
             }
         }
-        $this->xml = $this->cr.$this->_quoted($element);
+        $this->xml = $this->_quoted($element);
         return $this->xml;
     }
     // }}}
@@ -196,9 +196,7 @@ class XML_FastCreate_Text extends XML_FastCreate
      */
     function cdata($content)
     {
-        return  $this->_quoted('/*<![CDATA[*/'
-                .$this->cr.$content
-                .$this->cr.'/*]]>*/');
+        return  $this->_quoted("/*<![CDATA[*/\n{$content}\n/*]]>*/");
     }
     // }}}
     // {{{ getXML()
@@ -216,7 +214,7 @@ class XML_FastCreate_Text extends XML_FastCreate
                 .' encoding="'.$this->_options['encoding'].'"'
                 .' standalone="'.$this->_options['standalone'].'" ?>';
         if ($this->_options['doctype']) {
-            $header .= "\n".$this->_options['doctype'];
+            $header .= "\n".$this->_options['doctype']."\n";
         }
         return $header.$this->_unquote($this->xml);
     }
@@ -252,7 +250,7 @@ class XML_FastCreate_Text extends XML_FastCreate
         foreach ($data as $str) {
             $xml .= $str;
         }
-        return $this->cr.$xml.$this->cr;
+        return $xml;
     }
     // }}}
     // {{{ quote()
@@ -274,24 +272,23 @@ class XML_FastCreate_Text extends XML_FastCreate
         if (is_string($str)) {
             $len = strlen($str);
             $new = $toQuote = '';
-            $waitEnd  = false;
+            $waitEnd = false;
             for ($i=0; $i < $len; $i++) {
                 if ($str{$i} == '<') {
-                    if (($str{$i+1} == '_') && ($str{$i+2} == '>')) {
+                    if (($str{$i+1} == "'") && ($str{$i+2} == '>')) {
                         $new .= $this->_quoteEntities($toQuote);
                         $toQuote = '';
                         $waitEnd = true;
-                        $i += 3;
+                        $i += 2;
+                        continue;
                     }
                 }
                 if ($waitEnd && ($str{$i} == '<')) {
-                    if (($str{$i+1} == '/') && ($str{$i+2} == '_') 
+                    if (($str{$i+1} == '/') && ($str{$i+2} == "'") 
                         && ($str{$i+3} == '>')) {
                         $waitEnd = false;
-                        $i += 4;
-                        if ($i > $len) { 
-                            $i--;
-                        }
+                        $i += 3;
+                        continue;
                     }
                 }
                 if ($waitEnd) {
@@ -302,9 +299,9 @@ class XML_FastCreate_Text extends XML_FastCreate
                     }
                 }
             }
-            $new = '<_>'.$new.$this->_quoteEntities($toQuote).'</_>';
+            $str = "<'>".$new.$this->_quoteEntities($toQuote)."</'>";
         }
-        return $new;
+        return $str;
     }
     // }}}
     // {{{ noquote()
@@ -321,7 +318,7 @@ class XML_FastCreate_Text extends XML_FastCreate
      */
     function noquote($str) 
     {
-        return '<_>'.$str.'</_>';
+        return "<'>{$str}</'>";
     }
     // }}}
     // {{{ _unquote()
@@ -336,7 +333,7 @@ class XML_FastCreate_Text extends XML_FastCreate
      */
     function _unquote($str) 
     {
-        return str_replace(array('<_>', '</_>'), array('', ''), $str);
+        return str_replace(array("<'>", "</'>"), array('', ''), $str);
     }
     // }}}
     // {{{ _quoted()
@@ -352,7 +349,7 @@ class XML_FastCreate_Text extends XML_FastCreate
     function _quoted($content) 
     {
         if ($this->_options['quote']) {
-            return '<_>'.$this->_unquote($content).'</_>';
+            return "<'>".$this->_unquote($content)."</'>";
         }
         return $content;
     }

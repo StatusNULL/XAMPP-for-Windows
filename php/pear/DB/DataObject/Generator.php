@@ -15,7 +15,7 @@
  * @author     Alan Knowles <alan@akbkhome.com>
  * @copyright  1997-2006 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Generator.php,v 1.113 2006/03/03 07:03:25 alan_k Exp $
+ * @version    CVS: $Id: Generator.php,v 1.122 2006/10/16 02:20:16 alan_k Exp $
  * @link       http://pear.php.net/package/DB_DataObject
  */
  
@@ -45,8 +45,10 @@
 
 /**
  * Needed classes
+ * We lazy load here, due to problems with the tests not setting up include path correctly.
+ * FIXME!
  */
-require_once 'DB/DataObject.php';
+class_exists('DB_DataObject') ? '' : require_once 'DB/DataObject.php';
 //require_once('Config.php');
 
 /**
@@ -250,11 +252,13 @@ class DB_DataObject_Generator extends DB_DataObject
                     $table = $bits[1];
                 }
             }
-
-            $defs =  $__DB->tableInfo($table);
-            if ($is_MDB2) {
+            if (!$is_MDB2) {
+                $defs =  $__DB->tableInfo($table);
+            } else {
+                $defs =  $__DB->reverse->tableInfo($table);
+                // rename the length value, so it matches db's return.
                 foreach ($defs as $k => $v) {
-                    $defs[$k]['len'] = &$defs[$k]['length'];
+                    $defs[$k]['len'] = $defs[$k]['length'];
                 }
             }
 
@@ -344,6 +348,87 @@ class DB_DataObject_Generator extends DB_DataObject
     }
 
     /**
+     * generate Foreign Keys (for links.ini) 
+     * Currenly only works with mysql / mysqli
+     * to use, you must set option: generate_links=true
+     * 
+     * @author Pascal Schöni 
+     */
+    function generateForeignKeys() 
+    {
+        $options = PEAR::getStaticProperty('DB_DataObject','options');
+        if (empty($options['generate_links'])) {
+            return false;
+        }
+        $__DB = &$GLOBALS['_DB_DATAOBJECT']['CONNECTIONS'][$this->_database_dsn_md5];
+        if (!in_array($__DB->phptype, array('mysql','mysqli'))) {
+            echo "WARNING: cant handle non-mysql introspection for defaults.";
+            return; // cant handle non-mysql introspection for defaults.
+        }
+
+        $DB = $this->getDatabaseConnection();
+
+        $fk = array();
+
+        foreach($this->tables as $this->table) {
+            $res =& $DB->query('SHOW CREATE TABLE ' . $this->table);
+            if (PEAR::isError($res)) {
+                die($res->getMessage());
+            }
+
+            $text = $res->fetchRow(DB_DEFAULT_MODE, 0);
+            $treffer = array();
+            // Extract FOREIGN KEYS
+            preg_match_all(
+                "/FOREIGN KEY \(`(\w*)`\) REFERENCES `(\w*)` \(`(\w*)`\)/i", 
+                $text[1], 
+                $treffer, 
+                PREG_SET_ORDER);
+
+            if (count($treffer) < 1) {
+                continue;
+            }
+            for ($i = 0; $i < count($treffer); $i++) {
+                $fk[$this->table][$treffer[$i][1]] = $treffer[$i][2] . ":" . $treffer[$i][3];
+            }
+            
+        }
+
+        $links_ini = "";
+
+        foreach($fk as $table => $details) {
+            $links_ini .= "[$table]\n";
+            foreach ($details as $col => $ref) {
+                $links_ini .= "$col = $ref\n";
+            }
+            $links_ini .= "\n";
+        }
+
+        // dont generate a schema if location is not set
+        // it's created on the fly!
+        $options = PEAR::getStaticProperty('DB_DataObject','options');
+
+        if (empty($options['schema_location'])) {
+            return;
+        }
+
+        
+        $file = "{$options['schema_location']}/{$this->_database}.links.ini";
+
+        if (!file_exists(dirname($file))) {
+            require_once 'System.php';
+            System::mkdir(array('-p','-m',0755,dirname($file)));
+        }
+
+        $this->debug("Writing ini as {$file}\n");
+        touch($file); // not sure why this is needed?
+        $fh = fopen($file,'w');
+        fwrite($fh,$links_ini);
+        fclose($fh);
+    }
+
+      
+    /**
      * The table geneation part
      *
      * @access  private
@@ -378,7 +463,9 @@ class DB_DataObject_Generator extends DB_DataObject
         foreach($defs as $t) {
              
             $n=0;
-
+            $write_ini = true;
+            
+            
             switch (strtoupper($t->type)) {
 
                 case 'INT':
@@ -442,6 +529,8 @@ class DB_DataObject_Generator extends DB_DataObject
                 case 'INET':        // postgres IP
                 case 'MACADDR':     // postgress network Mac address.
                 
+                case 'INTEGER[]':   // postgres type
+                case 'BOOLEAN[]':   // postgres type
                 
                     $type = DB_DATAOBJECT_STR;
                     break;
@@ -483,8 +572,15 @@ class DB_DataObject_Generator extends DB_DataObject
                 case 'BYTEA':   // postgres blob support..
                     $type = DB_DATAOBJECT_STR + DB_DATAOBJECT_BLOB;
                     break;
-                    
-                    
+                default:     
+                    echo "*****************************************************************\n".
+                         "**               WARNING UNKNOWN TYPE                          **\n".
+                         "** Found column '{$t->name}', of type  '{$t->type}'            **\n".
+                         "** Please submit a bug, describe what type you expect this     **\n".
+                         "** column  to be                                               **\n".
+                         "*****************************************************************\n";
+                    $write_ini = false;
+                    break;
             }
             
             
@@ -496,7 +592,7 @@ class DB_DataObject_Generator extends DB_DataObject
                 $type += DB_DATAOBJECT_NOTNULL;
             }
            
-            $write_ini = true;
+           
             if (in_array($t->name,array('null','yes','no','true','false'))) {
                 echo "*****************************************************************\n".
                      "**                             WARNING                         **\n".
@@ -514,7 +610,9 @@ class DB_DataObject_Generator extends DB_DataObject
             // only use primary key or nextval(), cause the setFrom blocks you setting all key items...
             // if no keys exist fall back to using unique
             //echo "\n{$t->name} => {$t->flags}\n";
-            if (preg_match("/(auto_increment|nextval\()/i",rawurldecode($t->flags))) {
+            if (preg_match("/(auto_increment|nextval\()/i",rawurldecode($t->flags)) 
+                || (isset($t->autoincrement) && ($t->autoincrement === true))) {
+                    
                 // native sequences = 2
                 if ($write_ini) {
                     $keys_out_primary .= "{$t->name} = N\n";
@@ -549,6 +647,68 @@ class DB_DataObject_Generator extends DB_DataObject
         
     }
 
+    /**
+    * Convert a table name into a class name -> override this if you want a different mapping
+    *
+    * @access  public
+    * @return  string class name;
+    */
+    
+    
+    function getClassNameFromTableName($table)
+    {
+        $options = &PEAR::getStaticProperty('DB_DataObject','options');
+        $class_prefix  = $options['class_prefix'];
+        return  $class_prefix.preg_replace('/[^A-Z0-9]/i','_',ucfirst(trim($this->table)));
+    }
+    
+    
+    /**
+    * Convert a table name into a file name -> override this if you want a different mapping
+    *
+    * @access  public
+    * @return  string file name;
+    */
+    
+    
+    function getFileNameFromTableName($table)
+    {
+        $options = &PEAR::getStaticProperty('DB_DataObject','options');
+        $base = $options['class_location'];
+        if (strpos($base,'%s') !== false) {
+            $base = dirname($base);
+        } 
+        if (!file_exists($base)) {
+            require_once 'System.php';
+            System::mkdir(array('-p',$base));
+        }
+        if (strpos($options['class_location'],'%s') !== false) {
+            $outfilename   = sprintf($options['class_location'], 
+                    preg_replace('/[^A-Z0-9]/i','_',ucfirst($this->table)));
+        } else { 
+            $outfilename = "{$base}/".preg_replace('/[^A-Z0-9]/i','_',ucfirst($this->table)).".php";
+        }
+        return $outfilename;
+        
+    }
+    
+    
+     /**
+    * Convert a column name into a method name (usually prefixed by get/set/validateXXXXX)
+    *
+    * @access  public
+    * @return  string method name;
+    */
+    
+    
+    function getMethodNameFromColumnName($col)
+    {
+        return ucfirst($col);
+    }
+    
+    
+    
+    
     /*
      * building the class files
      * for each of the tables output a file!
@@ -557,37 +717,25 @@ class DB_DataObject_Generator extends DB_DataObject
     {
         //echo "Generating Class files:        \n";
         $options = &PEAR::getStaticProperty('DB_DataObject','options');
-        $base = $options['class_location'];
-        if (strpos($base,'%s') !== false) {
-            $base = dirname($base);
-        } 
+       
         
-        
-        if (!file_exists($base)) {
-            require_once 'System.php';
-            System::mkdir(array('-p',$base));
-        }
-        $class_prefix  = $options['class_prefix'];
         if ($extends = @$options['extends']) {
             $this->_extends = $extends;
             $this->_extendsFile = $options['extends_location'];
         }
 
         foreach($this->tables as $this->table) {
-            $this->table = trim($this->table);
-            $this->classname = $class_prefix.preg_replace('/[^A-Z0-9]/i','_',ucfirst($this->table));
+            $this->table        = trim($this->table);
+            $this->classname    = $this->getClassNameFromTableName($this->table);
             $i = '';
+            $outfilename        = $this->getFileNameFromTableName($this->table);
             
-            if (strpos($options['class_location'],'%s') !== false) {
-                $outfilename   = sprintf($options['class_location'], preg_replace('/[^A-Z0-9]/i','_',ucfirst($this->table)));
-            } else { 
-                $outfilename = "{$base}/".preg_replace('/[^A-Z0-9]/i','_',ucfirst($this->table)).".php";
-            }
             $oldcontents = '';
             if (file_exists($outfilename)) {
                 // file_get_contents???
                 $oldcontents = implode('',file($outfilename));
             }
+            
             $out = $this->_generateClassTable($oldcontents);
             $this->debug( "writing $this->classname\n");
             $fh = fopen($outfilename, "w");
@@ -738,7 +886,7 @@ class DB_DataObject_Generator extends DB_DataObject
             $body .= $this->_generateDefaultsFunction($this->table,$def['table']);
              
         }
-        $body .= $this->derivedHookFunctions();
+        $body .= $this->derivedHookFunctions($input);
 
         $body .= "\n    /* the code above is auto generated do not remove the tag below */";
         $body .= "\n    ###END_AUTOCODE\n";
@@ -751,7 +899,7 @@ class DB_DataObject_Generator extends DB_DataObject
                 if (!strlen(trim($t->name))) {
                     continue;
                 }
-                $validate_fname = 'validate' . ucfirst(strtolower($t->name));
+                $validate_fname = 'validate' . $this->getMethodNameFromColumnName($t->name);
                 // dont re-add it..
                 if (preg_match('/\s+function\s+' . $validate_fname . '\s*\(/i', $input)) {
                     continue;
@@ -809,7 +957,7 @@ class DB_DataObject_Generator extends DB_DataObject
      * @access   public
      * @return  string added to class eg. functions.
      */
-    function derivedHookFunctions()
+    function derivedHookFunctions($input = "")
     {
         // This is so derived generator classes can generate functions
         // It MUST NOT be changed here!!!
@@ -862,11 +1010,8 @@ class DB_DataObject_Generator extends DB_DataObject
             $this->_extends = $extends;
             $this->_extendsFile = $options['extends_location'];
         }
+        $classname = $this->classname = $this->getClassNameFromTableName($this->table);
         
-        
-        
-        $classname = $this->classname = $class_prefix.preg_replace('/[^A-Z0-9]/i','_',ucfirst(trim($this->table)));
-
         $out = $this->_generateClassTable();
         //echo $out;
         eval('?>'.$out);
@@ -904,7 +1049,37 @@ class DB_DataObject_Generator extends DB_DataObject
         }
         $__DB= &$GLOBALS['_DB_DATAOBJECT']['CONNECTIONS'][$this->_database_dsn_md5];
         
-        $defs =  $__DB->tableInfo($table);
+        
+        $options   = PEAR::getStaticProperty('DB_DataObject','options');
+        $db_driver = empty($options['db_driver']) ? 'DB' : $options['db_driver'];
+        $is_MDB2   = ($db_driver != 'DB') ? true : false;
+        
+        if (!$is_MDB2) {
+            // try getting a list of schema tables first. (postgres)
+            $__DB->expectError(DB_ERROR_UNSUPPORTED);
+            $this->tables = $__DB->getListOf('schema.tables');
+            $__DB->popExpect();
+        } else {
+            /**
+             * set portability and some modules to fetch the informations
+             */
+            $__DB->setOption('portability', MDB2_PORTABILITY_ALL ^ MDB2_PORTABILITY_FIX_CASE);
+            $__DB->loadModule('Manager');
+            $__DB->loadModule('Reverse');
+        }
+ 
+        if (!$is_MDB2) {
+            $defs =  $__DB->tableInfo($table);
+        } else {
+            $defs =  $__DB->reverse->tableInfo($table);
+            foreach ($defs as $k => $v) {
+                $defs[$k]['len'] = &$defs[$k]['length'];
+            }
+        }
+        
+         
+        
+        
         if (PEAR::isError($defs)) {
             return $defs;
         }
@@ -958,7 +1133,7 @@ class DB_DataObject_Generator extends DB_DataObject
         foreach ($defs = $defs as $t) {
 
             // build mehtod name
-            $methodName = 'get' . ucfirst($t->name);
+            $methodName = 'get' . $this->getMethodNameFromColumnName($t->name);
 
             if (!strlen(trim($t->name)) || preg_match("/function[\s]+[&]?$methodName\(/i", $input)) {
                 continue;
@@ -1011,7 +1186,7 @@ class DB_DataObject_Generator extends DB_DataObject
         foreach ($defs = $defs as $t) {
 
             // build mehtod name
-            $methodName = 'set' . ucfirst($t->name);
+            $methodName = 'set' . $this->getMethodNameFromColumnName($t->name);
 
             if (!strlen(trim($t->name)) || preg_match("/function[\s]+[&]?$methodName\(/i", $input)) {
                 continue;
@@ -1105,19 +1280,48 @@ class DB_DataObject_Generator extends DB_DataObject
     {
     
         //print_r($def);
-        //DB_DataObject::debugLevel(5);
+        // DB_DataObject::debugLevel(5);
         global $_DB_DATAOBJECT;
-        // set the objects keys
-        $obj = new DB_DataObject;
-        $obj->_table = $this->table;
-        $obj->_database = $this->_database;
-        $obj->_database_dsn_md5 =  $this->_database_dsn_md5;
+        // print_r($def);
         
-        // if the key is not an integer - then it's not a sequence or native
-        $_DB_DATAOBJECT['INI'][$obj->_database][$obj->__table] = $def['table'];
-        $_DB_DATAOBJECT['INI'][$obj->_database][$obj->__table."__keys"] = $def['keys'];
-        $ar = $obj->sequenceKey();
-        //print_r($obj);
+        
+        $dbtype     = $_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5]->dsn['phptype'];
+        $realkeys   = $def['keys'];
+        $keys       = array_keys($realkeys);
+        $usekey     = isset($keys[0]) ? $keys[0] : false;
+        $table      = $def['table'];
+        
+         
+        $seqname = false;
+        
+        
+        
+        
+        $ar = array(false,false,false);
+        if ($usekey !== false) {
+            if (!empty($_DB_DATAOBJECT['CONFIG']['sequence_'.$this->__table])) {
+                $usekey = $_DB_DATAOBJECT['CONFIG']['sequence_'.$this->__table];
+                if (strpos($usekey,':') !== false) {
+                    list($usekey,$seqname) = explode(':',$usekey);
+                }
+            }  
+        
+            if (in_array($dbtype , array( 'mysql', 'mysqli', 'mssql', 'ifx')) && 
+                ($table[$usekey] & DB_DATAOBJECT_INT) && 
+                isset($realkeys[$usekey]) && ($realkeys[$usekey] == 'N')
+                ) {
+                // use native sequence keys.
+                $ar =  array($usekey,true,$seqname);
+            } else {
+                // use generated sequence keys..
+                if ($table[$usekey] & DB_DATAOBJECT_INT) {
+                    $ar = array($usekey,false,$seqname);
+                }
+            }
+        }
+    
+    
+      
      
         $ret = "\n" .
                "    function sequenceKey() // keyname, use native, native name\n" .
@@ -1164,30 +1368,39 @@ class DB_DataObject_Generator extends DB_DataObject
         foreach($res as $ar) {
             // this is initially very dumb... -> and it may mess up..
             $type = $defs[$ar['Field']];
+            
             switch (true) {
                 
-                case ($type &  DB_DATAOBJECT_DATE): // not supported yet..
-                case ($type & DB_DATAOBJECT_TIME): // not supported yet..
+                case (is_null( $ar['Default'])):
+                    $defaults[$ar['Field']]  = 'null';
+                    break;
+                
+                case ($type & DB_DATAOBJECT_DATE): 
+                case ($type & DB_DATAOBJECT_TIME): 
                 case ($type & DB_DATAOBJECT_MYSQLTIMESTAMP): // not supported yet..
                     break;
                     
-                case ($type & DB_DATAOBJECT_BOOL): // not supported yet..
+                case ($type & DB_DATAOBJECT_BOOL): 
                     $defaults[$ar['Field']] = (int)(boolean) $ar['Default'];
                     break;
                     
                 
-                case ($type & DB_DATAOBJECT_STR): // not supported yet..
+                case ($type & DB_DATAOBJECT_STR): 
                     $defaults[$ar['Field']] =  "'" . addslashes($ar['Default']) . "'";
                     break;
-                    
+                
+                 
                 default:    // hopefully eveything else...  - numbers etc.
                     if (!strlen($ar['Default'])) {
                         continue;
                     }
-                    $defaults[$ar['Field']] =   $ar['Default'];
+                    if (is_numeric($ar['Default'])) {
+                        $defaults[$ar['Field']] =   $ar['Default'];
+                    }
                     break;
             
             }
+            //var_dump(array($ar['Field'], $ar['Default'], $defaults[$ar['Field']]));
         }
         if (empty($defaults)) {
             return;

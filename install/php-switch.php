@@ -5,7 +5,7 @@
 	*/
 
 	echo "\r\n  ########################################################################\n";
-	echo "  # ApacheFriends XAMPP PHP Switch win32 Version 1.5                     #\r\n";
+	echo "  # ApacheFriends XAMPP PHP Switch win32 Version 1.6                     #\r\n";
 	echo "  #----------------------------------------------------------------------#\r\n";
 	echo "  # Copyright (c) 2002-2006 Apachefriends                                #\r\n";
 	echo "  #----------------------------------------------------------------------#\r\n";

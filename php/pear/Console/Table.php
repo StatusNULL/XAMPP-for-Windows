@@ -33,7 +33,7 @@
 // |         Jan Schneider <jan@horde.org>                                 |
 // +-----------------------------------------------------------------------+
 //
-// $Id: Table.php,v 1.15 2006/03/12 23:34:18 yunosh Exp $
+// $Id: Table.php,v 1.19 2007/01/19 22:30:07 yunosh Exp $
 //
 // Utility for printing tables from cmdline scripts
 //
@@ -79,6 +79,13 @@ class Console_Table
      * @var array
      */
     var $_cell_lengths = array();
+
+    /**
+     * Heights of the rows.
+     *
+     * @var array
+     */
+    var $_row_heights = array();
 
     /**
      * How many spaces to use to pad the table.
@@ -231,7 +238,7 @@ class Console_Table
      */
     function setHeaders($headers)
     {
-        $this->_headers = array_values($headers);
+        $this->_headers = array(array_values($headers));
         $this->_updateRowsCols($headers);
     }
 
@@ -294,6 +301,11 @@ class Console_Table
     function addData($data, $col_id = 0, $row_id = 0)
     {
         foreach ($data as $row) {
+            if ($row === CONSOLE_TABLE_HORIZONTAL_RULE) {
+                $this->_data[$row_id] = CONSOLE_TABLE_HORIZONTAL_RULE;
+                $row_id++;
+                continue;
+            }
             $starting_col = $col_id;
             foreach ($row as $cell) {
                 $this->_data[$row_id][$starting_col++] = $cell;
@@ -359,7 +371,9 @@ class Console_Table
                 $callback = $filter[1];
 
                 foreach ($this->_data as $row_id => $row_data) {
-                    $this->_data[$row_id][$column] = call_user_func($callback, $row_data[$column]);
+                    if ($row_data !== CONSOLE_TABLE_HORIZONTAL_RULE) {
+                        $this->_data[$row_id][$column] = call_user_func($callback, $row_data[$column]);
+                    }
                 }
             }
         }
@@ -370,25 +384,83 @@ class Console_Table
      */
     function _validateTable()
     {
+        $this->_calculateRowHeight(-1, $this->_headers[0]);
+
         for ($i = 0; $i < $this->_max_rows; $i++) {
             for ($j = 0; $j < $this->_max_cols; $j++) {
                 if (!isset($this->_data[$i][$j]) &&
                     (!isset($this->_data[$i]) ||
-                     $this->_data[$i] != CONSOLE_TABLE_HORIZONTAL_RULE)) {
+                     $this->_data[$i] !== CONSOLE_TABLE_HORIZONTAL_RULE)) {
                     $this->_data[$i][$j] = '';
                 }
 
-                // Update cell lengths
-                $this->_calculateCellLengths($this->_data[$i]);
             }
+            $this->_calculateRowHeight($i, $this->_data[$i]);
 
-            if ($this->_data[$i] != CONSOLE_TABLE_HORIZONTAL_RULE) {
+            if ($this->_data[$i] !== CONSOLE_TABLE_HORIZONTAL_RULE) {
                  ksort($this->_data[$i]);
             }
 
         }
 
+        $this->_splitMultilineRows();
+
+        // Update cell lengths.
+        for ($i = 0; $i < count($this->_headers); $i++) {
+            $this->_calculateCellLengths($this->_headers[$i]);
+        }
+        for ($i = 0; $i < $this->_max_rows; $i++) {
+            $this->_calculateCellLengths($this->_data[$i]);
+        }
+
         ksort($this->_data);
+    }
+
+    /**
+     * Splits multiline rows into many smaller one-line rows.
+     */
+    function _splitMultilineRows()
+    {
+        ksort($this->_data);
+        $sections = array(&$this->_headers, &$this->_data);
+        $max_rows = array(count($this->_headers), $this->_max_rows);
+
+        for ($s = 0; $s <= 1; $s++) {
+            $inserted = 0;
+            $new_data = $sections[$s];
+
+            for ($i = 0; $i < $max_rows[$s]; $i++) {
+                // Process only rows that have many lines.
+                if (($height = $this->_row_heights[$i]) > 1) {
+                    // Split column data into one-liners.
+                    $split = array();
+                    for ($j = 0; $j < $this->_max_cols; $j++) {
+                        $split[$j] = preg_split('/\r?\n|\r/', $sections[$s][$i][$j]);
+                    }
+
+                    $new_rows = array();
+                    // Construct new 'virtual' rows - insert empty strings for
+                    // columns that have less lines that the highest one.
+                    for ($i2 = 0; $i2 < $height; $i2++) {
+                        for ($j = 0; $j < $this->_max_cols; $j++) {
+                            $new_rows[$i2][$j] = !empty($split[$j][$i2]) ? $split[$j][$i2] : '';
+                        }
+                    }
+
+                    // Replace current row with smaller rows.  $inserted is
+                    // used to take account of bigger array because of already
+                    // inserted rows.
+                    array_splice($new_data, $i + $inserted, 1, $new_rows);
+                    $inserted += count($new_rows) - 1;
+                }
+            }
+
+            // Has the data been modified?
+            if ($inserted > 0) {
+                $sections[$s] = $new_data;
+                $this->_updateRowsCols();
+            }
+        }
     }
 
     /**
@@ -397,25 +469,23 @@ class Console_Table
     function _buildTable()
     {
         $return = array();
-        $rows   = $this->_data;
-
-        for ($i = 0; $i < count($rows); $i++) {
-            for ($j = 0; $j < count($rows[$i]); $j++) {
-                if ($rows[$i] != CONSOLE_TABLE_HORIZONTAL_RULE &&
-                    $this->_strlen($rows[$i][$j]) < $this->_cell_lengths[$j]) {
-                    $rows[$i][$j] = str_pad($rows[$i][$j],
+        for ($i = 0; $i < count($this->_data); $i++) {
+            for ($j = 0; $j < count($this->_data[$i]); $j++) {
+                if ($this->_data[$i] !== CONSOLE_TABLE_HORIZONTAL_RULE &&
+                    $this->_strlen($this->_data[$i][$j]) < $this->_cell_lengths[$j]) {
+                    $this->_data[$i][$j] = str_pad($this->_data[$i][$j],
                                             $this->_cell_lengths[$j],
                                             ' ',
                                             $this->_col_align[$j]);
                 }
             }
 
-            if ($rows[$i] != CONSOLE_TABLE_HORIZONTAL_RULE) {
+            if ($this->_data[$i] !== CONSOLE_TABLE_HORIZONTAL_RULE) {
                 $row_begin    = '|' . str_repeat(' ', $this->_padding);
                 $row_end      = str_repeat(' ', $this->_padding) . '|';
                 $implode_char = str_repeat(' ', $this->_padding) . '|' .
                     str_repeat(' ', $this->_padding);
-                $return[] = $row_begin . implode($implode_char, $rows[$i]) .
+                $return[] = $row_begin . implode($implode_char, $this->_data[$i]) .
                     $row_end;
             } else {
                 $return[] = $this->_getSeparator();
@@ -457,18 +527,22 @@ class Console_Table
     function _getHeaderLine()
     {
         // Make sure column count is correct
-        for ($i = 0;  $i < $this->_max_cols; $i++) {
-            if (!isset($this->_headers[$i])) {
-                $this->_headers[$i] = '';
+        for ($j = 0; $j < count($this->_headers); $j++) {
+            for ($i = 0; $i < $this->_max_cols; $i++) {
+                if (!isset($this->_headers[$j][$i])) {
+                    $this->_headers[$j][$i] = '';
+                }
             }
         }
 
-        for ($i = 0; $i < count($this->_headers); $i++) {
-            if ($this->_strlen($this->_headers[$i]) < $this->_cell_lengths[$i]) {
-                $this->_headers[$i] = str_pad($this->_headers[$i],
-                                              $this->_cell_lengths[$i],
-                                              ' ',
-                                              $this->_col_align[$i]);
+        for ($j = 0; $j < count($this->_headers); $j++) {
+            for ($i = 0; $i < count($this->_headers[$j]); $i++) {
+                if ($this->_strlen($this->_headers[$j][$i]) < $this->_cell_lengths[$i]) {
+                    $this->_headers[$j][$i] = str_pad($this->_headers[$j][$i],
+                                                      $this->_cell_lengths[$i],
+                                                      ' ',
+                                                      $this->_col_align[$i]);
+                }
             }
         }
 
@@ -478,8 +552,11 @@ class Console_Table
             str_repeat(' ', $this->_padding);
 
         $return[] = $this->_getSeparator();
-        $return[] = $row_begin . implode($implode_char, $this->_headers) .
-            $row_end;
+        for ($j = 0; $j < count($this->_headers); $j++) {
+            $return[] = $row_begin .
+                implode($implode_char, $this->_headers[$j]) .
+                $row_end;
+        }
 
         return implode("\r\n", $return);
     }
@@ -521,9 +598,33 @@ class Console_Table
             if (!isset($this->_cell_lengths[$i])) {
                 $this->_cell_lengths[$i] = 0;
             }
-            $this->_cell_lengths[$i] = max(isset($this->_headers[$i]) ? $this->_strlen($this->_headers[$i]) : 0,
-                                           $this->_cell_lengths[$i],
+            $this->_cell_lengths[$i] = max($this->_cell_lengths[$i],
                                            $this->_strlen($row[$i]));
+        }
+    }
+
+    /**
+     * This function given a row of data will calculate the max height for all
+     * columns and store it in the _row_heights array.
+     *
+     * @param integer $row_number  The row number.
+     * @param array $row           The row data.
+     */
+    function _calculateRowHeight($row_number, $row)
+    {
+        if (!isset($this->_row_heights[$row_number])) {
+            $this->_row_heights[$row_number] = 1;
+        }
+
+        // Do not process horizontal rule rows.
+        if ($row === CONSOLE_TABLE_HORIZONTAL_RULE) {
+            return;
+        }
+
+        for ($i = 0; $i < count($row); $i++) {
+            $lines = preg_split('/\r?\n|\r/', $row[$i]);
+            $this->_row_heights[$row_number] = max($this->_row_heights[$row_number],
+                                                   count($lines));
         }
     }
 

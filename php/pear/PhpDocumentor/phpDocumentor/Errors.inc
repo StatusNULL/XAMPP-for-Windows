@@ -1,27 +1,42 @@
 <?php
-//
-// +------------------------------------------------------------------------+
-// | phpDocumentor                                                          |
-// +------------------------------------------------------------------------+
-// | Copyright (c) 2000-2003 Joshua Eichorn, Gregory Beaver                 |
-// | Email         jeichorn@phpdoc.org, cellog@phpdoc.org                   |
-// | Web           http://www.phpdoc.org                                    |
-// | Mirror        http://phpdocu.sourceforge.net/                          |
-// | PEAR          http://pear.php.net/package-info.php?pacid=137           |
-// +------------------------------------------------------------------------+
-// | This source file is subject to version 3.00 of the PHP License,        |
-// | that is available at http://www.php.net/license/3_0.txt.               |
-// | If you did not receive a copy of the PHP license and are unable to     |
-// | obtain it through the world-wide-web, please send a note to            |
-// | license@php.net so we can mail you a copy immediately.                 |
-// +------------------------------------------------------------------------+
-//
-
 /**
- * @package phpDocumentor
+ * Error handling for phpDocumentor
+ *
+ * phpDocumentor :: automatic documentation generator
+ * 
+ * PHP versions 4 and 5
+ *
+ * Copyright (c) 2001-2006 Gregory Beaver
+ * 
+ * LICENSE:
+ * 
+ * This library is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation;
+ * either version 2.1 of the License, or (at your option) any
+ * later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ *
+ * @package    phpDocumentor
  * @subpackage Errors
- * @author Gregory Beaver <cellog@users.sourceforge.net>
- * @version $Id: Errors.inc,v 1.70.2.7 2003/07/30 00:39:39 CelloG Exp $
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  2001-2006 Gregory Beaver
+ * @license    http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @version    CVS: $Id: Errors.inc,v 1.8 2006/08/16 17:08:32 cellog Exp $
+ * @filesource
+ * @link       http://www.phpdoc.org
+ * @link       http://pear.php.net/PhpDocumentor
+ * @see        parserDocBlock, parserInclude, parserPage, parserClass
+ * @see        parserDefine, parserFunction, parserMethod, parserVar
+ * @since      0.4
  */
 /**
  * warning triggered when inheritance could be from more than one class
@@ -295,6 +310,10 @@ define("PDERROR_TEMPLATEDIR_DOESNT_EXIST",64);
  */
 define("PDERROR_UNTERMINATED_ENTITY",65);
 /**
+ * warning triggered by an unterminated entity in a tutorial
+ */
+define("PDERROR_BEAUTIFYING_FAILED",66);
+/**
  * warning triggered by a function with no name
  *
  * <pre>
@@ -304,7 +323,7 @@ define("PDERROR_UNTERMINATED_ENTITY",65);
  * </pre>
  * triggers this error
  */
-define("PDERROR_FUNCTION_HAS_NONAME",66);
+define("PDERROR_FUNCTION_HAS_NONAME",67);
 /**
  * warning triggered by a page-level docblock preceding a source element
  *
@@ -317,20 +336,44 @@ define("PDERROR_FUNCTION_HAS_NONAME",66);
  * include 'file.php';
  * </code>
  */
-define("PDERROR_DOCBLOCK_CONFLICT", 67);
+define("PDERROR_DOCBLOCK_CONFLICT", 68);
 /**
  * warning triggered when a file does not contain a page-level docblock
  */
-define("PDERROR_NO_PAGE_LEVELDOCBLOCK", 68);
+define("PDERROR_NO_PAGE_LEVELDOCBLOCK", 69);
 /**
  * warning triggered when the first docblock in a file with a @package tag
  * precedes a class.  In this case, the class gets the docblock.
  */
-define("PDERROR_DOCBLOCK_GOES_CLASS", 69);
+define("PDERROR_DOCBLOCK_GOES_CLASS", 70);
 /**
  * warning triggered in tutorial parsing if there is a missing {@id} inline tag
  */
-define("PDERROR_NO_DOCBOOK_ID", 70);
+define("PDERROR_NO_DOCBOOK_ID", 71);
+/**
+ * warning triggered if someone brilliant tries "class X extends X {"
+ */
+define("PDERROR_CANNOT_EXTEND_SELF", 72);
+/**
+ * warning triggered by improper "@uses {@link blah}"
+ */
+define("PDERROR_DUMB_USES",73);
+/**
+ * warning triggered if <<ul>> is nested inside <<ul>> and not <<li>>
+ */
+define("PDERROR_UL_IN_UL", 74);
+/**
+ * warning triggered if a command line option does not have a valid value passed in
+ */
+define("PDERROR_INVALID_VALUES", 75);
+/**
+ * warning triggered when {@}internal}} is nested inside another {@}internal}}
+ */
+define("PDERROR_NESTED_INTERNAL", 76);
+/**
+ * warning triggered when @todo is used on an include element
+ */
+define("PDERROR_NOTODO_INCLUDE", 77);
 
 /**
  * Error messages for phpDocumentor parser warnings
@@ -365,6 +408,8 @@ $GLOBALS['phpDocumentor_warning_descrip'] =
         PDERROR_NO_PAGE_LEVELDOCBLOCK => 'File "%s" has no page-level DocBlock, use @package in the first DocBlock to create one',
         PDERROR_DOCBLOCK_GOES_CLASS => 'DocBlock would be page-level, but precedes class "%s", use another DocBlock to document the file',
         PDERROR_NO_DOCBOOK_ID => 'Tutorial section %s "%s" has no id="{@id subsection}" tag ({@id} for refentry)',
+        PDERROR_BEAUTIFYING_FAILED => 'Beautifying failed: %s',
+        PDERROR_NOTODO_INCLUDE => '@todo on an include element is ignored (line %s, file %s)',
         );
 
 
@@ -424,6 +469,11 @@ $GLOBALS['phpDocumentor_error_descrip'] =
         PDERROR_TEMPLATEDIR_DOESNT_EXIST => 'template directory "%s" does not exist',
         PDERROR_UNTERMINATED_ENTITY => 'entity &%s is unterminated',
         PDERROR_FUNCTION_HAS_NONAME => 'function has no name (PHP error - test your file before parsing!)',
+        PDERROR_CANNOT_EXTEND_SELF => 'class %s cannot extend itself - TEST YOUR CODE BEFORE PARSING',
+        PDERROR_DUMB_USES => '@uses can only link to string data',
+        PDERROR_UL_IN_UL => 'ul/ol tags cannot be directly nested inside ul/ol, nest inside li',
+        PDERROR_INVALID_VALUES => 'command %s was passed "%s" but must be one of %s',
+        PDERROR_NESTED_INTERNAL => '{@internal}} cannot be nested inside {@internal}}',
         );
 
 /**

@@ -1,28 +1,39 @@
 <?php
-//
-// +------------------------------------------------------------------------+
-// | phpDocumentor                                                          |
-// +------------------------------------------------------------------------+
-// | Copyright (c) 2000-2003 Joshua Eichorn, Gregory Beaver                 |
-// | Email         jeichorn@phpdoc.org, cellog@phpdoc.org                   |
-// | Web           http://www.phpdoc.org                                    |
-// | Mirror        http://phpdocu.sourceforge.net/                          |
-// | PEAR          http://pear.php.net/package-info.php?pacid=137           |
-// +------------------------------------------------------------------------+
-// | This source file is subject to version 3.00 of the PHP License,        |
-// | that is available at http://www.php.net/license/3_0.txt.               |
-// | If you did not receive a copy of the PHP license and are unable to     |
-// | obtain it through the world-wide-web, please send a note to            |
-// | license@php.net so we can mail you a copy immediately.                 |
-// +------------------------------------------------------------------------+
-//
-
 /**
- * This was all in phpdoc.inc, and now encapsulates the complexity
- * @author Greg Beaver <cellog@users.sourceforge.net>
- * @version $Revision: 1.1.2.3 $
- * @package phpDocumentor
- * @since 1.2
+ * This was all in {@link phpdoc.inc}, and now encapsulates the complexity
+ * 
+ * phpDocumentor :: automatic documentation generator
+ * 
+ * PHP versions 4 and 5
+ *
+ * Copyright (c) 2002-2006 Gregory Beaver
+ * 
+ * LICENSE:
+ * 
+ * This library is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation;
+ * either version 2.1 of the License, or (at your option) any
+ * later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ *
+ * @category   documentation
+ * @package    phpDocumentor
+ * @author     Gregory Beaver <cellog@php.net>
+ * @copyright  2002-2006 Gregory Beaver
+ * @license    http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @version    CVS: $Id: Setup.inc.php,v 1.13 2006/10/23 03:45:08 cellog Exp $
+ * @link       http://www.phpdoc.org
+ * @link       http://pear.php.net/PhpDocumentor
+ * @since      1.2
  */
 error_reporting(E_ALL);
 /** common settings */
@@ -45,6 +56,7 @@ include_once("phpDocumentor/Parser.inc");
 include_once("phpDocumentor/phpDocumentorTWordParser.inc");
 include_once("phpDocumentor/phpDocumentorTParser.inc");
 include_once("phpDocumentor/HighlightParser.inc");
+include_once("phpDocumentor/TutorialHighlightParser.inc");
 include_once("phpDocumentor/ParserDescCleanup.inc");
 include_once("phpDocumentor/PackagePageElements.inc");
 include_once("phpDocumentor/XMLpackagePageParser.inc");
@@ -140,22 +152,52 @@ class phpDocumentor_setup
      */
     function phpDocumentor_setup()
     {
-        global $_phpDocumentor_cvsphpfile_exts;
+        global $_phpDocumentor_cvsphpfile_exts, $_phpDocumentor_setting;
         if (!function_exists('is_a'))
         {
             print "phpDocumentor requires PHP version 4.2.0 or greater to function";
             exit;
         }
+
+        $this->setup = new Io;
+        if (!isset($interface) && !isset($_GET['interface']) && !isset($_phpDocumentor_setting))
+        {
+            // Parse the argv settings
+            $_phpDocumentor_setting = $this->setup->parseArgv();
+        }
+        if (isset($_phpDocumentor_setting['useconfig']) &&
+             !empty($_phpDocumentor_setting['useconfig'])) {
+            $this->readConfigFile($_phpDocumentor_setting['useconfig']);
+        }
+
         // set runtime to a large value since this can take quite a while
-        set_time_limit(0);    // six minute timeout
-        ini_set("memory_limit","256M");
+        // we can only set_time_limit when not in safe_mode bug #912064
+        if (!ini_get('safe_mode'))
+        {
+            set_time_limit(0);    // unlimited runtime
+        } else
+        {
+            phpDocumentor_out("time_limit cannot be set since your in safe_mode, please edit time_limit in your php.ini to allow enough time for phpDocumentor to run"); 
+        }
+        $x = str_replace('M', '', ini_get('memory_limit'));
+        if ($x < 256) {
+            ini_set("memory_limit","256M");
+        }
+
+        $phpver = phpversion();
+        $phpdocver = PHPDOCUMENTOR_VER;
+        if (isset($_GET['interface'])) {
+            $phpver = "<b>$phpver</b>";
+            $phpdocver = "<b>$phpdocver</b>";
+        }
+        phpDocumentor_out("PHP Version $phpver\n");
+        phpDocumentor_out("phpDocumentor version $phpdocver\n\n");
 
         $this->parseIni();
-        // create new classes
-        $this->setup = new Io;
+
         if (tokenizer_ext)
         {
-            phpDocumentor_out("using experimental tokenizer Parser\n");
+            phpDocumentor_out("using tokenizer Parser\n");
             $this->parse = new phpDocumentorTParser;
         } else
         {
@@ -174,12 +216,17 @@ and load the tokenizer extension for faster parsing (your version is ".phpversio
         global $_phpDocumentor_setting, $_phpDocumentor_options;
         // security
         $file = str_replace(array('..','.ini','\\'),array('','','/'),$file);
-        if (strpos($file,'/') !== false)
+        if (is_file($file . '.ini'))
         {
             $_phpDocumentor_setting = phpDocumentor_parse_ini_file($file.'.ini');
         } else
         {
-            $configdir = str_replace('\\','/', '\xampp\php\pear\data/PhpDocumentor') . PATH_DELIMITER . 'user' . PATH_DELIMITER;
+            if ('C:\php5\pear\data' != '@'.'DATA-DIR@')
+            {
+                $configdir = str_replace('\\','/', 'C:\php5\pear\data/PhpDocumentor') . PATH_DELIMITER . 'user' . PATH_DELIMITER;
+            } else {
+                $configdir = str_replace('\\','/',$GLOBALS['_phpDocumentor_install_dir']) . PATH_DELIMITER . 'user' . PATH_DELIMITER;
+            }
             if (isset($_phpDocumentor_options['userdir'])) $configdir = $_phpDocumentor_options['userdir'];
             if (substr($configdir,-1) != '/')
             {
@@ -193,7 +240,6 @@ and load the tokenizer extension for faster parsing (your version is ".phpversio
         }
         // don't want a loop condition!
         unset($_phpDocumentor_setting['useconfig']);
-        $this->readCommandLineSettings();
     }
     
     /**
@@ -201,20 +247,11 @@ and load the tokenizer extension for faster parsing (your version is ".phpversio
      */
     function readCommandLineSettings()
     {
-        global $_phpDocumentor_setting,$interface;
+        global $_phpDocumentor_setting,$interface,$_phpDocumentor_RIC_files;
         // subscribe $render class to $parse class events
-        if (!isset($interface) && !isset($_GET['interface']) && !isset($_phpDocumentor_setting))
-        {
-            // Parse the argv settings
-            $_phpDocumentor_setting = $this->setup->parseArgv();
-        }
-        if (isset($_phpDocumentor_setting['useconfig']) && !empty($_phpDocumentor_setting['useconfig'])) return $this->readConfigFile($_phpDocumentor_setting['useconfig']);
         if (!isset($_phpDocumentor_setting['junk'])) $_phpDocumentor_setting['junk'] = '';
         if (!isset($_phpDocumentor_setting['title'])) $_phpDocumentor_setting['title'] = 'Generated Documentation';
-        if(array_key_exists('title',$_phpDocumentor_setting))
-            $temp_title = $_phpDocumentor_setting['title'];
-        else
-            $temp_title = "";
+        $temp_title = $_phpDocumentor_setting['title'];
         $this->render = new phpDocumentor_IntermediateParser($temp_title);
         if (isset($_phpDocumentor_setting['help']) || $_phpDocumentor_setting['junk'] == "-h" || $_phpDocumentor_setting['junk'] == "--help")
         {
@@ -230,16 +267,28 @@ and load the tokenizer extension for faster parsing (your version is ".phpversio
             $this->render->setParsePrivate(true);
         }
         
-        if (isset($_phpDocumentor_setting['ignore-tags']))
+        if (isset($_phpDocumentor_setting['ignoretags']))
         {
-            $_phpDocumentor_setting['ignore-tags'] = explode(',',str_replace(' ','',$_phpDocumentor_setting['ignore-tags']));
+            $ignoretags = explode(',', $_phpDocumentor_setting['ignoretags']);
+            $ignoretags = array_map('trim', $ignoretags);
             $tags = array();
-            foreach($_phpDocumentor_setting['ignore-tags'] as $tag)
+            foreach($ignoretags as $tag)
             {
                 if (!in_array($tag,array('@global', '@access', '@package', '@ignore', '@name', '@param', '@return', '@staticvar', '@var')))
                     $tags[] = $tag;
             }
-            $_phpDocumentor_setting['ignore-tags'] = $tags;
+            $_phpDocumentor_setting['ignoretags'] = $tags;
+        }
+        
+        if (isset($_phpDocumentor_setting['readmeinstallchangelog']))
+        {
+            $_phpDocumentor_setting['readmeinstallchangelog'] = explode(',',str_replace(' ','',$_phpDocumentor_setting['readmeinstallchangelog']));
+            $rics = array();
+            foreach($_phpDocumentor_setting['readmeinstallchangelog'] as $ric)
+            {
+                $rics[] = strtoupper(trim($ric));
+            }
+            $_phpDocumentor_RIC_files = $rics;
         }
         
         if (isset($_phpDocumentor_setting['javadocdesc']) && $_phpDocumentor_setting['javadocdesc'] == 'on')
@@ -307,11 +356,11 @@ and load the tokenizer extension for faster parsing (your version is ".phpversio
         // Setup the different classes
         if (isset($_phpDocumentor_setting['templatebase']))
         {
-            $this->render->setTemplateBase($_phpDocumentor_setting['templatebase']);
+            $this->render->setTemplateBase(trim($_phpDocumentor_setting['templatebase']));
         }
         if (isset($_phpDocumentor_setting['target']) && !empty($_phpDocumentor_setting['target']))
         {
-            $this->render->setTargetDir($_phpDocumentor_setting['target']);
+            $this->render->setTargetDir(trim($_phpDocumentor_setting['target']));
         }
         else
         {
@@ -320,25 +369,27 @@ and load the tokenizer extension for faster parsing (your version is ".phpversio
         }
         if (!empty($_phpDocumentor_setting['packageoutput']))
         {
-            $this->packages = explode(",",$_phpDocumentor_setting['packageoutput']);
+            $this->packages = explode(",",trim($_phpDocumentor_setting['packageoutput']));
             foreach($this->packages as $p => $v)
             {
                 $this->packages[$p] = trim($v);
             }
         }
-        if (!empty($_phpDocumentor_setting['filename']))
-        $this->files = $_phpDocumentor_setting['filename'];
-        if (!empty($_phpDocumentor_setting['directory']))
-        $this->dirs = $_phpDocumentor_setting['directory'];
+        if (!empty($_phpDocumentor_setting['filename'])) {
+            $this->files = trim($_phpDocumentor_setting['filename']);
+        }
+        if (!empty($_phpDocumentor_setting['directory'])) {
+            $this->dirs = trim($_phpDocumentor_setting['directory']);
+        }
     }
     
     function checkIgnoreTag($tagname, $inline = false)
     {
         global $_phpDocumentor_setting;
         $tagname = '@'.$tagname;
-        if (!isset($_phpDocumentor_setting['ignore-tags'])) return false;
+        if (!isset($_phpDocumentor_setting['ignoretags'])) return false;
         if ($inline) $tagname = '{'.$tagname.'}';
-        return in_array($tagname, $_phpDocumentor_setting['ignore-tags']);
+        return in_array($tagname, $_phpDocumentor_setting['ignoretags']);
     }
     
     function setJavadocDesc()
@@ -348,7 +399,7 @@ and load the tokenizer extension for faster parsing (your version is ".phpversio
     
     function setParsePrivate()
     {
-        $this->render->setParserPrivate(true);
+        $this->render->setParsePrivate(true);
     }
     
     function setQuietMode()
@@ -369,6 +420,7 @@ and load the tokenizer extension for faster parsing (your version is ".phpversio
     function setPackageOutput($po)
     {
         $this->packages = explode(",",$po);
+        array_map('trim', $this->packages);
     }
     
     function setTitle($ti)
@@ -400,6 +452,7 @@ and load the tokenizer extension for faster parsing (your version is ".phpversio
             if (!empty($ig))
             $this->ignore_files = array($ig);
         }
+        $this->ignore_files = array_map('trim', $this->ignore_files);
     }
     
     function createDocs($title = false)
@@ -451,7 +504,7 @@ and load the tokenizer extension for faster parsing (your version is ".phpversio
                     }
                 } else
                 {
-                    $dir = realpath(dirname(realpath($file)));
+                    $dir = dirname(realpath($file));
                     $dir = strtr($dir, "\\", "/");
                     $dir = str_replace('//','/',$dir);
                     // strip trailing directory seperator
@@ -479,7 +532,13 @@ and load the tokenizer extension for faster parsing (your version is ".phpversio
             $dirs = explode(",",$this->dirs);
             foreach($dirs as $dir)
             {
-                $dir = trim(realpath($dir));
+                $olddir = $dir;
+                $dir = realpath($dir);
+                if (!$dir) {
+                    phpDocumentor_out('ERROR: "' . $olddir . '" does not exist, skipping');
+                    continue;
+                }
+                $dir = trim($dir);
                 $dir = strtr($dir, "\\", "/");
                 $dir = str_replace('//','/',$dir);
                 // strip trailing directory seperator
@@ -494,10 +553,9 @@ and load the tokenizer extension for faster parsing (your version is ".phpversio
                     {
                         // Make sure the file isn't a hidden file
                         $file = strtr($file, "\\", "/");
-                        $test = array_pop(explode("/",$file));
-                        if (substr($test,0,1) != ".") 
+                        if (substr(basename($file),0,1) != ".")
                         {
-                               if (!$this->setup->checkIgnore(basename($file),str_replace('\\','/',dirname($file)),$this->ignore_files))
+                            if (!$this->setup->checkIgnore(basename($file),str_replace('\\','/',dirname($file)),$this->ignore_files))
                             {
                                 $filelist[] = str_replace('\\','/',$file);
                             } else {
@@ -581,6 +639,11 @@ and load the tokenizer extension for faster parsing (your version is ".phpversio
                         if ($fp)
                         {
                             $ret = fread($fp,filesize($tutorial['path']));
+                            // fix 1151650
+                            if (stristr($ret, "utf-8") !== "")
+                            {
+                                $ret = utf8_decode($ret);
+                            }
                             fclose($fp);
                             unset($fp);
                             phpDocumentor_out('Parsing '.$ptext.$tutorial['path'].'...');
@@ -606,7 +669,7 @@ and load the tokenizer extension for faster parsing (your version is ".phpversio
             {
                 phpDocumentor_out("Reading file $file");
                 flush();
-                $this->parse->parse($this->setup->readPhpFile($file, $this->render->quietMode),$file,$base,$this->packages);
+                $this->parse->parse($a = $this->setup->readPhpFile($file, $this->render->quietMode),$file,$base,$this->packages);
     
             }
             $b = (time() - $this->parse_start_time);
@@ -636,11 +699,16 @@ and load the tokenizer extension for faster parsing (your version is ".phpversio
     {
         phpDocumentor_out("Parsing configuration file phpDocumentor.ini...");
         flush();
-        $options = phpDocumentor_parse_ini_file(str_replace('\\','/', '\xampp\php\pear\data/PhpDocumentor') . PATH_DELIMITER . 'phpDocumentor.ini',true);
+        if ('C:\php5\pear\data' != '@'.'DATA-DIR@')
+        {
+            $options = phpDocumentor_parse_ini_file(str_replace('\\','/', 'C:\php5\pear\data/PhpDocumentor') . PATH_DELIMITER . 'phpDocumentor.ini',true);
+        } else {
+            $options = phpDocumentor_parse_ini_file(str_replace('\\','/',$GLOBALS['_phpDocumentor_install_dir']) . PATH_DELIMITER . 'phpDocumentor.ini',true);
+        }
 
         if (!$options)
         {
-            print "ERROR: cannot open phpDocumentor.ini in directory \xampp\php\pear\data/PhpDocumentor\n";
+            print "ERROR: cannot open phpDocumentor.ini in directory " . $GLOBALS['_phpDocumentor_install_dir']."\n";
             print "-Is phpdoc in either the path or include_path in your php.ini file?";
             exit;
         }

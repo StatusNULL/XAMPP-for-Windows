@@ -15,7 +15,7 @@
  * @author     Hartmut Holzgraefe <hartmut@php.net>
  * @copyright  2005 Hartmut Holzgraefe
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: XmlParser.php,v 1.12 2006/02/04 19:17:32 hholzgra Exp $
+ * @version    CVS: $Id: XmlParser.php,v 1.14 2006/07/08 19:58:36 hholzgra Exp $
  * @link       http://pear.php.net/package/CodeGen
  */
 
@@ -558,6 +558,19 @@
             return false;
         }
 
+
+        /**
+         * Check that no attributes are given
+         *
+         */
+        protected function noAttributes($attr) 
+        {
+            if (!empty($attr)) {
+              return PEAR::raiseError("<".end($this->tagStack)."> does not allow any attributes");
+            }
+
+            return true;
+        }
 
         /**
          * Check attributes

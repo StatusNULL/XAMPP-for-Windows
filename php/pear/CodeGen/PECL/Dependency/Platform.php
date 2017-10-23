@@ -15,7 +15,7 @@
  * @author     Hartmut Holzgraefe <hartmut@php.net>
  * @copyright  2005 Hartmut Holzgraefe
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Platform.php,v 1.4 2006/02/01 00:48:31 hholzgra Exp $
+ * @version    CVS: $Id: Platform.php,v 1.6 2006/03/07 08:09:40 hholzgra Exp $
  * @link       http://pear.php.net/package/CodeGen_PECL
  */
 
@@ -50,11 +50,11 @@ class CodeGen_PECL_Dependency_Platform
         $xml = "";
 
         if ($this->test("windows")) {
-            $xml.= "    <dep type=\"os\">windows</dep>\n";
+            $xml.= "    <dep type='os' rel='has' name='windows'/>\n";
         }
 
         if ($this->test("unix")) {
-            $xml.= "    <dep type=\"os\">unix</dep>\n";
+            $xml.= "    <dep type='os' rel='has' name='unix'/>\n";
         }
 
         return $xml;
@@ -72,11 +72,11 @@ class CodeGen_PECL_Dependency_Platform
         $xml = "";
 
         if ($this->test("windows")) {
-            $xml.= "    <os><name>windows</name></os>>\n";
+            $xml.= "    <os><name>windows</name></os>\n";
         }
 
         if ($this->test("unix")) {
-            $xml.= "    <os><name>unix</name></os>>\n";
+            $xml.= "    <os><name>unix</name></os>\n";
         }
 
         return $xml;

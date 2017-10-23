@@ -3,7 +3,7 @@
  *  License Information:
  *
  *    Net_DNS:  A resolver library for PHP
- *    Copyright (C) 2002 Eric Kilfoil eric@ypass.net
+ *    Copyright (c) 2002-2003 Eric Kilfoil eric@ypass.net
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -39,8 +39,8 @@ class Net_DNS_RR_MX extends Net_DNS_RR
     var $exchange;
 
     /* }}} */
-    /* class constructor - RR(&$rro, $data, $offset = "") {{{ */
-    function Net_DNS_RR_MX(&$rro, $data, $offset = "")
+    /* class constructor - RR(&$rro, $data, $offset = '') {{{ */
+    function Net_DNS_RR_MX(&$rro, $data, $offset = '')
     {
         $this->name = $rro->name;
         $this->type = $rro->type;
@@ -54,13 +54,13 @@ class Net_DNS_RR_MX extends Net_DNS_RR
                 $a = unpack("@$offset/npreference", $data);
                 $offset += 2;
                 list($exchange, $offset) = Net_DNS_Packet::dn_expand($data, $offset);
-                $this->preference = $a["preference"];
+                $this->preference = $a['preference'];
                 $this->exchange = $exchange;
             }
         } else {
             ereg("([0-9]+)[ \t]+(.+)[ \t]*$", $data, $regs);
             $this->preference = $regs[1];
-            $this->exchange = ereg_replace("(.*)\.$", "\\1", $regs[2]);
+            $this->exchange = ereg_replace('(.*)\.$', '\\1', $regs[2]);
         }
     }
 
@@ -68,22 +68,22 @@ class Net_DNS_RR_MX extends Net_DNS_RR
     /* Net_DNS_RR_MX::rdatastr() {{{ */
     function rdatastr()
     {
-        if ($this->preference) {
-            return($this->preference . " " . $this->exchange . ".");
+        if (preg_match('/^[0-9]+$/', $this->preference)) {
+            return $this->preference . ' ' . $this->exchange . '.';
         }
-        return("; no data");
+        return '; no data';
     }
 
     /* }}} */
     /* Net_DNS_RR_MX::rr_rdata($packet, $offset) {{{ */
     function rr_rdata($packet, $offset)
     {
-        if ($this->preference) {
-            $rdata = pack("n", $this->preference);
+        if (preg_match('/^[0-9]+$/', $this->preference)) {
+            $rdata = pack('n', $this->preference);
             $rdata .= $packet->dn_comp($this->exchange, $offset + strlen($rdata));
-            return($rdata);
+            return $rdata;
         }
-        return(NULL);
+        return null;
     }
 
     /* }}} */

@@ -32,7 +32,7 @@
  * @author     Lorenzo Alberton <l dot alberton at quipo dot it>
  * @copyright  2003-2006 Lorenzo Alberton
  * @license    http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version    CVS: $Id: EasyJoin.php,v 1.11 2006/01/26 17:10:17 quipo Exp $
+ * @version    CVS: $Id: EasyJoin.php,v 1.12 2006/03/28 16:43:32 lsmith Exp $
  * @link       http://pear.php.net/package/MDB_QueryTool
  */
 
@@ -78,10 +78,11 @@ class MDB_QueryTool_EasyJoin extends MDB_QueryTool_Query
      * call parent constructor
      * @param mixed $dsn DSN string, DSN array or MDB object
      * @param array $options
+     * @param integer $version
      */
-    function __construct($dsn=false, $options=array())
+    function __construct($dsn=false, $options=array(), $version = 1)
     {
-        parent::MDB_QueryTool_Query($dsn, $options);
+        parent::MDB_QueryTool_Query($dsn, $options, $version);
     }
 
     // }}}

@@ -36,7 +36,7 @@ require_once 'SOAP/Parser.php';
 // these two are BC/FC handlers for call in PHP4/5
 
 if (!class_exists('SOAP_Client_Overload')) {
-    if (substr(phpversion(), 0, 1) == 5) {
+    if (substr(zend_version(), 0, 1) > 1) {
         class SOAP_Client_Overload extends SOAP_Base {
             function __call($method, $args)
             {
@@ -68,6 +68,10 @@ if (!class_exists('SOAP_Client_Overload')) {
  *   $soapclient = new SOAP_Client( string path [ , boolean wsdl] );
  *   echo $soapclient->call( string methodname [ , array parameters] );
  * </code>
+ * or, if using PHP 5+ or the overload extension:<code>
+ *   $soapclient = new SOAP_Client( string path [ , boolean wsdl] );
+ *   echo $soapclient->methodname( [ array parameters] );
+ * </code>
  *
  * Originally based on SOAPx4 by Dietrich Ayala
  * http://dietrich.ganx4.com/soapx4
@@ -92,76 +96,93 @@ class SOAP_Client extends SOAP_Client_Overload
      *   https://www.example.com/soap/server.php
      *   mailto:soap@example.com
      *
-     * @see  SOAP_Client()
-     * @var $_endpoint string
+     * @see SOAP_Client()
+     * @var string
      */
     var $_endpoint = '';
 
     /**
      * The SOAP PORT name that is used by the client.
      *
-     * @var $_portName string
+     * @var string
      */
     var $_portName = '';
 
     /**
      * Endpoint type e.g. 'wdsl'.
      *
-     * @var $__endpointType string
+     * @var string
      */
-    var $__endpointType = '';
+    var $_endpointType = '';
 
     /**
      * The received xml.
      *
-     * @var $xml string
+     * @var string
      */
     var $xml;
 
     /**
      * The outgoing and incoming data stream for debugging.
      *
-     * @var $wire string
+     * @var string
      */
     var $wire;
-    var $__last_request = null;
-    var $__last_response = null;
+
+    /**
+     * The outgoing data stream for debugging.
+     *
+     * @var string
+     */
+    var $_last_request = null;
+
+    /**
+     * The incoming data stream for debugging.
+     *
+     * @var string
+     */
+    var $_last_response = null;
 
     /**
      * Options.
      *
-     * @var $__options array
+     * @var array
      */
-    var $__options = array('trace'=>0);
+    var $_options = array('trace' => false);
 
     /**
      * The character encoding used for XML parser, etc.
      *
-     * @var $_encoding string
+     * @var string
      */
     var $_encoding = SOAP_DEFAULT_ENCODING;
 
     /**
      * The array of SOAP_Headers that we are sending.
      *
-     * @var $headersOut array
+     * @var array
      */
     var $headersOut = null;
 
     /**
      * The headers we recieved back in the response.
      *
-     * @var $headersIn array
+     * @var array
      */
     var $headersIn = null;
 
     /**
      * Options for the HTTP_Request class (see HTTP/Request.php).
      *
-     * @var $__proxy_params array
+     * @var array
      */
-    var $__proxy_params = array();
+    var $_proxy_params = array();
 
+    /**
+     * The SOAP_Transport instance.
+     *
+     * @var SOAP_Transport
+     */
     var $_soap_transport = null;
 
     /**
@@ -169,20 +190,22 @@ class SOAP_Client extends SOAP_Client_Overload
      *
      * @access public
      *
-     * @param string $endpoint     An URL.
-     * @param boolean $wsdl        Whether the endpoint is a WSDL file.
-     * @param string $portName
-     * @param array $proxy_params  Options for the HTTP_Request class (see
-     *                             HTTP/Request.php)
+     * @param string $endpoint       An URL.
+     * @param boolean $wsdl          Whether the endpoint is a WSDL file.
+     * @param string $portName       The service's port name to use.
+     * @param array $proxy_params    Options for the HTTP_Request class
+     *                               @see HTTP_Request
+     * @param boolean|string $cache  Use WSDL caching? The cache directory if
+     *                               a string.
      */
     function SOAP_Client($endpoint, $wsdl = false, $portName = false,
-                         $proxy_params = array())
+                         $proxy_params = array(), $cache = false)
     {
         parent::SOAP_Base('Client');
 
         $this->_endpoint = $endpoint;
         $this->_portName = $portName;
-        $this->__proxy_params = $proxy_params;
+        $this->_proxy_params = $proxy_params;
 
         // This hack should perhaps be removed as it might cause unexpected
         // behaviour.
@@ -192,10 +215,11 @@ class SOAP_Client extends SOAP_Client_Overload
 
         // make values
         if ($wsdl) {
-            $this->__endpointType = 'wsdl';
+            $this->_endpointType = 'wsdl';
             // instantiate wsdl class
             $this->_wsdl =& new SOAP_WSDL($this->_endpoint,
-                                          $this->__proxy_params);
+                                          $this->_proxy_params,
+                                          $cache);
             if ($this->_wsdl->fault) {
                 $this->_raiseSoapFault($this->_wsdl->fault);
             }
@@ -206,8 +230,8 @@ class SOAP_Client extends SOAP_Client_Overload
     {
         $this->xml = null;
         $this->wire = null;
-        $this->__last_request = null;
-        $this->__last_response = null;
+        $this->_last_request = null;
+        $this->_last_response = null;
         $this->headersIn = null;
         $this->headersOut = null;
     }
@@ -290,17 +314,18 @@ class SOAP_Client extends SOAP_Client_Overload
     function &call($method, &$params, $namespace = false, $soapAction = false)
     {
         $this->headersIn = null;
-        $this->__last_request = null;
-        $this->__last_response = null;
+        $this->_last_request = null;
+        $this->_last_response = null;
         $this->wire = null;
         $this->xml = null;
 
-        $soap_data =& $this->__generate($method, $params, $namespace, $soapAction);
+        $soap_data =& $this->_generate($method, $params, $namespace, $soapAction);
         if (PEAR::isError($soap_data)) {
-            return $this->_raiseSoapFault($soap_data);
+            $fault =& $this->_raiseSoapFault($soap_data);
+            return $fault;
         }
 
-        // __generate() may have changed the endpoint if the WSDL has more
+        // _generate() may have changed the endpoint if the WSDL has more
         // than one service, so we need to see if we need to generate a new
         // transport to hook to a different URI.  Since the transport protocol
         // can also change, we need to get an entirely new object.  This could
@@ -311,35 +336,38 @@ class SOAP_Client extends SOAP_Client_Overload
             if (PEAR::isError($this->_soap_transport)) {
                 $fault =& $this->_soap_transport;
                 $this->_soap_transport = null;
-                return $this->_raiseSoapFault($fault);
+                $fault =& $this->_raiseSoapFault($fault);
+                return $fault;
             }
         }
         $this->_soap_transport->encoding = $this->_encoding;
 
         // Send the message.
-        $transport_options = array_merge_recursive($this->__proxy_params,
-                                                   $this->__options);
-        $this->xml =& $this->_soap_transport->send($soap_data, $transport_options);
+        $transport_options = array_merge_recursive($this->_proxy_params,
+                                                   $this->_options);
+        $this->xml = $this->_soap_transport->send($soap_data, $transport_options);
 
         // Save the wire information for debugging.
-        if ($this->__options['trace'] > 0) {
-            $this->__last_request =& $this->_soap_transport->outgoing_payload;
-            $this->__last_response =& $this->_soap_transport->incoming_payload;
-            $this->wire =& $this->__get_wire();
+        if ($this->_options['trace']) {
+            $this->_last_request = $this->_soap_transport->outgoing_payload;
+            $this->_last_response = $this->_soap_transport->incoming_payload;
+            $this->wire = $this->getWire();
         }
         if ($this->_soap_transport->fault) {
-            return $this->_raiseSoapFault($this->xml);
+            $fault =& $this->_raiseSoapFault($this->xml);
+            return $fault;
         }
 
-        $this->__attachments =& $this->_soap_transport->attachments;
-        $this->__result_encoding = $this->_soap_transport->result_encoding;
-
-        if (isset($this->__options['result']) &&
-            $this->__options['result'] != 'parse') {
+        if (isset($this->_options['result']) &&
+            $this->_options['result'] != 'parse') {
             return $this->xml;
         }
 
-        return $this->__parse($this->xml, $this->__result_encoding, $this->__attachments);
+        $this->__result_encoding = $this->_soap_transport->result_encoding;
+
+        $result = &$this->parseResponse($this->xml, $this->__result_encoding,
+                                        $this->_soap_transport->attachments);
+        return $result;
     }
 
     /**
@@ -363,12 +391,12 @@ class SOAP_Client extends SOAP_Client_Overload
     function setOpt($category, $option, $value = null)
     {
         if (!is_null($value)) {
-            if (!isset($this->__options[$category])) {
-                $this->__options[$category] = array();
+            if (!isset($this->_options[$category])) {
+                $this->_options[$category] = array();
             }
-            $this->__options[$category][$option] = $value;
+            $this->_options[$category][$option] = $value;
         } else {
-            $this->__options[$category] = $option;
+            $this->_options[$category] = $option;
         }
     }
 
@@ -386,7 +414,7 @@ class SOAP_Client extends SOAP_Client_Overload
      *
      * @param string $method        The method to call.
      * @param array $params         The method parameters.
-     * @param string $return_value  Will get the method's return value
+     * @param mixed $return_value   Will get the method's return value
      *                              assigned.
      *
      * @return boolean  Always true.
@@ -394,7 +422,7 @@ class SOAP_Client extends SOAP_Client_Overload
     function _call($method, $params, &$return_value)
     {
         // Overloading lowercases the method name, we need to look into the
-        // wsdl and try to find the correct method name to get the correct
+        // WSDL and try to find the correct method name to get the correct
         // case for the call.
         if ($this->_wsdl) {
             $this->_wsdl->matchMethod($method);
@@ -405,38 +433,107 @@ class SOAP_Client extends SOAP_Client_Overload
         return true;
     }
 
+    /**
+     * @deprecated Use getLastRequest().
+     */
     function &__getlastrequest()
     {
-        return $this->__last_request;
+        $request = $this->getLastRequest();
+        return $request;
     }
 
+    /**
+     * Returns the XML content of the last SOAP request.
+     *
+     * @return string  The last request.
+     */
+    function getLastRequest()
+    {
+        return $this->_last_request;
+    }
+
+    /**
+     * @deprecated Use getLastResponse().
+     */
     function &__getlastresponse()
     {
-        return $this->__last_response;
+        $response =& $this->getLastResponse;
+        return $response;
     }
 
+    /**
+     * Returns the XML content of the last SOAP response.
+     *
+     * @return string  The last response.
+     */
+    function getLastResponse()
+    {
+        return $this->_last_response;
+    }
+
+    /**
+     * @deprecated Use setUse().
+     */
     function __use($use)
     {
-        $this->__options['use'] = $use;
+        $this->setUse($use);
     }
 
+    /**
+     * Sets the SOAP encoding.
+     *
+     * @param string $use  Either 'literal' or 'encoded' (section 5).
+     */
+    function setUse($use)
+    {
+        $this->_options['use'] = $use;
+    }
+
+    /**
+     * @deprecated Use setStyle().
+     */
     function __style($style)
     {
-        $this->__options['style'] = $style;
+        $this->setStyle($style);
     }
 
+    /**
+     * Sets the SOAP encoding style.
+     *
+     * @param string $style  Either 'document' or 'rpc'.
+     */
+    function setStyle($style)
+    {
+        $this->_options['style'] = $style;
+    }
+
+    /**
+     * @deprecated Use setTrace().
+     */
     function __trace($level)
     {
-        $this->__options['trace'] = $level;
+        $this->setTrace($level);
     }
 
-    function &__generate($method, &$params, $namespace = false,
-                         $soapAction = false)
+    /**
+     * Sets whether to trace the traffic on the transport level.
+     *
+     * @see getWire()
+     *
+     * @param boolean $trace
+     */
+    function setTrace($trace)
+    {
+        $this->_options['trace'] = $trace;
+    }
+
+    function &_generate($method, &$params, $namespace = false,
+                        $soapAction = false)
     {
         $this->fault = null;
-        $this->__options['input']='parse';
-        $this->__options['result']='parse';
-        $this->__options['parameters'] = false;
+        $this->_options['input'] = 'parse'; 
+        $this->_options['result'] = 'parse';
+        $this->_options['parameters'] = false;
 
         if ($params && gettype($params) != 'array') {
             $params = array($params);
@@ -444,21 +541,21 @@ class SOAP_Client extends SOAP_Client_Overload
 
         if (gettype($namespace) == 'array') {
             foreach ($namespace as $optname => $opt) {
-                $this->__options[strtolower($optname)] = $opt;
+                $this->_options[strtolower($optname)] = $opt;
             }
-            if (isset($this->__options['namespace'])) {
-                $namespace = $this->__options['namespace'];
+            if (isset($this->_options['namespace'])) {
+                $namespace = $this->_options['namespace'];
             } else {
                 $namespace = false;
             }
         } else {
             // We'll place $soapAction into our array for usage in the
             // transport.
-            $this->__options['soapaction'] = $soapAction;
-            $this->__options['namespace'] = $namespace;
+            $this->_options['soapaction'] = $soapAction;
+            $this->_options['namespace'] = $namespace;
         }
 
-        if ($this->__endpointType == 'wsdl') {
+        if ($this->_endpointType == 'wsdl') {
             $this->_setSchemaVersion($this->_wsdl->xsd);
 
             // Get port name.
@@ -466,29 +563,32 @@ class SOAP_Client extends SOAP_Client_Overload
                 $this->_portName = $this->_wsdl->getPortName($method);
             }
             if (PEAR::isError($this->_portName)) {
-                return $this->_raiseSoapFault($this->_portName);
+                $fault =& $this->_raiseSoapFault($this->_portName);
+                return $fault;
             }
 
             // Get endpoint.
             $this->_endpoint = $this->_wsdl->getEndpoint($this->_portName);
             if (PEAR::isError($this->_endpoint)) {
-                return $this->_raiseSoapFault($this->_endpoint);
+                $fault =& $this->_raiseSoapFault($this->_endpoint);
+                return $fault;
             }
 
             // Get operation data.
             $opData = $this->_wsdl->getOperationData($this->_portName, $method);
 
             if (PEAR::isError($opData)) {
-                return $this->_raiseSoapFault($opData);
+                $fault =& $this->_raiseSoapFault($opData);
+                return $fault;
             }
             $namespace = $opData['namespace'];
-            $this->__options['style'] = $opData['style'];
-            $this->__options['use'] = $opData['input']['use'];
-            $this->__options['soapaction'] = $opData['soapAction'];
+            $this->_options['style'] = $opData['style'];
+            $this->_options['use'] = $opData['input']['use'];
+            $this->_options['soapaction'] = $opData['soapAction'];
 
             // Set input parameters.
-            if ($this->__options['input'] == 'parse') {
-                $this->__options['parameters'] = $opData['parameters'];
+            if ($this->_options['input'] == 'parse') {
+                $this->_options['parameters'] = $opData['parameters'];
                 $nparams = array();
                 if (isset($opData['input']['parts']) &&
                     count($opData['input']['parts'])) {
@@ -508,7 +608,8 @@ class SOAP_Client extends SOAP_Client_Overload
                         } else {
                             // We now force an associative array for
                             // parameters if using WSDL.
-                            return $this->_raiseSoapFault("The named parameter $name is not in the call parameters.");
+                            $fault =& $this->_raiseSoapFault("The named parameter $name is not in the call parameters.");
+                            return $fault;
                         }
                         if (gettype($nparams[$name]) != 'object' ||
                             !is_a($nparams[$name], 'SOAP_Value')) {
@@ -545,25 +646,25 @@ class SOAP_Client extends SOAP_Client_Overload
         }
 
         // Serialize the message.
-        $this->_section5 = (isset($this->__options['use']) &&
-                            $this->__options['use'] == 'literal');
+        $this->_section5 = (!isset($this->_options['use']) ||
+                            $this->_options['use'] != 'literal');
 
-        if (!isset($this->__options['style']) ||
-            $this->__options['style'] == 'rpc') {
-            $this->__options['style'] = 'rpc';
+        if (!isset($this->_options['style']) ||
+            $this->_options['style'] == 'rpc') {
+            $this->_options['style'] = 'rpc';
             $this->docparams = true;
             $mqname =& new QName($method, $namespace);
             $methodValue =& new SOAP_Value($mqname->fqn(), 'Struct', $params);
-            $soap_msg =& $this->_makeEnvelope($methodValue,
-                                              $this->headersOut,
-                                              $this->_encoding,
-                                              $this->__options);
+            $soap_msg = $this->makeEnvelope($methodValue,
+                                            $this->headersOut,
+                                            $this->_encoding,
+                                            $this->_options);
         } else {
             if (!$params) {
                 $mqname =& new QName($method, $namespace);
                 $mynull = null;
                 $params =& new SOAP_Value($mqname->fqn(), 'Struct', $mynull);
-            } elseif ($this->__options['input'] == 'parse') {
+            } elseif ($this->_options['input'] == 'parse') {
                 if (is_array($params)) {
                     $nparams = array();
                     $keys = array_keys($params);
@@ -578,41 +679,43 @@ class SOAP_Client extends SOAP_Client_Overload
                     }
                     $params =& $nparams;
                 }
-                if ($this->__options['parameters']) {
+                if ($this->_options['parameters']) {
                     $mqname =& new QName($method, $namespace);
                     $params =& new SOAP_Value($mqname->fqn(),
                                               'Struct',
                                               $params);
                 }
             }
-            $soap_msg =& $this->_makeEnvelope($params,
-                                              $this->headersOut,
-                                              $this->_encoding,
-                                              $this->__options);
+            $soap_msg = $this->makeEnvelope($params,
+                                            $this->headersOut,
+                                            $this->_encoding,
+                                            $this->_options);
         }
         unset($this->headersOut);
 
         if (PEAR::isError($soap_msg)) {
-            return $this->_raiseSoapFault($soap_msg);
+            $fault =& $this->_raiseSoapFault($soap_msg);
+            return $fault;
         }
 
         // Handle MIME or DIME encoding.
         // TODO: DIME encoding should move to the transport, do it here for
         // now and for ease of getting it done.
-        if (count($this->__attachments)) {
-            if ((isset($this->__options['attachments']) &&
-                 $this->__options['attachments'] == 'Mime') ||
-                isset($this->__options['Mime'])) {
+        if (count($this->_attachments)) {
+            if ((isset($this->_options['attachments']) &&
+                 $this->_options['attachments'] == 'Mime') ||
+                isset($this->_options['Mime'])) {
                 $soap_msg =& $this->_makeMimeMessage($soap_msg,
                                                      $this->_encoding);
             } else {
                 // default is dime
                 $soap_msg =& $this->_makeDIMEMessage($soap_msg,
                                                      $this->_encoding);
-                $this->__options['headers']['Content-Type'] = 'application/dime';
+                $this->_options['headers']['Content-Type'] = 'application/dime';
             }
             if (PEAR::isError($soap_msg)) {
-                return $this->_raiseSoapFault($soap_msg);
+                $fault =& $this->_raiseSoapFault($soap_msg);
+                return $fault;
             }
         }
 
@@ -620,10 +723,10 @@ class SOAP_Client extends SOAP_Client_Overload
         if (is_array($soap_msg)) {
             $soap_data =& $soap_msg['body'];
             if (count($soap_msg['headers'])) {
-                if (isset($this->__options['headers'])) {
-                    $this->__options['headers'] = array_merge($this->__options['headers'], $soap_msg['headers']);
+                if (isset($this->_options['headers'])) {
+                    $this->_options['headers'] = array_merge($this->_options['headers'], $soap_msg['headers']);
                 } else {
-                    $this->__options['headers'] = $soap_msg['headers'];
+                    $this->_options['headers'] = $soap_msg['headers'];
                 }
             }
         } else {
@@ -633,35 +736,57 @@ class SOAP_Client extends SOAP_Client_Overload
         return $soap_data;
     }
 
+    /**
+     * @deprecated Use parseResponse().
+     */
     function &__parse(&$response, $encoding, &$attachments)
+    {
+        return $this->parseResponse($response, $encoding, $attachments);
+    }
+
+    /**
+     * Parses a SOAP response.
+     *
+     * @see SOAP_Parser::
+     *
+     * @param string $response    XML content of SOAP response.
+     * @param string $encoding    Character set encoding, defaults to 'UTF-8'.
+     * @param array $attachments  List of attachments.
+     */
+    function &parseResponse(&$response, $encoding, &$attachments)
     {
         // Parse the response.
         $response =& new SOAP_Parser($response, $encoding, $attachments);
         if ($response->fault) {
-            return $this->_raiseSoapFault($response->fault);
+            $fault =& $this->_raiseSoapFault($response->fault);
+            return $fault;
         }
 
         // Return array of parameters.
         $return =& $response->getResponse();
         $headers =& $response->getHeaders();
         if ($headers) {
-            $this->headersIn =& $this->__decodeResponse($headers, false);
+            $this->headersIn =& $this->_decodeResponse($headers, false);
         }
 
-        return $this->__decodeResponse($return);
+        $decoded = &$this->_decodeResponse($return);
+        return $decoded;
     }
 
-    function &__decodeResponse(&$response, $shift = true)
+    function &_decodeResponse(&$response, $shift = true)
     {
         if (!$response) {
-            return null;
+            $decoded = null;
+            return $decoded;
         }
 
         // Check for valid response.
         if (PEAR::isError($response)) {
-            return $this->_raiseSoapFault($response);
+            $fault =& $this->_raiseSoapFault($response);
+            return $fault;
         } elseif (!is_a($response, 'soap_value')) {
-            return $this->_raiseSoapFault("Didn't get SOAP_Value object back from client");
+            $fault =& $this->_raiseSoapFault("Didn't get SOAP_Value object back from client");
+            return $fault;
         }
 
         // Decode to native php datatype.
@@ -669,7 +794,8 @@ class SOAP_Client extends SOAP_Client_Overload
 
         // Fault?
         if (PEAR::isError($returnArray)) {
-            return $this->_raiseSoapFault($returnArray);
+            $fault =& $this->_raiseSoapFault($returnArray);
+            return $fault;
         }
 
         if (is_object($returnArray) &&
@@ -686,25 +812,44 @@ class SOAP_Client extends SOAP_Client_Overload
                     if (stristr($k, 'detail')) $faultdetail = $v;
                     if (stristr($k, 'faultactor')) $faultactor = $v;
                 }
-                return $this->_raiseSoapFault($faultstring, $faultdetail, $faultactor, $faultcode);
+                $fault =& $this->_raiseSoapFault($faultstring, $faultdetail, $faultactor, $faultcode);
+                return $fault;
             }
             // Return array of return values.
             if ($shift && count($returnArray) == 1) {
-                return array_shift($returnArray);
+                $decoded = array_shift($returnArray);
+                return $decoded;
             }
             return $returnArray;
         }
         return $returnArray;
     }
 
+    /**
+     * @deprecated Use getWire().
+     */
     function __get_wire()
     {
-        if ($this->__options['trace'] > 0 &&
-            ($this->__last_request || $this->__last_response)) {
+        return $this->getWire();
+    }
+
+    /**
+     * Returns the outgoing and incoming traffic on the transport level.
+     *
+     * Tracing has to be enabled.
+     *
+     * @see setTrace()
+     *
+     * @return string  The complete traffic between the client and the server.
+     */
+    function getWire()
+    {
+        if ($this->_options['trace'] &&
+            ($this->_last_request || $this->_last_response)) {
             return "OUTGOING:\n\n" .
-                $this->__last_request .
+                $this->_last_request .
                 "\n\nINCOMING\n\n" .
-                preg_replace("/></",">\r\n<", $this->__last_response);
+                preg_replace("/></",">\r\n<", $this->_last_response);
         }
 
         return null;

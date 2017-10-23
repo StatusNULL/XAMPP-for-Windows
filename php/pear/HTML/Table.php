@@ -14,21 +14,24 @@
  *
  * For auto filling of data and such then check out http://pear.php.net/package/HTML_Table_Matrix
  *
- * PHP versions 4
+ * PHP versions 4 and 5
  *
- * LICENSE: This source file is subject to version 3.0 of the PHP license
- * that is available through the world-wide-web at the following URI:
- * http://www.php.net/license/3_0.txt.  If you did not receive a copy of
- * the PHP License and are unable to obtain it through the web, please
- * send a note to license@php.net so we can mail you a copy immediately.
+ * LICENSE: This source file is subject to the new BSD license that is bundled
+ * with this package in the file LICENSE.
+ * It is also available through the world-wide-web at this URL:
+ * http://www.opensource.org/licenses/bsd-license.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to wiesemann@php.net so we can send you a copy immediately.
+
  *
  * @category   HTML
  * @package    HTML_Table
  * @author     Adam Daniel <adaniel1@eesus.jnj.com>
  * @author     Bertrand Mansion <bmansion@mamasam.com>
- * @copyright  2005 The PHP Group
- * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Table.php,v 1.29 2005/10/25 12:41:19 wiesemann Exp $
+ * @copyright  2005-2006 The PHP Group
+ * @license    http://www.opensource.org/licenses/bsd-license.php New BSD License
+ * @version    CVS: $Id: Table.php,v 1.34 2006/11/09 20:47:41 wiesemann Exp $
  * @link       http://pear.php.net/package/HTML_Table
  */
 
@@ -57,8 +60,8 @@ require_once 'HTML/Table/Storage.php';
  * @package    HTML_Table
  * @author     Adam Daniel <adaniel1@eesus.jnj.com>
  * @author     Bertrand Mansion <bmansion@mamasam.com>
- * @copyright  2005 The PHP Group
- * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
+ * @copyright  2005-2006 The PHP Group
+ * @license    http://www.opensource.org/licenses/bsd-license.php New BSD License
  * @version    Release: @package_version@
  * @link       http://pear.php.net/package/HTML_Table
  */
@@ -77,6 +80,15 @@ class HTML_Table extends HTML_Common {
      * @access  private
      */
     var $_caption = array();
+
+    /**
+     * Array containing the table column group specifications
+     *
+     * @var     array
+     * @author  Laurent Laville (pear at laurent-laville dot org)
+     * @access  private
+     */
+    var $_colgroup = array();
 
     /**
      * HTML_Table_Storage object for the (t)head of the table
@@ -116,17 +128,12 @@ class HTML_Table extends HTML_Common {
      */
     function HTML_Table($attributes = null, $tabOffset = 0, $useTGroups = false)
     {
-        $commonVersion = 1.7;
-        if (HTML_Common::apiVersion() < $commonVersion) {
-            return PEAR::raiseError('HTML_Table version ' . $this->apiVersion() . ' requires ' .
-                "HTML_Common version $commonVersion or greater.", 0, PEAR_ERROR_TRIGGER);
-        }
         HTML_Common::HTML_Common($attributes, (int)$tabOffset);
         $this->_useTGroups = (boolean)$useTGroups;
-        $this->_tbody =& new HTML_Table_Storage($attributes, $tabOffset, $this->_useTGroups);
+        $this->_tbody =& new HTML_Table_Storage($tabOffset, $this->_useTGroups);
         if ($this->_useTGroups) {
-            $this->_thead =& new HTML_Table_Storage($attributes, $tabOffset, $this->_useTGroups);
-            $this->_tfoot =& new HTML_Table_Storage($attributes, $tabOffset, $this->_useTGroups);
+            $this->_thead =& new HTML_Table_Storage($tabOffset, $this->_useTGroups);
+            $this->_tfoot =& new HTML_Table_Storage($tabOffset, $this->_useTGroups);
         }
     }
 
@@ -134,6 +141,7 @@ class HTML_Table extends HTML_Common {
      * Returns the API version
      * @access  public
      * @return  double
+     * @deprecated
      */
     function apiVersion()
     {
@@ -149,8 +157,8 @@ class HTML_Table extends HTML_Common {
     {
         if (is_null($this->_thead)) {
             $this->_useTGroups = true;
-            $this->_thead =& new HTML_Table_Storage($this->_attributes,
-                $this->_tabOffset, $this->_useTGroups);
+            $this->_thead =& new HTML_Table_Storage($this->_tabOffset,
+                                                    $this->_useTGroups);
             $this->_tbody->setUseTGroups(true);
         }
         return $this->_thead;
@@ -165,8 +173,8 @@ class HTML_Table extends HTML_Common {
     {
         if (is_null($this->_tfoot)) {
             $this->_useTGroups = true;
-            $this->_tfoot =& new HTML_Table_Storage($this->_attributes,
-                $this->_tabOffset, $this->_useTGroups);
+            $this->_tfoot =& new HTML_Table_Storage($this->_tabOffset,
+                                                    $this->_useTGroups);
             $this->_tbody->setUseTGroups(true);
         }
         return $this->_tfoot;
@@ -193,6 +201,26 @@ class HTML_Table extends HTML_Common {
     {
         $attributes = $this->_parseAttributes($attributes);
         $this->_caption = array('attr' => $attributes, 'contents' => $caption);
+    }
+
+    /**
+     * Sets the table columns group specifications, or removes existing ones.
+     *
+     * @param   mixed     $colgroup         (optional) Columns attributes
+     * @param   mixed     $attributes       (optional) Associative array or string
+     *                                                 of table row attributes
+     * @author  Laurent Laville (pear at laurent-laville dot org)
+     * @access  public
+     */
+    function setColGroup($colgroup = null, $attributes = null)
+    {
+        if (isset($colgroup)) {
+            $attributes = $this->_parseAttributes($attributes);
+            $this->_colgroup[] = array('attr' => $attributes,
+                                       'contents' => $colgroup);
+        } else {
+            $this->_colgroup = array();
+        }
     }
 
     /**
@@ -559,6 +587,25 @@ class HTML_Table extends HTML_Common {
             $strHtml .= $contents;
             $strHtml .= '</caption>' . $lnEnd;
         }
+        if (!empty($this->_colgroup)) {
+            foreach ($this->_colgroup as $g => $col) {
+                $attr = $this->_colgroup[$g]['attr'];
+                $contents = $this->_colgroup[$g]['contents'];
+                $strHtml .= $tabs . $tab . '<colgroup' . $this->_getAttrString($attr) . '>';
+                if (!empty($contents)) {
+                    $strHtml .= $lnEnd;
+                    if (!is_array($contents)) {
+                        $contents = array($contents);
+                    }
+                    foreach ($contents as $a => $colAttr) {
+                        $attr = $this->_parseAttributes($colAttr);
+                        $strHtml .= $tabs . $tab . $tab . '<col' . $this->_getAttrString($attr) . '>' . $lnEnd;
+                    }
+                    $strHtml .= $tabs . $tab;
+                }
+                $strHtml .= '</colgroup>' . $lnEnd;
+            }
+        }
         if ($this->_useTGroups) {
             $tHeadColCount = 0;
             if ($this->_thead !== null) {
@@ -576,29 +623,35 @@ class HTML_Table extends HTML_Common {
             if ($this->_thead !== null) {
                 $this->_thead->setColCount($maxColCount);
                 if ($this->_thead->getRowCount() > 0) {
-                    $strHtml .= $tabs . $tab . '<thead>' . $lnEnd;
-                    $strHtml .= $this->_thead->toHtml();
+                    $strHtml .= $tabs . $tab . '<thead' .
+                                $this->_getAttrString($this->_thead->_attributes) .
+                                '>' . $lnEnd;
+                    $strHtml .= $this->_thead->toHtml($tabs, $tab);
                     $strHtml .= $tabs . $tab . '</thead>' . $lnEnd;
                 }
             }
             if ($this->_tfoot !== null) {
                 $this->_tfoot->setColCount($maxColCount);
                 if ($this->_tfoot->getRowCount() > 0) {
-                    $strHtml .= $tabs . $tab . '<tfoot>' . $lnEnd;
-                    $strHtml .= $this->_tfoot->toHtml();
+                    $strHtml .= $tabs . $tab . '<tfoot' .
+                                $this->_getAttrString($this->_tfoot->_attributes) .
+                                '>' . $lnEnd;
+                    $strHtml .= $this->_tfoot->toHtml($tabs, $tab);
                     $strHtml .= $tabs . $tab . '</tfoot>' . $lnEnd;
                 }
             }
             if ($this->_tbody !== null) {
                 $this->_tbody->setColCount($maxColCount);
                 if ($this->_tbody->getRowCount() > 0) {
-                    $strHtml .= $tabs . $tab . '<tbody>' . $lnEnd;
-                    $strHtml .= $this->_tbody->toHtml();
+                    $strHtml .= $tabs . $tab . '<tbody' .
+                                $this->_getAttrString($this->_tbody->_attributes) .
+                                '>' . $lnEnd;
+                    $strHtml .= $this->_tbody->toHtml($tabs, $tab);
                     $strHtml .= $tabs . $tab . '</tbody>' . $lnEnd;
                 }
             }
         } else {
-            $strHtml .= $this->_tbody->toHtml();
+            $strHtml .= $this->_tbody->toHtml($tabs, $tab);
         }
         $strHtml .= $tabs . '</table>' . $lnEnd;
         return $strHtml;

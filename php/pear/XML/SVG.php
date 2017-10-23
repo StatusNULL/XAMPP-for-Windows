@@ -5,9 +5,9 @@
  * Wrapper class that provides some examples and a few convenience
  * methods.
  *
- * $Horde: framework/XML_SVG/SVG.php,v 1.18 2005/01/03 13:09:24 jan Exp $
+ * $Horde: framework/XML_SVG/SVG.php,v 1.20 2006/01/01 21:10:25 jan Exp $
  *
- * Copyright 2002-2005 Chuck Hagenbuch <chuck@horde.org>
+ * Copyright 2002-2006 Chuck Hagenbuch <chuck@horde.org>
  *
  * See the enclosed file COPYING for license information (LGPL). If you
  * did not receive this file, see http://www.fsf.org/copyleft/lgpl.html.
@@ -285,13 +285,19 @@ class XML_SVG_Textpath extends XML_SVG_Element {
     var $_rotate;
     var $_textLength;
     var $_lengthAdjust;
+    var $_charset;
 
     function printElement($element = 'textpath')
     {
         echo '<' . $element;
         $this->printParams('id', 'x', 'y', 'dx', 'dy', 'rotate',
                            'textLength', 'lengthAdjust', 'style', 'transform');
-        echo '>' . htmlentities($this->_text);
+        echo '>';
+        if (isset($this->_charset)) {
+            echo @htmlspecialchars($this->_text, ENT_COMPAT, $this->_charset);
+        } else {
+            echo htmlspecialchars($this->_text);
+        }
         parent::printElement();
         echo "</$element>\n";
     }

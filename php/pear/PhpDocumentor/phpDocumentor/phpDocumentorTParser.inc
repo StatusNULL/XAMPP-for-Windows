@@ -1,34 +1,46 @@
 <?php
-//
-// +------------------------------------------------------------------------+
-// | phpDocumentor                                                          |
-// +------------------------------------------------------------------------+
-// | Copyright (c) 2000-2003 Joshua Eichorn, Gregory Beaver                 |
-// | Email         jeichorn@phpdoc.org, cellog@phpdoc.org                   |
-// | Web           http://www.phpdoc.org                                    |
-// | Mirror        http://phpdocu.sourceforge.net/                          |
-// | PEAR          http://pear.php.net/package-info.php?pacid=137           |
-// +------------------------------------------------------------------------+
-// | This source file is subject to version 3.00 of the PHP License,        |
-// | that is available at http://www.php.net/license/3_0.txt.               |
-// | If you did not receive a copy of the PHP license and are unable to     |
-// | obtain it through the world-wide-web, please send a note to            |
-// | license@php.net so we can mail you a copy immediately.                 |
-// +------------------------------------------------------------------------+
-//
-
 /**
- * @package phpDocumentor
+ * tokenizer extension-based parser for PHP code
+ * 
+ * phpDocumentor :: automatic documentation generator
+ * 
+ * PHP versions 4 and 5
+ *
+ * Copyright (c) 2002-2006 Gregory Beaver
+ * 
+ * LICENSE:
+ * 
+ * This library is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation;
+ * either version 2.1 of the License, or (at your option) any
+ * later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ *
+ * @package    phpDocumentor
  * @subpackage Parsers
- * @author Gregory Beaver <cellog@users.sourceforge.net>
- * @version $Revision: 1.48.2.13 $
+ * @author     Gregory Beaver <cellog@php.net>
+ * @copyright  2002-2006 Gregory Beaver
+ * @license    http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @version    CVS: $Id: phpDocumentorTParser.inc,v 1.18 2006/08/17 03:13:39 cellog Exp $
+ * @link       http://www.phpdoc.org
+ * @link       http://pear.php.net/PhpDocumentor
+ * @since      1.2
  */
 /**
  * Tokenizer-based parser for PHP source code
  * @package phpDocumentor
  * @subpackage Parsers
  * @author Gregory Beaver <cellog@users.sourceforge.net>
- * @version $Revision: 1.48.2.13 $
+ * @version $Revision: 1.18 $
  */
 class phpDocumentorTParser extends Parser
 {
@@ -69,6 +81,7 @@ class phpDocumentorTParser extends Parser
     var $_pv_docblock;
     var $_pv_dtemplate;
     var $_pv_func;
+    var $_pv_func_param;
     var $_pv_findglobal;
     var $_pv_global_name;
     var $_pv_global_val;
@@ -117,6 +130,8 @@ class phpDocumentorTParser extends Parser
     var $source_location;
     var $eventHandlers = array(
                                 PARSER_EVENT_ARRAY => 'handleArray',
+                                PARSER_EVENT_VAR_ARRAY => 'handleArray',
+                                PARSER_EVENT_VAR_ARRAY_COMMENT => 'handleVarArrayComment',
                                 PARSER_EVENT_CLASS => 'handleClass',
                                 PARSER_EVENT_COMMENT => 'handleComment',
                                 PARSER_EVENT_DOCBLOCK_TEMPLATE => 'handleDocBlockTemplate',
@@ -133,9 +148,10 @@ class phpDocumentorTParser extends Parser
                                 PARSER_EVENT_DESC => 'handleDesc',
                                 PARSER_EVENT_DOCKEYWORD => 'handleTag',
                                 PARSER_EVENT_DOCKEYWORD_EMAIL => 'handleDockeywordEmail',
-                                PARSER_EVENT_EOFQUOTE => 'handleEOFQuote',
+                                PARSER_EVENT_EOFQUOTE => 'handleHereDoc',
                                 PARSER_EVENT_FUNCTION => 'handleFunction',
                                 PARSER_EVENT_FUNCTION_PARAMS => 'handleFunctionParams',
+                                PARSER_EVENT_FUNCTION_PARAM_VAR => 'handleFunctionParams',
                                 PARSER_EVENT_FUNC_GLOBAL => 'handleFuncGlobal',
                                 PARSER_EVENT_DEFINE_GLOBAL => 'handleGlobal',
                                 PARSER_EVENT_GLOBAL_VALUE => 'handleGlobalValue',
@@ -148,6 +164,9 @@ class phpDocumentorTParser extends Parser
                                 PARSER_EVENT_STATIC_VAR => 'handleStaticVar',
                                 PARSER_EVENT_STATIC_VAR_VALUE => 'handleStaticValue',
                                 PARSER_EVENT_VAR => 'handleVar',
+                                PARSER_EVENT_ACCESS_MODIFIER => 'handleAccessModifier',
+                                PARSER_EVENT_IMPLEMENTS => 'handleImplements',
+                                PARSER_EVENT_CLASS_CONSTANT => 'handleClassConstant',
     );
     
     var $inlineTagHandlers = array(
@@ -199,9 +218,9 @@ class phpDocumentorTParser extends Parser
         $this->publishEvent(PHPDOCUMENTOR_EVENT_NEWFILE,basename($path));
         //$name = str_replace("/","_",dirname($path)) . "_" . array_shift(explode(".",$page->getFile()));
         // fc@fc.clever-soft.com 11/29/2001
-        $name = str_replace(PATH_DELIMITER,"_",dirname($path)) . "_" .  str_replace(".","_",$page->getFile());
-        $tmp = explode("_",$name);
-        $name = str_replace(':','_',implode("_",array_slice($tmp,$base)));
+        $name = str_replace( ':', '', dirname($path) . PATH_DELIMITER . $page->getFile() );
+        $tmp = explode( PATH_DELIMITER, $name );
+        $name = implode( "---", array_slice( $tmp, $base ) );
         // if base is '', drive letter is present in windows
 
         $page->setName($name);
@@ -215,7 +234,6 @@ class phpDocumentorTParser extends Parser
 
         $this->publishEvent(PHPDOCUMENTOR_EVENT_PAGE,$page);
         unset($page);
-
         do
         {
             $lpevent = $pevent;
@@ -456,7 +474,7 @@ class phpDocumentorTParser extends Parser
             {
                 addErrorDie(PDERROR_FUNCTION_HAS_NONAME);
             }
-            if ($e == PARSER_EVENT_COMMENT || $e == PARSER_EVENT_COMMENTBLOCK || $e == PARSER_EVENT_FUNCTION_PARAMS) return;
+            if ($e == PARSER_EVENT_COMMENT || $e == PARSER_EVENT_COMMENTBLOCK || $e == PARSER_EVENT_FUNCTION_PARAMS || $e == PARSER_EVENT_LOGICBLOCK) return;
         }
     
         if (!isset($this->_pv_func)) $this->_pv_func = false;
@@ -465,9 +483,18 @@ class phpDocumentorTParser extends Parser
             $this->_pv_globals = array();
             $this->_pv_global_count = $this->_pv_static_count = 0;
             if ($this->_pf_in_class)
-            $this->_pv_func = new parserMethod($this->_pv_cur_class); 
-            else
-            $this->_pv_func = new parserFunction;
+            {
+                $this->_pv_func = new parserMethod($this->_pv_cur_class); 
+            } else
+            {
+                $this->_pv_func = new parserFunction;
+                unset($this->_accessModifiers);
+            }
+            if (isset($this->_accessModifiers))
+            {
+                $this->_pv_func->setModifiers($this->_accessModifiers);
+                unset($this->_accessModifiers);
+            }
             $this->_pv_func->setLineNumber($this->_wp->linenum + 1);
             if (is_string($word) && $word == '&')
             $this->_pv_func->setReturnsReference();
@@ -520,10 +547,12 @@ class phpDocumentorTParser extends Parser
         }
         if (isset($this->_pv_function_param))
         {
-            $this->_pv_func->addParam($this->_pv_function_param,$this->_pv_function_data, $this->_pf_funcparam_val);
+            $this->_pv_func->addParam($this->_pv_function_param,$this->_pv_function_data,
+                $this->_pf_funcparam_val, $this->_pv_function_param_type);
             unset($this->_pv_function_param);
             $this->_pv_function_data = '';
             $this->_pf_funcparam_val = false;
+            $this->_pv_function_param_type = null;
         }
     }
     /**
@@ -535,23 +564,26 @@ class phpDocumentorTParser extends Parser
     
     function handleFunctionParams($word, $pevent)
     {
-        //echo $this->wp->getPos() . ": word=|$word|\t\t\tlastword=|".$this->_pv_last_word."|\n";
+        //echo $this->_wp->getPos() . ": word=|$word|\t\t\tlastword=|".$this->_pv_last_word."|\n";
         //echo "function_param = '".$this->_pv_function_param."'\n";
         //echo "function_data = '".$this->_pv_function_data."'\n";
-        $e1 = $this->checkEventPush( $word, $pevent); 
+        $e1 = $this->checkEventPush($word, $pevent); 
 
         if (!$e1)
         {
-            if ($word == ',' || $this->checkEventPop($word,$pevent))
-            {
+            if (($pop = $this->checkEventPop($word,$pevent)) && $pevent == PARSER_EVENT_FUNCTION_PARAM_VAR)
+            { // end of [typehint ]$param[= defaultval]
+                if (is_string($word) && $word == ')') {
+                    $this->_wp->backupPos();
+                }
                 $this->endFunctionParam($word);
             } elseif ($word == '=')
-            {
+            { // about to parse the default value
                 $this->_pf_funcparam_val = true;
             } else
             {
                 if ($this->_pf_funcparam_val)
-                {
+                { // parsing default value
                     if (isset($this->_pv_quote_data))
                     {
                         $this->_pv_function_data .= $this->_pv_quote_data;
@@ -560,15 +592,30 @@ class phpDocumentorTParser extends Parser
                     if (is_array($word)) $word = $word[1];
                     $this->_pv_function_data .= $word;
                 } else
-                {
+                { // pre-param
+                    if ($pop) {
+                        return;
+                    }
                     if (!isset($this->_pv_function_param)) $this->_pv_function_param = '';
-                    if (is_array($word)) $word = $word[1];
+                    if (is_array($word) && $pevent == PARSER_EVENT_FUNCTION_PARAMS)
+                    {
+                        if ($word[0] == T_STRING || $word[0] == T_ARRAY)
+                        { // object or array type hint
+                            $this->_pv_function_param_type = $word[1];
+                            return;
+                        }
+                        $word = $word[1];
+                    }
                     $this->_pv_function_param .= $word;
                 }
             }
         } elseif ($e1 == PARSER_EVENT_ARRAY)
         {
             $this->_wp->setWhiteSpace(true);
+        } elseif ($e1 == PARSER_EVENT_FUNCTION_PARAM_VAR) {
+            if (!isset($this->_pv_function_param)) $this->_pv_function_param = '';
+            // we just got the $var part of the param
+            $this->_pv_function_param .= $word[1];
         }
     }
 
@@ -602,6 +649,37 @@ class phpDocumentorTParser extends Parser
         {
             $this->_pv_paren_count--;
             $this->_wp->setWhiteSpace(false);
+        }
+    }
+    
+    /**
+     * handler for HEREDOC in a function logic block.
+     * this handler recognizes function declarations, and parses them.  The body
+     * of the function is parsed by handleLogicBlock()
+     * @see handleLogicBlock()
+     */
+    
+    function handleHereDoc($word, $pevent)
+    {
+        if (is_array($this->_pv_last_word) && $this->_pv_last_word[0] == T_START_HEREDOC)
+        {
+            $save = $word;
+            if (is_array($word)) $word = $word[1];
+            $this->_pv_quote_data = $this->_pv_last_word[1] . $word;
+            $this->_pf_quote_active = true;
+        } elseif (!$this->_pf_quote_active)
+        {
+            $this->_pv_quote_data = $this->_pv_last_word[1];
+            $this->_event_stack->popEvent();
+            $this->_wp->backupPos();
+            return;
+        }
+        $save = $word;
+        if (is_array($word)) $word = $word[1];
+        $this->_pv_quote_data .= $word;
+        if ($this->checkEventPop($save, $pevent))
+        {
+            $this->_pf_quote_active = false;
         }
     }
 
@@ -685,6 +763,21 @@ class phpDocumentorTParser extends Parser
 
         if ($this->checkEventPop($word,$pevent))
         {
+            $this->_pv_include = new parserInclude;
+            $this->_pv_include->setLineNumber($this->_pv_linenum + 1);
+            $this->_pf_in_include = false;
+            $this->_pv_include->setName($this->_pv_include_name);
+            $this->_pv_include->setValue($this->_pv_include_value);
+            $this->publishEvent(PHPDOCUMENTOR_EVENT_INCLUDE,$this->_pv_include);
+            $this->_pf_includename_isset = false;
+            unset($this->_pv_include);
+            unset($this->_pv_include_name);
+            unset($this->_pv_include_value);
+            unset($this->_pv_include_params_data);
+        } elseif ($this->_last_pevent == PARSER_EVENT_INCLUDE_PARAMS) {
+            // include is part of a larger statement
+            // force ending of include
+            $this->_event_stack->popEvent();
             $this->_pv_include = new parserInclude;
             $this->_pv_include->setLineNumber($this->_pv_linenum + 1);
             $this->_pf_in_include = false;
@@ -788,7 +881,8 @@ class phpDocumentorTParser extends Parser
         
         if ($this->checkEventPop($word,$pevent))
         {
-            if ($this->_last_pevent == PARSER_EVENT_QUOTE)
+            if ($this->_last_pevent == PARSER_EVENT_QUOTE ||
+                $this->_last_pevent == PARSER_EVENT_EOFQUOTE)
             {
                 $this->_pv_define_params_data .= $this->_pv_quote_data;
                 unset($this->_pv_quote_data);
@@ -810,6 +904,17 @@ class phpDocumentorTParser extends Parser
                 else
                 {
                     $this->_pv_define_value = "";
+                    switch ($w) {
+                        case 0:
+                        $this->_pv_define_value = "0";
+                        break;
+                        case null:
+                        $this->_pv_define_value = "null";
+                        break;
+                        case "":
+                        $this->_pv_define_value = "";
+                        break;
+                    }
                 }
             }
         }
@@ -862,21 +967,77 @@ class phpDocumentorTParser extends Parser
         $this->_pv_define_params_data .= $word;
     }
 
+    /**
+     * handler for IMPLEMENTS.
+     * this handler parses a class statement's implements clause (PHP 5)
+     */
+    
+    function handleImplements($word, $pevent)
+    {
+        if ($this->checkEventPop($word, $pevent))
+        {
+            $this->_wp->backupPos();
+            return;
+        }
+        if (is_array($word) && $word[0] == T_STRING)
+        {
+            $this->_pv_class->addImplements($word[1]);
+        }
+    }
+
+    /**
+     * handler for ACCESS_MODIFIER.
+     * this handler parses public/private/protected/static/abstract PHP 5 modifiers
+     */
+    
+    function handleAccessModifier($word, $pevent)
+    {
+        if (!isset($this->_accessModifiers))
+        {
+            $this->_accessModifiers = array();
+        }
+        $this->_wp->backupPos();
+        $this->_event_stack->popEvent();
+        if ($word[0] == T_VARIABLE) {
+            // this is a PHP5-style variable with no "var"
+            $this->_event_stack->pushEvent(PARSER_EVENT_VAR);
+        }
+        $this->_accessModifiers[] = strtolower($this->_pv_last_word[1]);
+    }
 
     /**
      * handler for CLASS.
-     * this handler parses a class statement
+     * this handler parses a class/interface statement
      */
     
     function handleClass($word, $pevent)
     {
-        $this->_pf_in_class = true;
+        if (!$this->_pf_in_class)
+        {
+            $this->_pf_in_class = true;
+            if ($this->_pv_last_word[0] == T_INTERFACE)
+            {
+                $this->_pf_interface = true;
+            } else
+            {
+                $this->_pf_interface = false;
+            }
+        }
         $a = $this->checkEventPush( $word, $pevent);
 
         if (!isset($this->_pv_class)) $this->_pv_class = false;
         if (!is_subclass_of($this->_pv_class,"parserBase"))
         {
             $this->_pv_class = new parserClass;
+            if (isset($this->_accessModifiers))
+            {
+                $this->_pv_class->setModifiers($this->_accessModifiers);
+                unset($this->_accessModifiers);
+            }
+            if ($this->_pf_interface)
+            {
+                $this->_pv_class->setInterface();
+            }
             $this->_pv_class->setLineNumber($this->_wp->linenum + 1);
             $this->_pv_class->setname($word[1]);
             $this->_pv_cur_class = $word[1];
@@ -885,6 +1046,10 @@ class phpDocumentorTParser extends Parser
 
         if (is_array($this->_pv_last_word) && $this->_pv_last_word[0] == T_EXTENDS)
         {
+            // I don't know why I am so nice, this fixes 1150809
+            if ($word[1] == $this->_pv_class->getName()) {
+                addErrorDie(PDERROR_CANNOT_EXTEND_SELF, $word[1]);
+            }
             $this->_pv_class->setExtends($word[1]);
         }
 
@@ -896,11 +1061,21 @@ class phpDocumentorTParser extends Parser
         if ($this->checkEventPop($word,$pevent))
         {
             $this->_pv_class->setEndLineNumber($this->_wp->linenum + 1);
-            $this->_pf_in_class = false;
+            $this->_pf_in_class = $this->_pf_interface = false;
             // throw an event when class is done
             $this->publishEvent(PHPDOCUMENTOR_EVENT_NEWSTATE,STATE_END_CLASS);
             $this->_pv_class = false;
         }
+    }
+    
+    /**
+     * handler for VAR_ARRAY_COMMENT
+     * if parsing a default value, add the comment to the text
+     */
+    function handleVarArrayComment($word, $pevent)
+    {
+        $this->_pv_function_data .= $this->_pv_last_word[1];
+        return $this->handleComment($word, $pevent);
     }
 
     /**
@@ -928,7 +1103,7 @@ class phpDocumentorTParser extends Parser
             $this->_pv_var = new parserVar($this->_pv_cur_class);
             $this->_pv_var->setName($this->_pv_varname);
         }
-        if ($this->_last_pevent == PARSER_EVENT_ARRAY)
+        if ($this->_last_pevent == PARSER_EVENT_VAR_ARRAY)
         {
             if (isset($this->_pv_function_data))
             $this->_pv_var->setValue($this->_pv_function_data);
@@ -947,6 +1122,10 @@ class phpDocumentorTParser extends Parser
             unset($this->_pv_var_value);
             $this->_pv_var->setEndLineNumber($this->_wp->linenum + 1);
             $this->_pv_var->setLineNumber($this->_pv_linenum);
+            if (isset($this->_accessModifiers))
+            {
+                $this->_pv_var->setModifiers($this->_accessModifiers);
+            }
             $this->publishEvent(PHPDOCUMENTOR_EVENT_VAR,$this->_pv_var);
             unset($this->_pv_var);
             $this->_pf_in_var = false;
@@ -963,6 +1142,11 @@ class phpDocumentorTParser extends Parser
             unset($this->_pv_var_value);
             $this->_pv_var->setEndLineNumber($this->_wp->linenum + 1);
             $this->_pv_var->setLineNumber($this->_pv_linenum);
+            if (isset($this->_accessModifiers))
+            {
+                $this->_pv_var->setModifiers($this->_accessModifiers);
+                unset($this->_accessModifiers);
+            }
             $this->publishEvent(PHPDOCUMENTOR_EVENT_VAR,$this->_pv_var);
             unset($this->_pv_var);
             $this->_pf_in_var = false;
@@ -973,6 +1157,82 @@ class phpDocumentorTParser extends Parser
         if ($word[0] == T_VARIABLE)
         {
             $this->_pv_varname = $word[1];
+        }
+
+    }
+
+    /**
+     * handler for CLASS_CONSTANT.
+     * handle a const constname = default_value; statement in a class definition
+     */
+    
+    function handleClassConstant($word, $pevent)
+    {
+        if (!$this->_pf_in_const)
+        {
+            $this->_pf_set_const_value = false;
+            $this->_pv_const_value = '';
+            $this->_pv_linenum = $this->_wp->linenum + 1;
+        }
+        $this->_pf_in_const = true;
+        //echo $word."\n";
+        $e = $this->checkEventPush( $word, $pevent);
+        
+        if (!isset($this->_pv_const)) $this->_pv_const = false;
+        if ($word == '=' || $word == ';' || $word == ',')
+        {
+            $this->_wp->setWhitespace(true);
+            $this->_pf_const_equals = true;
+            $this->_pv_const = new parserConst($this->_pv_cur_class);
+            $this->_pv_const->setName($this->_pv_constname);
+        }
+        if ($this->_last_pevent == PARSER_EVENT_VAR_ARRAY)
+        {
+            if (isset($this->_pv_function_data))
+            $this->_pv_const->setValue($this->_pv_function_data);
+            $this->_pf_set_const_value = true;
+            unset($this->_pv_function_data);
+        } elseif ($this->_pf_const_equals && $word != ';' && $word != '=' && $word != ',' && !$e)
+        {
+            if (is_array($word)) $word = $word[1];
+            $this->_pv_const_value .= $word;
+        }
+        if ($word == ',')
+        {
+            if (!$this->_pf_set_const_value)
+            {
+                $this->_pv_const->setValue($this->_pv_const_value);
+            }
+            $this->_pf_set_const_value = false;
+            unset($this->_pv_const_value);
+            $this->_pv_const->setEndLineNumber($this->_wp->linenum + 1);
+            $this->_pv_const->setLineNumber($this->_pv_linenum);
+            $this->publishEvent(PHPDOCUMENTOR_EVENT_CONST,$this->_pv_const);
+            unset($this->_pv_const);
+            $this->_pf_in_const = false;
+            $this->_pf_const_equals = false;
+            $this->_pv_constname = '';
+            return;
+        }
+        if ($this->checkEventPop($word,$pevent))
+        {
+            $this->_wp->setWhitespace(false);
+            if (!$this->_pf_set_const_value)
+            $this->_pv_const->setValue($this->_pv_const_value);
+            $this->_pf_set_const_value = false;
+            unset($this->_pv_const_value);
+            $this->_pv_const->setEndLineNumber($this->_wp->linenum + 1);
+            $this->_pv_const->setLineNumber($this->_pv_linenum);
+            $this->publishEvent(PHPDOCUMENTOR_EVENT_VAR,$this->_pv_const);
+            unset($this->_pv_const);
+            $this->_pf_in_const = false;
+            $this->_pf_const_equals = false;
+            $this->_pv_constname = '';
+            return;
+        }
+        if ($word[0] == T_STRING && !$this->_pf_const_equals)
+        {
+            $this->_pv_constname = $word[1];
         }
 
     }
@@ -1020,7 +1280,10 @@ class phpDocumentorTParser extends Parser
             $dtype = '_pv_dtemplate';
             // strip /**#@+ and */
             $word = substr($word,6).'*';
-            $word = substr($word,0,strlen($word) - 2);
+            $word = trim(substr($word,0,strlen($word) - 3));
+            if (strlen($word) && $word{0} != '*') {
+                $word = "* $word";
+            }
         } else
         {
             // strip /** and */
@@ -1078,6 +1341,9 @@ class phpDocumentorTParser extends Parser
     {
         unset($this->_pv_periodline);
         $this->_pf_useperiod = false;
+        if (empty($desc)) {
+            $desc = array('');
+        }
         foreach($desc as $i => $line)
         {
             $line = trim($line);
@@ -1300,7 +1566,12 @@ class phpDocumentorTParser extends Parser
                 {
                     $this->_pv_docblock->addTag($tag);
                 }
-                if (!count($this->_pv_docblock->params)) $this->_pv_docblock->params = $this->_pv_dtemplate->params;
+                if (!count($this->_pv_docblock->params)) {
+                    $this->_pv_docblock->params = $this->_pv_dtemplate->params;
+                }
+                if (!$this->_pv_docblock->return) {
+                    $this->_pv_docblock->return = $this->_pv_dtemplate->return;
+                }
                 $my_desc->add($this->_pv_dtemplate->sdesc);
                 $my_desc->add($this->_pv_dtemplate->desc);
             }
@@ -1370,12 +1641,13 @@ class phpDocumentorTParser extends Parser
         foreach($newtags as $tag)
         {
             $x = explode(' ',str_replace("\t",'    ',$tag));
-            $tagname = substr(array_shift($x),1);
+            $tagname = trim(substr(array_shift($x),1));
             $restoftag = $x;
-            if (isset($this->tagHandlers[$tagname]))
-            $handle = $this->tagHandlers[$tagname];
-            else
-            $handle = $this->tagHandlers['*'];
+            if (isset($this->tagHandlers[$tagname])) {
+                $handle = $this->tagHandlers[$tagname];
+            } else {
+                $handle = $this->tagHandlers['*'];
+            }
             $this->$handle($tagname,$restoftag);
         }
     }
@@ -1412,27 +1684,24 @@ class phpDocumentorTParser extends Parser
         $save = $value;
         $value = explode('{@',$value);
         $newval = array();
-        $a->add($value[0]);
+        if ($priv || (!$priv && !$this->_pf_internal)) {
+            // ignore anything between {@internal and }}
+            $a->add($value[0]);
+        }
         for($i=1;$i<count($value);$i++)
         {
-            if (!$priv && $this->_pf_internal)
-            { // ignore anything between {@internal and }}
-                if (strpos($value[$i],'}}') !== false)
-                {
-                    $x = strrpos($value[$i],'}}');
-                    $value[$i] = substr($value[$i],$x + 1);
-                    $this->_pf_internal = false;
-                    if (!$value[$i]) continue;
-                    $a->add($value[$i]);
-                    continue;
-                } else continue;
-            }
             if (substr($value[$i],0,1) == '}')
             {
-                $a->add('{@'.substr($value[$i],1));
+                if ($priv || (!$priv && !$this->_pf_internal)) {
+                    // ignore anything between {@internal and }}
+                    $a->add('{@'.substr($value[$i],1));
+                }
             } elseif (substr($value[$i],0,2) == '*}')
             { // used for inserting */ in code examples
-                $a->add('*/'.substr($value[$i],2));
+                if ($priv || (!$priv && !$this->_pf_internal)) {
+                    // ignore anything between {@internal and }}
+                    $a->add('*/'.substr($value[$i],2));
+                }
             } else
             {
                 $save = $value[$i];
@@ -1441,20 +1710,30 @@ class phpDocumentorTParser extends Parser
                 $val = join(' ',$value[$i]);
                 if (trim($word) == 'internal')
                 {
+                    if ($this->_pf_internal) {
+                        addErrorDie(PDERROR_NESTED_INTERNAL);
+                    }
                     $this->_pf_internal = true;
                     $value[$i] = substr($save,strlen('internal') + 1);
+                    if (!$value[$i]) {
+                        $value[$i] = ''; // substr can set this to false
+                    }
                     if (strpos($value[$i],'}}') !== false)
                     {
                         $x = strrpos($value[$i],'}}');
                         // strip internal and cycle as if it were normal text.
                         $startval = substr($value[$i],0,$x - 1);
-                        if ($priv) $a->add($startval);
+                        if ($priv) {
+                            $a->add($startval);
+                        }
                         $value[$i] = substr($value[$i],$x + 1);
                         if (!$value[$i]) $value[$i] = '';
                         $this->_pf_internal = false;
                         $a->add($value[$i]);
                         continue;
-                    } elseif ($priv) $a->add($value[$i]);
+                    } elseif ($priv) {
+                        $a->add($value[$i]);
+                    }
                     continue;
                 }
                 if (in_array(str_replace('}','',trim($word)),$this->allowableInlineTags))
@@ -1465,9 +1744,12 @@ class phpDocumentorTParser extends Parser
                         $word = str_replace('}','',trim($word));
                         $val = $res.$val;
                     }
-                    if ($word == 'source')
-                    {
-                        $this->_pf_get_source = true;
+                    if ($priv || (!$priv && !$this->_pf_internal)) {
+                        // ignore anything between {@internal and }}
+                        if ($word == 'source')
+                        {
+                            $this->_pf_get_source = true;
+                        }
                     }
                     $val = explode('}',$val);
                     if (count($val) == 1)
@@ -1477,30 +1759,51 @@ class phpDocumentorTParser extends Parser
                     $rest = $val;
                     $val = array_shift($rest);
                     $rest = join('}',$rest);
-                    if (isset($this->inlineTagHandlers[$word]))
-                    $handle = $this->inlineTagHandlers[$word];
-                    else
-                    $handle = $this->inlineTagHandlers['*'];
+                    if (isset($this->inlineTagHandlers[$word])) {
+                        $handle = $this->inlineTagHandlers[$word];
+                    } else {
+                        $handle = $this->inlineTagHandlers['*'];
+                    }
                     $val = $this->$handle($word,$val);
-                    $a->add($val);
+                    if ($priv || (!$priv && !$this->_pf_internal)) {
+                        // ignore anything between {@internal and }}
+                        $a->add($val);
+                    }
                     if ($this->_pf_internal)
                     {
-                        if (strpos($rest,'}}') !== false)
+                        if (($x = strpos($rest,'}}')) !== false)
                         {
                             $value[$i] = $rest;
-                            $x = strrpos($value[$i],'}}');
-                            $startval = substr($value[$i],0,$x - 1);
-                            if ($priv) $a->add($startval);
-                            $value[$i] = substr($value[$i],$x + 1);
-                            if (!$value[$i]) $value[$i] = '';
+                            $startval = substr($value[$i],0,$x);
+                            if ((false !== $startval) && $priv) {
+                                $a->add($startval);
+                            }
+                            $value[$i] = substr($value[$i],$x + 2);
+                            if (!$value[$i]) {
+                                $value[$i] = '';
+                            }
                             $this->_pf_internal = false;
                             $a->add($value[$i]);
-                        } else $a->add($rest);
-                    } else $a->add($rest);
+                        } else {
+                            $rest = explode('}}', $rest);
+                            if ($priv) {
+                                $a->add(array_shift($rest));
+                            }
+                            $this->_pf_internal = false;
+                            // try this line again without internal
+                            $value[$i--] = join('}}', $rest);
+                            continue;
+                        }
+                    } else {
+                        $a->add($rest);
+                    }
                 } else
                 {
                     $val = $word.' '.$val;
-                    $a->add('{@'.$val);
+                    if ($priv || (!$priv && !$this->_pf_internal)) {
+                        // ignore anything between {@internal and }}
+                        $a->add('{@'.$val);
+                    }
                 }
             }
         }
@@ -1622,7 +1925,8 @@ class phpDocumentorTParser extends Parser
         if ((strpos($value,'<') !== false) && (strpos($value,'>') !== false))
         {
             $email = substr($value,strpos($value,'<') + 1,strpos($value,'>') - strpos($value,'<') - 1);
-            $value = str_replace('<'.$email.'>','<{@link mailto:'.$email.'}>',$value);
+            $value = str_replace('<'.$email.'>','<{@link mailto:'.$email.' ' .
+                        $email . '}>',$value);
         }
         $this->$dtype->addKeyword('author',$this->getInlineTags($value));
     }
@@ -1679,7 +1983,7 @@ class phpDocumentorTParser extends Parser
         { // global define
             $this->_pv_global_type = $type;
             if (!empty($desc)) $var .= ' '.$desc;
-            $this->findGlobal($var);
+            $this->findGlobal(trim($var));
         } elseif (!empty($desc))
         { // function global
             if ($type{0} == '$') addError(PDERROR_MALFORMED_GLOBAL_TAG);
@@ -1723,7 +2027,7 @@ class phpDocumentorTParser extends Parser
     {
         $info = $this->retrieveType($value, true);
         //if (!$info) addErrorDie(PDERROR_MALFORMED_TAG, '@param');
-	if (!$info) { addError(PDERROR_MALFORMED_TAG, '@param'); return; }
+	    if (!$info) { addError(PDERROR_MALFORMED_TAG, '@param'); return; }
         $type = $info['type'];
         $var = $info['var'];
         $desc = $info['desc'];
@@ -1811,7 +2115,7 @@ class phpDocumentorTParser extends Parser
             }
             if ($value[0]{0} == '$' || substr($value[0],0,2) == '&$')
             { // was just passed "object" and the next thing is a variable name
-                $result['var'] = $value[0];
+                $result['var'] = trim($value[0]);
                 $result['type'] = 'object';
                 array_shift($value);
                 $result['desc'] = join(' ', $value);
@@ -1839,7 +2143,7 @@ class phpDocumentorTParser extends Parser
                 array_shift($value);
                 if (isset ($value[0]) && strlen($value[0]) && ($value[0]{0} == '$' || substr($value[0],0,2) == '&$'))
                 { // was just passed "object" and the next thing is a variable name
-                    $result['var'] = $value[0];
+                    $result['var'] = trim($value[0]);
                     $result['type'] = $types;
                     array_shift($value);
                     $result['desc'] = join(' ', $value);
@@ -1863,7 +2167,7 @@ class phpDocumentorTParser extends Parser
             {
                 if (substr($value[0],0,1) == '$' || substr($value[0],0,2) == '&$')
                 {
-                    $result['var'] = $value[0];
+                    $result['var'] = trim($value[0]);
                     array_shift($value);
                 } else $result['var'] = false;
             }
@@ -1948,7 +2252,8 @@ class phpDocumentorTParser extends Parser
             $this->_pv_global_val .= $this->_pv_function_data;
             $this->_pv_function_data = '';
         }
-        if ($this->_last_pevent == PARSER_EVENT_QUOTE)
+        if ($this->_last_pevent == PARSER_EVENT_QUOTE ||
+            $this->_last_pevent == PARSER_EVENT_EOFQUOTE)
         {
             $this->_pv_global_val .= $this->_pv_quote_data;
             unset($this->_pv_quote_data);
@@ -2065,6 +2370,9 @@ class phpDocumentorTParser extends Parser
         $this->_pv_function_data = null;
         $this->_pv_var = null;
         $this->_pv_varname = null;
+        $this->_pv_const = null;
+        $this->_pv_constname = null;
+        $this->_pv_function_param_type = null;
         $this->_pf_definename_isset = false;
         $this->_pf_includename_isset = false;
         $this->_pf_get_source = false;
@@ -2074,11 +2382,13 @@ class phpDocumentorTParser extends Parser
         $this->_pf_in_global = false;
         $this->_pf_in_include = false;
         $this->_pf_in_var = false;
+        $this->_pf_in_const = false;
         $this->_pf_funcparam_val = false;
         $this->_pf_quote_active = false;
         $this->_pf_reset_quote_data = true;
         $this->_pf_useperiod = false;
         $this->_pf_var_equals = false;
+        $this->_pf_const_equals = false;
         $this->_event_stack = new EventStack;
     }
     
@@ -2087,9 +2397,9 @@ class phpDocumentorTParser extends Parser
      */
     function setupEventStates()
     {
-        if (!defined('T_ML_COMMENT'))
+        if (!defined('T_DOC_COMMENT'))
         {
-            define('T_ML_COMMENT', T_DOC_COMMENT);
+            define('T_DOC_COMMENT', T_DOC_COMMENT);
         }
 /**************************************************************/
 
@@ -2102,6 +2412,7 @@ class phpDocumentorTParser extends Parser
             array(
                 T_GLOBAL    => PARSER_EVENT_FUNC_GLOBAL,
                 T_STATIC    => PARSER_EVENT_STATIC_VAR,
+                T_START_HEREDOC   => PARSER_EVENT_EOFQUOTE,
                 T_CURLY_OPEN    => PARSER_EVENT_LOGICBLOCK,
                 T_DOLLAR_OPEN_CURLY_BRACES => PARSER_EVENT_LOGICBLOCK,
             );
@@ -2117,16 +2428,21 @@ class phpDocumentorTParser extends Parser
 
 /**************************************************************/
 
+        $this->tokenpopEvent[PARSER_EVENT_EOFQUOTE] = array(T_END_HEREDOC);
+/**************************************************************/
+
         $this->tokenpushEvent[PARSER_EVENT_PHPCODE] = 
             array(
                 T_FUNCTION     => PARSER_EVENT_FUNCTION,
+                T_ABSTRACT => PARSER_EVENT_ACCESS_MODIFIER,
                 T_CLASS     => PARSER_EVENT_CLASS,
+                T_INTERFACE => PARSER_EVENT_CLASS,
                 T_INCLUDE_ONCE => PARSER_EVENT_INCLUDE,
                 T_INCLUDE => PARSER_EVENT_INCLUDE,
                 T_REQUIRE    => PARSER_EVENT_INCLUDE,
                 T_REQUIRE_ONCE    => PARSER_EVENT_INCLUDE,
                 T_COMMENT   => PARSER_EVENT_DOCBLOCK,
-                T_ML_COMMENT         => PARSER_EVENT_DOCBLOCK,
+                T_DOC_COMMENT         => PARSER_EVENT_DOCBLOCK,
 //                "/**#@+"    => PARSER_EVENT_DOCBLOCK_TEMPLATE,
 //                "/**#@-*/"    => PARSER_EVENT_END_DOCBLOCK_TEMPLATE,
                 T_CLOSE_TAG         => PARSER_EVENT_OUTPHP,
@@ -2148,10 +2464,10 @@ class phpDocumentorTParser extends Parser
         $this->tokenpushEvent[PARSER_EVENT_FUNCTION] =
             array(
                 T_COMMENT   => PARSER_EVENT_COMMENT,
-                T_ML_COMMENT => PARSER_EVENT_COMMENT,
+                T_DOC_COMMENT => PARSER_EVENT_COMMENT,
             );
 
-        $this->wordpopEvent[PARSER_EVENT_FUNCTION] = array("}");
+        $this->wordpopEvent[PARSER_EVENT_FUNCTION] = array("}",';');
 /**************************************************************/
 
         $this->wordpopEvent[PARSER_EVENT_QUOTE] = array('"');
@@ -2159,31 +2475,48 @@ class phpDocumentorTParser extends Parser
 
         $this->tokenpushEvent[PARSER_EVENT_FUNCTION_PARAMS] =
             array(
-                T_CONSTANT_ENCAPSED_STRING => PARSER_EVENT_QUOTE,
-                T_ARRAY => PARSER_EVENT_ARRAY,
+                T_VARIABLE => PARSER_EVENT_FUNCTION_PARAM_VAR,
                 T_COMMENT => PARSER_EVENT_COMMENT,
-                T_ML_COMMENT => PARSER_EVENT_COMMENT,
+                T_DOC_COMMENT => PARSER_EVENT_COMMENT,
             );
-        $this->wordpushEvent[PARSER_EVENT_FUNCTION_PARAMS] =
+        $this->wordpopEvent[PARSER_EVENT_FUNCTION_PARAMS] = array(")");
+/**************************************************************/
+
+        $this->tokenpushEvent[PARSER_EVENT_FUNCTION_PARAM_VAR] =
+            array(
+                T_CONSTANT_ENCAPSED_STRING => PARSER_EVENT_QUOTE,
+                T_COMMENT => PARSER_EVENT_COMMENT,
+                T_DOC_COMMENT => PARSER_EVENT_COMMENT,
+                T_ARRAY => PARSER_EVENT_ARRAY,
+            );
+        $this->wordpushEvent[PARSER_EVENT_FUNCTION_PARAM_VAR] =
             array(
                 '"' => PARSER_EVENT_QUOTE,
                 "'" => PARSER_EVENT_QUOTE,
             );
-        $this->wordpopEvent[PARSER_EVENT_FUNCTION_PARAMS] = array(")");
+        $this->wordpopEvent[PARSER_EVENT_FUNCTION_PARAM_VAR] = array(",", ")");
 /**************************************************************/
 
         $this->tokenpushEvent[PARSER_EVENT_ARRAY] = 
             array(
                 T_COMMENT  => PARSER_EVENT_COMMENT,
-                T_ML_COMMENT     => PARSER_EVENT_COMMENT,
+                T_DOC_COMMENT     => PARSER_EVENT_COMMENT,
             );
         $this->wordpopEvent[PARSER_EVENT_ARRAY] = array(")");
+/**************************************************************/
+
+        $this->tokenpushEvent[PARSER_EVENT_VAR_ARRAY] = 
+            array(
+                T_COMMENT  => PARSER_EVENT_VAR_ARRAY_COMMENT,
+                T_DOC_COMMENT     => PARSER_EVENT_VAR_ARRAY_COMMENT,
+            );
+        $this->wordpopEvent[PARSER_EVENT_VAR_ARRAY] = array(")");
 /**************************************************************/
 
         $this->tokenpushEvent[PARSER_EVENT_FUNC_GLOBAL] =
             array(
                 T_COMMENT   => PARSER_EVENT_COMMENT,
-                T_ML_COMMENT    => PARSER_EVENT_COMMENT,
+                T_DOC_COMMENT    => PARSER_EVENT_COMMENT,
             );
 
         $this->wordpopEvent[PARSER_EVENT_FUNC_GLOBAL] = array(";");
@@ -2193,7 +2526,7 @@ class phpDocumentorTParser extends Parser
             array(
                 T_CONSTANT_ENCAPSED_STRING  => PARSER_EVENT_QUOTE,
                 T_COMMENT   => PARSER_EVENT_COMMENT,
-                T_ML_COMMENT    => PARSER_EVENT_COMMENT,
+                T_DOC_COMMENT    => PARSER_EVENT_COMMENT,
             );
         $this->wordpushEvent[PARSER_EVENT_STATIC_VAR] =
             array(
@@ -2206,7 +2539,7 @@ class phpDocumentorTParser extends Parser
             array(
                 T_CONSTANT_ENCAPSED_STRING  => PARSER_EVENT_QUOTE,
                 T_COMMENT   => PARSER_EVENT_COMMENT,
-                T_ML_COMMENT    => PARSER_EVENT_COMMENT,
+                T_DOC_COMMENT    => PARSER_EVENT_COMMENT,
                 T_ARRAY     => PARSER_EVENT_ARRAY,
             );
         $this->wordpushEvent[PARSER_EVENT_STATIC_VAR_VALUE] =
@@ -2220,7 +2553,7 @@ class phpDocumentorTParser extends Parser
         $this->tokenpushEvent[PARSER_EVENT_DEFINE] = 
             array(
                 T_COMMENT     => PARSER_EVENT_COMMENT,
-                T_ML_COMMENT     => PARSER_EVENT_COMMENT,
+                T_DOC_COMMENT     => PARSER_EVENT_COMMENT,
                 T_CONSTANT_ENCAPSED_STRING        => PARSER_EVENT_QUOTE,
             );
         $this->wordpushEvent[PARSER_EVENT_DEFINE] = 
@@ -2233,7 +2566,7 @@ class phpDocumentorTParser extends Parser
         $this->tokenpushEvent[PARSER_EVENT_INCLUDE] = 
             array(
                 T_COMMENT     => PARSER_EVENT_COMMENT,
-                T_ML_COMMENT     => PARSER_EVENT_COMMENT,
+                T_DOC_COMMENT     => PARSER_EVENT_COMMENT,
             );
         $this->wordpushEvent[PARSER_EVENT_INCLUDE] = 
             array(
@@ -2245,7 +2578,8 @@ class phpDocumentorTParser extends Parser
         $this->tokenpushEvent[PARSER_EVENT_DEFINE_PARAMS] = 
             array(
                 T_COMMENT     => PARSER_EVENT_COMMENT,
-                T_ML_COMMENT     => PARSER_EVENT_COMMENT,
+                T_DOC_COMMENT     => PARSER_EVENT_COMMENT,
+                T_START_HEREDOC => PARSER_EVENT_EOFQUOTE,
             );
         $this->wordpushEvent[PARSER_EVENT_DEFINE_PARAMS] = 
             array(
@@ -2259,7 +2593,7 @@ class phpDocumentorTParser extends Parser
         $this->tokenpushEvent[PARSER_EVENT_INCLUDE_PARAMS] = 
             array(
                 T_COMMENT     => PARSER_EVENT_COMMENT,
-                T_ML_COMMENT     => PARSER_EVENT_COMMENT,
+                T_DOC_COMMENT     => PARSER_EVENT_COMMENT,
             );
         $this->wordpushEvent[PARSER_EVENT_INCLUDE_PARAMS] = 
             array(
@@ -2271,7 +2605,7 @@ class phpDocumentorTParser extends Parser
         $this->tokenpushEvent[PARSER_EVENT_DEFINE_PARAMS_PARENTHESIS] =
             array(
                 T_COMMENT     => PARSER_EVENT_COMMENT,
-                T_ML_COMMENT     => PARSER_EVENT_COMMENT,
+                T_DOC_COMMENT     => PARSER_EVENT_COMMENT,
             );
         $this->wordpushEvent[PARSER_EVENT_DEFINE_PARAMS_PARENTHESIS] =
             array(
@@ -2285,7 +2619,7 @@ class phpDocumentorTParser extends Parser
         $this->tokenpushEvent[PARSER_EVENT_INCLUDE_PARAMS_PARENTHESIS] =
             array(
                 T_COMMENT     => PARSER_EVENT_COMMENT,
-                T_ML_COMMENT     => PARSER_EVENT_COMMENT,
+                T_DOC_COMMENT     => PARSER_EVENT_COMMENT,
             );
         $this->wordpushEvent[PARSER_EVENT_INCLUDE_PARAMS_PARENTHESIS] =
             array(
@@ -2297,18 +2631,37 @@ class phpDocumentorTParser extends Parser
         $this->tokenpushEvent[PARSER_EVENT_VAR] = 
             array(
                 T_COMMENT     => PARSER_EVENT_COMMENT,
-                T_ML_COMMENT     => PARSER_EVENT_COMMENT,
-                T_ARRAY     => PARSER_EVENT_ARRAY,
+                T_DOC_COMMENT     => PARSER_EVENT_COMMENT,
+                T_ARRAY     => PARSER_EVENT_VAR_ARRAY,
             );
         $this->wordpopEvent[PARSER_EVENT_VAR] = array(";");
 /**************************************************************/
 
+        $this->tokenpushEvent[PARSER_EVENT_CLASS_CONSTANT] = 
+            array(
+                T_COMMENT     => PARSER_EVENT_COMMENT,
+                T_DOC_COMMENT     => PARSER_EVENT_COMMENT,
+                T_ARRAY     => PARSER_EVENT_VAR_ARRAY,
+            );
+        $this->wordpopEvent[PARSER_EVENT_CLASS_CONSTANT] = array(";");
+/**************************************************************/
+
+        $this->wordpopEvent[PARSER_EVENT_IMPLEMENTS] = array('{');
+/**************************************************************/
+
         $this->tokenpushEvent[PARSER_EVENT_CLASS] = 
             array(
+                T_ABSTRACT      => PARSER_EVENT_ACCESS_MODIFIER,
+                T_PUBLIC      => PARSER_EVENT_ACCESS_MODIFIER,
+                T_PRIVATE      => PARSER_EVENT_ACCESS_MODIFIER,
+                T_PROTECTED      => PARSER_EVENT_ACCESS_MODIFIER,
+                T_STATIC      => PARSER_EVENT_ACCESS_MODIFIER,
+                T_IMPLEMENTS      => PARSER_EVENT_IMPLEMENTS,
+                T_CONST        => PARSER_EVENT_CLASS_CONSTANT,
                 T_FUNCTION     => PARSER_EVENT_FUNCTION,
                 T_VAR         => PARSER_EVENT_VAR,
                 T_COMMENT         => PARSER_EVENT_DOCBLOCK,
-                T_ML_COMMENT         => PARSER_EVENT_DOCBLOCK,
+                T_DOC_COMMENT         => PARSER_EVENT_DOCBLOCK,
                 T_CLOSE_TAG        => PARSER_EVENT_OUTPHP,
             );
         $this->wordpopEvent[PARSER_EVENT_CLASS] = array("}");
@@ -2317,7 +2670,7 @@ class phpDocumentorTParser extends Parser
         $this->tokenpushEvent[PARSER_EVENT_DEFINE_GLOBAL] = 
             array(
                 T_COMMENT => PARSER_EVENT_COMMENT,
-                T_ML_COMMENT => PARSER_EVENT_COMMENT,
+                T_DOC_COMMENT => PARSER_EVENT_COMMENT,
             );
         $this->wordpushEvent[PARSER_EVENT_DEFINE_GLOBAL] = 
             array(
@@ -2330,7 +2683,8 @@ class phpDocumentorTParser extends Parser
             array(
                 T_ARRAY => PARSER_EVENT_ARRAY,
                 T_COMMENT     => PARSER_EVENT_COMMENT,
-                T_ML_COMMENT     => PARSER_EVENT_COMMENT,
+                T_DOC_COMMENT     => PARSER_EVENT_COMMENT,
+                T_START_HEREDOC => PARSER_EVENT_EOFQUOTE,
             );
         $this->wordpushEvent[PARSER_EVENT_GLOBAL_VALUE] =
             array(

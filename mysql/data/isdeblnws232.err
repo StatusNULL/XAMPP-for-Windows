@@ -1,0 +1,14 @@
+070207 13:34:16 [Note] mysql\bin\mysqld.exe: ready for connections.
+Version: '5.0.33'  socket: ''  port: 3306  Source distribution
+070207 13:35:47 [Note] mysql\bin\mysqld.exe: Normal shutdown
+
+070207 13:35:47 [Note] mysql\bin\mysqld.exe: Shutdown complete
+
+Error in my_thread_global_end(): 1 threads didn't exit
+070208 13:48:40 [Note] mysql\bin\mysqld.exe: ready for connections.
+Version: '5.0.33'  socket: ''  port: 3306  Source distribution
+070208 13:49:32 [Note] mysql\bin\mysqld.exe: Normal shutdown
+
+070208 13:49:32 [Note] mysql\bin\mysqld.exe: Shutdown complete
+
+Error in my_thread_global_end(): 1 threads didn't exit

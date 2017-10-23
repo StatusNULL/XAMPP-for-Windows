@@ -1,34 +1,46 @@
 <?php
-//
-// +------------------------------------------------------------------------+
-// | phpDocumentor                                                          |
-// +------------------------------------------------------------------------+
-// | Copyright (c) 2000-2003 Joshua Eichorn, Gregory Beaver                 |
-// | Email         jeichorn@phpdoc.org, cellog@phpdoc.org                   |
-// | Web           http://www.phpdoc.org                                    |
-// | Mirror        http://phpdocu.sourceforge.net/                          |
-// | PEAR          http://pear.php.net/package-info.php?pacid=137           |
-// +------------------------------------------------------------------------+
-// | This source file is subject to version 3.00 of the PHP License,        |
-// | that is available at http://www.php.net/license/3_0.txt.               |
-// | If you did not receive a copy of the PHP license and are unable to     |
-// | obtain it through the world-wide-web, please send a note to            |
-// | license@php.net so we can mail you a copy immediately.                 |
-// +------------------------------------------------------------------------+
-//
-
 /**
  * All of the functions to clean up and handle the long description
  * of a DocBlock are in this file.
  *
  * The primary functionality is based on Parser and WordParser, and modified to recognize
  * only the tokens defined in the PHPDOCUMENTOR_PDP_* constants
- * @see Parser, WordParser
- * @package phpDocumentor
+ * 
+ * phpDocumentor :: automatic documentation generator
+ * 
+ * PHP versions 4 and 5
+ *
+ * Copyright (c) 2002-2006 Gregory Beaver
+ * 
+ * LICENSE:
+ * 
+ * This library is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation;
+ * either version 2.1 of the License, or (at your option) any
+ * later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ *
+ * @package    phpDocumentor
  * @subpackage Parsers
- * @author Greg Beaver <cellog@users.sourceforge.net>
- * @since 1.2
+ * @author     Gregory Beaver <cellog@php.net>
+ * @copyright  2002-2006 Gregory Beaver
+ * @license    http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @version    CVS: $Id: ParserDescCleanup.inc,v 1.9 2006/05/23 13:06:57 cellog Exp $
+ * @link       http://www.phpdoc.org
+ * @link       http://pear.php.net/PhpDocumentor
+ * @see        Parser, WordParser
+ * @since      1.2
  */
+
 /**#@+
  * {@link parserDescParser} token constants
  */
@@ -396,7 +408,7 @@ class parserDescParser extends Parser
             if (0)//PHPDOCUMENTOR_DEBUG == true)
             {
                 echo "----------------\n";
-                echo "LAST: |" . $this->p_vars['last_word'] . "|\n";
+                echo "LAST: |" . htmlentities($this->p_vars['last_word']) . "|\n";
 //                echo "INDEX: ".$this->p_vars['curpar']."\n";
                 echo "PEVENT: " . $this->getParserEventName($pevent) . "\n";
                 echo "LASTPEVENT: " . $this->getParserEventName($this->p_vars['last_pevent']) . "\n";
@@ -423,7 +435,7 @@ class parserDescParser extends Parser
             {
                 $this->p_vars['start'] = false;
             }
-        } while (!($word === false) && $word != '');
+        } while (is_object($word) || !($word === false) && $word != '');
         $context = $this->getContext();
         if ($context != 'normal')
         {
@@ -464,7 +476,8 @@ class parserDescParser extends Parser
         if (is_string($word) && $this->checkEventPush($word, $pevent)) return;
 //        if (!isset($this->parse_Ps) || !$this->parse_Ps)
         {
-            if ($word == ' ' && $this->p_vars['last_word'] == ' ') return;
+            if (is_string($word) && is_string($this->p_vars['last_word']) &&
+                  ($word == ' ' && $this->p_vars['last_word'] == ' ')) return;
             if ($pevent == PARSER_EVENT_NOEVENTS)
             {
                 if ($this->doSimpleList($word)) return;
@@ -513,6 +526,9 @@ class parserDescParser extends Parser
         if ($context == 'list')
         {
 //            debug('aded to '.$context);
+            if (!is_object($this->p_vars['list_item'][$this->p_vars['list_count']])) {
+                addErrorDie(PDERROR_UL_IN_UL);
+            }
             $this->p_vars['list_item'][$this->p_vars['list_count']]->add($text);
         } elseif ($context != 'normal')
         {
@@ -831,7 +847,8 @@ class parserDescParser extends Parser
                     // item text
                     if (isset($this->p_vars['list_item'][$this->p_vars['list_count']]))
                     {
-                        if ($word == ' ' && $this->p_vars['last_word'] == ' ') return;
+                        if (is_string($word) && $word == ' ' &&
+                              $this->p_vars['last_word'] == ' ') return;
                         $this->p_vars['list_item'][$this->p_vars['list_count']]->add($word);
                     }
                 } else
@@ -848,6 +865,9 @@ class parserDescParser extends Parser
                         if ($this->p_vars['list_count'] > 1)
                         {
                             // this is a sublist, add it to the list item of the parent list
+                            if (!isset($this->p_vars['list_item'][$this->p_vars['list_count'] - 1])) {
+                                addErrorDie(PDERROR_UL_IN_UL);
+                            }
                             $this->p_vars['list_item'][$this->p_vars['list_count'] - 1]->add($this->p_vars['lists'][$this->p_vars['list_count']]);
                             // remove the sublist item and sublist, drop to parent list
                             unset($this->p_vars['lists'][$this->p_vars['list_count']]);
@@ -1068,7 +1088,7 @@ class parserDescParser extends Parser
             $this->addText($word);
             return;
         }
-        if ($word == "\n") $word = " ";
+        if (is_string($word) && $word == "\n") $word = " ";
         if (is_string($word))
         {
             if ($this->checkEventPop($word, $pevent))
@@ -1089,7 +1109,7 @@ class parserDescParser extends Parser
         } else
         {// if the <p> is not at the beginning of the desc, then it is not
          // possible to parse into paragraphs using this tag
-            if ($word == ' ' && $this->p_vars['last_word'] == ' ') return;
+            if (is_string($word) && $word == ' ' && $this->p_vars['last_word'] == ' ') return;
             $this->addText($word);
         }
     }
@@ -1159,9 +1179,9 @@ class parserDescParser extends Parser
         if (is_object($word)) return false;
         $ltrimword = ltrim($word);
         if ((strlen($ltrimword) != strlen($word))
-             && strlen($ltrimword)
+             && strlen($ltrimword) > 1
              && ((in_array($ltrimword{0},array('o','-','1','0','#','+')) && $ltrimword{1} == ' '))
-                 || ((strlen($ltrimword) >= 2) && (in_array(substr($ltrimword,0,2),array('1.','0.')) && $ltrimword{2} == ' ')))
+                 || ((strlen($ltrimword) >= 2) && (substr($ltrimword,0,2) === '1.' || substr($ltrimword,0,2) === '0.') && $ltrimword{2} == ' '))
         {
             // save the whitespace for comparison
             $this->p_vars['whitespace'] = substr($word,0,strlen($word) - strlen($ltrimword));
@@ -1215,7 +1235,7 @@ class parserDescParser extends Parser
         if (PHPDOCUMENTOR_KILL_WHITESPACE) $this->tokens[PHPDOCUMENTOR_PDP_STATE_P][] = ' ';
         $this->tokens[PHPDOCUMENTOR_PDP_STATE_CODE]        = array("</code>", '<</code>>');
         $this->tokens[PHPDOCUMENTOR_PDP_STATE_PRE]        = array("</pre>", '<</pre>>');
-        $this->tokens[PHPDOCUMENTOR_PDP_STATE_LIST]        = array("<ul>","<ol>","</ul>","</ol>","<li>","</li>","<b>","<i>","<br", '<<',
+        $this->tokens[PHPDOCUMENTOR_PDP_STATE_LIST]        = array("<ul>","<ol>","</ul>","</ol>","<li>","</li>","<b>","<i>","<br", '<<',"<code>","<pre>","<br",
                                                                    '<var>', '<kbd>', '<samp>');
         $this->tokens[PHPDOCUMENTOR_PDP_STATE_DOUBLECR]        = array("\n","<ol>","<ul>","<code>","<pre>","<b>","<i>","<br","<p>","</p>",
                                                                        '<var>', '<kbd>', '<samp>', '<<');
@@ -1234,7 +1254,7 @@ class parserDescParser extends Parser
                                                             '<var>', '<kbd>', '<samp>');
         $this->tokens[PHPDOCUMENTOR_PDP_STATE_BR]    = array(">","/>");
         $this->tokens[PHPDOCUMENTOR_PDP_STATE_ESCAPE]    = array('code>>', '/code>>', 'pre>>', '/pre>>', 'b>>', '/b>>', 
-                                                                 'i>>', '/i>>', 'ol>>', '/ol>>', 'ul>>', '/ul>>', 
+                                                                 'i>>', '/i>>', 'ol>>', '/ol>>', 'ul>>', '/ul>>', 'li>>', '/li>>', 
                                                                  'br>>', 'br />>', 'p>>', '/p>>', 'samp>>', '/samp>>', 
                                                                  'kbd>>', '/kbd>>', 'var>>', '/var>>'); 
         if (PHPDOCUMENTOR_KILL_WHITESPACE) $this->tokens[PHPDOCUMENTOR_PDP_STATE_DOUBLECR][] = ' ';
@@ -1302,6 +1322,7 @@ class parserDescParser extends Parser
                 "<kbd>" => PHPDOCUMENTOR_PDP_EVENT_KBD,
                 "<b>" => PHPDOCUMENTOR_PDP_EVENT_B,
                 "<i>" => PHPDOCUMENTOR_PDP_EVENT_I,
+                "<pre>" => PHPDOCUMENTOR_PDP_EVENT_PRE,
                 "<br" => PHPDOCUMENTOR_PDP_EVENT_BR,
                 '<<' => PHPDOCUMENTOR_PDP_EVENT_ESCAPE,
             );

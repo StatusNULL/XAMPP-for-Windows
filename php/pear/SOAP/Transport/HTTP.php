@@ -14,7 +14,8 @@
  * @category   Web Services
  * @package    SOAP
  * @author     Shane Caraveo <Shane@Caraveo.com>
- * @copyright  2003-2005 The PHP Group
+ * @author     Jan Schneider <jan@horde.org>
+ * @copyright  2003-2006 The PHP Group
  * @license    http://www.php.net/license/2_02.txt  PHP License 2.02
  * @link       http://pear.php.net/package/SOAP
  */
@@ -29,7 +30,7 @@
 /**
  * Needed Classes
  */
-require_once 'SOAP/Base.php';
+require_once 'SOAP/Transport.php';
 
 /**
  *  HTTP Transport for SOAP
@@ -37,75 +38,33 @@ require_once 'SOAP/Base.php';
  * @access public
  * @package SOAP
  * @author Shane Caraveo <shane@php.net>
+ * @author Jan Schneider <jan@horde.org>
  */
-class SOAP_Transport_HTTP extends SOAP_Base
+class SOAP_Transport_HTTP extends SOAP_Transport
 {
-
     /**
-     * Basic Auth string
+     * Basic Auth string.
      *
-     * @var  array
+     * @var array
      */
     var $headers = array();
 
     /**
-     * Cookies
+     * Cookies.
      *
      * @var array
      */
     var $cookies;
 
     /**
+     * Connection timeout in seconds. 0 = none.
      *
-     * @var  int connection timeout in seconds - 0 = none
+     * @var integer
      */
     var $timeout = 4;
 
     /**
-     * Array containing urlparts - parse_url()
-     *
-     * @var  mixed
-     */
-    var $urlparts = NULL;
-
-    /**
-     * Connection endpoint - URL
-     *
-     * @var  string
-     */
-    var $url = '';
-
-    /**
-     * Incoming payload
-     *
-     * @var  string
-     */
-    var $incoming_payload = '';
-
-    /**
-     * HTTP-Request User-Agent
-     *
-     * @var  string
-     */
-    var $_userAgent = SOAP_LIBRARY_NAME;
-
-    /**
-     * HTTP Encoding
-     *
-     * @var string
-     */
-    var $encoding = SOAP_DEFAULT_ENCODING;
-
-    /**
-     * HTTP-Response Content-Type encoding
-     *
-     * we assume UTF-8 if no encoding is set
-     * @var  string
-     */
-    var $result_encoding = 'UTF-8';
-
-    /**
-     * HTTP-Response Content-Type
+     * HTTP-Response Content-Type.
      */
     var $result_content_type;
 
@@ -116,55 +75,56 @@ class SOAP_Transport_HTTP extends SOAP_Base
     /**
      * SOAP_Transport_HTTP Constructor
      *
-     * @param string $URL    http url to soap endpoint
-     *
      * @access public
-     * @param  string $URI
-     * @param  string $encoding  encoding to use
+     *
+     * @param string $url       HTTP url to SOAP endpoint.
+     * @param string $encoding  Encoding to use.
      */
-    function SOAP_Transport_HTTP($URL, $encoding = SOAP_DEFAULT_ENCODING)
+    function SOAP_Transport_HTTP($url, $encoding = SOAP_DEFAULT_ENCODING)
     {
         parent::SOAP_Base('HTTP');
-        $this->urlparts = @parse_url($URL);
-        $this->url = $URL;
+        $this->urlparts = @parse_url($url);
+        $this->url = $url;
         $this->encoding = $encoding;
     }
 
     /**
-     * send and receive soap data
+     * Sends and receives SOAP data.
      *
-     * @param string outgoing post data
-     * @param array  options
-     *
-     * @return string|fault response
      * @access public
+     *
+     * @param string  Outgoing SOAP data.
+     * @param array   Options.
+     *
+     * @return string|SOAP_Fault
      */
-    function &send(&$msg, $options = null)
+    function send($msg, $options = array())
     {
+        $this->fault = null;
+
         if (!$this->_validateUrl()) {
             return $this->fault;
         }
 
-        if (isset($options['timeout']))
+        if (isset($options['timeout'])) {
             $this->timeout = (int)$options['timeout'];
+        }
 
         if (strcasecmp($this->urlparts['scheme'], 'HTTP') == 0) {
             return $this->_sendHTTP($msg, $options);
-        } else if (strcasecmp($this->urlparts['scheme'], 'HTTPS') == 0) {
+        } elseif (strcasecmp($this->urlparts['scheme'], 'HTTPS') == 0) {
             return $this->_sendHTTPS($msg, $options);
         }
 
-        return $this->_raiseSoapFault('Invalid url scheme '.$this->url);
+        return $this->_raiseSoapFault('Invalid url scheme ' . $this->url);
     }
 
     /**
-     * set data for http authentication
-     * creates Authorization header
+     * Sets data for HTTP authentication, creates authorization header.
      *
-     * @param string $username   username
-     * @param string $password   response data, minus http headers
+     * @param string $username   Username.
+     * @param string $password   Response data, minus HTTP headers.
      *
-     * @return none
      * @access public
      */
     function setCredentials($username, $password)
@@ -173,76 +133,104 @@ class SOAP_Transport_HTTP extends SOAP_Base
     }
 
     /**
-     * Add a cookie
+     * Adds a cookie.
      *
      * @access public
-     * @param  string  $name   cookie name
-     * @param  mixed   $value  cookie value
-     * @return void
+     * @param string $name  Cookie name.
+     * @param mixed $value  Cookie value.
      */
     function addCookie($name, $value)
     {
-        $this->cookies[$name]=$value;
+        $this->cookies[$name] = $value;
     }
 
-    // private methods
-
     /**
-     * Generates the correct headers for the cookies
+     * Generates the correct headers for the cookies.
      *
      * @access private
-     * @return void
+     *
+     * @param array $options  Cookie options. If 'nocookies' is set and true
+     *                        the cookies from the last response are added
+     *                        automatically. 'cookies' is name-value-hash with
+     *                        a list of cookies to add.
+     *
+     * @return string  The cookie header value.
      */
-    function _genCookieHeader()
+    function _generateCookieHeader($options)
     {
-        foreach ($this->cookies as $name=>$value) {
-            $cookies = (isset($cookies) ? $cookies. '; ' : '') .
-                        urlencode($name) . '=' . urlencode($value);
+        $this->cookies = array();
+
+        if (empty($options['nocookies']) &&
+            isset($this->result_cookies)) {
+            // Add the cookies we got from the last request.
+            foreach ($this->result_cookies as $cookie) {
+                if ($cookie['domain'] == $this->urlparts['host']) {
+                    $this->cookies[$cookie['name']] = $cookie['value'];
+                }
+            }
         }
+
+        // Add cookies the user wants to set.
+        if (isset($options['cookies'])) {
+            foreach ($options['cookies'] as $cookie) {
+                if ($cookie['domain'] == $this->urlparts['host']) {
+                    $this->cookies[$cookie['name']] = $cookie['value'];
+                }
+            }
+        }
+
+        $cookies = '';
+        foreach ($this->cookies as $name => $value) {
+            if (!empty($cookies)) {
+                $cookies .= '; ';
+            }
+            $cookies .= urlencode($name) . '=' . urlencode($value);
+        }
+
         return $cookies;
     }
 
     /**
-     * validate url data passed to constructor
+     * Validate url data passed to constructor.
      *
      * @access private
      * @return boolean
      */
     function _validateUrl()
     {
-        if ( ! is_array($this->urlparts) ) {
-            $this->_raiseSoapFault("Unable to parse URL " . $this->url);
+        if (!is_array($this->urlparts) ) {
+            $this->_raiseSoapFault('Unable to parse URL ' . $this->url);
             return false;
         }
         if (!isset($this->urlparts['host'])) {
-            $this->_raiseSoapFault("No host in URL " . $this->url);
+            $this->_raiseSoapFault('No host in URL ' . $this->url);
             return false;
         }
         if (!isset($this->urlparts['port'])) {
-
-            if (strcasecmp($this->urlparts['scheme'], 'HTTP') == 0)
+            if (strcasecmp($this->urlparts['scheme'], 'HTTP') == 0) {
                 $this->urlparts['port'] = 80;
-            else if (strcasecmp($this->urlparts['scheme'], 'HTTPS') == 0)
+            } elseif (strcasecmp($this->urlparts['scheme'], 'HTTPS') == 0) {
                 $this->urlparts['port'] = 443;
+            }
 
         }
         if (isset($this->urlparts['user'])) {
             $this->setCredentials(urldecode($this->urlparts['user']),
-                                    urldecode($this->urlparts['pass']));
+                                  urldecode($this->urlparts['pass']));
         }
-        if (!isset($this->urlparts['path']) || !$this->urlparts['path'])
+        if (!isset($this->urlparts['path']) || !$this->urlparts['path']) {
             $this->urlparts['path'] = '/';
+        }
+
         return true;
     }
 
     /**
-     * Finds out what is the encoding.
-     *
+     * Finds out what the encoding is.
      * Sets the object property accordingly.
      *
      * @access private
-     * @param  array $headers  headers
-     * @return void
+     * @param array $headers  Headers.
      */
     function _parseEncoding($headers)
     {
@@ -250,9 +238,13 @@ class SOAP_Transport_HTTP extends SOAP_Base
         preg_match_all('/^Content-Type:\s*(.*)$/im', $h, $ct, PREG_SET_ORDER);
         $n = count($ct);
         $ct = $ct[$n - 1];
+
+        // Strip the string of \r.
         $this->result_content_type = str_replace("\r", '', $ct[1]);
-        if (preg_match('/(.*?)(?:;\s?charset=)(.*)/i', $this->result_content_type, $m)) {
-            // strip the string of \r
+
+        if (preg_match('/(.*?)(?:;\s?charset=)(.*)/i',
+                       $this->result_content_type,
+                       $m)) {
             $this->result_content_type = $m[1];
             if (count($m) > 2) {
                 $enc = strtoupper(str_replace('"', '', $m[2]));
@@ -261,55 +253,55 @@ class SOAP_Transport_HTTP extends SOAP_Base
                 }
             }
         }
-        // deal with broken servers that don't set content type on faults
-        if (!$this->result_content_type) $this->result_content_type = 'text/xml';
+
+        // Deal with broken servers that don't set content type on faults.
+        if (!$this->result_content_type) {
+            $this->result_content_type = 'text/xml';
+        }
     }
 
     /**
-     * Parses the headers
+     * Parses the headers.
      *
-     * @param  array $headers the headers
-     * @return void
+     * @param array $headers  The headers.
      */
     function _parseHeaders($headers)
     {
-        /* largely borrowed from HTTP_Request */
+        /* Largely borrowed from HTTP_Request. */
         $this->result_headers = array();
         $headers = split("\r?\n", $headers);
         foreach ($headers as $value) {
             if (strpos($value,':') === false) {
-                $this->result_headers[0]=$value;
+                $this->result_headers[0] = $value;
                 continue;
             }
-            list($name,$value) = split(':',$value);
+            list($name, $value) = split(':', $value);
             $headername = strtolower($name);
             $headervalue = trim($value);
-            $this->result_headers[$headername]=$headervalue;
+            $this->result_headers[$headername] = $headervalue;
 
             if ($headername == 'set-cookie') {
-                // Parse a SetCookie header to fill _cookies array
-                $cookie = array(
-                    'expires' => null,
-                    'domain'  => $this->urlparts['host'],
-                    'path'    => null,
-                    'secure'  => false
-                );
+                // Parse a SetCookie header to fill _cookies array.
+                $cookie = array('expires' => null,
+                                'domain'  => $this->urlparts['host'],
+                                'path'    => null,
+                                'secure'  => false);
 
-                // Only a name=value pair
                 if (!strpos($headervalue, ';')) {
+                    // Only a name=value pair.
                     list($cookie['name'], $cookie['value']) = array_map('trim', explode('=', $headervalue));
                     $cookie['name']  = urldecode($cookie['name']);
                     $cookie['value'] = urldecode($cookie['value']);
 
-                // Some optional parameters are supplied
                 } else {
+                    // Some optional parameters are supplied.
                     $elements = explode(';', $headervalue);
                     list($cookie['name'], $cookie['value']) = array_map('trim', explode('=', $elements[0]));
                     $cookie['name']  = urldecode($cookie['name']);
                     $cookie['value'] = urldecode($cookie['value']);
 
                     for ($i = 1; $i < count($elements);$i++) {
-                        list ($elName, $elValue) = array_map('trim', explode('=', $elements[$i]));
+                        list($elName, $elValue) = array_map('trim', explode('=', $elements[$i]));
                         if ('secure' == $elName) {
                             $cookie['secure'] = true;
                         } elseif ('expires' == $elName) {
@@ -327,26 +319,29 @@ class SOAP_Transport_HTTP extends SOAP_Base
     }
 
     /**
-     * Remove http headers from response
+     * Removes HTTP headers from response.
      *
      * @return boolean
      * @access private
      */
     function _parseResponse()
     {
-        if (preg_match("/^(.*?)\r?\n\r?\n(.*)/s", $this->incoming_payload, $match)) {
-            #$this->response = preg_replace("/[\r|\n]/", '', $match[2]);
-            $this->response =& $match[2];
-            // find the response error, some servers response with 500 for soap faults
+        if (preg_match("/^(.*?)\r?\n\r?\n(.*)/s",
+                       $this->incoming_payload,
+                       $match)) {
+            $this->response = $match[2];
+            // Find the response error, some servers response with 500 for
+            // SOAP faults.
             $this->_parseHeaders($match[1]);
 
-            list($protocol, $code, $msg) = sscanf($this->result_headers[0], '%s %s %s');
+            list($protocol, $code, $msg) = sscanf($this->result_headers[0],
+                                                  '%s %s %s');
             unset($this->result_headers[0]);
 
             switch($code) {
                 case 100: // Continue
-                   $this->incoming_payload = $match[2];
-                   return $this->_parseResponse();
+                    $this->incoming_payload = $match[2];
+                    return $this->_parseResponse();
                 case 400:
                     $this->_raiseSoapFault("HTTP Response $code Bad Request");
                     return false;
@@ -386,18 +381,18 @@ class SOAP_Transport_HTTP extends SOAP_Base
 
             if ($this->result_content_type == 'application/dime') {
                 // XXX quick hack insertion of DIME
-                if (PEAR::isError($this->_decodeDIMEMessage($this->response,$this->headers,$this->attachments))) {
+                if (PEAR::isError($this->_decodeDIMEMessage($this->response, $this->headers, $this->attachments))) {
                     // _decodeDIMEMessage already raised $this->fault
                     return false;
                 }
                 $this->result_content_type = $this->headers['content-type'];
-            } else if (stristr($this->result_content_type,'multipart/related')) {
+            } elseif (stristr($this->result_content_type, 'multipart/related')) {
                 $this->response = $this->incoming_payload;
-                if (PEAR::isError($this->_decodeMimeMessage($this->response,$this->headers,$this->attachments))) {
+                if (PEAR::isError($this->_decodeMimeMessage($this->response, $this->headers, $this->attachments))) {
                     // _decodeMimeMessage already raised $this->fault
                     return false;
                 }
-            } else if ($this->result_content_type != 'text/xml') {
+            } elseif ($this->result_content_type != 'text/xml') {
                 $this->_raiseSoapFault($this->response);
                 return false;
             }
@@ -409,26 +404,37 @@ class SOAP_Transport_HTTP extends SOAP_Base
     }
 
     /**
-     * Create http request, including headers, for outgoing request
+     * Creates an HTTP request, including headers, for th eoutgoing request.
      *
-     * @param string   &$msg   outgoing SOAP package
-     * @param $options
-     * @return string outgoing_payload
      * @access private
+     *
+     * @param string $msg     Outgoing SOAP package.
+     * @param array $options  Options.
+     *
+     * @return string  Outgoing payload.
      */
-    function &_getRequest(&$msg, $options)
+    function _getRequest($msg, $options)
     {
-        $action = isset($options['soapaction'])?$options['soapaction']:'';
-        $fullpath = $this->urlparts['path'].
-                        (isset($this->urlparts['query'])?'?'.$this->urlparts['query']:'').
-                        (isset($this->urlparts['fragment'])?'#'.$this->urlparts['fragment']:'');
+        $this->headers = array();
+
+        $action = isset($options['soapaction']) ? $options['soapaction'] : '';
+        $fullpath = $this->urlparts['path'];
+        if (isset($this->urlparts['query'])) {
+            $fullpath .= '?' . $this->urlparts['query'];
+        }
+        if (isset($this->urlparts['fragment'])) {
+            $fullpath .= '#' . $this->urlparts['fragment'];
+        }
 
         if (isset($options['proxy_host'])) {
-            $fullpath = 'http://' . $this->urlparts['host'] . ':' . $this->urlparts['port'] . $fullpath;
+            $fullpath = 'http://' . $this->urlparts['host'] . ':' .
+                $this->urlparts['port'] . $fullpath;
         }
 
         if (isset($options['proxy_user'])) {
-            $this->headers['Proxy-Authorization'] = 'Basic ' . base64_encode($options['proxy_user'].":".$options['proxy_pass']);
+            $this->headers['Proxy-Authorization'] = 'Basic ' .
+                base64_encode($options['proxy_user'] . ':' .
+                              $options['proxy_pass']);
         }
 
         if (isset($options['user'])) {
@@ -439,51 +445,37 @@ class SOAP_Transport_HTTP extends SOAP_Base
         $this->headers['Host'] = $this->urlparts['host'];
         $this->headers['Content-Type'] = "text/xml; charset=$this->encoding";
         $this->headers['Content-Length'] = strlen($msg);
-        $this->headers['SOAPAction'] = "\"$action\"";
+        $this->headers['SOAPAction'] = '"' . $action . '"';
         if (isset($options['headers'])) {
             $this->headers = array_merge($this->headers, $options['headers']);
         }
 
-        $this->cookies = array();
-        if (!isset($options['nocookies']) || !$options['nocookies']) {
-            // add the cookies we got from the last request
-            if (isset($this->result_cookies)) {
-                foreach ($this->result_cookies as $cookie) {
-                    if ($cookie['domain'] == $this->urlparts['host'])
-                        $this->cookies[$cookie['name']]=$cookie['value'];
-                }
-            }
+        $cookies = $this->_generateCookieHeader($options);
+        if ($cookies) {
+            $this->headers['Cookie'] = $cookies;
         }
-        // add cookies the user wants to set
-        if (isset($options['cookies'])) {
-            foreach ($options['cookies'] as $cookie) {
-                if ($cookie['domain'] == $this->urlparts['host'])
-                    $this->cookies[$cookie['name']]=$cookie['value'];
-            }
-        }
-        if (count($this->cookies)) {
-            $this->headers['Cookie'] = $this->_genCookieHeader();
-        }
+
         $headers = '';
         foreach ($this->headers as $k => $v) {
             $headers .= "$k: $v\r\n";
         }
-        $this->outgoing_payload =
-                "POST $fullpath HTTP/1.0\r\n".
-                $headers."\r\n".
-                $msg;
+        $this->outgoing_payload = "POST $fullpath HTTP/1.0\r\n" . $headers .
+            "\r\n" . $msg;
+
         return $this->outgoing_payload;
     }
 
     /**
-     * Send outgoing request, and read/parse response
+     * Sends the outgoing HTTP request and reads and parses the response.
      *
-     * @param string  &$msg   outgoing SOAP package
-     * @param string  $action   SOAP Action
-     * @return string &$response   response data, minus http headers
      * @access private
+     *
+     * @param string $msg     Outgoing SOAP package.
+     * @param array $options  Options.
+     *
+     * @return string  Response data without HTTP headers.
      */
-    function &_sendHTTP(&$msg, $options)
+    function _sendHTTP($msg, $options)
     {
         $this->incoming_payload = '';
         $this->_getRequest($msg, $options);
@@ -493,7 +485,7 @@ class SOAP_Transport_HTTP extends SOAP_Base
             $host = $options['proxy_host'];
             $port = isset($options['proxy_port']) ? $options['proxy_port'] : 8080;
         }
-        // send
+        // Send.
         if ($this->timeout > 0) {
             $fp = @fsockopen($host, $port, $this->errno, $this->errmsg, $this->timeout);
         } else {
@@ -503,8 +495,7 @@ class SOAP_Transport_HTTP extends SOAP_Base
             return $this->_raiseSoapFault("Connect Error to $host:$port");
         }
         if ($this->timeout > 0) {
-            // some builds of php do not support this, silence
-            // the warning
+            // some builds of PHP do not support this, silence the warning
             @socket_set_timeout($fp, $this->timeout);
         }
         if (!fputs($fp, $this->outgoing_payload, strlen($this->outgoing_payload))) {
@@ -532,18 +523,18 @@ class SOAP_Transport_HTTP extends SOAP_Base
     }
 
     /**
-     * Send outgoing request, and read/parse response, via HTTPS
+     * Sends the outgoing HTTPS request and reads and parses the response.
      *
-     * @param string  &$msg   outgoing SOAP package
-     * @param string  $action   SOAP Action
-     * @return string &$response   response data, minus http headers
      * @access private
+     *
+     * @param string $msg     Outgoing SOAP package.
+     * @param array $options  Options.
+     *
+     * @return string  Response data without HTTP headers.
      */
-    function &_sendHTTPS(&$msg, $options)
+    function _sendHTTPS($msg, $options)
     {
-        /* NOTE This function uses the CURL functions
-         *  Your php must be compiled with CURL
-         */
+        /* Check if the required curl extension is installed. */
         if (!extension_loaded('curl')) {
             return $this->_raiseSoapFault('CURL Extension is required for HTTPS');
         }
@@ -551,40 +542,48 @@ class SOAP_Transport_HTTP extends SOAP_Base
         $ch = curl_init();
 
         if (isset($options['proxy_host'])) {
-            // $options['http_proxy'] == 'hostname:port'
-            $host = $options['proxy_host'];
             $port = isset($options['proxy_port']) ? $options['proxy_port'] : 8080;
-            curl_setopt($ch, CURLOPT_PROXY, $host . ":" . $port);
+            curl_setopt($ch, CURLOPT_PROXY,
+                        $options['proxy_host'] . ':' . $port);
         }
-
         if (isset($options['proxy_user'])) {
-            // $options['http_proxy_userpw'] == 'username:password'
-            curl_setopt($ch, CURLOPT_PROXYUSERPWD, $options['proxy_user'] . ':' . $options['proxy_pass']);
+            curl_setopt($ch, CURLOPT_PROXYUSERPWD,
+                        $options['proxy_user'] . ':' . $options['proxy_pass']);
         }
 
         if (isset($options['user'])) {
-            curl_setopt($ch, CURLOPT_USERPWD, $options['user'] . ':' . $options['pass']);
+            curl_setopt($ch, CURLOPT_USERPWD,
+                        $options['user'] . ':' . $options['pass']);
         }
 
         if (!isset($options['soapaction'])) {
             $options['soapaction'] = '';
         }
-        curl_setopt($ch, CURLOPT_HTTPHEADER ,    array('Content-Type: text/xml;charset=' . $this->encoding, 'SOAPAction: "'.$options['soapaction'].'"'));
-        curl_setopt($ch, CURLOPT_USERAGENT ,     $this->_userAgent);
+        curl_setopt($ch, CURLOPT_HTTPHEADER,
+                    array('Content-Type: text/xml;charset=' . $this->encoding,
+                          'SOAPAction: "' . $options['soapaction'] . '"'));
+        curl_setopt($ch, CURLOPT_USERAGENT,
+                    $this->_userAgent);
 
         if ($this->timeout) {
-            curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout); //times out after 4s
+            curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
         }
 
-        curl_setopt($ch, CURLOPT_POSTFIELDS,       $msg);
-        curl_setopt($ch, CURLOPT_URL,              $this->url);
-        curl_setopt($ch, CURLOPT_POST,             1);
-        curl_setopt($ch, CURLOPT_FAILONERROR,      0);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION,   1);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER,   1);
-        curl_setopt($ch, CURLOPT_HEADER,           1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $msg);
+        curl_setopt($ch, CURLOPT_URL, $this->url);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_FAILONERROR, 0);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_HEADER, 1);
         if (defined('CURLOPT_HTTP_VERSION')) {
             curl_setopt($ch, CURLOPT_HTTP_VERSION, 1);
+        }
+        if (!ini_get('safe_mode') && !ini_get('open_basedir')) {
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        }
+        $cookies = $this->_generateCookieHeader($options);
+        if ($cookies) {
+            curl_setopt($ch, CURLOPT_COOKIE, $cookies);
         }
 
         if (isset($options['curl'])) {
@@ -593,9 +592,9 @@ class SOAP_Transport_HTTP extends SOAP_Base
             }
         }
 
-        // Save the outgoing XML. This doesn't quite match _sendHTTP
-        // as CURL generates the headers, but having the XML is
-        // usually the most important part for tracing/debugging.
+        // Save the outgoing XML. This doesn't quite match _sendHTTP as CURL
+        // generates the headers, but having the XML is usually the most
+        // important part for tracing/debugging.
         $this->outgoing_payload = $msg;
 
         $this->incoming_payload = curl_exec($ch);

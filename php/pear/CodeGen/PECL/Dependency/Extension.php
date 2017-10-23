@@ -15,7 +15,7 @@
  * @author     Hartmut Holzgraefe <hartmut@php.net>
  * @copyright  2005 Hartmut Holzgraefe
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Extension.php,v 1.5 2006/02/17 11:47:52 hholzgra Exp $
+ * @version    CVS: $Id: Extension.php,v 1.7 2006/03/22 22:24:07 hholzgra Exp $
  * @link       http://pear.php.net/package/CodeGen
  */
 
@@ -175,7 +175,7 @@ class CodeGen_PECL_Dependency_Extension
     {
         return "/* {{{ cross-extension dependencies */\n
 #if ZEND_EXTENSION_API_NO >= 220050617
-static zend_module_dep pdo_".$extension->getName()."_deps[] = {
+static zend_module_dep ".$extension->getName()."_deps[] = {
 ";
     }
 

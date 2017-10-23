@@ -20,7 +20,7 @@
  * @author     Adam Ashley <aashley@php.net>
  * @copyright  2001-2006 The PHP Group
  * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
- * @version    CVS: $Id: POP3.php,v 1.8 2006/03/02 06:53:08 aashley Exp $
+ * @version    CVS: $Id: POP3.php,v 1.11 2007/02/02 00:41:14 aashley Exp $
  * @link       http://pear.php.net/package/Auth
  * @since      File available since Release 1.2.0
  */
@@ -48,7 +48,7 @@ require_once 'Net/POP3.php';
  * @author     Adam Ashley <aashley@php.net>
  * @copyright  2001-2006 The PHP Group
  * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
- * @version    Release: 1.3.0  File: $Revision: 1.8 $
+ * @version    Release: 1.5.0  File: $Revision: 1.11 $
  * @link       http://pear.php.net/package/Auth
  * @since      Class available since Release 1.2.0
  */
@@ -92,7 +92,7 @@ class Auth_Container_POP3 extends Auth_Container
      */
     function Auth_Container_POP3($server=null)
     {
-        if (isset($server)) {
+        if (isset($server) && !is_null($server)) {
             if (is_array($server)) {
                 if (isset($server['host'])) {
                     $this->server = $server['host'];
@@ -127,9 +127,11 @@ class Auth_Container_POP3 extends Auth_Container
      */
     function fetchData($username, $password)
     {
+        $this->log('Auth_Container_POP3::fetchData() called.', AUTH_LOG_DEBUG);
         $pop3 =& new Net_POP3();
         $res = $pop3->connect($this->server, $this->port, $this->method);
         if (!$res) {
+            $this->log('Connection to POP3 server failed.', AUTH_LOG_DEBUG);
             return $res;
         }
         $result = $pop3->login($username, $password);

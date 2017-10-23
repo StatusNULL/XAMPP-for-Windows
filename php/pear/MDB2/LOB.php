@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------+
 // | PHP version 5                                                        |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1998-2004 Manuel Lemos, Tomas V.V.Cox,                 |
+// | Copyright (c) 1998-2006 Manuel Lemos, Tomas V.V.Cox,                 |
 // | Stig. S. Bakken, Lukas Smith                                         |
 // | All rights reserved.                                                 |
 // +----------------------------------------------------------------------+
@@ -42,7 +42,7 @@
 // | Author: Lukas Smith <smith@pooteeweet.org>                           |
 // +----------------------------------------------------------------------+
 //
-// $Id: LOB.php,v 1.24 2006/02/03 19:13:04 lsmith Exp $
+// $Id: LOB.php,v 1.34 2006/10/25 11:52:21 lsmith Exp $
 
 /**
  * @package  MDB2
@@ -79,14 +79,6 @@ class MDB2_LOB
      */
     var $lob_index;
 
-    /**
-     * LOB data
-     *
-     * @var string
-     * @access protected
-     */
-    var $lob;
-
     // {{{ stream_open()
 
     /**
@@ -106,20 +98,18 @@ class MDB2_LOB
             return false;
         }
         $url = parse_url($path);
-        if (!array_key_exists('host', $url) && !array_key_exists('user', $url)) {
+        if (empty($url['host'])) {
             return false;
         }
-        $this->db_index = $url['host'];
+        $this->db_index = (int)$url['host'];
         if (!isset($GLOBALS['_MDB2_databases'][$this->db_index])) {
             return false;
         }
         $db =& $GLOBALS['_MDB2_databases'][$this->db_index];
-        $this->lob_index = $url['user'];
+        $this->lob_index = (int)$url['user'];
         if (!isset($db->datatype->lobs[$this->lob_index])) {
             return false;
         }
-        $this->lob =& $db->datatype->lobs[$this->lob_index];
-        $db->datatype->_retrieveLOB($this->lob);
         return true;
     }
     // }}}
@@ -138,13 +128,14 @@ class MDB2_LOB
     {
         if (isset($GLOBALS['_MDB2_databases'][$this->db_index])) {
             $db =& $GLOBALS['_MDB2_databases'][$this->db_index];
+            $db->datatype->_retrieveLOB($db->datatype->lobs[$this->lob_index]);
 
-            $data = $db->datatype->_readLOB($this->lob, $count);
+            $data = $db->datatype->_readLOB($db->datatype->lobs[$this->lob_index], $count);
             $length = strlen($data);
             if ($length == 0) {
-                $this->lob['endOfLOB'] = true;
+                $db->datatype->lobs[$this->lob_index]['endOfLOB'] = true;
             }
-            $this->lob['position'] += $length;
+            $db->datatype->lobs[$this->lob_index]['position'] += $length;
             return $data;
         }
     }
@@ -176,14 +167,17 @@ class MDB2_LOB
      */
     function stream_tell()
     {
-        return $this->lob['position'];
+        if (isset($GLOBALS['_MDB2_databases'][$this->db_index])) {
+            $db =& $GLOBALS['_MDB2_databases'][$this->db_index];
+            return $db->datatype->lobs[$this->lob_index]['position'];
+        }
     }
     // }}}
 
     // {{{ stream_eof()
 
     /**
-     * check if stream reaches EOF
+     * Check if stream reaches EOF
      *
      * @return bool
      * @access public
@@ -193,8 +187,9 @@ class MDB2_LOB
         if (!isset($GLOBALS['_MDB2_databases'][$this->db_index])) {
             return true;
         }
+
         $db =& $GLOBALS['_MDB2_databases'][$this->db_index];
-        $result = $db->datatype->_endOfLOB($this->lob);
+        $result = $db->datatype->_endOfLOB($db->datatype->lobs[$this->lob_index]);
         if (version_compare(phpversion(), "5.0", ">=")
             && version_compare(phpversion(), "5.1", "<")
         ) {
@@ -207,7 +202,7 @@ class MDB2_LOB
     // {{{ stream_seek()
 
     /**
-     * seek stream, not implemented
+     * Seek stream, not implemented
      *
      * @param int offset
      * @param int whence
@@ -218,6 +213,25 @@ class MDB2_LOB
     function stream_seek($offset, $whence)
     {
         return false;
+    }
+    // }}}
+
+    // {{{ stream_stat()
+
+    /**
+     * return information about stream
+     *
+     * @access public
+     */
+    function stream_stat()
+    {
+        if (isset($GLOBALS['_MDB2_databases'][$this->db_index])) {
+            $db =& $GLOBALS['_MDB2_databases'][$this->db_index];
+            return array(
+              'db_index' => $this->db_index,
+              'lob_index' => $this->lob_index,
+            );
+        }
     }
     // }}}
 
@@ -233,7 +247,7 @@ class MDB2_LOB
         if (isset($GLOBALS['_MDB2_databases'][$this->db_index])) {
             $db =& $GLOBALS['_MDB2_databases'][$this->db_index];
             if (isset($db->datatype->lobs[$this->lob_index])) {
-                $db->datatype->_destroyLOB($this->lob_index);
+                $db->datatype->_destroyLOB($db->datatype->lobs[$this->lob_index]);
                 unset($db->datatype->lobs[$this->lob_index]);
             }
         }

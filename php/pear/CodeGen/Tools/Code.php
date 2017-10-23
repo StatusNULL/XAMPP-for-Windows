@@ -15,7 +15,7 @@
  * @author     Hartmut Holzgraefe <hartmut@php.net>
  * @copyright  2005 Hartmut Holzgraefe
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Code.php,v 1.3 2005/08/24 00:30:35 hholzgra Exp $
+ * @version    CVS: $Id: Code.php,v 1.5 2006/07/08 20:04:37 hholzgra Exp $
  * @link       http://pear.php.net/package/CodeGen
  */
 
@@ -23,7 +23,8 @@
  * includes
  */
 
-require_once("CodeGen/Tools/Indent.php");
+require_once("CodeGen/Tools/IndentC.php");
+// TODO make this configurable by language
 
 /**
  * Wrapper class for code block generation
@@ -85,7 +86,7 @@ class CodeGen_Tools_Code {
      * @return string   formated code block
      */
     function block($code, $indent = 1) {
-        return CodeGen_Tools_Indent::indent($indent*$this->indentSteps, $code);     
+        return CodeGen_Tools_IndentC::indent($indent*$this->indentSteps, $code);     
     }
 
 
@@ -98,14 +99,14 @@ class CodeGen_Tools_Code {
      */
     function varblock($code, $indent = 1) {    
         if ($this->language == 'c') {
-            $head = CodeGen_Tools_Indent::indent($indent * $this->indentSteps, "do {\n");   
-            $foot = CodeGen_Tools_Indent::indent($indent * $this->indentSteps, "} while (0);\n");   
+            $head = CodeGen_Tools_IndentC::indent($indent * $this->indentSteps, "do {\n");   
+            $foot = CodeGen_Tools_IndentC::indent($indent * $this->indentSteps, "} while (0);\n");   
             $indent++;
         } else {
             $head = $foot = "";
         }
 
-        $code = CodeGen_Tools_Indent::indent($indent * $this->indentSteps, $code);      
+        $code = CodeGen_Tools_IndentC::indent($indent * $this->indentSteps, $code); 
         return $head . $code . $foot;
     }
 

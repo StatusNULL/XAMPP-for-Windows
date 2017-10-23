@@ -21,7 +21,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
  * DEALINGS IN THE SOFTWARE.
  *
- * $Id: CheckIP.php,v 1.7 2006/02/06 14:39:53 mj Exp $
+ * $Id: CheckIP.php,v 1.8 2006/12/15 17:42:26 mj Exp $
  */
 
 /**
@@ -65,7 +65,7 @@ class Net_CheckIP
         }
 
         for ($i = 0; $i < 4; $i++) {
-            if (!is_numeric($oct[$i])) {
+            if (!preg_match("/^[0-9]+$/", $oct[$i])) {
                 return false;
             }
 

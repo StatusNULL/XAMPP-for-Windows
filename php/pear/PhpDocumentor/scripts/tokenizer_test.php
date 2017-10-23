@@ -35,7 +35,7 @@ $file = "
 ";
 $tokens = token_get_all($file);
 
-$nl_check = array(T_WHITESPACE,T_ENCAPSED_AND_WHITESPACE,T_COMMENT,T_ML_COMMENT,T_OPEN_TAG,T_CLOSE_TAG,T_INLINE_HTML);
+$nl_check = array(T_WHITESPACE,T_ENCAPSED_AND_WHITESPACE,T_COMMENT,T_DOC_COMMENT,T_OPEN_TAG,T_CLOSE_TAG,T_INLINE_HTML);
 print '<pre>';
 $line = 0;
 foreach($tokens as $key => $val)

@@ -1,23 +1,39 @@
 <?php
 /* vim: set ts=4 sw=4: */
-// +----------------------------------------------------------------------+
-// | PHP Version 4                                                        |
-// +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2003 The PHP Group                                |
-// +----------------------------------------------------------------------+
-// | This source file is subject to version 2.0 of the PHP license,       |
-// | that is bundled with this package in the file LICENSE, and is        |
-// | available at through the world-wide-web at                           |
-// | http://www.php.net/license/2_02.txt.                                 |
-// | If you did not receive a copy of the PHP license and are unable to   |
-// | obtain it through the world-wide-web, please send a note to          |
-// | license@php.net so we can mail you a copy immediately.               |
-// +----------------------------------------------------------------------+
-// | Author: Mika Tuupola <tuupola@appelsiini.net>                        |
-// +----------------------------------------------------------------------+
-//
-// $Id: HtAccess.php,v 1.11 2003/02/19 14:50:15 tuupola Exp $
-//
+
+/*
++-----------------------------------------------------------------------+
+| Copyright (c) 2002-2006 Mika Tuupola                                  |
+| All rights reserved.                                                  |
+|                                                                       |
+| Redistribution and use in source and binary forms, with or without    |
+| modification, are permitted provided that the following conditions    |
+| are met:                                                              |
+|                                                                       |
+| o Redistributions of source code must retain the above copyright      |
+|   notice, this list of conditions and the following disclaimer.       |
+| o Redistributions in binary form must reproduce the above copyright   |
+|   notice, this list of conditions and the following disclaimer in the |
+|   documentation and/or other materials provided with the distribution.|
+|                                                                       |
+| THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS   |
+| "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT     |
+| LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR |
+| A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT  |
+| OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, |
+| SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT      |
+| LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, |
+| DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY |
+| THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT   |
+| (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE |
+| OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  |
+|                                                                       |
++-----------------------------------------------------------------------+
+| Author: Mika Tuupola <tuupola@appelsiini.net>                         |
++-----------------------------------------------------------------------+
+*/
+
+/* $Id: HtAccess.php,v 1.16 2006/12/07 09:27:38 tuupola Exp $ */
 
 require_once 'PEAR.php' ;
 
@@ -124,8 +140,7 @@ class File_HtAccess {
 
                     } elseif (preg_match('/Require/i', $buffer)) {
                        $require = split(' ', $data[1]);
-                       $this->setRequire($require);
-
+                       $this->addRequire($require);
                     } elseif (trim($buffer)) {
                        $this->addAdditional($buffer);
                     }
@@ -250,7 +265,15 @@ class File_HtAccess {
     * @param  string $require
     */
     function addRequire($require) {
-        $this->require[] = $require;
+        if (is_array($require)) {
+            $merge = array_merge($this->getRequire(), $require);
+            $merge = array_unique($merge);
+            $merge = array_merge($merge);
+            $this->setRequire($merge);
+        } else {
+            $this->require[] = $require;
+        }
+
     }
 
     /**
@@ -424,23 +447,7 @@ class File_HtAccess {
 
         $retval = true;
 
-        $str  = 'AuthName '     . $this->getAuthName() . "\n";
-        $str .= 'AuthType '     . $this->getAuthType() . "\n";
-
-        if ('basic' == strtolower($this->getAuthType())) {
-            $str .= 'AuthUserFile ' . $this->getAuthUserFile() . "\n";
-            if (trim($this->getAuthGroupFile())) {
-                $str .= 'AuthGroupFile ' . $this->getAuthGroupFile() . "\n";   
-            }
-        } elseif ('digest' == strtolower($this->getAuthType())) {
-            $str .= 'AuthDigestFile ' . $this->getAuthDigestFile() . "\n";
-            if (trim($this->getAuthDigestGroupFile())) {
-                $str .= 'AuthDigestGroupFile ' . $this->getAuthDigestGroupFile() . "\n";   
-            }
-        }
-
-        $str .= 'Require ' . $this->getRequire('string') . "\n";
-        $str .= $this->getAdditional('string') . "\n";
+        $str  = $this->getContent();
         
         $fd = @fopen($this->getFile(), 'w');
         if ($fd) {
@@ -453,6 +460,42 @@ class File_HtAccess {
 
         return($retval);
         
+    }
+
+    /**
+    * Returns the .htaccess File content
+    *
+    * @access public
+    * @return string
+    */
+
+    function getContent() {
+
+        $retval  = '';
+        
+        if ($this->getAuthName()) {
+            $retval .= 'AuthName '     . $this->getAuthName() . "\n";
+        }
+        if ($this->getAuthType()) {
+            $retval .= 'AuthType '     . $this->getAuthType() . "\n";
+        }
+        if ('basic' == strtolower($this->getAuthType())) {
+            $retval .= 'AuthUserFile ' . $this->getAuthUserFile() . "\n";
+            if (trim($this->getAuthGroupFile())) {
+                $retval .= 'AuthGroupFile ' . $this->getAuthGroupFile() . "\n";   
+            }
+        } elseif ('digest' == strtolower($this->getAuthType())) {
+            $retval .= 'AuthDigestFile ' . $this->getAuthDigestFile() . "\n";
+            if (trim($this->getAuthDigestGroupFile())) {
+                $retval .= 'AuthDigestGroupFile ' . $this->getAuthDigestGroupFile() . "\n";   
+            }
+        }
+        if (trim($this->getRequire('string'))) {
+            $retval .= 'Require ' . $this->getRequire('string') . "\n";
+        }
+        $retval .= $this->getAdditional('string') . "\n";
+        
+        return($retval);
     }
 
 }

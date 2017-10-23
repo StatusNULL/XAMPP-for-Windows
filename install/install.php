@@ -5,7 +5,7 @@
 	*/
 
 	echo "\r\n  ########################################################################\n";
-	echo "  # ApacheFriends XAMPP setup win32 Version 1.5                          #\r\n";
+	echo "  # ApacheFriends XAMPP setup win32 Version 1.6                          #\r\n";
 	echo "  #----------------------------------------------------------------------#\r\n";
 	echo "  # Copyright (c) 2002-2005 Apachefriends                                #\r\n";
 	echo "  #----------------------------------------------------------------------#\r\n";
@@ -117,11 +117,11 @@
 					}
 					$updateinc = "xampp".$update.".inc";
 					$updateconf = $update.".conf";
-					echo "  Configure for $update $updateversion\r\n";
+					
 					$i++;
 				}
 				fclose($datei);
-
+        echo "  Configure for $update $updateversion\r\n";
 				if (file_exists($installsysroot)) {
 					$datei = fopen($installsysroot, 'r');
 					unset($newzeile);

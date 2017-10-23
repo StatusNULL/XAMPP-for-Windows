@@ -3,7 +3,7 @@
  *  License Information:
  *
  *    Net_DNS:  A resolver library for PHP
- *    Copyright (C) 2002 Eric Kilfoil eric@ypass.net
+ *    Copyright (c) 2002-2003 Eric Kilfoil eric@ypass.net
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -31,29 +31,31 @@
 class Net_DNS_Question
 {
     /* class variable definitions {{{ */
-    var $qname = NULL;
-    var $qtype = NULL;
-    var $qclass = NULL;
+    var $qname = null;
+    var $qtype = null;
+    var $qclass = null;
 
     /* }}} */
     /* class constructor Net_DNS_Question($qname, $qtype, $qclass) {{{ */
     function Net_DNS_Question($qname, $qtype, $qclass)
     {
-        if (   is_null(Net_DNS::typesbyname($qtype))
-                &&  !is_null(Net_DNS::classesbyname($qtype))
-                && is_null(Net_DNS::classesbyname($qclass))
-                &&  !is_null(Net_DNS::typesbyname($qclass))) {
+        $qtype  = !is_null($qtype)  ? strtoupper($qtype)  : 'ANY';
+        $qclass = !is_null($qclass) ? strtoupper($qclass) : 'ANY';
 
-            $t = $qtype;
-            $qtype = $qclass;
-            $qclass = $t;
+        // Check if the caller has the type and class reversed.
+        // We are not that kind for unknown types.... :-)
+        if ( ( is_null(Net_DNS::typesbyname($qtype)) ||
+               is_null(Net_DNS::classesbyname($qtype)) )
+          && !is_null(Net_DNS::classesbyname($qclass))
+          && !is_null(Net_DNS::typesbyname($qclass)))
+        {
+            list($qtype, $qclass) = array($qclass, $qtype);
         }
-
+        $qname = preg_replace(array('/^\.+/', '/\.+$/'), '', $qname);
         $this->qname = $qname;
         $this->qtype = $qtype;
         $this->qclass = $qclass;
     }
-
     /* }}} */
     /* Net_DNS_Question::display() {{{*/
     function display()
@@ -65,7 +67,7 @@ class Net_DNS_Question
     /* Net_DNS_Question::string() {{{*/
     function string()
     {
-        return($this->qname . ".\t" . $this->qclass . "\t" . $this->qtype);
+        return $this->qname . ".\t" . $this->qclass . "\t" . $this->qtype;
     }
 
     /*}}}*/
@@ -73,9 +75,9 @@ class Net_DNS_Question
     function data($packet, $offset)
     {
         $data = $packet->dn_comp($this->qname, $offset);
-        $data .= pack("n", Net_DNS::typesbyname(strtoupper($this->qtype)));
-        $data .= pack("n", Net_DNS::classesbyname(strtoupper($this->qclass)));
-        return($data);
+        $data .= pack('n', Net_DNS::typesbyname(strtoupper($this->qtype)));
+        $data .= pack('n', Net_DNS::classesbyname(strtoupper($this->qclass)));
+        return $data;
     }
 
     /*}}}*/

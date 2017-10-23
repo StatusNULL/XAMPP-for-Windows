@@ -15,7 +15,7 @@
  * @author     Hartmut Holzgraefe <hartmut@php.net>
  * @copyright  2005 Hartmut Holzgraefe
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Extension.php,v 1.16 2006/02/17 09:47:00 hholzgra Exp $
+ * @version    CVS: $Id: Extension.php,v 1.23 2006/07/08 21:28:01 hholzgra Exp $
  * @link       http://pear.php.net/package/CodeGen
  */
 
@@ -27,9 +27,9 @@ require_once "CodeGen/Maintainer.php";
 require_once "CodeGen/License.php";
 require_once "CodeGen/Release.php";
 require_once "CodeGen/Tools/Platform.php";
-require_once "CodeGen/Tools/Indent.php";
 require_once "CodeGen/Tools/FileReplacer.php";
 require_once "CodeGen/Tools/Outbuf.php";
+require_once "CodeGen/Tools/Code.php";
 require_once "CodeGen/Dependency/Lib.php";
 require_once "CodeGen/Dependency/Header.php";
 
@@ -51,14 +51,14 @@ abstract class CodeGen_Extension
     * 
     * @return string
     */
-    abstract static public function version();
+    abstract public function version();
 
     /**
     * Copyright message
     *
     * @return string
     */
-    abstract static public function copyright();
+    abstract public function copyright();
 
     /**
      * The extensions basename (C naming rules apply)
@@ -215,6 +215,12 @@ abstract class CodeGen_Extension
     protected $acfragments = array("top"=>array(), "bottom"=>array());
 
 
+    /**
+     * CodeGen_Tool_Code instance for internal use
+     *
+     * @var object
+     */
+    public $codegen;
 
     // {{{ constructor
 
@@ -225,11 +231,16 @@ abstract class CodeGen_Extension
      */
     function __construct() 
     {
-        set_locale("C"); // ASCII only
+        setlocale(LC_ALL, "C"); // ASCII only
 
-        $this->release = new CodeGen_Release;
-        
-        $this->platform = new CodeGen_Tools_Platform("all");
+        if ($this->release == NULL) {
+            $this->release = new CodeGen_Release;
+        }
+        if ($this->platform == NULL) {
+            $this->platform = new CodeGen_Tools_Platform("all");
+        }
+
+        $this->codegen = new CodeGen_Tools_Code;
     }
     
     // }}} 
@@ -319,11 +330,13 @@ abstract class CodeGen_Extension
         switch (strtolower($lang)) {
         case "c":
             $this->language = "c";
+            $this->codegen->setLanguage("c");
             return true;
         case "cpp":
         case "cxx":
         case "c++":
             $this->language = "cpp";
+            $this->codegen->setLanguage("cpp");
             return true;
         default:
             break;
@@ -482,6 +495,8 @@ abstract class CodeGen_Extension
 
         $this->headers[$name] = $header;
 
+        // TODO $this->addConfigFragment($header->configm4());
+
         return true;
     }
 
@@ -548,17 +563,24 @@ abstract class CodeGen_Extension
      * @access  public
      * @param   string  type
      * @param   string  path
+     * @param   string  optional target dir
      * @returns bool    success state
      */
-    function addPackageFile($type, $path)
+    function addPackageFile($type, $path, $dir = "")
     {
-        $basename = basename($path);
-
-        if (isset($this->packageFiles[$type][$basename])) {
-            return PEAR::raiseError("duplicate distribution file name '$basename'");
+        $targetpath = basename($path);
+        if ($dir) {
+            if ($dir{0} == "/") {
+                return PEAR::raiseError("only relative pathes are allowed as target dir");
+            }
+            $targetpath = $dir."/".$targetpath;
         }
 
-        $this->packageFiles[$type][$basename] = $path;
+        if (isset($this->packageFiles[$type][$targetpath])) {
+            return PEAR::raiseError("duplicate distribution file name '$targetpath'");
+        }
+
+        $this->packageFiles[$type][$targetpath] = $path;
         return true;
     }
 
@@ -567,51 +589,52 @@ abstract class CodeGen_Extension
      *
      * @access public
      * @param  string path
+     * @param  string optional target dir
      */
-    function addSourceFile($name) 
+    function addSourceFile($name, $dir="") 
     {
         // TODO catch errors returned from addPackageFile
 
         $filename = realpath($name);
 
-		if (!is_file($filename)) {
-		  return PEAR::raiseError("'$name' is not a valid file");
-		}
+        if (!is_file($filename)) {
+          return PEAR::raiseError("'$name' is not a valid file");
+        }
         
-		if (!is_readable($filename)) {
-		  return PEAR::raiseError("'$name' is not readable");
-		}
+        if (!is_readable($filename)) {
+          return PEAR::raiseError("'$name' is not readable");
+        }
         
-		$pathinfo = pathinfo($filename);
-		$ext = $pathinfo["extension"];
+        $pathinfo = pathinfo($filename);
+        $ext = $pathinfo["extension"];
 
-		switch ($ext) {
-		case 'c':
-		  $this->addConfigFragment("AC_PROG_CC");
-		  $this->addPackageFile('code', $filename);
-		  break;
-		case 'cpp':
-		case 'cxx':
-		case 'c++':
-		  $this->addConfigFragment("AC_PROG_CXX");
-		  $this->addConfigFragment("AC_LANG([C++])");
-		  $this->addPackageFile('code', $filename);
-		  break;
-		case 'l':
-		case 'flex':
-		  $this->addConfigFragment("AM_PROG_LEX");
-		  $this->addPackageFile('code', $filename);
-		  break;
-		case 'y':
-		case 'bison':
-		  $this->addConfigFragment("AM_PROG_YACC");
-		  $this->addPackageFile('code', $filename);
-		  break;
-		default:
-		  break;
-		}
-		
-		return $this->addPackageFile('copy', $filename);
+        switch ($ext) {
+        case 'c':
+          $this->addConfigFragment("AC_PROG_CC");
+          $this->addPackageFile('code', $filename);
+          break;
+        case 'cpp':
+        case 'cxx':
+        case 'c++':
+          $this->addConfigFragment("AC_PROG_CXX");
+          $this->addConfigFragment("AC_LANG([C++])");
+          $this->addPackageFile('code', $filename);
+          break;
+        case 'l':
+        case 'flex':
+          $this->addConfigFragment("AM_PROG_LEX");
+          $this->addPackageFile('code', $filename);
+          break;
+        case 'y':
+        case 'bison':
+          $this->addConfigFragment("AM_PROG_YACC");
+          $this->addPackageFile('code', $filename);
+          break;
+        default:
+          break;
+        }
+        
+        return $this->addPackageFile('copy', $filename, $dir);
     }
 
     /**

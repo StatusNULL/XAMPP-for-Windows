@@ -14,12 +14,13 @@
  * @category   Web Services
  * @package    SOAP
  * @author     Shane Hanna <iordy_at_iordy_dot_com>
- * @copyright  2003-2005 The PHP Group
+ * @author     Jan Schneider <jan@horde.org>
+ * @copyright  2003-2006 The PHP Group
  * @license    http://www.php.net/license/2_02.txt  PHP License 2.02
  * @link       http://pear.php.net/package/SOAP
  */
 
-require_once 'SOAP/Base.php';
+require_once 'SOAP/Transport.php';
 
 /**
  * TCP transport for SOAP.
@@ -29,36 +30,27 @@ require_once 'SOAP/Base.php';
  * @access  public
  * @package SOAP
  * @author  Shane Hanna <iordy_at_iordy_dot_com>
+ * @author  Jan Schneider <jan@horde.org>
  */
-class SOAP_Transport_TCP extends SOAP_Base_Object
+class SOAP_Transport_TCP extends SOAP_Transport
 {
-
-    var $headers = array();
-    var $urlparts = NULL;
-    var $url = '';
-    var $incoming_payload = '';
-    var $_userAgent = SOAP_LIBRARY_NAME;
-    var $encoding = SOAP_DEFAULT_ENCODING;
-    var $result_encoding = 'UTF-8';
-    var $result_content_type;
-
     /**
-     * socket
+     * Socket.
      */
-    var $socket = '';
+    var $socket = null;
 
     /**
-     * SOAP_Transport_TCP Constructor
+     * Constructor.
      *
-     * @param string $URL    http url to soap endpoint
+     * @param string $url  HTTP url to SOAP endpoint.
      *
      * @access public
      */
-    function SOAP_Transport_TCP($URL, $encoding = SOAP_DEFAULT_ENCODING)
+    function SOAP_Transport_TCP($url, $encoding = SOAP_DEFAULT_ENCODING)
     {
         parent::SOAP_Base_Object('TCP');
-        $this->urlparts = @parse_url($URL);
-        $this->url = $URL;
+        $this->urlparts = @parse_url($url);
+        $this->url = $url;
         $this->encoding = $encoding;
     }
 
@@ -66,81 +58,96 @@ class SOAP_Transport_TCP extends SOAP_Base_Object
     {
         // XXX how do we restart after socket_shutdown?
         //if (!$this->socket) {
-            # create socket resource
+            // Create socket resource.
             $this->socket = @socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-            if ($this->socket < 0) return 0;
+            if ($this->socket < 0) {
+                return 0;
+            }
 
-            # connect
-            $result = socket_connect($this->socket, $this->urlparts['host'], $this->urlparts['port']);
-            if ($result < 0) return 0;
+            // Connect.
+            $result = socket_connect($this->socket, $this->urlparts['host'],
+                                     $this->urlparts['port']);
+            if ($result < 0) {
+                return 0;
+            }
         //}
         return 1;
     }
 
     /**
-     * send and receive soap data
+     * Sends and receives SOAP data.
      *
-     * @param string &$msg       outgoing post data
-     * @param string $action      SOAP Action header data
-     *
-     * @return string|fault response
      * @access public
+     *
+     * @param string  Outgoing SOAP data.
+     * @param array   Options.
+     *
+     * @return string|SOAP_Fault
      */
-    function &send(&$msg, $options = NULL)
+    function send($msg, $options = array())
     {
+        $this->fault = null;
         $this->incoming_payload = '';
-        $this->outgoing_payload = &$msg;
-        if (!$this->_validateUrl()) return $this->fault;
+        $this->outgoing_payload = $msg;
+        if (!$this->_validateUrl()) {
+            return $this->fault;
+        }
 
-        // check for TCP scheme
+        // Check for TCP scheme.
         if (strcasecmp($this->urlparts['scheme'], 'TCP') == 0) {
-            // check connection
-            if (!$this->_socket_ping())
-                return $this->_raiseSoapFault('error on '.$this->url.' reason '.socket_strerror(socket_last_error($this->socket)));
-
-            // write to the socket
-            if (!@socket_write($this->socket, $this->outgoing_payload, strlen($this->outgoing_payload))) {
-                return $this->_raiseSoapFault('Error sending data to '.$this->url.' reason '.socket_strerror(socket_last_error($this->socket)));
+            // Check connection.
+            if (!$this->_socket_ping()) {
+                return $this->_raiseSoapFault('Error connecting to ' . $this->url . '; reason: ' . socket_strerror(socket_last_error($this->socket)));
             }
 
-            // shutdown writing
-            if(!socket_shutdown($this->socket, 1))
-                return $this->_raiseSoapFault("can't change socket mode to read.");
+            // Write to the socket.
+            if (!@socket_write($this->socket, $this->outgoing_payload,
+                               strlen($this->outgoing_payload))) {
+                return $this->_raiseSoapFault('Error sending data to ' . $this->url . '; reason: ' . socket_strerror(socket_last_error($this->socket)));
+            }
 
-            // read everything we can.
-            while($buf = @socket_read($this->socket, 1024, PHP_BINARY_READ)) {
+            // Shutdown writing.
+            if(!socket_shutdown($this->socket, 1)) {
+                return $this->_raiseSoapFault('Cannot change socket mode to read.');
+            }
+
+            // Read everything we can.
+            while ($buf = @socket_read($this->socket, 1024, PHP_BINARY_READ)) {
                 $this->incoming_payload .= $buf;
             }
 
-            // return payload or die
-            if ($this->incoming_payload)
+            // Return payload or die.
+            if ($this->incoming_payload) {
                 return $this->incoming_payload;
+            }
 
-            return $this->_raiseSoapFault("Error reveiving data from ".$this->url);
+            return $this->_raiseSoapFault('Error reveiving data from ' . $this->url);
         }
 
-        return $this->_raiseSoapFault('Invalid url scheme '.$this->url);
+        return $this->_raiseSoapFault('Invalid url scheme ' . $this->url);
     }
 
     /**
-     * validate url data passed to constructor
+     * Validates the url data passed to the constructor.
      *
      * @return boolean
      * @access private
      */
     function _validateUrl()
     {
-        if ( ! is_array($this->urlparts) ) {
+        if (!is_array($this->urlparts) ) {
             $this->_raiseSoapFault("Unable to parse URL $url");
-            return FALSE;
+            return false;
         }
         if (!isset($this->urlparts['host'])) {
             $this->_raiseSoapFault("No host in URL $url");
-            return FALSE;
+            return false;
         }
-        if (!isset($this->urlparts['path']) || !$this->urlparts['path'])
+        if (!isset($this->urlparts['path']) || !$this->urlparts['path']) {
             $this->urlparts['path'] = '/';
-        return TRUE;
+        }
+
+        return true;
     }
 
 }

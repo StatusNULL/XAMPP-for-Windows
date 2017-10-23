@@ -1,29 +1,49 @@
 <?php
-//
-// +------------------------------------------------------------------------+
-// | phpDocumentor                                                          |
-// +------------------------------------------------------------------------+
-// | Copyright (c) 2000-2003 Joshua Eichorn, Gregory Beaver                 |
-// | Email         jeichorn@phpdoc.org, cellog@phpdoc.org                   |
-// | Web           http://www.phpdoc.org                                    |
-// | Mirror        http://phpdocu.sourceforge.net/                          |
-// | PEAR          http://pear.php.net/package-info.php?pacid=137           |
-// +------------------------------------------------------------------------+
-// | This source file is subject to version 3.00 of the PHP License,        |
-// | that is available at http://www.php.net/license/3_0.txt.               |
-// | If you did not receive a copy of the PHP license and are unable to     |
-// | obtain it through the world-wide-web, please send a note to            |
-// | license@php.net so we can mail you a copy immediately.                 |
-// +------------------------------------------------------------------------+
-//
-
 /**
- * Common variables/functions used by other files in phpDocumentor
- * @package phpDocumentor
+ * Common information needed by all portions of the application
+ *
+ * phpDocumentor :: automatic documentation generator
+ * 
+ * PHP versions 4 and 5
+ *
+ * Copyright (c) 2001-2006 Gregory Beaver
+ * 
+ * LICENSE:
+ * 
+ * This library is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation;
+ * either version 2.1 of the License, or (at your option) any
+ * later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ *
+ * @package    phpDocumentor
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  2001-2006 Gregory Beaver
+ * @license    http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @version    CVS: $Id: common.inc.php,v 1.7 2006/10/18 18:52:12 cellog Exp $
  * @filesource
+ * @link       http://www.phpdoc.org
+ * @link       http://pear.php.net/PhpDocumentor
+ * @see        parserDocBlock, parserInclude, parserPage, parserClass
+ * @see        parserDefine, parserFunction, parserMethod, parserVar
+ * @since      1.0rc1
  */
 /** phpDocumentor version */
-define("PHPDOCUMENTOR_VER","1.2.3");
+if ('D:\xampp\php\pear' != '@'.'PEAR-DIR@')
+{
+    define("PHPDOCUMENTOR_VER","1.3.1");
+} else {
+    define("PHPDOCUMENTOR_VER","1.3.1");
+}
 /** phpDocumentor version */
 define("PHPDOCUMENTOR_WEBSITE","http://www.phpdoc.org");
 define('SMART_PATH_DELIMITER', DIRECTORY_SEPARATOR ); // set the correct path delimiter
@@ -31,6 +51,26 @@ define('tokenizer_ext', extension_loaded('tokenizer') && version_compare(phpvers
 // we just replace all the \ with / so that we can just operate on /
 define('PATH_DELIMITER', '/' ); // set the correct path delimiter
 define('PHPDOCUMENTOR_WINDOWS',substr(PHP_OS, 0, 3) == 'WIN');
+define('_IN_PHP5', phpversion() == '5.0.0RC1-dev' || phpversion() == '5.0.0RC2-dev' ||
+    version_compare(phpversion(), '5.0.0', 'ge'));
+if ('1.3.1' != '@'.'VER@')
+{
+    if (_IN_PHP5) {
+        require_once 'PhpDocumentor/phpDocumentor/clone5.inc.php';
+    } else {
+        require_once 'PhpDocumentor/phpDocumentor/clone.inc.php';
+    }
+} else {
+    if (_IN_PHP5) {
+        require_once dirname(__FILE__) . '/clone5.inc.php';
+    } else {
+        require_once dirname(__FILE__) . '/clone.inc.php';
+    }
+}
+if (isset($_SERVER['argv'])) {
+    $argv = $_SERVER['argv'];
+    $argc = $_SERVER['argc'];
+}
 
 /** used in phpdoc.php and new_phpdoc.php */
 function phpDocumentor_ConfigFileList($directory)
@@ -107,10 +147,13 @@ function phpDocumentor_parse_ini_file($filename, $process_sections = false)
                 $pos = strpos($line, "=");
                 $property = trim(substr($line, 0, $pos));
                 // code by Greg Beaver
+                if (substr($property, 0, 1) == '"' && substr($property, -1) == '"') {
+                    $property = stripcslashes(substr($property,1,count($property) - 2));
+                }
                 $value = trim(substr($line, $pos + 1));
                 if ($value == 'false') $value = false;
                 if ($value == 'true') $value = true;
-                if (substr($value,0,1) == '"' && substr($value,-1) == '"')
+                if (substr($value, 0, 1) == '"' && substr($value,-1) == '"')
                 {
                     $value = stripcslashes(substr($value,1,count($value) - 2));
                 }
@@ -201,6 +244,16 @@ function fancy_debug($s,$v)
         }
     }
     debug("</pre></blockquote><pre>\n\n");
+}
+
+/**
+ * Returns a lower-cased version of get_class for PHP 5
+ *
+ * get_class() returns case as declared in the file in PHP 5
+ */
+function phpDocumentor_get_class($object)
+{
+    return strtolower(get_class($object));
 }
 
 ?>

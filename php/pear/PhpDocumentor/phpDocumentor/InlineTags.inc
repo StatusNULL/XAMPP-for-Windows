@@ -1,28 +1,40 @@
 <?php
-//
-// +------------------------------------------------------------------------+
-// | phpDocumentor                                                          |
-// +------------------------------------------------------------------------+
-// | Copyright (c) 2000-2003 Joshua Eichorn, Gregory Beaver                 |
-// | Email         jeichorn@phpdoc.org, cellog@phpdoc.org                   |
-// | Web           http://www.phpdoc.org                                    |
-// | Mirror        http://phpdocu.sourceforge.net/                          |
-// | PEAR          http://pear.php.net/package-info.php?pacid=137           |
-// +------------------------------------------------------------------------+
-// | This source file is subject to version 3.00 of the PHP License,        |
-// | that is available at http://www.php.net/license/3_0.txt.               |
-// | If you did not receive a copy of the PHP license and are unable to     |
-// | obtain it through the world-wide-web, please send a note to            |
-// | license@php.net so we can mail you a copy immediately.                 |
-// +------------------------------------------------------------------------+
-//
-
 /**
  * All abstract representations of inline tags are in this file
- * @package phpDocumentor
+ *
+ * phpDocumentor :: automatic documentation generator
+ * 
+ * PHP versions 4 and 5
+ *
+ * Copyright (c) 2002-2006 Gregory Beaver
+ * 
+ * LICENSE:
+ * 
+ * This library is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation;
+ * either version 2.1 of the License, or (at your option) any
+ * later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ *
+ * @package    phpDocumentor
  * @subpackage InlineTags
- * @since separate file since version 1.2
- * @version $Id: InlineTags.inc,v 1.21.2.6 2003/10/09 03:40:39 CelloG Exp $
+ * @author     Gregory Beaver <cellog@php.net>
+ * @copyright  2002-2006 Gregory Beaver
+ * @license    http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @version    CVS: $Id: InlineTags.inc,v 1.6 2006/05/22 01:07:28 cellog Exp $
+ * @filesource
+ * @link       http://www.phpdoc.org
+ * @link       http://pear.php.net/PhpDocumentor
+ * @since      separate file since 1.2
  */
 /**
  * Use this element to represent an {@}inline tag} like {@}link}
@@ -31,7 +43,7 @@
  * @subpackage InlineTags
  * @author Greg Beaver <cellog@users.sourceforge.net>
  * @since 1.0rc1
- * @version $Revision: 1.21.2.6 $
+ * @version $Revision: 1.6 $
  * @tutorial inlinetags.pkg
  */
 class parserInlineTag extends parserBase
@@ -42,7 +54,7 @@ class parserInlineTag extends parserBase
      * Type is used by many functions to skip the hassle of
      *
      * <code>
-     * if get_class($blah) == 'parserBlah'
+     * if phpDocumentor_get_class($blah) == 'parserBlah'
      * </code>
      * always "inlinetag"
      * @var string
@@ -69,6 +81,12 @@ class parserInlineTag extends parserBase
      */
     function Strlen()
     {
+        // fix 1203451
+        if (is_array($this->value))
+        {
+            return array_reduce(create_function('$a,$b', 'return $a + strlen($b);')) +
+                count($this->value);
+        }
         return strlen($this->value);
     }
     
@@ -193,7 +211,8 @@ class parserLinkInlineTag extends parserInlineTag
                 if (strpos($value,'://'))
                 {
                     // php function
-                    return $c->returnLink($value,str_replace('PHP_MANUAL#','',$value));
+                    return $c->returnLink($value,
+                        $descrip ? $descrip : str_replace('PHP_MANUAL#','',$value));
                 }
                 return $value;
             }
@@ -345,10 +364,10 @@ class parserSourceInlineTag extends parserInlineTag
     function parserSourceInlineTag($value)
     {
         parserInlineTag::parserInlineTag('source','');
-        preg_match('/^([0-9]*)\W([0-9]*)$/',trim($value), $match);
+        preg_match('/^([0-9]+)\W([0-9]*)$/',trim($value), $match);
         if (!count($match))
         {
-            preg_match('/^([0-9]*)$/',trim($value),$match);
+            preg_match('/^([0-9]+)$/',trim($value),$match);
             if (count($match))
             {
                 $this->start = (int) $match[1];
@@ -449,6 +468,210 @@ class parserSourceInlineTag extends parserInlineTag
         }
         $source = $c->unmangle($source,$this->source);
         return $source;
+    }
+}
+
+/**
+ * Represents the example inline tag, used to display an example file
+ * inside a docblock or tutorial
+ * @tutorial tags.inlineexample.pkg
+ * @package phpDocumentor
+ * @subpackage InlineTags
+ */
+class parserExampleInlineTag extends parserSourceInlineTag
+{
+    /**
+     * @param string format "filepath[ start [end]]" where start and end are line numbers
+     *               with the end line number optional
+     * @param string full path to the current file, used to check relative
+     *               directory locations
+     * @param boolean if true, then this is in a tutorial
+     */
+    function parserExampleInlineTag($value, $current_path, $isTutorial = false)
+    {
+        global $_phpDocumentor_setting;
+        parserInlineTag::parserInlineTag('example','');
+        $path = false;
+        $tagValue = trim($value);
+        $path = $isAbsPath = $pathOnly = $fileName = $fileExt = $original_path  = $title = FALSE;
+        do
+        {
+            // make sure the format is stuff.ext startline[ endline]
+            if (!preg_match('`(.*)\.(\w*)\s(.*)`', $tagValue, $match))
+            {
+                // or format is stuff.ext
+                if (!preg_match('`(.*)\.(\w*)\s*$`', $tagValue, $match))
+                {
+                    // Murphy: Some funny path was given
+                    $original_path = $tagValue; // used for error output
+                    break; // try-block
+                }
+            }
+            if (strlen($match[1]) === 0)
+            {
+                // Murphy: Some funny path was given
+                $original_path = $tagValue; // used for error output
+                break; // try-block
+            }
+            $fileExt = $match[2];
+            if (isset($match[3]))
+            {
+                $lines = explode(' ', trim($match[3]));
+                $this->start = (int) $lines[0];
+                if (isset($lines[1])) {
+                    $this->end = (int) $lines[1];
+                }
+            }
+            $pathTmp = str_replace('\\', '/', $match[1]); // Replace windows '\' the path.
+
+            // Is there a path and a file or is it just a file?
+            if (strpos($pathTmp,'/') === false)
+            {
+                // No path part
+                $pathOnly = '';
+                $fileName = $pathTmp .'.'. $fileExt;
+            } else
+            {
+                $splitPos = strrpos($pathTmp,'/'); // split the path on the last directory, find the filename
+                $pathOnly = substr($match[1], 0, $splitPos+1);
+                $fileName = substr($match[1], $splitPos+1) .'.'. $fileExt;
+                // Is the path absolute? (i.e. does it start like an absolute path?)
+                if (('/' === $pathTmp[0]) || preg_match('`^\w*:`i', $pathTmp))
+                { // works for both windows 'C:' and URLs like 'http://'
+                    $isAbsPath = true; // Yes
+                }
+            }
+
+            $original_path = $pathOnly . $fileName;
+
+            // Now look for the file starting with abs. path.
+            if ($isAbsPath)
+            {
+                $tmp = realpath($original_path); // remove any weirdities like /../file.ext
+                if ($tmp && is_file($tmp))
+                {
+                    $path = $tmp;
+                }
+                // Alway break if abs. path was detected; even if file was not found.
+                break; // try-block
+            }
+
+            // Search for the example file some standard places 
+            // 1) Look if the ini-var examplesdir is set and look there ...
+            if (isset($_phpDocumentor_setting['examplesdir']))
+            {
+                $tmp = realpath($_phpDocumentor_setting['examplesdir'] . PATH_DELIMITER  . $original_path);
+                if ($tmp && is_file($tmp))
+                {
+                    $path = $tmp; // Yo! found it :)
+                    break; // try-block
+                }
+            }
+
+            // 2) Then try to look for an 'example/'-dir below the *currently* parsed file ...
+            if (!empty($current_path))
+            {
+                $tmp = realpath(dirname($current_path) . PATH_DELIMITER . 'examples' . PATH_DELIMITER . $fileName);
+                if ($tmp && is_file($tmp))
+                {
+                    $path = $tmp; // Yo! found it :)
+                    break; // try-block
+                }
+            }
+
+            // 3) Then try to look for the example file below the subdir PHPDOCUMENTOR_BASE/examples/ ...
+            if (is_dir(PHPDOCUMENTOR_BASE . PATH_DELIMITER . 'examples'))
+            {
+                $tmp = realpath(PHPDOCUMENTOR_BASE . PATH_DELIMITER . 'examples' . PATH_DELIMITER . $original_path);
+                if ($tmp && is_file($tmp))
+                {
+                    $path = $tmp; // Yo! found it :)
+                    break; // try-block
+                }
+            }
+
+            $tmp = realpath(PHPDOCUMENTOR_BASE . PATH_DELIMITER . $original_path);
+            if ($tmp && is_file($tmp))
+            {
+                $path = $tmp; // Yo! found it :)
+                break; // try-block
+            }
+            // If we reach this point, nothing was found and $path is false.
+        } while (false);
+
+        if (!$path)
+        {
+            addWarning(PDERROR_EXAMPLE_NOT_FOUND, $original_path);
+            $this->path = false;
+        } else
+        {
+            $f = @fopen($path,'r');
+            if ($f)
+            {
+                $example = fread($f,filesize($path));
+                if (tokenizer_ext && !$isTutorial)
+                {
+                    $obj = new phpDocumentorTWordParser;
+                    $obj->setup($example);
+                    $this->setSource($obj->getFileSource());
+                    unset($obj);
+                } else
+                {
+                    $this->setSource($example);
+                }
+            }
+        }
+    }
+    
+    /**
+     * @param string|array source code
+     * @param boolean in php 4.3.0, if this is a method this will be true
+     * @param string class name if this is a method
+     */
+    function setSource($source, $class = false)
+    {
+        $this->_class = $class;
+        $this->source = $source;
+    }
+    
+    /**
+     * @param Converter
+     * @uses phpDocumentor_HighlightParser Parses the tokenized source
+     */
+    function arrayConvert(&$c)
+    {
+        $source = $this->source;
+        if ($this->end != '*')
+        {
+            $source = array_slice($this->source,0,$this->end + $this->start - 1);
+        }
+        $start = $this->start - 1;
+        if ($start < 0) $start = 0;
+        return $c->exampleProgramExample($source, true, true, $this->_class, $start);
+    }
+
+    /**
+     * Return the source for the example file, enclosed in
+     * a <programlisting> tag to use in a tutorial
+     * @return string
+     */
+    function getProgramListing()
+    {
+        $source = explode("\n", $this->source);
+        $start = $this->start;
+        if ($this->end != '*')
+        {
+            $source = array_slice($source,$start - 1,$this->end - $start + 1);
+        } else
+        {
+            $source = array_slice($source,$start - 1);
+        }
+        $source = join("\n", $source);
+        return
+        "<programlisting role=\"php\">
+         <![CDATA[\n" .
+          $source .
+        "\n]]>\n</programlisting>";
     }
 }
 
@@ -622,21 +845,23 @@ class parserTocInlineTag extends parserInlineTag
     function Convert(&$c)
     {
         $newtoc = array();
-        foreach($this->toc as $i => $toc)
-        {
-            if (isset($toc['title']))
-            $toc['tag']->setTitle($toc['title']);
-            else
-            $toc['tag']->setTitle(new parserStringWithInlineTags);
-            $newtoc[$i]['tagname'] = $toc['tag']->name;
-            $l = new tutorialLink;
-            if (!isset($toc['title'])) $title = 'section '.$toc['id']->id;
-            else
-            $title = $toc['title']->Convert($c);
-            $l->addLink($toc['id']->id,$this->_path,basename($this->_path),$toc['id']->package, $toc['id']->subpackage, strip_tags($title));
-            $newtoc[$i]['link'] = $c->returnSee($l);
-            $newtoc[$i]['id'] = $c->getTutorialId($toc['id']->package, $toc['id']->subpackage, basename($this->_path), $toc['id']->id, $toc['id']->category);
-            $newtoc[$i]['title'] = $title;
+        if (isset($this->toc) && is_array($this->toc)) {
+            foreach($this->toc as $i => $toc)
+            {
+                if (isset($toc['title']))
+                $toc['tag']->setTitle($toc['title']);
+                else
+                $toc['tag']->setTitle(new parserStringWithInlineTags);
+                $newtoc[$i]['tagname'] = $toc['tag']->name;
+                $l = new tutorialLink;
+                if (!isset($toc['title'])) $title = 'section '.$toc['id']->id;
+                else
+                $title = $toc['title']->Convert($c);
+                $l->addLink($toc['id']->id,$this->_path,basename($this->_path),$toc['id']->package, $toc['id']->subpackage, strip_tags($title));
+                $newtoc[$i]['link'] = $c->returnSee($l);
+                $newtoc[$i]['id'] = $c->getTutorialId($toc['id']->package, $toc['id']->subpackage, basename($this->_path), $toc['id']->id, $toc['id']->category);
+                $newtoc[$i]['title'] = $title;
+            }
         }
         return $c->formatTutorialTOC($newtoc);
     }

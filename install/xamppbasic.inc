@@ -4,10 +4,13 @@
 	$backslashrootreal[] = "$partwampp\php\php4\\php4.ini";
 	$backslashrootreal[] = "$partwampp\php\\php.ini";
 	$backslashrootreal[] = "$partwampp\php\php4\\php.ini";
+	$backslashrootreal[] = "$partwampp\php\\compatinfo.bat";
+	$backslashrootreal[] = "$partwampp\php\\pear.ini";
 	$backslashrootreal[] = "$partwampp\php\\pear.bat";
 	$backslashrootreal[] = "$partwampp\php\\peardev.bat";
 	$backslashrootreal[] = "$partwampp\php\\pecl.bat";
 	$backslashrootreal[] = "$partwampp\php\\phpdoc.bat";
+	$backslashrootreal[] = "$partwampp\php\\phing.bat";
 	$backslashrootreal[] = "$partwampp\php\\phpunit.bat";
 	$backslashrootreal[] = "$partwampp\php\pear\\pearcmd.php";
 	$backslashrootreal[] = "$partwampp\php\pear\\peclcmd.php";

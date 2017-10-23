@@ -14,9 +14,9 @@
  * @package    PEAR
  * @author     Stig Bakken <ssb@php.net>
  * @author     Greg Beaver <cellog@php.net>
- * @copyright  1997-2005 The PHP Group
+ * @copyright  1997-2006 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Config.php,v 1.122 2005/11/03 04:52:26 cellog Exp $
+ * @version    CVS: $Id: Config.php,v 1.124.2.3 2006/07/15 00:38:27 pajoye Exp $
  * @link       http://pear.php.net/package/PEAR
  * @since      File available since Release 0.1
  */
@@ -138,6 +138,15 @@ if (getenv('PHP_PEAR_TEST_DIR')) {
            $PEAR_INSTALL_DIR.DIRECTORY_SEPARATOR.'tests');
 }
 
+// Default for temp_dir
+if (getenv('PHP_PEAR_TEMP_DIR')) {
+    define('PEAR_CONFIG_DEFAULT_TEMP_DIR', getenv('PHP_PEAR_TEMP_DIR'));
+} else {
+    define('PEAR_CONFIG_DEFAULT_TEMP_DIR',
+           System::tmpdir() . DIRECTORY_SEPARATOR . 'pear' .
+           DIRECTORY_SEPARATOR . 'temp');
+}
+
 // Default for cache_dir
 if (getenv('PHP_PEAR_CACHE_DIR')) {
     define('PEAR_CONFIG_DEFAULT_CACHE_DIR', getenv('PHP_PEAR_CACHE_DIR'));
@@ -145,6 +154,15 @@ if (getenv('PHP_PEAR_CACHE_DIR')) {
     define('PEAR_CONFIG_DEFAULT_CACHE_DIR',
            System::tmpdir() . DIRECTORY_SEPARATOR . 'pear' .
            DIRECTORY_SEPARATOR . 'cache');
+}
+
+// Default for download_dir
+if (getenv('PHP_PEAR_DOWNLOAD_DIR')) {
+    define('PEAR_CONFIG_DEFAULT_DOWNLOAD_DIR', getenv('PHP_PEAR_DOWNLOAD_DIR'));
+} else {
+    define('PEAR_CONFIG_DEFAULT_DOWNLOAD_DIR',
+           System::tmpdir() . DIRECTORY_SEPARATOR . 'pear' .
+           DIRECTORY_SEPARATOR . 'download');
 }
 
 // Default for php_bin
@@ -214,9 +232,9 @@ if (getenv('PHP_PEAR_SIG_KEYDIR')) {
  * @package    PEAR
  * @author     Stig Bakken <ssb@php.net>
  * @author     Greg Beaver <cellog@php.net>
- * @copyright  1997-2005 The PHP Group
+ * @copyright  1997-2006 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    Release: 1.4.5
+ * @version    Release: 1.4.11
  * @link       http://pear.php.net/package/PEAR
  * @since      Class available since Release 0.1
  */
@@ -410,6 +428,20 @@ class PEAR_Config extends PEAR
             'default' => PEAR_CONFIG_DEFAULT_CACHE_DIR,
             'doc' => 'directory which is used for XMLRPC cache',
             'prompt' => 'PEAR Installer cache directory',
+            'group' => 'File Locations (Advanced)',
+            ),
+        'temp_dir' => array(
+            'type' => 'directory',
+            'default' => PEAR_CONFIG_DEFAULT_TEMP_DIR,
+            'doc' => 'directory which is used for all temp files',
+            'prompt' => 'PEAR Installer temp directory',
+            'group' => 'File Locations (Advanced)',
+            ),
+        'download_dir' => array(
+            'type' => 'directory',
+            'default' => PEAR_CONFIG_DEFAULT_CACHE_DIR,
+            'doc' => 'directory which is used for all downloaded files',
+            'prompt' => 'PEAR Installer download directory',
             'group' => 'File Locations (Advanced)',
             ),
         'php_bin' => array(
@@ -1265,6 +1297,9 @@ class PEAR_Config extends PEAR
                         $reg = &$this->getRegistry();
                         if (is_object($reg)) {
                             $chan = &$reg->getChannel($channel);
+                            if (PEAR::isError($chan)) {
+                                return $channel;
+                            }
                             if (!$chan->getMirror($test) && $chan->getName() != $test) {
                                 return $channel; // mirror does not exist
                             }
@@ -1286,6 +1321,9 @@ class PEAR_Config extends PEAR
                 $reg = &$this->getRegistry();
                 if (is_object($reg)) {
                     $chan = &$reg->getChannel($channel);
+                    if (PEAR::isError($chan)) {
+                        return $channel;
+                    }
                     if (!$chan->getMirror($test) && $chan->getName() != $test) {
                         return $channel; // mirror does not exist
                     }
@@ -1329,6 +1367,9 @@ class PEAR_Config extends PEAR
                 $reg = &$this->getRegistry($layer);
                 if (is_object($reg)) {
                     $chan = &$reg->getChannel($channel);
+                    if (PEAR::isError($chan)) {
+                        return $channel;
+                    }
                     if (!$chan->getMirror($ret) && $chan->getName() != $ret) {
                         return $channel; // mirror does not exist
                     }
@@ -1383,6 +1424,9 @@ class PEAR_Config extends PEAR
             $reg = &$this->getRegistry($layer);
             if (is_object($reg)) {
                 $chan = &$reg->getChannel($channel ? $channel : 'pear.php.net');
+                if (PEAR::isError($chan)) {
+                    return false;
+                }
                 if (!$chan->getMirror($value) && $chan->getName() != $value) {
                     return false; // mirror does not exist
                 }

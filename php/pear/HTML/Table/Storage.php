@@ -8,7 +8,7 @@
  * more than one instance, it can be used for grouping the table into the
  * parts <thead>...</thead>, <tfoot>...</tfoot> and <tbody>...</tbody>.
  *
- * PHP versions 4
+ * PHP versions 4 and 5
  *
  * LICENSE: This source file is subject to version 3.0 of the PHP license
  * that is available through the world-wide-web at the following URI:
@@ -20,9 +20,9 @@
  * @package    HTML_Table
  * @author     Adam Daniel <adaniel1@eesus.jnj.com>
  * @author     Bertrand Mansion <bmansion@mamasam.com>
- * @copyright  2005 The PHP Group
- * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Storage.php,v 1.6 2005/10/25 20:29:43 wiesemann Exp $
+ * @copyright  2005-2006 The PHP Group
+ * @license    http://www.opensource.org/licenses/bsd-license.php New BSD License
+ * @version    CVS: $Id: Storage.php,v 1.11 2006/10/20 20:36:48 wiesemann Exp $
  * @link       http://pear.php.net/package/HTML_Table
  */
 
@@ -38,8 +38,8 @@
  * @author     Adam Daniel <adaniel1@eesus.jnj.com>
  * @author     Bertrand Mansion <bmansion@mamasam.com>
  * @author     Mark Wiesemann <wiesemann@php.net>
- * @copyright  2005 The PHP Group
- * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
+ * @copyright  2005-2006 The PHP Group
+ * @license    http://www.opensource.org/licenses/bsd-license.php New BSD License
  * @version    Release: @package_version@
  * @link       http://pear.php.net/package/HTML_Table
  */
@@ -96,15 +96,14 @@ class HTML_Table_Storage extends HTML_Common {
 
     /**
      * Class constructor
-     * @param    array    $attributes        Associative array of table tag attributes
      * @param    int      $tabOffset
      * @param    bool     $useTGroups        Whether to use <thead>, <tfoot> and
      *                                       <tbody> or not
      * @access   public
      */
-    function HTML_Table_Storage($attributes = null, $tabOffset = 0, $useTGroups = false)
+    function HTML_Table_Storage($tabOffset = 0, $useTGroups = false)
     {
-        HTML_Common::HTML_Common($attributes, (int)$tabOffset);
+        HTML_Common::HTML_Common(null, (int)$tabOffset);
         $this->_useTGroups = (boolean)$useTGroups;
     }
 
@@ -393,7 +392,8 @@ class HTML_Table_Storage extends HTML_Common {
      * @param    int     $row
      * @param    int     $col
      * @param    mixed   $contents
-     * @param    mixed  $attributes Associative array or string of table row attributes
+     * @param    mixed   $attributes  Associative array or string of table row
+     *                                attributes
      * @access   public
      */
     function setHeaderContents($row, $col, $contents, $attributes = null)
@@ -463,7 +463,7 @@ class HTML_Table_Storage extends HTML_Common {
             }
         } else {
             $attributes = $this->_parseAttributes($attributes);
-            $err = $this->_adjustEnds($row, 1, 'setRowAttributes', $attributes);
+            $err = $this->_adjustEnds($row, 0, 'setRowAttributes', $attributes);
             if (PEAR::isError($err)) {
                 return $err;
             }
@@ -494,7 +494,7 @@ class HTML_Table_Storage extends HTML_Common {
             }
         } else {
             $attributes = $this->_parseAttributes($attributes);
-            $err = $this->_adjustEnds($row, 1, 'updateRowAttributes', $attributes);
+            $err = $this->_adjustEnds($row, 0, 'updateRowAttributes', $attributes);
             if (PEAR::isError($err)) {
                 return $err;
             }
@@ -630,11 +630,15 @@ class HTML_Table_Storage extends HTML_Common {
      * @access   public
      * @return   string
      */
-    function toHtml()
+    function toHtml($tabs = null, $tab = null)
     {
         $strHtml = '';
-        $tabs = $this->_getTabs();
-        $tab = $this->_getTab();
+        if (is_null($tabs)) {
+            $tabs = $this->_getTabs();
+        }
+        if (is_null($tab)) {
+            $tab = $this->_getTab();
+        }
         $lnEnd = $this->_getLineEnd();
         if ($this->_useTGroups) {
             $extraTab = $tab;
@@ -652,7 +656,6 @@ class HTML_Table_Storage extends HTML_Common {
                 $contents = '';
                 $type     = 'td';
                 if (isset($this->_structure[$i][$j]) && $this->_structure[$i][$j] == '__SPANNED__') {
-                    $strHtml .= $tabs . $tab . $tab . $extraTab . '<!-- span -->' . $lnEnd;
                     continue;
                 }
                 if (isset($this->_structure[$i][$j]['type'])) {

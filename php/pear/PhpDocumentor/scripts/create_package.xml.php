@@ -1,50 +1,35 @@
 <?php
+set_time_limit(0);
 require_once('PEAR/PackageFileManager.php');
-$test = new PEAR_PackageFileManager;
+require_once('PEAR/PackageFileManager2.php');
+PEAR::setErrorHandling(PEAR_ERROR_DIE);
 
-$packagedir = 'C:/Web Pages/chiara/phpdoc';
+$packagedir = dirname(dirname(__FILE__));
+$notes = '
+ - fixed these bugs reported at sourceforge
+ [ 1544977 ] Command line arguments split by spaces (fix included)
+ [ 1545927 ] HTMLSmartyConverter logo not in package
+ [ 1573807 ] CHM Convertor does not strip full path for all TOC entries
+ [ 1575145 ] \'-q on\' quiet mode not fully quiet
+ [ 1581487 ] subdirectory include another subdirectory doc error.
+ - fixed these bugs reported in PEAR:
+  Bug #8520: Broken XML when XML_Beautifier is installed
+  Bug #8533: require() broken in a lot of places - cannot run!
+  Bug #8539: Parser error in create_examples.php
+  Bug #8746: XML:DocBook generates warning with function/parameters without @param tag
+  Bug #8773: PDF Convertor fails due to being unable to find fonts
+  Bug #8914: returning non varibale reference ParserData.inc#500
 
-$e = $test->setOptions(
-array('baseinstalldir' => 'PhpDocumentor',
-'version' => '1.2.3',
+  The peardoc2 converter no longer uses funky PHP source highlighting, leaving
+that to the peardoc build instead.
+';
+$version = '1.3.1';
+$options = array(
+'baseinstalldir' => 'PhpDocumentor',
+'version' => $version,
 'packagedirectory' => $packagedir,
-'state' => 'stable',
 'filelistgenerator' => 'cvs',
-'notes' => 'Bugfix release
-
-From both Windows and Unix, both the command-line version
-of phpDocumentor and the web interface will work
-out of the box by using command phpdoc - guaranteed :)
-
-WARNING: in order to use the web interface through PEAR, you must set your
-data_dir to a subdirectory of your document root.
-
-$ pear config-set data_dir /path/to/public_html/pear
-
-on Windows with default apache setup, it might be
-
-C:\> pear config-set data_dir "C:\Program Files\Apache\htdocs\pear"
-
-After this, install/upgrade phpDocumentor
-
-$ pear upgrade phpDocumentor
-
-and you can browse to:
-
-http://localhost/pear/PhpDocumentor/
-
-for the web interface
-
-- WARNING: phpDocumentor installs phpdoc in the
-  scripts directory, and this will conflict with PHPDoc,
-  you can\'t have both installed at the same time
-- fixed these bugs:
- [ 731750 ] Links to unparsed includes shown (2nd time reopened)
- [ 771531 ] body styles not explicitly white
- [ 795095 ] top_frame.tpl doesn\'t output single RIC element
- [ 797066 ] HighlightParser stuffs whitespace in start of string in func
- [ 802891 ] Inline link text does not show up
-',
+'notes' => $notes,
 'package' => 'PhpDocumentor',
 'dir_roles' => array(
     'Documentation' => 'doc',
@@ -53,12 +38,13 @@ for the web interface
     'HTML_TreeMenu-1.1.2' => 'data',
     'tutorials' => 'doc',
     ),
+'simpleoutput' => true,
 'exceptions' =>
     array(
         'index.html' => 'data',
         'README' => 'doc',
         'ChangeLog' => 'doc',
-        'PHPLICENSE.txt' => 'doc',
+        'LICENSE' => 'doc',
         'poweredbyphpdoc.gif' => 'data',
         'INSTALL' => 'doc',
         'FAQ' => 'doc',
@@ -72,161 +58,90 @@ for the web interface
         'Release-1.2.1' => 'doc',
         'Release-1.2.2' => 'doc',
         'Release-1.2.3' => 'doc',
+        'Release-1.2.3.1' => 'doc',
+        'Release-1.3.0' => 'doc',
+        'Release-1.3.1' => 'doc',
         'pear-phpdoc' => 'script',
         'pear-phpdoc.bat' => 'script',
         'HTML_TreeMenu-1.1.2/TreeMenu.php' => 'php',
-        'phpDocumentor/Smarty-2.5.0/libs/debug.tpl' => 'php',
+        'phpDocumentor/Smarty-2.6.0/libs/debug.tpl' => 'php',
         'new_phpdoc.php' => 'data',
         'phpdoc.php' => 'data',
         ),
 'ignore' =>
-    array('package.xml', 
-          "$packagedir/phpdoc",
-          'phpdoc.bat', 
-          'LICENSE',
-          '*docbuilder/actions.php',
-          '*docbuilder/builder.php',
-          '*docbuilder/config.php',
-          '*docbuilder/file_dialog.php',
-          '*docbuilder/top.php',
-          'utilities.php',
-          'Converter.inc',
-          'IntermediateParser.inc',
+    array('package.xml',
+          'package2.xml',
           '*templates/PEAR/*',
-          'Setup.inc.php',
-          'makedocs.ini',
-          'common.inc.php',
           'publicweb-PEAR-1.2.1.patch.txt',
           ),
-'installas' =>
-    array('pear-phpdoc' => 'phpdoc',
-          'pear-phpdoc.bat' => 'phpdoc.bat',
-          'docbuilder/pear-actions.php' => 'docbuilder/actions.php',
-          'docbuilder/pear-builder.php' => 'docbuilder/builder.php',
-          'docbuilder/pear-config.php' => 'docbuilder/config.php',
-          'docbuilder/pear-file_dialog.php' => 'docbuilder/file_dialog.php',
-          'docbuilder/pear-top.php' => 'docbuilder/top.php',
-          'docbuilder/includes/pear-utilities.php' => 'docbuilder/includes/utilities.php',
-          'phpDocumentor/pear-IntermediateParser.inc' => 'phpDocumentor/IntermediateParser.inc',
-          'phpDocumentor/pear-Converter.inc' => 'phpDocumentor/Converter.inc',
-          'phpDocumentor/pear-Setup.inc.php' => 'phpDocumentor/Setup.inc.php',
-          'phpDocumentor/pear-common.inc.php' => 'phpDocumentor/common.inc.php',
-          'user/pear-makedocs.ini' => 'user/makedocs.ini',
-          ),
 'installexceptions' => array('pear-phpdoc' => '/', 'pear-phpdoc.bat' => '/', 'scripts/makedoc.sh' => '/'),
-));
-if (PEAR::isError($e)) {
-    echo $e->getMessage();
-    exit;
-}
-$e = $test->addPlatformException('pear-phpdoc.bat', 'windows');
-if (PEAR::isError($e)) {
-    echo $e->getMessage();
-    exit;
-}
-$e = $test->addDependency('php', '4.1.0', 'ge', 'php');
-if (PEAR::isError($e)) {
-    echo $e->getMessage();
-    exit;
-}
-// just to make sure people don't try to install this with a broken Archive_Tar
-$e = $test->addDependency('Archive_Tar', '1.1', 'ge');
-if (PEAR::isError($e)) {
-    echo $e->getMessage();
-    exit;
-}
-// replace @PHP-BIN@ in this file with the path to php executable!  pretty neat
-$e = $test->addReplacement('pear-phpdoc', 'pear-config', '@PHP-BIN@', 'php_bin');
-if (PEAR::isError($e)) {
-    echo $e->getMessage();
-    exit;
-}
-$e = $test->addReplacement('pear-phpdoc.bat', 'pear-config', '@PHP-BIN@', 'php_bin');
-if (PEAR::isError($e)) {
-    echo $e->getMessage();
-    exit;
-}
-$e = $test->addReplacement('pear-phpdoc.bat', 'pear-config', '@BIN-DIR@', 'bin_dir');
-if (PEAR::isError($e)) {
-    echo $e->getMessage();
-    exit;
-}
-$e = $test->addReplacement('pear-phpdoc.bat', 'pear-config', '@PEAR-DIR@', 'php_dir');
-if (PEAR::isError($e)) {
-    echo $e->getMessage();
-    exit;
-}
-$e = $test->addReplacement('pear-phpdoc.bat', 'pear-config', '@DATA-DIR@', 'data_dir');
-if (PEAR::isError($e)) {
-    echo $e->getMessage();
-    exit;
-}
-$e = $test->addReplacement('docbuilder/pear-builder.php', 'pear-config', '@DATA-DIR@', 'data_dir');
-if (PEAR::isError($e)) {
-    echo $e->getMessage();
-    exit;
-}
-$e = $test->addReplacement('docbuilder/pear-file_dialog.php', 'pear-config', '@DATA-DIR@', 'data_dir');
-if (PEAR::isError($e)) {
-    echo $e->getMessage();
-    exit;
-}
-$e = $test->addReplacement('docbuilder/pear-file_dialog.php', 'pear-config', '@WEB-DIR@', 'data_dir');
-if (PEAR::isError($e)) {
-    echo $e->getMessage();
-    exit;
-}
-$e = $test->addReplacement('docbuilder/pear-actions.php', 'pear-config', '@WEB-DIR@', 'data_dir');
-if (PEAR::isError($e)) {
-    echo $e->getMessage();
-    exit;
-}
-$e = $test->addReplacement('docbuilder/pear-config.php', 'pear-config', '@DATA-DIR@', 'data_dir');
-if (PEAR::isError($e)) {
-    echo $e->getMessage();
-    exit;
-}
-$e = $test->addReplacement('docbuilder/pear-config.php', 'pear-config', '@WEB-DIR@', 'data_dir');
-if (PEAR::isError($e)) {
-    echo $e->getMessage();
-    exit;
-}
-$e = $test->addReplacement('phpDocumentor/pear-Setup.inc.php', 'pear-config', '@DATA-DIR@', 'data_dir');
-if (PEAR::isError($e)) {
-    echo $e->getMessage();
-    exit;
-}
-$e = $test->addReplacement('phpDocumentor/pear-Converter.inc', 'pear-config', '@DATA-DIR@', 'data_dir');
-if (PEAR::isError($e)) {
-    echo $e->getMessage();
-    exit;
-}
-$e = $test->addReplacement('phpDocumentor/pear-common.inc.php', 'package-info', '@VER@', 'version');
-if (PEAR::isError($e)) {
-    echo $e->getMessage();
-    exit;
-}
-$e = $test->addReplacement('user/pear-makedocs.ini', 'pear-config', '@PEAR-DIR@', 'php_dir');
-if (PEAR::isError($e)) {
-    echo $e->getMessage();
-    exit;
-}
-$e = $test->addReplacement('user/pear-makedocs.ini', 'pear-config', '@DOC-DIR@', 'doc_dir');
-if (PEAR::isError($e)) {
-    echo $e->getMessage();
-    exit;
-}
-$test->addRole('inc', 'php');
-$test->addRole('sh', 'script');
-if (isset($_GET['make'])) {
-    $e = $test->writePackageFile();
+);
+$pfm2 = PEAR_PackageFileManager2::importOptions(dirname(dirname(__FILE__))
+    . DIRECTORY_SEPARATOR . 'package.xml', array_merge($options, array('packagefile' => 'package.xml')));
+$pfm2->setReleaseVersion($version);
+$pfm2->setReleaseStability('stable');
+$pfm2->setLicense('LGPL', 'http://www.opensource.org/licenses/lgpl-license.php');
+$pfm2->setNotes($notes);
+$pfm2->clearDeps();
+$pfm2->setPhpDep('4.2.0');
+$pfm2->setPearinstallerDep('1.4.6');
+$pfm2->addPackageDepWithChannel('optional', 'XML_Beautifier', 'pear.php.net', '1.1');
+$pfm2->addReplacement('pear-phpdoc', 'pear-config', '@PHP-BIN@', 'php_bin');
+$pfm2->addReplacement('pear-phpdoc.bat', 'pear-config', '@PHP-BIN@', 'php_bin');
+$pfm2->addReplacement('pear-phpdoc.bat', 'pear-config', '@BIN-DIR@', 'bin_dir');
+$pfm2->addReplacement('pear-phpdoc.bat', 'pear-config', '@PEAR-DIR@', 'php_dir');
+$pfm2->addReplacement('pear-phpdoc.bat', 'pear-config', '@DATA-DIR@', 'data_dir');
+$pfm2->addReplacement('docbuilder/includes/utilities.php', 'pear-config', '@DATA-DIR@', 'data_dir');
+$pfm2->addReplacement('docbuilder/builder.php', 'pear-config', '@DATA-DIR@', 'data_dir');
+$pfm2->addReplacement('docbuilder/file_dialog.php', 'pear-config', '@DATA-DIR@', 'data_dir');
+$pfm2->addReplacement('docbuilder/file_dialog.php', 'pear-config', '@WEB-DIR@', 'data_dir');
+$pfm2->addReplacement('docbuilder/actions.php', 'pear-config', '@WEB-DIR@', 'data_dir');
+$pfm2->addReplacement('docbuilder/top.php', 'pear-config', '@DATA-DIR@', 'data_dir');
+$pfm2->addReplacement('docbuilder/config.php', 'pear-config', '@DATA-DIR@', 'data_dir');
+$pfm2->addReplacement('docbuilder/config.php', 'pear-config', '@WEB-DIR@', 'data_dir');
+$pfm2->addReplacement('phpDocumentor/Setup.inc.php', 'pear-config', '@DATA-DIR@', 'data_dir');
+$pfm2->addReplacement('phpDocumentor/Converter.inc', 'pear-config', '@DATA-DIR@', 'data_dir');
+$pfm2->addReplacement('phpDocumentor/common.inc.php', 'package-info', '@VER@', 'version');
+$pfm2->addReplacement('phpDocumentor/common.inc.php', 'pear-config', '@PEAR-DIR@', 'php_dir');
+$pfm2->addReplacement('phpDocumentor/IntermediateParser.inc', 'package-info', '@VER@', 'version');
+$pfm2->addReplacement('phpDocumentor/IntermediateParser.inc', 'pear-config', '@PEAR-DIR@', 'php_dir');
+$pfm2->addReplacement('user/pear-makedocs.ini', 'pear-config', '@PEAR-DIR@', 'php_dir');
+$pfm2->addReplacement('user/pear-makedocs.ini', 'pear-config', '@DOC-DIR@', 'doc_dir');
+$pfm2->addReplacement('user/pear-makedocs.ini', 'package-info', '@VER@', 'version');
+$pfm2->addRole('inc', 'php');
+$pfm2->addRole('sh', 'script');
+$pfm2->addUnixEol('pear-phpdoc');
+$pfm2->addUnixEol('phpdoc');
+$pfm2->addWindowsEol('pear-phpdoc.bat');
+$pfm2->addWindowsEol('phpdoc.bat');
+$pfm2->generateContents();
+$pfm2->setPackageType('php');
+$pfm2->addRelease();
+$pfm2->setOsInstallCondition('windows');
+// these next two files are only used if the archive is extracted as-is
+// without installing via "pear install blah"
+$pfm2->addIgnoreToRelease("phpdoc");
+$pfm2->addIgnoreToRelease('phpdoc.bat');
+$pfm2->addIgnoreToRelease('user/makedocs.ini');
+$pfm2->addIgnoreToRelease('scripts/makedoc.sh');
+$pfm2->addInstallAs('pear-phpdoc', 'phpdoc');
+$pfm2->addInstallAs('pear-phpdoc.bat', 'phpdoc.bat');
+$pfm2->addInstallAs('user/pear-makedocs.ini', 'user/makedocs.ini');
+$pfm2->addRelease();
+// these next two files are only used if the archive is extracted as-is
+// without installing via "pear install blah"
+$pfm2->addIgnoreToRelease("phpdoc");
+$pfm2->addIgnoreToRelease('phpdoc.bat');
+$pfm2->addIgnoreToRelease('user/makedocs.ini');
+$pfm2->addIgnoreToRelease('pear-phpdoc.bat');
+$pfm2->addInstallAs('pear-phpdoc', 'phpdoc');
+$pfm2->addInstallAs('user/pear-makedocs.ini', 'user/makedocs.ini');
+if (isset($_GET['make']) || (isset($_SERVER['argv'][1]) && $_SERVER['argv'][1] == 'make')) {
+    $pfm2->writePackageFile();
 } else {
-    $e = $test->debugPackageFile();
+    $pfm2->debugPackageFile();
 }
-if (PEAR::isError($e)) {
-    echo $e->getMessage();
-}
-if (!isset($_GET['make'])) {
+if (!isset($_GET['make']) && !(isset($_SERVER['argv'][1]) && $_SERVER['argv'][1] == 'make')) {
     echo '<a href="' . $_SERVER['PHP_SELF'] . '?make=1">Make this file</a>';
 }
 ?>

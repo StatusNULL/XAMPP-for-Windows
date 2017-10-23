@@ -1,27 +1,39 @@
 <?php
-//
-// +------------------------------------------------------------------------+
-// | phpDocumentor                                                          |
-// +------------------------------------------------------------------------+
-// | Copyright (c) 2000-2003 Joshua Eichorn, Gregory Beaver                 |
-// | Email         jeichorn@phpdoc.org, cellog@phpdoc.org                   |
-// | Web           http://www.phpdoc.org                                    |
-// | Mirror        http://phpdocu.sourceforge.net/                          |
-// | PEAR          http://pear.php.net/package-info.php?pacid=137           |
-// +------------------------------------------------------------------------+
-// | This source file is subject to version 3.00 of the PHP License,        |
-// | that is available at http://www.php.net/license/3_0.txt.               |
-// | If you did not receive a copy of the PHP license and are unable to     |
-// | obtain it through the world-wide-web, please send a note to            |
-// | license@php.net so we can mail you a copy immediately.                 |
-// +------------------------------------------------------------------------+
-//
-
 /**
- * @author Greg Beaver <cellog@users.sourceforge.net>
- * @package phpDocumentor
- * @subpackage WordParsers
- * @since 1.2
+ * tokenizer extension-based lexer for PHP code
+ * 
+ * phpDocumentor :: automatic documentation generator
+ * 
+ * PHP versions 4 and 5
+ *
+ * Copyright (c) 2002-2006 Gregory Beaver
+ * 
+ * LICENSE:
+ * 
+ * This library is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation;
+ * either version 2.1 of the License, or (at your option) any
+ * later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ *
+ * @package    phpDocumentor
+ * @subpackage Parsers
+ * @author     Gregory Beaver <cellog@php.net>
+ * @copyright  2002-2006 Gregory Beaver
+ * @license    http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @version    CVS: $Id: phpDocumentorTWordParser.inc,v 1.5 2006/04/30 22:18:14 cellog Exp $
+ * @link       http://www.phpdoc.org
+ * @link       http://pear.php.net/PhpDocumentor
+ * @since      1.2
  */
 /**
  * Like WordParser, but expects an array of tokens from the tokenizer instead
@@ -45,7 +57,15 @@ class phpDocumentorTWordParser extends WordParser
      * List of tokens that can contain a newline
      * @var array
      */
-    var $_nl_check = array(T_WHITESPACE,T_ENCAPSED_AND_WHITESPACE,T_COMMENT,T_ML_COMMENT,T_OPEN_TAG,T_CLOSE_TAG,T_INLINE_HTML);
+    var $_nl_check = array(
+        T_WHITESPACE,
+        T_ENCAPSED_AND_WHITESPACE,
+        T_CONSTANT_ENCAPSED_STRING,
+        T_COMMENT,
+        T_DOC_COMMENT,
+        T_OPEN_TAG,
+        T_CLOSE_TAG,
+        T_INLINE_HTML);
     /**
      * @var array
      */
@@ -78,7 +98,7 @@ class phpDocumentorTWordParser extends WordParser
      */
     function setup(&$input)
     {
-        $input = trim($input);
+        $input = rtrim(ltrim($input, "\r\n"));
         $this->data = &$input;
         // fix php warnings on invalid source code
         $this->_all = @token_get_all($input);
@@ -236,22 +256,11 @@ class phpDocumentorTWordParser extends WordParser
             $lines = str_replace("\r", '', explode("\n",$word[1]));
             foreach($lines as $i => $line)
             {
-                if ($line == '')
+                $this->_set_sars($file, array($word[0],$line));
+                if ($i < count($lines) - 1)
                 {
-                    $this->_set_sars($file, array(T_WHITESPACE, ''));
-                    if ($i < count($lines) - 1)
-                    {
-                        // increment sourceline
-                        $this->_sourceline++;
-                    }
-                } else
-                {
-                    $this->_set_sars($file, array($word[0],$line));
-                    if ($i < count($lines) - 1)
-                    {
-                        // increment sourceline
-                        $this->_sourceline++;
-                    }
+                    // increment sourceline
+                    $this->_sourceline++;
                 }
             }
         } else $this->_set_sars($file, $word);

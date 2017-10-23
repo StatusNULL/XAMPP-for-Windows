@@ -1,31 +1,41 @@
 <?php
-//
-// +------------------------------------------------------------------------+
-// | phpDocumentor                                                          |
-// +------------------------------------------------------------------------+
-// | Copyright (c) 2000-2003 Joshua Eichorn, Gregory Beaver                 |
-// | Email         jeichorn@phpdoc.org, cellog@phpdoc.org                   |
-// | Web           http://www.phpdoc.org                                    |
-// | Mirror        http://phpdocu.sourceforge.net/                          |
-// | PEAR          http://pear.php.net/package-info.php?pacid=137           |
-// +------------------------------------------------------------------------+
-// | This source file is subject to version 3.00 of the PHP License,        |
-// | that is available at http://www.php.net/license/3_0.txt.               |
-// | If you did not receive a copy of the PHP license and are unable to     |
-// | obtain it through the world-wide-web, please send a note to            |
-// | license@php.net so we can mail you a copy immediately.                 |
-// +------------------------------------------------------------------------+
-//
 /**
- * XML output converter for DocBook.
- * This Converter takes output from the {@link Parser} and converts it to DocBook output
+ * Outputs documentation in XML DocBook format, in the version expected by
+ * pear.php.net's documentation team
  *
- * @package Converters
+ * phpDocumentor :: automatic documentation generator
+ * 
+ * PHP versions 4 and 5
+ *
+ * Copyright (c) 2002-2006 Gregory Beaver
+ * 
+ * LICENSE:
+ * 
+ * This library is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation;
+ * either version 2.1 of the License, or (at your option) any
+ * later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ *
+ * @package    Converters
  * @subpackage XMLDocBook
- * @see parserDocBlock, parserInclude, parserPage, parserClass, parserDefine, parserFunction, parserMethod, parserVar
- * @author Greg Beaver <cellog@users.sourceforge.net>
- * @since 1.2
- * @version $Id: XMLDocBookpeardoc2Converter.inc,v 1.29.2.10 2003/10/13 03:44:06 CelloG Exp $
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  2002-2006 Gregory Beaver
+ * @license    http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @version    CVS: $Id: XMLDocBookpeardoc2Converter.inc,v 1.6 2006/10/24 04:18:14 cellog Exp $
+ * @filesource
+ * @link       http://www.phpdoc.org
+ * @link       http://pear.php.net/PhpDocumentor
+ * @since      1.2
  */
 /**
  * XML DocBook converter.
@@ -43,10 +53,16 @@
  * @subpackage XMLDocBook
  * @author Greg Beaver <cellog@users.sourceforge.net>
  * @since 1.2
- * @version $Id: XMLDocBookpeardoc2Converter.inc,v 1.29.2.10 2003/10/13 03:44:06 CelloG Exp $
+ * @version $Id: XMLDocBookpeardoc2Converter.inc,v 1.6 2006/10/24 04:18:14 cellog Exp $
  */
 class XMLDocBookpeardoc2Converter extends Converter
 {
+    /**
+     * This converter knows about the new root tree processing
+     * In order to fix PEAR Bug #6389
+     * @var boolean
+     */
+    var $processSpecialRoots = true;
     /**
      * XMLDocBookConverter wants elements sorted by type as well as alphabetically
      * @see Converter::$sort_page_contents_by_type
@@ -190,12 +206,28 @@ class XMLDocBookpeardoc2Converter extends Converter
      */
     var $category;
     /**
+     * Used to re-format output so that it's easy for translators to handle
+     * 
+     * @var XML_Beautifier|false
+     * @access private
+     */
+    var $_beautifier = false;
+
+    /**
      * sets {@link $base_dir} to $targetDir
      * @see Converter()
      */
     function XMLDocBookpeardoc2Converter(&$allp, &$packp, &$classes, &$procpages, $po, $pp, $qm, $targetDir, $templateDir, $title)
     {
+        if (!class_exists('XML_Beautifier')) {
+            @include_once 'XML/Beautifier.php';
+        }
         Converter::Converter($allp, $packp, $classes, $procpages,$po, $pp, $qm, $targetDir, $templateDir, $title);
+        if (class_exists('XML_Beautifier')) {
+            require_once 'phpDocumentor/Converters/XML/DocBook/peardoc2/Beautifier.php';
+            $this->_beautifier = new phpDocumentor_peardoc2_XML_Beautifier;
+            $this->_beautifier->setOption('indent', ' ');
+        }
         $this->base_dir = $targetDir;
     }
     
@@ -212,6 +244,54 @@ class XMLDocBookpeardoc2Converter extends Converter
         return '<programlisting role="php"><![CDATA[
 '.$sourcecode.']]></programlisting>';
     }
+
+    /**
+     * Writes a file to target dir, beautify any .xml files first
+     * @param string filename
+     * @param string file contents
+     * @param boolean true if the data is binary and not text
+     */
+    function writeFile($file,$data,$binary = false)
+    {
+        if ($this->_beautifier && substr($file, -4) == '.xml') {
+            $ret = $this->_beautifier->formatString($data);
+            if (PEAR::isError($ret)) {
+                addWarning(PDERROR_BEAUTIFYING_FAILED, $ret->getMessage());
+                $ret = $data;
+            }
+            $data = $ret;
+        }
+        return parent::writeFile($file, $data, $binary);
+    }
+    
+    /**
+     * Used to convert the {@}example} inline tag in a docblock.
+     * 
+     * By default, this just wraps ProgramExample
+     * @see XMLDocBookpeardoc2Converter::exampleProgramExample
+     * @param string
+     * @param boolean true if this is to highlight a tutorial <programlisting>
+     * @return string
+     */
+    function exampleProgramExample($example, $tutorial = false, $inlinesourceparse = null/*false*/,
+                            $class = null/*false*/, $linenum = null/*false*/, $filesourcepath = null/*false*/)
+    {
+        return '<example><title>Example</title><programlisting role="php"><![CDATA[' .
+         $example . ']]></programlisting></example>';
+        $this->ProgramExample($example, $tutorial, $inlinesourceparse, $class, $linenum, $filesourcepath)
+        . '</example>';
+    }
+    
+    function writeExample($title, $path, $source)
+    {
+        $this->_save_example = array($title, $source);
+    }
+    
+    function getExampleLink($unused, $title)
+    {
+        $source = $this->_save_example[1];
+        return '<para><example><title>' . $title . '</title>' . $source . '</example></para>';
+    }
     
     function type_adjust($typename)
     {
@@ -220,13 +300,13 @@ class XMLDocBookpeardoc2Converter extends Converter
         $a = $this->getLink($typename);
         if (is_object($a))
         {
-            if (get_class($a) == 'classlink')
+            if (phpDocumentor_get_class($a) == 'classlink')
             return '<classname>'.$typename.'</classname>';
-            if (get_class($a) == 'functionlink' || get_class($a) == 'methodlink')
+            if (phpDocumentor_get_class($a) == 'functionlink' || phpDocumentor_get_class($a) == 'methodlink')
             return '<function>'.$typename.'</function>';
-            if (get_class($a) == 'definelink')
+            if (phpDocumentor_get_class($a) == 'definelink')
             return '<constant>'.$typename.'</constant>';
-            if (get_class($a) == 'varlink')
+            if (phpDocumentor_get_class($a) == 'varlink')
             return '<varname>'.$typename.'</varname>';
         }
         return $typename;
@@ -274,7 +354,7 @@ class XMLDocBookpeardoc2Converter extends Converter
     {
         if (isset($this->packagexml))
         {
-            if ($element->docblock->package != $this->package || !$element) // finished with package
+            if (!$element || $element->docblock->package != $this->package) // finished with package
             {
                 if (isset($this->_write_constants_xml[$this->category][$this->package]) &&
                     $this->_write_constants_xml[$this->category][$this->package])
@@ -297,9 +377,11 @@ class XMLDocBookpeardoc2Converter extends Converter
                 $this->writefile(str_replace('_','-',strtolower($this->package)).'.xml',
                     '<!-- $' . "Revision$ -->\n" . $this->packagexml->fetch('package.tpl'));
                 $this->packagexml->clear_all_assign();
-                $this->packagexml->assign('package',$element->docblock->package);
-                $this->packagexml->assign('ids',array());
-                $this->packagexml->assign('id',$this->getId($element, true));
+                if ($element) {
+                    $this->packagexml->assign('package',$element->docblock->package);
+                    $this->packagexml->assign('ids',array());
+                    $this->packagexml->assign('id',$this->getId($element, true));
+                }
             }
         } else
         {
@@ -360,11 +442,6 @@ class XMLDocBookpeardoc2Converter extends Converter
         $this->makeLeft();
     }
     
-    function getExampleLink()
-    {
-        return '';
-    }
-    
     /**
      * This function takes an {@link abstractLink} descendant and returns an html link
      *
@@ -407,6 +484,8 @@ class XMLDocBookpeardoc2Converter extends Converter
                 if ($element->type == 'define') $eltext .= '</constant>';
                 break;
             }
+        } elseif (!is_object($element)) {
+            return false;
         } elseif ($element->type == 'method')
         {
             $eltext = str_replace($element->name . '()', $element->name, $eltext);
@@ -433,7 +512,7 @@ class XMLDocBookpeardoc2Converter extends Converter
      */
     function getId(&$el, $returnpackage = false)
     {
-        if (get_class($el) == 'parserdata')
+        if (phpDocumentor_get_class($el) == 'parserdata')
         {
             $element = $this->addLink($el->parent);
             $elp = $el->parent;
@@ -606,16 +685,20 @@ class XMLDocBookpeardoc2Converter extends Converter
 
     function getCData($value)
     {
-        return '<!CDATA['.$value.']]>';
+        return '<![CDATA['.$value.']]>';
     }
     
     function ProgramExample($listing, $tutorial = false, $inlinesourceparse = null/*false*/,
-                            $class = null/*false*/, $linenum = null/*false*/, $filesourcepath = null/*false*/)
+                            $class = null/*false*/, $linenum = null/*false*/, $filesourcepath = null/*false*/, $origsource = null)
     {
+        if ($origsource !== null) {
+            $listing = $origsource;
+        }
         if (!tokenizer_ext)
         {
             $listing = $this->getCData($listing);
         }
+        return '<programlisting role="php">' . $this->getCData($listing) . '</programlisting>';
         return parent::ProgramExample($listing, false, $inlinesourceparse, $class, $linenum, $filesourcepath);
     }
     
@@ -660,7 +743,8 @@ class XMLDocBookpeardoc2Converter extends Converter
         if ($element->subpackage) $a = PATH_DELIMITER . $element->subpackage;
         phpDocumentor_out("\n");
         flush();
-        $this->setTargetDir($this->base_dir . PATH_DELIMITER . strtolower($element->category) . PATH_DELIMITER . strtolower($element->package . $a));
+        $this->setTargetDir($this->base_dir . PATH_DELIMITER . str_replace(array('_','.'),array('-','--'),strtolower($element->category))
+          . PATH_DELIMITER . strtolower(str_replace(array('_','.'),array('-','--'),$element->package) . $a));
         $this->writeFile(str_replace(array('_','.'),array('-','--'),strtolower($element->name)).'-tutorial.xml',
             '<!-- $' . "Revision$ -->\n" . $contents);
     }
@@ -718,7 +802,6 @@ class XMLDocBookpeardoc2Converter extends Converter
         $this->category = strtolower($element->docblock->category);
         if (!empty($element->docblock->subpackage)) $this->class_dir .= PATH_DELIMITER . $element->docblock->subpackage;
         $docblock = $this->prepareDocBlock($element,false);
-        
         $this->class_data->assign("sdesc",$docblock['sdesc']);
         $this->class_data->assign("desc",$docblock['desc']);
         $this->class_data->assign("tags",$docblock['tags']);
@@ -833,7 +916,7 @@ class XMLDocBookpeardoc2Converter extends Converter
                                                   'line_number' => $element->getLineNumber(),
                                                   'params' => $params));
         $this->method_data[$i = count($this->method_data) - 1][0] = &$this->newSmarty(true);
-        $this->method_data[$i][1] = $element->getName();
+        $this->method_data[$i][1] = str_replace(array('_','.'),array('-','--'),$element->getName());
         $this->method_data[$i][0]->assign('class',$this->class);
         $this->method_data[$i][0]->assign('source_location',$this->returnSee($this->getLink(basename($this->curpage->getFile())),$this->sourceloc));
         $this->method_data[$i][0]->assign('sdesc',$docblock['sdesc']);
@@ -973,7 +1056,7 @@ class XMLDocBookpeardoc2Converter extends Converter
             $value = $this->ProgramExample($value);
         } else
         {
-            $value = $this->getGlobalValue('<!CDATA[' .$element->getValue() . ']]>');
+            $value = $this->getGlobalValue('<![CDATA[' .$element->getValue() . ']]>');
         }
         $this->_appendGlobals(array('sdesc' => $docblock['sdesc'],
                                    'desc' => $docblock['desc'],
@@ -1049,6 +1132,10 @@ class XMLDocBookpeardoc2Converter extends Converter
             $parent = $tree[$class->getName()];
             while ($parent)
             {
+                if (is_string($parent)) {
+                    $result[] = $parent;
+                    break;
+                }
                 $subpackage = $parent->docblock->subpackage;
                 $package = $parent->docblock->package;
                 $x = $parent;
@@ -1114,12 +1201,102 @@ class XMLDocBookpeardoc2Converter extends Converter
      */
     function generateFormattedClassTrees($package)
     {
-        if (!isset($this->roots[$package])) return array();
-        $roots = $trees = array();
-        $roots = $this->roots[$package];
-        for($i=0;$i<count($roots);$i++)
-        {
-            $trees[] = array('class' => $roots[$i],'class_tree' => "<ul>\n".$this->getRootTree($this->getSortedClassTreeFromClass($roots[$i],$package,''),$package)."</ul>\n");
+        if (!isset($this->roots['normal'][$package]) &&
+              !isset($this->roots['special'][$package])) {
+            return array();
+        }
+        $trees = array();
+        if (isset($this->roots['normal'][$package])) {
+            $roots = $this->roots['normal'][$package];
+            for($i=0;$i<count($roots);$i++)
+            {
+                $root = $this->classes->getClassByPackage($roots[$i], $package);
+                if ($root && $root->isInterface()) {
+                    continue;
+                }
+                $trees[] = array('class' => $roots[$i],'class_tree' => "<ul>\n".$this->getRootTree($this->getSortedClassTreeFromClass($roots[$i],$package,''),$package)."</ul>\n");
+            }
+        }
+        if (isset($this->roots['special'][$package])) {
+            $roots = $this->roots['special'][$package];
+            foreach ($roots as $parent => $classes) {
+                $thistree = '';
+                foreach ($classes as $classinfo) {
+                    $root = $this->classes->getClassByPackage($classinfo, $package);
+                    if ($root && $root->isInterface()) {
+                        continue;
+                    }
+                    $thistree .=
+                        $this->getRootTree(
+                            $this->getSortedClassTreeFromClass(
+                                $classinfo,
+                                $package,
+                                ''),
+                            $package,
+                            true);
+                }
+                if (!$thistree) {
+                    continue;
+                }
+                $trees[] = array(
+                    'class' => $parent,
+                    'class_tree' => "<ul>\n" . $thistree . "</ul>\n"
+                );
+            }
+        }
+        return $trees;
+    }
+
+    /**
+     * returns a template-enabled array of interface inheritance trees
+     * 
+     * @param    string    $package    package to generate a class tree for
+     * @see $roots, HTMLConverter::getRootTree()
+     */
+    function generateFormattedInterfaceTrees($package)
+    {
+        if (!isset($this->roots['normal'][$package]) &&
+              !isset($this->roots['special'][$package])) {
+            return array();
+        }
+        $trees = array();
+        if (isset($this->roots['normal'][$package])) {
+            $roots = $this->roots['normal'][$package];
+            for($i=0;$i<count($roots);$i++)
+            {
+                $root = $this->classes->getClassByPackage($roots[$i], $package);
+                if ($root && !$root->isInterface()) {
+                    continue;
+                }
+                $trees[] = array('class' => $roots[$i],'class_tree' => "<ul>\n".$this->getRootTree($this->getSortedClassTreeFromClass($roots[$i],$package,''),$package)."</ul>\n");
+            }
+        }
+        if (isset($this->roots['special'][$package])) {
+            $roots = $this->roots['special'][$package];
+            foreach ($roots as $parent => $classes) {
+                $thistree = '';
+                foreach ($classes as $classinfo) {
+                    $root = $this->classes->getClassByPackage($classinfo, $package);
+                    if ($root && !$root->isInterface()) {
+                        continue;
+                    }
+                    $thistree .=
+                        $this->getRootTree(
+                            $this->getSortedClassTreeFromClass(
+                                $classinfo,
+                                $package,
+                                ''),
+                            $package,
+                            true);
+                }
+                if (!$thistree) {
+                    continue;
+                }
+                $trees[] = array(
+                    'class' => $parent,
+                    'class_tree' => "<ul>\n" . $thistree . "</ul>\n"
+                );
+            }
         }
         return $trees;
     }
@@ -1128,10 +1305,12 @@ class XMLDocBookpeardoc2Converter extends Converter
      * return formatted class tree for the Class Trees page
      *
      * @param array $tree output from {@link getSortedClassTreeFromClass()}
+     * @param string $package  package
+     * @param boolean $nounknownparent if true, an object's parent will not be checked
      * @see Classes::$definitechild, generateFormattedClassTrees()
      * @return string
      */
-    function getRootTree($tree,$package)
+    function getRootTree($tree, $package, $noparent = false)
     {
         if (!$tree) return '';
         $my_tree = '';
@@ -1139,7 +1318,7 @@ class XMLDocBookpeardoc2Converter extends Converter
         $lastcur = array(false);
         $kids = array();
         $dopar = false;
-        if ($tree[$cur]['parent'])
+        if (!$noparent && $tree[$cur]['parent'])
         {
             $dopar = true;
             if (!is_object($tree[$cur]['parent']))

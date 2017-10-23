@@ -32,7 +32,7 @@
  * @author     Roman Dostovalov, Com-tec-so S.A.<roman.dostovalov@ctco.lv>
  * @copyright  2004-2006 Roman Dostovalov
  * @license    http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version    CVS: $Id: Object.php,v 1.4 2006/01/26 17:27:46 quipo Exp $
+ * @version    CVS: $Id: Object.php,v 1.5 2006/05/01 15:47:27 quipo Exp $
  * @link       http://pear.php.net/package/DB_QueryTool
  */
 
@@ -93,6 +93,9 @@ class DB_QueryTool_Result_Object extends DB_QueryTool_Result
 	{
 		$arr = $this->getNext();
 		if (!PEAR::isError($arr)) {
+		    if (is_scalar($arr)) {
+                return $arr;
+            }
 		    $row = new DB_QueryTool_Result_Row($arr);
 			return $row;
 		}

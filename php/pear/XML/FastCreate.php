@@ -21,7 +21,7 @@
  * @author     Guillaume Lecanu <Guillaume@dev.fr>
  * @copyright  1997-2005 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: FastCreate.php,v 1.5 2005/03/31 15:14:55 guillaume Exp $
+ * @version    CVS: $Id: FastCreate.php,v 1.7 2005/12/10 17:26:54 guillaume Exp $
  * @link       http://pear.php.net/package/XML_FastCreate
  * @see        XML_Tree
  */
@@ -105,11 +105,11 @@ define('XML_FASTCREATE_DOCTYPE_HTML_4_01_Frameset',
  * Make a special class for overloading, depending of the PHP version.
  * The class XML_FastCreate extend this special class 'XML_FastCreate_Overload'
  */
-if (isSet($_GLOBALS['XML_FASTCREATE_NO_OVERLOAD']) 
-    && $_GLOBALS['XML_FASTCREATE_NO_OVERLOAD']) {
-    if (is_array($_GLOBALS['XML_FASTCREATE_NO_OVERLOAD'])) {
+if (isSet($GLOBAALS['XML_FASTCREATE_NO_OVERLOAD']) 
+    && $GLOBAALS['XML_FASTCREATE_NO_OVERLOAD']) {
+    if (is_array($GLOBAALS['XML_FASTCREATE_NO_OVERLOAD'])) {
         $class = 'class XML_FastCreate_Overload extends PEAR {';
-        foreach ($_GLOBALS['XML_FASTCREATE_NO_OVERLOAD'] as $tag) {
+        foreach ($GLOBAALS['XML_FASTCREATE_NO_OVERLOAD'] as $tag) {
             $class .= <<<TEXT
             function $tag() { 
                 \$args = func_get_args();
@@ -202,7 +202,7 @@ TEXT;
  * @author     Guillaume Lecanu <Guillaume@dev.fr>
  * @copyright  1997-2005 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: FastCreate.php,v 1.5 2005/03/31 15:14:55 guillaume Exp $
+ * @version    CVS: $Id: FastCreate.php,v 1.7 2005/12/10 17:26:54 guillaume Exp $
  * @link       http://pear.php.net/package/XML_FastCreate
  * @see        XML_Tree
  */
@@ -282,22 +282,6 @@ class XML_FastCreate extends XML_FastCreate_Overload
     */
     var $_replaces = array('&amp;', '&lt;', '&gt;', '&quot;', '&apos;');
         
-    /*
-    * String representation of the carriage return
-    *
-    * @var      string
-    * @access   public
-    */
-    var $cr;
-    
-    /*
-    * String representation of a tabulation
-    *
-    * @var      string
-    * @access   public
-    */
-    var $tab;
-    
     // }}}
     // {{{ factory()
     
@@ -418,8 +402,6 @@ class XML_FastCreate extends XML_FastCreate_Overload
                 array_pop($this->_entities);
                 array_pop($this->_replaces);
             }
-            $this->cr  = chr(13).chr(10);
-            $this->tab = chr(9);
 
         } else {
             PEAR::raiseError("Use the factory() method please.",

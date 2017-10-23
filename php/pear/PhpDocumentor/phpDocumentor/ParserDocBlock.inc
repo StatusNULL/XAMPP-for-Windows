@@ -1,26 +1,40 @@
 <?php
-//
-// +------------------------------------------------------------------------+
-// | phpDocumentor                                                          |
-// +------------------------------------------------------------------------+
-// | Copyright (c) 2000-2003 Joshua Eichorn, Gregory Beaver                 |
-// | Email         jeichorn@phpdoc.org, cellog@phpdoc.org                   |
-// | Web           http://www.phpdoc.org                                    |
-// | Mirror        http://phpdocu.sourceforge.net/                          |
-// | PEAR          http://pear.php.net/package-info.php?pacid=137           |
-// +------------------------------------------------------------------------+
-// | This source file is subject to version 3.00 of the PHP License,        |
-// | that is available at http://www.php.net/license/3_0.txt.               |
-// | If you did not receive a copy of the PHP license and are unable to     |
-// | obtain it through the world-wide-web, please send a note to            |
-// | license@php.net so we can mail you a copy immediately.                 |
-// +------------------------------------------------------------------------+
-//
-
 /**
  * DocBlock Parser Classes
- * @package phpDocumentor
+ * 
+ * phpDocumentor :: automatic documentation generator
+ * 
+ * PHP versions 4 and 5
+ *
+ * Copyright (c) 2002-2006 Gregory Beaver
+ * 
+ * LICENSE:
+ * 
+ * This library is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation;
+ * either version 2.1 of the License, or (at your option) any
+ * later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ *
+ * @package    phpDocumentor
  * @subpackage ParserDocBlock
+ * @author     Gregory Beaver <cellog@php.net>
+ * @copyright  2002-2006 Gregory Beaver
+ * @license    http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @version    CVS: $Id: ParserDocBlock.inc,v 1.9 2006/08/17 03:46:58 cellog Exp $
+ * @link       http://www.phpdoc.org
+ * @link       http://pear.php.net/PhpDocumentor
+ * @see        Parser, WordParser
+ * @since      1.0rc1
  */
 /**
  * represents a short or long description in a DocBlock ({@link parserDocBlock})
@@ -28,12 +42,12 @@
  * @subpackage ParserDocBlock
  * @author Greg Beaver <cellog@users.sourceforge.net>
  * @since 1.0rc1
- * @version $Id: ParserDocBlock.inc,v 1.38.2.7 2003/07/24 20:22:43 CelloG Exp $
+ * @version $Id: ParserDocBlock.inc,v 1.9 2006/08/17 03:46:58 cellog Exp $
  */
 class parserDesc extends parserStringWithInlineTags
 {
     /**
-     * Type is used by many functions to skip the hassle of if get_class($blah) == 'parserBlah'
+     * Type is used by many functions to skip the hassle of if phpDocumentor_get_class($blah) == 'parserBlah'
      * always '_desc'
      * @var string
      */
@@ -47,8 +61,8 @@ class parserDesc extends parserStringWithInlineTags
     {
         if (is_object($stringOrClass))
         {
-            if (get_class($stringOrClass) == 'parserstringwithinlinetags' ||
-                get_class($stringOrClass) == 'parserdesc')
+            if (phpDocumentor_get_class($stringOrClass) == 'parserstringwithinlinetags' ||
+                phpDocumentor_get_class($stringOrClass) == 'parserdesc')
             {
                 for($i=0;$i<count($stringOrClass->value);$i++)
                 {
@@ -68,7 +82,7 @@ class parserDesc extends parserStringWithInlineTags
     {
         for($i=0;$i<count($this->value);$i++)
         {
-            if (get_class($this->value[$i])=='parserinheritdocinlinetag') return true;
+            if (phpDocumentor_get_class($this->value[$i])=='parserinheritdocinlinetag') return true;
         }
     }
     
@@ -79,7 +93,7 @@ class parserDesc extends parserStringWithInlineTags
     {
         for($i=0;$i<count($this->value);$i++)
         {
-            if (get_class($this->value[$i])=='parsersourceinlinetag') return true;
+            if (phpDocumentor_get_class($this->value[$i])=='parsersourceinlinetag') return true;
         }
     }
     
@@ -93,7 +107,7 @@ class parserDesc extends parserStringWithInlineTags
         $this->value = array();
         for($i=0;$i<count($value);$i++)
         {
-            if (get_class($value[$i])=='parserinheritdocinlinetag')
+            if (phpDocumentor_get_class($value[$i])=='parserinheritdocinlinetag')
             {
                 for($j=0;$j<count($desc->value);$j++)
                 {
@@ -110,7 +124,7 @@ class parserDesc extends parserStringWithInlineTags
  * @subpackage ParserDocBlock
  * @author Greg Beaver <cellog@users.sourceforge.net>
  * @since 1.0rc1
- * @version $Id: ParserDocBlock.inc,v 1.38.2.7 2003/07/24 20:22:43 CelloG Exp $
+ * @version $Id: ParserDocBlock.inc,v 1.9 2006/08/17 03:46:58 cellog Exp $
  */
 class parserDocBlock
 {
@@ -305,6 +319,16 @@ class parserDocBlock
     }
     
     /**
+     * Tells the DocBlock it can't have a @filesource tag
+     *
+     * Only page-level DocBlocks may have a @filesource tag
+     */
+    function cantSource()
+    {
+        $this->_canSource = false;
+    }
+    
+    /**
      * Indirectly called after parsing by {@link postProcess}
      *
      * @param integer either 1 for long desc or 2 for short desc
@@ -322,6 +346,38 @@ class parserDocBlock
     }
     
     /**
+     * @param array
+     */
+    function updateModifiers($modifiers)
+    {
+        if (is_array($modifiers) && count($modifiers))
+        {
+            foreach ($modifiers as $modifier)
+            {
+                switch ($modifier)
+                {
+                    case 'private' :
+                    case 'public' :
+                    case 'protected' :
+                        unset($this->tags['access']);
+                        $x = new parserAccessTag($modifier);
+                        if ($x->isvalid)
+                        {
+                            $this->hasaccess = true;
+                            $this->tags['access'][] = $x;
+                        }
+                    break;
+                    case 'static' :
+                    case 'abstract' :
+                        unset($this->tags[$modifier]);
+                        $this->addKeyword($modifier, '');
+                    break;
+                }
+            }
+        }
+    }
+    
+    /**
      * Set the short description of the DocBlock
      *
      * Setting the short description is possible by passing in one of three
@@ -335,15 +391,15 @@ class parserDocBlock
      */
     function setShortDesc($desc)
     {
-        if (get_class($desc) == 'parsertag')
+        if (phpDocumentor_get_class($desc) == 'parsertag')
         {
             $this->sdesc = new parserDesc;
             $this->processed_sdesc = $desc->value;
             return;
         }
-        if (get_class($desc) == 'parserdesc')
-                    $this->sdesc = $desc;
-        else
+        if (phpDocumentor_get_class($desc) == 'parserdesc') {
+            $this->sdesc = $desc;
+        } else
         {
             $this->sdesc = $desc->sdesc;
             $this->processed_sdesc = $desc->processed_sdesc;
@@ -377,7 +433,7 @@ class parserDocBlock
      */
     function setDesc($desc)
     {
-        if (get_class($desc) == 'parserdesc')
+        if (phpDocumentor_get_class($desc) == 'parserdesc')
         $this->desc = $desc;
         else
         {
@@ -464,30 +520,57 @@ class parserDocBlock
         else
         $this->params[$paramVar] = new parserParamTag($paramType,$value);
     }
-    
+
+    function resetParams()
+    {
+        $this->params = array();
+    }
     /**
      * @param integer $index index of parameter in the {@link $params} array
      * @param string $name name of the parameter to set in the $params array
+     * @param string|null $type type of the parameter
      */
-    function changeParam($index,$name)
+    function changeParam($index, $name, $type)
     {
+        if ($name === $index) {
+            return;
+        }
         $this->params[$name] = $this->params[$index];
         unset($this->params[$index]);
     }
     
     /**
      * replaces nameless parameters in the {@link $params} array with their names
-     * @param array $params Format: array(parameter index => parameter name,...)
+     * add @param tags for params in the function with no entry
+     * @param array $params Format: array(parameter key =>
+     *                      array(0 => parameter name[,1 => default value][,2 => type hint]),...)
      */
     function updateParams($params)
     {
-        for($i=0;$i<count($params);$i++)
+        $countparams = array_values($params);
+        reset($params);
+        for($i=0;$i<count($countparams);$i++, next($params))
         {
             if (isset($this->params[$i]))
             {
-                $this->changeParam($i,$params[$i]);
+                $info = current($params);
+                $type = isset($info[2]) ? $info[2] : null;
+                $this->changeParam($i, key($params), $type);
+                $params[key($params)] = false;
             }
         }
+        $blank = new parserStringWithInlineTags;
+        foreach ($params as $key => $info) {
+            if (!$info) {
+                continue;
+            }
+            $type = isset($info[2]) ? $info[2] : null;
+            if (!isset($this->params[$info[0]])) {
+                $this->addParam($info[0], $type, $blank);
+            }
+        }
+        reset($params);
+        
         if (isset($this->tags))
         unset($this->tags['param']);
     }
@@ -520,6 +603,7 @@ class parserDocBlock
     function addKeyword($keyword, $value)
     {
         global $_phpDocumentor_setting;
+        $keyword = trim($keyword);
         if (phpDocumentor_setup::checkIgnoreTag($keyword)) return;
         // don't add the tag at all if it was specified to ignore it with --ignore-tags
         if ($keyword == 'package' || $keyword == 'subpackage' || $keyword == 'category') return $this->addPackage($keyword, $value);
@@ -533,11 +617,13 @@ class parserDocBlock
         else
         {
         if ($keyword == 'internal' && (!isset($_phpDocumentor_setting['parseprivate']) || $_phpDocumentor_setting['parseprivate'] == 'off')) return;
-            $ptag = 'parser'.ucfirst($keyword).'Tag';
+            if (!isset($this->tags[$keyword])) {
+                $this->tags[$keyword] = array();
+            }
+            $ptag = 'parserTag';
             if (class_exists('parser'.$keyword.'tag'))
-            $this->tags[$keyword][] = new $ptag($keyword, $value);
-            else
-            $this->tags[$keyword][] = new parserTag($keyword, $value);
+                $ptag = 'parser'.ucfirst($keyword).'Tag';
+            array_unshift($this->tags[$keyword], new $ptag($keyword, $value));
         }
     }
     
@@ -569,7 +655,7 @@ class parserDocBlock
      * @param string
      * @param string
      * @param string element name
-     * @param string element type (include, define, var, method, global, function)
+     * @param string element type (include, define, var, method, global, function, const)
      */
     function overridePackage($category, $package,$subpackage,$elname,$type)
     {
@@ -646,7 +732,7 @@ class parserDocBlock
                 if (count($value) - 1)
                 {
                     $rest = $value;
-                    $value = $value[0];
+                    $value = trim($value[0]);
                     unset($rest[0]);
                     $rest = implode($rest,' ');
                 } else
@@ -655,28 +741,12 @@ class parserDocBlock
                     if (count($value) - 1)
                     {
                         $rest = $value;
-                        $value = $value[0];
+                        $value = trim($value[0]);
                         unset($rest[0]);
                         $rest = implode($rest,"\t");
-                    } else $value = $value[0];
+                    } else $value = trim($value[0]);
                 }
-                preg_match("/^([a-zA-Z0-9\-_\.\[\]]+)$/",$value,$match);
-                if (!isset($match[0]))
-                {
-                    // if were a single line and the only bad character is a space then will fix things for them
-                    preg_match("/^([a-zA-Z0-9\-_\.\[\]\/\\: ]+)$/",$value,$match);
-                    if (!isset($match[0]))
-                    {
-                        addError(PDERROR_ILLEGAL_PACKAGENAME,'package','package',$value);
-                        $value = $GLOBALS['phpDocumentor_DefaultPackageName'];
-                    }
-                    else
-                    {
-                        $value = 
-                            str_replace(array(" ","/","\\",":"),"_",
-                                trim($value));
-                    }
-                }
+                $value = preg_replace('/[^\[\]0-9\-a-zA-Z_\x7f-\xff]/', '-', $value);
                 $this->packagedescrip = $this->package = trim($value);
                 if (!empty($rest)) $this->packagedescrip = $rest;
             } else
@@ -713,23 +783,7 @@ class parserDocBlock
                 }
                 if (!empty($value))
                 {
-                    preg_match("/^([a-zA-Z0-9\-_\.\[\]]+)$/",$value,$match);
-                    if (!isset($match[0]))
-                    {
-                        // if were a single line and the only bad character is a space then will fix things for them
-                        preg_match("/^([a-zA-Z0-9\-_\.\[\]\/\\: ]+)$/",$value,$match);
-                        if (!isset($match[0]))
-                        {
-                            addError(PDERROR_ILLEGAL_PACKAGENAME,'subpackage','subpackage',$value);
-                            $value = '';
-                        }
-                        else
-                        {
-                            $value = 
-                                str_replace(array(" ","/","\\",":"),"_",
-                                    trim($value));
-                        }
-                    }
+                    $value = preg_replace('/[^\[\]0-9\-a-zA-Z_\x7f-\xff]/', '-', $value);
                 }
                 $this->subpackage = trim($value);
                 if (!empty($rest)) $this->subpackagedescrip = $rest;
@@ -746,6 +800,7 @@ class parserDocBlock
             {
                 if (!is_string($value))
                 $value = $value->getString();
+                $value = preg_replace('/[^\[\]0-9\-a-zA-Z_\x7f-\xff]/', '-', $value);
                 $this->category = $value;
             } else
             {
@@ -963,8 +1018,22 @@ class parserDocBlock
     function addUses($seeel, $description)
     {
         $this->tags['uses'][] = new parserUsesTag($seeel, $description);
+        usort($this->tags['uses'], array($this, '_sortUses'));
     }
-    
+
+    /**
+     * Custom sorting function for sorting @uses tags
+     *
+     * @param parserTag $a
+     * @param parserTag $b
+     * @access private
+     * @return int
+     */
+    function _sortUses($a, $b)
+    {
+        return strnatcasecmp($a->getString(), $b->getString());
+    }
+
     /**
      * @param string
      * @return mixed false if no keyword, unconverted value if one keyword, array of unconverted values if more than one keyword
@@ -1029,7 +1098,7 @@ class parserDocBlock
  */
 function tagsort($a, $b)
 {
-    switch(get_class($a))
+    switch(phpDocumentor_get_class($a))
     {
         case 'parsertag' :
             switch ($a->keyword)
@@ -1077,7 +1146,7 @@ function tagsort($a, $b)
             $o = 12;
             break;
     }
-    switch(get_class($b))
+    switch(phpDocumentor_get_class($b))
     {
         case 'parsertag' :
             switch ($b->keyword)

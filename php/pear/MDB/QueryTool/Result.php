@@ -32,7 +32,7 @@
  * @author     Lorenzo Alberton <l dot alberton at quipo dot it>
  * @copyright  2003-2006 Lorenzo Alberton
  * @license    http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version    CVS: $Id: Result.php,v 1.9 2006/01/26 17:10:17 quipo Exp $
+ * @version    CVS: $Id: Result.php,v 1.13 2006/12/18 23:05:21 hugoki Exp $
  * @link       http://pear.php.net/package/MDB_QueryTool
  */
 
@@ -77,6 +77,12 @@ class MDB_QueryTool_Result
      * @var array
      */
     var $_counter = null;
+    
+    /**
+     * True if the data is a collection of rows, false if it's a single record
+     * @var boolean
+     */
+    var $_is_collection_of_rows = false;
 
     // }}}
     // {{{ MDB_QueryTool_Result()
@@ -89,11 +95,11 @@ class MDB_QueryTool_Result
      */
     function MDB_QueryTool_Result($data)
     {
+        $this->_checkIfCollectionOfRows($data);
         if (!count($data)) {
             $this->_count = 0;
         } else {
-            list($firstElement) = $data;
-            if (is_array($firstElement)) { // is the array a collection of rows?
+            if ($this->_is_collection_of_rows) {
                 $this->_count = sizeof($data);
             } else {
                 if (sizeof($data) > 0) {
@@ -107,20 +113,51 @@ class MDB_QueryTool_Result
     }
 
     // }}}
+    // {{{ _checkIfCollectionOfRows
+    
+    /**
+     * Check if the result is a single record or a collection of rows
+     * @access private
+     */
+    function _checkIfCollectionOfRows($data)
+    {
+        if (is_array($data)) {
+            $this->_is_collection_of_rows = is_array(array_pop($data));
+        }
+    }
+
+    // }}}
+    // {{{ _returnRowOrValue
+
+    /**
+     * Check if the row is a single value with a numeric index.
+     * If so, return the value straight away, since the user probably
+     * called getCol() or getOne().
+     * @access protected
+     */
+    function _returnRowOrValue($data)
+    {
+        if ((count($data) == 1) && is_numeric(key($data))) {
+            return array_pop($data);
+        }
+        return $data;
+    }
+
+    // }}}
     // {{{ numRows
 
-	/**
-	 * return the number of rows returned. This is an alias for getCount().
-	 *
-	 * @access    public
-	 * @return    integer
-	 */
-	function numRows()
-	{
-	    return $this->_count;
-	}
+    /**
+     * return the number of rows returned. This is an alias for getCount().
+     *
+     * @access    public
+     * @return    integer
+     */
+    function numRows()
+    {
+        return $this->_count;
+    }
 
-	// }}}
+    // }}}
     // {{{ getCount()
 
     /**
@@ -169,9 +206,12 @@ class MDB_QueryTool_Result
     function getFirst()
     {
         if ($this->getCount() > 0) {
-            $this->_dataKeys = array_keys($this->_data);
-            $this->_counter = 0;
-            return $this->_data[$this->_dataKeys[$this->_counter]];
+            if ($this->_is_collection_of_rows) {
+                $this->_dataKeys = array_keys($this->_data);
+                $this->_counter = 0;
+                return $this->_returnRowOrValue($this->_data[$this->_dataKeys[$this->_counter]]);
+            }
+            return $this->_returnRowOrValue($this->_data);
         }
         return new PEAR_Error('there are no elements!');
     }
@@ -189,11 +229,11 @@ class MDB_QueryTool_Result
     function getNext()
     {
         if (!$this->initDone()) {
-    		return $this->getFirst();
-    	}
+            return $this->getFirst();
+        }
         if ($this->hasMore()) {
             $this->_counter++;
-            return $this->_data[$this->_dataKeys[$this->_counter]];
+            return $this->_returnRowOrValue($this->_data[$this->_dataKeys[$this->_counter]]);
         }
         return new PEAR_Error('there are no more elements!');
     }
@@ -216,46 +256,44 @@ class MDB_QueryTool_Result
     }
 
     // }}}
-	// {{{ fetchRow
+    // {{{ fetchRow
 
-	/**
-	 * This function emulates PEAR_MDB fetchRow() method.
-	 * With this method, MDB_QueryTool can transparently replace PEAR::MDB
-	 *
-	 * @todo implement fetchmode support?
-	 * @access    public
-	 * @return    void
-	 */
-	function fetchRow()
-	{
-		if ($this->hasMore()) {
-    		$arr = $this->getNext();
-    		if (!PEAR::isError($arr)) {
-    		    return $arr;
-    		}
-    	}
-    	return false;
-	}
+    /**
+     * This function emulates PEAR_MDB fetchRow() method.
+     * With this method, MDB_QueryTool can transparently replace PEAR::MDB
+     *
+     * @todo implement fetchmode support?
+     * @access    public
+     * @return    void
+     */
+    function fetchRow()
+    {
+        $arr = $this->getNext();
+        if (!PEAR::isError($arr)) {
+            return $arr;
+        }
+        return false;
+    }
 
     // }}}
-	// {{{ initDone
+    // {{{ initDone
 
-	/**
-	 * Helper method. Check if $this->_dataKeys has been initialized
-	 *
-	 * @return boolean
-	 * @access private
-	 */
-	function initDone()
-	{
-	    return (
-	        isset($this->_dataKeys) &&
+    /**
+     * Helper method. Check if $this->_dataKeys has been initialized
+     *
+     * @return boolean
+     * @access private
+     */
+    function initDone()
+    {
+        return (
+            isset($this->_dataKeys) &&
             is_array($this->_dataKeys) &&
             count($this->_dataKeys)
         );
-	}
+    }
 
-	// }}}
+    // }}}
 
     #TODO
     #function getPrevious()

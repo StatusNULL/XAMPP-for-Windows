@@ -4,28 +4,31 @@
  *
  * PHP versions 4 and 5
  *
- * LICENSE: This source file is subject to version 3.0 of the PHP license
+ * LICENSE: This source file is subject to version 3.01 of the PHP license
  * that is available through the world-wide-web at the following URI:
- * http://www.php.net/license/3_0.txt.  If you did not receive a copy of
+ * http://www.php.net/license/3_01.txt.  If you did not receive a copy of
  * the PHP License and are unable to obtain it through the web, please
  * send a note to license@php.net so we can mail you a copy immediately.
  *
  * @category   HTML
  * @package    HTML_Progress2
  * @author     Laurent Laville <pear@laurent-laville.org>
- * @copyright  1997-2005 The PHP Group
- * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Progress2.php,v 1.17 2005/09/25 16:19:11 farell Exp $
+ * @copyright  2005-2007 The PHP Group
+ * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
+ * @version    CVS: $Id: Progress2.php,v 1.33 2007/01/03 16:44:05 farell Exp $
  * @link       http://pear.php.net/package/HTML_Progress2
  * @since      File available since Release 2.0.0RC1
  */
 
 require_once 'HTML/Common.php';
+require_once 'HTML/CSS.php';
 require_once 'Event/Dispatcher.php';
-require_once 'PHP/Compat.php';
 
-PHP_Compat::loadFunction('ob_get_clean');
-PHP_Compat::loadConstant('PHP_EOL');
+if (version_compare(phpversion(), '5.0.0', '<')) {
+    include_once 'PHP/Compat.php';
+    PHP_Compat::loadFunction('ob_get_clean');
+    PHP_Compat::loadConstant('PHP_EOL');
+}
 
 /**#@+
  * Progress Bar shape types
@@ -129,9 +132,9 @@ define ('HTML_PROGRESS2_ERROR_INVALID_OPTION',   -103);
  * @category   HTML
  * @package    HTML_Progress2
  * @author     Laurent Laville <pear@laurent-laville.org>
- * @copyright  1997-2005 The PHP Group
- * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    Release: 2.0.0
+ * @copyright  2005-2007 The PHP Group
+ * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
+ * @version    Release: 2.2.0
  * @link       http://pear.php.net/package/HTML_Progress2
  * @since      Class available since Release 2.0.0RC1
  */
@@ -694,7 +697,7 @@ class HTML_Progress2 extends HTML_Common
      */
     function apiVersion()
     {
-        return '2.0.0';
+        return '2.2.0';
     }
 
     /**
@@ -1720,7 +1723,7 @@ class HTML_Progress2 extends HTML_Common
 
         $options = array_merge($default, $attributes);
 
-        foreach($options as $prop => $val) {
+        foreach ($options as $prop => $val) {
             if (in_array($prop, $allowed_options)) {
                 $this->frame[$prop] = $val;
             } else {
@@ -2083,7 +2086,7 @@ class HTML_Progress2 extends HTML_Common
      * Get the javascript URL or inline code that will handle the progress meter
      * refresh.
      *
-     * @param      boolean   (optional) html output with script tags or just raw data
+     * @param      boolean   $raw           (optional) html output with script tags or just raw data
      *
      * @return     string
      * @since      2.0.0
@@ -2117,58 +2120,56 @@ class HTML_Progress2 extends HTML_Common
 function setProgress(pIdent, pValue, pDeterminate, pCellCount)
 {
     if (pValue == pDeterminate) {
-        for (i=0; i < pCellCount; i++) {
-            showCell(i, pIdent, 'hidden');
+        for (var i = 0; i < pCellCount; i++) {
+            showCell(i, pIdent, 'I');
         }
     }
     if ((pDeterminate > 0) && (pValue > 0)) {
-        i = (pValue - 1) % pCellCount;
-        showCell(i, pIdent, 'visible');
+        var i = (pValue - 1) % pCellCount;
+        showCell(i, pIdent, 'A');
     } else {
-        for (i = pValue - 1; i >=0; i--) {
-            showCell(i, pIdent, 'visible');
+        for (var i = pValue - 1; i >= 0; i--) {
+            showCell(i, pIdent, 'A');
         }
     }
 }
 
 function showCell(pCell, pIdent, pVisibility)
 {
-    name = '%progressCell%' + pCell + 'A' + pIdent;
-    document.getElementById(name).style.visibility = pVisibility;
+    var name = '%progressCell%' + pCell + pIdent;
+    var cellElement = document.getElementById(name);
+    cellElement.className = '%cellCN%' + pIdent + pVisibility;
 }
 
-function hideProgress(pIdent, pCellCount)
+function hideProgress(pIdent)
 {
-    name = 'tfrm' + pIdent;
-    document.getElementById(name).style.visibility = 'hidden';
-    for (i = 0; i < pCellCount; i++) {
-        showCell(i, pIdent, 'hidden');
-    }
+    var name = 'tfrm' + pIdent;
+    var tfrm = document.getElementById(name);
+    tfrm.style.visibility = "hidden";
 }
 
 function setLabelText(pIdent, pName, pText)
 {
-    name = 'plbl' + pName + pIdent;
+    var name = 'plbl' + pName + pIdent;
     document.getElementById(name).firstChild.nodeValue = pText;
 }
 
 function setElementStyle(pPrefix, pName, pIdent, pStyles)
 {
-    name = pPrefix + pName + pIdent;
-    styles = pStyles.split(';');
+    var name = pPrefix + pName + pIdent;
+    var styles = pStyles.split(';');
     styles.pop();
-    for (i = 0; i < styles.length; i++)
-    {
-        s = styles[i].split(':');
-        c = 'document.getElementById(name).style.' + s[0] + '="' + s[1] + '"';
+    for (var i = 0; i < styles.length; i++) {
+        var s = styles[i].split(':');
+        var c = 'document.getElementById(name).style.' + s[0] + '="' + s[1] + '"';
         eval(c);
     }
 }
 
 function setRotaryCross(pIdent, pName)
 {
-    name = 'plbl' + pName + pIdent;
-    cross = document.getElementById(name).firstChild.nodeValue;
+    var name = 'plbl' + pName + pIdent;
+    var cross = document.getElementById(name).firstChild.nodeValue;
     switch(cross) {
         case "--": cross = "\\\\"; break;
         case "\\\\": cross = "|"; break;
@@ -2180,8 +2181,11 @@ function setRotaryCross(pIdent, pName)
 
 JS;
         $cellAttr = $this->getCellAttributes();
-        $attr = trim(sprintf($cellAttr['id'], '   '));
-        $js = str_replace('%progressCell%', $attr, $js);
+        $attr = array(
+            trim(sprintf($cellAttr['id'], '   ')),
+            trim(sprintf($cellAttr['class'], ' '))
+            );
+        $js = str_replace(array('%progressCell%', '%cellCN%'), $attr, $js);
 
         if ($raw !== true) {
             $js = '<script type="text/javascript">' . PHP_EOL
@@ -2257,7 +2261,7 @@ JS;
                       'paramnum' => 1));
         }
 
-        include_once 'Image/Color.php';
+        require_once 'Image/Color.php';
 
         $cellAttr  = $this->getCellAttributes();
         $w = $cellAttr['width'];
@@ -2277,9 +2281,9 @@ JS;
 
         $image = imagecreate($w, $h);
 
-        $bg     = Image_Color::allocateColor($image,$cellAttr['background-color']);
-        $colorA = Image_Color::allocateColor($image,$cellAttr['active-color']);
-        $colorI = Image_Color::allocateColor($image,$cellAttr['inactive-color']);
+        $bg     = Image_Color::allocateColor($image, $cellAttr['background-color']);
+        $colorA = Image_Color::allocateColor($image, $cellAttr['active-color']);
+        $colorI = Image_Color::allocateColor($image, $cellAttr['inactive-color']);
 
         imagefilledarc($image, $cx, $cy, $w, $h, 0, 360, $colorI, IMG_ARC_EDGED);
         $filename = $dir . DIRECTORY_SEPARATOR . sprintf($fileMask,0);
@@ -2374,7 +2378,7 @@ JS;
      *
      * Get the CSS required to display the progress meter in a HTML document.
      *
-     * @param      boolean   (optional) html output with script tags or just raw data
+     * @param      boolean   $raw           (optional) html output with script tags or just raw data
      *
      * @return     string
      * @since      2.0.0
@@ -2391,99 +2395,223 @@ JS;
                       'paramnum' => 1));
         }
 
-        $tab = $this->_getTab();
         $progressAttr = $this->getProgressAttributes();
         $borderAttr = $this->getBorderAttributes();
         $cellAttr = $this->getCellAttributes();
 
-        $styles  = '.' . sprintf($borderAttr['class'], $this->ident) . ' {' . PHP_EOL;
-        $styles .= $tab . 'width: '. $progressAttr['width'] .'px;'. PHP_EOL;
-        $styles .= $tab . 'height: '. $progressAttr['height'] .'px;'. PHP_EOL;
+        $css = new HTML_CSS();
+
+        $borderCls = '.' . sprintf($borderAttr['class'], $this->ident);
+        $css->setStyle($borderCls, 'width', $progressAttr['width'].'px');
+        $css->setStyle($borderCls, 'height', $progressAttr['height'].'px');
         if ($this->isBorderPainted()) {
-            $styles .= $tab . 'border-width: '. $borderAttr['width'] .'px;'. PHP_EOL;
-            $styles .= $tab . 'border-style: '. $borderAttr['style'] .';'. PHP_EOL;
-            $styles .= $tab . 'border-color: '. $borderAttr['color'] .';'. PHP_EOL;
+            $css->setStyle($borderCls, 'border-width', $borderAttr['width'].'px');
+            $css->setStyle($borderCls, 'border-style', $borderAttr['style']);
+            $css->setStyle($borderCls, 'border-color', $borderAttr['color']);
         }
         if ($progressAttr['background-image'] !== 'none') {
-            $styles .= $tab . 'background-image: url('. $progressAttr['background-image'] .');'. PHP_EOL;
-            $styles .= $tab . 'background-repeat: '. $progressAttr['background-repeat'] .';'. PHP_EOL;
-            $styles .= $tab . 'background-position: '. $progressAttr['background-position'] .';'. PHP_EOL;
+            $css->setStyle($borderCls, 'background-image', 'url("'. $progressAttr['background-image'] .'")');
+            $css->setStyle($borderCls, 'background-repeat', $progressAttr['background-repeat']);
+            $css->setStyle($borderCls, 'background-position', $progressAttr['background-position']);
         }
-
         if ($this->cellCount > 0) {
-            $styles .= $tab . 'background-color: '. $progressAttr['background-color'] .';'. PHP_EOL;
+            $css->setStyle($borderCls, 'background-color', $progressAttr['background-color']);
         } else {
-            $styles .= $tab . 'background-color: '. $cellAttr['inactive-color'] .';'. PHP_EOL;
+            $css->setStyle($borderCls, 'background-color', $cellAttr['inactive-color']);
         }
-        $styles .= '}'. PHP_EOL . PHP_EOL;
 
         foreach($this->label as $name => $data) {
-            $styles .= '.' . sprintf($data['class'], $name . $this->ident). ' {' . PHP_EOL;
+            $style = '.' . sprintf($data['class'], $name . $this->ident);
 
             if ($data['width'] > 0) {
-                $styles .= $tab . 'width: '. $data['width'] .'px;'. PHP_EOL;
+                $css->setStyle($style, 'width', $data['width'].'px');
             }
             if ($data['height'] > 0) {
-                $styles .= $tab . 'height: '. $data['height'] .'px;'. PHP_EOL;
+                $css->setStyle($style, 'height', $data['height'].'px');
             }
-            $styles .= $tab . 'text-align: '. $data['align'] .';'. PHP_EOL;
-            $styles .= $tab . 'background-color: '. $data['background-color'] .';'. PHP_EOL;
-
-            $styles .= $tab . 'font-size: '. $data['font-size'] .'px;'. PHP_EOL;
-            $styles .= $tab . 'font-family: '. $data['font-family'] .';'. PHP_EOL;
-            $styles .= $tab . 'font-weight: '. $data['font-weight'] .';'. PHP_EOL;
-            $styles .= $tab . 'color: '. $data['color'] .';'. PHP_EOL;
-            $styles .= '}'. PHP_EOL . PHP_EOL;
+            $css->setStyle($style, 'text-align', $data['align']);
+            $css->setStyle($style, 'background-color', $data['background-color']);
+            $css->setStyle($style, 'font-size', $data['font-size'].'px');
+            $css->setStyle($style, 'font-family', $data['font-family']);
+            $css->setStyle($style, 'font-weight', $data['font-weight']);
+            $css->setStyle($style, 'color', $data['color']);
         }
 
         $cellClsI = '.' . sprintf($cellAttr['class'], $this->ident) . 'I';
         $cellClsA = '.' . sprintf($cellAttr['class'], $this->ident) . 'A';
+        $css->setStyle($cellClsI, 'width', $cellAttr['width'].'px');
+        $css->setStyle($cellClsI, 'height', $cellAttr['height'].'px');
+        $css->setStyle($cellClsI, 'font-family', $cellAttr['font-family']);
+        $css->setStyle($cellClsI, 'font-size', $cellAttr['font-size'].'px');
 
-        $styles .= $cellClsI . ', ' . $cellClsA . ' {' . PHP_EOL;
-        $styles .= $tab . 'width: '. $cellAttr['width'] .'px;'. PHP_EOL;
-        $styles .= $tab . 'height: '. $cellAttr['height'] .'px;'. PHP_EOL;
-        $styles .= $tab . 'font-family: '. $cellAttr['font-family'] .';'. PHP_EOL;
-        $styles .= $tab . 'font-size: '. $cellAttr['font-size'] .'px;'. PHP_EOL;
         if ($this->orientation == HTML_PROGRESS2_BAR_HORIZONTAL) {
-            $styles .= $tab . 'float: left;'. PHP_EOL;
+            $css->setStyle($cellClsI, 'float', 'left');
         }
         if ($this->orientation == HTML_PROGRESS2_BAR_VERTICAL) {
-            $styles .= $tab . 'float: none;'. PHP_EOL;
+            $css->setStyle($cellClsI, 'float', 'none');
         }
-        $styles .= '}'. PHP_EOL . PHP_EOL;
+        $css->setSameStyle($cellClsA, $cellClsI);
 
-        $styles .= $cellClsI . ' {' . PHP_EOL;
-        if ($this->orientation == HTML_PROGRESS2_CIRCLE) {
-            $styles .= $tab . 'background-image: url("'. $cellAttr[0]['background-image'] .'");'. PHP_EOL;
-            $styles .= $tab . 'background-repeat: no-repeat;'. PHP_EOL;
-        } else {
-            $styles .= $tab . 'background-color: '. $cellAttr['inactive-color'] .';'. PHP_EOL;
+        if ($this->orientation !== HTML_PROGRESS2_CIRCLE) {
+            $css->setStyle($cellClsI, 'background-color', $cellAttr['inactive-color']);
         }
-        $styles .= '}'. PHP_EOL . PHP_EOL;
 
-        $styles .= $cellClsA . ' {' . PHP_EOL;
-        if ($cellAttr['background-image'] == 'none') {
-            $styles .= $tab . 'background-color: '. $cellAttr['active-color'] .';'. PHP_EOL;
-        } else {
-            $styles .= $tab . 'background-image: url("'. $cellAttr['background-image'] .'");'. PHP_EOL;
+        $css->setStyle($cellClsA, 'background-color', $cellAttr['active-color']);
+        if ($cellAttr['background-image'] !== 'none') {
+            $css->setStyle($cellClsA, 'background-image', 'url("'. $cellAttr['background-image'] .'")');
             if ($this->orientation == HTML_PROGRESS2_CIRCLE) {
-                $styles .= $tab . 'background-repeat: no-repeat;'. PHP_EOL;
+                $css->setStyle($cellClsA, 'background-repeat', 'no-repeat');
             } else {
-                $styles .= $tab . 'background-repeat: '. $cellAttr['background-repeat'] .';'. PHP_EOL;
-                $styles .= $tab . 'background-position: '. $cellAttr['background-position'] .';'. PHP_EOL;
+                $css->setStyle($cellClsA, 'background-repeat', $cellAttr['background-repeat']);
+                $css->setStyle($cellClsA, 'background-position', $cellAttr['background-position']);
             }
         }
-        $styles .= $tab . 'visibility: hidden;'. PHP_EOL;
-        $styles .= '}'. PHP_EOL . PHP_EOL;
+
+        if ($this->orientation == HTML_PROGRESS2_CIRCLE) {
+            $css->setStyle($cellClsI, 'background-image', 'url("'.$cellAttr[0]['background-image'].'")');
+            $css->setStyle($cellClsI, 'background-repeat', 'no-repeat');
+        }
+        $styles = $css->toString();
 
         if ($raw !== true) {
             $styles = '<style type="text/css">' . PHP_EOL
                     . '<!--'    . PHP_EOL
                     . $styles   . PHP_EOL
-                    . '// -->'  . PHP_EOL
+                    . ' -->'    . PHP_EOL
                     . '</style>'. PHP_EOL;
         }
         return $styles;
+    }
+
+    /**
+     * Import cascading style sheet (CSS) elements
+     *
+     * Set the CSS required to display the progress meter in a HTML document.
+     *
+     * @param      mixed     $styles        CSS elements reference to import
+     *
+     * @return     void|PEAR_Error
+     * @since      2.2.0
+     * @access     public
+     * @throws     HTML_PROGRESS2_ERROR_INVALID_INPUT
+     */
+    function importStyle($styles)
+    {
+        if (is_string($styles)) {
+            $styles = (array)$styles;
+        }
+
+        if (!is_array($styles)) {
+            return $this->raiseError(HTML_PROGRESS2_ERROR_INVALID_INPUT, 'exception',
+                array('var' => '$styles',
+                      'was' => gettype($styles),
+                      'expected' => 'array | string',
+                      'paramnum' => 1));
+        }
+
+        $css = new HTML_CSS();
+
+        $res = $css->parseData($styles);
+        if ($css->isError()) {
+            return $this->raiseError(HTML_PROGRESS2_ERROR_INVALID_INPUT, 'error',
+                array('var' => '$styles',
+                      'was' => 'unknown data source',
+                      'expected' => 'valid CSS',
+                      'paramnum' => 1));
+        }
+
+        if (strpos($this->border['class'], '%s') === false) {
+            $pattern = $this->ident . '\.' . $this->border['class'];
+        } else {
+            $pattern = '\.' . sprintf($this->border['class'], $this->ident);
+        }
+        $border = $css->grepStyle("/$pattern/");
+
+        foreach ($border as $b) {
+            foreach ($b as $p => $v) {
+                if (substr($p, 0, 6) == 'border') {
+                    $n = str_replace('border-', '', $p);
+                    if (isset($this->border[$n])) {
+                        if (substr($v, -2) == 'px') {
+                            $this->border[$n] = intval($v);
+                        } else {
+                            $this->border[$n] = $v;
+                        }
+                    }
+                } else {
+                    if ($p == 'background-color' && $this->cellCount == 0) {
+                        $this->cell['inactive-color'] = $v;
+                    } elseif (isset($this->_progress[$p])) {
+                        if (substr($v, -2) == 'px') {
+                            $this->_progress[$p] = intval($v);
+                        } else {
+                            $this->_progress[$p] = $v;
+                        }
+                    }
+                }
+            }
+            if ($this->border['width'] > 0) {
+                $this->_paintBorder = true;
+            }
+        }
+
+        foreach ($this->label as $name => $data) {
+            if (strpos($data['class'], '%s') === false) {
+                $pattern = $name . $this->ident . '\.' . $data['class'];
+            } else {
+                $pattern = '\.' . sprintf($data['class'], $name . $this->ident);
+            }
+            $label = $css->grepStyle("/$pattern/");
+
+            foreach ($label as $l) {
+                foreach ($l as $p => $v) {
+                    if (substr($p, 0, 4) == 'text') {
+                        $n = str_replace('text-', '', $p);
+                        if (isset($this->label[$name][$n])) {
+                            $this->label[$name][$n] = $v;
+                        }
+                    } elseif (isset($this->label[$name][$p])) {
+                        if (substr($v, -2) == 'px') {
+                            $this->label[$name][$p] = intval($v);
+                        } else {
+                            $this->label[$name][$p] = $v;
+                        }
+                    }
+                }
+            }
+        }
+
+        $pcell = '.' . sprintf($this->cell['class'], $this->ident);
+        if (strpos($this->cell['class'], '%s') === false) {
+            $pattern = $this->ident . '\s*\.' . $this->cell['class'];
+        } else {
+            $pattern = '\.' . sprintf($this->cell['class'], $this->ident);
+        }
+        $cell = $css->grepStyle("/$pattern/");
+
+        foreach ($cell as $c => $data) {
+            foreach ($data as $p => $v) {
+                if ($p == 'background-color') {
+                    if (strpos($c, $pcell.'A') !== false) {
+                        $this->cell['active-color'] = $v;
+                    } else {
+                        $this->cell['inactive-color'] = $v;
+                    }
+                } elseif ($p == 'background-image') {
+                    $pattern = "\s*url\s*\([\s\"'`]*([\w:?=@&\/#._;-]+)[\s\"'`]*\)\s*";
+                    $found = preg_match("/$pattern/", $v, $matches);
+                    if ($found) {
+                        $this->cell[$p] = $matches[1];
+                    }
+                } else {
+                    if (substr($v, -2) == 'px') {
+                        $this->cell[$p] = intval($v);
+                    } else {
+                        $this->cell[$p] = $v;
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -2804,7 +2932,7 @@ JS;
     function hide()
     {
         $bar = '<script type="text/javascript">'
-             .  'hideProgress("' . $this->ident . '",' . $this->cellCount . ');'
+             .  'hideProgress("' . $this->ident . '");'
              .  '</script>';
 
         echo $bar . PHP_EOL;
@@ -2830,8 +2958,9 @@ JS;
         // convert delay from milliseconds to microseconds
         $usecs = $this->animSpeed * 1000;
 
-        if ((substr(PHP_OS, 0, 3) == 'WIN') && (substr(PHP_VERSION,0,1) < '5') ){
-            for ($i = 0; $i < $usecs; $i++) { }
+        if ((substr(PHP_OS, 0, 3) == 'WIN') && (substr(PHP_VERSION,0,1) < '5')) {
+            for ($i = 0; $i < $usecs; $i++) {
+            }
         } else {
             usleep($usecs);
         }
@@ -2919,7 +3048,7 @@ JS;
             } else {
                 $this->moveStep($ret);
             }
-        } while(1);
+        } while (1);
         $this->_postNotification('onLoad', array('handler' => __FUNCTION__, 'value' => $this->getValue()));
     }
 
@@ -2969,14 +3098,16 @@ JS;
      * for all messages emitted by this HTML_Progress2 instance.
      *
      * @param      mixed     $callback      PHP callback that will act as listener
+     * @param      string    $nName         Expected notification name, serves as a filter
      *
      * @return     void
      * @since      2.0.0
      * @access     public
-     * @throws     HTML_PROGRESS2_ERROR_INVALID_CALLBACK
+     * @throws     HTML_PROGRESS2_ERROR_INVALID_CALLBACK,
+     *             HTML_PROGRESS2_ERROR_INVALID_INPUT
      * @see        removeListener()
      */
-    function addListener($callback)
+    function addListener($callback, $nName = EVENT_DISPATCHER_GLOBAL)
     {
         if (!is_callable($callback)) {
             return $this->raiseError(HTML_PROGRESS2_ERROR_INVALID_CALLBACK, 'exception',
@@ -2984,10 +3115,17 @@ JS;
                       'element' => 'valid Class-Method/Function',
                       'was' => 'callback',
                       'paramnum' => 1));
+
+        } elseif (!is_string($nName)) {
+            return $this->raiseError(HTML_PROGRESS2_ERROR_INVALID_INPUT, 'exception',
+                array('var' => '$nName',
+                      'was' => gettype($nName),
+                      'expected' => 'string',
+                      'paramnum' => 2));
         }
 
-        $this->dispatcher =& Event_Dispatcher::getInstance();
-        $this->dispatcher->addObserver($callback);
+        $this->dispatcher =& Event_Dispatcher::getInstance('ProgressMeter');
+        $this->dispatcher->addObserver($callback, $nName);
         $this->_observerCount++;
     }
 
@@ -2998,14 +3136,16 @@ JS;
      * if there is no more observer registered.
      *
      * @param      mixed     $callback      PHP callback that act as listener
+     * @param      string    $nName         Expected notification name, serves as a filter
      *
      * @return     bool                     True if observer was removed, false otherwise
      * @since      2.0.0
      * @access     public
-     * @throws     HTML_PROGRESS2_ERROR_INVALID_CALLBACK
+     * @throws     HTML_PROGRESS2_ERROR_INVALID_CALLBACK,
+     *             HTML_PROGRESS2_ERROR_INVALID_INPUT
      * @see        addListener()
      */
-    function removeListener($callback)
+    function removeListener($callback, $nName = EVENT_DISPATCHER_GLOBAL)
     {
         if (!is_callable($callback)) {
             return $this->raiseError(HTML_PROGRESS2_ERROR_INVALID_CALLBACK, 'exception',
@@ -3013,14 +3153,21 @@ JS;
                       'element' => 'valid Class-Method/Function',
                       'was' => 'callback',
                       'paramnum' => 1));
+
+        } elseif (!is_string($nName)) {
+            return $this->raiseError(HTML_PROGRESS2_ERROR_INVALID_INPUT, 'exception',
+                array('var' => '$nName',
+                      'was' => gettype($nName),
+                      'expected' => 'string',
+                      'paramnum' => 2));
         }
 
-        $result = $this->dispatcher->removeObserver($callback);
+        $result = $this->dispatcher->removeObserver($callback, $nName);
 
         if ($result) {
             $this->_observerCount--;
             if ($this->_observerCount == 0) {
-                unsset($this->dispatcher);
+                unset($this->dispatcher);
             }
         }
         return $result;
@@ -3040,7 +3187,7 @@ JS;
     {
         static $determinate;
 
-        foreach($this->label as $name => $data) {
+        foreach ($this->label as $name => $data) {
             switch($data['type']) {
             case HTML_PROGRESS2_LABEL_STEP:
                 if (!$this->indeterminate) {
@@ -3126,26 +3273,11 @@ JS;
         $html = '';
 
         if ($way_natural) {
-            // inactive cells first
             $pos = $cellAttr['spacing'];
             for ($i = 0; $i < $this->cellCount; $i++) {
                 $html .= $tabs . $tab
-                      .  '<div id="' . sprintf($cellAttr['id'],$i) . 'I' . $this->ident . '"'
+                      .  '<div id="' . sprintf($cellAttr['id'], $i) . $this->ident . '"'
                       .  ' class="' . $cellCls . 'I"'
-                      .  ' style="position:absolute;'
-                      .  'left:' . $pos . 'px;'
-                      .  'top:' . $cellAttr['spacing'] . 'px;'
-                      .  '"></div>'
-                      .  PHP_EOL;
-
-                $pos += ($cellAttr['width'] + $cellAttr['spacing']);
-            }
-            // then active cells
-            $pos = $cellAttr['spacing'];
-            for ($i = 0; $i < $this->cellCount; $i++) {
-                $html .= $tabs . $tab
-                      .  '<div id="' . sprintf($cellAttr['id'],$i) . 'A' . $this->ident . '"'
-                      .  ' class="' . $cellCls . 'A"'
                       .  ' style="position:absolute;'
                       .  'left:' . $pos . 'px;'
                       .  'top:' . $cellAttr['spacing'] . 'px;';
@@ -3157,26 +3289,11 @@ JS;
                 $pos += ($cellAttr['width'] + $cellAttr['spacing']);
             }
         } else {
-            // inactive cells first
             $pos = $cellAttr['spacing'];
             for ($i = $this->cellCount - 1; $i >= 0; $i--) {
                 $html .= $tabs . $tab
-                      .  '<div id="' . sprintf($cellAttr['id'],$i) . 'I' . $this->ident . '"'
+                      .  '<div id="' . sprintf($cellAttr['id'], $i) . $this->ident . '"'
                       .  ' class="' . $cellCls . 'I"'
-                      .  ' style="position:absolute;'
-                      .  'left:' . $pos . 'px;'
-                      .  'top:' . $cellAttr['spacing'] . 'px;'
-                      .  '"></div>'
-                      .  PHP_EOL;
-
-                $pos += ($cellAttr['width'] + $cellAttr['spacing']);
-            }
-            // then active cells
-            $pos = $cellAttr['spacing'];
-            for ($i = $this->cellCount - 1; $i >= 0; $i--) {
-                $html .= $tabs . $tab
-                      .  '<div id="' . sprintf($cellAttr['id'],$i) . 'A' . $this->ident . '"'
-                      .  ' class="' . $cellCls . 'A"'
                       .  ' style="position:absolute;'
                       .  'left:' . $pos . 'px;'
                       .  'top:' . $cellAttr['spacing'] . 'px;';
@@ -3208,26 +3325,11 @@ JS;
         $html = '';
 
         if ($way_natural) {
-            // inactive cells first
             $pos = $cellAttr['spacing'];
             for ($i = $this->cellCount - 1; $i >= 0; $i--) {
                 $html .= $tabs . $tab
-                      .  '<div id="' . sprintf($cellAttr['id'],$i) . 'I' . $this->ident . '"'
+                      .  '<div id="' . sprintf($cellAttr['id'], $i) . $this->ident . '"'
                       .  ' class="' . $cellCls . 'I"'
-                      .  ' style="position:absolute;'
-                      .  'left:' . $cellAttr['spacing'] . 'px;'
-                      .  'top:' . $pos . 'px;'
-                      .  '"></div>'
-                      .  PHP_EOL;
-
-                $pos += ($cellAttr['height'] + $cellAttr['spacing']);
-            }
-            // then active cells
-            $pos = $cellAttr['spacing'];
-            for ($i = $this->cellCount - 1; $i >= 0; $i--) {
-                $html .= $tabs . $tab
-                      .  '<div id="' . sprintf($cellAttr['id'],$i) . 'A' . $this->ident . '"'
-                      .  ' class="' . $cellCls . 'A"'
                       .  ' style="position:absolute;'
                       .  'left:' . $cellAttr['spacing'] . 'px;'
                       .  'top:' . $pos . 'px;';
@@ -3239,26 +3341,11 @@ JS;
                 $pos += ($cellAttr['height'] + $cellAttr['spacing']);
             }
         } else {
-            // inactive cells first
             $pos = $cellAttr['spacing'];
             for ($i = 0; $i < $this->cellCount; $i++) {
                 $html .= $tabs . $tab
-                      .  '<div id="' . sprintf($cellAttr['id'],$i) . 'I' . $this->ident . '"'
+                      .  '<div id="' . sprintf($cellAttr['id'], $i) . $this->ident . '"'
                       .  ' class="' . $cellCls . 'I"'
-                      .  ' style="position:absolute;'
-                      .  'left:' . $cellAttr['spacing'] . 'px;'
-                      .  'top:' . $pos . 'px;'
-                      .  '"></div>'
-                      .  PHP_EOL;
-
-                $pos += ($cellAttr['height'] + $cellAttr['spacing']);
-            }
-            // then active cells
-            $pos = $cellAttr['spacing'];
-            for ($i = 0; $i < $this->cellCount; $i++) {
-                $html .= $tabs . $tab
-                      .  '<div id="' . sprintf($cellAttr['id'],$i) . 'A' . $this->ident . '"'
-                      .  ' class="' . $cellCls . 'A"'
                       .  ' style="position:absolute;'
                       .  'left:' . $cellAttr['spacing'] . 'px;'
                       .  'top:' . $pos . 'px;';
@@ -3291,26 +3378,12 @@ JS;
         $html = '';
 
         if ($way_natural) {
-            // inactive cells first
             for ($i = 0; $i < $this->cellCount; $i++) {
                 $top  = $coord[$i][0] * $cellAttr['width'];
                 $left = $coord[$i][1] * $cellAttr['height'];
                 $html .= $tabs . $tab
-                      .  '<div id="' . sprintf($cellAttr['id'],$i) . 'I' . $this->ident . '"'
+                      .  '<div id="' . sprintf($cellAttr['id'], $i) . $this->ident . '"'
                       .  ' class="' . $cellCls . 'I"'
-                      .  ' style="position:absolute;'
-                      .  'left:' . $left . 'px;'
-                      .  'top:' . $top . 'px;'
-                      .  '"></div>'
-                      .  PHP_EOL;
-            }
-            // then active cells
-            for ($i = 0; $i < $this->cellCount; $i++) {
-                $top  = $coord[$i][0] * $cellAttr['width'];
-                $left = $coord[$i][1] * $cellAttr['height'];
-                $html .= $tabs . $tab
-                      .  '<div id="' . sprintf($cellAttr['id'],$i) . 'A' . $this->ident . '"'
-                      .  ' class="' . $cellCls . 'A"'
                       .  ' style="position:absolute;'
                       .  'left:' . $left . 'px;'
                       .  'top:' . $top . 'px;';
@@ -3321,26 +3394,12 @@ JS;
             }
         } else {
             $c = count($coord) - 1;
-            // inactive cells first
             for ($i = 0; $i < $this->cellCount; $i++) {
                 $top  = $coord[$c-$i][0] * $cellAttr['width'];
                 $left = $coord[$c-$i][1] * $cellAttr['height'];
                 $html .= $tabs . $tab
-                      .  '<div id="' . sprintf($cellAttr['id'],$i) . 'I' . $this->ident . '"'
+                      .  '<div id="' . sprintf($cellAttr['id'], $i) . $this->ident . '"'
                       .  ' class="' . $cellCls . 'I"'
-                      .  ' style="position:absolute;'
-                      .  'left:' . $left . 'px;'
-                      .  'top:' . $top . 'px;'
-                      .  '"></div>'
-                      .  PHP_EOL;
-            }
-            // then active cells
-            for ($i = 0; $i < $this->cellCount; $i++) {
-                $top  = $coord[$c-$i][0] * $cellAttr['width'];
-                $left = $coord[$c-$i][1] * $cellAttr['height'];
-                $html .= $tabs . $tab
-                      .  '<div id="' . sprintf($cellAttr['id'],$i) . 'A' . $this->ident . '"'
-                      .  ' class="' . $cellCls . 'A"'
                       .  ' style="position:absolute;'
                       .  'left:' . $left . 'px;'
                       .  'top:' . $top . 'px;';
@@ -3371,42 +3430,24 @@ JS;
         $html = '';
 
         if ($way_natural) {
-            // inactive cells first
             for ($i = 0; $i < $this->cellCount; $i++) {
                 $html .= $tabs . $tab
-                      .  '<div id="' . sprintf($cellAttr['id'],$i) . 'I' . $this->ident . '"'
+                      .  '<div id="' . sprintf($cellAttr['id'], $i) . $this->ident . '"'
                       .  ' class="' . $cellCls . 'I"'
                       .  ' style="position:absolute;left:0;top:0;'
-                      .  '"></div>'
-                      .  PHP_EOL;
-            }
-            // then active cells
-            for ($i = 0; $i < $this->cellCount; $i++) {
-                $html .= $tabs . $tab
-                      .  '<div id="' . sprintf($cellAttr['id'],$i) . 'A' . $this->ident . '"'
-                      .  ' class="' . $cellCls . 'A"'
-                      .  ' style="position:absolute;left:0;top:0;'
-                      .  '"><img src="' . $cellAttr[$i+1]['background-image'] . '" border="0" />'
+                      .  '"><img src="' . $cellAttr[$i+1]['background-image']
+                      .  '" border="0" alt="" />'
                       .  '</div>'
                       .  PHP_EOL;
             }
         } else {
-            // inactive cells first
             for ($i = 0; $i < $this->cellCount; $i++) {
                 $html .= $tabs . $tab
-                      .  '<div id="' . sprintf($cellAttr['id'],$i) . 'I' . $this->ident . '"'
+                      .  '<div id="' . sprintf($cellAttr['id'], $i) . $this->ident . '"'
                       .  ' class="' . $cellCls . 'I"'
                       .  ' style="position:absolute;left:0;top:0;'
-                      .  '"></div>'
-                      .  PHP_EOL;
-            }
-            // then active cells
-            for ($i = 0; $i < $this->cellCount; $i++) {
-                $html .= $tabs . $tab
-                      .  '<div id="' . sprintf($cellAttr['id'],$i) . 'A' . $this->ident . '"'
-                      .  ' class="' . $cellCls . 'A"'
-                      .  ' style="position:absolute;left:0;top:0;'
-                      .  '"><img src="' . $cellAttr[$i+1]['background-image'] . '" border="0" />'
+                      .  '"><img src="' . $cellAttr[$i+1]['background-image']
+                      .  '" border="0" alt="" />'
                       .  '</div>'
                       .  PHP_EOL;
             }
@@ -3734,7 +3775,7 @@ JS;
      */
     function _errorHandler($code, $level, $params)
     {
-        include_once 'HTML/Progress2/Error.php';
+        require_once 'HTML/Progress2/Error.php';
 
         $mode = call_user_func($this->_callback_push, $code, $level);
 

@@ -15,7 +15,7 @@
  * @author     Hartmut Holzgraefe <hartmut@php.net>
  * @copyright  2005 Hartmut Holzgraefe
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Function.php,v 1.24 2006/02/15 18:43:37 hholzgra Exp $
+ * @version    CVS: $Id: Function.php,v 1.32 2006/08/14 22:50:43 hholzgra Exp $
  * @link       http://pear.php.net/package/CodeGen
  */
 
@@ -24,7 +24,6 @@
  */
 require_once "CodeGen/PECL/Element.php";
 
-require_once "CodeGen/Tools/Indent.php";
 require_once "CodeGen/Tools/Tokenizer.php";
 
 /**
@@ -240,6 +239,13 @@ require_once "CodeGen/Tools/Tokenizer.php";
         protected $optional = 0;
 
         /**
+         * Does this function have by-reference parameters?
+         *
+         * @var bool
+         */
+        protected $hasRefArgs = false;
+
+        /**
          * Set parameter and return value information from PHP style prototype
          *
          * @access public
@@ -364,7 +370,7 @@ require_once "CodeGen/Tools/Tokenizer.php";
             
             // some types may carry a name
             if ($token === "object" || $token == "resource") {
-                if ($tokens[0][0] === 'name') {
+                if (isset($tokens[0][0]) && $tokens[0][0] === 'name') {
                     list($type, $token) = array_shift($tokens);
                     $returnSubtype = $token;
                 }
@@ -454,10 +460,14 @@ require_once "CodeGen/Tools/Tokenizer.php";
                     }
                 }
                 
-                // return by reference?
+                //  pass by reference?
                 if (count($tokens) && $tokens[0][0] === 'char' && $tokens[0][1] === '&') {
                     list($type, $token) = array_shift($tokens);
+                    if ($type != "array" && $type != "mixed") {
+                      return PEAR::raiseError("only 'array' and 'mixed' arguments may be passed by reference, '$param[name]' is of type '$type'");
+                    }
                     $param['byRef'] = true;
+                    $this->hasRefArgs = true;
                 }
                 
                 // any tokens left?
@@ -956,6 +966,7 @@ require_once "CodeGen/Tools/Tokenizer.php";
                 } else {
                     $code .= "    void * return_res;\n";
                 }
+                $code .= "    long return_res_id = -1;\n";
             }
 
             return $code;
@@ -970,14 +981,19 @@ require_once "CodeGen/Tools/Tokenizer.php";
          */
         function cCode($extension) 
         {
-            $code = "";
+            $code = "\n";
 
             $returns = explode(" ", $this->returns);
 
             switch ($this->role) {
             case "public":
+              
+                if ($this->ifCondition) {
+                  $code .= "#if {$this->ifCondition}\n";
+                }
+
                 // function prototype comment
-                $code .= "\n/* {{{ proto {$this->proto}\n  ";
+                $code .= "/* {{{ proto {$this->proto}\n  ";
                 if (!empty($this->summary)) {
                     $code .= $this->summary;
                 }
@@ -1120,7 +1136,7 @@ require_once "CodeGen/Tools/Tokenizer.php";
                             break;
 
                         case "callback": 
-                            $postProcess.= "    if (!zend_is_callable({$name}, 0 NULL) {\n";
+                            $postProcess.= "    if (!zend_is_callable({$name}, 0, NULL)) {\n";
                             $postProcess.= "      php_error(E_WARNING, \"Invalid comparison function.\");\n";
                             $postProcess.= "      return;";
                             $postProcess.= "    }\n";
@@ -1132,7 +1148,7 @@ require_once "CodeGen/Tools/Tokenizer.php";
                             break;                          
                         }
 
-                        if (empty($param['byRef']) && $param['type'] != 'object') {
+                        if (empty($param['byRef']) && ($param['type'] == 'mixed' || $param['type'] == 'array')) {
                             $argString .= "/";
                         } else if (!$zvalType) {
                             // TODO: pass by ref for 'simple' types requires further thinking
@@ -1186,26 +1202,14 @@ require_once "CodeGen/Tools/Tokenizer.php";
                     }
 
                     // if function code is specified so we add it here
-                    if ($extension->getLanguage() == "c") {
-                        // in C variable declarations have to be at the very beginning
-                        // of a block, so we have to add {...} around the snippet
-                        $code .= "    do {\n";
-                        if (isset($linedef)) {
-                            $code .= "$linedef\n";
-                        }
-                        $code .= CodeGen_Tools_Indent::indent(8, $this->code);
-                        $code .= "    } while(0);\n"; 
-                    } else {
-                        // in C++ variable may be declared at any time
-                        if (isset($linedef)) {
-                            $code .= "$linedef\n";
-                        }
-                        $code .= CodeGen_Tools_Indent::indent(4, $this->code)."\n";
+                    if (isset($linedef)) {
+                      $code .= "$linedef\n";
                     }
+                    $code .= $extension->codegen->varblock($this->code);
 
                     // when a function returns a named resource we know what to do
                     if ($returns[0] == "resource" && isset($returns[1])) {
-                        $code .= "    ZEND_REGISTER_RESOURCE(return_value, return_res, le_$returns[1]);\n";
+                        $code .= "    return_res_id = ZEND_REGISTER_RESOURCE(return_value, return_res, le_$returns[1]);\n";
                     }
                 } else {
                     // no code snippet was given so we produce a suggestion for the return statement
@@ -1262,13 +1266,16 @@ require_once "CodeGen/Tools/Tokenizer.php";
                 }
                 
                 $code .= "}\n/* }}} {$this->name} */\n\n";
+
+                if ($this->ifCondition) {
+                    $code .= "#endif\n";
+                } 
+
                 break;
                 
             case "internal":
                 if (!empty($this->code)) {
-                    $code .= "    {\n";
-                    $code .= CodeGen_Tools_Indent::indent(8, $this->code."\n");
-                    $code .= "    }\n";
+                    $code .= $extension->codegen->varblock($this->code."\n");
                 }
                 break;
             }
@@ -1417,58 +1424,73 @@ require_once "CodeGen/Tools/Tokenizer.php";
          */
         function hCode($extension) 
         {
-            $code = $this->cProto();
+          $code = "";
+
+            if ($this->ifCondition) {
+              $code .= "#if {$this->ifCondition}\n";
+            }
+
+            $code .= $this->cProto();
             if ($code) {
                 $code.= ";\n";
             }
 
             $code.= $this->argInfoCode();
 
+            if ($this->ifCondition) {
+               $code .= "#endif\n";
+            }
+
             return $code;
         }
 
 
         /**
-         * Code needed ahead of the method table 
+         * Code needed ahead of the function table 
          *
-         * Abstract/Interface methods need to define their argument
-         * list ahead of the method table
+         * Only required for functions that accept parameters by reference
          *
          * @returns string
          */
         function argInfoCode() {
             $code = "";
 
-            if (count($this->params) > 1) {
-                $code.= "ZEND_BEGIN_ARG_INFO(".$this->getFullName()."_args, 0)\n";
-
-                $params = $this->params;
-                array_shift($params);
-
-                $useTypeHints = true;
-
-                foreach($params as $param) {
-                    if ($param['type'] != "object" || !isset($param['subtype'])) {
-                        $useTypeHints = false;
-                        break;
-                    }
+            // generate refargs mask if needed
+            if ($this->hasRefArgs) {              
+                $code.= "ZEND_BEGIN_ARG_INFO({$this->name}_arg_info, 0)\n";
+                foreach ($this->params as $param)
+                {
+                    $code.= "  ZEND_ARG_PASS_INFO(". (isset($param["byRef"]) ? 1 : 0) .")\n";
                 }
-
-                // TODO optional paramteres?
-                foreach($params as $param) {
-                    $byRef = empty($param["byRef"]) ? 0 : 1;
-                    if ($useTypeHints) {
-                        $code.= "  ZEND_ARG_OBJ_INFO(0, $param[name], $param[subtype], 0)\n";
-                    } else {
-                        $code.= "  ZEND_ARG_INFO($byRef, $param[name])\n";
-                    }
-                }                
-                
                 $code.= "ZEND_END_ARG_INFO()\n";
             }
 
             return $code;
         } 
+
+        /**
+         * Generate registration entry for extension function table
+         *
+         * @return string
+         */
+        function functionEntry()
+        {
+            $code = "";
+
+            $arginfo = $this->hasRefArgs ? "{$this->name}_arg_info" : "NULL";
+
+            if ($this->ifCondition) {
+                $code .= "#if {$this->ifCondition}\n";
+            }
+
+            $code .= sprintf("    PHP_FE(%-20s, %s)\n", $this->name, $arginfo);
+
+            if ($this->ifCondition) {
+                $code .= "#endif\n";
+            }
+
+            return $code;
+        }
     }
 
 ?>

@@ -1,4 +1,0 @@
-<?xml version="1.0" ?>
-<extension name="logo" version="1.0.0">
- <logo src="logo.gif" mimetype="image/gif" />
-</extension>

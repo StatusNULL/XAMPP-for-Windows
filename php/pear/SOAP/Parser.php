@@ -53,22 +53,41 @@ class SOAP_Parser extends SOAP_Base
     var $root_struct_name = array();
     var $header_struct_name = array();
     var $curent_root_struct_name = '';
-    var $entities = array ( '&' => '&amp;', '<' => '&lt;', '>' => '&gt;', "'" => '&apos;', '"' => '&quot;' );
+
+    /**
+     * XML entities.
+     *
+     * @var array
+     */
+    var $entities = array('&' => '&amp;',
+                          '<' => '&lt;',
+                          '>' => '&gt;',
+                          "'" => '&apos;',
+                          '"' => '&quot;');
+
     var $root_struct = array();
     var $header_struct = array();
     var $curent_root_struct = 0;
     var $references = array();
     var $need_references = array();
     var $XMLSchemaVersion;
-    var $bodyDepth; // used to handle non-root elements before root body element
 
     /**
-     * SOAP_Parser constructor
+     * Used to handle non-root elements before root body element.
      *
-     * @param string xml content
-     * @param string xml character encoding, defaults to 'UTF-8'
+     * @var integer
      */
-    function SOAP_Parser(&$xml, $encoding = SOAP_DEFAULT_ENCODING, $attachments = null)
+    var $bodyDepth;
+
+    /**
+     * Constructor.
+     *
+     * @param string $xml         XML content.
+     * @param string $encoding    Character set encoding, defaults to 'UTF-8'.
+     * @param array $attachments  List of attachments.
+     */
+    function SOAP_Parser(&$xml, $encoding = SOAP_DEFAULT_ENCODING,
+                         $attachments = null)
     {
         parent::SOAP_Base('Parser');
         $this->_setSchemaVersion(SOAP_XML_SCHEMA_VERSION);
@@ -461,42 +480,43 @@ class SOAP_Parser extends SOAP_Base
     }
 
     /**
-     * getResponse
+     * Returns an array of responses.
      *
-     * returns an array of responses
-     * after parsing a soap message, use this to get the response
+     * After parsing a SOAP message, use this to get the response.
      *
-     * @return   array
+     * @return array
      * @access public
      */
     function &getResponse()
     {
         if (isset($this->root_struct[0]) &&
             $this->root_struct[0]) {
-            return $this->buildResponse($this->root_struct[0]);
+            $response =& $this->buildResponse($this->root_struct[0]);
+        } else {
+            $response =& $this->_raiseSoapFault("couldn't build response");
         }
-        return $this->_raiseSoapFault("couldn't build response");
+        return $response;
     }
 
     /**
-     * getHeaders
+     * Returns an array of header responses.
      *
-     * returns an array of header responses
-     * after parsing a soap message, use this to get the response
+     * After parsing a SOAP message, use this to get the response.
      *
-     * @return   array
+     * @return array
      * @access public
      */
     function &getHeaders()
     {
         if (isset($this->header_struct[0]) &&
             $this->header_struct[0]) {
-            return $this->buildResponse($this->header_struct[0]);
+            $response = &$this->buildResponse($this->header_struct[0]);
+        } else {
+            // We don't fault if there are no headers; that can be handled by
+            // the application if necessary.
+            $response = null;
         }
-
-        // We don't fault if there are no headers that can be handled
-        // by the app if necessary.
-        return null;
+        return $response;
     }
 
     /**

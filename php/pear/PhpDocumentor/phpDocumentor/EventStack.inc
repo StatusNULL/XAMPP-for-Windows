@@ -1,34 +1,45 @@
 <?php
-//
-// +------------------------------------------------------------------------+
-// | phpDocumentor                                                          |
-// +------------------------------------------------------------------------+
-// | Copyright (c) 2000-2003 Joshua Eichorn, Gregory Beaver                 |
-// | Email         jeichorn@phpdoc.org, cellog@phpdoc.org                   |
-// | Web           http://www.phpdoc.org                                    |
-// | Mirror        http://phpdocu.sourceforge.net/                          |
-// | PEAR          http://pear.php.net/package-info.php?pacid=137           |
-// +------------------------------------------------------------------------+
-// | This source file is subject to version 3.00 of the PHP License,        |
-// | that is available at http://www.php.net/license/3_0.txt.               |
-// | If you did not receive a copy of the PHP license and are unable to     |
-// | obtain it through the world-wide-web, please send a note to            |
-// | license@php.net so we can mail you a copy immediately.                 |
-// +------------------------------------------------------------------------+
-//
-
 /**
- * An event Stack
+ * An Event Stack for inter-program communication, particularly for parsing
+ *
+ * phpDocumentor :: automatic documentation generator
  * 
- * @author    Joshua Eichorn <jeichorn@phpdoc.org>
- * @version    $Id: EventStack.inc,v 1.8.2.1 2003/06/03 05:44:52 CelloG Exp $
- * @package     phpDocumentor
+ * PHP versions 4 and 5
+ *
+ * Copyright (c) 2000-2006 Joshua Eichorn
+ * 
+ * LICENSE:
+ * 
+ * This library is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation;
+ * either version 2.1 of the License, or (at your option) any
+ * later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ *
+ * @package    phpDocumentor
+ * @author     Joshua Eichorn <jeichorn@phpdoc.org>
+ * @copyright  2000-2006 Joshua Eichorn
+ * @license    http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @version    CVS: $Id: EventStack.inc,v 1.3 2006/04/30 22:18:13 cellog Exp $
+ * @filesource
+ * @link       http://www.phpdoc.org
+ * @link       http://pear.php.net/PhpDocumentor
+ * @since      0.1
  */
 /**
  * An event Stack
  * 
  * @author    Joshua Eichorn <jeichorn@phpdoc.org>
- * @version    $Id: EventStack.inc,v 1.8.2.1 2003/06/03 05:44:52 CelloG Exp $
+ * @version    $Id: EventStack.inc,v 1.3 2006/04/30 22:18:13 cellog Exp $
  * @package     phpDocumentor
  */
 class EventStack

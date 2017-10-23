@@ -30,7 +30,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 This code cannot simply be copied and put under the GNU Public License or 
 any other GPL-like (LGPL, GPL2) License.
 
-    $Id: RADIUS.php,v 1.5 2004/03/25 15:48:40 mbretter Exp $
+    $Id: RADIUS.php,v 1.7 2006/08/18 16:53:39 mbretter Exp $
 */
 
 require_once 'PEAR.php';
@@ -43,7 +43,7 @@ require_once 'PEAR.php';
 * @package Auth_RADIUS
 * @author  Michael Bretterklieber <michael@bretterklieber.com>
 * @access  public
-* @version $Revision: 1.5 $
+* @version $Revision: 1.7 $
 */
 
 PEAR::loadExtension('radius');
@@ -392,10 +392,10 @@ class Auth_RADIUS extends PEAR {
     /**
      * Reads all received attributes after sending the request.
      *
-     * This methos stores know attributes in the property attributes, 
+     * This methos stores known attributes in the property attributes, 
      * all attributes (including known attibutes) are stored in rawAttributes 
      * or rawVendorAttributes.
-     * NOTE: call this functio also even if the request was rejected, because the 
+     * NOTE: call this function also even if the request was rejected, because the 
      * Server returns usualy an errormessage
      *
      * @access public
@@ -445,7 +445,7 @@ class Auth_RADIUS extends PEAR {
                 break;
 
             case RADIUS_CLASS:
-                $this->attributes['class'] = radius_cvt_int($data);
+                $this->attributes['class'] = radius_cvt_string($data);
                 break;
 
             case RADIUS_FRAMED_PROTOCOL:
@@ -458,6 +458,10 @@ class Auth_RADIUS extends PEAR {
 
             case RADIUS_FILTER_ID:
                 $this->attributes['filter_id'] = radius_cvt_string($data);
+                break;
+
+            case RADIUS_REPLY_MESSAGE:
+                $this->attributes['reply_message'] = radius_cvt_string($data);
                 break;
 
             case RADIUS_VENDOR_SPECIFIC:

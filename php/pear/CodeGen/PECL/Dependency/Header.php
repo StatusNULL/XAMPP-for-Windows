@@ -15,7 +15,7 @@
  * @author     Hartmut Holzgraefe <hartmut@php.net>
  * @copyright  2005 Hartmut Holzgraefe
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Header.php,v 1.5 2006/02/01 00:55:36 hholzgra Exp $
+ * @version    CVS: $Id: Header.php,v 1.7 2006/08/14 17:09:03 hholzgra Exp $
  * @link       http://pear.php.net/package/CodeGen_PECL
  */
 
@@ -38,6 +38,20 @@ require_once "CodeGen/Dependency/Header.php";
 class CodeGen_PECL_Dependency_Header
   extends CodeGen_Dependency_Header
 {
+    /**
+     * return config.m4 code snippet for unix builds
+     *
+     * @param   string  Extension name
+     * @param   string  --with option name
+     * @return  string
+     */
+    function configm4($extname, $withname)
+    {
+        $upname = strtoupper($extname);
+        $withUpname = strtoupper($withname);
+        return "  AC_CHECK_HEADER([{$this->name}], [], AC_MSG_ERROR('{$this->name}' header not found))\n";
+    }
+
     /**
      * return config.w32 code snippet for windows builds
      *

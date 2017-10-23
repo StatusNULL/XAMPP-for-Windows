@@ -15,7 +15,7 @@
  * @author     Hartmut Holzgraefe <hartmut@php.net>
  * @copyright  2005 Hartmut Holzgraefe
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Extension.php,v 1.41 2006/02/17 19:09:17 hholzgra Exp $
+ * @version    CVS: $Id: Extension.php,v 1.53 2006/08/16 10:40:51 hholzgra Exp $
  * @link       http://pear.php.net/package/CodeGen_PECL
  */
 
@@ -25,7 +25,7 @@
 require_once "System.php";
 
 require_once "CodeGen/Extension.php";
-    
+
 require_once "CodeGen/PECL/Release.php";
 
 require_once "CodeGen/PECL/Element.php";
@@ -54,7 +54,7 @@ require_once "CodeGen/PECL/Dependency/Platform.php";
  * @author     Hartmut Holzgraefe <hartmut@php.net>
  * @copyright  2005 Hartmut Holzgraefe
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    Release: 1.0.0
+ * @version    Release: 1.0.3
  * @link       http://pear.php.net/package/CodeGen_PECL
  */
 class CodeGen_PECL_Extension 
@@ -65,9 +65,9 @@ class CodeGen_PECL_Extension
     * 
     * @return string
     */
-    static function version() 
+    function version() 
     {
-        return "1.0.0";
+        return "1.0.3";
     }
 
     /**
@@ -75,7 +75,7 @@ class CodeGen_PECL_Extension
     *
     * @return string
     */
-    static function copyright()
+    function copyright()
     {
         return "Copyright (c) 2003-2005 Hartmut Holzgraefe";
     }
@@ -188,7 +188,7 @@ class CodeGen_PECL_Extension
      * @var     bool
      * @access  private
      */
-    protected $linespecs = true;
+    protected $linespecs = false;
 
     /**
      * PHP Streams
@@ -206,6 +206,13 @@ class CodeGen_PECL_Extension
      */
     protected $with = array();
 
+    /**
+     * pear installer channel name
+     *
+     * @var    string
+     * @access private
+     */
+    protected $channel = "pecl.php.net";
 
     // }}} 
 
@@ -222,6 +229,8 @@ class CodeGen_PECL_Extension
         $this->release = new CodeGen_PECL_Release;
         
         $this->platform = new CodeGen_PECL_Dependency_Platform("all");
+
+        parent::__construct();
     }
     
     // }}} 
@@ -428,27 +437,7 @@ class CodeGen_PECL_Extension
         return true;
     }
     
-    
-    /**
-     * Add a package file by type and path
-     *
-     * @access  public
-     * @param   string  type
-     * @param   string  path
-     * @returns bool    success state
-     */
-    function addPackageFile($type, $path)
-    {
-        $basename = basename($path);
-
-        if (isset($this->packageFiles[$type][$basename])) {
-            return PEAR::raiseError("duplicate distribution file name '$basename'");
-        }
-
-        $this->packageFiles[$type][$basename] = $path;
-        return true;
-    }
-    
+        
     /** 
      * Add a --with configure option
      *
@@ -568,8 +557,12 @@ class CodeGen_PECL_Extension
 
         // copy additional source files
         if (isset($this->packageFiles['copy'])) {
-            foreach ($this->packageFiles['copy'] as $basename => $filepath) {
-                copy($filepath, $this->dirpath."/".$basename);
+            foreach ($this->packageFiles['copy'] as $targetpath => $sourcepath) {
+                $targetpath = $this->dirpath."/".$targetpath;
+                if (!is_dir(dirname($targetpath))) {
+                    mkdir(dirname($targetpath), 0777, true);
+                }
+                copy($sourcepath, $targetpath);
             }
         }
         
@@ -811,7 +804,7 @@ class CodeGen_PECL_Extension
            $moduleHeader = 
 "#if ZEND_EXTENSION_API_NO >= 220050617
         STANDARD_MODULE_HEADER_EX, NULL,
-        pdo_{$this->name}_deps,
+        {$this->name}_deps,
 #else
         STANDARD_MODULE_HEADER,
 #endif
@@ -922,7 +915,7 @@ $moduleHeader
         $code  = "/* {{{ {$this->name}_functions[] */\n";
         $code .= "function_entry {$this->name}_functions[] = {\n";
         foreach ($this->functions as $function) {
-            $code .=  sprintf("    PHP_FE(%-20s, NULL)\n", $function->getName());
+            $code.= $function->functionEntry();
         }
         foreach ($this->classes as $class) {
             $code.= $class->functionAliasEntries();
@@ -1031,6 +1024,22 @@ $moduleHeader
     
     // }}} 
 
+    
+    /**
+     * Set pear installer channel
+     *
+     * @access public
+     * @param  string
+     */
+    function setChannel($channel)
+    {
+        if (! preg_match('/^[a-z\-_\.]+$/i', $channel)) {
+            return PEAR::raiseError("'$channel' is not a valid pear installer channel name");
+        }
+
+        $this->channel = $channel;
+    }
+
 
     // {{{ header file
 
@@ -1092,7 +1101,7 @@ $moduleHeader
 
         if (isset($this->code["header"]["top"])) {
             foreach ($this->code["header"]["top"] as $code) {
-                echo CodeGen_Tools_Indent::indent(0, $code);
+                echo $this->codegen->block($code, 0);
             }
         }
 
@@ -1152,7 +1161,7 @@ PHP_MINFO_FUNCTION({$this->name});
         }
 
         foreach ($this->streams as $name => $stream) {
-            echo CodeGen_Tools_Indent::indent(1, $stream->hCode());
+            echo $this->codegen->block($stream->hCode());
         }
 
         echo "#ifdef  __cplusplus\n";
@@ -1175,7 +1184,7 @@ PHP_MINFO_FUNCTION({$this->name});
         if (isset($this->code["header"]["bottom"])) {
             echo "/* 'bottom' header snippets*/\n";
             foreach ($this->code["header"]["bottom"] as $code) {
-                echo CodeGen_Tools_Indent::indent(0, $code);
+                echo $this->codegen->block($code, 0);
             }
             echo "\n";
         }
@@ -1220,50 +1229,47 @@ PHP_MINIT_FUNCTION({$this->name})
         }
            
         foreach ($this->logos as $logo) {
-            $code .= CodeGen_Tools_Indent::indent(4, $logo->minitCode());
+            $code .= $this->codegen->block($logo->minitCode());
             $need_block = true;
         }
             
         if (count($this->constants)) {
             foreach ($this->constants as $constant) {
-                $code .= CodeGen_Tools_Indent::indent(4, $constant->cCode($this->name));
+                $code .= $this->codegen->block($constant->cCode($this->name));
             }
             $need_block = true;
         }
             
         if (count($this->resources)) {
             foreach ($this->resources as $resource) {
-                $code .= CodeGen_Tools_Indent::indent(4, $resource->minitCode());
+                $code .= $this->codegen->block($resource->minitCode());
             }
             $need_block = true;         
         }
 
         if (count($this->classes)) {
           foreach ($this->classes as $class) {
-            $code .= CodeGen_Tools_Indent::indent(4, $class->minitCode($this));
+            $code .= $this->codegen->block($class->minitCode($this));
           }
           $need_block = true;
         }
 
         if (count($this->interfaces)) {
           foreach ($this->interfaces as $interface) {
-            $code .= CodeGen_Tools_Indent::indent(4, $interface->minitCode($this));
+              $code .= $this->codegen->block($interface->minitCode($this));
           }
           $need_block = true;
         }
             
         if (count($this->streams)) {
           foreach ($this->streams as $stream) {
-            $code .= CodeGen_Tools_Indent::indent(4, $stream->minitCode($this));
+            $code .= $this->codegen->block($stream->minitCode($this));
           }
           $need_block = true;
         }
             
         if (isset($this->internalFunctions['MINIT'])) {
-            $indent = $need_block ? 8 : 4;
-            if ($need_block) $code .= "\n    do {\n";
-            $code .= CodeGen_Tools_Indent::indent($indent, $this->internalFunctions['MINIT']->getCode());
-            if ($need_block) $code .= "\n    } while (0);\n";
+            $code .= $this->codegen->varblock($this->internalFunctions['MINIT']->getCode());
         } else {
             $code .="\n    /* add your stuff here */\n";
         }
@@ -1287,16 +1293,13 @@ PHP_MSHUTDOWN_FUNCTION({$this->name})
 
         if (count($this->logos)) {
             foreach ($this->logos as $logo) {
-                $code .= CodeGen_Tools_Indent::indent(4, $logo->mshutdownCode());
+                $code .= $this->codegen->block($logo->mshutdownCode());
             }
             $need_block = true;
         }
             
         if (isset($this->internalFunctions['MSHUTDOWN'])) {
-            $indent = $need_block ? 8 : 4;
-            if (count($this->phpini)) $code .= "\n    do {\n";
-            $code .= CodeGen_Tools_Indent::indent(4, $this->internalFunctions['MSHUTDOWN']->getCode());
-            if (count($this->phpini)) $code .= "\n    } while (0);\n";
+            $code .= $this->codegen->varblock($this->internalFunctions['MSHUTDOWN']->getCode());
         } else {
             $code .="\n    /* add your stuff here */\n";
         }
@@ -1315,7 +1318,7 @@ PHP_RINIT_FUNCTION({$this->name})
 ";
 
         if (isset($this->internalFunctions['RINIT'])) {
-            $code .= CodeGen_Tools_Indent::indent(4, $this->internalFunctions['RINIT']->getCode());
+            $code .= $this->codegen->block($this->internalFunctions['RINIT']->getCode());
         } else {
           $code .= "    /* add your stuff here */\n";
         }
@@ -1334,7 +1337,7 @@ PHP_RSHUTDOWN_FUNCTION({$this->name})
 ";
 
         if (isset($this->internalFunctions['RSHUTDOWN'])) {
-            $code .= CodeGen_Tools_Indent::indent(4, $this->internalFunctions['RSHUTDOWN']->getCode());
+            $code .= $this->codegen->block($this->internalFunctions['RSHUTDOWN']->getCode());
         } else {
             $code .= "    /* add your stuff here */\n";
         }
@@ -1369,7 +1372,7 @@ PHP_MINFO_FUNCTION({$this->name})
         if (count($this->authors)) {
             $code .= "    php_printf(\"<p><b>Authors:</b></p>\\n\");\n";
             foreach ($this->authors as $author) {
-                $code.= CodeGen_Tools_Indent::indent(4, $author->phpinfoCode($this->name));
+                $code.= $this->codegen->block($author->phpinfoCode($this->name));
             }
         }
 
@@ -1379,9 +1382,7 @@ PHP_MINFO_FUNCTION({$this->name})
 
         // TODO move this decision up?
         if (isset($this->internalFunctions['MINFO'])) {
-            $code .= "\n    do {\n";
-            $code .= CodeGen_Tools_Indent::indent(8, $this->internalFunctions['MINFO']->getCode());
-            $code .= "\n    } while (0);\n";
+            $code .= $this->codegen->varblock($this->internalFunctions['MINFO']->getCode());
         } else {
             $code .= "    /* add your stuff here */\n";
         }
@@ -1412,7 +1413,7 @@ PHP_MINFO_FUNCTION({$this->name})
         $code = "";
 
         foreach ($this->functions as $function) {
-            $code .= $function->cCode(&$this);
+            $code .= $function->cCode($this);
         }
         
         return $code;
@@ -1446,7 +1447,7 @@ PHP_MINFO_FUNCTION({$this->name})
   
         if (isset($this->code["code"]["top"])) {
             foreach ($this->code["code"]["top"] as $code) {
-                echo CodeGen_Tools_Indent::indent(0, $code);
+                echo $this->codegen->block($code, 0);
             }
         }
 
@@ -1483,7 +1484,7 @@ PHP_MINFO_FUNCTION({$this->name})
 
         if (isset($this->code["code"]["bottom"])) {
             foreach ($this->code["code"]["bottom"] as $code) {
-                echo CodeGen_Tools_Indent::indent(0, $code);
+                echo $this->codegen->block($code, 0);
             }
         }
 
@@ -1521,10 +1522,7 @@ dnl
         
         if (isset($this->with[$this->name])) {
             $with = $this->with[$this->name];
-            echo " 
-PHP_ARG_WITH({$this->name}, whether to enable {$this->name} functions,
-[  --with-{$this->name}[=DIR]      With {$this->name} support])
-\n";
+            echo "\n".$with->m4Line()."\n";
         } else {
             echo "
 PHP_ARG_ENABLE({$this->name}, whether to enable {$this->name} functions,
@@ -1542,56 +1540,7 @@ PHP_ARG_ENABLE({$this->name}, whether to enable {$this->name} functions,
 
 
         foreach ($this->with as $with) {
-            $withName   = $with->getName();
-            $withUpname = strtoupper($withName);
-
-            if ($withName != $this->name) {
-                echo " 
-PHP_ARG_WITH({$withName}, ".trim($with->getSummary()).",
-[  --with-{$withName}[=DIR]      With {$withName} support])
-\n";
-            }
-
-            echo "
-  if test -r \"\$PHP_$withUpname/".$with->getTestfile()."\"; then
-    PHP_{$withUpname}_DIR=\"\$PHP_$withUpname\"
-  else
-    AC_MSG_CHECKING(for ".$with->getName()." in default path)
-    for i in ".str_replace(":"," ",$with->getDefaults())."; do
-      if test -r \"\$i/".$with->getTestfile()."\"; then
-        PHP_{$withUpname}_DIR=\$i
-        AC_MSG_RESULT(found in \$i)
-        break
-      fi
-    done
-    if test \"x\" = \"x\$PHP_{$withUpname}_DIR\"; then
-      AC_MSG_ERROR(not found)
-    fi
-  fi
-
-";
-
-            $pathes = array();
-            foreach($with->getHeaders() as $header) {
-               $pathes[$header->getPath()] = true; // TODO WTF???
-            }
-       
-            foreach (array_keys($pathes) as $path) {
-                echo "  PHP_ADD_INCLUDE(\$PHP_{$withUpname}_DIR/$path)\n";
-            }
-
-            echo "  export OLD_CPPFLAGS=\"\$CPPFLAGS\"\n";
-            echo "  export CPPFLAGS=\"\$CPPFLAGS \$INCLUDES -DHAVE_$withUpname\"\n";
-
-            foreach($with->getHeaders() as $header) {
-                echo $header->configm4($this->name, $with->getName());
-            }  
-
-            foreach ($with->getLibs() as $lib) {
-                echo $lib->configm4($this->name, $with->getName());
-            }
-            
-            echo "  export CPPFLAGS=\"\$OLD_CPPFLAGS\"\n";
+           echo $with->configm4($this);
         }
 
         $pathes = array();
@@ -1612,9 +1561,14 @@ PHP_ARG_WITH({$withName}, ".trim($with->getSummary()).",
         echo "  export OLD_CPPFLAGS=\"\$CPPFLAGS\"\n";
         echo "  export CPPFLAGS=\"\$CPPFLAGS \$INCLUDES -DHAVE_".strtoupper($this->name)."\"\n";
 
+        if (count($this->headers)) {
+            if (!isset($this->with[$this->name])) {
+                $this->terminate("global headers not bound to a --with option found and no --with option by the default name");
+            }
 
-        foreach($this->headers as $header) {
-            echo $header->configm4($this->name, $this->name);
+            foreach($this->headers as $header) {
+                echo $header->configm4($this->name, $this->name);
+            }
         }  
 
         foreach ($this->resources as $resource) {
@@ -1624,8 +1578,9 @@ PHP_ARG_WITH({$withName}, ".trim($with->getSummary()).",
         echo "  export CPPFLAGS=\"\$OLD_CPPFLAGS\"\n";
 
         if (count($this->libs)) {
-            $first = true;
-
+            if (!isset($this->with[$this->name])) {
+                $this->terminate("global libs not bound to a --with option found and no --with option by the default name");
+            }
             foreach ($this->libs as $lib) {
                 echo $lib->configm4($this->name, $this->name);
             }
@@ -1645,7 +1600,7 @@ PHP_ARG_WITH({$withName}, ".trim($with->getSummary()).",
 
             $frag = new CodeGen_Tools_FileReplacer($this->dirpath."/Makefile.frag");
             foreach($this->makefragments as $block) {
-                $frag->puts(CodeGen_Tools_Indent::tabify("\n$block\n"));
+                $frag->puts(CodeGen_Tools_IndentC::tabify("\n$block\n"));
             }
             $frag->close();
         }
@@ -2089,7 +2044,7 @@ http://pear.php.net/dtd/package-2.0.xsd">
 ';
 
         echo "  <name>{$this->name}</name>\n";
-        echo "  <channel>pecl.php.net</channel>\n\n"; // TODO -> get from specs
+        echo "  <channel>{$this->channel}</channel>\n\n"; 
 
         if (isset($this->summary)) {
             echo "  <summary>{$this->summary}</summary>\n\n";
@@ -2354,6 +2309,26 @@ vi: ts=1 sw=1
 ';
     }
 
+
+
+    /**
+     * Show error message and bailout
+     *
+     * @param string  error message
+     */
+    function terminate($msg)
+    {
+        while (@ob_end_clean()); // purge output buffers
+
+        $stderr = fopen("php://stderr", "w");
+        if ($stderr) {
+            fprintf($stderr, "%s\n", $msg);
+            fclose($stderr);
+        } else {
+            echo "$msg\n";
+        }
+        exit(3);
+    }
 }   
 
 

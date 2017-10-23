@@ -22,11 +22,11 @@
  * @author     Guillaume Lecanu <Guillaume@dev.fr>
  * @copyright  1997-2005 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: HTML_4_01_TRANSITIONAL.php,v 1.2 2005/03/31 15:14:56 guillaume Exp $
+ * @version    CVS: $Id: HTML_4_01_TRANSITIONAL.php,v 1.3 2005/12/08 13:57:56 guillaume Exp $
  * @link       http://pear.php.net/package/XML_FastCreate
  */
 
-$_GLOBALS['XML_FASTCREATE_NO_OVERLOAD'] = array(
+$GLOBAALS['XML_FASTCREATE_NO_OVERLOAD'] = array(
     'basefont',
     'font',
     'center',

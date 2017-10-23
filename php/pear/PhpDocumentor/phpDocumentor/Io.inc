@@ -1,34 +1,50 @@
 <?php
-//
-// +------------------------------------------------------------------------+
-// | phpDocumentor                                                          |
-// +------------------------------------------------------------------------+
-// | Copyright (c) 2000-2003 Joshua Eichorn, Gregory Beaver                 |
-// | Email         jeichorn@phpdoc.org, cellog@phpdoc.org                   |
-// | Web           http://www.phpdoc.org                                    |
-// | Mirror        http://phpdocu.sourceforge.net/                          |
-// | PEAR          http://pear.php.net/package-info.php?pacid=137           |
-// +------------------------------------------------------------------------+
-// | This source file is subject to version 3.00 of the PHP License,        |
-// | that is available at http://www.php.net/license/3_0.txt.               |
-// | If you did not receive a copy of the PHP license and are unable to     |
-// | obtain it through the world-wide-web, please send a note to            |
-// | license@php.net so we can mail you a copy immediately.                 |
-// +------------------------------------------------------------------------+
-//
-
 /**
- * Class to handle file and user io opperations
+ * File and input handling routines
+ * 
+ * This class parses command-line options, and works with files to
+ * generate lists of files to parse based on the ignore/include options
+ * 
+ * phpDocumentor :: automatic documentation generator
+ * 
+ * PHP versions 4 and 5
  *
- * @author    Joshua Eichorn <jeichorn@phpdoc.org>
- * @version    $Id: Io.inc,v 1.80.2.9 2003/09/19 04:28:09 CelloG Exp $
- * @package     phpDocumentor
+ * Copyright (c) 2000-2006 Joshua Eichorn, Gregory Beaver
+ * 
+ * LICENSE:
+ * 
+ * This library is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation;
+ * either version 2.1 of the License, or (at your option) any
+ * later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ *
+ * @package    phpDocumentor
+ * @author     Joshua Eichorn <jeichorn@phpdoc.org>
+ * @author     Gregory Beaver <cellog@php.net>
+ * @copyright  2000-2006 Joshua Eichorn, Gregory Beaver
+ * @license    http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @version    CVS: $Id: Io.inc,v 1.12 2006/05/23 13:09:26 cellog Exp $
+ * @filesource
+ * @link       http://www.phpdoc.org
+ * @link       http://pear.php.net/PhpDocumentor
+ * @since      0.1
  */
 /**
  * Class to handle file and user io opperations
  *
  * @author    Joshua Eichorn <jeichorn@phpdoc.org>
- * @version    $Id: Io.inc,v 1.80.2.9 2003/09/19 04:28:09 CelloG Exp $
+ * @author     Gregory Beaver <cellog@php.net>
+ * @version    $Id: Io.inc,v 1.12 2006/05/23 13:09:26 cellog Exp $
  * @package     phpDocumentor
  */
 class Io 
@@ -87,11 +103,13 @@ class Io
 
         $this->phpDocOptions['hidden']['tag'] = array("-dh", "--hidden");
         $this->phpDocOptions['hidden']['desc'] = "set equal to on (-dh on) to descend into hidden directories (directories starting with '.'), default is off";
-        $this->phpDocOptions['hidden']['type'] = "value";
+        $this->phpDocOptions['hidden']['type'] = "set";
+        $this->phpDocOptions['hidden']['validvalues'] = array('on', 'off');
 
         $this->phpDocOptions['quiet']['tag'] = array("-q", "--quiet");
         $this->phpDocOptions['quiet']['desc'] = "do not display parsing/conversion messages.  Useful for cron jobs on/off default off";
-        $this->phpDocOptions['quiet']['type'] = "value";
+        $this->phpDocOptions['quiet']['type'] = "set";
+        $this->phpDocOptions['quiet']['validvalues'] = array('on', 'off');
 
         $this->phpDocOptions['title']['tag'] = array("-ti","--title");
         $this->phpDocOptions['title']['desc'] = "title of generated documentation, default is 'Generated Documentation'";
@@ -106,7 +124,8 @@ class Io
 
         $this->phpDocOptions['parseprivate']['tag'] = array("-pp","--parseprivate");
         $this->phpDocOptions['parseprivate']['desc'] = "parse @internal and elements marked private with @access.  Use on/off, default off";
-        $this->phpDocOptions['parseprivate']['type'] = "value";
+        $this->phpDocOptions['parseprivate']['type'] = "set";
+        $this->phpDocOptions['parseprivate']['validvalues'] = array('on', 'off');
 
         $this->phpDocOptions['packageoutput']['tag'] = array("-po","--packageoutput");
         $this->phpDocOptions['packageoutput']['desc'] = "output documentation only for selected packages.  Use a comma-delimited list";
@@ -134,15 +153,22 @@ class Io
 
         $this->phpDocOptions['sourcecode']['tag'] = array("-s","--sourcecode");
         $this->phpDocOptions['sourcecode']['desc'] = "generate highlighted sourcecode for every parsed file (PHP 4.3.0+ only) on/off default off";
-        $this->phpDocOptions['sourcecode']['type'] = "value";
+        $this->phpDocOptions['sourcecode']['type'] = "set";
+        $this->phpDocOptions['sourcecode']['validvalues'] = array('on', 'off');
 
         $this->phpDocOptions['javadocdesc']['tag'] = array("-j","--javadocdesc");
         $this->phpDocOptions['javadocdesc']['desc'] = "JavaDoc-compliant description parsing.  Use on/off, default off (more flexibility)";
-        $this->phpDocOptions['javadocdesc']['type'] = "value";
+        $this->phpDocOptions['javadocdesc']['type'] = "set";
+        $this->phpDocOptions['javadocdesc']['validvalues'] = array('on', 'off');
 
         $this->phpDocOptions['pear']['tag'] = array("-p","--pear");
         $this->phpDocOptions['pear']['desc'] = "Parse a PEAR-style repository (package is directory, _members are @access private) on/off default off";
-        $this->phpDocOptions['pear']['type'] = "value";
+        $this->phpDocOptions['pear']['type'] = "set";
+        $this->phpDocOptions['pear']['validvalues'] = array('on', 'off');
+
+        $this->phpDocOptions['readmeinstallchangelog']['tag'] = array("-ric","--readmeinstallchangelog");
+        $this->phpDocOptions['readmeinstallchangelog']['desc'] = "Specify custom filenames to parse like README, INSTALL or CHANGELOG files";
+        $this->phpDocOptions['readmeinstallchangelog']['type'] = "value";
 
         $this->phpDocOptions['general']['message'] ="You can have multiple directories and multiple files, as well as a combination of both options";
     }
@@ -195,6 +221,10 @@ class Io
      */
     function isIncludeable($filename)
     {
+        $test = realpath($filename);
+        if ($test && is_readable($test)) {
+            return true; // for absolute paths
+        }
         $ip = get_include_path();
         if (PHPDOCUMENTOR_WINDOWS)
         {
@@ -222,22 +252,33 @@ class Io
      */
     function parseArgv()
     {
+        global $argv;
         // defaults for setting
         $setting['hidden'] = "off";
         $setting['template'] = 'templates' . PATH_DELIMITER .'default' . PATH_DELIMITER;
 
         $valnext = "junk";
-        if(array_key_exists('argv',$_SERVER) && is_array($_SERVER['argv']))
+        $data = array();
+        if(isset($argv) && is_array($argv))
         {
-            foreach ( $_SERVER['argv'] as $cmd )
+            foreach ($argv as $cmd)
             {
                 //if($cmd === 'phpdoc' || basename($cmd)==='phpdoc')
                 //    continue;
 
+                if ($cmd == '--') {
+                    continue;
+                }
                 if ($cmd == '-h' || $cmd == '--help')
                 {
                     echo $this->displayHelpMsg();
                     die();
+                }
+                if (isset($data['type']) && $data['type'] == 'set') {
+                    if (!in_array(strtolower($cmd), $data['validvalues'], true)) {
+                        addErrorDie(PDERROR_INVALID_VALUES, $valnext, $cmd,
+                            '(' . implode(', ', $data['validvalues']) . ')');
+                    }
                 }
                 $setting[$valnext] = $cmd;
                 foreach( $this->phpDocOptions as $name => $data )
@@ -284,12 +325,13 @@ class Io
      */
     function dirList($directory,$hidden = "off")
     {
+        $directory = realpath($directory);
         $ret = false;
         if (@is_dir($directory))
         {
             $ret = array();
             $d = @dir($directory); // thanks to Jason E Sweat (jsweat@users.sourceforge.net) for fix
-            while($d && $entry=$d->read()) {
+            while($d && ($entry=$d->read()) !== false) {
                 if (strcmp($entry,".") != 0 && strcmp($entry,"..") != 0) {
                 if ($hidden == "off")
                 {
@@ -345,9 +387,10 @@ class Io
      */
     function getBase($filelist)
     {
+        $masterPath = false;
         foreach($filelist as $path)
         {
-            if (!isset($masterPath))
+            if (!$masterPath)
             {
                 $masterPath = str_replace('\\','/',dirname($path));
             } else
@@ -438,7 +481,7 @@ class Io
     function getReadmeInstallChangelog($base,$filelist)
     {
         $list = $ric = array();
-        $names = array('README', 'INSTALL', 'CHANGELOG', 'FAQ', 'NEWS');
+        $names = $GLOBALS['_phpDocumentor_RIC_files'];
         foreach($filelist as $file)
         {
             if ((dirname($file) == $base) && in_array(strtoupper(basename($file)), $names))
@@ -461,11 +504,15 @@ class Io
             if ($this->checkIgnore(basename($file),dirname($file),$ignore)) continue;
             $path = substr(dirname($file),strlen(str_replace('\\','/',realpath($base_dir)))+1);
             if (!$path) $path = '/';
-            $file1 = $file;
-            $file = basename($file);
-            $ext = array_pop(explode('.',$file));
-            if (strlen($ext) == strlen($file)) $ext = '';
-            $struc[$path][] = array('file' => $file,'ext' => $ext,'path' => $file1);
+            $parts = pathinfo($file);
+            if (!isset($parts['extension']))
+            {
+                $parts['extension'] = '';
+            }
+            $struc[$path][] = array(
+                'file' => $parts['basename'],
+                'ext' => $parts['extension'],
+                'path' => $file);
         }
         uksort($struc,'strnatcasecmp');
         foreach($struc as $key => $ind)
@@ -514,7 +561,7 @@ class Io
             $struc['/'] = setup_dirs($struc['/'], $dir, $tempstruc[$save]);
             unset($struc[$save]);
         }
-        uksort($struc['/'],'Ioinc_mystrucsort');
+        @uksort($struc['/'],'Ioinc_mystrucsort');
         return $struc;
     }
     
@@ -546,6 +593,9 @@ class Io
                 {
                     phpDocumentor_out(" -- Parsing file\n");
                     flush();
+                    if (function_exists('file_get_contents')) {
+                        return file_get_contents($path);
+                    }
                     $fp = fopen($path,"r");
                     $ret = fread($fp,filesize($path));
                     fclose($fp);
@@ -554,9 +604,13 @@ class Io
                 { 
                     phpDocumentor_out(" CVS file [EXPERIMENTAL]\n"); 
                     flush();
-                    $fp = fopen($path,"r"); 
-                    $ret = fread($fp,filesize($path)); 
-                    fclose($fp); 
+                    if (function_exists('file_get_contents')) {
+                        $ret = file_get_contents($path);
+                    } else {
+                        $fp = fopen($path,"r"); 
+                        $ret = fread($fp,filesize($path)); 
+                        fclose($fp); 
+                    }
                     $ret = strstr($ret,"<?");
                     $ret = substr($ret,0,strpos($ret,"@\n"));
                     $ret = str_replace("@@","@",$ret); 
@@ -589,9 +643,11 @@ class Io
      */
     function checkIgnore($file,$path,$ignore,$ignore_no_ext = true)
     {
+        global $_phpDocumentor_RIC_files;
         $path = realpath($path);
         if (!count($ignore)) return false;
-        if ($ignore_no_ext && strtoupper($file) != 'README' && strtoupper($file) != 'INSTALL' && strtoupper($file) != 'CHANGELOG' && strtoupper($file) != 'FAQ' && strtoupper($file) != 'NEWS')
+        if ($ignore_no_ext && 
+            !in_array(strtoupper($file), $_phpDocumentor_RIC_files))
         {
             if (!is_numeric(strpos($file,'.'))) return true;
         }
@@ -704,7 +760,8 @@ class Io
         $s = str_replace('/', DIRECTORY_SEPARATOR, $s);
         $x = strtr($s, array('?' => '.','*' => '.*','.' => '\\.','\\' => '\\\\','/' => '\\/',
                                 '[' => '\\[',']' => '\\]','-' => '\\-'));
-        if (strpos($s, DIRECTORY_SEPARATOR) === strlen($s) - 1)
+        if (strpos($s, DIRECTORY_SEPARATOR) !== false &&
+            strrpos($s, DIRECTORY_SEPARATOR) === strlen($s) - 1)
         {
             $x = "(?:.*$y$x?.*|$x.*)";
         }

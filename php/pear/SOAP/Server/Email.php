@@ -120,7 +120,7 @@ class SOAP_Server_Email extends SOAP_Server {
 
         $client =& new SOAP_Client(null);
 
-        return $client->__parse($data, $this->xml_encoding, $this->attachments);
+        return $client->parseResponse($data, $this->xml_encoding, $this->attachments);
     }
 
     function service(&$data, $endpoint = '', $send_response = true,
@@ -161,7 +161,7 @@ class SOAP_Server_Email extends SOAP_Server {
             /* Handle Mime or DIME encoding. */
             /* TODO: DIME Encoding should move to the transport, do it here
              * for now and for ease of getting it done. */
-            if (count($this->__attachments)) {
+            if (count($this->_attachments)) {
                 if ($useEncoding == 'Mime') {
                     $soap_msg = $this->_makeMimeMessage($soap_msg);
                 } else {

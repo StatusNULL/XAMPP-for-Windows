@@ -17,9 +17,9 @@
  * @author     Wolfram Kriesing <wk@visionp.de>
  * @author     Paolo Panto <wk@visionp.de>
  * @author     Lorenzo Alberton <l dot alberton at quipo dot it>
- * @copyright  2003-2006 Wolfram Kriesing, Paolo Panto, Lorenzo Alberton
+ * @copyright  2003-2007 Wolfram Kriesing, Paolo Panto, Lorenzo Alberton
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Query.php,v 1.62 2006/01/26 17:27:18 quipo Exp $
+ * @version    CVS: $Id: Query.php,v 1.71 2007/01/10 17:49:47 quipo Exp $
  * @link       http://pear.php.net/package/DB_QueryTool
  */
 
@@ -39,7 +39,7 @@ require_once 'DB.php';
  * @author     Wolfram Kriesing <wk@visionp.de>
  * @author     Paolo Panto <wk@visionp.de>
  * @author     Lorenzo Alberton <l dot alberton at quipo dot it>
- * @copyright  2003-2006 Wolfram Kriesing, Paolo Panto, Lorenzo Alberton
+ * @copyright  2003-2007 Wolfram Kriesing, Paolo Panto, Lorenzo Alberton
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
  * @link       http://pear.php.net/package/DB_QueryTool
  */
@@ -175,22 +175,27 @@ class DB_QueryTool_Query
      * in a column name, the string found by using this regular expression will be removed
      * from the column name and it will be checked if it is a table name
      * i.e. the default '/_id$/' would find the table name 'user' from the column name 'user_id'
+     *
+     * @access private
      */
     var $_tableNameToShortNamePreg = '/^.*_/';
 
     /**
      * @var array this array caches queries that have already been built once
      *            to reduce the execution time
+     * @access private
      */
     var $_queryCache = array();
 
     /**
      * The object that contains the log-instance
+     * @access private
      */
     var $_logObject = null;
 
     /**
      * Some internal data the logging needs
+     * @access private
      */
     var $_logData = array();
 
@@ -201,9 +206,10 @@ class DB_QueryTool_Query
      * this is the constructor, as it will be implemented in ZE2 (php5)
      *
      * @version    2002/04/02
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @param      object  db-object
+     * @param   array   options array
+     * @access     public
      */
 /*
     function __construct($dsn=false, $options=array())
@@ -233,7 +239,7 @@ class DB_QueryTool_Query
         //    $this->primaryCol = 'ID';
         //}
 
-        if ($this->sequenceName == null) {
+        if (is_null($this->sequenceName)) {
             $this->sequenceName = $this->table;
         }
     }
@@ -244,10 +250,10 @@ class DB_QueryTool_Query
 
     /**
      * @version    2002/04/02
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @param mixed $dsn DSN string, DSN array or DB object
      * @param array $options
+     * @access     public
      */
     function DB_QueryTool_Query($dsn=false, $options=array())
     {
@@ -283,7 +289,7 @@ class DB_QueryTool_Query
 
     /**
      * use this method if you want to connect manually
-     * @param mixed $dsn DSN string, DSN array or MDB object
+     * @param mixed $dsn DSN string, DSN array or DB object
      * @param array $options
      */
     function connect($dsn, $options=array())
@@ -293,7 +299,7 @@ class DB_QueryTool_Query
         } else {
             $res = $this->db = DB::connect($dsn, $options);
         }
-        if (DB::isError($res)) {
+        if (PEAR::isError($res)) {
 // FIXXME what shall we do here?
             $this->_errorLog($res->getUserInfo());
         } else {
@@ -338,17 +344,22 @@ class DB_QueryTool_Query
      * directly not as an array!
      *
      * @version    2002/03/05
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @param      integer the id of the element to retrieve
-     * @param      string  if this is given only one row shall be returned, directly, not an array
+     * @param      string  if this is given only one row shall be returned,
+     *             directly, not an array
      * @return     mixed   (1) an array of the retrieved data
      *                     (2) if the second parameter is given and its only one column,
      *                         only this column's data will be returned
      *                     (3) false in case of failure
+     * @access  public
      */
     function get($id, $column='')
     {
+        if (is_string($id)) {
+            $id = trim($id);
+        }
+        $column = trim($column);
         $table = $this->table;
         $getMethod = 'getRow';
         if ($column && !strpos($column, ',')) {   // if only one column shall be selected
@@ -358,10 +369,11 @@ class DB_QueryTool_Query
         // build the query directly
         // if $column is '' then _buildSelect selects '*' anyway, so that's the same behaviour as before
         $query['select'] = $this->_buildSelect($column);
-        $query['where']  = $this->_buildWhere($this->table.'.'.$this->primaryCol.'='.$this->db->quoteSmart($id));
+        $query['where']  = $this->_buildWhere(
+            $this->_quoteIdentifier($this->table).'.'.$this->_quoteIdentifier($this->primaryCol) .'='. $this->_quote($id));
         $queryString = $this->_buildSelectQuery($query);
 
-        return $this->returnResult($this->execute($queryString,$getMethod));
+        return $this->returnResult($this->execute($queryString, $getMethod));
     }
 
     // }}}
@@ -371,12 +383,12 @@ class DB_QueryTool_Query
      * gets the data of the given ids
      *
      * @version    2002/04/23
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @param      array   this is an array of ids to retrieve
      * @param      string  the column to search in for
      * @return     mixed   an array of the retrieved data, or false in case of failure
      *                       when failing an error is set in $this->_error
+     * @access  public
      */
     function getMultiple($ids, $column='')
     {
@@ -394,6 +406,22 @@ class DB_QueryTool_Query
     }
 
     // }}}
+    // {{{ getOne()
+
+    /**
+     * get the first value of the first row
+     *
+     * @access     public
+     * @return     mixed   (1) a scalar value in case of success
+     *                     (2) false in case of failure
+     */
+    function getOne()
+    {
+        $queryString = $this->getQueryString();
+        return $this->execute($queryString, 'getOne');
+    }
+
+    // }}}
     // {{{ getAll()
 
     /**
@@ -401,19 +429,20 @@ class DB_QueryTool_Query
      * for sorting use setOrder!!!, the last 2 parameters are deprecated
      *
      * @version    2002/03/05
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @param      int     to start from
      * @param      int     the number of rows to show
      * @param      string  the DB-method to use, i dont know if we should leave this param here ...
      * @return     mixed   an array of the retrieved data, or false in case of failure
      *                       when failing an error is set in $this->_error
+     * @access  public
      */
-    function getAll($from=0,$count=0,$method='getAll')
+    function getAll($from = 0, $count = 0, $method = 'getAll')
     {
         $query = array();
         if ($count) {
             $query = array('limit' => array($from, $count));
+//echo '<br/>'.$this->_buildSelectQuery($query).'<br/>';
         }
         return $this->returnResult($this->execute($this->_buildSelectQuery($query), $method));
     }
@@ -432,27 +461,28 @@ class DB_QueryTool_Query
      * so ids will be an array with all the id's
      *
      * @version    2003/02/25
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @param      string  the column that shall be retrieved
      * @param      int     to start from
      * @param      int     the number of rows to show
      * @return     mixed   an array of the retrieved data, or false in case of failure
      *                     when failing an error is set in $this->_error
+     * @access  public
      */
     function getCol($column=null, $from=0, $count=0)
     {
         $query = array();
         if (!is_null($column)) {
-            // by using _buildSelect() i can be sure that the table name will not be ambigious
+            // by using _buildSelect() I can be sure that the table name will not be ambiguous
             // i.e. in a join, where all the joined tables have a col 'id'
             // _buildSelect() will put the proper table name in front in case there is none
-            $query['select'] = $this->_buildSelect($column);
+            $query['select'] = $this->_buildSelect(trim($column));
         }
         if ($count) {
             $query['limit'] = array($from,$count);
         }
-        return $this->returnResult($this->execute($this->_buildSelectQuery($query), 'getCol'));
+        $res = $this->returnResult($this->execute($this->_buildSelectQuery($query), 'getCol'));
+        return ($res === false) ? array() : $res;
     }
 
     // }}}
@@ -462,11 +492,10 @@ class DB_QueryTool_Query
      * get the number of entries
      *
      * @version    2002/04/02
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
-     * @param
      * @return     mixed   an array of the retrieved data, or false in case of failure
      *                       when failing an error is set in $this->_error
+     * @access  public
      */
     function getCount()
     {
@@ -497,7 +526,6 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
 */
         //$this->setSelect('count(*)');
         $queryString = $this->_buildSelectQuery($query, true);
-
         return ($res = $this->execute($queryString, 'getOne')) ? $res : 0;
     }
 
@@ -509,9 +537,9 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * corresponding to the columns in the DB
      *
      * @version    2002/04/05
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @return     array   an empty, or pre-initialized element
+     * @access     public
      */
     function getDefaultValues()
     {
@@ -554,6 +582,46 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     }
 
     // }}}
+    // {{{ _floatToStringNoLocale()
+
+    /**
+     * If a double number was "localized", restore its decimal separator to "."
+     * @see http://pear.php.net/bugs/bug.php?id=3021
+     * @param float
+     * @access private
+     */
+    function _floatToStringNoLocale($float)
+    {
+        $precision = strlen($float) - strlen(intval($float));
+        if ($precision) {
+            --$precision; // don't count decimal seperator
+        }
+        return number_format($float, $precision, '.', '');
+    }
+
+    // }}}
+    // {{{ _localeSafeImplode()
+
+    /**
+     * New "implode()" implementation to bypass float locale formatting:
+     * the SQL decimal separator is and must be ".".  Always.
+     * @param string $glue
+     * @param array $array
+     * @access private
+     */
+    function _localeSafeImplode($glue, $array)
+    {
+        $str = '';
+        foreach ($array as $value) {
+            if (!empty($str)) {
+                $str .= $glue;
+            }
+            $str .= is_double($value) ? $this->_floatToStringNoLocale($value) : $value;
+        }
+        return $str;
+    }
+
+    // }}}
     // {{{ save()
 
     /**
@@ -568,14 +636,14 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * method and do the checks in here, and both cases will be validated first.
      *
      * @version    2002/03/11
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @param      array   contains the new data that shall be saved in the DB
      * @return     mixed   the data returned by either add or update-method
+     * @access  public
      */
     function save($data)
     {
-        if (!empty($data[$this->primaryCol])) {
+        if (isset($data[$this->primaryCol]) && $data[$this->primaryCol]) {
             return $this->update($data);
         }
         return $this->add($data);
@@ -588,11 +656,11 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * update the member data of a data set
      *
      * @version    2002/03/06
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @param      array   contains the new data that shall be saved in the DB
      *                     the id has to be given in the field with the key 'ID'
      * @return     mixed   true on success, or false otherwise
+     * @access  public
      */
     function update($newData)
     {
@@ -601,20 +669,19 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
         // do only set the 'where' part in $query, if a primary column is given
         // if not the default 'where' clause is used
         if (isset($newData[$this->primaryCol])) {
-            $query['where'] = $this->primaryCol.'='
-                .($raw ? $newData[$this->primaryCol] : $this->db->quoteSmart($newData[$this->primaryCol]));
+            $query['where'] = $this->_quoteIdentifier($this->primaryCol) . '=' . $this->_quote($newData[$this->primaryCol]);
         }
         $newData = $this->_checkColumns($newData, 'update');
         $values = array();
         foreach ($newData as $key => $aData) {         // quote the data
-            //$values[] = "{$this->table}.$key=". ($raw ? $aData : $this->db->quote($aData));
-            $values[] = "$key=". ($raw ? $aData : $this->db->quote($aData));
+            //$values[] = "{$this->table}.$key=". $this->_quote($aData);
+            $values[] = $this->_quoteIdentifier($key) . '=' . $this->_quote($aData);
         }
 
-        $query['set'] = implode(',', $values);
+        $query['set'] = $this->_localeSafeImplode(',', $values);
 //FIXXXME _buildUpdateQuery() seems to take joins into account, whcih is bullshit here
         $updateString = $this->_buildUpdateQuery($query);
-#print '$updateString = '.$updateString;
+//print '$updateString = '.$updateString;
         return $this->execute($updateString, 'query') ? true : false;
     }
 
@@ -625,17 +692,18 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * add a new member in the DB
      *
      * @version    2002/04/02
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @param      array   contains the new data that shall be saved in the DB
      * @return     mixed   the inserted id on success, or false otherwise
+     * @access  public
      */
     function add($newData)
     {
         // if no primary col is given, get next sequence value
         if (empty($newData[$this->primaryCol])) {
-            if ($this->primaryCol) {    // do only use the sequence if a primary column is given
-                                        // otherwise the data are written as given
+            if ($this->primaryCol) {
+                // do only use the sequence if a primary column is given
+                // otherwise the data are written as given
                 $id = $this->db->nextId($this->sequenceName);
                 $newData[$this->primaryCol] = (int)$id;
             } else {
@@ -650,13 +718,22 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
 
         $newData = $this->_checkColumns($newData, 'add');
         $newData = $this->_quoteArray($newData);
+        
+        //quoting the columns
+        $tmpData = array();
+        foreach ($newData as $key=>$val) {
+            $tmpData[$this->_quoteIdentifier($key)] = $val;
+        }
+        $newData = $tmpData;
+        unset($tmpData);
 
         $query = sprintf(
             'INSERT INTO %s (%s) VALUES (%s)',
             $this->table,
             implode(', ', array_keys($newData)),
-            implode(', ', $newData)
+            $this->_localeSafeImplode(', ', $newData)
         );
+        //echo $query;
         return $this->execute($query, 'query') ? $id : false;
     }
 
@@ -666,44 +743,75 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     /**
      * adds multiple new members in the DB
      *
-     * @version    2002/07/17
-     * @access     public
-     * @author     Wolfram Kriesing <wk@visionp.de>
-     * @param      array   contains an array of new data that shall be saved in the DB
-     *                     the key-value pairs have to be the same for all the data!!!
-     * @return     mixed   the inserted ids on success, or false otherwise
+     * @version 2002/07/17
+     * @author  Wolfram Kriesing <wk@visionp.de>
+     * @param   array   contains an array of new data that shall be saved in the DB
+     *                  the key-value pairs have to be the same for all the data!!!
+     * @return  mixed   the inserted ids on success, or false otherwise
+     * @access  public
      */
     function addMultiple($data)
     {
         if (!sizeof($data)) {
             return false;
         }
+        $ret = true;
         // the inserted ids which will be returned or if no primaryCol is given
         // we return true by default
         $retIds = $this->primaryCol ? array() : true;
-        $allData = array();     // each row that will be inserted
-        foreach ($data as $key => $aData) {
-            $aData = $this->_checkColumns($aData, 'add');
-            $aData = $this->_quoteArray($aData);
+        $dbtype = $this->db->phptype;
+        if ($dbtype == 'mysql') { //Optimise for MySQL
+            $allData = array();     // each row that will be inserted
+            foreach ($data as $key => $aData) {
+                $aData = $this->_checkColumns($aData, 'add');
+                $aData = $this->_quoteArray($aData);
 
-            if (empty($aData[$this->primaryCol])) {
-                if ($this->primaryCol) {    // do only use the sequence if a primary column is given
-                                            // otherwise the data are written as given
-                    $retIds[] = $id = (int)$this->db->nextId($this->sequenceName);
-                    $aData[$this->primaryCol] = $id;
+                if (empty($aData[$this->primaryCol])) {
+                    if ($this->primaryCol) {
+                        // do only use the sequence if a primary column is given
+                        // otherwise the data are written as given
+                        $retIds[] = $id = (int)$this->db->nextId($this->sequenceName);
+                        $aData[$this->primaryCol] = $id;
+                    }
+                } else {
+                    $retIds[] = $aData[$this->primaryCol];
                 }
-            } else {
-                $retIds[] = $aData[$this->primaryCol];
+                $allData[] = '('.$this->_localeSafeImplode(', ', $aData).')';
             }
-            $allData[] = '('.implode(', ', $aData).')';
-        }
 
-        $query = sprintf(   'INSERT INTO %s (%s) VALUES %s',
-                            $this->table,
-                            implode(', ', array_keys($aData)), // use the keys of the last element built
-                            implode(', ', $allData)
-                        );
-        return $this->execute($query, 'query') ? $retIds : false;
+            //quoting the columns
+            $tmpData = array();
+            foreach ($aData as $key=>$val) {
+                $tmpData[$this->_quoteIdentifier($key)] = $val;
+            }
+            $newData = $tmpData;
+            unset($tmpData);
+
+            $query = sprintf(
+                'INSERT INTO %s (%s) VALUES %s',
+                $this->table ,
+                implode(', ', array_keys($aData)) ,
+                $this->_localeSafeImplode(', ', $allData)
+            );
+            return $this->execute($query, 'query') ? $retIds : false;
+        }
+        
+        //Executing for every entry the add method
+        foreach ($data as $entity) {
+            if ($ret) {
+                $res = $this->add($entity);
+                if (!$res) {
+                    $ret = false;
+                } else {
+                    $retIds[] = $res;
+                }
+            }
+        }
+        //Setting the return value to the array with ids
+        if ($ret) {
+            $ret = $retIds;
+        }
+        return $ret;
     }
 
     // }}}
@@ -712,13 +820,13 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
    /**
      * removes a member from the DB
      *
-     * @version    2002/04/08
-     * @access     public
-     * @author     Wolfram Kriesing <wk@visionp.de>
-     * @param      mixed   integer/string - the value of the column that shall be removed
-     *                       array   - multiple columns that shall be matched, the second parameter will be ignored
-     * @param      string  the column to match the data against, only if $data is not an array
-     * @return     boolean
+     * @version 2002/04/08
+     * @author  Wolfram Kriesing <wk@visionp.de>
+     * @param   mixed   integer/string - the value of the column that shall be removed
+     *                  array   - multiple columns that shall be matched, the second parameter will be ignored
+     * @param   string  the column to match the data against, only if $data is not an array
+     * @return  boolean
+     * @access  public
      */
     function remove($data, $whereCol='')
     {
@@ -728,20 +836,21 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
 //FIXXME check $data if it only contains columns that really exist in the table
             $wheres = array();
             foreach ($data as $key => $val) {
-                $wheres[] = $key.'='. ($raw ? $val : $this->db->quote($val));
+                if (is_null($val)) {
+                    $wheres[] = $this->_quoteIdentifier($key) .' IS NULL';
+                } else {
+                    $wheres[] = $this->_quoteIdentifier($key) .'='. $this->_quote($val);
+                }
             }
-            $whereClause = implode(' AND ',$wheres);
+            $whereClause = implode(' AND ', $wheres);
         } else {
             if (empty($whereCol)) {
                 $whereCol = $this->primaryCol;
             }
-            $whereClause = $whereCol.'='. ($raw ? $data : $this->db->quote($data));
+            $whereClause = $this->_quoteIdentifier($whereCol) .'='. $this->_quote($data);
         }
 
-        $query = sprintf(   'DELETE FROM %s WHERE %s',
-                            $this->table,
-                            $whereClause
-                            );
+        $query = 'DELETE FROM '. $this->table .' WHERE '. $whereClause;
         return $this->execute($query, 'query') ? true : false;
 // i think this method should return the ID's that it removed, this way we could simply use the result
 // for further actions that depend on those id ... or? make stuff easier, see ignaz::imail::remove
@@ -753,10 +862,10 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     /**
      * empty a table
      *
-     * @version    2002/06/17
-     * @access     public
-     * @author     Wolfram Kriesing <wk@visionp.de>
-     * @return
+     * @version 2002/06/17
+     * @author  Wolfram Kriesing <wk@visionp.de>
+     * @return  resultSet or false on error [execute() result]
+     * @access  public
      */
     function removeAll()
     {
@@ -770,11 +879,11 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     /**
      * remove the datasets with the given ids
      *
-     * @version    2002/04/24
-     * @access     public
-     * @author     Wolfram Kriesing <wk@visionp.de>
-     * @param      array   the ids to remove
-     * @return
+     * @version 2002/04/24
+     * @author  Wolfram Kriesing <wk@visionp.de>
+     * @param   array   the ids to remove
+     * @return  resultSet or false on error [execute() result]
+     * @access  public
      */
     function removeMultiple($ids, $colName='')
     {
@@ -783,11 +892,12 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
         }
         $ids = $this->_quoteArray($ids);
 
-        $query = sprintf(   'DELETE FROM %s WHERE %s IN (%s)',
-                            $this->table,
-                            $colName,
-                            implode(',', $ids)
-                        );
+        $query = sprintf(
+            'DELETE FROM %s WHERE %s IN (%s)',
+            $this->table,
+            $colName,
+            $this->_localeSafeImplode(',', $ids)
+        );
         return $this->execute($query, 'query') ? true : false;
     }
 
@@ -799,13 +909,13 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * so all rows in another table that refer to this table are erased too
      *
      * @version    2002/04/08
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @param      integer the value of the primary key
      * @param      string  the column name of the tables with the foreign keys
      * @param      object  just for convinience, so nobody forgets to call this method
      *                       with at least one object as a parameter
      * @return     boolean
+     * @access     public
      */
     function removePrimary($id, $colName, $atLeastOneObject)
     {
@@ -828,8 +938,11 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     // {{{ setLimit()
 
     /**
-     * @param integer $from
-     * @param integer $count
+     * sets query limits
+     *
+     * @param   integer $from   start index
+     * @param   integer $count  number of results
+     * @access  public
      */
     function setLimit($from=0, $count=0)
     {
@@ -844,7 +957,10 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     // {{{ getLimit()
 
     /**
-     * @return array
+     * gets query limits
+     *
+     * @return array (start index, number of results)
+     * @access  public
      */
     function getLimit()
     {
@@ -858,9 +974,9 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * sets the where condition which is used for the current instance
      *
      * @version    2002/04/16
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @param      string  the where condition, this can be complete like 'X=7 AND Y=8'
+     * @access     public
      */
     function setWhere($whereCondition='')
     {
@@ -876,9 +992,9 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * gets the where condition which is used for the current instance
      *
      * @version    2002/04/22
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @return     string  the where condition, this can be complete like 'X=7 AND Y=8'
+     * @access     public
      */
     function getWhere()
     {
@@ -892,11 +1008,11 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * only adds a string to the where clause
      *
      * @version    2002/07/22
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @param      string  the where clause to add to the existing one
      * @param      string  the condition for how to concatenate the new where clause
      *                       to the existing one
+     * @access     public
      */
     function addWhere($where, $condition='AND')
     {
@@ -917,11 +1033,12 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      *     LOWER(name) LIKE "%otto%hans%"
      * so the search finds the given string
      *
-     * @version    2002/08/14
-     * @access     public
-     * @author     Wolfram Kriesing <wk@visionp.de>
-     * @param      string  the column to search in for
-     * @param      string  the string to search for
+     * @version 2002/08/14
+     * @author  Wolfram Kriesing <wk@visionp.de>
+     * @param   string  the column to search in for
+     * @param   string  the string to search for
+     * @param   string  the condition
+     * @access  public
      */
     function addWhereSearch($column, $string, $condition='AND')
     {
@@ -930,11 +1047,11 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
         if (strpos($column, '.') === false) {
             $meta = $this->metadata();
             if (isset($meta[$column])) {
-                $column = $this->table.".$column";
+                $column = $this->table .'.'. trim($column);
             }
         }
 
-        $string = $this->db->quote('%'.str_replace(' ', '%', strtolower($string)).'%');
+        $string = $this->db->quoteSmart('%'.str_replace(' ', '%', strtolower($string)).'%');
         $this->addWhere("LOWER($column) LIKE $string", $condition);
     }
 
@@ -945,10 +1062,10 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * sets the order condition which is used for the current instance
      *
      * @version    2002/05/16
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @param      string  the where condition, this can be complete like 'X=7 AND Y=8'
      * @param      boolean sorting order (TRUE => ASC, FALSE => DESC)
+     * @access     public
      */
     function setOrder($orderCondition='', $desc=false)
     {
@@ -962,10 +1079,10 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * Add a order parameter to the query.
      *
      * @version    2003/05/28
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @param      string  the where condition, this can be complete like 'X=7 AND Y=8'
      * @param      boolean sorting order (TRUE => ASC, FALSE => DESC)
+     * @access     public
      */
     function addOrder($orderCondition='', $desc=false)
     {
@@ -984,9 +1101,9 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * gets the order condition which is used for the current instance
      *
      * @version    2002/05/16
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @return     string  the order condition, this can be complete like 'ID,TIMESTAMP DESC'
+     * @access     public
      */
     function getOrder()
     {
@@ -1000,9 +1117,9 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * sets the having definition
      *
      * @version    2003/06/05
-     * @access     public
      * @author     Johannes Schaefer <johnschaefer@gmx.de>
      * @param      string  the having definition
+     * @access     public
      */
     function setHaving($having='')
     {
@@ -1016,9 +1133,9 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * gets the having definition which is used for the current instance
      *
      * @version    2003/06/05
-     * @access     public
      * @author     Johannes Schaefer <johnschaefer@gmx.de>
      * @return     string  the having definition
+     * @access     public
      */
     function getHaving()
     {
@@ -1035,6 +1152,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      *
      * @param string this is a having clause, i.e. 'column' or 'table.column' or 'MAX(column)'
      * @param string the connection string, which usually stays the default, which is ',' (a comma)
+     * @access     public
      */
     function addHaving($what='*', $connectString=' AND ')
     {
@@ -1052,11 +1170,11 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * sets a join-condition
      *
      * @version    2002/06/10
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @param      mixed   either a string or an array that contains
      *                       the table(s) to join on the current table
      * @param      string  the where clause for the join
+     * @access     public
      */
     function setJoin($table=null, $where=null, $joinType='default')
     {
@@ -1081,7 +1199,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     }
 
     // }}}
-    // {{{ setJoin()
+    // {{{ setLeftJoin()
 
     /**
      * if you do a left join on $this->table you will get all entries
@@ -1090,10 +1208,10 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * NOTE: be sure to only use either a right or a left join
      *
      * @version    2002/07/22
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @param      string  the table(s) to be left-joined
      * @param      string  the where clause for the join
+     * @access     public
      */
     function setLeftJoin($table=null, $where=null)
     {
@@ -1104,9 +1222,11 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     // {{{ addLeftJoin()
 
     /**
-     * @param string the table to be left-joined
-     * @param string the where clause for the join
-     * @param string the join type
+     *
+     * @param  string  the table(s) to be left-joined
+     * @param  string  the where clause for the join
+     * @param  string  join type
+     * @access public
      */
     function addLeftJoin($table, $where, $type='left')
     {
@@ -1125,12 +1245,12 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * NOTE: be sure to only use either a right or a left join
 //FIXXME check if the above sentence is necessary and if sql doesnt allow the use of both
      *
-     * @see        setLeftJoin()
      * @version    2002/09/04
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @param      string  the table(s) to be right-joined
      * @param      string  the where clause for the join
+     * @see        setLeftJoin()
+     * @access     public
      */
     function setRightJoin($table=null, $where=null)
     {
@@ -1168,7 +1288,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
             case 'right':   // return right-join data only
             case 'left':    // return left join data only
             default:
-                if (count($this->_join[$what])) {
+                if (isset($this->_join[$what]) && count($this->_join[$what])) {
                     $ret = array_merge($ret, $this->_join[$what]);
                 }
                 break;
@@ -1180,23 +1300,23 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     // {{{ addJoin()
 
     /**
-     *   adds a table and a where clause that shall be used for the join
-     *   instead of calling
-     *       setJoin(array(table1,table2),'<where clause1> AND <where clause2>')
-     *   you can also call
-     *       setJoin(table1,'<where clause1>')
-     *       addJoin(table2,'<where clause2>')
-     *   or where it makes more sense is to build a query which is made out of a
-     *   left join and a standard join
-     *       setLeftJoin(table1,'<where clause1>')
-     *       // results in ... FROM $this->table LEFT JOIN table ON <where clause1>
-     *       addJoin(table2,'<where clause2>')
-     *       // results in ...  FROM $this->table,table2 LEFT JOIN table ON <where clause1> WHERE <where clause2>
+     * adds a table and a where clause that shall be used for the join
+     * instead of calling
+     *     setJoin(array(table1,table2),'<where clause1> AND <where clause2>')
+     * you can also call
+     *     setJoin(table1,'<where clause1>')
+     *     addJoin(table2,'<where clause2>')
+     * or where it makes more sense is to build a query which is made out of a
+     * left join and a standard join
+     *     setLeftJoin(table1,'<where clause1>')
+     *     // results in ... FROM $this->table LEFT JOIN table ON <where clause1>
+     *     addJoin(table2,'<where clause2>')
+     *     // results in ...  FROM $this->table,table2 LEFT JOIN table ON <where clause1> WHERE <where clause2>
      *
-     * @access     public
      * @param      string the table to be joined
      * @param      string the where clause for the join
      * @param      string the join type
+     * @access     public
      */
     function addJoin($table, $where, $type='default')
     {
@@ -1204,7 +1324,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
             return;  //skip. Self joins are not supported.
         }
         // init value, to prevent E_ALL-warning
-        if (!isset($this->_join[$type]) || !$this->_join[$type]) {
+        if (!array_key_exists($type, $this->_join)) {
             $this->_join[$type] = array();
         }
         $this->_join[$type][$table] = $where;
@@ -1217,9 +1337,9 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * sets the table this class is currently working on
      *
      * @version    2002/07/11
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @param      string  the table name
+     * @access     public
      */
     function setTable($table)
     {
@@ -1233,9 +1353,9 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * gets the table this class is currently working on
      *
      * @version    2002/07/11
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @return     string  the table name
+     * @access     public
      */
     function getTable()
     {
@@ -1249,15 +1369,15 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * sets the group-by condition
      *
      * @version    2002/07/22
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @param      string  the group condition
+     * @access     public
      */
     function setGroup($group='')
     {
         $this->_group = $group;
-//FIXXME parse the condition and replace ambigious column names, such as "name='Deutschland'" with "country.name='Deutschland'"
-// then the users dont have to write that explicitly and can use the same name as in the setOrder i.e. setOrder('name,_net_name,_netPrefix_prefix');
+//FIXXME parse the condition and replace ambiguous column names, such as "name='Deutschland'" with "country.name='Deutschland'"
+// then the users don't have to write that explicitly and can use the same name as in the setOrder i.e. setOrder('name,_net_name,_netPrefix_prefix');
     }
 
     // }}}
@@ -1267,9 +1387,9 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      *   gets the group condition which is used for the current instance
      *
      * @version    2002/07/22
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @return     string  the group condition
+     * @access     public
      */
     function getGroup()
     {
@@ -1282,6 +1402,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     /**
      * limit the result to return only the columns given in $what
      * @param string fields that shall be selected
+     * @access     public
      */
     function setSelect($what='*')
     {
@@ -1299,11 +1420,10 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * (SELECT xxx FROM - xxx is the select-part of a query)
      *
      * @version    2003/01/08
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @param      string  the string that shall be added to the select-part
      * @param      string  the string to connect the new string with the existing one
-     * @return     void
+     * @access     public
      */
     function addSelect($what='*', $connectString=',')
     {
@@ -1320,6 +1440,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
 
     /**
      * @return     string
+     * @access     public
      */
     function getSelect()
     {
@@ -1331,6 +1452,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
 
     /**
      * @param     string
+     * @access     public
      */
     function setDontSelect($what='')
     {
@@ -1342,6 +1464,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
 
     /**
      * @return     string
+     * @access     public
      */
     function getDontSelect()
     {
@@ -1352,12 +1475,12 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     // {{{ reset()
 
     /**
-     * reset all the set* settings; with no parameter given, it resets them all
+     * reset all the set* settings; with no parameter given, it resets them all.
      *
      * @version    2002/09/16
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
-     * @return     void
+     * @param array $what
+     * @access     public
      */
     function reset($what=array())
     {
@@ -1391,11 +1514,10 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * 'raw'   does not quote the data before building the query
      *
      * @version    2002/09/17
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @param      string      the mode to be set
      * @param      mixed       the value of the mode
-     * @return     void
+     * @access     public
      */
     function setOption($option, $value)
     {
@@ -1406,7 +1528,9 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     // {{{ getOption()
 
     /**
-     * @return     string
+     * @param   string name of the option to retrieve
+     * @return  string value of the option
+     * @access  public
      */
     function getOption($option)
     {
@@ -1414,20 +1538,63 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     }
 
     // }}}
+    // {{{ _quoteIdentifier()
+
+    /**
+     * Quotes an identifier (table or field name). This wrapper is needed to
+     * comply with the $raw parameter and to override DB_ibase::quoteIdentifier().
+     *
+     * @param string $var
+     * @return string quoted identifier
+     * @access private
+     */
+    function _quoteIdentifier($var)
+    {
+        if (!$this->getOption('raw') && $this->db->phptype != 'ibase') {
+            return $this->db->quoteIdentifier($var);
+        }
+        return $var;
+    }
+
+    // }}}
     // {{{ _quoteArray()
 
     /**
      * quotes all the data in this array if we are not in raw mode!
-     * @param array
+     * @param array $data
+     * @return array
+     * @access private
      */
     function _quoteArray($data)
     {
         if (!$this->getOption('raw')) {
             foreach ($data as $key => $val) {
-                $data[$key] = $this->db->quote($val);
+                $data[$key] = $this->db->quoteSmart($val);
             }
         }
         return $data;
+    }
+
+    // }}}
+    // {{{ _quote()
+
+    /**
+     * quotes all the data in this array|string if we are not in raw mode!
+     * @param mixed $data
+     * @return mixed
+     * @access private
+     */
+    function _quote($data)
+    {
+        if ($this->getOption('raw')) {
+            return $data;
+        }
+        switch (gettype($data)) {
+            case 'array':
+                return $this->_quoteArray($data);
+            default:
+                return $this->db->quoteSmart($data);
+        }
     }
 
     // }}}
@@ -1438,21 +1605,21 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * if not it will be unset anyway
      *
      * @version    2002/04/16
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @param      string  the actual message, first word should always be the method name,
      *                       to build the message like this: className::methodname
      * @param      integer the line number
+     * @access     public
      */
     function _checkColumns($newData, $method='unknown')
     {
-        if (!$meta = $this->metadata()) {   // if no metadata available, return data as given
+        if (!$meta = $this->metadata()) {
+            // if no metadata available, return data as given
             return $newData;
         }
-
         foreach ($newData as $colName => $x) {
             if (!isset($meta[$colName])) {
-                $this->_errorLog("$method, column {$this->table}.$colName doesnt exist, value was removed before '$method'",__LINE__);
+                $this->_errorLog("$method, column {$this->table}.$colName doesn't exist, value was removed before '$method'",__LINE__);
                 unset($newData[$colName]);
             } else {
                 // if the current column exists, check the length too, not to write content that is too long
@@ -1478,9 +1645,10 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * overwrite this method and i.e. print the query $string
      * to see the final query
      *
-     * @param      string  the query mostly
+     * @param  string  the query mostly
+     * @access public
      */
-    function debug($string){}
+    function debug($string) {}
 
     //
     //
@@ -1494,12 +1662,11 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     /**
      * !!!! query COPIED FROM db_oci8.inc - from PHPLIB !!!!
      *
-     * @access   public
-     * @see
      * @version  2001/09
-     * @author   PHPLIB
-     * @param
-     * @return
+     * @see db_oci8.inc - PHPLIB
+     * @param string $table
+     * @return resultSet or false on error
+     * @access public
      */
     function metadata($table='')
     {
@@ -1518,7 +1685,6 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
         if (isset($this->_metadata[$table])) {
             return $this->_metadata[$table];
         }
-
 // FIXXXME use oci8 implementation of newer PEAR::DB-version
         if ($this->db->phptype == 'oci8') {
             $count = 0;
@@ -1539,7 +1705,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
                 " AND T.table_name=I.table_name (+)".
                 " AND T.table_name=UPPER('$table') ORDER BY T.column_id");
 
-            if (DB::isError($res)) {
+            if (PEAR::isError($res)) {
                 //$this->_errorSet($res->getMessage());
                 // i think we only need to log here, since this method is never used
                 // directly for the user's functionality, which means if it fails it
@@ -1547,7 +1713,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
                 $this->_errorLog($res->getUserInfo());
                 return false;
             }
-            foreach ($res as $key=>$val) {
+            foreach ($res as $key => $val) {
                 $res[$key]['name'] = $val['COLUMN_NAME'];
             }
         } else {
@@ -1555,7 +1721,9 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
                 return false;
             }
             $res = $this->db->tableinfo($table);
-            if (DB::isError($res)) {
+            if (PEAR::isError($res)) {
+            //var_dump($res);
+            //echo '<div style="border:1px solid red; background: yellow">'.$res->getUserInfo().'<br/><pre>'; print_r(debug_backtrace()); echo '</pre></div>';
                 $this->_errorSet($res->getUserInfo());
                 return false;
             }
@@ -1569,11 +1737,40 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
         return $ret;
     }
 
-
+    // }}}
 
     //
     //  methods for building the query
     //
+
+    // {{{ _prependTableName()
+
+    /**
+     * replace 'column' by 'table.column' if the column is defined for the table
+     *
+     * @param string $fieldlist
+     * @param string $table table name
+     * @return string $fieldlist
+     * @see http://pear.php.net/bugs/bug.php?id=9734
+     * @access private
+     */
+    function _prependTableName($fieldlist, $table) {
+        if (!$meta = $this->metadata($table)) {
+            return $fieldlist;
+        }
+        $fields = explode(',', $fieldlist);
+        foreach (array_keys($meta) as $column) {
+            //$fieldlist = preg_replace('/(^\s*|\s+|,)'.$column.'\s*(,)?/U', "$1{$table}.$column$2", $fieldlist);
+            $pattern = '/^'.$column.'\b.*/U';
+            foreach (array_keys($fields) as $k) {
+                $fields[$k] = trim($fields[$k]);
+                if (!strpos($fields[$k], '.') && preg_match($pattern, $fields[$k])) {
+                    $fields[$k] = $this->_quoteIdentifier($table).'.'.$this->_quoteIdentifier($fields[$k]);
+                }
+            }
+        }
+        return implode(',', $fields);
+    }
 
     // }}}
     // {{{ _buildFrom()
@@ -1581,12 +1778,12 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     /**
      * build the from string
      *
-     * @access     private
      * @return     string  the string added after FROM
+     * @access     private
      */
     function _buildFrom()
     {
-        $from = $this->table;
+        $this_table = $from = $this->_quoteIdentifier($this->table);
         $join = $this->getJoin();
 
         if (!$join) {  // no join set
@@ -1594,7 +1791,9 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
         }
         // handle the standard join thingy
         if (isset($join['default']) && count($join['default'])) {
-            $from .= ','.implode(',',array_keys($join['default']));
+            foreach (array_keys($join['default']) as $joined_tbl) {
+                $from .= ','.$this->_quoteIdentifier($joined_tbl);
+            }
         }
 
         // handle left/right/inner joins
@@ -1602,7 +1801,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
             if (isset($join[$joinType]) && count($join[$joinType])) {
                 foreach($join[$joinType] as $table => $condition) {
                     // replace the _TABLENAME_COLUMNNAME by TABLENAME.COLUMNNAME
-                    // since oracle doesnt work with the _TABLENAME_COLUMNNAME which i think is strange
+                    // since oracle doesn't work with the _TABLENAME_COLUMNNAME which i think is strange
 // FIXXME i think this should become deprecated since the setWhere should not be used like this: '_table_column' but 'table.column'
                     $regExp = '/_('.$table.')_([^\s]+)/';
                     $where = preg_replace($regExp, '$1.$2', $condition);
@@ -1610,18 +1809,18 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
                     // add the table name before any column that has no table prefix
                     // since this might cause "unambiguous column" errors
                     if ($meta = $this->metadata()) {
-                        foreach ($meta as $aCol=>$x) {
+                        foreach ($meta as $aCol => $x) {
                             // this covers the LIKE,IN stuff: 'name LIKE "%you%"'  'id IN (2,3,4,5)'
-                            $condition = preg_replace('/\s'.$aCol.'\s/', " {$this->table}.$aCol ", $condition);
+                            $condition = preg_replace('/\s'.$aCol.'\s/', " {$this_table}.$aCol ", $condition);
                             // replace also the column names which are behind a '='
                             // and do this also if the aCol is at the end of the where clause
                             // that's what the $ is for
-                            $condition = preg_replace('/=\s*'.$aCol.'(\s|$)/', "={$this->table}.$aCol ", $condition);
+                            $condition = preg_replace('/=\s*'.$aCol.'(\s|$)/', "={$this_table}.$aCol ", $condition);
                             // replace if colName is first and possibly also if at the beginning of the where-string
-                            $condition = preg_replace('/(^\s*|\s+)'.$aCol.'\s*=/', "$1{$this->table}.$aCol=", $condition);
+                            $condition = preg_replace('/(^\s*|\s+)'.$aCol.'\s*=/', "$1{$this_table}.$aCol=", $condition);
                         }
                     }
-                    $from .= ' '.strtoupper($joinType).' JOIN '.$table.' ON '.$condition;
+                    $from .= ' '.strtoupper($joinType).' JOIN '.$this->_quoteIdentifier($table).' ON '.$condition;
                 }
             }
         }
@@ -1632,23 +1831,24 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     // {{{ getTableShortName()
 
     /**
-     *   this method gets the short name for a table
+     * Gets the short name for a table
      *
-     *   get the short name for a table, this is needed to properly build the
-     *   'AS' parts in the select query
+     * get the short name for a table, this is needed to properly build the
+     * 'AS' parts in the select query
      * @param  string  the real table name
      * @return string  the table's short name
+     * @access public
      */
     function getTableShortName($table)
     {
         $tableSpec = $this->getTableSpec(false);
         if (isset($tableSpec[$table]['shortName']) && $tableSpec[$table]['shortName']) {
-//print "$table ... ".$tableSpec[$table]['shortName'].'<br>';
+//print "$table ... ".$tableSpec[$table]['shortName'].'<br />';
             return $tableSpec[$table]['shortName'];
         }
 
         $possibleTableShortName = preg_replace($this->_tableNameToShortNamePreg, '', $table);
-//print "$table ... $possibleTableShortName<br>";
+//print "$table ... $possibleTableShortName<br />";
         return $possibleTableShortName;
     }
 
@@ -1660,10 +1860,11 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * returns the array for the tables given as parameter or if no
      * parameter given for all tables that exist in the tableSpec
      *
-     * @param      array   table names (not the short names!)
-     * @param      boolean if true the table is returned indexed by the shortName
-     *                       otherwise indexed by the name
-     * @return     array   the tableSpec indexed
+     * @param  array   table names (not the short names!)
+     * @param  boolean if true the table is returned indexed by the shortName
+     *                   otherwise indexed by the name
+     * @return array   the tableSpec indexed
+     * @access public
      */
     function getTableSpec($shortNameIndexed=true, $tables=array())
     {
@@ -1687,10 +1888,10 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      *   build the 'SELECT <what> FROM ... 'for a select
      *
      * @version    2002/07/11
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @param      string      if given use this string
      * @return     string      the what-clause
+     * @access     private
      */
     function _buildSelect($what=null)
     {
@@ -1700,13 +1901,13 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
         if (empty($what) && $this->getSelect()) {
             $what = $this->getSelect();
         }
-
+        
         //
         // replace all the '*' by the real column names, and take care of the dontSelect-columns!
         //
         $dontSelect = $this->getDontSelect();
         $dontSelect = $dontSelect ? explode(',', $dontSelect) : array(); // make sure dontSelect is an array
-
+        
         // here we will replace all the '*' and 'table.*' by all the columns that this table
         // contains. we do this so we can easily apply the 'dontSelect' values.
         // and so we can also handle queries like: 'SELECT *,count() FROM ' and 'SELECT table.*,x FROM ' too
@@ -1714,8 +1915,9 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
             // subpattern 1 get all the table names, that are written like this: 'table.*' including '*'
             // for '*' the tablename will be ''
             preg_match_all('/([^,]*)(\.)?\*\s*(,|$)/U', $what, $res);
-//print "$what ... ";print_r($res);print "<br>";
+//echo '<pre>'; print "$what ... "; print_r($res); print "</pre><hr />";
             $selectAllFromTables = array_unique($res[1]); // make the table names unique, so we do it all just once for each table
+//echo '<pre>'; print "$what ... "; print_r($selectAllFromTables); print "</pre><hr />";
             $tables = array();
             if (in_array('', $selectAllFromTables)) { // was there a '*' ?
                 // get all the tables that we need to process, depending on if joined or not
@@ -1725,9 +1927,11 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
             } else {
                 $tables = $selectAllFromTables;
             }
-
+//echo '<br />'; print_r($tables);
             $cols = array();
             foreach ($tables as $aTable) {      // go thru all the tables and get all columns for each, and handle 'dontSelect'
+//echo '<br />$this->metadata('.$aTable.')';
+//echo '<br /><pre>';var_dump($this->metadata($aTable)); echo '</pre>';
                 if ($meta = $this->metadata($aTable)) {
                     foreach ($meta as $colName => $x) {
                         // handle the dontSelect's
@@ -1738,16 +1942,15 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
                         // build the AS clauses
                         // put " around them to enable use of reserved words, i.e. SELECT table.option as option FROM...
                         // and 'option' actually is a reserved word, at least in mysql
-                        // put double quotes around them, since pgsql doesnt work with single quotes
                         // but don't do this for ibase because it doesn't work!
                         if ($aTable == $this->table) {
-                            if ($this->db->phptype == 'ibase') {
-                                $cols[$aTable][] = $this->table. '.' .$colName . ' AS '. $colName;
-                            } else {
-                                $cols[$aTable][] = $this->table. '.' .$colName . ' AS "'. $colName .'"';
-                            }
+                            $cols[$aTable][] = $this->table. '.' .$colName . ' AS '. $this->_quoteIdentifier($colName);
                         } else {
-                            $cols[$aTable][] = "$aTable.$colName AS \"_".$this->getTableShortName($aTable)."_$colName\"";
+                            //with ibase, don't quote aliases, and prepend the 
+                            //joined table cols alias with "t_" because an alias
+                            //starting with just "_" triggers an "invalid token" error
+                            $short_alias = ($this->db->phptype == 'ibase' ? 't_' : '_') . $this->getTableShortName($aTable) .'_'. $colName;
+                            $cols[$aTable][] = $aTable. '.' .$colName . ' AS '. $this->_quoteIdentifier($short_alias);
                         }
                     }
                 }
@@ -1768,14 +1971,14 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
                 foreach ($cols as $tableName => $aTable) {
                     if (is_array($aTable) && sizeof($aTable)) {
                         // replace all the 'table.*' by their select of each column
-                        $what = preg_replace('/(^|,)\s*'.$tableName.'\.\*\s*($|,)/', '$1'.implode(',',$aTable).'$2', $what);
+                        $what = preg_replace('/(^|,)\s*'.$tableName.'\.\*\s*($|,)/', '$1'.implode(',', $aTable).'$2', $what);
                     }
                 }
             }
         }
 
         if ($this->getJoin()) {
-            // replace all 'column' by '$this->table.column' to prevent ambigious errors
+            // replace all 'column' by '$this->table.column' to prevent ambiguous errors
             $metadata = $this->metadata();
             if (is_array($metadata)) {
                 foreach ($metadata as $aCol => $x) {
@@ -1793,7 +1996,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
             // if that was there, then it has already been done before
             foreach ($this->getJoin('tables') as $aTable) {
                 if ($meta = $this->metadata($aTable)) {
-                    foreach ($meta as $aCol=>$x) {
+                    foreach ($meta as $aCol => $x) {
                         // dont put the 'AS' behind it if there is already one
                         if (preg_match("/$aTable.$aCol\s*as/i",$what)) {
                             continue;
@@ -1809,7 +2012,52 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
                 }
             }
         }
-        return $what;
+
+        // quotations of columns
+        $columns    = explode(',', $what);
+        $identifier = substr($this->_quoteIdentifier(''), 0, 1);
+        for ($i=0; $i<sizeof($columns); $i++) {
+            $column = trim($columns[$i]);
+            // Uppercasing "as"
+            $column = str_replace(' as ', ' AS ', $column);
+            if (strpos($column, ' AS ') !== false) {
+                $column = explode(' AS ', $column);
+                if (strpos($column[0], '(') !== false) {
+                    //do not quote function calls, COUNT(), etc.
+                } elseif (strpos($column[0], '.') !== false) {
+                    $column[0] = explode('.', $column[0]);
+                    $column[0][0] = $this->_quoteIdentifier($column[0][0]);
+                    $column[0][1] = $this->_quoteIdentifier($column[0][1]);
+                    $column[0] = implode('.', $column[0]);
+                } else {
+                    $column[0] = $this->_quoteIdentifier($column[0]);
+                }
+                $column = implode(' AS ', $column);
+            } else {
+                if (strpos($column, '(') !== false) {
+                    //do not quote function calls, COUNT(), etc.
+                } elseif (strpos($column, '.') !== false) {
+                    $column = explode('.', $column);
+                    $column[0] = $this->_quoteIdentifier($column[0]);
+                    $column[1] = $this->_quoteIdentifier($column[1]);
+                    $column = implode('.', $column);
+                } else {
+                    $column = $this->_quoteIdentifier($column);
+                }
+            }
+            /*
+            // Clean up if a function was used in the query
+            if (substr($column, -2) == ')'.$identifier) {
+                $column = substr($column, 0, -2).$identifier.')';
+                // Some like spaces in the function
+                while (strpos($column, ' '.$identifier) !== false) {
+                    $column = str_replace(' '.$identifier, $identifier.' ', $column);
+                }
+            }
+            */
+            $columns[$i] = $column;
+        }
+        return implode(',', $columns);
     }
 
     // }}}
@@ -1875,83 +2123,63 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     // {{{ _buildOrder()
 
     /**
+     * Build the "ORDER BY" clause, replace 'column' by 'table.column'.
      *
-     *
-     * @version    2002/07/11
-     * @access     public
-     * @author     Wolfram Kriesing <wk@visionp.de>
-     * @param
-     * @return
+     * @version 2007/01/10
+     * @author  Lorenzo Alberton <l.alberton@quipo.it>
+     * @return string the rendered "ORDER BY" clause
+     * @access private
      */
     function _buildOrder()
     {
-        $order = $this->getOrder();
-        // replace 'column' by '$this->table.column' if the column is defined for $this->table
-        if ($meta = $this->metadata()) {
-            foreach ($meta as $aCol=>$x) {
-                $order = preg_replace('/(^\s*|\s+|,)'.$aCol.'\s*(,)?/U', "$1{$this->table}.$aCol$2", $order);
-            }
-        }
-        return $order;
+        return $this->_prependTableName($this->getOrder(), $this->table);
     }
 
     // }}}
     // {{{ _buildGroup()
 
     /**
-     *   Build the group-clause, replace 'column' by 'table.column'.
+     * Build the "GROUP BY" clause, replace 'column' by 'table.column'.
      *
-     * @access public
-     * @param void
-     * @return string the rendered group clause
+     * @version 2007/01/10
+     * @author  Lorenzo Alberton <l.alberton@quipo.it>
+     * @return string the rendered "GROUP BY" clause
+     * @access private
      */
     function _buildGroup()
     {
-        $group = $this->getGroup();
-        // replace 'column' by '$this->table.column' if the column is defined for $this->table
-        if ($meta = $this->metadata()) {
-            foreach ($meta as $aCol => $x) {
-                $group = preg_replace('/(^\s*|\s+|,)'.$aCol.'\s*(,)?/U', "$1{$this->table}.$aCol$2", $group);
-            }
-        }
-        return $group;
+        return $this->_prependTableName($this->getGroup(), $this->table);
     }
 
     // }}}
     // {{{ _buildHaving()
 
     /**
+     * Build the "HAVING" clause, replace 'column' by 'table.column'.
      *
-     * @version    2003/06/05
-     * @access     public
-     * @author     Johannes Schaefer <johnschaefer@gmx.de>
-     * @param
-     * @return string the having clause
+     * @version 2007/01/10
+     * @author  Lorenzo Alberton <l.alberton@quipo.it>
+     * @return string the rendered "HAVING" clause
+     * @access private
      */
     function _buildHaving()
     {
-        $having = $this->getHaving();
-        // replace 'column' by '$this->table.column' if the column is defined for $this->table
-        if ($meta = $this->metadata()) {
-            foreach ($meta as $aCol => $x) {
-                $having = preg_replace('/(^\s*|\s+|,)'.$aCol.'\s*(,)?/U',"$1{$this->table}.$aCol$2",$having);
-            }
-        }
-        return $having;
+        return $this->_prependTableName($this->getHaving(), $this->table);
     }
 
     // }}}
-    // {{{ _buildHaving()
+    // {{{ _buildSelectQuery()
 
     /**
+     * Build the "SELECT" query
      *
-     * @version    2002/07/11
-     * @access     public
-     * @author     Wolfram Kriesing <wk@visionp.de>
-     * @param      array   this array contains the elements of the query,
-     *                       indexed by their key, which are: 'select','from','where', etc.
-     * @param      boolean whether this method is called via getCount() or not.
-     * @return
+     * @version 2002/07/11
+     * @author Wolfram Kriesing <wk@visionp.de>
+     * @param  array   this array contains the elements of the query,
+     *                 indexed by their key, which are: 'select','from','where', etc.
+     * @param  boolean whether this method is called via getCount() or not.
+     * @return string $querystring or false on error
+     * @access private
      */
     function _buildSelectQuery($query=array(), $isCalledViaGetCount = false)
     {
@@ -1978,19 +2206,22 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
         if ($having) {
             $having = 'HAVING '.$having;
         }
-        $queryString = sprintf( 'SELECT %s FROM %s %s %s %s %s',
-                                isset($query['select']) ? $query['select'] : $this->_buildSelect(),
-                                isset($query['from']) ? $query['from'] : $this->_buildFrom(),
-                                $where,
-                                $group,
-                                $having,
-                                $order
-                                );
+        $queryString = sprintf(
+            'SELECT %s FROM %s %s %s %s %s',
+            isset($query['select']) ? $query['select'] : $this->_buildSelect(),
+            isset($query['from']) ? $query['from'] : $this->_buildFrom(),
+            $where,
+            $group,
+            $having,
+            $order
+        );
         // $query['limit'] has preference!
         $limit = isset($query['limit']) ? $query['limit'] : $this->_limit;
-        if (!$isCalledViaGetCount && @$limit[1]) {    // is there a count set?
-            $queryString=$this->db->modifyLimitQuery($queryString,$limit[0],$limit[1]);
-            if (DB::isError($queryString)) {
+        if (!$isCalledViaGetCount && !empty($limit[1])) {
+            // is there a count set?
+            $queryString = $this->db->modifyLimitQuery($queryString, $limit[0], $limit[1]);
+//echo '<pre>'; var_dump($queryString); echo '</pre>';
+            if (PEAR::isError($queryString)) {
                 $this->_errorSet('DB_QueryTool::db::modifyLimitQuery failed '.$queryString->getMessage());
                 $this->_errorLog($queryString->getUserInfo());
                 return false;
@@ -2013,6 +2244,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      *         'set'       the actual data to be updated
      *                     in the example above, that would be 'x=1'
      * @return string the resulting query
+     * @access private
      */
     function _buildUpdateQuery($query=array())
     {
@@ -2021,11 +2253,12 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
             $where = 'WHERE '.$where;
         }
 
-        $updateString = sprintf('UPDATE %s SET %s %s',
-                                $this->table,
-                                $query['set'],
-                                $where
-                            );
+        $updateString = sprintf(
+            'UPDATE %s SET %s %s',
+            $this->table,
+            $query['set'],
+            $where
+        );
         return $updateString;
     }
 
@@ -2035,11 +2268,11 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     /**
      *
      * @version    2002/07/11
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
-     * @param
-     * @param      string  query method
-     * @return     boolean
+     * @param  string $query
+     * @param  string method
+     * @return resultSet or false on error
+     * @access public
      */
     function execute($query=null, $method='getAll')
     {
@@ -2048,14 +2281,13 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
             $query = $this->_buildSelectQuery();
         }
         $this->writeLog('query built: '.$query);
-
 // FIXXME on ORACLE this doesnt work, since we return joined columns as _TABLE_COLNAME and the _ in front
 // doesnt work on oracle, add a letter before it!!!
         $this->_lastQuery = $query;
 
         $this->debug($query);
         $this->writeLog('start query');
-        if (DB::isError($res = $this->db->$method($query))) {
+        if (PEAR::isError($res = $this->db->$method($query))) {
             $this->writeLog('end query (failed)');
             if ($this->getOption('verbose')) {
                 $this->_errorSet($res->getMessage());
@@ -2075,11 +2307,13 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     // {{{ writeLog()
 
     /**
-     *   Write events to the logfile.
+     * Write events to the logfile.
      *
-     *   It does some additional work, like time measuring etc. to
-     *   see some additional info
+     * It does some additional work, like time measuring etc. to
+     * see some additional info
      *
+     * @param string $text
+     * @access public
      */
     function writeLog($text='START')
     {
@@ -2096,34 +2330,34 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
             $this->_logObject =& Log::factory('file', $this->options['logfile']);
         }
 
-        if ($text==='start query' || $text==='end query') {
+        if ($text === 'start query' || $text === 'end query') {
             $bytesSent = $this->db->getAll("SHOW STATUS like 'Bytes_sent'");
             $bytesSent = $bytesSent[0]['Value'];
         }
-        if ($text==='START') {
+        if ($text === 'START') {
             $startTime = split(' ', microtime());
             $this->_logData['startTime'] = $startTime[1] + $startTime[0];
         }
-        if ($text==='start query') {
+        if ($text === 'start query') {
             $this->_logData['startBytesSent'] = $bytesSent;
             $startTime = split(' ', microtime());
             $this->_logData['startQueryTime'] = $startTime[1] + $startTime[0];
             return;
         }
-        if ($text==='end query') {
+        if ($text === 'end query') {
             $text .= ' result size: '.((int)$bytesSent-(int)$this->_logData['startBytesSent']).' bytes';
             $endTime = split(' ', microtime());
             $endTime = $endTime[1] + $endTime[0];
             $text .= ', took: '.(($endTime - $this->_logData['startQueryTime'])).' seconds';
         }
-        if (strpos($text, 'query built')===0) {
+        if (strpos($text, 'query built') === 0) {
             $endTime = split(' ', microtime());
             $endTime = $endTime[1] + $endTime[0];
             $this->writeLog('query building took: '.(($endTime - $this->_logData['startTime'])).' seconds');
         }
         $this->_logObject->log($text);
 
-        if (strpos($text, 'end query')===0) {
+        if (strpos($text, 'end query') === 0) {
             $endTime = split(' ', microtime());
             $endTime = $endTime[1] + $endTime[0];
             $text = 'time over all: '.(($endTime - $this->_logData['startTime'])).' seconds';
@@ -2138,9 +2372,9 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * Return the chosen result type
      *
      * @version    2004/04/28
-     * @access     public
-     * @param object reference
-     * @return mixed
+     * @param  object reference
+     * @return mixed [boolean, array or object]
+     * @access public
      */
     function returnResult($result)
     {
@@ -2164,10 +2398,10 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     /**
      *
      * @version    2002/07/11
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
-     * @param      mixed
-     * @return     mixed
+     * @param      mixed $data
+     * @return     mixed $data or array $indexedData
+     * @access     public
      */
     function &_makeIndexed(&$data)
     {
@@ -2185,7 +2419,6 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
             unset($data);
             return $indexedData;
         }
-
         return $data;
     }
 
@@ -2215,10 +2448,9 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * have 2 primary keys. Be sure to remember that the index is a string!
      *
      * @version    2002/07/11
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
-     * @param
-     * @return
+     * @param string $key
+     * @access     public
      */
     function setIndex($key=null)
     {
@@ -2245,10 +2477,9 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     /**
      *
      * @version    2002/07/11
-     * @access     public
-     * @author     Wolfram Kriesing <wk@visionp.de>
-     * @param
-     * @return
+     * @author Wolfram Kriesing <wk@visionp.de>
+     * @return string index
+     * @access public
      */
     function getIndex()
     {
@@ -2266,6 +2497,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * @param string $type  ['array' | 'object' | 'none']
      *             For BC reasons, $type=true is equal to 'array',
      *             $type=false is equal to 'none'
+     * @access public
      */
     function useResult($type='array')
     {
@@ -2294,6 +2526,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     /**
      * set both callbacks
      * @param string
+     * @access public
      */
     function setErrorCallback($param='')
     {
@@ -2332,24 +2565,23 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * sets error log and adds additional info
      *
      * @version    2002/04/16
-     * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @param      string  the actual message, first word should always be the method name,
      *                     to build the message like this: className::methodname
      * @param      integer the line number
+     * @access private
      */
     function _errorLog($msg, $line='unknown')
     {
         $this->_errorHandler('log', $msg, $line);
 /*
-        if ($this->getOption('verbose') == true)
-        {
+        if ($this->getOption('verbose') == true) {
             $this->_errorLog(get_class($this)."::$msg ($line)");
             return;
         }
-
-        if ($this->_errorLogCallback)
+        if ($this->_errorLogCallback) {
             call_user_func($this->_errorLogCallback, $msg);
+        }
 */
     }
 
@@ -2376,8 +2608,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     function _errorHandler($logOrSet, $msg, $line='unknown')
     {
 /* what did i do this for?
-        if ($this->getOption('verbose') == true)
-        {
+        if ($this->getOption('verbose') == true) {
             $this->_errorHandler($logOrSet, get_class($this)."::$msg ($line)");
             return;
         }

@@ -1,22 +1,4 @@
 <?php
-//
-// +------------------------------------------------------------------------+
-// | phpDocumentor                                                          |
-// +------------------------------------------------------------------------+
-// | Copyright (c) 2000-2003 Joshua Eichorn, Gregory Beaver                 |
-// | Email         jeichorn@phpdoc.org, cellog@phpdoc.org                   |
-// | Web           http://www.phpdoc.org                                    |
-// | Mirror        http://phpdocu.sourceforge.net/                          |
-// | PEAR          http://pear.php.net/package-info.php?pacid=137           |
-// +------------------------------------------------------------------------+
-// | This source file is subject to version 3.00 of the PHP License,        |
-// | that is available at http://www.php.net/license/3_0.txt.               |
-// | If you did not receive a copy of the PHP license and are unable to     |
-// | obtain it through the world-wide-web, please send a note to            |
-// | license@php.net so we can mail you a copy immediately.                 |
-// +------------------------------------------------------------------------+
-//
-
 /**
  * All abstract representations of html tags in DocBlocks are handled by the
  * classes in this file
@@ -34,9 +16,42 @@
  * conversion in destination converters.  This design also allows different
  * conversion for different templates within a converter, which separates
  * design from logic almost 100%
- * @package phpDocumentor
+ *
+ * phpDocumentor :: automatic documentation generator
+ * 
+ * PHP versions 4 and 5
+ *
+ * Copyright (c) 2002-2006 Gregory Beaver
+ * 
+ * LICENSE:
+ * 
+ * This library is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation;
+ * either version 2.1 of the License, or (at your option) any
+ * later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ *
+ * @package    phpDocumentor
  * @subpackage DescHTML
- * @since 1.2
+ * @author     Greg Beaver <cellog@php.net>
+ * @copyright  2002-2006 Gregory Beaver
+ * @license    http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @version    CVS: $Id: DescHTML.inc,v 1.3 2006/04/30 22:18:13 cellog Exp $
+ * @filesource
+ * @link       http://www.phpdoc.org
+ * @link       http://pear.php.net/PhpDocumentor
+ * @see        parserDocBlock, parserInclude, parserPage, parserClass
+ * @see        parserDefine, parserFunction, parserMethod, parserVar
+ * @since      1.2
  */
 /**
  * Used for <<code>> in a description
@@ -56,7 +71,18 @@ class parserCode extends parserStringWithInlineTags
         {
             $this->value[0] = substr($this->value[0],1);
         }
-        return $c->ProgramExample(rtrim($this->getString(false)));
+        $linktags = array();
+        foreach($this->value as $val) {
+            if (phpDocumentor_get_class($val) == 'parserlinkinlinetag' ||
+                  phpDocumentor_get_class($val) == 'parsertutorialinlinetag') {
+                $linktags[] = array($c->postProcess($val->Convert($c, false, false)), $val);
+            }
+        }
+        $a = $c->ProgramExample(rtrim(ltrim(parent::Convert($c, false, false), "\n\r")));
+        foreach ($linktags as $tag) {
+            $a = str_replace($tag[0], $tag[1]->Convert($c, false, false), $a);
+        }
+        return $a;
 //        else return $c->PreserveWhiteSpace($this->getString(false));
     }
 }
@@ -74,7 +100,7 @@ class parserPre extends parserStringWithInlineTags
      */
     function Convert(&$c)
     {
-        return $c->PreserveWhiteSpace($this->getString(false));
+        return $c->PreserveWhiteSpace(rtrim(ltrim(parent::Convert($c, false, false), "\n\r")));
     }
 }
 
@@ -91,7 +117,7 @@ class parserB extends parserStringWithInlineTags
      */
     function Convert(&$c)
     {
-        return $c->Bolden($this->getString());
+        return $c->Bolden(parent::Convert($c));
     }
 }
 
@@ -108,7 +134,7 @@ class parserI extends parserStringWithInlineTags
      */
     function Convert(&$c)
     {
-        return $c->Italicize($this->getString());
+        return $c->Italicize(parent::Convert($c));
     }
 }
 
@@ -125,7 +151,7 @@ class parserDescVar extends parserStringWithInlineTags
      */
     function Convert(&$c)
     {
-        return $c->Varize($this->getString());
+        return $c->Varize(parent::Convert($c));
     }
 }
 
@@ -142,7 +168,7 @@ class parserSamp extends parserStringWithInlineTags
      */
     function Convert(&$c)
     {
-        return $c->Sampize($this->getString());
+        return $c->Sampize(parent::Convert($c));
     }
 }
 
@@ -159,7 +185,7 @@ class parserKbd extends parserStringWithInlineTags
      */
     function Convert(&$c)
     {
-        return $c->Kbdize($this->getString());
+        return $c->Kbdize(parent::Convert($c));
     }
 }
 

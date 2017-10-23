@@ -18,7 +18,7 @@
  * @author     Adam Ashley <aashley@php.net>
  * @copyright  2001-2006 The PHP Group
  * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
- * @version    CVS: $Id: PEAR.php,v 1.7 2006/03/02 06:53:08 aashley Exp $
+ * @version    CVS: $Id: PEAR.php,v 1.9 2007/02/02 00:41:14 aashley Exp $
  * @link       http://pear.php.net/package/Auth
  * @since      File available since Release 1.3.0
  */
@@ -44,7 +44,7 @@ require_once 'XML/RPC.php';
  * @author     Adam Ashley <aashley@php.net>
  * @copyright  2001-2006 The PHP Group
  * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
- * @version    Release: 1.3.0  File: $Revision: 1.7 $
+ * @version    Release: 1.5.0  File: $Revision: 1.9 $
  * @link       http://pear.php.net/package/Auth
  * @since      Class available since Release 1.3.0
  */
@@ -80,6 +80,7 @@ class Auth_Container_Pear extends Auth_Container
      */
     function fetchData($username, $password)
     {
+        $this->log('Auth_Container_PEAR::fetchData() called.', AUTH_LOG_DEBUG);
         $rpc = new XML_RPC_Client('/xmlrpc.php', 'pear.php.net');
         $rpc_message = new XML_RPC_Message("user.info", array(new XML_RPC_Value($username, "string")) );
         

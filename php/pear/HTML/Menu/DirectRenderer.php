@@ -18,7 +18,7 @@
 // |          Alexey Borzov <avb@php.net>                                 |
 // +----------------------------------------------------------------------+
 //
-// $Id: DirectRenderer.php,v 1.3 2004/01/18 17:35:52 avb Exp $
+// $Id: DirectRenderer.php,v 1.4 2006/06/01 18:17:28 avb Exp $
 //
 
 require_once 'HTML/Menu/Renderer.php';
@@ -28,7 +28,7 @@ require_once 'HTML/Menu/Renderer.php';
  * 
  * Inspired by HTML_Menu 1.0 code
  * 
- * @version  $Revision: 1.3 $
+ * @version  $Revision: 1.4 $
  * @author   Ulf Wendel <ulf.wendel@phpdoc.de>
  * @author   Alexey Borzov <avb@php.net>
  * @access   public
@@ -104,7 +104,7 @@ class HTML_Menu_DirectRenderer extends HTML_Menu_Renderer
             $values = array('');
         }
         foreach ($node as $k => $v) {
-            if ('sub' != $k) {
+            if ('sub' != $k && is_scalar($v)) {
                 $keys[]   = '{' . $k . '}';
                 $values[] = $v;
             }

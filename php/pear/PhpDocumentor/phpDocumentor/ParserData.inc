@@ -1,29 +1,39 @@
 <?php
-//
-// +------------------------------------------------------------------------+
-// | phpDocumentor                                                          |
-// +------------------------------------------------------------------------+
-// | Copyright (c) 2000-2003 Joshua Eichorn, Gregory Beaver                 |
-// | Email         jeichorn@phpdoc.org, cellog@phpdoc.org                   |
-// | Web           http://www.phpdoc.org                                    |
-// | Mirror        http://phpdocu.sourceforge.net/                          |
-// | PEAR          http://pear.php.net/package-info.php?pacid=137           |
-// +------------------------------------------------------------------------+
-// | This source file is subject to version 3.00 of the PHP License,        |
-// | that is available at http://www.php.net/license/3_0.txt.               |
-// | If you did not receive a copy of the PHP license and are unable to     |
-// | obtain it through the world-wide-web, please send a note to            |
-// | license@php.net so we can mail you a copy immediately.                 |
-// +------------------------------------------------------------------------+
-//
-
 /**
  * Parser Data Structures
- * @package phpDocumentor
+ * 
+ * phpDocumentor :: automatic documentation generator
+ * 
+ * PHP versions 4 and 5
+ *
+ * Copyright (c) 2002-2006 Gregory Beaver
+ * 
+ * LICENSE:
+ * 
+ * This library is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation;
+ * either version 2.1 of the License, or (at your option) any
+ * later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ *
+ * @package    phpDocumentor
  * @subpackage ParserData
- * @author Greg Beaver <cellog@users.sourceforge.net>
- * @since 1.0rc1
- * @version $Id: ParserData.inc,v 1.79.2.3 2003/08/13 20:18:55 CelloG Exp $
+ * @author     Gregory Beaver <cellog@php.net>
+ * @copyright  2002-2006 Gregory Beaver
+ * @license    http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @version    CVS: $Id: ParserData.inc,v 1.6 2006/10/23 04:02:46 cellog Exp $
+ * @link       http://www.phpdoc.org
+ * @link       http://pear.php.net/PhpDocumentor
+ * @since      1.0rc1
  */
 /**
  * Contains information about a PHP file, used to group procedural elements
@@ -32,13 +42,13 @@
  * @subpackage ParserData
  * @author Greg Beaver <cellog@users.sourceforge.net>
  * @since 1.0rc1
- * @version $Id: ParserData.inc,v 1.79.2.3 2003/08/13 20:18:55 CelloG Exp $
+ * @version $Id: ParserData.inc,v 1.6 2006/10/23 04:02:46 cellog Exp $
  */
 class parserPage
 {
     /**
      * Type is used by many functions to skip the hassle of if
-     * <code>get_class($blah) == 'parserBlah'</code>
+     * <code>phpDocumentor_get_class($blah) == 'parserBlah'</code>
      * @var string
      */
     var $type = 'page';
@@ -62,6 +72,13 @@ class parserPage
      * @var string
      */
     var $name = '';
+    /**
+     * original phpdoc-safe name (only letters, numbers and _)
+     * 
+     * This fixes [ 1391432 ] Too many underscores in include links.
+     * @var string
+     */
+    var $origName = '';
     /**
      * @var string
      */
@@ -194,6 +211,7 @@ class parserPage
      */
     function setName($name)
     {
+        $this->origName = $name;
         $this->name = $name;
     }
     
@@ -264,7 +282,7 @@ class parserPage
  * @subpackage ParserData
  * @author Greg Beaver <cellog@users.sourceforge.net>
  * @since 1.0rc1
- * @version $Id: ParserData.inc,v 1.79.2.3 2003/08/13 20:18:55 CelloG Exp $
+ * @version $Id: ParserData.inc,v 1.6 2006/10/23 04:02:46 cellog Exp $
  */
 class parserData
 {
@@ -279,6 +297,16 @@ class parserData
      * @var array
      */
     var $elements = array();
+    /**
+     * @var boolean
+     * @access private
+     */
+    var $_hasclasses = false;
+    /**
+     * @var boolean
+     * @access private
+     */
+    var $_hasinterfaces = false;
     /**
      * array of parsed elements with @access private
      * @var array
@@ -326,7 +354,7 @@ class parserData
     var $_explicitdocblock = false;
     /**
      * Type is used by many functions to skip the hassle of if
-     * <code>get_class($blah) == 'parserBlah'</code>
+     * <code>phpDocumentor_get_class($blah) == 'parserBlah'</code>
      * always 'page', used in element indexing and conversion functions found in
      * {@link Converter}
      * @var string
@@ -340,8 +368,16 @@ class parserData
     function addElement(&$element)
     {
         $element->setPath($this->parent->path);
-        if ($element->getType() == 'class' || $element->getType() == 'method' || $element->getType() == 'var')
+        if ($element->getType() == 'class' || $element->getType() == 'method' || $element->getType() == 'var'
+            || $element->getType() == 'const')
         {
+            if ($element->getType() == 'class') {
+                if ($element->isInterface()) {
+                    $this->_hasinterfaces = true;
+                } else {
+                    $this->_hasclasses = true;
+                }
+            }
             $this->classelements[] = $element;
         } else
         {
@@ -349,7 +385,27 @@ class parserData
         }
         $this->clean = false;
     }
-    
+
+    /**
+     * Does this package have interfaces?
+     *
+     * @return boolean
+     */
+    function hasInterfaces()
+    {
+        return $this->_hasinterfaces;
+    }
+
+    /**
+     * Does this package have classes?
+     *
+     * @return boolean
+     */
+    function hasClasses()
+    {
+        return $this->_hasclasses;
+    }
+
     /**
      * @param parserTutorial
      * @param Converter
@@ -441,7 +497,8 @@ class parserData
     
     function &getLink(&$c, $text = false)
     {
-        return $c->getPageLink($this->parent->file, $this->docblock->package, $this->parent->path, $text);
+        $a = $c->getPageLink($this->parent->file, $this->docblock->package, $this->parent->path, $text);
+        return $a;
     }
     
     /**
@@ -504,12 +561,12 @@ class parserData
  * @abstract
  * @author Greg Beaver <cellog@users.sourceforge.net>
  * @since 1.0rc1
- * @version $Id: ParserData.inc,v 1.79.2.3 2003/08/13 20:18:55 CelloG Exp $
+ * @version $Id: ParserData.inc,v 1.6 2006/10/23 04:02:46 cellog Exp $
  */
 class parserBase
 {
     /**
-     * Type is used by many functions to skip the hassle of if get_class($blah) == 'parserBlah'
+     * Type is used by many functions to skip the hassle of if phpDocumentor_get_class($blah) == 'parserBlah'
      * always base
      * @var string
      */
@@ -553,12 +610,12 @@ class parserBase
  * @subpackage ParserData
  * @author Greg Beaver <cellog@users.sourceforge.net>
  * @since 1.0rc1
- * @version $Id: ParserData.inc,v 1.79.2.3 2003/08/13 20:18:55 CelloG Exp $
+ * @version $Id: ParserData.inc,v 1.6 2006/10/23 04:02:46 cellog Exp $
  */
 class parserStringWithInlineTags extends parserBase
 {
     /**
-     * Type is used by many functions to skip the hassle of if get_class($blah) == 'parserBlah'
+     * Type is used by many functions to skip the hassle of if phpDocumentor_get_class($blah) == 'parserBlah'
      * always '_string'
      * @var string
      */
@@ -625,7 +682,7 @@ class parserStringWithInlineTags extends parserBase
     {
         for($i=0;$i<count($this->value);$i++)
         {
-            if (get_class($this->value[$i]) == 'parsersourceinlinetag')
+            if (phpDocumentor_get_class($this->value[$i]) == 'parsersourceinlinetag')
             {
                 $this->value[$i]->setSource($source);
             }
@@ -688,12 +745,16 @@ class parserStringWithInlineTags extends parserBase
      * @see Converter::returnSee()
      * @param Converter
      * @param boolean true if one needs to postprocess
+     * @param boolean false if the output should not be trimmed
      */
-    function Convert(&$converter,$postprocess = true)
+    function Convert(&$converter,$postprocess = true, $trim = true)
     {
         if ($this->cache)
         {
             if ($converter->name == $this->cache['name'] && $converter->outputformat == $this->cache['output'] && $converter->checkState($this->cache['state']) && $this->cache['postprocess'] === $postprocess) return $this->cache['contents'];
+            if ($converter->name != $this->cache['name']) {
+                $this->cache = false;
+            }
         }
         if (is_string($this->value)) return $this->value;
         $a = '';
@@ -709,8 +770,11 @@ class parserStringWithInlineTags extends parserBase
                 $a .= $this->value[$i]->Convert($converter, $postprocess);
             }
         }
-        $this->cache = array('name' => $converter->name,'output' => $converter->outputformat, 'contents' => trim($a), 'state' => $converter->getState(), 'postprocess' => $postprocess);
-        return trim($a);
+        if ($trim) {
+            $a = trim($a);
+        }
+        $this->cache = array('name' => $converter->name,'output' => $converter->outputformat, 'contents' => $a, 'state' => $converter->getState(), 'postprocess' => $postprocess);
+        return $a;
     }
 }
 
