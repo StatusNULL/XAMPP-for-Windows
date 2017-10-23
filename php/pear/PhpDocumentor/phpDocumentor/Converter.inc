@@ -25,12 +25,11 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * @category   documentation
  * @package    Converters
  * @author     Greg Beaver <cellog@php.net>
  * @copyright  2001-2006 Gregory Beaver
  * @license    http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @version    CVS: $Id: Converter.inc,v 1.33 2006/10/22 18:54:47 cellog Exp $
+ * @version    CVS: $Id: Converter.inc,v 1.39 2007/12/19 02:16:49 ashnazg Exp $
  * @filesource
  * @link       http://www.phpdoc.org
  * @link       http://pear.php.net/PhpDocumentor
@@ -68,9 +67,9 @@ include_once("phpDocumentor/Smarty-2.6.0/libs/Smarty.class.php");
  *
  * @package Converters
  * @abstract
- * @author Greg Beaver <cellog@users.sourceforge.net>
+ * @author Greg Beaver <cellog@php.net>
  * @since 1.0rc1
- * @version $Id: Converter.inc,v 1.33 2006/10/22 18:54:47 cellog Exp $
+ * @version $Id: Converter.inc,v 1.39 2007/12/19 02:16:49 ashnazg Exp $
  */
 class Converter
 {
@@ -1145,12 +1144,27 @@ class Converter
      * linking to line numbers of source.
      *
      * Wrapper for {@link $sourcePaths} in this version
+     * 
+     * {@internal since file paths get stored with most/all slashes 
+     * set to forward slash '/', we need to doublecheck that
+     * we're not given a backslashed path to search for...
+     * if we are, it's likely that it was originally stored
+     * with a forward slash.  Further, I'm not convinced it's safe
+     * to just check the {@link PHPDOCUMENTOR_WINDOWS} flag, so I'm checking
+     * specifically for backslashes intead.}}
+     * 
      * @param string full path to the source code file
      * @return boolean
      */
     function hasSourceCode($path)
     {
         return isset($this->sourcePaths[$path]);
+        if (strpos($path, '\\') > -1) {
+            $modifiedPath = str_replace('\\', '/', $path);
+            return isset($this->sourcePaths[$modifiedPath]);
+        } else {
+            return isset($this->sourcePaths[$path]);
+        }
     }
 
     /**
@@ -1381,7 +1395,7 @@ class Converter
      */
     function ConvertTitle($tag,$attr,$title,$cdata)
     {
-        if (!isset($this->template_options[$tag.'_title'])) return array($attr,$title.$cdata);
+        if (!isset($this->template_options[$tag.'_title'])) return array($attr,$cdata);
         if (isset($this->template_options[$tag.'_title']['tag_attr']))
         {
             $attr[$this->template_options[$tag.'_title']['tag_attr']] = urlencode($cdata);
@@ -2676,7 +2690,7 @@ class Converter
                 }
             }
         }
-        $i = 0;
+        $startPositionOfElementName = 0;    // which character of the element name actually starts its textual name
         switch($element->type)
         {
             case 'page' :
@@ -2723,7 +2737,7 @@ class Converter
                     $this->package_elements[$element->docblock->package][$element->docblock->subpackage]['page'][$curpath][] = $element;
                 }
                 $link = $this->addLink($element);
-                $i++;
+                $startPositionOfElementName = 1;    // lose the leading "$" character
                 if ($this->leftindex['globals'])
                 $this->global_elements[$element->docblock->package][$element->docblock->subpackage][] = $link;
                 $this->page_contents[$element->docblock->package][$element->docblock->subpackage][$curpath][] = $link;
@@ -2734,7 +2748,7 @@ class Converter
                     $this->package_elements[$element->docblock->package][$element->docblock->subpackage]['class'][$this->class][] = $element;
                 }
                 $link = $this->addLink($element);
-                $i++;
+                $startPositionOfElementName = 1;    // lose the leading "$" character
                 $this->class_contents[$element->docblock->package][$element->docblock->subpackage][$this->class][] = $link;
             break;
             case 'const' :
@@ -2743,7 +2757,6 @@ class Converter
                     $this->package_elements[$element->docblock->package][$element->docblock->subpackage]['class'][$this->class][] = $element;
                 }
                 $link = $this->addLink($element);
-                $i++;
                 $this->class_contents[$element->docblock->package][$element->docblock->subpackage][$this->class][] = $link;
             break;
             case 'method' :
@@ -2788,12 +2801,12 @@ class Converter
         }
         if ($element->type == 'page')
         {
-            $this->elements[substr(strtolower($element->getFile()),$i,1)][] = $element;
-            $this->pkg_elements[$this->package][$this->subpackage][substr(strtolower($element->getFile()),$i,1)][] = $element;
+            $this->elements[substr(strtolower($element->getFile()),$startPositionOfElementName,1)][] = $element;
+            $this->pkg_elements[$this->package][$this->subpackage][substr(strtolower($element->getFile()),$startPositionOfElementName,1)][] = $element;
         } else
         {
-            $this->elements[substr(strtolower($element->getName()),$i,1)][] = $element;
-            $this->pkg_elements[$this->package][$this->subpackage][substr(strtolower($element->getName()),$i,1)][] = $element;
+            $this->elements[substr(strtolower($element->getName()),$startPositionOfElementName,1)][] = $element;
+            $this->pkg_elements[$this->package][$this->subpackage][substr(strtolower($element->getName()),$startPositionOfElementName,1)][] = $element;
         }
     }
 
@@ -4049,6 +4062,7 @@ class Converter
         $this->class_data->assign("api_tags",$docblock['api_tags']);
         $this->class_data->assign("info_tags",$docblock['info_tags']);
         $this->class_data->assign("utags",$docblock['utags']);
+        $this->class_data->assign( "prop_tags", $docblock['property_tags'] );
         if ($this->hasSourceCode($element->getPath())) {
         $this->class_data->assign("class_slink",$this->getSourceAnchor($element->getPath(),$element->getLineNumber(),$element->getLineNumber(),true));
         }
@@ -4441,6 +4455,7 @@ class Converter
         $tags = $ret = $api_tags = $info_tags = array();
         $api_tags_arr = array("abstract", "access", "deprecated", "example", "filesource",
                              "global", "internal", "name", "return", "see",
+                             "property", "property-read", "property-write", "method",
                              "staticvar", "usedby", "uses", "var");
         if (!$nopackage)
         {
@@ -4487,6 +4502,24 @@ class Converter
             $a = $val->Convert($this);
             $tags[] = $api_tags[] = array('keyword' => 'staticvar','data' => $val->converted_returnType.' '.$static.': '.$a);
         }
+        $property_tags = array();
+        foreach ( $element->docblock->properties as $prop_name => $val )
+        {
+            $a = $val->Convert( $this );
+            if ( !empty( $a ) )
+            {
+                $tags[] = $api_tags[] = array( 'keyword' => $val->keyword ,
+                                               'data' => $val->converted_returnType  . ' ' . $prop_name . ': ' . $a );
+                $prop['prop_name'] = $prop_name;
+                $prop['access'] = $val->keyword == 'property-read' ? 'read' :
+                                    ( $val->keyword == 'property-write' ? 'write' : 'read/write' );
+                $prop['prop_type'] = $val->converted_returnType;
+                $prop['sdesc'] = $a;
+                $property_tags[ $prop_name ] = $prop;
+            }
+        }
+        ksort( $property_tags, SORT_STRING );
+        $property_tags = array_values( $property_tags );
         $info_tags_sorted = array();
         $ret['static'] = false;
         foreach($tagses as $tag)
@@ -4536,6 +4569,7 @@ class Converter
         $ret['api_tags'] = $api_tags;
         $ret['info_tags'] = $info_tags;
         $ret['utags'] = $utags;
+        $ret['property_tags'] = $property_tags;
         return $ret;
     }
 

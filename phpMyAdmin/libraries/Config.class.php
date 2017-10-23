@@ -3,7 +3,7 @@
 /**
  *
  *
- * @version $Id: Config.class.php 11046 2008-01-12 12:18:49Z lem9 $
+ * @version $Id: Config.class.php 11338 2008-06-23 16:40:08Z lem9 $
  */
 
 /**
@@ -85,7 +85,7 @@ class PMA_Config
      */
     function checkSystem()
     {
-        $this->set('PMA_VERSION', '2.11.4');
+        $this->set('PMA_VERSION', '2.11.7');
         /**
          * @deprecated
          */
@@ -178,6 +178,9 @@ class PMA_Config
                    && preg_match('@Safari/([0-9]*)@', $HTTP_USER_AGENT, $log_version2)) {
             $this->set('PMA_USR_BROWSER_VER', $log_version[1] . '.' . $log_version2[1]);
             $this->set('PMA_USR_BROWSER_AGENT', 'SAFARI');
+        } elseif (preg_match('@rv:1.9(.*)Gecko@', $HTTP_USER_AGENT)) {
+            $this->set('PMA_USR_BROWSER_VER', '1.9');
+            $this->set('PMA_USR_BROWSER_AGENT', 'GECKO');
         } elseif (preg_match('@Mozilla/([0-9].[0-9]{1,2})@', $HTTP_USER_AGENT, $log_version)) {
             $this->set('PMA_USR_BROWSER_VER', $log_version[1]);
             $this->set('PMA_USR_BROWSER_AGENT', 'MOZILLA');
@@ -372,6 +375,8 @@ class PMA_Config
          * Parses the configuration file
          */
         $old_error_reporting = error_reporting(0);
+        // avoid "headers already sent" error when file contains a BOM
+        ob_start();
         if (function_exists('file_get_contents')) {
             $eval_result =
                 eval('?>' . trim(file_get_contents($this->getSource())));
@@ -379,6 +384,7 @@ class PMA_Config
             $eval_result =
                 eval('?>' . trim(implode("\n", file($this->getSource()))));
         }
+        ob_end_clean();
         error_reporting($old_error_reporting);
 
         if ($eval_result === false) {
@@ -886,8 +892,9 @@ class PMA_Config
      */
     function enableBc()
     {
-        $GLOBALS['cfg']             =& $this->settings;
-        $GLOBALS['default_server']  =& $this->default_server;
+        $GLOBALS['cfg']             = $this->settings;
+        $GLOBALS['default_server']  = $this->default_server;
+        unset($this->default_server);
         $GLOBALS['collation_connection'] = $this->get('collation_connection');
         $GLOBALS['is_upload']       = $this->get('enable_upload');
         $GLOBALS['max_upload_size'] = $this->get('max_upload_size');

@@ -19,7 +19,7 @@
 *
 * @package Cache_Lite
 * @category Caching
-* @version $Id: Lite.php,v 1.45 2006/06/03 08:10:33 fab Exp $
+* @version $Id: Lite.php,v 1.51 2008/06/08 08:46:22 tacker Exp $
 * @author Fabien MARTY <fab@php.net>
 */
 
@@ -395,11 +395,11 @@ class Cache_Lite
                 $res = $this->_write($data);
             }
             if (is_object($res)) {
-	        	// $res is a PEAR_Error object 
+                // $res is a PEAR_Error object 
                 if (!($this->_errorHandlingAPIBreak)) {   
-	                return false; // we return false (old API)
-	            }
-	        }
+                    return false; // we return false (old API)
+                }
+            }
             return $res;
         }
         return false;
@@ -410,10 +410,11 @@ class Cache_Lite
     *
     * @param string $id cache id
     * @param string $group name of the cache group
+    * @param boolean $checkbeforeunlink check if file exists before removing it
     * @return boolean true if no problem
     * @access public
     */
-    function remove($id, $group = 'default')
+    function remove($id, $group = 'default', $checkbeforeunlink = false)
     {
         $this->_setFileName($id, $group);
         if ($this->_memoryCaching) {
@@ -424,6 +425,9 @@ class Cache_Lite
             if ($this->_onlyMemoryCaching) {
                 return true;
             }
+        }
+        if ( $checkbeforeunlink ) {
+            if (!file_exists($this->_file)) return true;
         }
         return $this->_unlink($this->_file);
     }
@@ -482,7 +486,7 @@ class Cache_Lite
         if ($this->_caching) {
             $array = array(
                 'counter' => $this->_memoryCachingCounter,
-                'array' => $this->_memoryCachingState
+                'array' => $this->_memoryCachingArray
             );
             $data = serialize($array);
             $this->save($data, $id, $group);
@@ -598,8 +602,8 @@ class Cache_Lite
             $motif = ($group) ? 'cache_'.$group.'_' : 'cache_';
         }
         if ($this->_memoryCaching) {
-            while (list($key, ) = each($this->_memoryCachingArray)) {
-                if (strpos($key, $motif, 0)) {
+	    foreach($this->_memoryCachingArray as $key => $v) {
+                if (strpos($key, $motif) !== false) {
                     unset($this->_memoryCachingArray[$key]);
                     $this->_memoryCachingCounter = $this->_memoryCachingCounter - 1;
                 }
@@ -627,7 +631,7 @@ class Cache_Lite
                                 }
                                 break;
                             case 'notingrou':
-                                if (!strpos($file2, $motif, 0)) {
+                                if (strpos($file2, $motif) === false) {
                                     $result = ($result and ($this->_unlink($file2)));
                                 }
                                 break;
@@ -639,7 +643,7 @@ class Cache_Lite
                                 break;
                             case 'ingroup':
                             default:
-                                if (strpos($file2, $motif, 0)) {
+                                if (strpos($file2, $motif) !== false) {
                                     $result = ($result and ($this->_unlink($file2)));
                                 }
                                 break;
@@ -765,8 +769,10 @@ class Cache_Lite
             if ($this->_readControl) {
                 @fwrite($fp, $this->_hash($data, $this->_readControlType), 32);
             }
-            $len = strlen($data);
-            @fwrite($fp, $data, $len);
+            $mqr = get_magic_quotes_runtime();
+            set_magic_quotes_runtime(0);
+            @fwrite($fp, $data);
+            set_magic_quotes_runtime($mqr);
             if ($this->_fileLocking) @flock($fp, LOCK_UN);
             @fclose($fp);
             return true;
@@ -789,7 +795,7 @@ class Cache_Lite
         }
         $dataRead = $this->_read();
         if (is_object($dataRead)) {
-            return $result; # We return the PEAR_Error object
+            return $dataRead; # We return the PEAR_Error object
         }
         if ((is_bool($dataRead)) && (!$dataRead)) {
             return false; 

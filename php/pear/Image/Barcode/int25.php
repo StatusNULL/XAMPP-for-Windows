@@ -19,7 +19,7 @@
  * @author     Marcelo Subtil Marcal <msmarcal@php.net>
  * @copyright  2005 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: int25.php,v 1.2 2005/05/30 04:31:41 msmarcal Exp $
+ * @version    CVS: $Id: int25.php,v 1.4 2006/12/13 19:29:30 cweiske Exp $
  * @link       http://pear.php.net/package/Image_Barcode
  */
 
@@ -100,7 +100,7 @@ class Image_Barcode_int25 extends Image_Barcode
      * @since  Image_Barcode 0.3
      */
 
-    function draw($text, $imgtype = 'png')
+    function &draw($text, $imgtype = 'png')
     {
 
         $text = trim($text);
@@ -167,31 +167,8 @@ class Image_Barcode_int25 extends Image_Barcode
         $elementwidth = $this->_barthinwidth;
         imagefilledrectangle($img, $xpos, 0, $xpos + $elementwidth - 1, $this->_barcodeheight, $black);
 
-        // Send image to browser
-        switch($imgtype) {
-
-            case 'gif':
-                header("Content-type: image/gif");
-                imagegif($img);
-                imagedestroy($img);
-            break;
-
-            case 'jpg':
-                header("Content-type: image/jpg");
-                imagejpeg($img);
-                imagedestroy($img);
-            break;
-
-            default:
-                header("Content-type: image/png");
-                imagepng($img);
-                imagedestroy($img);
-            break;
-
-        }
-
-        return;
-
+        return $img;
     } // function create
 
 } // class
+?>

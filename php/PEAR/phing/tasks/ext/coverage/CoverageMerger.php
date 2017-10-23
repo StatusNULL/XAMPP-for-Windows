@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: CoverageMerger.php 82 2006-07-07 18:15:35Z mrook $
+ * $Id: CoverageMerger.php 81 2006-07-06 13:07:29Z mrook $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -25,7 +25,7 @@ require_once 'phing/system/util/Properties.php';
  * Saves coverage output of the test to a specified database
  *
  * @author Michiel Rook <michiel.rook@gmail.com>
- * @version $Id: CoverageMerger.php 82 2006-07-07 18:15:35Z mrook $
+ * @version $Id: CoverageMerger.php 81 2006-07-06 13:07:29Z mrook $
  * @package phing.tasks.ext.coverage
  * @since 2.1.0
  */

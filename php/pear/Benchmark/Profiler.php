@@ -14,7 +14,7 @@
 // | license@php.net so we can mail you a copy immediately.               |
 // +----------------------------------------------------------------------+
 //
-// $Id: Profiler.php,v 1.19 2006/03/01 19:26:09 anant Exp $
+// $Id: Profiler.php,v 1.2 2007/05/24 05:23:20 anant Exp $
 //
 
 require_once 'PEAR.php';
@@ -157,11 +157,11 @@ class Benchmark_Profiler extends PEAR {
     }
 
     /**
-     * Destructor, stops profiling recording
+     * Close method, stop profiling recording and display output.
      *
-     * @access private
+     * @access public
      */
-    function _Benchmark_Profiler() {
+    function close() {
         if (isset($this->_auto) && $this->_auto) {
             $this->stop();
             $this->display();

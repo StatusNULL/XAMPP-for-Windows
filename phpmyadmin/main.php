@@ -2,7 +2,7 @@
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
  *
- * @version $Id: main.php 10635 2007-09-13 20:48:07Z lem9 $
+ * @version $Id: main.php 11173 2008-03-22 21:41:20Z lem9 $
  */
 
 /**
@@ -96,12 +96,15 @@ if ($server > 0) {
         PMA_printListItem($strServerVersion . ': ' . PMA_MYSQL_STR_VERSION, 'li_server_info');
         PMA_printListItem($strProtocolVersion . ': ' . PMA_DBI_get_proto_info(),
             'li_mysql_proto');
-        PMA_printListItem($strServer . ': ' . $server_info, 'li_server_info');
+    /**
+     * @todo tweak the CSS to use same image as li_server_info 
+     */
+        PMA_printListItem($strServer . ': ' . $server_info, 'li_server_info2');
         PMA_printListItem($strUser . ': ' . htmlspecialchars($mysql_cur_user_and_host),
             'li_user_info');
     } else {
         PMA_printListItem($strServerVersion . ': ' . PMA_MYSQL_STR_VERSION, 'li_server_info');
-        PMA_printListItem($strServer . ': ' . $server_info, 'li_server_info');
+        PMA_printListItem($strServer . ': ' . $server_info, 'li_server_info2');
     }
 
     if ($cfg['AllowAnywhereRecoding'] && $allow_recoding && PMA_MYSQL_INT_VERSION < 40100) {
@@ -298,7 +301,7 @@ echo '<li id="li_select_fontsize">';
 echo PMA_Config::getFontsizeForm();
 echo '</li>';
 PMA_printListItem($strPmaDocumentation, 'li_pma_docs', 'Documentation.html', null, '_blank');
-PMA_printListItem($strPmaWiki, 'li_pma_docs', 'http://wiki.cihar.com', null, '_blank');
+PMA_printListItem($strPmaWiki, 'li_pma_docs2', 'http://wiki.cihar.com', null, '_blank');
 
 if ($cfg['ShowPhpInfo']) {
     PMA_printListItem($strShowPHPInfo, 'li_phpinfo', './phpinfo.php?' . $common_url_query);
@@ -399,13 +402,22 @@ if ($server > 0 && substr(PMA_MYSQL_CLIENT_API, 0, 3) != substr(PMA_MYSQL_INT_VE
 /**
  * Warning about wrong controluser settings
  */
-$strControluserFailed = 'Connection for controluser as defined in your config.inc.php failed.';
 if (defined('PMA_DBI_CONNECT_FAILED_CONTROLUSER')) {
     echo '<div class="warning">' . $strControluserFailed . '</div>' . "\n";
 }
 
+/**
+ * Warning about missing mcrypt extension 
+ */
 if (defined('PMA_WARN_FOR_MCRYPT')) {
     echo '<div class="warning">' . PMA_sanitize(sprintf($strCantLoad, 'mcrypt')) . '</div>' . "\n";
+}
+
+/**
+ * Warning about Suhosin 
+ */
+if ($cfg['SuhosinDisableWarning'] == false && @ini_get('suhosin.request.max_value_length')) {
+    echo '<div class="warning">' . PMA_sanitize(sprintf($strSuhosin, '[a@./Documentation.html#faq1_38@_blank]', '[/a]')) . '</div>' . "\n";
 }
 
 /**

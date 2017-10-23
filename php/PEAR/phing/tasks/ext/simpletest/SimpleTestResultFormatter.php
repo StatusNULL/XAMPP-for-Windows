@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: SimpleTestResultFormatter.php 82 2006-07-07 18:15:35Z mrook $
+ * $Id: SimpleTestResultFormatter.php 227 2007-08-28 02:17:00Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -27,7 +27,7 @@ require_once 'phing/system/io/Writer.php';
  * This abstract class describes classes that format the results of a SimpleTest testrun.
  *
  * @author Michiel Rook <michiel.rook@gmail.com>
- * @version $Id: SimpleTestResultFormatter.php 82 2006-07-07 18:15:35Z mrook $
+ * @version $Id: SimpleTestResultFormatter.php 227 2007-08-28 02:17:00Z hans $
  * @package phing.tasks.ext.phpunit2
  * @since 2.2.0
  */

@@ -19,7 +19,7 @@
  * @author     Josef "Jeff" Sipek <jeffpc@optonline.net>
  * @copyright  2005 Josef "Jeff" Sipek
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: postnet.php,v 1.1 2005/06/03 11:44:42 msmarcal Exp $
+ * @version    CVS: $Id: postnet.php,v 1.3 2006/12/13 19:29:30 cweiske Exp $
  * @link       http://pear.php.net/package/Image_Barcode
  */
 
@@ -36,8 +36,7 @@
   *  density:        22 bars/inch    = 8.66 bars/cm
   */
 
-require_once "PEAR.php";
-require_once "Image/Barcode.php";
+require_once 'Image/Barcode.php';
 
 
 /**
@@ -50,7 +49,7 @@ require_once "Image/Barcode.php";
  * @author     Josef "Jeff" Sipek <jeffpc@optonline.net>
  * @copyright  2005 Josef "Jeff" Sipek
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: postnet.php,v 1.1 2005/06/03 11:44:42 msmarcal Exp $
+ * @version    CVS: $Id: postnet.php,v 1.3 2006/12/13 19:29:30 cweiske Exp $
  * @link       http://pear.php.net/package/Image_Barcode
  */
 class Image_Barcode_postnet extends Image_Barcode
@@ -115,10 +114,11 @@ class Image_Barcode_postnet extends Image_Barcode
 
     function draw($text, $imgtype = 'png')
     {
-
         $text = trim($text);
 
-        if (!preg_match("/[0-9]/",$text)) return;
+        if (!preg_match('/[0-9]/', $text)) {
+            return;
+        }
 
         // Calculate the barcode width
         $barcodewidth = (strlen($text)) * 2 * 5 * $this->_barwidth + $this->_barwidth*3;
@@ -155,31 +155,8 @@ class Image_Barcode_postnet extends Image_Barcode
         imagefilledrectangle($img, $xpos, 0, $xpos + $this->_barwidth - 1, $this->_bartallheight, $black);
         $xpos += 2*$this->_barwidth;
 
-    // Send image to browser
-        switch($imgtype) {
-
-            case 'gif':
-                header("Content-type: image/gif");
-                imagegif($img);
-                imagedestroy($img);
-            break;
-
-            case 'jpg':
-                header("Content-type: image/jpg");
-                imagejpeg($img);
-                imagedestroy($img);
-            break;
-
-            default:
-                header("Content-type: image/png");
-                imagepng($img);
-                imagedestroy($img);
-            break;
-
-        }
-
-        return;
-
+        return $img;
     } // function create
 
 } // class
+?>

@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: IoncubeComment.php 82 2006-07-07 18:15:35Z mrook $
+ * $Id: IoncubeComment.php 227 2007-08-28 02:17:00Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -23,7 +23,7 @@
  * Wrapper for comments for ionCube tasks
  *
  * @author Michiel Rook <michiel.rook@gmail.com>
- * @version $Id: IoncubeComment.php 82 2006-07-07 18:15:35Z mrook $
+ * @version $Id: IoncubeComment.php 227 2007-08-28 02:17:00Z hans $
  * @package phing.tasks.ext.ioncube
  * @since 2.2.0
  */

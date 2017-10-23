@@ -21,11 +21,9 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions=" -DCMAKE_INTDIR=\&quot;Debug\&quot;"
 				AdditionalIncludeDirectories=""
 				ExceptionHandling="FALSE"
-				WarningLevel="3"
-				PreprocessorDefinitions=",&quot; WITH_MYISAM_STORAGE_ENGINE&quot;,&quot; CMAKE_BUILD&quot;,&quot; HAVE_YASSL&quot;,&quot; HAVE_ARCHIVE_DB&quot;,&quot; HAVE_INNOBASE_DB&quot;,&quot; WITH_INNOBASE_STORAGE_ENGINE&quot;,&quot; HAVE_FEDERATED_DB&quot;,&quot; WITH_FEDERATED_STORAGE_ENGINE&quot;,&quot; HAVE_BLACKHOLE_DB&quot;,&quot; __NT__&quot;,&quot;_WINDOWS&quot;,&quot;__WIN__&quot;,&quot; _CRT_SECURE_NO_DEPRECATE&quot;,"
+				PreprocessorDefinitions="CMAKE_BUILD,HAVE_YASSL,HAVE_ARCHIVE_DB,HAVE_BLACKHOLE_DB,HAVE_FEDERATED_DB,HAVE_INNOBASE_DB,__NT__,_WINDOWS,__WIN__,_CRT_SECURE_NO_DEPRECATE,&quot;CMAKE_INTDIR=\&quot;Debug\&quot;&quot;"
 				AssemblerListingLocation="Debug"
 				ObjectFile="$(IntDir)\"
 />
@@ -34,10 +32,10 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions=",&quot; WITH_MYISAM_STORAGE_ENGINE&quot;,&quot; CMAKE_BUILD&quot;,&quot; HAVE_YASSL&quot;,&quot; HAVE_ARCHIVE_DB&quot;,&quot; HAVE_INNOBASE_DB&quot;,&quot; WITH_INNOBASE_STORAGE_ENGINE&quot;,&quot; HAVE_FEDERATED_DB&quot;,&quot; WITH_FEDERATED_STORAGE_ENGINE&quot;,&quot; HAVE_BLACKHOLE_DB&quot;,&quot; __NT__&quot;,&quot;_WINDOWS&quot;,&quot;__WIN__&quot;,&quot; _CRT_SECURE_NO_DEPRECATE&quot;," />
+				PreprocessorDefinitions="CMAKE_BUILD,HAVE_YASSL,HAVE_ARCHIVE_DB,HAVE_BLACKHOLE_DB,HAVE_FEDERATED_DB,HAVE_INNOBASE_DB,__NT__,_WINDOWS,__WIN__,_CRT_SECURE_NO_DEPRECATE,&quot;CMAKE_INTDIR=\&quot;Debug\&quot;&quot;"/>
 			<Tool
 				Name="VCMIDLTool"
-				PreprocessorDefinitions=",&quot; WITH_MYISAM_STORAGE_ENGINE&quot;,&quot; CMAKE_BUILD&quot;,&quot; HAVE_YASSL&quot;,&quot; HAVE_ARCHIVE_DB&quot;,&quot; HAVE_INNOBASE_DB&quot;,&quot; WITH_INNOBASE_STORAGE_ENGINE&quot;,&quot; HAVE_FEDERATED_DB&quot;,&quot; WITH_FEDERATED_STORAGE_ENGINE&quot;,&quot; HAVE_BLACKHOLE_DB&quot;,&quot; __NT__&quot;,&quot;_WINDOWS&quot;,&quot;__WIN__&quot;,&quot; _CRT_SECURE_NO_DEPRECATE&quot;,"
+				PreprocessorDefinitions="CMAKE_BUILD,HAVE_YASSL,HAVE_ARCHIVE_DB,HAVE_BLACKHOLE_DB,HAVE_FEDERATED_DB,HAVE_INNOBASE_DB,__NT__,_WINDOWS,__WIN__,_CRT_SECURE_NO_DEPRECATE,&quot;CMAKE_INTDIR=\&quot;Debug\&quot;&quot;"
 				MkTypLibCompatible="FALSE"
 				TargetEnvironment="1"
 				GenerateStublessProxies="TRUE"
@@ -52,8 +50,7 @@
 			<Tool
 				Name="VCPreLinkEventTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-CommandLine=""/>
+				Name="VCPostBuildEventTool"/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
@@ -65,11 +62,9 @@ CommandLine=""/>
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions=" -DCMAKE_INTDIR=\&quot;Release\&quot;"
 				AdditionalIncludeDirectories=""
 				ExceptionHandling="FALSE"
-				WarningLevel="3"
-				PreprocessorDefinitions=",&quot; WITH_MYISAM_STORAGE_ENGINE&quot;,&quot; CMAKE_BUILD&quot;,&quot; HAVE_YASSL&quot;,&quot; HAVE_ARCHIVE_DB&quot;,&quot; HAVE_INNOBASE_DB&quot;,&quot; WITH_INNOBASE_STORAGE_ENGINE&quot;,&quot; HAVE_FEDERATED_DB&quot;,&quot; WITH_FEDERATED_STORAGE_ENGINE&quot;,&quot; HAVE_BLACKHOLE_DB&quot;,&quot; __NT__&quot;,&quot;_WINDOWS&quot;,&quot;__WIN__&quot;,&quot; _CRT_SECURE_NO_DEPRECATE&quot;,"
+				PreprocessorDefinitions="CMAKE_BUILD,HAVE_YASSL,HAVE_ARCHIVE_DB,HAVE_BLACKHOLE_DB,HAVE_FEDERATED_DB,HAVE_INNOBASE_DB,__NT__,_WINDOWS,__WIN__,_CRT_SECURE_NO_DEPRECATE,&quot;CMAKE_INTDIR=\&quot;Release\&quot;&quot;"
 				AssemblerListingLocation="Release"
 				ObjectFile="$(IntDir)\"
 />
@@ -78,10 +73,10 @@ CommandLine=""/>
 			<Tool
 				Name="VCResourceCompilerTool"
 				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions=",&quot; WITH_MYISAM_STORAGE_ENGINE&quot;,&quot; CMAKE_BUILD&quot;,&quot; HAVE_YASSL&quot;,&quot; HAVE_ARCHIVE_DB&quot;,&quot; HAVE_INNOBASE_DB&quot;,&quot; WITH_INNOBASE_STORAGE_ENGINE&quot;,&quot; HAVE_FEDERATED_DB&quot;,&quot; WITH_FEDERATED_STORAGE_ENGINE&quot;,&quot; HAVE_BLACKHOLE_DB&quot;,&quot; __NT__&quot;,&quot;_WINDOWS&quot;,&quot;__WIN__&quot;,&quot; _CRT_SECURE_NO_DEPRECATE&quot;," />
+				PreprocessorDefinitions="CMAKE_BUILD,HAVE_YASSL,HAVE_ARCHIVE_DB,HAVE_BLACKHOLE_DB,HAVE_FEDERATED_DB,HAVE_INNOBASE_DB,__NT__,_WINDOWS,__WIN__,_CRT_SECURE_NO_DEPRECATE,&quot;CMAKE_INTDIR=\&quot;Release\&quot;&quot;"/>
 			<Tool
 				Name="VCMIDLTool"
-				PreprocessorDefinitions=",&quot; WITH_MYISAM_STORAGE_ENGINE&quot;,&quot; CMAKE_BUILD&quot;,&quot; HAVE_YASSL&quot;,&quot; HAVE_ARCHIVE_DB&quot;,&quot; HAVE_INNOBASE_DB&quot;,&quot; WITH_INNOBASE_STORAGE_ENGINE&quot;,&quot; HAVE_FEDERATED_DB&quot;,&quot; WITH_FEDERATED_STORAGE_ENGINE&quot;,&quot; HAVE_BLACKHOLE_DB&quot;,&quot; __NT__&quot;,&quot;_WINDOWS&quot;,&quot;__WIN__&quot;,&quot; _CRT_SECURE_NO_DEPRECATE&quot;,"
+				PreprocessorDefinitions="CMAKE_BUILD,HAVE_YASSL,HAVE_ARCHIVE_DB,HAVE_BLACKHOLE_DB,HAVE_FEDERATED_DB,HAVE_INNOBASE_DB,__NT__,_WINDOWS,__WIN__,_CRT_SECURE_NO_DEPRECATE,&quot;CMAKE_INTDIR=\&quot;Release\&quot;&quot;"
 				MkTypLibCompatible="FALSE"
 				TargetEnvironment="1"
 				GenerateStublessProxies="TRUE"
@@ -96,8 +91,7 @@ CommandLine=""/>
 			<Tool
 				Name="VCPreLinkEventTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-CommandLine=""/>
+				Name="VCPostBuildEventTool"/>
 		</Configuration>
 		<Configuration
 			Name="MinSizeRel|Win32"
@@ -109,11 +103,9 @@ CommandLine=""/>
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions=" -DCMAKE_INTDIR=\&quot;MinSizeRel\&quot;"
 				AdditionalIncludeDirectories=""
 				ExceptionHandling="FALSE"
-				WarningLevel="3"
-				PreprocessorDefinitions=",&quot; WITH_MYISAM_STORAGE_ENGINE&quot;,&quot; CMAKE_BUILD&quot;,&quot; HAVE_YASSL&quot;,&quot; HAVE_ARCHIVE_DB&quot;,&quot; HAVE_INNOBASE_DB&quot;,&quot; WITH_INNOBASE_STORAGE_ENGINE&quot;,&quot; HAVE_FEDERATED_DB&quot;,&quot; WITH_FEDERATED_STORAGE_ENGINE&quot;,&quot; HAVE_BLACKHOLE_DB&quot;,&quot; __NT__&quot;,&quot;_WINDOWS&quot;,&quot;__WIN__&quot;,&quot; _CRT_SECURE_NO_DEPRECATE&quot;,"
+				PreprocessorDefinitions="CMAKE_BUILD,HAVE_YASSL,HAVE_ARCHIVE_DB,HAVE_BLACKHOLE_DB,HAVE_FEDERATED_DB,HAVE_INNOBASE_DB,__NT__,_WINDOWS,__WIN__,_CRT_SECURE_NO_DEPRECATE,&quot;CMAKE_INTDIR=\&quot;MinSizeRel\&quot;&quot;"
 				AssemblerListingLocation="MinSizeRel"
 				ObjectFile="$(IntDir)\"
 />
@@ -122,10 +114,10 @@ CommandLine=""/>
 			<Tool
 				Name="VCResourceCompilerTool"
 				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions=",&quot; WITH_MYISAM_STORAGE_ENGINE&quot;,&quot; CMAKE_BUILD&quot;,&quot; HAVE_YASSL&quot;,&quot; HAVE_ARCHIVE_DB&quot;,&quot; HAVE_INNOBASE_DB&quot;,&quot; WITH_INNOBASE_STORAGE_ENGINE&quot;,&quot; HAVE_FEDERATED_DB&quot;,&quot; WITH_FEDERATED_STORAGE_ENGINE&quot;,&quot; HAVE_BLACKHOLE_DB&quot;,&quot; __NT__&quot;,&quot;_WINDOWS&quot;,&quot;__WIN__&quot;,&quot; _CRT_SECURE_NO_DEPRECATE&quot;," />
+				PreprocessorDefinitions="CMAKE_BUILD,HAVE_YASSL,HAVE_ARCHIVE_DB,HAVE_BLACKHOLE_DB,HAVE_FEDERATED_DB,HAVE_INNOBASE_DB,__NT__,_WINDOWS,__WIN__,_CRT_SECURE_NO_DEPRECATE,&quot;CMAKE_INTDIR=\&quot;MinSizeRel\&quot;&quot;"/>
 			<Tool
 				Name="VCMIDLTool"
-				PreprocessorDefinitions=",&quot; WITH_MYISAM_STORAGE_ENGINE&quot;,&quot; CMAKE_BUILD&quot;,&quot; HAVE_YASSL&quot;,&quot; HAVE_ARCHIVE_DB&quot;,&quot; HAVE_INNOBASE_DB&quot;,&quot; WITH_INNOBASE_STORAGE_ENGINE&quot;,&quot; HAVE_FEDERATED_DB&quot;,&quot; WITH_FEDERATED_STORAGE_ENGINE&quot;,&quot; HAVE_BLACKHOLE_DB&quot;,&quot; __NT__&quot;,&quot;_WINDOWS&quot;,&quot;__WIN__&quot;,&quot; _CRT_SECURE_NO_DEPRECATE&quot;,"
+				PreprocessorDefinitions="CMAKE_BUILD,HAVE_YASSL,HAVE_ARCHIVE_DB,HAVE_BLACKHOLE_DB,HAVE_FEDERATED_DB,HAVE_INNOBASE_DB,__NT__,_WINDOWS,__WIN__,_CRT_SECURE_NO_DEPRECATE,&quot;CMAKE_INTDIR=\&quot;MinSizeRel\&quot;&quot;"
 				MkTypLibCompatible="FALSE"
 				TargetEnvironment="1"
 				GenerateStublessProxies="TRUE"
@@ -140,8 +132,7 @@ CommandLine=""/>
 			<Tool
 				Name="VCPreLinkEventTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-CommandLine=""/>
+				Name="VCPostBuildEventTool"/>
 		</Configuration>
 		<Configuration
 			Name="RelWithDebInfo|Win32"
@@ -153,11 +144,9 @@ CommandLine=""/>
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions=" -DCMAKE_INTDIR=\&quot;RelWithDebInfo\&quot;"
 				AdditionalIncludeDirectories=""
 				ExceptionHandling="FALSE"
-				WarningLevel="3"
-				PreprocessorDefinitions=",&quot; WITH_MYISAM_STORAGE_ENGINE&quot;,&quot; CMAKE_BUILD&quot;,&quot; HAVE_YASSL&quot;,&quot; HAVE_ARCHIVE_DB&quot;,&quot; HAVE_INNOBASE_DB&quot;,&quot; WITH_INNOBASE_STORAGE_ENGINE&quot;,&quot; HAVE_FEDERATED_DB&quot;,&quot; WITH_FEDERATED_STORAGE_ENGINE&quot;,&quot; HAVE_BLACKHOLE_DB&quot;,&quot; __NT__&quot;,&quot;_WINDOWS&quot;,&quot;__WIN__&quot;,&quot; _CRT_SECURE_NO_DEPRECATE&quot;,"
+				PreprocessorDefinitions="CMAKE_BUILD,HAVE_YASSL,HAVE_ARCHIVE_DB,HAVE_BLACKHOLE_DB,HAVE_FEDERATED_DB,HAVE_INNOBASE_DB,__NT__,_WINDOWS,__WIN__,_CRT_SECURE_NO_DEPRECATE,&quot;CMAKE_INTDIR=\&quot;RelWithDebInfo\&quot;&quot;"
 				AssemblerListingLocation="RelWithDebInfo"
 				ObjectFile="$(IntDir)\"
 />
@@ -166,10 +155,10 @@ CommandLine=""/>
 			<Tool
 				Name="VCResourceCompilerTool"
 				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions=",&quot; WITH_MYISAM_STORAGE_ENGINE&quot;,&quot; CMAKE_BUILD&quot;,&quot; HAVE_YASSL&quot;,&quot; HAVE_ARCHIVE_DB&quot;,&quot; HAVE_INNOBASE_DB&quot;,&quot; WITH_INNOBASE_STORAGE_ENGINE&quot;,&quot; HAVE_FEDERATED_DB&quot;,&quot; WITH_FEDERATED_STORAGE_ENGINE&quot;,&quot; HAVE_BLACKHOLE_DB&quot;,&quot; __NT__&quot;,&quot;_WINDOWS&quot;,&quot;__WIN__&quot;,&quot; _CRT_SECURE_NO_DEPRECATE&quot;," />
+				PreprocessorDefinitions="CMAKE_BUILD,HAVE_YASSL,HAVE_ARCHIVE_DB,HAVE_BLACKHOLE_DB,HAVE_FEDERATED_DB,HAVE_INNOBASE_DB,__NT__,_WINDOWS,__WIN__,_CRT_SECURE_NO_DEPRECATE,&quot;CMAKE_INTDIR=\&quot;RelWithDebInfo\&quot;&quot;"/>
 			<Tool
 				Name="VCMIDLTool"
-				PreprocessorDefinitions=",&quot; WITH_MYISAM_STORAGE_ENGINE&quot;,&quot; CMAKE_BUILD&quot;,&quot; HAVE_YASSL&quot;,&quot; HAVE_ARCHIVE_DB&quot;,&quot; HAVE_INNOBASE_DB&quot;,&quot; WITH_INNOBASE_STORAGE_ENGINE&quot;,&quot; HAVE_FEDERATED_DB&quot;,&quot; WITH_FEDERATED_STORAGE_ENGINE&quot;,&quot; HAVE_BLACKHOLE_DB&quot;,&quot; __NT__&quot;,&quot;_WINDOWS&quot;,&quot;__WIN__&quot;,&quot; _CRT_SECURE_NO_DEPRECATE&quot;,"
+				PreprocessorDefinitions="CMAKE_BUILD,HAVE_YASSL,HAVE_ARCHIVE_DB,HAVE_BLACKHOLE_DB,HAVE_FEDERATED_DB,HAVE_INNOBASE_DB,__NT__,_WINDOWS,__WIN__,_CRT_SECURE_NO_DEPRECATE,&quot;CMAKE_INTDIR=\&quot;RelWithDebInfo\&quot;&quot;"
 				MkTypLibCompatible="FALSE"
 				TargetEnvironment="1"
 				GenerateStublessProxies="TRUE"
@@ -184,47 +173,46 @@ CommandLine=""/>
 			<Tool
 				Name="VCPreLinkEventTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-CommandLine=""/>
+				Name="VCPostBuildEventTool"/>
 		</Configuration>
 	</Configurations>
 	<Files>
 			<File
-				RelativePath="f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\CMakeLists.txt">
+				RelativePath="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\CMakeLists.txt">
 				<FileConfiguration
 					Name="Debug|Win32">
 					<Tool
 					Name="VCCustomBuildTool"
-					Description="Building Custom Rule f:/build/mysql-5.0.45-winbuild/mysql-community-nt-5.0.45-build/scripts/CMakeLists.txt"
-					CommandLine="&quot;c:\Program Files\CMake 2.4\bin\cmake.exe&quot; -Hf:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build -Bf:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build&#x0D;&#x0A;"
-					AdditionalDependencies="f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\CMakeLists.txt;&quot;c:\Program Files\CMake 2.4\share\CMake\Templates\CMakeWindowsSystemConfig.cmake&quot;;f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\CMakeLists.txt;"
+					Description="Building Custom Rule F:/build/mysql-5.0.51b-winbuild/mysql-community-nt-5.0.51b-build/scripts/CMakeLists.txt"
+					CommandLine="&quot;C:\Program Files\CMake 2.4\bin\cmake.exe&quot; -HF:/build/mysql-5.0.51b-winbuild/mysql-community-nt-5.0.51b-build -BF:/build/mysql-5.0.51b-winbuild/mysql-community-nt-5.0.51b-build"
+					AdditionalDependencies="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\CMakeLists.txt;&quot;C:\Program Files\CMake 2.4\share\cmake-2.4\Templates\CMakeWindowsSystemConfig.cmake&quot;;F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\CMakeLists.txt;"
 					Outputs="comp_sql.vcproj.cmake"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|Win32">
 					<Tool
 					Name="VCCustomBuildTool"
-					Description="Building Custom Rule f:/build/mysql-5.0.45-winbuild/mysql-community-nt-5.0.45-build/scripts/CMakeLists.txt"
-					CommandLine="&quot;c:\Program Files\CMake 2.4\bin\cmake.exe&quot; -Hf:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build -Bf:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build&#x0D;&#x0A;"
-					AdditionalDependencies="f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\CMakeLists.txt;&quot;c:\Program Files\CMake 2.4\share\CMake\Templates\CMakeWindowsSystemConfig.cmake&quot;;f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\CMakeLists.txt;"
+					Description="Building Custom Rule F:/build/mysql-5.0.51b-winbuild/mysql-community-nt-5.0.51b-build/scripts/CMakeLists.txt"
+					CommandLine="&quot;C:\Program Files\CMake 2.4\bin\cmake.exe&quot; -HF:/build/mysql-5.0.51b-winbuild/mysql-community-nt-5.0.51b-build -BF:/build/mysql-5.0.51b-winbuild/mysql-community-nt-5.0.51b-build"
+					AdditionalDependencies="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\CMakeLists.txt;&quot;C:\Program Files\CMake 2.4\share\cmake-2.4\Templates\CMakeWindowsSystemConfig.cmake&quot;;F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\CMakeLists.txt;"
 					Outputs="comp_sql.vcproj.cmake"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="MinSizeRel|Win32">
 					<Tool
 					Name="VCCustomBuildTool"
-					Description="Building Custom Rule f:/build/mysql-5.0.45-winbuild/mysql-community-nt-5.0.45-build/scripts/CMakeLists.txt"
-					CommandLine="&quot;c:\Program Files\CMake 2.4\bin\cmake.exe&quot; -Hf:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build -Bf:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build&#x0D;&#x0A;"
-					AdditionalDependencies="f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\CMakeLists.txt;&quot;c:\Program Files\CMake 2.4\share\CMake\Templates\CMakeWindowsSystemConfig.cmake&quot;;f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\CMakeLists.txt;"
+					Description="Building Custom Rule F:/build/mysql-5.0.51b-winbuild/mysql-community-nt-5.0.51b-build/scripts/CMakeLists.txt"
+					CommandLine="&quot;C:\Program Files\CMake 2.4\bin\cmake.exe&quot; -HF:/build/mysql-5.0.51b-winbuild/mysql-community-nt-5.0.51b-build -BF:/build/mysql-5.0.51b-winbuild/mysql-community-nt-5.0.51b-build"
+					AdditionalDependencies="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\CMakeLists.txt;&quot;C:\Program Files\CMake 2.4\share\cmake-2.4\Templates\CMakeWindowsSystemConfig.cmake&quot;;F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\CMakeLists.txt;"
 					Outputs="comp_sql.vcproj.cmake"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="RelWithDebInfo|Win32">
 					<Tool
 					Name="VCCustomBuildTool"
-					Description="Building Custom Rule f:/build/mysql-5.0.45-winbuild/mysql-community-nt-5.0.45-build/scripts/CMakeLists.txt"
-					CommandLine="&quot;c:\Program Files\CMake 2.4\bin\cmake.exe&quot; -Hf:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build -Bf:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build&#x0D;&#x0A;"
-					AdditionalDependencies="f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\CMakeLists.txt;&quot;c:\Program Files\CMake 2.4\share\CMake\Templates\CMakeWindowsSystemConfig.cmake&quot;;f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\CMakeLists.txt;"
+					Description="Building Custom Rule F:/build/mysql-5.0.51b-winbuild/mysql-community-nt-5.0.51b-build/scripts/CMakeLists.txt"
+					CommandLine="&quot;C:\Program Files\CMake 2.4\bin\cmake.exe&quot; -HF:/build/mysql-5.0.51b-winbuild/mysql-community-nt-5.0.51b-build -BF:/build/mysql-5.0.51b-winbuild/mysql-community-nt-5.0.51b-build"
+					AdditionalDependencies="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\CMakeLists.txt;&quot;C:\Program Files\CMake 2.4\share\cmake-2.4\Templates\CMakeWindowsSystemConfig.cmake&quot;;F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\CMakeLists.txt;"
 					Outputs="comp_sql.vcproj.cmake"/>
 				</FileConfiguration>
 			</File>
@@ -232,81 +220,120 @@ CommandLine=""/>
 			Name="CMake Rules"
 			Filter="">
 			<File
-				RelativePath="f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\mysql_fix_privilege_tables_sql.c.rule">
+				RelativePath="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\CMakeFiles\GenFixPrivs.rule">
 				<FileConfiguration
 					Name="Debug|Win32">
 					<Tool
 					Name="VCCustomBuildTool"
-					Description="Generating mysql_fix_privilege_tables_sql.c"
-					CommandLine="$(OutDir)\comp_sql.exe mysql_fix_privilege_tables mysql_fix_privilege_tables.sql mysql_fix_privilege_tables_sql.c&#x0D;&#x0A;"
-					AdditionalDependencies="f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\$(OutDir)\comp_sql.exe;f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\mysql_fix_privilege_tables.sql;"
-					Outputs="f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\mysql_fix_privilege_tables_sql.c"/>
+					Description=""
+					CommandLine=""
+					AdditionalDependencies="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\mysql_fix_privilege_tables_sql.c;"
+					Outputs="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\CMakeFiles\GenFixPrivs"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|Win32">
 					<Tool
 					Name="VCCustomBuildTool"
-					Description="Generating mysql_fix_privilege_tables_sql.c"
-					CommandLine="$(OutDir)\comp_sql.exe mysql_fix_privilege_tables mysql_fix_privilege_tables.sql mysql_fix_privilege_tables_sql.c&#x0D;&#x0A;"
-					AdditionalDependencies="f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\$(OutDir)\comp_sql.exe;f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\mysql_fix_privilege_tables.sql;"
-					Outputs="f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\mysql_fix_privilege_tables_sql.c"/>
+					Description=""
+					CommandLine=""
+					AdditionalDependencies="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\mysql_fix_privilege_tables_sql.c;"
+					Outputs="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\CMakeFiles\GenFixPrivs"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="MinSizeRel|Win32">
 					<Tool
 					Name="VCCustomBuildTool"
-					Description="Generating mysql_fix_privilege_tables_sql.c"
-					CommandLine="$(OutDir)\comp_sql.exe mysql_fix_privilege_tables mysql_fix_privilege_tables.sql mysql_fix_privilege_tables_sql.c&#x0D;&#x0A;"
-					AdditionalDependencies="f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\$(OutDir)\comp_sql.exe;f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\mysql_fix_privilege_tables.sql;"
-					Outputs="f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\mysql_fix_privilege_tables_sql.c"/>
+					Description=""
+					CommandLine=""
+					AdditionalDependencies="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\mysql_fix_privilege_tables_sql.c;"
+					Outputs="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\CMakeFiles\GenFixPrivs"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="RelWithDebInfo|Win32">
 					<Tool
 					Name="VCCustomBuildTool"
-					Description="Generating mysql_fix_privilege_tables_sql.c"
-					CommandLine="$(OutDir)\comp_sql.exe mysql_fix_privilege_tables mysql_fix_privilege_tables.sql mysql_fix_privilege_tables_sql.c&#x0D;&#x0A;"
-					AdditionalDependencies="f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\$(OutDir)\comp_sql.exe;f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\mysql_fix_privilege_tables.sql;"
-					Outputs="f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\mysql_fix_privilege_tables_sql.c"/>
+					Description=""
+					CommandLine=""
+					AdditionalDependencies="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\mysql_fix_privilege_tables_sql.c;"
+					Outputs="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\CMakeFiles\GenFixPrivs"/>
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\mysql_fix_privilege_tables.sql.rule">
+				RelativePath="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\mysql_fix_privilege_tables_sql.c.rule">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+					Name="VCCustomBuildTool"
+					Description="Generating mysql_fix_privilege_tables_sql.c"
+					CommandLine="$(OutDir)\comp_sql.exe mysql_fix_privilege_tables mysql_fix_privilege_tables.sql mysql_fix_privilege_tables_sql.c"
+					AdditionalDependencies="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\$(OutDir)\comp_sql.exe;F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\mysql_fix_privilege_tables.sql;"
+					Outputs="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\mysql_fix_privilege_tables_sql.c"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+					Name="VCCustomBuildTool"
+					Description="Generating mysql_fix_privilege_tables_sql.c"
+					CommandLine="$(OutDir)\comp_sql.exe mysql_fix_privilege_tables mysql_fix_privilege_tables.sql mysql_fix_privilege_tables_sql.c"
+					AdditionalDependencies="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\$(OutDir)\comp_sql.exe;F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\mysql_fix_privilege_tables.sql;"
+					Outputs="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\mysql_fix_privilege_tables_sql.c"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="MinSizeRel|Win32">
+					<Tool
+					Name="VCCustomBuildTool"
+					Description="Generating mysql_fix_privilege_tables_sql.c"
+					CommandLine="$(OutDir)\comp_sql.exe mysql_fix_privilege_tables mysql_fix_privilege_tables.sql mysql_fix_privilege_tables_sql.c"
+					AdditionalDependencies="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\$(OutDir)\comp_sql.exe;F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\mysql_fix_privilege_tables.sql;"
+					Outputs="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\mysql_fix_privilege_tables_sql.c"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="RelWithDebInfo|Win32">
+					<Tool
+					Name="VCCustomBuildTool"
+					Description="Generating mysql_fix_privilege_tables_sql.c"
+					CommandLine="$(OutDir)\comp_sql.exe mysql_fix_privilege_tables mysql_fix_privilege_tables.sql mysql_fix_privilege_tables_sql.c"
+					AdditionalDependencies="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\$(OutDir)\comp_sql.exe;F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\mysql_fix_privilege_tables.sql;"
+					Outputs="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\mysql_fix_privilege_tables_sql.c"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\mysql_fix_privilege_tables.sql.rule">
 				<FileConfiguration
 					Name="Debug|Win32">
 					<Tool
 					Name="VCCustomBuildTool"
 					Description="Generating mysql_fix_privilege_tables.sql"
-					CommandLine="copy /b mysql_system_tables.sql + mysql_system_tables_fix.sql mysql_fix_privilege_tables.sql&#x0D;&#x0A;"
-					AdditionalDependencies="f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\mysql_system_tables.sql;f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\mysql_system_tables_fix.sql;"
-					Outputs="f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\mysql_fix_privilege_tables.sql"/>
+					CommandLine="copy /b mysql_system_tables.sql + mysql_system_tables_fix.sql mysql_fix_privilege_tables.sql"
+					AdditionalDependencies="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\mysql_system_tables.sql;F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\mysql_system_tables_fix.sql;"
+					Outputs="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\mysql_fix_privilege_tables.sql"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|Win32">
 					<Tool
 					Name="VCCustomBuildTool"
 					Description="Generating mysql_fix_privilege_tables.sql"
-					CommandLine="copy /b mysql_system_tables.sql + mysql_system_tables_fix.sql mysql_fix_privilege_tables.sql&#x0D;&#x0A;"
-					AdditionalDependencies="f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\mysql_system_tables.sql;f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\mysql_system_tables_fix.sql;"
-					Outputs="f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\mysql_fix_privilege_tables.sql"/>
+					CommandLine="copy /b mysql_system_tables.sql + mysql_system_tables_fix.sql mysql_fix_privilege_tables.sql"
+					AdditionalDependencies="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\mysql_system_tables.sql;F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\mysql_system_tables_fix.sql;"
+					Outputs="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\mysql_fix_privilege_tables.sql"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="MinSizeRel|Win32">
 					<Tool
 					Name="VCCustomBuildTool"
 					Description="Generating mysql_fix_privilege_tables.sql"
-					CommandLine="copy /b mysql_system_tables.sql + mysql_system_tables_fix.sql mysql_fix_privilege_tables.sql&#x0D;&#x0A;"
-					AdditionalDependencies="f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\mysql_system_tables.sql;f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\mysql_system_tables_fix.sql;"
-					Outputs="f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\mysql_fix_privilege_tables.sql"/>
+					CommandLine="copy /b mysql_system_tables.sql + mysql_system_tables_fix.sql mysql_fix_privilege_tables.sql"
+					AdditionalDependencies="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\mysql_system_tables.sql;F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\mysql_system_tables_fix.sql;"
+					Outputs="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\mysql_fix_privilege_tables.sql"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="RelWithDebInfo|Win32">
 					<Tool
 					Name="VCCustomBuildTool"
 					Description="Generating mysql_fix_privilege_tables.sql"
-					CommandLine="copy /b mysql_system_tables.sql + mysql_system_tables_fix.sql mysql_fix_privilege_tables.sql&#x0D;&#x0A;"
-					AdditionalDependencies="f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\mysql_system_tables.sql;f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\mysql_system_tables_fix.sql;"
-					Outputs="f:\build\mysql-5.0.45-winbuild\mysql-community-nt-5.0.45-build\scripts\mysql_fix_privilege_tables.sql"/>
+					CommandLine="copy /b mysql_system_tables.sql + mysql_system_tables_fix.sql mysql_fix_privilege_tables.sql"
+					AdditionalDependencies="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\mysql_system_tables.sql;F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\mysql_system_tables_fix.sql;"
+					Outputs="F:\build\mysql-5.0.51b-winbuild\mysql-community-nt-5.0.51b-build\scripts\mysql_fix_privilege_tables.sql"/>
 				</FileConfiguration>
 			</File>
 		</Filter>

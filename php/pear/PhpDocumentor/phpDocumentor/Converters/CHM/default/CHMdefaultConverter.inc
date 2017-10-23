@@ -31,7 +31,7 @@
  * @author     Greg Beaver <cellog@php.net>
  * @copyright  2000-2006 Joshua Eichorn, Gregory Beaver
  * @license    http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @version    CVS: $Id: CHMdefaultConverter.inc,v 1.8 2006/10/23 03:49:02 cellog Exp $
+ * @version    CVS: $Id: CHMdefaultConverter.inc,v 1.12 2007/04/19 20:20:57 ashnazg Exp $
  * @filesource
  * @link       http://www.phpdoc.org
  * @link       http://pear.php.net/PhpDocumentor
@@ -49,9 +49,9 @@
  * @link http://www.microsoft.com/downloads/release.asp?releaseid=33071 MS HTML Help Workshop download
  * @package Converters
  * @subpackage CHMdefault
- * @author Greg Beaver <cellog@users.sourceforge.net>
+ * @author Greg Beaver <cellog@php.net>
  * @since 1.0rc1
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.12 $
  */
 class CHMdefaultConverter extends Converter
 {
@@ -1359,6 +1359,7 @@ class CHMdefaultConverter extends Converter
     
     function copyMediaRecursively($media,$targetdir,$subdir = '')
     {
+        $versionControlDirectories = array ('CVS', 'media/CVS', 'media\\CVS', '.svn', 'media/.svn', 'media\\.svn');
         if (!is_array($media)) {
             return;
         }
@@ -1371,15 +1372,26 @@ class CHMdefaultConverter extends Converter
             {
                 if (!is_numeric($dir))
                 {
-                    // create the subdir
-                    phpDocumentor_out("creating $targetdir/$dir\n");
-                    Converter::setTargetDir($targetdir . PATH_DELIMITER . $dir);
-                    if (!empty($subdir)) $subdir .= PATH_DELIMITER;
-                    $this->copyMediaRecursively($files,"$targetdir/$dir",$subdir . $dir);
-                } else
+                    if (in_array($dir, $versionControlDirectories))
+                    {
+                        // skip it entirely
+                    }
+                    else
+                    {
+                        // create the subdir
+                        phpDocumentor_out("creating $targetdir" . PATH_DELIMITER . "$dir\n");
+                        Converter::setTargetDir($targetdir . PATH_DELIMITER . $dir);
+                        if (!empty($subdir)) 
+                        {
+                            $subdir .= PATH_DELIMITER;
+                        }
+                        $this->copyMediaRecursively($files,"$targetdir/$dir",$subdir . $dir);
+                    }
+                } 
+                else
                 {
                     // copy the file
-                    phpDocumentor_out("copying $targetdir/".$files['file']."\n");
+                    phpDocumentor_out("copying $targetdir" . PATH_DELIMITER . $files['file']."\n");
                     $this->copyFile($files['file'],$subdir);
                 }
             }

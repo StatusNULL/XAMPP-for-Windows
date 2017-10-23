@@ -1,44 +1,58 @@
-@ECHO OFF
+@echo off
 
-:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-:: The phing build script for Windows based systems
-:: $Id: pear-phing.bat,v 1.4 2005/12/22 13:12:33 hlellelid Exp $
-:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+rem *********************************************************************
+rem ** the phing build script for Windows based systems
+rem ** $Id: phing.bat 143 2007-02-05 14:57:57Z hans $
+rem *********************************************************************
 
-::----------------------------------------------------------------------------------
-:: Please set following to PHP's CLI
-:: NOTE: In PHP 4.2.x the PHP-CLI used to be named php-cli.exe. 
-::       PHP 4.3.x names it php.exe but stores it in a subdir called /cli/php.exe
-::       E.g. for PHP 4.2 C:\phpdev\php-4.2-Win32\php-cli.exe
-::            for PHP 4.3 C:\phpdev\php-4.3-Win32\cli\php.exe
-  
-  SET phpCli=\xampp\php\.\php.exe
+rem This script will do the following:
+rem - check for PHP_COMMAND env, if found, use it.
+rem   - if not found detect php, if found use it, otherwise err and terminate
+rem - check for PHING_HOME evn, if found use it
+rem   - if not found error and leave
+rem - check for PHP_CLASSPATH, if found use it
+rem   - if not found set it using PHING_HOME/classes
 
-::---------------------------------------------------------------------------------
-::---------------------------------------------------------------------------------
-:: Do not modify below this line!! (Unless you know what your doing :)
-::---------------------------------------------------------------------------------
-::---------------------------------------------------------------------------------
+if "%OS%"=="Windows_NT" @setlocal
 
-:: Check existence of php.exe
-IF EXIST "%phpCli%" (
-  SET doNothing=
-) ELSE GOTO :NoPhpCli
+rem %~dp0 is expanded pathname of the current script under NT
+set DEFAULT_PHING_HOME=%~dp0..
 
-"%phpCli%" -d html_errors=off -qC "\xampp\php\pear\phing.php" %*
-GOTO :EOF
+goto init
+goto cleanup
 
-::
-:: php.exe not found error  
-GOTO :PAUSE_END
-:NoPhpCli
-ECHO ** ERROR *****************************************************************
-ECHO * Sorry, can't find the php.exe file.
-ECHO * You must edit this file to point to your php.exe (CLI version!)
-ECHO *    [Currently set to %phpCli%]
-ECHO **************************************************************************
+:init
 
-GOTO :PAUSE_END
+if "%PHING_HOME%" == "" set PHING_HOME=%DEFAULT_PHING_HOME%
+set DEFAULT_PHING_HOME=
 
-:PAUSE_END
-PAUSE
+if "%PHP_COMMAND%" == "" goto no_phpcommand
+if "%PHP_CLASSPATH%" == "" goto set_classpath
+
+goto run
+goto cleanup
+
+:run
+%PHP_COMMAND% -d html_errors=off -qC %PHING_HOME%\bin\phing.php %1 %2 %3 %4 %5 %6 %7 %8 %9
+goto cleanup
+
+:no_phpcommand
+REM echo ------------------------------------------------------------------------
+REM echo WARNING: Set environment var PHP_COMMAND to the location of your php.exe
+REM echo          executable (e.g. C:\PHP\php.exe).  (Assuming php.exe on Path)
+REM echo ------------------------------------------------------------------------
+set PHP_COMMAND=php.exe
+goto init
+
+:err_home
+echo ERROR: Environment var PHING_HOME not set. Please point this
+echo variable to your local phing installation!
+goto cleanup
+
+:set_classpath
+set PHP_CLASSPATH=%PHING_HOME%\classes
+goto init
+
+:cleanup
+if "%OS%"=="Windows_NT" @endlocal
+REM pause

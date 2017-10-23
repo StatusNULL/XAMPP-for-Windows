@@ -22,7 +22,7 @@
  * - db connection
  * - authentication work
  *
- * @version $Id: common.inc.php 11033 2008-01-01 15:03:50Z lem9 $
+ * @version $Id: common.inc.php 11326 2008-06-17 21:32:48Z lem9 $
  */
 
 /**
@@ -51,6 +51,11 @@ if (version_compare(phpversion(), '6', 'lt')) {
      */
     @ini_set('magic_quotes_runtime', false);
 }
+
+/**
+ * for verification in all procedural scripts under libraries
+ */
+define('PHPMYADMIN', true);
 
 /**
  * core functions
@@ -129,6 +134,7 @@ foreach ($GLOBALS as $key => $dummy) {
         die('numeric key detected');
     }
 }
+unset($dummy);
 
 /**
  * PATH_INFO could be compromised if set, so remove it from PHP_SELF
@@ -147,7 +153,8 @@ $PMA_PHP_SELF = htmlspecialchars($PMA_PHP_SELF);
 
 /**
  * just to be sure there was no import (registering) before here
- * we empty the global space
+ * we empty the global space (but avoid unsetting $variables_list
+ * and $key in the foreach(), we still need them!)
  */
 $variables_whitelist = array (
     'GLOBALS',
@@ -160,6 +167,8 @@ $variables_whitelist = array (
     '_COOKIE',
     '_SESSION',
     'PMA_PHP_SELF',
+    'variables_whitelist',
+    'key'
 );
 
 foreach (get_defined_vars() as $key => $value) {
@@ -178,15 +187,15 @@ unset($key, $value, $variables_whitelist);
  * <code>
  * <form ...>
  * ... main form elments ...
- * <intput type="hidden" name="subform[action1][id]" value="1" />
+ * <input type="hidden" name="subform[action1][id]" value="1" />
  * ... other subform data ...
- * <intput type="submit" name="usesubform[action1]" value="do action1" />
+ * <input type="submit" name="usesubform[action1]" value="do action1" />
  * ... other subforms ...
- * <intput type="hidden" name="subform[actionX][id]" value="X" />
+ * <input type="hidden" name="subform[actionX][id]" value="X" />
  * ... other subform data ...
- * <intput type="submit" name="usesubform[actionX]" value="do actionX" />
+ * <input type="submit" name="usesubform[actionX]" value="do actionX" />
  * ... main form elments ...
- * <intput type="submit" name="main_action" value="submit form" />
+ * <input type="submit" name="main_action" value="submit form" />
  * </form>
  * </code
  *
@@ -211,11 +220,20 @@ if (isset($_POST['usesubform'])) {
         unset($_POST['redirect']);
     }
     unset($subform_id, $subform);
+} else {
+    // Note: here we overwrite $_REQUEST so that it does not contain cookies,
+    // because another application for the same domain could have set
+    // a cookie (with a compatible path) that overrides a variable 
+    // we expect from GET or POST.
+    // We'll refer to cookies explicitly with the $_COOKIE syntax.
+    $_REQUEST = array_merge($_GET, $_POST);
 }
 // end check if a subform is submitted
 
 // remove quotes added by php
-if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc()) {
+// (get_magic_quotes_gpc() is deprecated in PHP 5.3, but compare with 5.2.99
+// to be able to test with 5.3.0-dev)
+if (function_exists('get_magic_quotes_gpc') && -1 == version_compare(PHP_VERSION, '5.2.99') && get_magic_quotes_gpc()) {
     PMA_arrayWalkRecursive($_GET, 'stripslashes', true);
     PMA_arrayWalkRecursive($_POST, 'stripslashes', true);
     PMA_arrayWalkRecursive($_COOKIE, 'stripslashes', true);
@@ -456,25 +474,19 @@ $_REQUEST['js_frame'] = PMA_ifSetOr($_REQUEST['js_frame'], '');
 /******************************************************************************/
 /* parsing configuration file                         LABEL_parsing_config_file      */
 
-if (empty($_SESSION['PMA_Config'])) {
-    /**
-     * We really need this one!
-     */
-    if (! function_exists('preg_replace')) {
-        PMA_fatalError('strCantLoad', 'pcre');
-    }
-
-    /**
-     * @global PMA_Config $_SESSION['PMA_Config']
-     */
-    $_SESSION['PMA_Config'] = new PMA_Config('./config.inc.php');
-
-} elseif (version_compare(phpversion(), '5', 'lt')) {
-    /**
-     * @todo move all __wakeup() functionality into session.inc.php
-     */
-    $_SESSION['PMA_Config']->__wakeup();
+/**
+ * We really need this one!
+ */
+if (! function_exists('preg_replace')) {
+    PMA_fatalError('strCantLoad', 'pcre');
 }
+
+/**
+ * @global PMA_Config $_SESSION['PMA_Config']
+ * force reading of config file, because we removed sensitive values
+ * in the previous iteration
+ */
+$_SESSION['PMA_Config'] = new PMA_Config('./config.inc.php');
 
 if (!defined('PMA_MINIMUM_COMMON')) {
     $_SESSION['PMA_Config']->checkPmaAbsoluteUri();
@@ -723,9 +735,6 @@ if (! defined('PMA_MINIMUM_COMMON')) {
         // Gets the authentication library that fits the $cfg['Server'] settings
         // and run authentication
 
-        // (for a quick check of path disclosure in auth/cookies:)
-        $coming_from_common = true;
-
         // to allow HTTP or http
         $cfg['Server']['auth_type'] = strtolower($cfg['Server']['auth_type']);
         if (! file_exists('./libraries/auth/' . $cfg['Server']['auth_type'] . '.auth.lib.php')) {
@@ -893,6 +902,11 @@ if (! defined('PMA_MINIMUM_COMMON')) {
     }
 
 } // end if !defined('PMA_MINIMUM_COMMON')
+
+// remove sensitive values from session
+$_SESSION['PMA_Config']->set('blowfish_secret', '');
+$_SESSION['PMA_Config']->set('Servers', '');
+$_SESSION['PMA_Config']->set('default_server', '');
 
 if (!empty($__redirect) && in_array($__redirect, $goto_whitelist)) {
     /**

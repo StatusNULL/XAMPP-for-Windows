@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: sync_lang.sh 10758 2007-10-10 21:15:26Z lem9 $
+# $Id: sync_lang.sh 11213 2008-04-23 17:13:43Z lem9 $
 ##
 # Shell script that synchronises all translations in phpMyAdmin
 ##
@@ -108,7 +108,7 @@ greek-iso-8859-7
 hebrew-iso-8859-8-i
 hungarian-iso-8859-2
 indonesian-iso-8859-1
-italian-iso-8859-1
+italian-utf-8
 japanese-utf-8
 korean-utf-8
 latvian-windows-1257
@@ -119,13 +119,13 @@ norwegian-iso-8859-1
 persian-windows-1256
 polish-iso-8859-2
 portuguese-iso-8859-1
-romanian-iso-8859-1
+romanian-utf-8
 russian-windows-1251
 serbian_cyrillic-utf-8
 serbian_latin-utf-8
 slovenian-iso-8859-2
 slovak-utf-8
-spanish-iso-8859-1
+spanish-utf-8
 swedish-iso-8859-1
 tatarish-iso-8859-9
 thai-utf-8

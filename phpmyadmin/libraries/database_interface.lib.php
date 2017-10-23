@@ -3,8 +3,11 @@
 /**
  * Common Option Constants For DBI Functions
  *
- * @version $Id: database_interface.lib.php 11021 2007-12-27 23:50:45Z lem9 $
+ * @version $Id: database_interface.lib.php 11326 2008-06-17 21:32:48Z lem9 $
  */
+if (! defined('PHPMYADMIN')) {
+    exit;
+}
 
 /**
  *
@@ -848,7 +851,8 @@ function PMA_DBI_postConnect($link, $is_controluser = false)
         }
 
         // and we remove the non-UTF-8 choices to avoid confusion
-        if (!defined('PMA_REMOVED_NON_UTF_8')) {
+        // (unless there is a forced language)
+        if (!defined('PMA_REMOVED_NON_UTF_8') && ! isset($GLOBALS['cfg']['Lang'])) {
             foreach ($GLOBALS['available_languages'] as $each_lang => $dummy) {
                 if (substr($each_lang, -5) != 'utf-8') {
                     unset($GLOBALS['available_languages'][$each_lang]);
@@ -1269,8 +1273,11 @@ function PMA_DBI_get_triggers($db, $table) {
     $result = array();
 
     // available in INFORMATION_SCHEMA since MySQL 5.0.10
+    // Note: in http://dev.mysql.com/doc/refman/5.0/en/faqs-triggers.html
+    // their example uses WHERE TRIGGER_SCHEMA='dbname' so let's use this
+    // instead of WHERE EVENT_OBJECT_SCHEMA='dbname'
     if (PMA_MYSQL_INT_VERSION >= 50010) {
-        $triggers = PMA_DBI_fetch_result("SELECT TRIGGER_SCHEMA, TRIGGER_NAME, EVENT_MANIPULATION, ACTION_TIMING, ACTION_STATEMENT, EVENT_OBJECT_SCHEMA, EVENT_OBJECT_TABLE FROM information_schema.TRIGGERS WHERE EVENT_OBJECT_SCHEMA= '" . PMA_sqlAddslashes($db,true) . "' and EVENT_OBJECT_TABLE = '" . PMA_sqlAddslashes($table, true) . "';");
+        $triggers = PMA_DBI_fetch_result("SELECT TRIGGER_SCHEMA, TRIGGER_NAME, EVENT_MANIPULATION, ACTION_TIMING, ACTION_STATEMENT, EVENT_OBJECT_SCHEMA, EVENT_OBJECT_TABLE FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA= '" . PMA_sqlAddslashes($db,true) . "' and EVENT_OBJECT_TABLE = '" . PMA_sqlAddslashes($table, true) . "';");
 
         if ($triggers) {
             $delimiter = '//';

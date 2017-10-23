@@ -1,4 +1,4 @@
-# Install script for directory: f:/build/mysql-5.0.45-winbuild/mysql-community-nt-5.0.45-build/scripts
+# Install script for directory: F:/build/mysql-5.0.51b-winbuild/mysql-community-nt-5.0.51b-build/scripts
 
 # Set the install prefix
 IF(NOT DEFINED CMAKE_INSTALL_PREFIX)

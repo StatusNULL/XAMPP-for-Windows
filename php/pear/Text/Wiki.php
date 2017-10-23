@@ -9,7 +9,7 @@
  * @package    Text_Wiki
  * @author     Paul M. Jones <pmjones@php.net>
  * @license    http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
- * @version    CVS: $Id: Wiki.php,v 1.44 2006/03/02 04:04:59 justinpatrin Exp $
+ * @version    CVS: $Id: Wiki.php,v 1.51 2007/06/09 23:17:46 justinpatrin Exp $
  * @link       http://pear.php.net/package/Text_Wiki
  */
 
@@ -33,7 +33,7 @@ require_once 'Text/Wiki/Render.php';
  * @package    Text_Wiki
  * @author     Paul M. Jones <pmjones@php.net>
  * @license    http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
- * @version    Release: 1.1.0
+ * @version    Release: 1.2.0
  * @link       http://pear.php.net/package/Text_Wiki
  */
 class Text_Wiki {
@@ -256,6 +256,13 @@ class Text_Wiki {
 
     var $source = '';
 
+    /**
+     * The output text
+     *
+     * @var string
+     */
+    var $output = '';
+
 
     /**
     *
@@ -335,6 +342,33 @@ class Text_Wiki {
 
     var $_dirSep = DIRECTORY_SEPARATOR;
 
+    /**
+     * Temporary configuration variable
+     *
+     * @var string
+     */
+    var $renderingType = 'preg';
+
+    /**
+     * Stack of rendering callbacks
+     *
+     * @var Array
+     */
+    var $_renderCallbacks = array();
+
+    /**
+     * Current output block
+     *
+     * @var string
+     */
+    var $_block;
+
+    /**
+     * A stack of blocks
+     *
+     * @param Array
+     */
+    var $_blocks;
 
     /**
     *
@@ -352,7 +386,10 @@ class Text_Wiki {
     function Text_Wiki($rules = null)
     {
         if (is_array($rules)) {
-            $this->rules = $rules;
+            $this->rules = array();
+            foreach ($rules as $rule) {
+                $this->rules[] = ucfirst($rule);
+            }
         }
 
         $this->addPath(
@@ -408,8 +445,8 @@ class Text_Wiki {
     {
         static $only = array();
         if (!isset($only[$parser])) {
-            $ret =& Text_Wiki::factory($parser, $rules);
-            if (PEAR::isError($ret)) {
+            $ret = & Text_Wiki::factory($parser, $rules);
+            if (Text_Wiki::isError($ret)) {
                 return $ret;
             }
             $only[$parser] =& $ret;
@@ -423,6 +460,7 @@ class Text_Wiki {
      * @access public
      * @static
      * @param string $parser The name of the parse to instantiate
+     * you need to have Text_Wiki_XXX installed to use $parser = 'XXX', it's E_FATAL
      * @param array $rules The rules to pass into the constructor
      *    {@see Text_Wiki::singleton} for a list of rules
      * @return Text_Wiki a Parser object extended from Text_Wiki
@@ -432,22 +470,11 @@ class Text_Wiki {
         $class = 'Text_Wiki_' . $parser;
         $file = str_replace('_', '/', $class).'.php';
         if (!class_exists($class)) {
-            /*$exists = false;
-            foreach (split(PATH_SEPARATOR, get_include_path()) as $path) {
-                if (file_exists($path.'/'.$file)
-                    && is_readable($path.'/'.$file)) {
-                    $exists = true;
-                    break;
-                }
-            }*/
-            $fp = @fopen($file, 'r', true);
-            if ($fp === false) {
-                return PEAR::raiseError('Could not find file '.$file.' in include_path');
-            }
-            fclose($fp);
-            include_once($file);
+            require_once $file;
             if (!class_exists($class)) {
-                return PEAR::raiseError('Class '.$class.' does not exist after including '.$file);
+                return Text_Wiki::error(
+                    'Class ' . $class . ' does not exist after requiring '. $file .
+                        ', install package ' . $class . "\n");
             }
         }
 
@@ -954,7 +981,7 @@ class Text_Wiki {
         $format = ucwords(strtolower($format));
 
         // the eventual output text
-        $output = '';
+        $this->output = '';
 
         // when passing through the parsed source text, keep track of when
         // we are in a delimited section
@@ -971,7 +998,7 @@ class Text_Wiki {
 
         // pre-rendering activity
         if (is_object($this->formatObj[$format])) {
-            $output .= $this->formatObj[$format]->pre();
+            $this->output .= $this->formatObj[$format]->pre();
         }
 
         // load the render objects
@@ -979,59 +1006,150 @@ class Text_Wiki {
             $this->loadRenderObj($format, $rule);
         }
 
-        // pass through the parsed source text character by character
-        $k = strlen($this->source);
-        for ($i = 0; $i < $k; $i++) {
-
-            // the current character
-            $char = $this->source{$i};
-
-            // are alredy in a delimited section?
-            if ($in_delim) {
-
-                // yes; are we ending the section?
-                if ($char == $this->delim) {
-
-                    // yes, get the replacement text for the delimited
-                    // token number and unset the flag.
-                    $key = (int)$key;
-                    $rule = $this->tokens[$key][0];
-                    $opts = $this->tokens[$key][1];
-                    $output .= $this->renderObj[$rule]->token($opts);
-                    $in_delim = false;
-
+        if ($this->renderingType == 'preg') {
+            $this->output = preg_replace_callback('/'.$this->delim.'(\d+)'.$this->delim.'/',
+                                            array(&$this, '_renderToken'),
+                                            $this->source);
+            /*
+//Damn strtok()! Why does it "skip" empty parts of the string. It's useless now!
+        } elseif ($this->renderingType == 'strtok') {
+            echo '<pre>'.htmlentities($this->source).'</pre>';
+            $t = strtok($this->source, $this->delim);
+            $inToken = true;
+            $i = 0;
+            while ($t !== false) {
+                echo 'Token: '.$i.'<pre>"'.htmlentities($t).'"</pre><br/><br/>';
+                if ($inToken) {
+                    //$this->output .= $this->renderObj[$this->tokens[$t][0]]->token($this->tokens[$t][1]);
                 } else {
-
-                    // no, add to the dlimited token key number
-                    $key .= $char;
-
+                    $this->output .= $t;
                 }
+                $inToken = !$inToken;
+                $t = strtok($this->delim);
+                ++$i;
+            }
+            */
+        } else {
+            // pass through the parsed source text character by character
+            $this->_block = '';
+            $tokenStack = array();
+            $k = strlen($this->source);
+            for ($i = 0; $i < $k; $i++) {
 
-            } else {
+                // the current character
+                $char = $this->source{$i};
 
-                // not currently in a delimited section.
-                // are we starting into a delimited section?
-                if ($char == $this->delim) {
-                    // yes, reset the previous key and
-                    // set the flag.
-                    $key = '';
-                    $in_delim = true;
+                // are alredy in a delimited section?
+                if ($in_delim) {
+
+                    // yes; are we ending the section?
+                    if ($char == $this->delim) {
+
+                        if (count($this->_renderCallbacks) == 0) {
+                            $this->output .= $this->_block;
+                            $this->_block = '';
+                        }
+
+                        if (isset($opts['type'])) {
+                            if ($opts['type'] == 'start') {
+                                array_push($tokenStack, $rule);
+                            } elseif ($opts['type'] == 'end') {
+                                if ($tokenStack[count($tokenStack) - 1] != $rule) {
+                                    return Text_Wiki::error('Unbalanced tokens, check your syntax');
+                                } else {
+                                    array_pop($tokenStack);
+                                }
+                            }
+                        }
+
+                        // yes, get the replacement text for the delimited
+                        // token number and unset the flag.
+                        $key = (int)$key;
+                        $rule = $this->tokens[$key][0];
+                        $opts = $this->tokens[$key][1];
+                        $this->_block .= $this->renderObj[$rule]->token($opts);
+                        $in_delim = false;
+
+                    } else {
+
+                        // no, add to the delimited token key number
+                        $key .= $char;
+
+                    }
+
                 } else {
-                    // no, add to the output as-is
-                    $output .= $char;
+
+                    // not currently in a delimited section.
+                    // are we starting into a delimited section?
+                    if ($char == $this->delim) {
+                        // yes, reset the previous key and
+                        // set the flag.
+                        $key = '';
+                        $in_delim = true;
+
+                    } else {
+                        // no, add to the output as-is
+                        $this->_block .= $char;
+                    }
                 }
             }
         }
 
+        if (count($this->_renderCallbacks)) {
+            return $this->error('Render callbacks left over after processing finished');
+        }
+        /*
+        while (count($this->_renderCallbacks)) {
+            $this->popRenderCallback();
+        }
+        */
+        if (strlen($this->_block)) {
+            $this->output .= $this->_block;
+            $this->_block = '';
+        }
+
         // post-rendering activity
         if (is_object($this->formatObj[$format])) {
-            $output .= $this->formatObj[$format]->post();
+            $this->output .= $this->formatObj[$format]->post();
         }
 
         // return the rendered source text.
-        return $output;
+        return $this->output;
     }
 
+    /**
+     * Renders a token, for use only as an internal callback
+     *
+     * @param array Matches from preg_rpelace_callback, [1] is the token number
+     * @return string The rendered text for the token
+     * @access private
+     */
+    function _renderToken($matches) {
+        return $this->renderObj[$this->tokens[$matches[1]][0]]->token($this->tokens[$matches[1]][1]);
+    }
+
+    function registerRenderCallback($callback) {
+        $this->_blocks[] = $this->_block;
+        $this->_block = '';
+        $this->_renderCallbacks[] = $callback;
+    }
+
+    function popRenderCallback() {
+        if (count($this->_renderCallbacks) == 0) {
+            return Text_Wiki::error('Render callback popped when no render callbacks in stack');
+        } else {
+            $callback = array_pop($this->_renderCallbacks);
+            $this->_block = call_user_func($callback, $this->_block);
+            if (count($this->_blocks)) {
+                $parentBlock = array_pop($this->_blocks);
+                $this->_block = $parentBlock.$this->_block;
+            }
+            if (count($this->_renderCallbacks) == 0) {
+                $this->output .= $this->_block;
+                $this->_block = '';
+            }
+        }
+    }
 
     /**
     *

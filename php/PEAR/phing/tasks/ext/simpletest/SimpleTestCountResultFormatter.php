@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: SimpleTestCountResultFormatter.php 82 2006-07-07 18:15:35Z mrook $
+ * $Id: SimpleTestCountResultFormatter.php 227 2007-08-28 02:17:00Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -25,7 +25,7 @@ require_once 'phing/tasks/ext/simpletest/SimpleTestResultFormatter.php';
  * Dummy result formatter used to count SimpleTest results
  *
  * @author Michiel Rook <michiel.rook@gmail.com>
- * @version $Id: SimpleTestCountResultFormatter.php 82 2006-07-07 18:15:35Z mrook $
+ * @version $Id: SimpleTestCountResultFormatter.php 227 2007-08-28 02:17:00Z hans $
  * @package phing.tasks.ext.simpletest
  * @since 2.2.0
  */

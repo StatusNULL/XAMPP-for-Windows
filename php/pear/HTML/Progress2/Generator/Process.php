@@ -1,24 +1,44 @@
 <?php
 /**
- * The ActionProcess class provides final step of ProgressBar creation.
- * Manage php/css source-code save and cancel action.
+ * Copyright (c) 2005-2008, Laurent Laville <pear@laurent-laville.org>
+ *
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the authors nor the names of its contributors
+ *       may be used to endorse or promote products derived from this software
+ *       without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  *
  * PHP versions 4 and 5
  *
- * LICENSE: This source file is subject to version 3.01 of the PHP license
- * that is available through the world-wide-web at the following URI:
- * http://www.php.net/license/3_01.txt.  If you did not receive a copy of
- * the PHP License and are unable to obtain it through the web, please
- * send a note to license@php.net so we can mail you a copy immediately.
- *
- * @category   HTML
- * @package    HTML_Progress2
- * @author     Laurent Laville <pear@laurent-laville.org>
- * @copyright  2005-2007 The PHP Group
- * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
- * @version    CVS: $Id: Process.php,v 1.5 2007/01/02 10:58:38 farell Exp $
- * @link       http://pear.php.net/package/HTML_Progress2
- * @since      File available since Release 2.0.0RC1
+ * @category  HTML
+ * @package   HTML_Progress2
+ * @author    Laurent Laville <pear@laurent-laville.org>
+ * @copyright 2005-2008 Laurent Laville
+ * @license   http://www.opensource.org/licenses/bsd-license.php  New BSD License
+ * @version   CVS: $Id: Process.php,v 1.9 2008/03/20 21:27:55 farell Exp $
+ * @link      http://pear.php.net/package/HTML_Progress2
+ * @since     File available since Release 2.0.0RC1
  */
 
 
@@ -26,14 +46,14 @@
  * The ActionProcess class provides final step of ProgressBar creation.
  * Manage php/css source-code save and cancel action.
  *
- * @category   HTML
- * @package    HTML_Progress2
- * @author     Laurent Laville <pear@laurent-laville.org>
- * @copyright  2005-2007 The PHP Group
- * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
- * @version    Release: 2.2.0
- * @link       http://pear.php.net/package/HTML_Progress2
- * @since      Class available since Release 2.0.0RC1
+ * @category  HTML
+ * @package   HTML_Progress2
+ * @author    Laurent Laville <pear@laurent-laville.org>
+ * @copyright 2005-2008 Laurent Laville
+ * @license   http://www.opensource.org/licenses/bsd-license.php  New BSD License
+ * @version   Release: 2.4.0
+ * @link      http://pear.php.net/package/HTML_Progress2
+ * @since     Class available since Release 2.0.0RC1
  */
 
 class ActionProcess extends HTML_QuickForm_Action
@@ -41,11 +61,11 @@ class ActionProcess extends HTML_QuickForm_Action
     /**
      * Performs an action on a page of the controller (wizard)
      *
-     * @param      string    $page          current page displayed by the controller
-     * @param      string    $actionName    page action asked
+     * @param string &$page      current page displayed by the controller
+     * @param string $actionName page action asked
      *
      * @return     void
-     * @since      2.0.0
+     * @since      version 2.0.0 (2005-10-01)
      * @access     public
      */
     function perform(&$page, $actionName)
@@ -60,7 +80,7 @@ class ActionProcess extends HTML_QuickForm_Action
 
             // what kind of source code is requested
             $code = $page->exportValue('phpcss');
-            $pb = $page->controller->createProgressBar();
+            $pb   = $page->controller->createProgressBar();
 
             $phpCode = (isset($code['P']) === true);
             $cssCode = (isset($code['C']) === true);
@@ -82,11 +102,11 @@ class ActionProcess extends HTML_QuickForm_Action
     /**
      * Returns a formatted string of the progress meter stylesheet
      *
-     * @param      object    $pBar          progress meter object reference
-     * @param      boolean   $raw           (optional) decides whether to put html tags or not
+     * @param object  &$pBar progress meter object reference
+     * @param boolean $raw   (optional) decides whether to put html tags or not
      *
      * @return     string
-     * @since      2.0.0
+     * @since      version 2.0.0 (2005-10-01)
      * @access     public
      */
     function sprintCSS(&$pBar, $raw = false)
@@ -97,12 +117,12 @@ class ActionProcess extends HTML_QuickForm_Action
     /**
      * Returns a formatted string of the progress meter php code
      *
-     * @param      object    $pBar          progress meter object reference
-     * @param      boolean   $cssCode       returns css source code
-     * @param      boolean   $raw           (optional) decides whether to put php tags or not
+     * @param object  &$pBar   progress meter object reference
+     * @param boolean $cssCode returns css source code
+     * @param boolean $raw     (optional) decides whether to put php tags or not
      *
      * @return     string
-     * @since      2.0.0
+     * @since      version 2.0.0 (2005-10-01)
      * @access     public
      */
     function sprintPHP(&$pBar, $cssCode, $raw = false)
@@ -112,63 +132,83 @@ class ActionProcess extends HTML_QuickForm_Action
         if ($raw) {
             $strPHP = PHP_EOL;
         } else {
-            $strPHP = '<?php' . PHP_EOL;
+            $strPHP = '<?php'
+                    . PHP_EOL;
         }
-        $strPHP .= 'require_once \'HTML/Progress2.php\';' . PHP_EOL . PHP_EOL;
-        $strPHP .= '$pb = new HTML_Progress2();' . PHP_EOL;
-        $strPHP .= '$pb->setIdent(\'PB1\');' . PHP_EOL;
+        $strPHP .= 'require_once \'HTML/Progress2.php\';'
+                . PHP_EOL . PHP_EOL;
+        $strPHP .= '$pb = new HTML_Progress2();'
+                . PHP_EOL;
+        $strPHP .= '$pb->setIdent(\'PB1\');'
+                . PHP_EOL;
 
         if ($pBar->isIndeterminate()) {
-            $strPHP .= '$pb->setIndeterminate(true);' . PHP_EOL;
+            $strPHP .= '$pb->setIndeterminate(true);'
+                    . PHP_EOL;
         }
         if ($pBar->isBorderPainted()) {
-            $strPHP .= '$pb->setBorderPainted(true);' . PHP_EOL;
+            $strPHP .= '$pb->setBorderPainted(true);'
+                    . PHP_EOL;
         }
         if ($structure['animspeed'] > 0) {
-            $strPHP .= '$pb->setAnimSpeed(' . $structure['animspeed'] . ');' . PHP_EOL;
+            $strPHP .= '$pb->setAnimSpeed(' . $structure['animspeed'] . ');'
+                    . PHP_EOL;
         }
         if ($structure['minimum'] != 0) {
-            $strPHP .= '$pb->setMinimum(' . $structure['minimum'] . ');' . PHP_EOL;
+            $strPHP .= '$pb->setMinimum(' . $structure['minimum'] . ');'
+                    . PHP_EOL;
         }
         if ($structure['maximum'] != 100) {
-            $strPHP .= '$pb->setMaximum(' . $structure['maximum'] . ');' . PHP_EOL;
+            $strPHP .= '$pb->setMaximum(' . $structure['maximum'] . ');'
+                    . PHP_EOL;
         }
         if ($structure['increment'] != 1) {
-            $strPHP .= '$pb->setIncrement(' . $structure['increment'] . ');' . PHP_EOL;
+            $strPHP .= '$pb->setIncrement(' . $structure['increment'] . ');'
+                    . PHP_EOL;
         }
         if ($structure['orientation'] == '2') {
-            $strPHP .= '$pb->setOrientation(HTML_PROGRESS2_BAR_VERTICAL);' . PHP_EOL;
+            $strPHP .= '$pb->setOrientation(HTML_PROGRESS2_BAR_VERTICAL);'
+                    . PHP_EOL;
         }
         if ($structure['fillway'] != 'natural') {
-            $strPHP .= '$pb->setFillWay(\'' . $structure['fillway'] . '\');' . PHP_EOL;
+            $strPHP .= '$pb->setFillWay(\'' . $structure['fillway'] . '\');'
+                    . PHP_EOL;
         }
 
-        /* Page 1: Progress attributes **************************************************/
-        $strPHP .= $this->_attributesArray('$pb->setProgressAttributes(', $structure['progress']);
+        /* Page 1: Progress attributes ****************************************/
+        $strPHP .= $this->_attributesArray('$pb->setProgressAttributes(',
+                                           $structure['progress']);
         $strPHP .= PHP_EOL;
 
-        /* Page 2: Cell attributes ******************************************************/
-        $strPHP .= '$pb->setCellCount(' . $structure['cellcount'] . ');' . PHP_EOL;
-        $strPHP .= $this->_attributesArray('$pb->setCellAttributes(', $structure['cell']);
+        /* Page 2: Cell attributes ********************************************/
+        $strPHP .= '$pb->setCellCount(' . $structure['cellcount'] . ');'
+                . PHP_EOL;
+        $strPHP .= $this->_attributesArray('$pb->setCellAttributes(',
+                                           $structure['cell']);
         $strPHP .= PHP_EOL;
 
-        /* Page 3: Border attributes ****************************************************/
-        $strPHP .= $this->_attributesArray('$pb->setBorderAttributes(', $structure['border']);
+        /* Page 3: Border attributes ******************************************/
+        $strPHP .= $this->_attributesArray('$pb->setBorderAttributes(',
+                                           $structure['border']);
         $strPHP .= PHP_EOL;
 
-        /* Page 4: Label attributes *****************************************************/
+        /* Page 4: Label attributes *******************************************/
         foreach ($structure['label'] as $name => $data) {
             if ($data['type'] == HTML_PROGRESS2_LABEL_TEXT) {
-                $strPHP .= '$pb->addLabel(HTML_PROGRESS2_LABEL_TEXT, \''. $name .'\');';
+                $strPHP .= '$pb->addLabel(HTML_PROGRESS2_LABEL_TEXT, \''
+                        . $name .'\');';
                 $strPHP .= PHP_EOL;
             }
             unset($data['type']);
-            $strPHP .= $this->_attributesArray('$pb->setLabelAttributes(\''.$name.'\', ', $data);
+            $strPHP .= $this->_attributesArray('$pb->setLabelAttributes(\''
+                    . $name . '\', ', $data);
             $strPHP .= PHP_EOL;
         }
 
         $strPHP .= PHP_EOL;
-        $strPHP .= '// code below is only for run demo; its not nececessary to create progress bar';
+        $strPHP .= '// code below is only for run demo;'
+        $strPHP .= PHP_EOL;
+        $strPHP .= '// its not nececessary to create progress bar';
         $strPHP .= PHP_EOL;
         if (!$cssCode) {
             $strPHP .= 'echo \'<head>\' . PHP_EOL;' . PHP_EOL;
@@ -193,12 +233,12 @@ class ActionProcess extends HTML_QuickForm_Action
     /**
      * Prints a string to standard output, with http headers if necessary
      *
-     * @param      string    $str           string to print
-     * @param      string    $mime          (optional) mime description
-     * @param      boolean   $raw           (optional) charset to use
+     * @param string $str     string to print
+     * @param string $mime    (optional) mime description
+     * @param string $charset (optional) charset to use
      *
      * @return     void
-     * @since      2.0.0
+     * @since      version 2.0.0 (2005-10-01)
      * @access     public
      */
     function exportOutput($str, $mime = 'text/plain', $charset = 'iso-8859-1')
@@ -216,11 +256,11 @@ class ActionProcess extends HTML_QuickForm_Action
     /**
      * Complete a php function arguments line with appropriate attributes
      *
-     * @param      string    $str           php function to complete
-     * @param      array     $attributes    function arguments list of values
+     * @param string $str        php function to complete
+     * @param array  $attributes function arguments list of values
      *
      * @return     string
-     * @since      2.0.0
+     * @since      version 2.0.0 (2005-10-01)
      * @access     private
      */
     function _attributesArray($str, $attributes)
@@ -235,7 +275,7 @@ class ActionProcess extends HTML_QuickForm_Action
                 $strPHP .= "'$attr'=>'$val', ";
             }
         }
-        $strPHP = ereg_replace(', $', '', $strPHP);
+        $strPHP  = ereg_replace(', $', '', $strPHP);
         $strPHP .= '));';
         return $strPHP;
     }

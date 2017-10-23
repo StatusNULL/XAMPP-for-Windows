@@ -23,8 +23,8 @@
 /**
  * @nodep Gtk
  */
-if ('\xampp\php\pear' != '@'.'include_path'.'@') {
-    ini_set('include_path', '\xampp\php\pear');
+if ('H:\release167\NEU\xampp\php\pear' != '@'.'include_path'.'@') {
+    ini_set('include_path', 'H:\release167\NEU\xampp\php\pear');
     $raw = false;
 } else {
     // this is a raw, uninstalled pear, either a cvs checkout, or php distro

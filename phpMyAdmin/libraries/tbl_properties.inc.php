@@ -2,8 +2,11 @@
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
  *
- * @version $Id: tbl_properties.inc.php 10588 2007-09-02 19:23:59Z lem9 $
+ * @version $Id: tbl_properties.inc.php 11326 2008-06-17 21:32:48Z lem9 $
  */
+if (! defined('PHPMYADMIN')) {
+    exit;
+}
 
 /**
  * Check parameters
@@ -68,7 +71,7 @@ if ($action == 'tbl_create.php') {
 } elseif ($action == 'tbl_addfield.php') {
     ?>
     <input type="hidden" name="field_where" value="<?php echo $field_where; ?>" />
-    <input type="hidden" name="after_field" value="<?php echo $after_field; ?>" />
+    <input type="hidden" name="after_field" value="<?php echo PMA_sanitize($after_field); ?>" />
     <?php
 }
 
@@ -86,7 +89,7 @@ if (isset($field_where)) {
 
 if (isset($after_field)) {
     ?>
-    <input type="hidden" name="orig_after_field" value="<?php echo $after_field; ?>" />
+    <input type="hidden" name="orig_after_field" value="<?php echo PMA_sanitize($after_field); ?>" />
     <?php
 }
 
@@ -234,6 +237,13 @@ for ($i = 0 ; $i <= $num_fields; $i++) {
         $row = $fields_meta[$i];
     }
 
+    if (isset($row) && isset($row['Type'])) {
+        $type_and_length = PMA_extract_type_length($row['Type']);
+        if ($type_and_length['type'] == 'bit') {
+            $row['Default'] = PMA_printable_bit_value($row['Default'], $type_and_length['length']);
+        }
+    }
+
     // Cell index: If certain fields get left out, the counter shouldn't chage.
     $ci = 0;
     // Everytime a cell shall be left out the STRG-jumping feature, $ci_offset
@@ -272,12 +282,10 @@ for ($i = 0 ; $i <= $num_fields; $i++) {
         $type   = preg_replace('@ZEROFILL@i', '', $type);
         $type   = preg_replace('@UNSIGNED@i', '', $type);
 
-        if (strpos($type, '(')) {
-            $length = chop(substr($type, (strpos($type, '(') + 1), (strpos($type, ')') - strpos($type, '(') - 1)));
-            $type = chop(substr($type, 0, strpos($type, '(')));
-        } else {
-            $length = '';
-        }
+        $type_and_length = PMA_extract_type_length($type);
+        $type = $type_and_length['type'];
+        $length = $type_and_length['length'];
+        unset($type_and_length);
     } // end if else
 
     // some types, for example longtext, are reported as
@@ -354,6 +362,9 @@ for ($i = 0 ; $i <= $num_fields; $i++) {
     if ($zerofill) {
         $attribute = 'UNSIGNED ZEROFILL';
     }
+    if (isset($row['Extra']) && $row['Extra'] == 'ON UPDATE CURRENT_TIMESTAMP') {
+        $attribute = 'ON UPDATE CURRENT_TIMESTAMP';
+    }
 
     if (isset($submit_attribute) && $submit_attribute != FALSE) {
         $attribute = $submit_attribute;
@@ -391,9 +402,6 @@ for ($i = 0 ; $i <= $num_fields; $i++) {
 
     $cnt_attribute_types = count($cfg['AttributeTypes']);
     for ($j = 0;$j < $cnt_attribute_types; $j++) {
-        if (PMA_MYSQL_INT_VERSION >= 40100 && $cfg['AttributeTypes'][$j] == 'BINARY') {
-            continue;
-        }
         $content_cells[$i][$ci] .= '                <option value="'. $cfg['AttributeTypes'][$j] . '"';
         if (strtoupper($attribute) == strtoupper($cfg['AttributeTypes'][$j])) {
             $content_cells[$i][$ci] .= ' selected="selected"';
@@ -457,7 +465,7 @@ for ($i = 0 ; $i <= $num_fields; $i++) {
 
     $content_cells[$i][$ci] = '<select name="field_extra[]" id="field_' . $i . '_' . ($ci - $ci_offset) . '">';
 
-    if (!isset($row) || empty($row['Extra'])) {
+    if (!isset($row) || empty($row['Extra']) || $row['Extra'] != 'auto_increment') {
         $content_cells[$i][$ci] .= "\n";
         $content_cells[$i][$ci] .= '<option value="">&nbsp;</option>' . "\n";
         $content_cells[$i][$ci] .= '<option value="AUTO_INCREMENT">auto_increment</option>' . "\n";

@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: EqualsCondition.php 59 2006-04-28 14:49:47Z mrook $
+ *  $Id: EqualsCondition.php 43 2006-03-10 14:31:51Z mrook $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -27,7 +27,7 @@ require_once 'phing/tasks/system/condition/Condition.php';
  *
  *  @author    Andreas Aderhold <andi@binarycloud.com>
  *  @copyright © 2001,2002 THYRELL. All rights reserved
- *  @version   $Revision: 1.7 $ $Date: 2006-04-28 14:49:47 +0000 (Fri, 28 Apr 2006) $
+ *  @version   $Revision: 1.7 $ $Date: 2006-03-10 15:31:51 +0100 (Fri, 10 Mar 2006) $
  *  @access    public
  *  @package   phing.tasks.system.condition
  */

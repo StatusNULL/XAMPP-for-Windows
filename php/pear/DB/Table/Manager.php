@@ -1,43 +1,58 @@
 <?php
 
+/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
+
 /**
-* 
-* Creates, checks or alters tables from DB_Table definitions.
-* 
-* DB_Table_Manager provides database automated table creation
-* facilities.
-* 
-* @category DB
-* 
-* @package DB_Table
-*
-* @author Paul M. Jones <pmjones@php.net>
-* @author Mark Wiesemann <wiesemann@php.net>
-* 
-* @license http://www.gnu.org/copyleft/lesser.html LGPL
-* 
-* @version $Id: Manager.php,v 1.29 2006/07/19 09:30:26 wiesemann Exp $
-*
-*/
+ * Creates, checks or alters tables from DB_Table definitions.
+ * 
+ * DB_Table_Manager provides database automated table creation
+ * facilities.
+ * 
+ * PHP versions 4 and 5
+ *
+ * LICENSE:
+ * 
+ * Copyright (c) 1997-2007, Paul M. Jones <pmjones@php.net>
+ *                          David C. Morse <morse@php.net>
+ *                          Mark Wiesemann <wiesemann@php.net>
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ *    * Redistributions of source code must retain the above copyright
+ *      notice, this list of conditions and the following disclaimer.
+ *    * Redistributions in binary form must reproduce the above copyright
+ *      notice, this list of conditions and the following disclaimer in the 
+ *      documentation and/or other materials provided with the distribution.
+ *    * The names of the authors may not be used to endorse or promote products 
+ *      derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+ * IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @category Database
+ * @package  DB_Table
+ * @author   Paul M. Jones <pmjones@php.net>
+ * @author   David C. Morse <morse@php.net>
+ * @author   Mark Wiesemann <wiesemann@php.net>
+ * @license  http://opensource.org/licenses/bsd-license.php New BSD License
+ * @version  CVS: $Id: Manager.php,v 1.39 2008/06/08 17:49:28 wiesemann Exp $
+ * @link     http://pear.php.net/package/DB_Table
+ */
 
 require_once 'DB/Table.php';
 
-
-/**
-* 
-* Creates, checks or alters tables from DB_Table definitions.
-* 
-* DB_Table_Manager provides database automated table creation
-* facilities.
-* 
-* @category DB
-* 
-* @package DB_Table
-*
-* @author Paul M. Jones <pmjones@php.net>
-* @author Mark Wiesemann <wiesemann@php.net>
-*
-*/
 
 /**
 * Valid types for the different data types in the different DBMS.
@@ -98,7 +113,7 @@ $GLOBALS['_DB_TABLE']['valid_type'] = array(
         'decimal'   => array('decimal', 'real'),
         'single'    => array('double', 'real'),
         'double'    => array('double', 'real'),
-        'clob'      => array('blob', 'longtext'),
+        'clob'      => array('blob', 'longtext', 'tinytext', 'text', 'mediumtext'),
         'date'      => array('char', 'date', 'string'),
         'time'      => array('char', 'string', 'time'),
         'timestamp' => array('char', 'datetime', 'string')
@@ -113,7 +128,7 @@ $GLOBALS['_DB_TABLE']['valid_type'] = array(
         'decimal'   => 'decimal',
         'single'    => array('double', 'float'),
         'double'    => 'double',
-        'clob'      => array('blob', 'longtext'),
+        'clob'      => array('blob', 'longtext', 'tinytext', 'text', 'mediumtext'),
         'date'      => array('char', 'date', 'varchar'),
         'time'      => array('char', 'time', 'varchar'),
         'timestamp' => array('char', 'datetime', 'varchar')
@@ -184,7 +199,20 @@ $GLOBALS['_DB_TABLE']['mdb2_type'] = array(
     'timestamp' => 'timestamp'
 );
 
-
+/**
+ * Creates, checks or alters tables from DB_Table definitions.
+ * 
+ * DB_Table_Manager provides database automated table creation
+ * facilities.
+ * 
+ * @category Database
+ * @package  DB_Table
+ * @author   Paul M. Jones <pmjones@php.net>
+ * @author   David C. Morse <morse@php.net>
+ * @author   Mark Wiesemann <wiesemann@php.net>
+ * @version  Release: 1.5.5
+ * @link     http://pear.php.net/package/DB_Table
+ */
 class DB_Table_Manager {
 
 
@@ -218,7 +246,7 @@ class DB_Table_Manager {
             $backend = 'mdb2';
             $db->loadModule('Manager');
         }
-        list($phptype,) = DB_Table::getPHPTypeAndDBSyntax($db);
+        $phptype = $db->phptype;
 
         // columns to be created
         $column = array();
@@ -267,8 +295,17 @@ class DB_Table_Manager {
             if ($backend == 'mdb2') {
 
                 // get the declaration string
-                $column[$colname] = DB_Table_Manager::getDeclareMDB2($type,
+                $result = DB_Table_Manager::getDeclareMDB2($type,
                     $size, $scope, $require, $default, $max_scope);
+
+                // did it work?
+                if (PEAR::isError($result)) {
+                    $result->userinfo .= " ('$colname')";
+                    return $result;
+                }
+
+                // add the declaration to the array of all columns
+                $column[$colname] = $result;
 
             } else {
 
@@ -441,7 +478,7 @@ class DB_Table_Manager {
             $table_info_mode = MDB2_TABLEINFO_FULL;
             $table_info_error = MDB2_ERROR_NEED_MORE_DATA;
         }
-        list($phptype,) = DB_Table::getPHPTypeAndDBSyntax($db);
+        $phptype = $db->phptype;
 
         // check #1: does the table exist?
 
@@ -502,7 +539,7 @@ class DB_Table_Manager {
         }
 
         // check #4: do all indexes exist?
-        $table_indexes = DB_Table_Manager::_getIndexes($db, $table);
+        $table_indexes = DB_Table_Manager::getIndexes($db, $table);
         if (PEAR::isError($table_indexes)) {
             return $table_indexes;
         }
@@ -562,7 +599,8 @@ class DB_Table_Manager {
 
     function alter(&$db, $table, $column_set, $index_set)
     {
-        list($phptype,) = DB_Table::getPHPTypeAndDBSyntax($db);
+        $phptype = $db->phptype;
+
         if (is_subclass_of($db, 'db_common')) {
             $backend = 'db';
             $reverse =& $db;
@@ -671,7 +709,7 @@ class DB_Table_Manager {
         }
 
         // get information about indexes / constraints
-        $table_indexes = DB_Table_Manager::_getIndexes($db, $table);
+        $table_indexes = DB_Table_Manager::getIndexes($db, $table);
         if (PEAR::isError($table_indexes)) {
             return $table_indexes;
         }
@@ -1426,7 +1464,7 @@ class DB_Table_Manager {
             $GLOBALS['_DB_TABLE']['reserved']
         );
 
-        if ($reserved) {
+        if ($reserved && !($type == 'primary' && $idxname == 'PRIMARY')) {
             return DB_Table::throwError(
                 DB_TABLE_ERR_DECLARE_IDXNAME,
                 "('$idxname')"
@@ -1501,7 +1539,7 @@ class DB_Table_Manager {
     * 
     * Return all indexes for a table.
     * 
-    * @access private
+    * @access public
     * 
     * @param object &$db A PEAR DB/MDB2 object.
     * 
@@ -1512,15 +1550,14 @@ class DB_Table_Manager {
     * 
     */
 
-    function _getIndexes(&$db, $table)
+    function getIndexes(&$db, $table)
     {
         if (is_subclass_of($db, 'db_common')) {
             $backend = 'db';
             // workaround for missing index and constraint information methods
             // in PEAR::DB ==> use adopted code from MDB2's driver classes
-            list($phptype,) = DB_Table::getPHPTypeAndDBSyntax($db);
-            require_once 'DB/Table/Manager/' . $phptype . '.php';
-            $classname = 'DB_Table_Manager_' . $phptype;
+            require_once 'DB/Table/Manager/' . $db->phptype . '.php';
+            $classname = 'DB_Table_Manager_' . $db->phptype;
             $dbtm =& new $classname();
             $dbtm->_db =& $db;  // pass database instance to the 'workaround' class
             $manager =& $dbtm;
@@ -1563,7 +1600,12 @@ class DB_Table_Manager {
                 }
                 return $index_fields;
             }
-            $index_type = current(array_keys($index_fields));
+            // get the first key of $index_fields that has boolean true value
+            foreach ($index_fields as $index_type => $value) {
+                if ($value === true) {
+                    break;
+                }
+            }
             $indexes[$index_type][$table_idx_tmp] = array_keys($index_fields['fields']);
         }
 

@@ -32,7 +32,7 @@
 // | Author: Richard Heyes <richard@phpguru.org>                           |
 // +-----------------------------------------------------------------------+
 //
-// $Id: SearchReplace.php,v 1.14 2006/07/12 09:35:09 techtonik Exp $
+// $Id: SearchReplace.php,v 1.15 2007/03/25 18:51:59 techtonik Exp $
 //
 // Search and Replace Utility
 //
@@ -332,7 +332,7 @@ class File_SearchReplace
         // because I haven't decided yet whether it is bug or feature)
 
         if ($this->php5) {
-            $file_array[$i] = str_replace($this->find, $this->replace, $file_array[$i], $counted);
+            $file = str_replace($this->find, $this->replace, $file, $counted);
             $occurences += $counted;
         } else {
             foreach ($local_find as $fk => $ff) {

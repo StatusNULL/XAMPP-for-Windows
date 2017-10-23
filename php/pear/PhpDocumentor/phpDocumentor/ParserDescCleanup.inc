@@ -34,7 +34,7 @@
  * @author     Gregory Beaver <cellog@php.net>
  * @copyright  2002-2006 Gregory Beaver
  * @license    http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @version    CVS: $Id: ParserDescCleanup.inc,v 1.9 2006/05/23 13:06:57 cellog Exp $
+ * @version    CVS: $Id: ParserDescCleanup.inc,v 1.13 2007/12/13 02:56:45 ashnazg Exp $
  * @link       http://www.phpdoc.org
  * @link       http://pear.php.net/PhpDocumentor
  * @see        Parser, WordParser
@@ -124,7 +124,7 @@ define('PHPDOCUMENTOR_PDP_STATE_SIMLIST',714);
 * {@link parserInlineTag}s
 * @package phpDocumentor
 * @subpackage WordParsers
-* @author Greg Beaver <cellog@users.sourceforge.net>
+* @author Greg Beaver <cellog@php.net>
 * @since 1.2
 */
 class ObjectWordParser extends WordParser
@@ -292,7 +292,7 @@ class ObjectWordParser extends WordParser
  * @tutorial phpDocumentor.howto.pkg#basics.desc
  * @package phpDocumentor
  * @subpackage Parsers
- * @author Greg Beaver <cellog@users.sourceforge.net>
+ * @author Greg Beaver <cellog@php.net>
  * @since 1.2
  */
 class parserDescParser extends Parser
@@ -385,8 +385,12 @@ class parserDescParser extends Parser
         $this->wp->setWhitespace(true);
         $this->p_vars['list_count'] = 0;
         if ($sdesc) $this->p_vars['start'] = false;
+
+        // beware of infinite loops
+        $infiniteLoopCatcher = 0;
         do
         {
+            $infiniteLoopCatcher++;
             if (!isset($this->pars[$this->p_vars['curpar']])) $this->pars[$this->p_vars['curpar']] = new $ind_type;
             $lpevent = $pevent;
             $pevent = $this->p_vars['event_stack']->getEvent();
@@ -405,7 +409,7 @@ class parserDescParser extends Parser
             $this->p_vars['last_word'] = $word;
             $word = $this->wp->getWord();
 
-            if (0)//PHPDOCUMENTOR_DEBUG == true)
+            if (PHPDOCUMENTOR_DEBUG == true)
             {
                 echo "----------------\n";
                 echo "LAST: |" . htmlentities($this->p_vars['last_word']) . "|\n";
@@ -428,12 +432,18 @@ class parserDescParser extends Parser
                 debug('WARNING: possible error, no ParserDescParser handler for event number '.$pevent);
                 if ($endrecur++ == 25)
                 {
-                    die("FATAL ERROR, recursion limit reached");
+                    addErrorDie(PDERROR_LOOP_RECURSION_LIMIT_REACHED);
                 }
             }
             if (is_object($word) || trim($word) != '')
             {
                 $this->p_vars['start'] = false;
+            }
+
+            if ($infiniteLoopCatcher > 10000) {
+                echo PHP_EOL . "FATAL ERROR:  Somehow we got into an infinite loop in parserDescCleanup->parse()'s do-while loop...";
+                echo PHP_EOL . "    The line being parsed was:  " . $word . PHP_EOL . PHP_EOL;
+                addErrorDie(PDERROR_LOOP_RECURSION_LIMIT_REACHED);
             }
         } while (is_object($word) || !($word === false) && $word != '');
         $context = $this->getContext();
@@ -1109,7 +1119,7 @@ class parserDescParser extends Parser
         } else
         {// if the <p> is not at the beginning of the desc, then it is not
          // possible to parse into paragraphs using this tag
-            if (is_string($word) && $word == ' ' && $this->p_vars['last_word'] == ' ') return;
+            if ($word === ' ' && $this->p_vars['last_word'] === ' ') return;
             $this->addText($word);
         }
     }

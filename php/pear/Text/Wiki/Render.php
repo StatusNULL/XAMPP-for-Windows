@@ -9,7 +9,7 @@
  * @package    Text_Wiki
  * @author     Paul M. Jones <pmjones@php.net>
  * @license    http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
- * @version    CVS: $Id: Render.php,v 1.9 2006/02/17 05:42:55 toggg Exp $
+ * @version    CVS: $Id: Render.php,v 1.10 2006/03/11 07:12:13 justinpatrin Exp $
  * @link       http://pear.php.net/package/Text_Wiki
  */
 
@@ -180,6 +180,7 @@ class Text_Wiki_Render {
     function formatConf($format, $key)
     {
         if (isset($this->conf[$key])) {
+            //$this->conf[$key] needs a textEncode....at least for Xhtml output...
             return sprintf($format, $this->conf[$key]);
         } else {
             return null;

@@ -30,7 +30,7 @@
  * @author     Gregory Beaver <cellog@php.net>
  * @copyright  2002-2006 Gregory Beaver
  * @license    http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @version    CVS: $Id: ParserDocBlock.inc,v 1.9 2006/08/17 03:46:58 cellog Exp $
+ * @version    CVS: $Id: ParserDocBlock.inc,v 1.12 2007/04/19 20:20:57 ashnazg Exp $
  * @link       http://www.phpdoc.org
  * @link       http://pear.php.net/PhpDocumentor
  * @see        Parser, WordParser
@@ -40,9 +40,9 @@
  * represents a short or long description in a DocBlock ({@link parserDocBlock})
  * @package phpDocumentor
  * @subpackage ParserDocBlock
- * @author Greg Beaver <cellog@users.sourceforge.net>
+ * @author Greg Beaver <cellog@php.net>
  * @since 1.0rc1
- * @version $Id: ParserDocBlock.inc,v 1.9 2006/08/17 03:46:58 cellog Exp $
+ * @version $Id: ParserDocBlock.inc,v 1.12 2007/04/19 20:20:57 ashnazg Exp $
  */
 class parserDesc extends parserStringWithInlineTags
 {
@@ -122,9 +122,9 @@ class parserDesc extends parserStringWithInlineTags
  * Represents a docblock and its components, {@link $desc}, {@link $sdesc}, {@link $tags}, and also {@link $params} for functions
  * @package phpDocumentor
  * @subpackage ParserDocBlock
- * @author Greg Beaver <cellog@users.sourceforge.net>
+ * @author Greg Beaver <cellog@php.net>
  * @since 1.0rc1
- * @version $Id: ParserDocBlock.inc,v 1.9 2006/08/17 03:46:58 cellog Exp $
+ * @version $Id: ParserDocBlock.inc,v 1.12 2007/04/19 20:20:57 ashnazg Exp $
  */
 class parserDocBlock
 {
@@ -191,6 +191,10 @@ class parserDocBlock
      * @var array
      */
     var $statics = array();
+    /**
+     * array of {@link parserPropertyTag}, {@link parserPropertyReadTag}, {@link parserPropertyWriteTag}, {@link parserMethodTag} magic tags
+     */
+    var $properties = array();
     /**
      * This is either a {@link parserReturnTag} or false if no return tag is present
      * @var mixed
@@ -1022,6 +1026,35 @@ class parserDocBlock
     }
 
     /**
+     * Adds a @property(-read or -write) or @method magic tag to the DocBlock
+     */
+    function addProperty( $tagName, $propertyName, $propertyType, $value )
+    {
+        if ( empty( $propertyName ) )
+        {
+            addWarning ( PDERROR_MISSING_PROPERTY_TAG_NAME, $tagName, $tagName, $propertyType, $value->getString() );
+        }
+        else
+        {
+            switch ( $tagName )
+            {
+            case 'property':
+                $this->properties[ $propertyName ] = new parserPropertyTag( $propertyType, $value );
+                break;
+            case 'property-read':
+                $this->properties[ $propertyName ] = new parserPropertyReadTag( $propertyType, $value );
+                break;
+            case 'property-write':
+                $this->properties[ $propertyName ] = new parserPropertyWriteTag( $propertyType, $value );
+                break;
+            case 'method':
+                $this->properties[ $propertyName ] = new parserMethodTag( $propertyType, $value );
+                break;
+            }
+        }
+    }
+
+    /**
      * Custom sorting function for sorting @uses tags
      *
      * @param parserTag $a
@@ -1067,6 +1100,22 @@ class parserDocBlock
             return array();
         }
     }
+
+    /**
+     * @return array Format: array('var' => tag name, 'data' => unconverted tag value)
+     */
+    function listProperties()
+    {
+        $ret = array();
+        if (isset($this->properties))
+        {
+            foreach($this->properties as $key => $val)
+            {
+                $ret[] = array("var" => ucfirst($key),"data" => $val);
+            }
+        }
+        return $ret;
+    }
     
     /**
      * @param Converter
@@ -1094,95 +1143,81 @@ class parserDocBlock
 }
 
 /**
+ * Determines the arbitrary tag rank value for a given tag
  * @access private
  */
-function tagsort($a, $b)
+function getTagRanking($tag)
 {
-    switch(phpDocumentor_get_class($a))
+    switch(phpDocumentor_get_class($tag))
     {
-        case 'parsertag' :
-            switch ($a->keyword)
-            {
-                case 'author' :
-                    $o = 3;
-                    break;
-                case 'version' :
-                    $o = 4;
-                    break;
-                case 'deprecated' :
-                case 'deprec' :
-                    $o = 7;
-                    break;
-                case 'todo' :
-                case 'TODO' :
-                    $o = 8;
-                    break;
-                case 'abstract' :
-                    $o = 9;
-                    break;
-            }
-        case 'parseraccesstag' :
-            $o = 10;
-            break;
-        case 'parsernametag' :
-            $o = 11;
-            break;
-        case 'parserseetag' :
-            $o = 5;
-            break;
-        case 'parserlinktag' :
-            $o = 6;
-            break;
         case 'parserreturntag' :
             $o = 0;
             break;
         case 'parservartag' :
             $o = 1;
             break;
-        case 'parserstaticvartag' :
+        case 'parsertutorialtag' :
             $o = 2;
             break;
-        default :
-            $o = 12;
+        case 'parserstaticvartag' :
+            $o = 3;
             break;
-    }
-    switch(phpDocumentor_get_class($b))
-    {
+        case 'parserseetag' :
+            $o = 10;
+            break;
+        case 'parserlinktag' :
+            $o = 11;
+            break;
         case 'parsertag' :
-            switch ($b->keyword)
+            switch ($tag->keyword)
             {
                 case 'author' :
-                    $p = 3;
+                    $o = 4;
+                    break;
                 case 'version' :
-                    $p = 4;
+                    $o = 5;
+                    break;
+                case 'copyright' :
+                    $o = 6;
+                    break;
                 case 'deprecated' :
                 case 'deprec' :
-                    $p = 7;
+                    $o = 12;
+                    break;
                 case 'todo' :
                 case 'TODO' :
-                    $p = 8;
+                    $o = 13;
+                    break;
                 case 'abstract' :
-                    $p = 9;
+                    $o = 14;
+                    break;
+                default :
+                    $o = 15;
+                    break;
             }
+            break;
         case 'parseraccesstag' :
-            $p = 10;
+            $o = 18;
+            break;
         case 'parsernametag' :
-            $p = 11;
-        case 'parserseetag' :
-            $p = 5;
-        case 'parserlinktag' :
-            $p = 6;
-        case 'parserreturntag' :
-            $p = 0;
-        case 'parservartag' :
-            $p = 1;
-        case 'parsertutorialtag' :
-            $p = 1;
-        case 'parserstaticvartag' :
-            $p = 2;
+            $o = 19;
+            break;
         default :
-            $p = 12;
+            $o = 20;
+            break;
     }
+    return $o;
+}
+
+/**
+ * Utilizes the getTagRanking method to determine tag sort order of two given tags
+ * @access private
+ */
+function tagsort($a, $b)
+{
+    $returnval = 0;
+    $o = getTagRanking($a);
+    $p = getTagRanking($b);
     if ($o == $p) return 0;
     if ($o < $p) return -1;
     if ($o > $p) return 1;

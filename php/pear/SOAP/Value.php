@@ -17,7 +17,7 @@
  * @author     Shane Caraveo <Shane@Caraveo.com>   Port to PEAR and more
  * @author     Chuck Hagenbuch <chuck@horde.org>   Maintenance
  * @author     Jan Schneider <jan@horde.org>       Maintenance
- * @copyright  2003-2005 The PHP Group
+ * @copyright  2003-2007 The PHP Group
  * @license    http://www.php.net/license/2_02.txt  PHP License 2.02
  * @link       http://pear.php.net/package/SOAP
  */
@@ -87,14 +87,14 @@ class SOAP_Value
                         $attributes = array())
     {
         // Detect type if not passed.
-        $this->nqn =& new QName($name);
+        $this->nqn = new QName($name);
         $this->name = $this->nqn->name;
         $this->namespace = $this->nqn->namespace;
-        $this->tqn =& new QName($type);
+        $this->tqn = new QName($type);
         $this->type = $this->tqn->name;
         $this->type_prefix = $this->tqn->ns;
         $this->type_namespace = $this->tqn->namespace;
-        $this->value =& $value;
+        $this->value = $value;
         $this->attributes = $attributes;
     }
 
@@ -188,11 +188,6 @@ class SOAP_Attachment extends SOAP_Value
                              $filename, $file = null)
     {
         parent::SOAP_Value($name, null, null);
-
-        if (!isset($GLOBALS['SOAP_options']['Mime'])) {
-            $this->options['attachment'] = PEAR::raiseError('Mail_mime is not installed, unable to support SOAP Attachements');
-            return;
-        }
 
         $filedata = ($file === null) ? $this->_file2str($filename) : $file;
         $filename = basename($filename);

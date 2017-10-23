@@ -3,7 +3,7 @@
 /**
  * Misc functions used all over the scripts.
  *
- * @version $Id: common.lib.php 11024 2007-12-29 20:38:27Z lem9 $
+ * @version $Id: common.lib.php 11299 2008-06-01 13:02:12Z lem9 $
  */
 
 /**
@@ -410,7 +410,8 @@ function PMA_showHint($hint_message)
  * @uses    $GLOBALS['pmaThemeImage']
  * @uses    $GLOBALS['strEdit']
  * @uses    $GLOBALS['strMySQLSaid']
- * @uses    $cfg['PropertiesIconic']
+ * @uses    $GLOBALS['cfg']['PropertiesIconic'] 
+ * @uses    $GLOBALS['cfg']['MaxCharactersInDisplayedSQL'] 
  * @uses    PMA_backquote()
  * @uses    PMA_DBI_getError()
  * @uses    PMA_formatSql()
@@ -471,7 +472,11 @@ function PMA_mysqlDie($error_message = '', $the_query = '',
     } elseif (empty($the_query) || trim($the_query) == '') {
         $formatted_sql = '';
     } else {
-        $formatted_sql = PMA_formatSql(PMA_SQP_parse($the_query), $the_query);
+        if (strlen($the_query) > $GLOBALS['cfg']['MaxCharactersInDisplayedSQL']) {
+            $formatted_sql = substr($the_query, 0, $GLOBALS['cfg']['MaxCharactersInDisplayedSQL']) . '[...]';
+        } else {
+            $formatted_sql = PMA_formatSql(PMA_SQP_parse($the_query), $the_query);
+        }
     }
     // ---
     echo "\n" . '<!-- PMA-SQL-ERROR -->' . "\n";
@@ -878,7 +883,7 @@ function PMA_reloadNavigation()
         // in this case, get rid of the table limit offset, otherwise
         // we have a problem when dropping a table on the last page
         // and the offset becomes greater than the total number of tables
-        unset($_SESSION['table_limit_offset']);
+        unset($_SESSION['userconf']['table_limit_offset']);
         echo "\n";
         $reload_url = './navigation.php?' . PMA_generate_common_url($GLOBALS['db'], '', '&');
         ?>
@@ -1557,8 +1562,11 @@ function PMA_getTab($tab)
     // display icon, even if iconic is disabled but the link-text is missing
     if (($GLOBALS['cfg']['MainPageIconic'] || empty($tab['text']))
         && isset($tab['icon'])) {
+        // avoid generating an alt tag, because it only illustrates
+        // the text that follows and if browser does not display
+        // images, the text is duplicated
         $image = '<img class="icon" src="' . htmlentities($GLOBALS['pmaThemeImage'])
-            .'%1$s" width="16" height="16" alt="%2$s" />%2$s';
+            .'%1$s" width="16" height="16" alt="" />%2$s';
         $tab['text'] = sprintf($image, htmlentities($tab['icon']), $tab['text']);
     }
     // check to not display an empty link-text
@@ -1962,8 +1970,8 @@ function PMA_getUniqueCondition($handle, $fields_cnt, $fields_meta, $row, $force
             // timestamp is numeric on some MySQL 4.1
             if ($meta->numeric && $meta->type != 'timestamp') {
                 $condition .= '= ' . $row[$i] . ' AND';
-            } elseif ($meta->type == 'blob'
-                // hexify only if this is a true not empty BLOB
+            } elseif (($meta->type == 'blob' || $meta->type == 'string')
+                // hexify only if this is a true not empty BLOB or a BINARY
                  && stristr($field_flags, 'BINARY')
                  && !empty($row[$i])) {
                     // do not waste memory building a too big condition
@@ -2074,8 +2082,8 @@ function PMA_pageselector($url, $rows, $pageNow = 1, $nbTotalPage = 1,
     $showAll = 200, $sliceStart = 5, $sliceEnd = 5, $percent = 20,
     $range = 10, $prompt = '')
 {
-    $gotopage = $prompt 
-              . ' <select name="goToPage" onchange="goToUrl(this, \''
+    $gotopage = $prompt
+              . ' <select name="pos" onchange="goToUrl(this, \''
               . $url . '\');">' . "\n";
     if ($nbTotalPage < $showAll) {
         $pages = range(1, $nbTotalPage);
@@ -2139,24 +2147,25 @@ function PMA_pageselector($url, $rows, $pageNow = 1, $nbTotalPage = 1,
         $gotopage .= '                <option ' . $selected . ' value="' . (($i - 1) * $rows) . '">' . $i . '</option>' . "\n";
     }
 
-    $gotopage .= ' </select>';
+    $gotopage .= ' </select><noscript><input type="submit" value="' . $GLOBALS['strGo'] . '" /></noscript>';
+
 
     return $gotopage;
 } // end function
 
 
 /**
- * Generate navigation for a list 
+ * Generate navigation for a list
  *
- * @todo    use $pos from $_url_params 
+ * @todo    use $pos from $_url_params
  * @uses    $GLOBALS['strPageNumber']
  * @uses    range()
- * @param   integer     number of elements in the list 
- * @param   integer     current position in the list 
- * @param   array       url parameters 
- * @param   string      script name for form target 
- * @param   string      target frame 
- * @param   integer     maximum number of elements to display from the list 
+ * @param   integer     number of elements in the list
+ * @param   integer     current position in the list
+ * @param   array       url parameters
+ * @param   string      script name for form target
+ * @param   string      target frame
+ * @param   integer     maximum number of elements to display from the list
  *
  * @access  public
  */
@@ -2191,7 +2200,7 @@ function PMA_listNavigator($count, $pos, $_url_params, $script, $frame, $max_cou
                 . $caption2 . '</a>';
         }
 
-        echo '<form action="./' . $script . '" method="post">' . "\n";
+        echo "\n", '<form action="./', basename($script), '" method="post" target="', $frame, '">', "\n";
         echo PMA_generate_common_hidden_inputs($_url_params);
         echo PMA_pageselector(
             $script . PMA_generate_common_url($_url_params) . '&',
@@ -2213,7 +2222,7 @@ function PMA_listNavigator($count, $pos, $_url_params, $script, $frame, $max_cou
                 $title4   = '';
             } // end if... else...
             $_url_params['pos'] = $pos + $max_count;
-            echo '<a' . $title3 . ' href="' . $script 
+            echo '<a' . $title3 . ' href="' . $script
                 . PMA_generate_common_url($_url_params) . '" target="' . $frame . '">'
                 . $caption3 . '</a>';
             $_url_params['pos'] = floor($count / $max_count) * $max_count;
@@ -2303,5 +2312,52 @@ function PMA_externalBug($functionality, $component, $minimum_version, $bugref)
     if ($component == 'mysql' && PMA_MYSQL_INT_VERSION < $minimum_version) {
         echo PMA_showHint(sprintf($GLOBALS['strKnownExternalBug'], $functionality, 'http://bugs.mysql.com/' . $bugref));
     }
+}
+
+/**
+ * Converts a bit value to printable format;
+ * in MySQL a BIT field can be from 1 to 64 bits so we need this
+ * function because in PHP, decbin() supports only 32 bits
+ *
+ * @uses    ceil()
+ * @uses    decbin()
+ * @uses    ord()
+ * @uses    substr()
+ * @uses    sprintf()
+ * @param   numeric $value coming from a BIT field
+ * @param   integer $length 
+ * @return  string  the printable value 
+ */
+function PMA_printable_bit_value($value, $length) {
+    $printable = '';
+    for ($i = 0; $i < ceil($length / 8); $i++) {
+        $printable .= sprintf('%08d', decbin(ord(substr($value, $i, 1))));
+    }
+    $printable = substr($printable, -$length);
+    return $printable;
+}
+
+/**
+ * Extracts the true field type and length from a field type spec
+ *
+ * @uses    strpos()
+ * @uses    chop()
+ * @uses    substr()
+ * @param   string $fieldspec 
+ * @return  array associative array containing the type and length 
+ */
+function PMA_extract_type_length($fieldspec) {
+    $first_bracket_pos = strpos($fieldspec, '(');
+    if ($first_bracket_pos) {
+        $length = chop(substr($fieldspec, $first_bracket_pos + 1, (strpos($fieldspec, ')') - $first_bracket_pos - 1)));
+        $type = chop(substr($fieldspec, 0, $first_bracket_pos));
+    } else {
+        $type = $fieldspec;
+        $length = '';
+    }
+    return array(
+        'type' => $type,
+        'length' => $length
+    );
 }
 ?>

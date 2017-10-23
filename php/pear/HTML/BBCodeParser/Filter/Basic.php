@@ -16,7 +16,7 @@
 // | Author: Stijn de Reede <sjr@gmx.co.uk>                               |
 // +----------------------------------------------------------------------+
 //
-// $Id: Basic.php,v 1.4 2004/01/13 13:07:22 sjr Exp $
+// $Id: Basic.php,v 1.6 2007/07/02 16:54:25 cweiske Exp $
 //
 
 /**
@@ -25,12 +25,12 @@
 */
 
 
-require_once('HTML/BBCodeParser.php');
+require_once 'HTML/BBCodeParser/Filter.php';
 
 
 
 
-class HTML_BBCodeParser_Filter_Basic extends HTML_BBCodeParser
+class HTML_BBCodeParser_Filter_Basic extends HTML_BBCodeParser_Filter
 {
 
     /**
@@ -47,12 +47,12 @@ class HTML_BBCodeParser_Filter_Basic extends HTML_BBCodeParser
                                                 'htmlclose' => 'em',
                                                 'allowed'   => 'all',
                                                 'attributes'=> array()),
-                                'u' => array(   'htmlopen'  => 'u',
-                                                'htmlclose' => 'u',
+                                'u' => array(   'htmlopen'  => 'span style="text-decoration:underline;"',
+                                                'htmlclose' => 'span',
                                                 'allowed'   => 'all',
                                                 'attributes'=> array()),
-                                's' => array(   'htmlopen'  => 'strike',
-                                                'htmlclose' => 'strike',
+                                's' => array(   'htmlopen'  => 'del',
+                                                'htmlclose' => 'del',
                                                 'allowed'   => 'all',
                                                 'attributes'=> array()),
                                 'sub' => array( 'htmlopen'  => 'sub',
@@ -64,7 +64,6 @@ class HTML_BBCodeParser_Filter_Basic extends HTML_BBCodeParser
                                                 'allowed'   => 'all',
                                                 'attributes'=> array())
                             );
-
 
 }
 

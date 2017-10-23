@@ -15,7 +15,7 @@
  * @author     Alan Knowles <alan@akbkhome.com>
  * @copyright  1997-2006 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: DataObject.php,v 1.423 2006/12/05 08:35:32 alan_k Exp $
+ * @version    CVS: $Id: DataObject.php,v 1.439 2008/01/30 02:14:06 alan_k Exp $
  * @link       http://pear.php.net/package/DB_DataObject
  */
   
@@ -235,7 +235,7 @@ class DB_DataObject extends DB_DataObject_Overload
     * @access   private
     * @var      string
     */
-    var $_DB_DataObject_version = "1.8.5";
+    var $_DB_DataObject_version = "1.8.8";
 
     /**
      * The Database table (used by table extends)
@@ -388,7 +388,7 @@ class DB_DataObject extends DB_DataObject_Overload
     function find($n = false)
     {
         global $_DB_DATAOBJECT;
-        if (!isset($this->_query)) {
+        if ($this->_query === false) {
             $this->raiseError(
                 "You cannot do two queries on the same object (copy it before finding)", 
                 DB_DATAOBJECT_ERROR_INVALIDARGS);
@@ -571,8 +571,8 @@ class DB_DataObject extends DB_DataObject_Overload
         if (!empty($_DB_DATAOBJECT['CONFIG']['debug'])) {
             $this->debug("{$this->__table} DONE", "fetchrow",2);
         }
-        if (isset($this->_query) &&  empty($_DB_DATAOBJECT['CONFIG']['keep_query_after_fetch'])) {
-            unset($this->_query);
+        if (($this->_query !== false) &&  empty($_DB_DATAOBJECT['CONFIG']['keep_query_after_fetch'])) {
+            $this->_query = false;
         }
         return true;
     }
@@ -591,8 +591,10 @@ class DB_DataObject extends DB_DataObject_Overload
      */
     function whereAdd($cond = false, $logic = 'AND')
     {
-        
-	if (!isset($this->_query)) {
+        // for PHP5.2.3 - there is a bug with setting array properties of an object.
+        $_query = $this->_query;
+         
+        if (!isset($this->_query) || ($_query === false)) {
             return $this->raiseError(
                 "You cannot do two queries on the same object (clone it before finding)", 
                 DB_DATAOBJECT_ERROR_INVALIDARGS);
@@ -600,19 +602,22 @@ class DB_DataObject extends DB_DataObject_Overload
         
         if ($cond === false) {
             $r = $this->_query['condition'];
-            $this->_query['condition'] = '';
+            $_query['condition'] = '';
+            $this->_query = $_query;
             return preg_replace('/^\s+WHERE\s+/','',$r);
         }
         // check input...= 0 or '   ' == error!
         if (!trim($cond)) {
             return $this->raiseError("WhereAdd: No Valid Arguments", DB_DATAOBJECT_ERROR_INVALIDARGS);
         }
-        $r = $this->_query['condition'];
-        if ($this->_query['condition']) {
-            $this->_query['condition'] .= " {$logic} ( {$cond} )";
+        $r = $_query['condition'];
+        if ($_query['condition']) {
+            $_query['condition'] .= " {$logic} ( {$cond} )";
+            $this->_query = $_query;
             return $r;
         }
-        $this->_query['condition'] = " WHERE ( {$cond} ) ";
+        $_query['condition'] = " WHERE ( {$cond} ) ";
+        $this->_query = $_query;
         return $r;
     }
 
@@ -629,7 +634,7 @@ class DB_DataObject extends DB_DataObject_Overload
      */
     function orderBy($order = false)
     {
-        if (!isset($this->_query)) {
+        if ($this->_query === false) {
             $this->raiseError(
                 "You cannot do two queries on the same object (copy it before finding)", 
                 DB_DATAOBJECT_ERROR_INVALIDARGS);
@@ -664,7 +669,7 @@ class DB_DataObject extends DB_DataObject_Overload
      */
     function groupBy($group = false)
     {
-        if (!isset($this->_query)) {
+        if ($this->_query === false) {
             $this->raiseError(
                 "You cannot do two queries on the same object (copy it before finding)", 
                 DB_DATAOBJECT_ERROR_INVALIDARGS);
@@ -699,7 +704,7 @@ class DB_DataObject extends DB_DataObject_Overload
      */
     function having($having = false)
     {
-        if (!isset($this->_query)) {
+        if ($this->_query === false) {
             $this->raiseError(
                 "You cannot do two queries on the same object (copy it before finding)", 
                 DB_DATAOBJECT_ERROR_INVALIDARGS);
@@ -740,7 +745,7 @@ class DB_DataObject extends DB_DataObject_Overload
      */
     function limit($a = null, $b = null)
     {
-        if (!isset($this->_query)) {
+        if ($this->_query === false) {
             $this->raiseError(
                 "You cannot do two queries on the same object (copy it before finding)", 
                 DB_DATAOBJECT_ERROR_INVALIDARGS);
@@ -783,7 +788,7 @@ class DB_DataObject extends DB_DataObject_Overload
      */
     function selectAdd($k = null)
     {
-        if (!isset($this->_query)) {
+        if ($this->_query === false) {
             $this->raiseError(
                 "You cannot do two queries on the same object (copy it before finding)", 
                 DB_DATAOBJECT_ERROR_INVALIDARGS);
@@ -825,7 +830,7 @@ class DB_DataObject extends DB_DataObject_Overload
     {
         global $_DB_DATAOBJECT;
         
-        if (!isset($this->_query)) {
+        if ($this->_query === false) {
             $this->raiseError(
                 "You cannot do two queries on the same object (copy it before finding)", 
                 DB_DATAOBJECT_ERROR_INVALIDARGS);
@@ -976,7 +981,7 @@ class DB_DataObject extends DB_DataObject_Overload
             
             
 
-            if (is_string($this->$k) && (strtolower($this->$k) === 'null') && !($v & DB_DATAOBJECT_NOTNULL)) {
+            if (!isset($options['disable_null_strings']) && is_string($this->$k) && (strtolower($this->$k) === 'null') && !($v & DB_DATAOBJECT_NOTNULL)) {
                 $rightq .= " NULL ";
                 continue;
             }
@@ -1054,10 +1059,11 @@ class DB_DataObject extends DB_DataObject_Overload
                         // $db->query('BEGIN');
                         // $db->insert();
                         // $db->query('COMMIT');
-                        
-                        $mssql_key = $DB->getOne("SELECT @@IDENTITY");
+                        $db_driver = empty($options['db_driver']) ? 'DB' : $options['db_driver'];
+                        $method = ($db_driver  == 'DB') ? 'getOne' : 'queryOne';
+                        $mssql_key = $DB->$method("SELECT @@IDENTITY");
                         if (PEAR::isError($mssql_key)) {
-                            $this->raiseError($r);
+                            $this->raiseError($mssql_key);
                             return false;
                         }
                         $this->$key = $mssql_key;
@@ -1065,12 +1071,15 @@ class DB_DataObject extends DB_DataObject_Overload
                         
                     case 'pgsql':
                         if (!$seq) {
-                            $seq = $DB->getSequenceName($this->__table );
+                            $seq = $DB->getSequenceName(strtolower($this->__table));
                         }
-                        $pgsql_key = $DB->getOne("SELECT currval('".$seq . "')"); 
+                        $db_driver = empty($options['db_driver']) ? 'DB' : $options['db_driver'];
+                        $method = ($db_driver  == 'DB') ? 'getOne' : 'queryOne';
+                        $pgsql_key = $DB->$method("SELECT currval('".$seq . "')"); 
+
 
                         if (PEAR::isError($pgsql_key)) {
-                            $this->raiseError($r);
+                            $this->raiseError($pgsql_key);
                             return false;
                         }
                         $this->$key = $pgsql_key;
@@ -1143,7 +1152,7 @@ class DB_DataObject extends DB_DataObject_Overload
         $this->_connect();
         
         
-        $original_query = isset($this->_query) ? $this->_query : null;
+        $original_query =  $this->_query;
         
         $items =  isset($_DB_DATAOBJECT['INI'][$this->_database][$this->__table]) ?   
             $_DB_DATAOBJECT['INI'][$this->_database][$this->__table] : $this->table();
@@ -1176,6 +1185,8 @@ class DB_DataObject extends DB_DataObject_Overload
         $DB            = &$_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5];
         $dbtype        = $DB->dsn["phptype"];
         $quoteIdentifiers = !empty($_DB_DATAOBJECT['CONFIG']['quote_identifiers']);
+        $options = $_DB_DATAOBJECT['CONFIG'];
+        
         
         foreach($items as $k => $v) {
             if (!isset($this->$k)) {
@@ -1217,7 +1228,7 @@ class DB_DataObject extends DB_DataObject_Overload
             }
             
             // special values ... at least null is handled...
-            if ((strtolower($this->$k) === 'null') && !($v & DB_DATAOBJECT_NOTNULL)) {
+            if (!isset($options['disable_null_strings']) && (strtolower($this->$k) === 'null') && !($v & DB_DATAOBJECT_NOTNULL)) {
                 $settings .= "$kSql = NULL ";
                 continue;
             }
@@ -1355,7 +1366,7 @@ class DB_DataObject extends DB_DataObject_Overload
             
 
         // don't delete without a condition
-        if (isset($this->_query) && $this->_query['condition']) {
+        if (($this->_query !== false) && $this->_query['condition']) {
         
             $table = ($quoteIdentifiers ? $DB->quoteIdentifier($this->__table) : $this->__table);
             $sql = "DELETE FROM {$table} {$this->_query['condition']}{$extra_cond}";
@@ -1490,10 +1501,11 @@ class DB_DataObject extends DB_DataObject_Overload
         }
         
         $t = clone($this);
+        $items   = $t->table();
         
         $quoteIdentifiers = !empty($_DB_DATAOBJECT['CONFIG']['quote_identifiers']);
         
-        $items   = $t->table();
+        
         if (!isset($t->_query)) {
             $this->raiseError(
                 "You cannot do run count after you have run fetch()", 
@@ -1563,17 +1575,23 @@ class DB_DataObject extends DB_DataObject_Overload
      * $object->query("select * from xyz where abc like '". $object->escape($_GET['name']) . "'");
      *
      * @param  string  $string  value to be escaped 
+     * @param  bool $likeEscape  escapes % and _ as well. - so like queries can be protected.
      * @access public
      * @return string
      */
-    function escape($string)
+    function escape($string, $likeEscape=false)
     {
         global $_DB_DATAOBJECT;
         $this->_connect();
         $DB = &$_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5];
         // mdb2 uses escape...
         $dd = empty($_DB_DATAOBJECT['CONFIG']['db_driver']) ? 'DB' : $_DB_DATAOBJECT['CONFIG']['db_driver'];
-        return ($dd == 'DB') ? $DB->escapeSimple($string) : $DB->escape($string);
+        $ret = ($dd == 'DB') ? $DB->escapeSimple($string) : $DB->escape($string);
+        if ($likeEscape) {
+            $ret = str_replace(array('_','%'), array('\_','\%'), $ret);
+        }
+        return $ret;
+        
     }
 
     /* ==================================================== */
@@ -2026,7 +2044,7 @@ class DB_DataObject extends DB_DataObject_Overload
         // technically postgres native here...
         // we need to get the new improved tabledata sorted out first.
         
-        if (    in_array($dbtype , array( 'mysql', 'mysqli', 'mssql', 'ifx')) && 
+        if (    in_array($dbtype , array('psql', 'mysql', 'mysqli', 'mssql', 'ifx')) && 
                 ($table[$usekey] & DB_DATAOBJECT_INT) && 
                 isset($realkeys[$usekey]) && ($realkeys[$usekey] == 'N')
                 ) {
@@ -2218,9 +2236,9 @@ class DB_DataObject extends DB_DataObject_Overload
             $db_options = PEAR::getStaticProperty('DB','options');
             require_once 'DB.php';
             if ($db_options) {
-                $_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5] = DB::connect($dsn,$db_options);
+                $_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5] = &DB::connect($dsn,$db_options);
             } else {
-                $_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5] = DB::connect($dsn);
+                $_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5] = &DB::connect($dsn);
             }
             
         } else {
@@ -2228,7 +2246,10 @@ class DB_DataObject extends DB_DataObject_Overload
             require_once 'MDB2.php';
             // this allows the setings of compatibility on MDB2 
             $db_options = PEAR::getStaticProperty('MDB2','options');
-            $_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5] = MDB2::connect($dsn,$db_options);
+            $db_options = is_array($db_options) ? $db_options : array();
+            $db_options['portability'] = isset($db_options['portability'] )
+                ? $db_options['portability']  : MDB2_PORTABILITY_ALL ^ MDB2_PORTABILITY_FIX_CASE;
+            $_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5] = &MDB2::connect($dsn,$db_options);
             
         }
         
@@ -2418,8 +2439,10 @@ class DB_DataObject extends DB_DataObject_Overload
         $DB = &$_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5];
        
         $quoteIdentifiers  = !empty($_DB_DATAOBJECT['CONFIG']['quote_identifiers']);
+        $options = $_DB_DATAOBJECT['CONFIG'];
+        
         // if we dont have query vars.. - reset them.
-        if (!isset($this->_query)) {
+        if ($this->_query === false) {
             $x = new DB_DataObject;
             $this->_query= $x->_query;
         }
@@ -2464,7 +2487,7 @@ class DB_DataObject extends DB_DataObject_Overload
                 continue;
             }
             
-            if ((strtolower($this->$k) === 'null') && !($v & DB_DATAOBJECT_NOTNULL)) {
+            if (!isset($options['disable_null_strings']) &&  (strtolower($this->$k) === 'null') && !($v & DB_DATAOBJECT_NOTNULL)) {
                 $this->whereAdd(" $kSql  IS NULL");
                 continue;
             }
@@ -3004,9 +3027,17 @@ class DB_DataObject extends DB_DataObject_Overload
      *                                          use @ to hide the include error message..
      *                                      
      *
-     * @param    optional $joinType  string     'LEFT'|'INNER'|'RIGHT'|'' Inner is default, '' indicates 
+     * @param    optional $joinType  string | array
+     *                                          'LEFT'|'INNER'|'RIGHT'|'' Inner is default, '' indicates 
      *                                          just select ... from a,b,c with no join and 
      *                                          links are added as where items.
+     *                                          
+     *                                          If second Argument is array, it is assumed to be an associative
+     *                                          array with arguments matching below = eg.
+     *                                          'joinType' => 'INNER',
+     *                                          'joinAs' => '...'
+     *                                          'joinCol' => ....
+     *                                          'useWhereAsOn' => false,
      *
      * @param    optional $joinAs    string     if you want to select the table as anther name
      *                                          useful when you want to select multiple columsn
@@ -3018,6 +3049,11 @@ class DB_DataObject extends DB_DataObject_Overload
      *                                          user->friend (is a link to another user)
      *                                          user->mother (is a link to another user..)
      *
+     *           optional 'useWhereAsOn' bool   default false;
+     *                                          convert the where argments from the object being added
+     *                                          into ON arguments.
+     * 
+     * 
      * @return   none
      * @access   public
      * @author   Stijn de Reede      <sjr@gmx.co.uk>
@@ -3029,7 +3065,17 @@ class DB_DataObject extends DB_DataObject_Overload
             $this->_join = '';
             return;
         }
-        
+         
+
+        $useWhereAsOn = false;
+        // support for 2nd argument as an array of options
+        if (is_array($joinType)) {
+            // new options can now go in here... (dont forget to document them)
+            $useWhereAsOn = !empty($joinType['useWhereAsOn']);
+            $joinCol      = isset($joinType['joinCol'])  ? $joinType['joinCol']  : $joinCol;
+            $joinAs       = isset($joinType['joinAs'])   ? $joinType['joinAs']   : $joinAs;
+            $joinType     = isset($joinType['joinType']) ? $joinType['joinType'] : 'INNER';
+        }
         // support for array as first argument 
         // this assumes that you dont have a links.ini for the specified table.
         // and it doesnt exist as am extended dataobject!! - experimental.
@@ -3111,6 +3157,14 @@ class DB_DataObject extends DB_DataObject_Overload
             foreach ($links as $k => $v) {
                 /* link contains {this column} = {linked table}:{linked column} */
                 $ar = explode(':', $v);
+                // Feature Request #4266 - Allow joins with multiple keys
+                if (strpos($k, ',') !== false) {
+                    $k = explode(',', $k);
+                }
+                if (strpos($ar[1], ',') !== false) {
+                    $ar[1] = explode(',', $ar[1]);
+                }
+
                 if ($ar[0] == $obj->__table) {
                     if ($joinCol !== false) {
                         if ($k == $joinCol) {
@@ -3152,6 +3206,7 @@ class DB_DataObject extends DB_DataObject_Overload
         }
         
         $quoteIdentifiers = !empty($_DB_DATAOBJECT['CONFIG']['quote_identifiers']);
+        $options = $_DB_DATAOBJECT['CONFIG'];
         
         // not sure  how portable adding database prefixes is..
         $objTable = $quoteIdentifiers ? 
@@ -3176,7 +3231,90 @@ class DB_DataObject extends DB_DataObject_Overload
             // prefix database (quoted if neccessary..)
         $objTable = $dbPrefix . $objTable;
        
-         
+        $cond = '';
+
+        // if obj only a dataobject - eg. no extended class has been defined..
+        // it obvioulsy cant work out what child elements might exist...
+        // until we get on the fly querying of tables..
+        // note: we have already checked that it is_a(db_dataobject earlier)
+        if ( strtolower(get_class($obj)) != 'db_dataobject') {
+                 
+            // now add where conditions for anything that is set in the object 
+        
+        
+        
+            $items = $obj->table();
+            // will return an array if no items..
+            
+            // only fail if we where expecting it to work (eg. not joined on a array)
+             
+            if (!$items) {
+                $this->raiseError(
+                    "joinAdd: No table definition for {$obj->__table}", 
+                    DB_DATAOBJECT_ERROR_INVALIDCONFIG);
+                return false;
+            }
+
+            foreach($items as $k => $v) {
+                if (!isset($obj->$k)) {
+                    continue;
+                }
+                
+                $kSql = ($quoteIdentifiers ? $DB->quoteIdentifier($k) : $k);
+                
+                
+                if ($v & DB_DATAOBJECT_STR) {
+                    $obj->whereAdd("{$joinAs}.{$kSql} = " . $this->_quote((string) (
+                            ($v & DB_DATAOBJECT_BOOL) ? 
+                                // this is thanks to the braindead idea of postgres to 
+                                // use t/f for boolean.
+                                (($obj->$k === 'f') ? 0 : (int)(bool) $obj->$k) :  
+                                $obj->$k
+                        )));
+                    continue;
+                }
+                if (is_numeric($obj->$k)) {
+                    $obj->whereAdd("{$joinAs}.{$kSql} = {$obj->$k}");
+                    continue;
+                }
+                            
+                if (is_a($obj->$k,'DB_DataObject_Cast')) {
+                    $value = $obj->$k->toString($v,$DB);
+                    if (PEAR::isError($value)) {
+                        $this->raiseError($value->getMessage() ,DB_DATAOBJECT_ERROR_INVALIDARG);
+                        return false;
+                    }
+                    if (!isset($options['disable_null_strings']) && strtolower($value) === 'null') {
+                        $obj->whereAdd("{$joinAs}.{$kSql} IS NULL");
+                        continue;
+                    } else {
+                        $obj->whereAdd("{$joinAs}.{$kSql} = $value");
+                        continue;
+                    }
+                }
+                
+                
+                /* this is probably an error condition! */
+                $obj->whereAdd("{$joinAs}.{$kSql} = 0");
+            }
+            if ($this->_query === false) {
+                $this->raiseError(
+                    "joinAdd can not be run from a object that has had a query run on it,
+                    clone the object or create a new one and use setFrom()", 
+                    DB_DATAOBJECT_ERROR_INVALIDARGS);
+                return false;
+            }
+        }
+
+        // and finally merge the whereAdd from the child..
+        if ($obj->_query['condition']) {
+            $cond = preg_replace('/^\sWHERE/i','',$obj->_query['condition']);
+
+            if (!$useWhereAsOn) {
+                $this->whereAdd($cond);
+            }
+        }
+    
         
         
         
@@ -3193,14 +3331,22 @@ class DB_DataObject extends DB_DataObject_Overload
             }
         }
         
+  
+        // fix for #2216
+        // add the joinee object's conditions to the ON clause instead of the WHERE clause
+        if ($useWhereAsOn && strlen($cond)) {
+            $appendJoin = ' AND ' . $cond . ' ' . $appendJoin;
+        }
+               
+        
         
         $table = $this->__table;
         
         if ($quoteIdentifiers) {
             $joinAs   = $DB->quoteIdentifier($joinAs);
             $table    = $DB->quoteIdentifier($table);     
-            $ofield   = $DB->quoteIdentifier($ofield);    
-            $tfield   = $DB->quoteIdentifier($tfield);    
+            $ofield   = (is_array($ofield)) ? array_map(array($DB, 'quoteIdentifier'), $ofield) : $DB->quoteIdentifier($ofield);
+            $tfield   = (is_array($tfield)) ? array_map(array($DB, 'quoteIdentifier'), $tfield) : $DB->quoteIdentifier($tfield); 
         }
         // add database prefix if they are different databases
        
@@ -3229,14 +3375,15 @@ class DB_DataObject extends DB_DataObject_Overload
                 	$key_count = count($ofield);
                     for($i = 0; $i < $key_count; $i++) {
                     	if ($i == 0) {
-                    		$this->_join .= " ON {$joinAs}.{$ofield[$i]}={$table}.{$tfield[$i]} {$appendJoin} ";
+                    		$this->_join .= " ON ({$joinAs}.{$ofield[$i]}={$table}.{$tfield[$i]}) ";
                     	}
                     	else {
-                    		$this->_join .= " AND {$joinAs}.{$ofield[$i]}={$table}.{$tfield[$i]} {$appendJoin} ";
+                    		$this->_join .= " AND {$joinAs}.{$ofield[$i]}={$table}.{$tfield[$i]} ";
                     	}
-                     }
+                    }
+                    $this->_join .= ' ' . $appendJoin . ' ';
                 } else {
-	                $this->_join .= " ON {$joinAs}.{$ofield}={$table}.{$tfield} {$appendJoin} ";
+	                $this->_join .= " ON ({$joinAs}.{$ofield}={$table}.{$tfield}) {$appendJoin} ";
                 }
 
                 break;
@@ -3246,87 +3393,7 @@ class DB_DataObject extends DB_DataObject_Overload
                 $this->whereAdd("{$joinAs}.{$ofield}={$table}.{$tfield}");
         }
          
-        // if obj only a dataobject - eg. no extended class has been defined..
-        // it obvioulsy cant work out what child elements might exist...
-        // untill we get on the fly querying of tables..
-        if ( strtolower(get_class($obj)) == 'db_dataobject') {
-            return true;
-        }
          
-        /* now add where conditions for anything that is set in the object */
-    
-    
-    
-        $items = $obj->table();
-        // will return an array if no items..
-        
-        // only fail if we where expecting it to work (eg. not joined on a array)
-        
-        
-        
-        if (!$items) {
-            $this->raiseError(
-                "joinAdd: No table definition for {$obj->__table}", 
-                DB_DATAOBJECT_ERROR_INVALIDCONFIG);
-            return false;
-        }
-
-        foreach($items as $k => $v) {
-            if (!isset($obj->$k)) {
-                continue;
-            }
-            
-            $kSql = ($quoteIdentifiers ? $DB->quoteIdentifier($k) : $k);
-            
-            
-            if ($v & DB_DATAOBJECT_STR) {
-                $this->whereAdd("{$joinAs}.{$kSql} = " . $this->_quote((string) (
-                        ($v & DB_DATAOBJECT_BOOL) ? 
-                            // this is thanks to the braindead idea of postgres to 
-                            // use t/f for boolean.
-                            (($obj->$k === 'f') ? 0 : (int)(bool) $obj->$k) :  
-                            $obj->$k
-                    )));
-                continue;
-            }
-            if (is_numeric($obj->$k)) {
-                $this->whereAdd("{$joinAs}.{$kSql} = {$obj->$k}");
-                continue;
-            }
-                        
-            if (is_a($obj->$k,'DB_DataObject_Cast')) {
-                $value = $obj->$k->toString($v,$DB);
-                if (PEAR::isError($value)) {
-                    $this->raiseError($value->getMessage() ,DB_DATAOBJECT_ERROR_INVALIDARG);
-                    return false;
-                }
-                if (strtolower($value) === 'null') {
-                    $this->whereAdd("{$joinAs}.{$kSql} IS NULL");
-                    continue;
-                } else {
-                    $this->whereAdd("{$joinAs}.{$kSql} = $value");
-                    continue;
-                }
-            }
-            
-            
-            /* this is probably an error condition! */
-            $this->whereAdd("{$joinAs}.{$kSql} = 0");
-        }
-        if (!isset($this->_query)) {
-            $this->raiseError(
-                "joinAdd can not be run from a object that has had a query run on it,
-                clone the object or create a new one and use setFrom()", 
-                DB_DATAOBJECT_ERROR_INVALIDARGS);
-            return false;
-        }
-        // and finally merge the whereAdd from the child..
-        if (!$obj->_query['condition']) {
-            return true;
-        }
-        $cond = preg_replace('/^\sWHERE/i','',$obj->_query['condition']);
-        
-        $this->whereAdd("($cond)");
         return true;
 
     }
@@ -3494,11 +3561,12 @@ class DB_DataObject extends DB_DataObject_Overload
      */
     function validate()
     {
+        global $_DB_DATAOBJECT;
         require_once 'Validate.php';
         $table = $this->table();
         $ret   = array();
         $seq   = $this->sequenceKey();
-        
+        $options = $_DB_DATAOBJECT['CONFIG'];
         foreach($table as $key => $val) {
             
             
@@ -3521,7 +3589,7 @@ class DB_DataObject extends DB_DataObject_Overload
             }
             
             
-            if (is_string($this->$key) && (strtolower($this->$key) == 'null')) {
+            if (!isset($options['disable_null_strings']) && is_string($this->$key) && (strtolower($this->$key) == 'null')) {
                 if ($val & DB_DATAOBJECT_NOTNULL) {
                     $this->debug("'null' field used for '$key', but it is defined as NOT NULL", 'VALIDATION', 4);
                     $ret[$key] = false;
@@ -3725,6 +3793,8 @@ class DB_DataObject extends DB_DataObject_Overload
     
     function fromValue($col,$value) 
     {
+        global $_DB_DATAOBJECT;
+        $options = $_DB_DATAOBJECT['CONFIG'];
         $cols = $this->table();
         // dont know anything about this col..
         if (!isset($cols[$col])) {
@@ -3734,13 +3804,13 @@ class DB_DataObject extends DB_DataObject_Overload
         //echo "FROM VALUE $col, {$cols[$col]}, $value\n";
         switch (true) {
             // set to null and column is can be null...
-            case ((strtolower($value) == 'null') && (!($cols[$col] & DB_DATAOBJECT_NOTNULL))):
+            case (!isset($options['disable_null_strings']) && (strtolower($value) == 'null') && (!($cols[$col] & DB_DATAOBJECT_NOTNULL))):
             case (is_object($value) && is_a($value,'DB_DataObject_Cast')): 
                 $this->$col = $value;
                 return true;
                 
             // fail on setting null on a not null field..
-            case ((strtolower($value) == 'null') && ($cols[$col] & DB_DATAOBJECT_NOTNULL)):
+            case (!isset($options['disable_null_strings']) && (strtolower($value) == 'null') && ($cols[$col] & DB_DATAOBJECT_NOTNULL)):
                 return false;
         
             case (($cols[$col] & DB_DATAOBJECT_DATE) &&  ($cols[$col] & DB_DATAOBJECT_TIME)):

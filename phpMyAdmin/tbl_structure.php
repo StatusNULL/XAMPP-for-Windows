@@ -2,7 +2,7 @@
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
  *
- * @version $Id: tbl_structure.php 10910 2007-11-09 17:26:07Z lem9 $
+ * @version $Id: tbl_structure.php 11183 2008-04-02 17:19:59Z lem9 $
  */
 
 /**
@@ -252,6 +252,8 @@ while ($row = PMA_DBI_fetch_assoc($fields_rs)) {
     $aryFields[]      = $row['Field'];
 
     $type             = $row['Type'];
+    $type_and_length = PMA_extract_type_length($row['Type']);
+
     // reformat mysql query output - staybyte - 9. June 2001
     // loic1: set or enum types: slashes single quotes inside options
     if (preg_match('@^(set|enum)\((.+)\)$@i', $type, $tmp)) {
@@ -378,7 +380,14 @@ while ($row = PMA_DBI_fetch_assoc($fields_rs)) {
 <?php echo PMA_MYSQL_INT_VERSION >= 40100 ? '    <td>' . (empty($field_charset) ? '' : '<dfn title="' . PMA_getCollationDescr($field_charset) . '">' . $field_charset . '</dfn>') . '</td>' . "\n" : '' ?>
     <td nowrap="nowrap" style="font-size: 70%"><?php echo $attribute; ?></td>
     <td><?php echo (($row['Null'] == 'YES') ? $strYes : $strNo); ?></td>
-    <td nowrap="nowrap"><?php if (isset($row['Default'])) { echo $row['Default']; } ?></td>
+    <td nowrap="nowrap"><?php
+    if (isset($row['Default'])) { 
+        if ($type_and_length['type'] == 'bit') {
+            echo PMA_printable_bit_value($row['Default'], $type_and_length['length']);
+        } else {
+            echo $row['Default']; 
+        }
+    } ?></td>
     <td nowrap="nowrap"><?php echo $row['Extra']; ?></td>
     <td align="center">
         <a href="sql.php?<?php echo $url_query; ?>&amp;sql_query=<?php echo urlencode('SELECT COUNT(*) AS ' . PMA_backquote($strRows) . ', ' . PMA_backquote($row['Field']) . ' FROM ' . PMA_backquote($table) . ' GROUP BY ' . PMA_backquote($row['Field']) . ' ORDER BY ' . PMA_backquote($row['Field'])); ?>">
@@ -633,17 +642,20 @@ if ($cfg['ShowStats']) {
     if (isset($showtable['Type']) && $showtable['Type'] == 'MRG_MyISAM') {
         $mergetable = true;
     }
-    list($data_size, $data_unit)         = PMA_formatByteDown($showtable['Data_length']);
+    // this is to display for example 261.2 MiB instead of 268k KiB
+    $max_digits = 5;
+    $decimals = 1;
+    list($data_size, $data_unit)         = PMA_formatByteDown($showtable['Data_length'], $max_digits, $decimals);
     if ($mergetable == false) {
-        list($index_size, $index_unit)   = PMA_formatByteDown($showtable['Index_length']);
+        list($index_size, $index_unit)   = PMA_formatByteDown($showtable['Index_length'], $max_digits, $decimals);
     }
     if (isset($showtable['Data_free']) && $showtable['Data_free'] > 0) {
-        list($free_size, $free_unit)     = PMA_formatByteDown($showtable['Data_free']);
-        list($effect_size, $effect_unit) = PMA_formatByteDown($showtable['Data_length'] + $showtable['Index_length'] - $showtable['Data_free']);
+        list($free_size, $free_unit)     = PMA_formatByteDown($showtable['Data_free'], $max_digits, $decimals);
+        list($effect_size, $effect_unit) = PMA_formatByteDown($showtable['Data_length'] + $showtable['Index_length'] - $showtable['Data_free'], $max_digits, $decimals);
     } else {
-        list($effect_size, $effect_unit) = PMA_formatByteDown($showtable['Data_length'] + $showtable['Index_length']);
+        list($effect_size, $effect_unit) = PMA_formatByteDown($showtable['Data_length'] + $showtable['Index_length'], $max_digits, $decimals);
     }
-    list($tot_size, $tot_unit)           = PMA_formatByteDown($showtable['Data_length'] + $showtable['Index_length']);
+    list($tot_size, $tot_unit)           = PMA_formatByteDown($showtable['Data_length'] + $showtable['Index_length'], $max_digits, $decimals);
     if ($table_info_num_rows > 0) {
         list($avg_size, $avg_unit)       = PMA_formatByteDown(($showtable['Data_length'] + $showtable['Index_length']) / $showtable['Rows'], 6, 1);
     }

@@ -16,21 +16,16 @@
 // | Author: Stijn de Reede <sjr@gmx.co.uk>                               |
 // +----------------------------------------------------------------------+
 //
-// $Id: Images.php,v 1.4 2004/02/05 16:39:45 sjr Exp $
+// $Id: Images.php,v 1.8 2007/07/02 17:44:47 cweiske Exp $
 //
 
 /**
 * @package  HTML_BBCodeParser
 * @author   Stijn de Reede  <sjr@gmx.co.uk>
 */
+require_once 'HTML/BBCodeParser/Filter.php';
 
-
-require_once('HTML/BBCodeParser.php');
-
-
-
-
-class HTML_BBCodeParser_Filter_Images extends HTML_BBCodeParser
+class HTML_BBCodeParser_Filter_Images extends HTML_BBCodeParser_Filter
 {
 
     /**
@@ -39,17 +34,19 @@ class HTML_BBCodeParser_Filter_Images extends HTML_BBCodeParser
     * @access   private
     * @var      array
     */
-    var $_definedTags = array(  'img' => array( 'htmlopen'  => 'img',
-                                                'htmlclose' => '',
-                                                'allowed'   => 'none',
-                                                'attributes'=> array(   'img'   => 'src=%2$s%1$s%2$s',
-                                                                        'w'     => 'width=%2$s%1$d%2$s',
-                                                                        'h'     => 'height=%2$s%1$d%2$s')
-                                                )
-                              );
-
-
-
+    var $_definedTags = array(
+        'img' => array(
+            'htmlopen'  => 'img',
+            'htmlclose' => '',
+            'allowed'   => 'none',
+            'attributes'=> array(
+                'img'   => 'src=%2$s%1$s%2$s',
+                'w'     => 'width=%2$s%1$d%2$s',
+                'h'     => 'height=%2$s%1$d%2$s',
+                'alt'   => 'alt=%2$s%1$s%2$s',
+            )
+        )
+    );
 
     /**
     * Executes statements before the actual array building starts
@@ -70,15 +67,13 @@ class HTML_BBCodeParser_Filter_Images extends HTML_BBCodeParser
     function _preparse()
     {
         $options = PEAR::getStaticProperty('HTML_BBCodeParser','_options');
-        $o = $options['open'];
-        $c = $options['close'];
+        $o  = $options['open'];
+        $c  = $options['close'];
         $oe = $options['open_esc'];
         $ce = $options['close_esc'];
-        $this->_preparsed = preg_replace("!".$oe."img(".$ce."|\s.*".$ce.")(.*)".$oe."/img".$ce."!Ui", $o."img=\\2\\1".$o."/img".$c, $this->_text);
+        $this->_preparsed = preg_replace(
+			"!".$oe."img(\s?.*)".$ce."(.*)".$oe."/img".$ce."!Ui",
+			$o."img=\"\$2\"\$1".$c.$o."/img".$c,
+			$this->_text);
     }
-
-
 }
-
-
-?>

@@ -14,6 +14,7 @@
 		&nbsp;<p>
 		<h1><?php echo $TEXT['mail-head']; ?></h1>
 		<a href="mercury-help.php"><?php echo $TEXT['mail-hinweise']; ?></a><br><br>
+    
 		<form method="post" action="mailsend.php">
 			<table width="600" cellpadding="0" cellspacing="0" border="0">
 				<tr>
@@ -56,6 +57,9 @@
 					<td align="left" width="400"><input type="submit" value="Send"> * <input type="reset" value="Reset"></td>
 				</tr>
 			</table>
-		</form>
+		</form><br><br>
+<br>
+		######## <a href="http://localhost:2224" target="_new"><i>Mercury HTTPD Server listen on Port 2224</i></a> ########
+    
 	</body>
 </html>

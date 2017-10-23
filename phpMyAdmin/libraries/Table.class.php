@@ -2,7 +2,7 @@
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
  *
- * @version $Id: Table.class.php 10923 2007-11-14 18:42:47Z lem9 $
+ * @version $Id: Table.class.php 11214 2008-04-24 17:05:50Z lem9 $
  */
 
 /**
@@ -345,19 +345,29 @@ class PMA_Table {
             $query .= ' ' . $extra;
             // Force an auto_increment field to be part of the primary key
             // even if user did not tick the PK box; 
-            // but the PK could contain other columns so do not append
-            // a PRIMARY KEY clause, just add a member to $field_primary
             if ($extra == 'AUTO_INCREMENT') {
                 $primary_cnt = count($field_primary);
-                $found_in_pk = false;
-                for ($j = 0; $j < $primary_cnt; $j++) {
-                    if ($field_primary[$j] == $index) {
-                        $found_in_pk = true;
-                        break;
+                if (1 == $primary_cnt) {
+                    for ($j = 0; $j < $primary_cnt && $field_primary[$j] != $index; $j++) {
+                        //void
                     }
-                } // end for
-                if (! $found_in_pk) {
-                    $field_primary[] = $index;
+                    if (isset($field_primary[$j]) && $field_primary[$j] == $index) {
+                        $query .= ' PRIMARY KEY';
+                        unset($field_primary[$j]);
+                    }
+                // but the PK could contain other columns so do not append
+                // a PRIMARY KEY clause, just add a member to $field_primary
+                } else {
+                    $found_in_pk = false;
+                    for ($j = 0; $j < $primary_cnt; $j++) {
+                        if ($field_primary[$j] == $index) {
+                            $found_in_pk = true;
+                            break;
+                        }
+                    } // end for
+                    if (! $found_in_pk) {
+                        $field_primary[] = $index;
+                    }
                 }
             } // end if (auto_increment)
         }
@@ -605,9 +615,16 @@ class PMA_Table {
                 }
             }
             unset($analyzed_sql);
+            $server_sql_mode = PMA_DBI_fetch_value("SHOW VARIABLES LIKE 'sql_mode'", 0, 1);
+            if ('ANSI_QUOTES' == $server_sql_mode) {
+                $table_delimiter = 'quote_double';
+            } else {
+                $table_delimiter = 'quote_backtick';
+            }
+            unset($server_sql_mode);
 
             /* nijel: Find table name in query and replace it */
-            while ($parsed_sql[$i]['type'] != 'quote_backtick') {
+            while ($parsed_sql[$i]['type'] != $table_delimiter) {
                 $i++;
             }
 
@@ -623,7 +640,7 @@ class PMA_Table {
                 $last = $parsed_sql['len'] - 1;
                 $backquoted_source_db = PMA_backquote($source_db);
                 for (++$i; $i <= $last; $i++) {
-                            if ($parsed_sql[$i]['type'] == 'quote_backtick' && $parsed_sql[$i]['data'] == $backquoted_source_db) {
+                            if ($parsed_sql[$i]['type'] == $table_delimiter && $parsed_sql[$i]['data'] == $backquoted_source_db) {
                                 $parsed_sql[$i]['data'] = $target_for_view;
                     }
                 }
@@ -663,8 +680,8 @@ class PMA_Table {
                 $parsed_sql =  PMA_SQP_parse($GLOBALS['sql_constraints_query']);
                 $i = 0;
 
-                // find the first quote_backtick, it must be the source table name
-                while ($parsed_sql[$i]['type'] != 'quote_backtick') {
+                // find the first $table_delimiter, it must be the source table name
+                while ($parsed_sql[$i]['type'] != $table_delimiter) {
                     $i++;
                     // maybe someday we should guard against going over limit
                     //if ($i == $parsed_sql['len']) {
@@ -675,7 +692,7 @@ class PMA_Table {
                 // replace it by the target table name, no need to PMA_backquote()
                 $parsed_sql[$i]['data'] = $target;
 
-                // now we must remove all quote_backtick that follow a CONSTRAINT
+                // now we must remove all $table_delimiter that follow a CONSTRAINT
                 // keyword, because a constraint name must be unique in a db
 
                 $cnt = $parsed_sql['len'] - 1;
@@ -683,7 +700,7 @@ class PMA_Table {
                 for ($j = $i; $j < $cnt; $j++) {
                     if ($parsed_sql[$j]['type'] == 'alpha_reservedWord'
                       && strtoupper($parsed_sql[$j]['data']) == 'CONSTRAINT') {
-                        if ($parsed_sql[$j+1]['type'] == 'quote_backtick') {
+                        if ($parsed_sql[$j+1]['type'] == $table_delimiter) {
                             $parsed_sql[$j+1]['data'] = '';
                         }
                     }

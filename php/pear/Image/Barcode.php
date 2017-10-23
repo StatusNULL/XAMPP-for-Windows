@@ -19,11 +19,11 @@
  * @author     Marcelo Subtil Marcal <msmarcal@php.net>
  * @copyright  2005 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Barcode.php,v 1.2 2005/05/30 04:31:40 msmarcal Exp $
+ * @version    CVS: $Id: Barcode.php,v 1.4 2006/12/13 19:29:30 cweiske Exp $
  * @link       http://pear.php.net/package/Image_Barcode
  */
 
-require_once("PEAR.php");
+require_once 'PEAR.php';
 
 /**
  * Image_Barcode class
@@ -50,49 +50,65 @@ class Image_Barcode extends PEAR
      *                          ean13  - EAN 13
      *                          upca   - UPC-A
      * @param  string $imgtype  The image type that will be generated
+     * @param  boolean $bSendToBrowser  if the image shall be outputted to the
+     *                                  browser, or be returned.
      *
-     * @return image            The corresponding image barcode
+     * @return image            The corresponding gd image object;
+     *                           PEAR_Error on failure
      *
      * @access public
      *
      * @author Marcelo Subtil Marcal <msmarcal@php.net>
      * @since  Image_Barcode 0.3
      */
-    function draw($text, $type = 'int25', $imgtype = 'png') {
-
-        // Check if include file exists
-        $barcodepath = PEAR_INSTALL_DIR . DIRECTORY_SEPARATOR . "Image" . DIRECTORY_SEPARATOR . "Barcode";
-        $supportedtypes = array();
-        if ( $incdir = opendir($barcodepath) ) {
-            while ( false != ( $avaiabletype = readdir($incdir) ) ) {
-                if ( strstr($avaiabletype, ".php") ) {
-                    $supportedtypes[] = $avaiabletype;
-                }
-            }
-            closedir($incdir);
+    function &draw($text, $type = 'int25', $imgtype = 'png', $bSendToBrowser = true)
+    {
+        //Make sure no bad files are included
+        if (!preg_match('/^[a-zA-Z0-9_-]+$/', $type)) {
+            return PEAR::raiseError('Invalid barcode type ' . $type);
+        }
+        if (!include_once('Image/Barcode/' . $type . '.php')) {
+            return PEAR::raiseError($type . ' barcode is not supported');
         }
 
-        if ( in_array($type . ".php", $supportedtypes) ) {
-            include_once("Image/Barcode/${type}.php");
-        } else {
-            return PEAR::raiseError("$type barcode is not supported");
-        }
-
-        $classname = "Image_Barcode_${type}";
-
-        if (!class_exists($classname)) {
-            return PEAR::raiseError("Unable to include the Image/Barcode/${type}.php file");
-        }
+        $classname = 'Image_Barcode_' . $type;
 
         if (!in_array('draw',get_class_methods($classname))) {
-            return PEAR::raiseError("Unable to find create method in '$classname' class");
+            return PEAR::raiseError("Unable to find draw method in '$classname' class");
         }
 
-        @$obj =& new $classname;
+        @$obj =& new $classname();
 
-        $obj->draw($text, $imgtype);
+        $img = &$obj->draw($text, $imgtype);
+
+        if (PEAR::isError($img)) {
+            return $img;
+        }
+
+        if ($bSendToBrowser) {
+            // Send image to browser
+            switch ($imgtype) {
+                case 'gif':
+                    header('Content-type: image/gif');
+                    imagegif($img);
+                    imagedestroy($img);
+                    break;
+
+                case 'jpg':
+                    header('Content-type: image/jpg');
+                    imagejpeg($img);
+                    imagedestroy($img);
+                    break;
+
+                default:
+                    header('Content-type: image/png');
+                    imagepng($img);
+                    imagedestroy($img);
+                    break;
+            }
+        } else {
+            return $img;
+        }
     }
-
 }
-
 ?>

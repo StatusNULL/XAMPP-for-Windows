@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: SimpleTestTask.php 82 2006-07-07 18:15:35Z mrook $
+ * $Id: SimpleTestTask.php 81 2006-07-06 13:07:29Z mrook $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -28,7 +28,7 @@ require_once 'phing/util/LogWriter.php';
  * Runs SimpleTest tests.
  *
  * @author Michiel Rook <michiel.rook@gmail.com>
- * @version $Id: SimpleTestTask.php 82 2006-07-07 18:15:35Z mrook $
+ * @version $Id: SimpleTestTask.php 81 2006-07-06 13:07:29Z mrook $
  * @package phing.tasks.ext.simpletest
  * @since 2.2.0
  */

@@ -108,7 +108,7 @@ class SOAP_Server extends SOAP_Base
         }
         // assume we encode with section 5
         $this->_section5 = true;
-        if ($this->_options['use']=='literal') {
+        if ($this->_options['use'] == 'literal') {
             $this->_section5 = false;
         }
     }
@@ -122,7 +122,7 @@ class SOAP_Server extends SOAP_Base
      *
      * @see http://www.php.net/set_error_handler
      */
-    function _errorHandler($errno, $errmsg, $filename, $linenum, $vars)
+    function _errorHandler($errno, $errmsg, $filename, $linenum)
     {
         /* The error handler should ignore '0' errors, eg. hidden by @ - see
          * the set_error_handler manual page. (thanks to Alan Knowles). */
@@ -131,7 +131,7 @@ class SOAP_Server extends SOAP_Base
             return false;
         }
 
-        $this->fault =& new SOAP_Fault($errmsg, 'Server', 'PHP', "Errno: $errno\nFilename: $filename\nLineno: $linenum\n");
+        $this->fault = new SOAP_Fault($errmsg, 'Server', 'PHP', "Errno: $errno\nFilename: $filename\nLineno: $linenum\n");
 
         $this->_sendResponse();
         exit;
@@ -356,8 +356,8 @@ class SOAP_Server extends SOAP_Base
                     if (is_a($method_response[$i], 'SOAP_Value')) {
                         $return_val[] =& $method_response[$i++];
                     } else {
-                        $qn =& new QName($key, $namespace);
-                        $return_val[] =& new SOAP_Value($qn->fqn(), $type, $method_response[$i++]);
+                        $qn = new QName($key, $namespace);
+                        $return_val[] = new SOAP_Value($qn->fqn(), $type, $method_response[$i++]);
                     }
                 }
             } else {
@@ -369,7 +369,7 @@ class SOAP_Server extends SOAP_Base
                     $values = array_values($return_type);
                     $return_type = $values[0];
                 }
-                $qn =& new QName($return_name, $namespace);
+                $qn = new QName($return_name, $namespace);
                 $return_val = array(new SOAP_Value($qn->fqn(), $return_type, $method_response));
             }
         }
@@ -496,7 +496,7 @@ class SOAP_Server extends SOAP_Base
 
         if ($this->_options['parameters'] ||
             !$method_response ||
-            $this->_options['style']=='rpc') {
+            $this->_options['style'] == 'rpc') {
             /* Get the method result. */
             if (is_null($method_response)) {
                 $return_val = null;
@@ -504,8 +504,8 @@ class SOAP_Server extends SOAP_Base
                 $return_val = $this->buildResult($method_response, $this->return_type);
             }
 
-            $qn =& new QName($this->methodname . 'Response', $this->method_namespace);
-            $methodValue =& new SOAP_Value($qn->fqn(), 'Struct', $return_val);
+            $qn = new QName($this->methodname . 'Response', $this->method_namespace);
+            $methodValue = new SOAP_Value($qn->fqn(), 'Struct', $return_val);
         } else {
             $methodValue =& $method_response;
         }
@@ -604,8 +604,8 @@ class SOAP_Server extends SOAP_Base
         }
 
         /* If there are input parameters required. */
-        if ($sig = $map['in']) {
-            $this->input_value = count($sig);
+        if ($map['in']) {
+            $this->input_value = count($map['in']);
             $this->return_type = false;
             if (is_array($map['out'])) {
                 $this->return_type = count($map['out']) > 1
@@ -614,12 +614,12 @@ class SOAP_Server extends SOAP_Base
             }
             if (is_array($params)) {
                 /* Validate the number of parameters. */
-                if (count($params) == count($sig)) {
+                if (count($params) == count($map['in'])) {
                     /* Make array of param types. */
                     foreach ($params as $param) {
                         $p[] = strtolower($param->type);
                     }
-                    $sig_t = array_values($sig);
+                    $sig_t = array_values($map['in']);
                     /* Validate each param's type. */
                     for ($i = 0; $i < count($p); $i++) {
                         /* If SOAP types do not match, it's still fine if the
@@ -639,12 +639,12 @@ class SOAP_Server extends SOAP_Base
                     return true;
                 } else {
                     /* Wrong number of params. */
-                    $this->_raiseSoapFault('SOAP request contained incorrect number of parameters. method "' . $this->methodname . '" required ' . count($sig) . ' and request provided ' . count($params), '', '', 'Client');
+                    $this->_raiseSoapFault('SOAP request contained incorrect number of parameters. method "' . $this->methodname . '" required ' . count($map['in']) . ' and request provided ' . count($params), '', '', 'Client');
                     return false;
                 }
             } else {
                 /* No params. */
-                $this->_raiseSoapFault('SOAP request contained incorrect number of parameters. method "' . $this->methodname . '" requires ' . count($sig) . ' parameters, and request provided none.', '', '', 'Client');
+                $this->_raiseSoapFault('SOAP request contained incorrect number of parameters. method "' . $this->methodname . '" requires ' . count($map['in']) . ' parameters, and request provided none.', '', '', 'Client');
                 return false;
             }
         }
@@ -790,7 +790,7 @@ class SOAP_Server extends SOAP_Base
     function bindWSDL($wsdl_url)
     {
         /* Instantiate WSDL class. */
-        $this->_wsdl =& new SOAP_WSDL($wsdl_url);
+        $this->_wsdl = new SOAP_WSDL($wsdl_url);
         if ($this->_wsdl->fault) {
             $this->_raiseSoapFault($this->_wsdl->fault);
         }
@@ -803,7 +803,7 @@ class SOAP_Server extends SOAP_Base
                            $service_desc = '')
     {
         if (!isset($this->_wsdl)) {
-            $this->_wsdl =& new SOAP_WSDL;
+            $this->_wsdl = new SOAP_WSDL;
         }
 
         $this->_wsdl->parseObject($wsdl_obj, $targetNamespace, $service_name, $service_desc);
@@ -812,4 +812,5 @@ class SOAP_Server extends SOAP_Base
             $this->_raiseSoapFault($this->_wsdl->fault);
         }
     }
+
 }

@@ -1,24 +1,44 @@
 <?php
 /**
- * The HTML_Progress2_Generator class provides an easy way to build
- * progress bar, show a preview, and save php/css code for a later reuse.
+ * Copyright (c) 2005-2008, Laurent Laville <pear@laurent-laville.org>
+ *
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the authors nor the names of its contributors
+ *       may be used to endorse or promote products derived from this software
+ *       without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  *
  * PHP versions 4 and 5
  *
- * LICENSE: This source file is subject to version 3.01 of the PHP license
- * that is available through the world-wide-web at the following URI:
- * http://www.php.net/license/3_01.txt.  If you did not receive a copy of
- * the PHP License and are unable to obtain it through the web, please
- * send a note to license@php.net so we can mail you a copy immediately.
- *
- * @category   HTML
- * @package    HTML_Progress2
- * @author     Laurent Laville <pear@laurent-laville.org>
- * @copyright  2005-2007 The PHP Group
- * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
- * @version    CVS: $Id: Generator.php,v 1.6 2007/01/02 10:58:28 farell Exp $
- * @link       http://pear.php.net/package/HTML_Progress2
- * @since      File available since Release 2.0.0RC1
+ * @category  HTML
+ * @package   HTML_Progress2
+ * @author    Laurent Laville <pear@laurent-laville.org>
+ * @copyright 2005-2008 Laurent Laville
+ * @license   http://www.opensource.org/licenses/bsd-license.php  New BSD License
+ * @version   CVS: $Id: Generator.php,v 1.11 2008/03/20 21:27:55 farell Exp $
+ * @link      http://pear.php.net/package/HTML_Progress2
+ * @since     File available since Release 2.0.0RC1
  */
 
 require_once 'HTML/QuickForm/Controller.php';
@@ -33,14 +53,14 @@ require_once 'HTML/Progress2/Generator/pages.php';
  * The HTML_Progress2_Generator class provides an easy way to build
  * progress bar, show a preview, and save php/css code for a later reuse.
  *
- * @category   HTML
- * @package    HTML_Progress2
- * @author     Laurent Laville <pear@laurent-laville.org>
- * @copyright  2005-2007 The PHP Group
- * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
- * @version    Release: 2.2.0
- * @link       http://pear.php.net/package/HTML_Progress2
- * @since      Class available since Release 2.0.0RC1
+ * @category  HTML
+ * @package   HTML_Progress2
+ * @author    Laurent Laville <pear@laurent-laville.org>
+ * @copyright 2005-2008 Laurent Laville
+ * @license   http://www.opensource.org/licenses/bsd-license.php  New BSD License
+ * @version   Release: 2.4.0
+ * @link      http://pear.php.net/package/HTML_Progress2
+ * @since     Class available since Release 2.0.0RC1
  */
 
 class HTML_Progress2_Generator extends HTML_QuickForm_Controller
@@ -111,10 +131,16 @@ class HTML_Progress2_Generator extends HTML_QuickForm_Controller
     /**
      * Constructor (ZE1)
      *
-     * @since      2.0.0
+     * @param string $controllerName (optional) Name of generator wizard (QuickForm)
+     * @param array  $attributes     (optional) List of renderer options
+     * @param array  $errorPrefs     (optional) Hash of parameters
+     *                                          to configure error handler
+     *
+     * @since      version 2.0.0 (2005-10-01)
      * @access     public
      */
-    function HTML_Progress2_Generator($controllerName = 'ProgressGenerator', $attributes = array(),
+    function HTML_Progress2_Generator($controllerName = 'ProgressGenerator',
+                                      $attributes = array(),
                                       $errorPrefs = array())
     {
         $this->__construct($controllerName, $attributes, $errorPrefs);
@@ -134,37 +160,46 @@ class HTML_Progress2_Generator extends HTML_QuickForm_Controller
      *   $controllerName = 'myPrivateGenerator';
      *   $attributes = array(
      *        'preview' => name of a HTML_QuickForm_Action instance
-     *                     (default 'ActionPreview', see 'HTML/Progress2/Generator/Preview.php')
+     *                     (default 'ActionPreview',
+     *                      see 'HTML/Progress2/Generator/Preview.php')
      *        'display' => name of a HTML_QuickForm_Action_Display instance
-     *                     (default 'ActionDisplay', see 'HTML/Progress2/Generator/Default.php')
+     *                     (default 'ActionDisplay',
+     *                      see 'HTML/Progress2/Generator/Default.php')
      *        'process' => name of a HTML_QuickForm_Action instance
-     *                     (default 'ActionProcess', see 'HTML/Progress2/Generator/Process.php')
+     *                     (default 'ActionProcess',
+     *                      see 'HTML/Progress2/Generator/Process.php')
      *   );
      *   $generator = new HTML_Progress2_Generator($controllerName, $attributes);
      *   </code>
      *
-     * @param      string    $controllerName(optional) Name of generator wizard (QuickForm)
-     * @param      array     $attributes    (optional) List of renderer options
-     * @param      array     $errorPrefs    (optional) Hash of params to configure error handler
+     * @param string $controllerName (optional) Name of generator wizard (QuickForm)
+     * @param array  $attributes     (optional) List of renderer options
+     * @param array  $errorPrefs     (optional) Hash of parameters
+     *                                          to configure error handler
      *
-     * @since      2.0.0
+     * @since      version 2.0.0 (2005-10-01)
      * @access     protected
      * @throws     HTML_PROGRESS2_ERROR_INVALID_INPUT
      */
-    function __construct($controllerName = 'ProgressGenerator', $attributes = array(),
+    function __construct($controllerName = 'ProgressGenerator',
+                         $attributes = array(),
                          $errorPrefs = array())
     {
-        $this->_progress = new HTML_Progress2($errorPrefs, HTML_PROGRESS2_BAR_HORIZONTAL, 0, 100);
+        $this->_progress = new HTML_Progress2($errorPrefs,
+                                              HTML_PROGRESS2_BAR_HORIZONTAL,
+                                              0, 100);
 
         if (!is_string($controllerName)) {
-            return $this->_progress->raiseError(HTML_PROGRESS2_ERROR_INVALID_INPUT, 'exception',
+            return $this->_progress->raiseError(HTML_PROGRESS2_ERROR_INVALID_INPUT,
+                'exception',
                 array('var' => '$controllerName',
                       'was' => gettype($controllerName),
                       'expected' => 'string',
                       'paramnum' => 1));
 
         } elseif (!is_array($attributes)) {
-            return $this->_progress->raiseError(HTML_PROGRESS2_ERROR_INVALID_INPUT, 'exception',
+            return $this->_progress->raiseError(HTML_PROGRESS2_ERROR_INVALID_INPUT,
+                'exception',
                 array('var' => '$attributes',
                       'was' => gettype($attributes),
                       'expected' => 'array',
@@ -188,19 +223,26 @@ class HTML_Progress2_Generator extends HTML_QuickForm_Controller
                 'shape'         => HTML_PROGRESS2_BAR_HORIZONTAL,
                 'way'           => 'natural',
                 'autosize'      => true,
-                'progresssize'  => array('left' => 10, 'top' => 25, 'position' => 'relative', 'bgcolor' => '#FFFFFF'),
+                'progresssize'  => array('left' => 10, 'top' => 25,
+                                         'position' => 'relative',
+                                         'bgcolor' => '#FFFFFF'),
                 'rAnimSpeed'    => 100,
 
                 'borderpainted' => false,
                 'borderclass'   => 'progressBorder%s',
-                'borderstyle'   => array('style' => 'solid', 'width' => 0, 'color' => '#000000'),
+                'borderstyle'   => array('style' => 'solid', 'width' => 0,
+                                         'color' => '#000000'),
 
                 'cellid'        => 'pcel%01s',
                 'cellclass'     => 'cell%s',
                 'cellvalue'     => array('min' => 0, 'max' => 100, 'inc' => 1),
-                'cellsize'      => array('width' => 15, 'height' => 20, 'spacing' => 2, 'count' => 10),
-                'cellcolor'     => array('active' => '#006600', 'inactive' => '#CCCCCC', 'bgcolor' => '#FFFFFF'),
-                'cellfont'      => array('family' => 'Courier, Verdana', 'size' => 8, 'color' => '#000000'),
+                'cellsize'      => array('width' => 15, 'height' => 20,
+                                         'spacing' => 2, 'count' => 10),
+                'cellcolor'     => array('active' => '#006600',
+                                         'inactive' => '#CCCCCC',
+                                         'bgcolor' => '#FFFFFF'),
+                'cellfont'      => array('family' => 'Courier, Verdana',
+                                         'size' => 8, 'color' => '#000000'),
 
                 'stringpainted' => false,
                 'stringid'      => 'txt1',
@@ -209,7 +251,8 @@ class HTML_Progress2_Generator extends HTML_QuickForm_Controller
                 'stringsize'    => array('left' => 5, 'top' => 5),
                 'stringvalign'  => 'top',
                 'stringalign'   => 'left',
-                'stringfont'    => array('family' => 'Verdana, Tahoma, Arial', 'size' => 11, 'color' => '#000000'),
+                'stringfont'    => array('family' => 'Verdana, Tahoma, Arial',
+                                         'size' => 11, 'color' => '#000000'),
                 'stringweight'  => 'normal',
 
                 'phpcss'        => array('P' => true)
@@ -220,21 +263,25 @@ class HTML_Progress2_Generator extends HTML_QuickForm_Controller
     /**
      * Returns a unique instance of the given progress generator wizard.
      *
-     * @param      string    $controllerName(optional) Name of generator wizard (QuickForm)
-     * @param      array     $attributes    (optional) List of renderer options
-     * @param      array     $errorPrefs    (optional) Hash of params to configure error handler
+     * @param string $controllerName (optional) Name of generator wizard (QuickForm)
+     * @param array  $attributes     (optional) List of renderer options
+     * @param array  $errorPrefs     (optional) Hash of parameters
+     *                                          to configure error handler
      *
      * @return     object    HTML_Progress2_Generator
-     * @since      2.1.0
+     * @since      version 2.1.0 (2006-08-12)
      * @access     public
      */
-    function &singleton($controllerName = 'ProgressGenerator', $attributes = array(),
+    function &singleton($controllerName = 'ProgressGenerator',
+                        $attributes = array(),
                         $errorPrefs = array())
     {
         static $generator;
 
         if (!isset($generator)) {
-            $generator =& new HTML_Progress2_Generator($controllerName, $attributes, $errorPrefs);
+            $generator =& new HTML_Progress2_Generator($controllerName,
+                                                       $attributes,
+                                                       $errorPrefs);
         }
 
         return $generator;
@@ -243,30 +290,32 @@ class HTML_Progress2_Generator extends HTML_QuickForm_Controller
     /**
      * Adds all pages of wizard at once
      *
-     * @param  mixed $pages  Wizard pages definition array or null if used defaults
+     * @param mixed $pages Wizard pages definition array or null if used defaults
+     *
      * @return void
      * @access public
-     * @since  2.1.0
+     * @since  version 2.1.0 (2006-08-12)
      */
     function addPages($pages = null)
     {
-         if (!isset($pages)) {
-             // default wizard pages
-             $pages = $this->_tabs;
-         }
+        if (!isset($pages)) {
+            // default wizard pages
+            $pages = $this->_tabs;
+        }
 
-         foreach($pages as $page) {
-             $this->addPage($page);
-         }
+        foreach ($pages as $page) {
+            $this->addPage($page);
+        }
     }
 
     /**
      * Add a specific page to wizard or each page one by one
      *
-     * @param  array $page  a single Wizard page definition
+     * @param array $page a single Wizard page definition
+     *
      * @return void
      * @access public
-     * @since  2.1.0
+     * @since  version 2.1.0 (2006-08-12)
      */
     function addPage($page)
     {
@@ -291,8 +340,11 @@ class HTML_Progress2_Generator extends HTML_QuickForm_Controller
     /**
      * Adds common actions for the frontend wizard
      *
+     * @param mixed $actions (optional) Identify for each action a class handler
+     *
+     * @return void
      * @access public
-     * @since  2.1.0
+     * @since  version 2.1.0 (2006-08-12)
      */
     function addActions($actions = null)
     {
@@ -306,7 +358,7 @@ class HTML_Progress2_Generator extends HTML_QuickForm_Controller
             include_once 'HTML/Progress2/Generator/Preview.php';
             $ActionPreview = 'ActionPreview';
         }
-        $this->addAction('apply', new $ActionPreview() );
+        $this->addAction('apply', new $ActionPreview());
 
         // adds display driver
         $ActionDisplay = $this->_act['display'];
@@ -314,7 +366,7 @@ class HTML_Progress2_Generator extends HTML_QuickForm_Controller
             include_once 'HTML/Progress2/Generator/Default.php';
             $ActionDisplay = 'ActionDisplay';
         }
-        $this->addAction('display', new $ActionDisplay() );
+        $this->addAction('display', new $ActionDisplay());
 
         // adds basic actions (abort, commit, reset)
         $ActionProcess = $this->_act['process'];
@@ -322,8 +374,8 @@ class HTML_Progress2_Generator extends HTML_QuickForm_Controller
             include_once 'HTML/Progress2/Generator/Process.php';
             $ActionProcess = 'ActionProcess';
         }
-        $this->addAction('cancel',  new $ActionProcess() );
-        $this->addAction('process', new $ActionProcess() );
+        $this->addAction('cancel', new $ActionProcess());
+        $this->addAction('process', new $ActionProcess());
 
         // adds dump class action (if necessary)
         $ActionDump = $this->_act['dump'];
@@ -332,18 +384,19 @@ class HTML_Progress2_Generator extends HTML_QuickForm_Controller
                 include_once 'HTML/Progress2/Generator/Dump.php';
                 $ActionDump = 'ActionDump';
             }
-            $this->addAction('dump', new $ActionDump() );
+            $this->addAction('dump', new $ActionDump());
         }
     }
 
     /**
      * Registers a handler for a specific action.
      *
-     * @param      string    $actionName  name of the action
-     * @param      object    $action      the handler for the action
+     * @param string $actionName name of the action
+     * @param object &$action    the handler for the action
+     *
      * @return     void
      * @access     public
-     * @since      2.1.0
+     * @since      version 2.1.0 (2006-08-12)
      */
     function addAction($actionName, &$action)
     {
@@ -354,20 +407,18 @@ class HTML_Progress2_Generator extends HTML_QuickForm_Controller
     /**
      * Returns whether or not a file is in the include path.
      *
-     * @param      string    $file
+     * @param string $file filename to test
+     *
      * @access     public
      * @return     boolean   true if the file is in the include path.
-     * @since      2.1.0
+     * @since      version 2.1.0 (2006-08-12)
      * @static
      */
     function isIncludeable($file)
     {
-        if (!defined('PATH_SEPARATOR')) {
-            define('PATH_SEPARATOR', strtolower(substr(PHP_OS, 0, 3)) == 'win' ? ';' : ':');
-        }
         foreach (explode(PATH_SEPARATOR, ini_get('include_path')) as $path) {
-            if (file_exists($path . DIRECTORY_SEPARATOR . $file) &&
-                  is_readable($path . DIRECTORY_SEPARATOR . $file)) {
+            if (file_exists($path . DIRECTORY_SEPARATOR . $file)
+                && is_readable($path . DIRECTORY_SEPARATOR . $file)) {
                 return true;
             }
         }
@@ -378,7 +429,7 @@ class HTML_Progress2_Generator extends HTML_QuickForm_Controller
      * Creates a progress bar with options choosen on all wizard tabs.
      *
      * @return     object
-     * @since      2.0.0
+     * @since      version 2.0.0 (2005-10-01)
      * @access     public
      */
     function createProgressBar()
@@ -416,22 +467,23 @@ class HTML_Progress2_Generator extends HTML_QuickForm_Controller
      * with options choosen on all wizard tabs.
      *
      * @return     array
-     * @since      2.0.0
+     * @since      version 2.0.0 (2005-10-01)
      * @access     public
      * @see        HTML_Progress2::toArray()
      */
     function createProgressStructure()
     {
         $structure = array();
-        $progress = $this->exportValues();
+        $progress  = $this->exportValues();
 
-        $structure['animspeed'] = intval($progress['rAnimSpeed']);
+        $structure['animspeed']     = intval($progress['rAnimSpeed']);
         $structure['borderpainted'] = ($progress['borderpainted'] == '1');
         $structure['stringpainted'] = ($progress['stringpainted'] == '1');
 
-        /* Page 1: Progress attributes **************************************************/
+        /* Page 1: Progress attributes ****************************************/
         if (strlen(trim($progress['progresssize']['bgcolor'])) > 0) {
-            $structure['progress']['background-color'] = $progress['progresssize']['bgcolor'];
+            $structure['progress']['background-color']
+                = $progress['progresssize']['bgcolor'];
         }
         if (strlen(trim($progress['progresssize']['width'])) > 0) {
             $structure['progress']['width'] = $progress['progresssize']['width'];
@@ -446,10 +498,12 @@ class HTML_Progress2_Generator extends HTML_QuickForm_Controller
             $structure['progress']['top'] = $progress['progresssize']['top'];
         }
         $structure['progress']['auto-size'] = ($progress['autosize'] == '1');
-        $structure['orientation'] = ($progress['shape'] == '1') ? HTML_PROGRESS2_BAR_HORIZONTAL : HTML_PROGRESS2_BAR_VERTICAL;
+        $structure['orientation']
+            = ($progress['shape'] == '1') ?
+                  HTML_PROGRESS2_BAR_HORIZONTAL : HTML_PROGRESS2_BAR_VERTICAL;
         $structure['fillway'] = $progress['way'];
 
-        /* Page 2: Cell attributes ******************************************************/
+        /* Page 2: Cell attributes ********************************************/
         if (strlen(trim($progress['cellid'])) > 0) {
             $structure['cell']['id'] = $progress['cellid'];
         }
@@ -481,10 +535,12 @@ class HTML_Progress2_Generator extends HTML_QuickForm_Controller
             $structure['cell']['active-color'] = $progress['cellcolor']['active'];
         }
         if (strlen(trim($progress['cellcolor']['inactive'])) > 0) {
-            $structure['cell']['inactive-color'] = $progress['cellcolor']['inactive'];
+            $structure['cell']['inactive-color']
+                = $progress['cellcolor']['inactive'];
         }
         if (strlen(trim($progress['cellcolor']['bgcolor'])) > 0) {
-            $structure['cell']['background-color'] = $progress['cellcolor']['bgcolor'];
+            $structure['cell']['background-color']
+                = $progress['cellcolor']['bgcolor'];
         }
         if (strlen(trim($progress['cellfont']['family'])) > 0) {
             $structure['cell']['font-family'] = $progress['cellfont']['family'];
@@ -496,7 +552,7 @@ class HTML_Progress2_Generator extends HTML_QuickForm_Controller
             $structure['cell']['color'] = $progress['cellfont']['color'];
         }
 
-        /* Page 3: Border attributes ****************************************************/
+        /* Page 3: Border attributes ******************************************/
         if (strlen(trim($progress['borderclass'])) > 0) {
             $structure['border']['class'] = $progress['borderclass'];
         }
@@ -510,7 +566,7 @@ class HTML_Progress2_Generator extends HTML_QuickForm_Controller
             $structure['border']['color'] = $progress['borderstyle']['color'];
         }
 
-        /* Page 4: Label attributes *****************************************************/
+        /* Page 4: Label attributes *******************************************/
         if (strlen(trim($progress['stringid'])) > 0) {
             $structure['string']['name'] = $progress['stringid'];
         }
@@ -533,7 +589,8 @@ class HTML_Progress2_Generator extends HTML_QuickForm_Controller
             $structure['string']['top'] = $progress['stringsize']['top'];
         }
         if (strlen(trim($progress['stringsize']['bgcolor'])) > 0) {
-            $structure['string']['background-color'] = $progress['stringsize']['bgcolor'];
+            $structure['string']['background-color']
+                = $progress['stringsize']['bgcolor'];
         }
         if (strlen(trim($progress['stringalign'])) > 0) {
             $structure['string']['align'] = $progress['stringalign'];

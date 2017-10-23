@@ -15,7 +15,7 @@
  * @author     Alan Knowles <alan@akbkhome.com>
  * @copyright  1997-2006 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Generator.php,v 1.122 2006/10/16 02:20:16 alan_k Exp $
+ * @version    CVS: $Id: Generator.php,v 1.141 2008/01/30 02:29:39 alan_k Exp $
  * @link       http://pear.php.net/package/DB_DataObject
  */
  
@@ -180,6 +180,10 @@ class DB_DataObject_Generator extends DB_DataObject
         $db_driver = empty($options['db_driver']) ? 'DB' : $options['db_driver'];
         $is_MDB2 = ($db_driver != 'DB') ? true : false;
 
+        if (is_a($__DB , 'PEAR_Error')) {
+            return PEAR::raiseError($__DB->toString(), null, PEAR_ERROR_DIE);
+        }
+        
         if (!$is_MDB2) {
             // try getting a list of schema tables first. (postgres)
             $__DB->expectError(DB_ERROR_UNSUPPORTED);
@@ -252,12 +256,19 @@ class DB_DataObject_Generator extends DB_DataObject
                     $table = $bits[1];
                 }
             }
+            $quotedTable = !empty($options['quote_identifiers_tableinfo']) ? 
+                $__DB->quoteIdentifier($table) : $table;
+                
             if (!$is_MDB2) {
-                $defs =  $__DB->tableInfo($table);
+                
+                $defs =  $__DB->tableInfo($quotedTable);
             } else {
-                $defs =  $__DB->reverse->tableInfo($table);
+                $defs =  $__DB->reverse->tableInfo($quotedTable);
                 // rename the length value, so it matches db's return.
                 foreach ($defs as $k => $v) {
+                    if (!isset($defs[$k]['length'])) {
+                        continue;
+                    }
                     $defs[$k]['len'] = $defs[$k]['length'];
                 }
             }
@@ -335,11 +346,20 @@ class DB_DataObject_Generator extends DB_DataObject
             System::mkdir(array('-p','-m',0755,dirname($file)));
         }
         $this->debug("Writing ini as {$file}\n");
-        touch($file);
+        //touch($file);
+        $tmpname = tempnam(session_save_path(),'DataObject_');
         //print_r($this->_newConfig);
-        $fh = fopen($file,'w');
+        $fh = fopen($tmpname,'w');
         fwrite($fh,$this->_newConfig);
         fclose($fh);
+        $perms = file_exists($file) ? fileperms($file) : 0755;
+        // windows can fail doing this. - not a perfect solution but otherwise it's getting really kludgy..
+        
+        if (!@rename($tmpname, $file)) { 
+            unlink($file); 
+            rename($tmpname, $file);
+        }
+        chmod($file,$perms);
         //$ret = $this->_newConfig->writeInput($file,false);
 
         //if (PEAR::isError($ret) ) {
@@ -376,7 +396,7 @@ class DB_DataObject_Generator extends DB_DataObject
                 die($res->getMessage());
             }
 
-            $text = $res->fetchRow(DB_DEFAULT_MODE, 0);
+            $text = $res->fetchRow(DB_FETCHMODE_DEFAULT, 0);
             $treffer = array();
             // Extract FOREIGN KEYS
             preg_match_all(
@@ -421,10 +441,20 @@ class DB_DataObject_Generator extends DB_DataObject
         }
 
         $this->debug("Writing ini as {$file}\n");
-        touch($file); // not sure why this is needed?
-        $fh = fopen($file,'w');
+        
+        //touch($file); // not sure why this is needed?
+        $tmpname = tempnam(session_save_path(),'DataObject_');
+       
+        $fh = fopen($tmpname,'w');
         fwrite($fh,$links_ini);
         fclose($fh);
+        $perms = file_exists($file) ? fileperms($file) : 0755;
+        // windows can fail doing this. - not a perfect solution but otherwise it's getting really kludgy..
+        if (!@rename($tmpname, $file)) { 
+            unlink($file); 
+            rename($tmpname, $file);
+        }
+        chmod($file, $perms);
     }
 
       
@@ -578,14 +608,27 @@ class DB_DataObject_Generator extends DB_DataObject
                          "** Found column '{$t->name}', of type  '{$t->type}'            **\n".
                          "** Please submit a bug, describe what type you expect this     **\n".
                          "** column  to be                                               **\n".
+                         "** ---------POSSIBLE FIX / WORKAROUND -------------------------**\n".
+                         "** Try using MDB2 as the backend - eg set the config option    **\n".
+                         "** db_driver = MDB2                                            **\n".
                          "*****************************************************************\n";
                     $write_ini = false;
                     break;
             }
             
+            if (!preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $t->name)) {
+                echo "*****************************************************************\n".
+                     "**               WARNING COLUMN NAME UNUSABLE                  **\n".
+                     "** Found column '{$t->name}', of type  '{$t->type}'            **\n".
+                     "** Since this column name can't be converted to a php variable **\n".
+                     "** name, and the whole idea of mapping would result in a mess  **\n".
+                     "** This column has been ignored...                             **\n".
+                     "*****************************************************************\n";
+                continue;
+            }
             
             if (!strlen(trim($t->name))) {
-                continue;
+                continue; // is this a bug?
             }
             
             if (preg_match('/not[ _]null/i',$t->flags)) {
@@ -658,7 +701,7 @@ class DB_DataObject_Generator extends DB_DataObject
     function getClassNameFromTableName($table)
     {
         $options = &PEAR::getStaticProperty('DB_DataObject','options');
-        $class_prefix  = $options['class_prefix'];
+        $class_prefix  = empty($options['class_prefix']) ? '' : $options['class_prefix'];
         return  $class_prefix.preg_replace('/[^A-Z0-9]/i','_',ucfirst(trim($this->table)));
     }
     
@@ -738,9 +781,20 @@ class DB_DataObject_Generator extends DB_DataObject
             
             $out = $this->_generateClassTable($oldcontents);
             $this->debug( "writing $this->classname\n");
-            $fh = fopen($outfilename, "w");
+            $tmpname = tempnam(session_save_path(),'DataObject_');
+       
+            $fh = fopen($tmpname, "w");
             fputs($fh,$out);
             fclose($fh);
+            $perms = file_exists($outfilename) ? fileperms($outfilename) : 0755;
+            
+            // windows can fail doing this. - not a perfect solution but otherwise it's getting really kludgy..
+            if (!@rename($tmpname, $outfilename)) {
+                unlink($outfilename); 
+                rename($tmpname, $outfilename);
+            }
+            
+            chmod($outfilename, $perms);
         }
         //echo $out;
     }
@@ -779,11 +833,17 @@ class DB_DataObject_Generator extends DB_DataObject
     {
         // title = expand me!
         $foot = "";
-        $head = "<?php\n/**\n * Table Definition for {$this->table}\n */\n";
+        $head = "<?php\n/**\n * Table Definition for {$this->table}\n";
+        $head .= $this->derivedHookPageLevelDocBlock();
+        $head .= " */\n";
+        $head .= $this->derivedHookExtendsDocBlock();
+
+        
         // requires
         $head .= "require_once '{$this->_extendsFile}';\n\n";
         // add dummy class header in...
-        // class
+        // class 
+        $head .= $this->derivedHookClassDocBlock();
         $head .= "class {$this->classname} extends {$this->_extends} \n{";
 
         $body =  "\n    ###START_AUTOCODE\n";
@@ -829,6 +889,18 @@ class DB_DataObject_Generator extends DB_DataObject
             if (!strlen(trim($t->name))) {
                 continue;
             }
+            if (!preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $t->name)) {
+                echo "*****************************************************************\n".
+                     "**               WARNING COLUMN NAME UNUSABLE                  **\n".
+                     "** Found column '{$t->name}', of type  '{$t->type}'            **\n".
+                     "** Since this column name can't be converted to a php variable **\n".
+                     "** name, and the whole idea of mapping would result in a mess  **\n".
+                     "** This column has been ignored...                             **\n".
+                     "*****************************************************************\n";
+                continue;
+            }
+            
+            
             $padding = (30 - strlen($t->name));
             if ($padding < 2) $padding =2;
             $p =  str_repeat(' ',$padding) ;
@@ -930,7 +1002,7 @@ class DB_DataObject_Generator extends DB_DataObject
 
         $class_rewrite = 'DB_DataObject';
         $options = &PEAR::getStaticProperty('DB_DataObject','options');
-        if (!($class_rewrite = @$options['generator_class_rewrite'])) {
+        if (empty($options['generator_class_rewrite']) || !($class_rewrite = $options['generator_class_rewrite'])) {
             $class_rewrite = 'DB_DataObject';
         }
         if ($class_rewrite == 'ANY') {
@@ -938,13 +1010,23 @@ class DB_DataObject_Generator extends DB_DataObject
         }
 
         $input = preg_replace(
-            '/(\n|\r\n)class\s*[a-z0-9_]+\s*extends\s*' .$class_rewrite . '\s*\{(\n|\r\n)/si',
+            '/(\n|\r\n)class\s*[a-z0-9_]+\s*extends\s*' .$class_rewrite . '\s*(\n|\r\n)\{(\n|\r\n)/si',
             "\nclass {$this->classname} extends {$this->_extends} \n{\n",
             $input);
 
-        return preg_replace(
+        $ret =  preg_replace(
             '/(\n|\r\n)\s*###START_AUTOCODE(\n|\r\n).*(\n|\r\n)\s*###END_AUTOCODE(\n|\r\n)/s',
             $body,$input);
+        
+        if (!strlen($ret)) {
+            return PEAR::raiseError(
+                "PREG_REPLACE failed to replace body, - you probably need to set these in your php.ini\n".
+                "pcre.backtrack_limit=1000000\n".
+                "pcre.recursion_limit=1000000\n"
+                ,null, PEAR_ERROR_DIE);
+       }
+        
+        return $ret;
     }
 
     /**
@@ -981,6 +1063,42 @@ class DB_DataObject_Generator extends DB_DataObject
         return "";
     }
 
+    /**
+     * hook to add extra page-level (in terms of phpDocumentor) DocBlock
+     *
+     * called once for each class, use it add extra page-level docs
+     * @access public
+     * @return string added to class eg. functions.
+     */
+    function derivedHookPageLevelDocBlock() {
+        return '';
+    }
+
+    /**
+     * hook to add extra doc block (in terms of phpDocumentor) to extend string
+     *
+     * called once for each class, use it add extra comments to extends
+     * string (require_once...)
+     * @access public
+     * @return string added to class eg. functions.
+     */
+    function derivedHookExtendsDocBlock() {
+        return '';
+    }
+
+    /**
+     * hook to add extra class level DocBlock (in terms of phpDocumentor)
+     *
+     * called once for each class, use it add extra comments to class
+     * string (require_once...)
+     * @access public
+     * @return string added to class eg. functions.
+     */
+    function derivedHookClassDocBlock() {
+        return '';
+    }
+
+    /**
 
     /**
     * getProxyFull - create a class definition on the fly and instantate it..
@@ -1004,7 +1122,7 @@ class DB_DataObject_Generator extends DB_DataObject
         
         
         $options = &PEAR::getStaticProperty('DB_DataObject','options');
-        $class_prefix  = $options['class_prefix'];
+        $class_prefix  = empty($options['class_prefix']) ? '' : $options['class_prefix'];
         
         if ($extends = @$options['extends']) {
             $this->_extends = $extends;
@@ -1067,13 +1185,18 @@ class DB_DataObject_Generator extends DB_DataObject
             $__DB->loadModule('Manager');
             $__DB->loadModule('Reverse');
         }
- 
+        $quotedTable = !empty($options['quote_identifiers']) ? 
+                $__DB->quoteIdentifier($table) : $table;
+          
         if (!$is_MDB2) {
-            $defs =  $__DB->tableInfo($table);
+            $defs =  $__DB->tableInfo($quotedTable);
         } else {
-            $defs =  $__DB->reverse->tableInfo($table);
+            $defs =  $__DB->reverse->tableInfo($quotedTable);
             foreach ($defs as $k => $v) {
-                $defs[$k]['len'] = &$defs[$k]['length'];
+                if (!isset($defs[$k]['length'])) {
+                    continue;
+                }
+                $defs[$k]['len'] = $defs[$k]['length'];
             }
         }
         
@@ -1362,8 +1485,10 @@ class DB_DataObject_Generator extends DB_DataObject
         if (!in_array($__DB->phptype, array('mysql','mysqli'))) {
             return; // cant handle non-mysql introspection for defaults.
         }
-        
-        $res = $__DB->getAll('DESCRIBE ' . $table,DB_FETCHMODE_ASSOC);
+        $options = PEAR::getStaticProperty('DB_DataObject','options'); 
+        $db_driver = empty($options['db_driver']) ? 'DB' : $options['db_driver'];
+        $method = $db_driver == 'DB' ? 'getAll' : 'queryAll'; 
+        $res = $__DB->$method('DESCRIBE ' . $table,DB_FETCHMODE_ASSOC);
         $defaults = array();
         foreach($res as $ar) {
             // this is initially very dumb... -> and it may mess up..

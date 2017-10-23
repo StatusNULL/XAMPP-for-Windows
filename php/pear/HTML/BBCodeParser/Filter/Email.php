@@ -16,7 +16,7 @@
 // | Author: Stijn de Reede <sjr@gmx.co.uk>                               |
 // +----------------------------------------------------------------------+
 //
-// $Id: Email.php,v 1.4 2004/02/05 16:39:45 sjr Exp $
+// $Id: Email.php,v 1.5 2007/07/02 16:54:25 cweiske Exp $
 //
 
 /**
@@ -25,12 +25,12 @@
 */
 
 
-require_once('HTML/BBCodeParser.php');
+require_once 'HTML/BBCodeParser/Filter.php';
 
 
 
 
-class HTML_BBCodeParser_Filter_Email extends HTML_BBCodeParser
+class HTML_BBCodeParser_Filter_Email extends HTML_BBCodeParser_Filter
 {
 
     /**

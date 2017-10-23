@@ -20,12 +20,11 @@
  * @author     Didier Fournout <didier.fournout@nyc.fr>
  * @copyright  2005 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: upca.php,v 1.2 2005/05/30 04:31:41 msmarcal Exp $
+ * @version    CVS: $Id: upca.php,v 1.5 2006/12/13 19:33:03 cweiske Exp $
  * @link       http://pear.php.net/package/Image_Barcode
  */
 
-require_once "PEAR.php";
-require_once "Image/Barcode.php";
+require_once 'Image/Barcode.php';
 
 /**
  * Image_Barcode_upca class
@@ -165,13 +164,13 @@ class Image_Barcode_upca extends Image_Barcode
      * @author  Didier Fournout <didier.fournout@nyc.fr>
      *
      */
-    function draw($text, $imgtype = 'png')  {
-
-        if ( (is_numeric($text)==false) || (strlen($text)!=12) )  {
+    function &draw($text, $imgtype = 'png')
+    {
+        $error = false;
+        if ((is_numeric($text)==false) || (strlen($text)!=12)) {
             $barcodewidth= (12 * 7 * $this->_barwidth) + 3 + 5 + 3 + 2 * (imagefontwidth($this->_font)+1);
-            $error = 1;
-        }
-        else {
+            $error = true;
+        } else {
             // Calculate the barcode width
             $barcodewidth = (strlen($text)) * (7 * $this->_barwidth)
                 + 3 // left
@@ -180,7 +179,7 @@ class Image_Barcode_upca extends Image_Barcode
                 + imagefontwidth($this->_font)+1
                 + imagefontwidth($this->_font)+1   // check digit's padding
                 ;
-        } 
+        }
 
         $barcodelongheight = (int) (imagefontheight($this->_font)/2)+$this->_barcodeheight;
 
@@ -194,13 +193,20 @@ class Image_Barcode_upca extends Image_Barcode
         // Fill image with white color
         imagefill($img, 0, 0, $white);
 
-        if ($error == 1) {
+        if ($error) {
             $imgerror = ImageCreate($barcodewidth, $barcodelongheight+imagefontheight($this->_font)+1);
-            $red = ImageColorAllocate($imgerror, 255, 0, 0);
-            $black = ImageColorAllocate($imgerror, 0,0,0);
-            imagefill($imgerror,0,0,$red);
+            $red      = ImageColorAllocate($imgerror, 255, 0, 0);
+            $black    = ImageColorAllocate($imgerror, 0, 0, 0);
+            imagefill($imgerror, 0, 0, $red);
 
-            imagestring($imgerror, $this->_font, $barcodewidth/2-(10/2* imagefontwidth($this->_font)), $this->_barcodeheight/2, "Code Error", $black);
+            imagestring(
+                $imgerror,
+                $this->_font,
+                $barcodewidth / 2 - (10/2 * imagefontwidth($this->_font)),
+                $this->_barcodeheight / 2,
+                'Code Error',
+                $black
+            );
         }
 
         // get the first digit which is the key for creating the first 6 bars
@@ -307,52 +313,12 @@ class Image_Barcode_upca extends Image_Barcode
         // Print Check Digit
         imagestring($img, $this->_font, $xpos+1, $this->_barcodeheight, $value, $black);
 
-
-
-        // Send image to browser
-        switch($imgtype) {
-
-            case 'gif':
-                header("Content-type: image/gif");
-
-                if ($error==1) {
-                    imagegif($imgerror);
-                    imagedestroy($imgerror);
-                }
-                else {
-                    imagegif($img);
-                    imagedestroy($img);
-                }
-            break;
-
-            case 'jpg':
-                header("Content-type: image/jpg");
-                if ($error==1) {
-                    imageijpeg($imgerror);
-                    imagedestroy($imgerror);
-                }
-                else {
-                    imagejpeg($img);
-                    imagedestroy($img);
-                }
-            break;
-
-            default:
-                header("Content-type: image/png");
-                if ($error==1) {
-                    imagepng($imgerror);
-                    imagedestroy($imgerror);
-                }
-                else {
-                    imagepng($img);
-                    imagedestroy($img);
-                }
-            break;
-
+        if ($error) {
+            return $imgerror;
+        } else {
+            return $img;
         }
-
-        return;
-
     } // function create
 
 } // class
+?>

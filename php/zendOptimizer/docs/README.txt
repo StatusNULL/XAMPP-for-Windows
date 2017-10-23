@@ -25,7 +25,7 @@ http://www.zend.com/support/knowledgebase.php
 
 For issues other than technical support, email us at: support@zend.com
 
-Otherwise, you can access one of the Zend forums: http://www.zend.com/phorum/
+Otherwise, you can access one of the Zend forums: http://www.zend.com/forums/
 
 Thank you for using the Zend Optimizer!
 

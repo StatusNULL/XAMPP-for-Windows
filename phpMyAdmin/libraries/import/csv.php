@@ -4,8 +4,11 @@
  * CSV import plugin for phpMyAdmin
  *
  * @todo    add an option for handling NULL values
- * @version $Id: csv.php 10466 2007-06-27 13:39:25Z lem9 $
+ * @version $Id: csv.php 11326 2008-06-17 21:32:48Z lem9 $
  */
+if (! defined('PHPMYADMIN')) {
+    exit;
+}
 
 /**
  *
@@ -47,7 +50,15 @@ if (strlen($csv_terminated) != 1) {
     $message = sprintf($strInvalidCSVParameter, $strFieldsTerminatedBy);
     $show_error_header = TRUE;
     $error = TRUE;
-} elseif (strlen($csv_enclosed) != 1) {
+    // The default dialog of MS Excel when generating a CSV produces a 
+    // semi-colon-separated file with no chance of specifying the 
+    // enclosing character. Thus, users who want to import this file 
+    // tend to remove the enclosing character on the Import dialog. 
+    // I could not find a test case where having no enclosing characters 
+    // confuses this script.
+    // But the parser won't work correctly with strings so we allow just
+    // one character.
+} elseif (strlen($csv_enclosed) > 1) {
     $message = sprintf($strInvalidCSVParameter, $strFieldsEnclosedBy);
     $show_error_header = TRUE;
     $error = TRUE;

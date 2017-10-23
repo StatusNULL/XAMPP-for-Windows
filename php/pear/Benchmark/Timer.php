@@ -14,7 +14,7 @@
 // | license@php.net so we can mail you a copy immediately.                 |
 // +------------------------------------------------------------------------+
 //
-// $Id: Timer.php,v 1.16 2006/03/01 13:41:39 matthias Exp $
+// $Id: Timer.php,v 1.2 2007/05/24 05:23:20 anant Exp $
 //
 
 require_once 'PEAR.php';
@@ -99,11 +99,11 @@ class Benchmark_Timer extends PEAR {
     }
 
     /**
-     * Destructor.
+     * Close method. Stop timer and display output.
      *
-     * @access private
+     * @access public
      */
-    function _Benchmark_Timer() {
+    function close() {
         if ($this->auto) {
             $this->stop();
             $this->display();
@@ -153,11 +153,13 @@ class Benchmark_Timer extends PEAR {
         if ($end == 'Stop' && !isset($this->markers['Stop'])) {
             $this->markers['Stop'] = $this->_getMicrotime();
         }
+        $end = isset($this->markers[$end]) ? $this->markers[$end] : 0;
+        $start = isset($this->markers[$start]) ? $this->markers[$start] : 0;
 
         if (extension_loaded('bcmath')) {
-            return bcsub($this->markers[$end], $this->markers[$start], 6);
+            return bcsub($end, $start, 6);
         } else {
-            return $this->markers[$end] - $this->markers[$start];
+            return $end - $start;
         }
     }
 

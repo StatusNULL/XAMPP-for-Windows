@@ -11,7 +11,14 @@
 	$backslashrootreal[] = "$partwampp\php\\pecl.bat";
 	$backslashrootreal[] = "$partwampp\php\\phpdoc.bat";
 	$backslashrootreal[] = "$partwampp\php\\phing.bat";
-	$backslashrootreal[] = "$partwampp\php\\phpunit.bat";
+	$backslashrootreal[] = "$partwampp\php\\phpunit.bat";	
+	$backslashrootreal[] = "$partwampp\php\\procwatch-lint.cmd";
+	$backslashrootreal[] = "$partwampp\php\\php_beautifier.bat";
+	$backslashrootreal[] = "$partwampp\php\\pci.bat";
+	$backslashrootreal[] = "$partwampp\php\\procwatch.cmd";
+	$backslashrootreal[] = "$partwampp\php\Text\Highlighter\\generate.bat";
+	$backslashrootreal[] = "$partwampp\php\PEAR\PhpDocumentor\phpDocumentor\\IntermediateParser.inc";
+	$backslashrootreal[] = "$partwampp\php\PEAR\.registry\\pear.reg";  
 	$backslashrootreal[] = "$partwampp\php\pear\\pearcmd.php";
 	$backslashrootreal[] = "$partwampp\php\pear\\peclcmd.php";
 	$backslashrootreal[] = "$partwampp\cgi-bin\\cgi.cgi";

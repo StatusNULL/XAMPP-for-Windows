@@ -3,14 +3,20 @@
 /**
  * displays the pma logo, links and db and server selection in left frame
  *
- * @version $Id: navigation_header.inc.php 10868 2007-10-20 17:19:39Z lem9 $
+ * @version $Id: navigation_header.inc.php 11326 2008-06-17 21:32:48Z lem9 $
  */
+
+if (! defined('PHPMYADMIN')) {
+    exit;
+}
 
 /**
  *
  */
 if (empty($query_url)) {
-    $query_url = PMA_generate_common_url($db, $table);
+    // avoid putting here $db because it could display a db name
+    // to which the next user does not have access
+    $query_url = PMA_generate_common_url();
 }
 
 // display Logo, depending on $GLOBALS['cfg']['LeftDisplayLogo']
