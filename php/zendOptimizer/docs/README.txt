@@ -1,4 +1,4 @@
-                       Zend Optimizer(TM), version 3.2
+                       Zend Optimizer(TM), version 3.3
                        ===============================
 
 

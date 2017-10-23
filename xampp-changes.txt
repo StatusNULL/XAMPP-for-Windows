@@ -1,27 +1,23 @@
-13. Dez 2007 XAMPP 1.6.5 Beta 2
-- Upgrade php_xdebug-2.0.2-5.2.5.dll as php_xdebug.dll
+04. Jan 2008 XAMPP 1.6.6 RC1
+- Replace import\sql.php (phpmyadmin) with Revision 11006 (trunk)
+- Building new config.inc.php
+- Replace (mini)perl with Version 5.10.0
+ 
+31. Jan 2008 XAMPP 1.6.6 Beta 5 
+- add new Norwegian language file
+- recompile openssl for windows 2003 support
 
-11. Dez 2007 XAMPP 1.6.5 Beta 1
-- Upgrade PHP 5.2.5
-- Upgrade eAccelerator 0.9.5.2 für PHP 5.2.5
-- Upgrade MySQL 5.0.51
-- Upgrade phpMyAdmin 2.11.3
-- Upgrade FileZilla FTP Server 0.9.24
-- Upgrade ADOdb 4.96
-- Upgrade Mercury Mail Transport System v4.52
+30. Jan 2008 XAMPP 1.6.6 Beta 4
+- adapting for mod_perl
 
-19 Nov 2007 XAMPP 1.6.5 Beta 0
-- Upgrade OpenSSL 0.9.8g
+27. Jan 2008 XAMPP 1.6.6 Beta 3
+- new compilation php4apache2.dll ans php5apache2.dll with apache 2.2.8 src (vc 7.1)
 
-30 Sept 2007 XAMPP 1.6.4 Beta 3
-- Upgrade eAccelerator 0.9.5.2 für PHP 5.2.4
-- Upgrade phpMyAdmin 2.11.1
+26. Jan 2008 XAMPP 1.6.6 Beta 2
+- new compilation apache 2.2.8 (vc 7.1)
 
-23 Sept 2007 XAMPP 1.6.4 Beta 2
-- Fix (comment out) PHP (APC) problem
-- Fix XAMPP Control Problem
-
-20. Sept 2007 XAMPP 1.6.4 Beta 1
-- Upgrade Apache 2.2.6
-- Upgrade PHP 5.2.4
-- Upgrade phpMyAdmin 2.11.0
+21. Jan 2008 XAMPP 1.6.6 Beta 1
+- Upgrade Apache HTTPD 2.2.8 (vc 8.0) 
+- Upgrade FileZilla FTP Server 0.9.25
+- Upgrade phpMyAdmin 2.11.4
+- Upgrade PHP 4.4.8 rc2

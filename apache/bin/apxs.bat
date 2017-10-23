@@ -10,7 +10,7 @@ if %errorlevel% == 9009 echo You do not have Perl in your PATH.
 if errorlevel 1 goto script_failed_so_exit_with_non_zero_val 2>nul
 goto endofperl
 @rem ';
-#!C:\xampp\perl\bin\perl.EXE -w
+#!\xampp\perl\bin\perl.EXE -w
 #line 15
 # ====================================================================
 #
@@ -43,7 +43,7 @@ use File::Spec::Functions;
 
 my %config_vars = ();
 
-my $installbuilddir = 'H:\apache\build';
+my $installbuilddir = '\xampp\tmp';
 get_config_vars("$installbuilddir/config_vars.mk",\%config_vars);
 
 # read the configuration variables once
@@ -80,10 +80,10 @@ my %internal_vars = map {$_ => 1}
     qw(TARGET CC CFLAGS CFLAGS_SHLIB LD_SHLIB LDFLAGS_SHLIB LIBS_SHLIB
        PREFIX SBINDIR INCLUDEDIR LIBEXECDIR SYSCONFDIR SYSCONF);
 
-my $CP    = 'C:\xampp\perl\bin\perl.EXE -MExtUtils::Command -e cp';
-my $CHMOD = 'C:\xampp\perl\bin\perl.EXE -MExtUtils::Command -e chmod';
-my $RM_F  = 'C:\xampp\perl\bin\perl.EXE -MExtUtils::Command -e rm_f';
-my $TOUCH = 'C:\xampp\perl\bin\perl.EXE -MExtUtils::Command -e touch';
+my $CP    = '\xampp\perl\bin\perl.EXE -MExtUtils::Command -e cp';
+my $CHMOD = '\xampp\perl\bin\perl.EXE -MExtUtils::Command -e chmod';
+my $RM_F  = '\xampp\perl\bin\perl.EXE -MExtUtils::Command -e rm_f';
+my $TOUCH = '\xampp\perl\bin\perl.EXE -MExtUtils::Command -e touch';
 
 ##
 ##  parse argument line

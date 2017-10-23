@@ -64,9 +64,9 @@
 	$TEXT['status-python'] = "Python med mod_python";
 	$TEXT['status-mmcache'] = "PHP tilleggspakke »eAccelerator«";
 	$TEXT['status-mmcache-url'] = "http://www.apachefriends.org/faq-xampp-windows-en.html#mmcache";
-	$TEXT['status-smtp'] = "SMTP Service";
-	$TEXT['status-ftp'] = "FTP Service";
-	$TEXT['status-tomcat'] = "Tomcat Service";
+	$TEXT['status-smtp'] = "SMTP Tjeneste";
+	$TEXT['status-ftp'] = "FTP Tjeneste";
+	$TEXT['status-tomcat'] = "Tomcat Tjeneste";
 	$TEXT['status-named'] = "Navneserver (DNS/NS)";
 	$TEXT['status-oci8'] = "PHP tilleggspakke »OCI8/Oracle«";
 	$TEXT['status-oci8-url'] = "http://www.apachefriends.org/faq-lampp-en.html#oci8";
@@ -281,15 +281,15 @@
 	// FLASH KUNST EKSEMPEL
 	// ---------------------------------------------------------------------
 
-	$TEXT['flash-head'] = "Flash Art (Example for PHP+MING)";
-	$TEXT['flash-text1'] = "The MING project for win32 does not exist any longer and it is not complete.<br>Please read this: <a class=blue target=extern href=\"http://www.opaque.net/wiki/index.php?Ming\">Ming - an SWF output library and PHP module</a>";
+	$TEXT['flash-head'] = "Flash Art (Eksempel for PHP+MING)";
+	$TEXT['flash-text1'] = "MING prosjektet for win32 eksisterer ikke lengre og er ikke komplett.<br>Vennligst les denne:<a class=blue target=extern href=\"http://www.opaque.net/wiki/index.php?Ming\">Ming - en SWF bibliotek og Php Modul</a>";
 	$TEXT['flash-ok'] = "OK";
 
 	// ---------------------------------------------------------------------
 	// PHONE BOOK DEMO
 	// ---------------------------------------------------------------------
 
-	$TEXT['phonebook-head'] = "Phone Book (Example for PHP+SQLite)";
+	$TEXT['phonebook-head'] = "Telefonbok (Eksempel for  PHP+SQLite)";
 
 	$TEXT['phonebook-text1'] = "En veldig enkel telefonbok skript, med en veldig moderne og up-to-date teknologi: SQLite, SQL database uten server.";
 
@@ -339,7 +339,7 @@
 	<li>For all bruk av gateway servere: Vennligst sett din DNS via TCP/IP (f.e. via InterNic with the IP nr. 198.41.0.4);</li>
 	<li>konfigurasjonsfilen til  Mercury er kalt MERCURY.INI;</li>
 	<li>for å teste, vennligst sendt en melding til postmaster@localhost eller admin@localhost og sjekk for disse meldingene i følgende mappe: xampp.../mailserver/MAIL/postmaster eller (...)/admin;</li>
-	<li> en testbruker kalt \"newbruker\" (newbruker@localhost) med passordet = wampp;</li>
+	<li> en testbruker kalt \"newbruker\" (nybruker@localhost) med passordet = wampp;</li>
 	<li>spam og annen mail som inneholder mistenkelige scripts er totall forbudt med Mercury!;</li>
 	</ul>";
 	$TEXT['mail-url'] = "<a href=\"http://www.pmail.com/overviews/ovw_mercury.htm\" target=\"_top\">http://www.pmail.com/overviews/ovw_mercury.htm</a>";
@@ -377,7 +377,7 @@
 	// ---------------------------------------------------------------------
 
 	$TEXT['ADOdb-head'] = "ADOdb - Annen DB access (PHP)";
-	$TEXT['ADOdb-text'] = "ADOdb står for Active Data Objects Data Base. For øyeblikket har støtte for MySQL, PostgreSQL, Interbase, Firebird, Informix, Oracle, MS SQL 7, Foxpro, Access, ADO, Sybase, FrontBase, DB2, SAP DB, SQLite and generic ODBC. The Sybase, Informix, FrontBase and PostgreSQL drivers are community contributions. You find it here at \(mini)xampp\php\pear\adodb.";
+	$TEXT['ADOdb-text'] = "ADOdb står for Active Data Objects Data Base. For øyeblikket har støtte for MySQL, PostgreSQL, Interbase, Firebird, Informix, Oracle, MS SQL 7, Foxpro, Access, ADO, Sybase, FrontBase, DB2, SAP DB, SQLite og generisk ODBC. Sybase, Informix, FrontBase and PostgreSQL drivers er støttespillere. Du vil finne den her \(mini)xampp\php\pear\adodb.";
 	$TEXT['ADOdb-example'] = "Eksempel:";
 	$TEXT['ADOdb-dbserver'] = "Database server (MySQL, Oracle ..?)";
 	$TEXT['ADOdb-host'] = "Database server Host (name or IP)";
@@ -450,22 +450,22 @@
 	// NAVI SPECIALS SECTION
 	// ---------------------------------------------------------------------
 	
-	$TEXT['navi-specials'] = "Specials";
+	$TEXT['navi-specials'] = "Extra";
 	
 	// ---------------------------------------------------------------------
 	// PS AND PARADOX EXAMPLE
 	// ---------------------------------------------------------------------
 
     $TEXT['navi-ps'] = "PHP PostScript";
-	$TEXT['ps-head'] = "PostScript Module Example";
-	$TEXT['ps-text1'] = "PostScript Module »php_ps« by <a class=blue target=extern href=\"mailto:steinm@php.net\">Uwe Steinmann</a>";
-	$TEXT['ps-text2'] = "Tip: To convert PS files to PDF files on win32, you can use <a href=\"http://www.shbox.de/\" target=\"_new\">FreePDF</a> with <a href=\"http://www.ghostscript.com/awki/\" target=\"_new\">GhostScript</a>.";
+	$TEXT['ps-head'] = "PostScript Modul Eksempel";
+	$TEXT['ps-text1'] = "PostScript Modul »php_ps« av <a class=blue target=extern href=\"mailto:steinm@php.net\">Uwe Steinmann</a>";
+	$TEXT['ps-text2'] = "Tip: For å konvertere PS filer til PDF filer i  win32 system, du kan bruke <a href=\"http://www.shbox.de/\" target=\"_new\">FreePDF</a> med <a href=\"http://www.ghostscript.com/awki/\" target=\"_new\">GhostScript</a>.";
 	
 	$TEXT['navi-paradox'] = "PHP Paradox";
-	$TEXT['paradox-head'] = "Paradox Module Example";
-	$TEXT['paradox-text1'] = "Paradox Module »php_paradox« by <a class=blue target=extern href=\"mailto:steinm@php.net\">Uwe Steinmann</a>";
-	$TEXT['paradox-text2'] = "<h2>Reading and writing a paradox database</h2>";
-	$TEXT['paradox-text3'] = "More examples you can find in the directory ";
-	$TEXT['paradox-text4'] = "Further information to Paradox databases in <a href=\"http://en.wikipedia.org/wiki/Paradox\" target=\"_new\">WikiPedia</a>.";
+	$TEXT['paradox-head'] = "Paradox Modul Eksempel";
+	$TEXT['paradox-text1'] = "Paradox Modul »php_paradox« av <a class=blue target=extern href=\"mailto:steinm@php.net\">Uwe Steinmann</a>";
+	$TEXT['paradox-text2'] = "<h2>Lese og skrive en paradox database</h2>";
+	$TEXT['paradox-text3'] = "Flere eksempler kan du finne i mappen";
+	$TEXT['paradox-text4'] = "Mere informasjon til Paradox databaser på <a href=\"http://en.wikipedia.org/wiki/Paradox\" target=\"_new\">WikiPedia</a>.";
 
 ?>
