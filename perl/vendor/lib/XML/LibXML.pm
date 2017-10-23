@@ -27,7 +27,7 @@ use XML::LibXML::XPathContext;
 use IO::Handle; # for FH reads called as methods
 
 BEGIN {
-$VERSION = "1.98"; # VERSION TEMPLATE: DO NOT CHANGE
+$VERSION = "2.0003"; # VERSION TEMPLATE: DO NOT CHANGE
 $ABI_VERSION = 2;
 require Exporter;
 require DynaLoader;
@@ -1246,6 +1246,14 @@ sub finish_push {
 #-------------------------------------------------------------------------#
 package XML::LibXML::Node;
 
+use overload
+    '""'   => sub { $_[0]->toString() },
+    'bool' => sub { 1 },
+    '0+'   => sub { Scalar::Util::refaddr($_[0]) },
+    fallback => 1,
+    ;
+
+
 sub CLONE_SKIP {
   return $XML::LibXML::__threads_shared ? 0 : 1;
 }
@@ -1493,9 +1501,9 @@ use Scalar::Util qw(blessed);
 
 use overload
     '%{}'  => 'getAttributeHash',
-    'bool' => sub { 1 },
     'eq' => '_isSameNodeLax', '==' => '_isSameNodeLax',
     'ne' => '_isNotSameNodeLax', '!=' => '_isNotSameNodeLax',
+    fallback => 1,
     ;
 
 sub _isNotSameNodeLax {
@@ -1518,39 +1526,21 @@ sub _isSameNodeLax {
 }
 
 {
-    # Note that we could generate a new hashref each time this
-    # is called. However, that breaks "each %$element" and
-    # "keys %$element". So instead we consistently return the
-    # same reference to the same (tied) hash. To do that, we
-    # need to use a fieldhash. Hash::FieldHash requires at least
-    # Perl 5.8, but XML-LibXML already dropped support for older
-    # Perls since XML-LibXML-1.77.
-    #
-    # If Hash::FieldHash isn't available we can sort of do the
-    # same thing by relying upon the stringification of non-scalar
-    # hash keys, and performing a bit of cleanup in DESTROY.
-    #
     my %tiecache;
-    BEGIN
+
+    sub __destroy_tiecache
     {
-        if (eval { require Hash::FieldHash; 1 })
-        {
-            Hash::FieldHash::fieldhashes(\%tiecache);
-            *__destroy_tiecache = sub {};
-        }
-        else
-        {
-            *__destroy_tiecache = sub { delete $tiecache{ $_[0] } };
-        }
-    };
+        delete $tiecache{ 0+$_[0] };
+    }
+
     sub getAttributeHash
     {
         my $self = shift;
-        if (!exists $tiecache{ $self }) {
+        if (!exists $tiecache{ 0+$self }) {
             tie my %attr, 'XML::LibXML::AttributeHash', $self, weaken => 1;
-            $tiecache{ $self } = \%attr;
+            $tiecache{ 0+$self } = \%attr;
         }
-        return $tiecache{ $self };
+        return $tiecache{ 0+$self };
     }
     sub DESTROY
     {

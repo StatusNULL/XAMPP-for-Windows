@@ -18,7 +18,7 @@ my %fatpacked;
 
 $fatpacked{"App/cpanminus.pm"} = <<'APP_CPANMINUS';
   package App::cpanminus;
-  our $VERSION = "1.5013";
+  our $VERSION = "1.5017";
   
   =head1 NAME
   
@@ -326,7 +326,7 @@ $fatpacked{"App/cpanminus/script.pm"} = <<'APP_CPANMINUS_SCRIPT';
   use constant WIN32 => $^O eq 'MSWin32';
   use constant SUNOS => $^O eq 'solaris';
   
-  our $VERSION = "1.5013";
+  our $VERSION = "1.5017";
   
   my $quote = WIN32 ? q/"/ : q/'/;
   
@@ -833,7 +833,7 @@ $fatpacked{"App/cpanminus/script.pm"} = <<'APP_CPANMINUS_SCRIPT';
   !   - Configure local::lib your existing local::lib in this shell to set PERL_MM_OPT etc.
   !   - Install local::lib by running the following commands
   !
-  !         cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+  !         cpanm --local-lib=~/perl5 local::lib && eval \$(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
   !
   DIAG
       sleep 2;
@@ -1677,8 +1677,8 @@ $fatpacked{"App/cpanminus/script.pm"} = <<'APP_CPANMINUS_SCRIPT';
       my($self, $dist) = @_;
   
       if (-e 'cpanfile' && $self->{installdeps}) {
-          require CPAN::cpanfile;
-          $dist->{cpanfile} = eval { CPAN::cpanfile->load('cpanfile') };
+          require Module::CPANfile;
+          $dist->{cpanfile} = eval { Module::CPANfile->load('cpanfile') };
           return {
               configured       => 1,
               configured_ok    => !!$dist->{cpanfile},
@@ -1900,7 +1900,7 @@ $fatpacked{"App/cpanminus/script.pm"} = <<'APP_CPANMINUS_SCRIPT';
           $self->chat("Finding PREREQ from Makefile ...\n");
           open my $mf, "Makefile";
           while (<$mf>) {
-              if (/^\#\s+PREREQ_PM => {\s*(.*?)\s*}/) {
+              if (/^\#\s+PREREQ_PM => \{\s*(.*?)\s*\}/) {
                   my @all;
                   my @pairs = split ', ', $1;
                   for (@pairs) {
@@ -2184,17 +2184,25 @@ $fatpacked{"App/cpanminus/script.pm"} = <<'APP_CPANMINUS_SCRIPT';
           $self->{_backends}{untar} = sub {
               my($self, $tarfile) = @_;
   
-              my $xf = "xf" . ($self->{verbose} ? 'v' : '');
+              my $xf = ($self->{verbose} ? 'v' : '')."xf";
               my $ar = $tarfile =~ /bz2$/ ? 'j' : 'z';
   
-              my($root, @others) = `$tar tf$ar $tarfile`
+              my($root, @others) = `$tar ${ar}tf $tarfile`
                   or return undef;
   
-              chomp $root;
-              $root =~ s!^\./!!;
-              $root =~ s{^(.+?)/.*$}{$1};
+              FILE: {
+                  chomp $root;
+                  $root =~ s!^\./!!;
+                  $root =~ s{^(.+?)/.*$}{$1};
   
-              system "$tar $xf$ar $tarfile";
+                  if (!length($root)) {
+                      # archive had ./ as the first entry, so try again
+                      $root = shift(@others);
+                      redo FILE if $root;
+                  }
+              }
+  
+              system "$tar $ar$xf $tarfile";
               return $root if -d $root;
   
               $self->diag_fail("Bad archive: $tarfile");
@@ -2213,8 +2221,17 @@ $fatpacked{"App/cpanminus/script.pm"} = <<'APP_CPANMINUS_SCRIPT';
               my($root, @others) = `$ar -dc $tarfile | $tar tf -`
                   or return undef;
   
-              chomp $root;
-              $root =~ s{^(.+?)/.*$}{$1};
+              FILE: {
+                  chomp $root;
+                  $root =~ s!^\./!!;
+                  $root =~ s{^(.+?)/.*$}{$1};
+  
+                  if (!length($root)) {
+                      # archive had ./ as the first entry, so try again
+                      $root = shift(@others);
+                      redo FILE if $root;
+                  }
+              }
   
               system "$ar -dc $tarfile | $tar $x";
               return $root if -d $root;
@@ -2227,8 +2244,17 @@ $fatpacked{"App/cpanminus/script.pm"} = <<'APP_CPANMINUS_SCRIPT';
           $self->{_backends}{untar} = sub {
               my $self = shift;
               my $t = Archive::Tar->new($_[0]);
-              my $root = ($t->list_files)[0];
-              $root =~ s{^(.+?)/.*$}{$1};
+              my($root, @others) = $t->list_files;
+              FILE: {
+                  $root =~ s!^\./!!;
+                  $root =~ s{^(.+?)/.*$}{$1};
+  
+                  if (!length($root)) {
+                      # archive had ./ as the first entry, so try again
+                      $root = shift(@others);
+                      redo FILE if $root;
+                  }
+              }
               $t->extract;
               return -d $root ? $root : undef;
           };
@@ -8123,6 +8149,195 @@ $fatpacked{"JSON/PP/Boolean.pm"} = <<'JSON_PP_BOOLEAN';
   1;
   
 JSON_PP_BOOLEAN
+
+$fatpacked{"Module/CPANfile.pm"} = <<'MODULE_CPANFILE';
+  package Module::CPANfile;
+  use strict;
+  use warnings;
+  use Cwd;
+  
+  our $VERSION = '0.9007';
+  
+  sub new {
+      my($class, $file) = @_;
+      bless {}, $class;
+  }
+  
+  sub load {
+      my($proto, $file) = @_;
+      my $self = ref $proto ? $proto : $proto->new;
+      $self->{file} = $file || "cpanfile";
+      $self->parse;
+      $self;
+  }
+  
+  sub parse {
+      my $self = shift;
+  
+      my $file = Cwd::abs_path($self->{file});
+      $self->{result} = Module::CPANfile::Environment::parse($file) or die $@;
+  }
+  
+  sub prereqs { shift->prereq }
+  
+  sub prereq {
+      my $self = shift;
+      require CPAN::Meta::Prereqs;
+      CPAN::Meta::Prereqs->new($self->prereq_specs);
+  }
+  
+  sub prereq_specs {
+      my $self = shift;
+      $self->{result}{spec};
+  }
+  
+  package Module::CPANfile::Environment;
+  use strict;
+  
+  my @bindings = qw(
+      on requires recommends suggests conflicts
+      osname perl
+      configure_requires build_requires test_requires author_requires
+  );
+  
+  my $file_id = 1;
+  
+  sub import {
+      my($class, $result_ref) = @_;
+      my $pkg = caller;
+  
+      $$result_ref = Module::CPANfile::Result->new;
+      for my $binding (@bindings) {
+          no strict 'refs';
+          *{"$pkg\::$binding"} = sub { $$result_ref->$binding(@_) };
+      }
+  }
+  
+  sub parse {
+      my $file = shift;
+  
+      my $code = do {
+          open my $fh, "<", $file or die "$file: $!";
+          join '', <$fh>;
+      };
+  
+      my($res, $err);
+  
+      {
+          local $@;
+          $res = eval sprintf <<EVAL, $file_id++;
+  package Module::CPANfile::Sandbox%d;
+  no warnings;
+  my \$_result;
+  BEGIN { import Module::CPANfile::Environment \\\$_result };
+  
+  $code;
+  
+  \$_result;
+  EVAL
+          $err = $@;
+      }
+  
+      if ($err) { die "Parsing $file failed: $err" };
+  
+      return $res;
+  }
+  
+  package Module::CPANfile::Result;
+  use strict;
+  
+  sub new {
+      bless {
+          phase => 'runtime', # default phase
+          spec  => {},
+      }, shift;
+  }
+  
+  sub on {
+      my($self, $phase, $code) = @_;
+      local $self->{phase} = $phase;
+      $code->()
+  }
+  
+  sub osname { die "TODO" }
+  sub perl { die "TODO" }
+  
+  sub requires {
+      my($self, $module, $requirement) = @_;
+      $self->{spec}{$self->{phase}}{requires}{$module} = $requirement || 0;
+  }
+  
+  sub recommends {
+      my($self, $module, $requirement) = @_;
+      $self->{spec}->{$self->{phase}}{recommends}{$module} = $requirement || 0;
+  }
+  
+  sub suggests {
+      my($self, $module, $requirement) = @_;
+      $self->{spec}->{$self->{phase}}{suggests}{$module} = $requirement || 0;
+  }
+  
+  sub conflicts {
+      my($self, $module, $requirement) = @_;
+      $self->{spec}->{$self->{phase}}{conflicts}{$module} = $requirement || 0;
+  }
+  
+  # Module::Install compatible shortcuts
+  
+  sub configure_requires {
+      my($self, @args) = @_;
+      $self->on(configure => sub { $self->requires(@args) });
+  }
+  
+  sub build_requires {
+      my($self, @args) = @_;
+      $self->on(build => sub { $self->requires(@args) });
+  }
+  
+  sub test_requires {
+      my($self, @args) = @_;
+      $self->on(test => sub { $self->requires(@args) });
+  }
+  
+  sub author_requires {
+      my($self, @args) = @_;
+      $self->on(develop => sub { $self->requires(@args) });
+  }
+  
+  package Module::CPANfile;
+  
+  1;
+  
+  __END__
+  
+  =head1 NAME
+  
+  Module::CPANfile - Parse cpanfile
+  
+  =head1 SYNOPSIS
+  
+    use Module::CPANfile;
+  
+    my $file = Module::CPANfile->load("cpanfile");
+    my $prereqs = $file->prereqs; # CPAN::Meta::Prereqs object
+  
+  =head1 DESCRIPTION
+  
+  Module::CPANfile is a tool to handle L<cpanfile> format to load application
+  specific dependencies, not just for CPAN distributions.
+  
+  =head1 AUTHOR
+  
+  Tatsuhiko Miyagawa
+  
+  =head1 SEE ALSO
+  
+  L<cpanfile>, L<CPAN::Meta>, L<CPAN::Meta::Spec>
+  
+  =cut
+  
+  
+MODULE_CPANFILE
 
 $fatpacked{"Module/Metadata.pm"} = <<'MODULE_METADATA';
   # -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-

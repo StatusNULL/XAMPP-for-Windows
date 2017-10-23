@@ -9,9 +9,9 @@
 
 /* Package name      : perl5
  * Source directory  : 
- * Configuration time: Mon May 21 22:08:30 2012
+ * Configuration time: Thu Aug  9 09:55:53 2012
  * Configured by     : strawberry-perl
- * Target system     : Win32 strawberry-perl 5.16.0.1 #1 Mon May 21 22:07:30 2012 i386
+ * Target system     : Win32 strawberry-perl 5.16.1.1 #1 Thu Aug  9 09:54:46 2012 i386
  */
 
 #ifndef _config_h_

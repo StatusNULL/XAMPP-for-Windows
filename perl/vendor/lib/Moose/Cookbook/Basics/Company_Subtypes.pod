@@ -12,7 +12,7 @@ Moose::Cookbook::Basics::Company_Subtypes - Demonstrates the use of subtypes and
 
 =head1 VERSION
 
-version 2.0602
+version 2.0603
 
 =head1 SYNOPSIS
 

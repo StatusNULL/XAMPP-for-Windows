@@ -1,7 +1,18 @@
 
+# PODNAME: Sub::Exporter::Tutorial
+# ABSTRACT: a friendly guide to exporting with Sub::Exporter
+
+
+__END__
+=pod
+
 =head1 NAME
 
 Sub::Exporter::Tutorial - a friendly guide to exporting with Sub::Exporter
+
+=head1 VERSION
+
+version 0.984
 
 =head1 DESCRIPTION
 
@@ -166,7 +177,7 @@ example shows how a generator can take and use arguments:
   package Package::Counter;
 
   sub _build_counter {
-    my ($class, $arg) = @_;
+    my ($class, $name, $arg) = @_;
     $arg ||= {};
     my $i = $arg->{start} || 0;
     return sub { $i++ };
@@ -213,7 +224,7 @@ Sometimes you will want to accept arguments once that can then be available to
 any subroutine that you're going to export.  To do this, you specify
 collectors, like this:
 
-  use Menu::Airline
+  package Menu::Airline
   use Sub::Exporter -setup => {
     exports =>  ... ,
     groups  =>  ... ,
@@ -244,21 +255,26 @@ you can supply a generator for a group which returns a hashref of names and
 code references.  This generator is passed all the usual data, and the group
 may receive the usual C<-prefix> or C<-suffix> arguments.
 
-=head1 AUTHOR
-
-Ricardo SIGNES, C<< <rjbs@cpan.org> >>
-
 =head1 SEE ALSO
 
-=over
+=over 4
 
-=item * L<Sub::Exporter> for complete documentation and references to other exporters.
+=item *
+
+L<Sub::Exporter> for complete documentation and references to other exporters
 
 =back
 
-=head1 COPYRIGHT
+=head1 AUTHOR
 
-Copyright 2007 Ricardo SIGNES.  This program is free software;  you can
-redistribute it and/or modify it under the same terms as Perl itself.
+Ricardo Signes <rjbs@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2007 by Ricardo Signes.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
+

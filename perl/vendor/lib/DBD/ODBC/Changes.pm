@@ -1,10 +1,87 @@
+=encoding utf8
+
 =head1 NAME
 
 DBD::ODBC::Changes - Log of significant changes to the DBD::ODBC
 
-As of $LastChangedDate: 2012-04-07 14:53:28 +0100 (Sat, 07 Apr 2012) $
+As of $LastChangedDate: 2012-07-07 13:13:39 +0100 (Sat, 07 Jul 2012) $
 
 $Revision: 10667 $
+
+=head2 Changes in DBD::ODBC 1.39 July 7 2012
+
+  [BUG FIXES]
+
+  Manifest mentioned 2 files in examples which do not exist - they
+  should have been execute_for_fetch.pl.
+
+  execute_for_fetch.pl example had not be changed since
+  odbc_disable_array_operations became odbc_array_operations.
+
+=head2 Changes in DBD::ODBC 1.38_3 June 25 2012
+
+  [BUG FIXES]
+
+  Added encoding line to this file to stop pod test from complaining.
+
+  [DOCUMENTATION]
+
+  Added link to 64 bit ODBC article.
+
+  Fixed some typos in the pod.
+
+  [MISCELLANEOUS]
+
+  Made pod.t an author test.
+
+=head2 Changes in DBD::ODBC 1.38_2 May 24 2012
+
+  [ENHANCEMENTS]
+
+  Added support for Oracle TAF (assuming your ODBC driver supports it)
+  - see odbc_taf_callback.
+
+=head2 Changes in DBD::ODBC 1.38_1 May 19 2012
+
+  [BUG FIXES]
+
+  Fixed rt 77283. If you overrode the bind type as SQL_INTEGER in a bind_col
+  call AFTER previously binding as another type (or not specifying a type)
+  you would not get the right value back. This also fixes the DiscardString
+  bind_col attribute for SQL_INTEGER binds (however, see below as DiscardString
+  is no longer required for SQL_INTEGER).
+
+  Fixed some format specifiers in trace calls.
+
+  [CHANGE IN BEHAVIOUR]
+
+  DBD::ODBC allowed you to change the bound column type in bind_col
+  after the column was already bound. It now does not allow this
+  and issues a warning.
+
+  You can nolonger override the bound column type (except with
+  SQL_NUMERIC and SQL_DOUBLE). All columns are now bound as either
+  SQL_C_LONG (integer columns) or SQL_C_[W]CHAR (all other columns).
+  If you are calling bind_col with a TYPE => xxx it most likely did
+  not do what you expected and you should examine it carefully with a
+  view to removing it altogether. As a result you no longer have to
+  override the bind type for MS SQL Server XML columns - these will be
+  bound as SQL_C_CHAR or SQL_C_WCHAR depending on whether Unicode is
+  enabled.
+
+  Integer columns are now bound as SQL_C_LONGs and not as before,
+  SQL_C_CHAR. This should not matter to you but if you were adding 0
+  to your integer columns retrieved to make them behave like integers
+  you should nolonger need to do it.
+
+  [OTHER]
+
+  Added some missing SQL_C_xxx types to S_SqlCTypeToString internal
+  function. This only affects tracing.
+
+  Some tests in 08bind were skipped when they did not need to be.
+
+  sql_type_cast tests rewritten due to fixes above.
 
 =head2 Changes in DBD::ODBC 1.37 April 7 2012
 
@@ -225,7 +302,7 @@ $Revision: 10667 $
   [OTHER]
 
   * Added example execute_for_fetch.pl
-  
+
 =head2 Changes in DBD::ODBC 1.34_1 December 11 2011
 
   [ENHANCEMENTS]
@@ -301,7 +378,7 @@ $Revision: 10667 $
 
   * I omitted rt_68720.t from the 1.31 distribution which leads
     to a warning as it is mentioned in the MANIFEST.
- 
+
   [OTHER]
 
   * Changed line endings in README.af and README.unicode to be unix

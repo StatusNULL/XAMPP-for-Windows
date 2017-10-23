@@ -10,11 +10,8 @@ if %errorlevel% == 9009 echo You do not have Perl in your PATH.
 if errorlevel 1 goto script_failed_so_exit_with_non_zero_val 2>nul
 goto endofperl
 @rem ';
-#!perl
-#line 15
-    eval 'exec C:\strawberry\perl\bin\perl.exe -S $0 ${1+"$@"}'
-	if $running_under_some_shell;
 #!/usr/bin/perl -w
+#line 15
 
 use strict;
 use App::Prove;
@@ -160,7 +157,7 @@ If you need to make sure your diagnostics are displayed in the correct
 order relative to test results you can use the C<--merge> option to
 merge the test scripts' STDERR into their STDOUT.
 
-This guarantees that STDOUT (where the test results appear) and STDOUT
+This guarantees that STDOUT (where the test results appear) and STDERR
 (where the diagnostics appear) will stay in sync. The harness will
 display any diagnostics your tests emit on STDERR.
 

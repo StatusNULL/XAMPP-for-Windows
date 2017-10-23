@@ -12,7 +12,7 @@ Moose::Manual::Unsweetened - Moose idioms in plain old Perl 5 without the sugar
 
 =head1 VERSION
 
-version 2.0602
+version 2.0603
 
 =head1 DESCRIPTION
 

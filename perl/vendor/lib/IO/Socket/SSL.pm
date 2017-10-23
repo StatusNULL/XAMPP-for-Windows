@@ -61,24 +61,48 @@ use vars qw(@ISA $VERSION $DEBUG $SSL_ERROR $GLOBAL_CONTEXT_ARGS @EXPORT );
 }
 
 my @caller_force_inet4; # in case inet4 gets forced we store here who forced it
-my $can_ipv6;           # true if we successfully enabled ipv6 while loading
 
 BEGIN {
 	# Declare @ISA, $VERSION, $GLOBAL_CONTEXT_ARGS
 
-	# if we have IO::Socket::INET6 we will use this not IO::Socket::INET, because
-	# it can handle both IPv4 and IPv6. If we don't have INET6 available fall back
-	# to INET
-	if ( ! eval {
-		require Socket6;
-		Socket6->import( 'inet_pton' );
-		require IO::Socket::INET6;
-		@ISA = qw(IO::Socket::INET6);
-		$can_ipv6 = 1;
-	}) {
-		@ISA = qw(IO::Socket::INET);
+	# try to load inet_pton from Socket or Socket6
+	my $ip6 = eval {
+	    require Socket;
+	    Socket->VERSION(1.95);
+	    Socket->import( 'inet_pton' );
+	    1;
+	} || eval {
+	    require Socket6;
+	    Socket6->import( 'inet_pton' );
+	    1;
+	};
+
+	# try IO::Socket::IP or IO::Socket::INET6 for IPv6 support
+	if ( $ip6 ) {
+
+	    # if we have IO::Socket::IP >= 0.11 we will use this in preference
+	    # because it can handle both IPv4 and IPv6
+	    if ( eval { require IO::Socket::IP; IO::Socket::IP->VERSION(0.11); } ) {
+		    @ISA = qw(IO::Socket::IP);
+		    constant->import( CAN_IPV6 => "IO::Socket::IP" );
+
+	    # if we have IO::Socket::INET6 we will use this not IO::Socket::INET
+	    # because it can handle both IPv4 and IPv6
+	    } elsif( eval { require IO::Socket::INET6; } ) {
+		    @ISA = qw(IO::Socket::INET6);
+		    constant->import( CAN_IPV6 => "IO::Socket::INET6" );
+	    } else {
+		    $ip6 = 0;
+	    }
 	}
-	$VERSION = '1.74';
+
+	# fall back to IO::Socket::INET for IPv4 only
+	if ( ! $ip6 ) {
+		@ISA = qw(IO::Socket::INET);
+		constant->import( CAN_IPV6 => '' );
+	}
+
+	$VERSION = '1.76';
 	$GLOBAL_CONTEXT_ARGS = {};
 
 	#Make $DEBUG another name for $Net::SSLeay::trace
@@ -151,11 +175,11 @@ sub import {
 				# either we don't support it or we disabled it by explicitly
 				# loading it with 'inet4'. In this case re-enable but warn
 				# because this is probably an error
-				if ( $can_ipv6 ) {
-					@ISA = 'IO::Socket::INET6';
+				if ( CAN_IPV6 ) {
+					@ISA = ( CAN_IPV6 );
 					warn "IPv6 support re-enabled in __PACKAGE__, got disabled in file $caller_force_inet4[1] line $caller_force_inet4[2]";
 				} else {
-					die "INET6 is not supported, missing Socket6 or IO::Socket::INET6";
+					die "INET6 is not supported, install IO::Socket::INET6";
 				}
 			}
 		} elsif ( /^:?debug(\d+)/ ) {
@@ -185,7 +209,7 @@ sub configure {
 	# work around Bug in IO::Socket::INET6 where it doesn't use the
 	# right family for the socket on BSD systems:
 	# http://rt.cpan.org/Ticket/Display.html?id=39550
-	if ( $can_ipv6 && ! $arg_hash->{Domain} &&
+	if ( CAN_IPV6 eq "IO::Socket::INET6" && ! $arg_hash->{Domain} &&
 		! ( $arg_hash->{LocalAddr} || $arg_hash->{LocalHost} ) &&
 		(my $peer = $arg_hash->{PeerAddr} || $arg_hash->{PeerHost})) {
 		# set Domain to AF_INET/AF_INET6 if there is only one choice
@@ -1185,11 +1209,8 @@ sub dump_peer_certificate {
 		# is the given hostname an IP address? Then we have to convert to network byte order [RFC791][RFC2460]
 
 		my $ipn;
-		if ( $identity =~m{:} ) {
+		if ( CAN_IPV6 and $identity =~m{:} ) {
 			# no IPv4 or hostname have ':'	in it, try IPv6.
-			#  make sure that Socket6 was loaded properly
-			UNIVERSAL::can( __PACKAGE__, 'inet_pton' ) or croak
-				q[Looks like IPv6 address, make sure that Socket6 is loaded or make "use IO::Socket::SSL 'inet6'];
 			$ipn = inet_pton(AF_INET6,$identity) 
 				or croak "'$identity' is not IPv6, but neither IPv4 nor hostname";
 		} elsif ( $identity =~m{^\d+\.\d+\.\d+\.\d+$} ) {
@@ -1458,16 +1479,18 @@ sub new {
 	my $ver;
 	my $disable_ver = 0;
 	for (split(/\s*:\s*/,$arg_hash->{SSL_version})) {
-	    m{^(!?)(?:(SSL(?:v2|v3|v23|v2/3))|(TLSv1))$}i 
+	    m{^(!?)(?:(SSL(?:v2|v3|v23|v2/3))|(TLSv1[12]?))$}i 
 		or croak("invalid SSL_version specified");
 	    my $not = $1;
 	    ( my $v = lc($2||$3) ) =~s{^(...)}{\U$1};
 	    $v =~s{/}{}; # interpret SSLv2/3 as SSLv23
 	    if ( $not ) {
 		$disable_ver |= 
-		    $v eq 'SSLv2' ? 0x01000000 : # SSL_OP_NO_SSLv2 
-		    $v eq 'SSLv3' ? 0x02000000 : # SSL_OP_NO_SSLv3 
-		    $v eq 'TLSv1' ? 0x04000000 : # SSL_OP_NO_TLSv1
+		    $v eq 'SSLv2'  ? 0x01000000 : # SSL_OP_NO_SSLv2 
+		    $v eq 'SSLv3'  ? 0x02000000 : # SSL_OP_NO_SSLv3 
+		    $v eq 'TLSv1'  ? 0x04000000 : # SSL_OP_NO_TLSv1
+		    $v eq 'TLSv11' ? 0x00000400 : # SSL_OP_NO_TLSv1_1
+		    $v eq 'TLSv12' ? 0x08000000 : # SSL_OP_NO_TLSv1_2
 		    croak("cannot disable version $_");
 	    } else {
 		croak("cannot set multiple SSL protocols in SSL_version")
@@ -1801,17 +1824,21 @@ side.
 
 =item SSL_version
 
-Sets the version of the SSL protocol used to transmit data. The default is 'SSLv23',
-which auto-negotiates between SSLv2 and SSLv3.	You may specify 'SSLv2', 'SSLv3', or
-'TLSv1' (case-insensitive) if you do not want this behavior.
+Sets the version of the SSL protocol used to transmit data. 'SSLv23' auto-negotiates 
+between SSLv2 and SSLv3, while 'SSLv2', 'SSLv3' or 'TLSv1' restrict the protocol
+to the specified version. All values are case-insensitive.
 
 You can limit to set of supported protocols by adding !version separated by ':'.
-The default is 'SSLv23:!SSLv2' which means, that SSLv2, SSLv3 and TLSv1 are supported
-for initial protocol handshakes, but SSLv2 will not be accepted, leaving only
-SSLv3 and TLSv1.  
+
+The default SSL_version is 'SSLv23:!SSLv2' which means, that SSLv2, SSLv3 and TLSv1 
+are supported for initial protocol handshakes, but SSLv2 will not be accepted, leaving 
+only SSLv3 and TLSv1. You can also use !TLSv11 and !TLSv12 to disable TLS versions
+1.1 and 1.2 while allowing TLS version 1.0.
 
 Setting the version instead to 'TLSv1' will probably break interaction with lots of
-clients which start with SSLv2 and then upgrade to TLSv1.
+clients which start with SSLv2 and then upgrade to TLSv1. On the other side some
+clients just close the connection when they receive a TLS version 1.1 request. In this 
+case setting the version to 'SSLv23:!SSLv2:!TLSv11:!TLSv12' might help.
 
 =item SSL_cipher_list
 

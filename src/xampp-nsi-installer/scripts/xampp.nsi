@@ -3,217 +3,88 @@
 ;---------------------
 ;Include Modern UI
    !include "MUI.nsh"
+   ; !include "MUI2.nsh"
 ;--------------------------------
 
-SetCompressor /solid lzma
-XPStyle on
-; HM NIS Edit Wizard helper defines
+
+  SetCompressor /solid lzma
+  XPStyle on
+  ; HM NIS Edit Wizard helper defines
   !define PRODUCT_NAME "XAMPP"
-  !define PRODUCT_VERSION "1.8.0"
+  !define PRODUCT_VERSION "1.8.1"
   !define PRODUCT_PUBLISHER "Kay Vogelgesang, Kai Oswald Seidler, ApacheFriends"
   !define PRODUCT_WEB_SITE "http://www.apachefriends.org"
-Caption "XAMPP ${PRODUCT_VERSION} win32"
-InstallDirRegKey HKLM "Software\xampp" "Install_Dir"
-; InstallDirRegKey HKCU "Software\xampp" ""
-Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile "F:\xampp-dev\xampp-win32-${PRODUCT_VERSION}-VC9-installer.exe"
-;Vista redirects $SMPROGRAMS to all users without this
-RequestExecutionLevel admin
-BGGradient f87820 FFFFFF FFFFFF
-InstallColors FF8080 000030
-CheckBitmap "${NSISDIR}\Contrib\Graphics\Checks\classic-cross.bmp"
+  Caption "XAMPP ${PRODUCT_VERSION} win32"
+  InstallDirRegKey HKLM "Software\xampp" "Install_Dir"
+  Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
+  OutFile "F:\xampp-dev\xampp-win32-${PRODUCT_VERSION}-VC9-installer.exe"
+  RequestExecutionLevel admin
+  BGGradient f87820 FFFFFF FFFFFF
+  InstallColors FF8080 000030
+  CheckBitmap "${NSISDIR}\Contrib\Graphics\Checks\classic-cross.bmp"
 
 ;--------------------------------
-;Language Selection Dialog Settings
 
 ;Remember the installer language
   !define MUI_LANGDLL_REGISTRY_ROOT "HKLM"
   !define MUI_LANGDLL_REGISTRY_KEY "Software\xampp"
   !define MUI_LANGDLL_REGISTRY_VALUENAME "lang"
 
-;--------------------------------
-
-; MUI Settings
   !define MUI_ABORTWARNING
-  !define MUI_ICON "C:\xampp\src\xampp-nsi-installer\icons\xampp-icon.ico"
-  !define MUI_UNICON "C:\xampp\src\xampp-nsi-installer\icons\xampp-icon-uninstall.ico"
+  !define MUI_ICON "F:\xampp-dev\svn\trunk\xampp\src\xampp-nsi-installer\icons\xampp-icon.ico"
+  !define MUI_UNICON "F:\xampp-dev\svn\trunk\xampp\src\xampp-nsi-installer\icons\xampp-icon-uninstall.ico"
   !define MUI_WELCOMEPAGE
   !define MUI_CUSTOMPAGECOMMANDS
   !define MUI_COMPONENTSPAGE
   !define MUI_COMPONENTSPAGE_NODESC
-
-; Welcome page
+  
+;Pages
   !insertmacro MUI_PAGE_WELCOME
-; Components
-; !insertmacro MUI_PAGE_COMPONENTS
-; License page
-;!insertmacro MUI_PAGE_LICENSE "${NSISDIR}\license.txt"
-; Directory page
+  !insertmacro MUI_PAGE_COMPONENTS
   !insertmacro MUI_PAGE_DIRECTORY
-             Page custom CustomPageC
-; Instfiles page
   !insertmacro MUI_PAGE_INSTFILES
-; Finish page
   !insertmacro MUI_PAGE_FINISH
+
+  !insertmacro MUI_UNPAGE_WELCOME
   !insertmacro MUI_UNPAGE_CONFIRM
   !insertmacro MUI_UNPAGE_INSTFILES
+  !insertmacro MUI_UNPAGE_FINISH
 
-;--------------------------------
+;Resevefiles
+  ;!insertmacro MUI_RESERVEFILE_LANGDLL
+  ;!insertmacro MUI_RESERVEFILE_INSTALLOPTIONS
 
 ;Languages
-
   !insertmacro MUI_LANGUAGE "English" # first language is the default language
   !insertmacro MUI_LANGUAGE "German"
-  ; !insertmacro MUI_LANGUAGE "Japanese"
-
-;--------------------------------
-;Reserve Files
-
-  ;These files should be inserted before other files in the data block
-  ;Keep these lines before any File command
-  ;Only for solid compression (by default, solid compression is enabled for BZIP2 and LZMA)
-
-  ReserveFile "xampp.ini"
-  ; ReserveFile "xampp-japanese.ini"
-  ReserveFile "xampp_home.ini"
- ;  ReserveFile "xampp_home-japanese.ini"
-  ReserveFile "xampp-german.ini"
-  ReserveFile "xampp_home-german.ini"
-
-  !insertmacro MUI_RESERVEFILE_LANGDLL
-  !insertmacro MUI_RESERVEFILE_INSTALLOPTIONS
-
+ 
 ;--------------------------------
 ;Variables
-
-  Var INI_VALUE
-  Var INI_VALUE2
-  Var INI_VALUE3
-  Var INI_VALUE4
-  Var INI_VALUE5
   Var INST_MESS
   Var INST_MESS1
   Var INST_MESS2
-  Var INST_MESS3
-  Var INST_MESS4
   Var MESS_INSTDIR1
   Var MESS_INSTDIR2
   Var DB_DEL
-  Var NO_DEL
+  Var OPT_MYSQL
+  Var OPT_FTPD
+  Var OPT_MERCUR
+  Var OPT_TOMCAT
+  Var OPT_PERL
+  Var OPT_PMA
+  Var OPT_WEBA
   
 InstallDir "c:\xampp"
-Icon "C:\xampp\src\xampp-nsi-installer\icons\xampp-icon.ico"
-UninstallIcon "C:\xampp\src\xampp-nsi-installer\icons\xampp-icon-uninstall.ico"
+Icon "F:\xampp-dev\svn\trunk\xampp\src\xampp-nsi-installer\icons\xampp-icon.ico"
+UninstallIcon "F:\xampp-dev\svn\trunk\xampp\src\xampp-nsi-installer\icons\xampp-icon-uninstall.ico"
 ShowInstDetails show
 ShowUninstDetails show
 
-Section "XAMPP Files" SEC01
-SetOutPath "$INSTDIR"
-SetOverwrite ifnewer
-File /r "F:\release180\release\xampp\*.*"
-ExecWait '"$INSTDIR\php\php.exe" -n -d output_buffering=0 "$INSTDIR\install\install.php"' $4
-
-WriteRegStr HKLM "Software\xampp" "Install_Dir" "$INSTDIR"
-WriteRegStr HKLM "Software\xampp" "apache" "2217"
-WriteRegStr HKLM "Software\xampp" "version" "1750"
-WriteRegStr HKLM "Software\xampp" "apacheservice" "0"
-WriteRegStr HKLM "Software\xampp" "mysqlservice" "0"
-WriteRegStr HKLM "Software\xampp" "tomcatservice" "0"
-WriteRegStr HKLM "Software\xampp" "filezillainstall" "1"
-WriteRegStr HKLM "Software\xampp" "filezillaservice" "0"
-WriteRegStr HKLM "Software\xampp" "mercuryinstall" "1"
-WriteRegStr HKLM "Software\xampp" "addonperl" "1"
-WriteRegStr HKLM "Software\xampp" "addonpython" "0"
-WriteRegStr HKLM "Software\xampp" "addontomcat" "1"
-WriteRegStr HKLM "Software\xampp" "addoncocoon" "0"
-WriteRegStr HKLM "Software\xampp" "programfiles" "0"
-WriteRegStr HKLM "Software\xampp" "desktopicon" "0"
-WriteRegStr HKLM "Software\xampp" "services" "0"
-WriteRegStr HKLM "Software\xampp" "lang" "$LANGUAGE"
-WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\xampp" "DisplayName" "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\xampp" "UninstallString" '"$INSTDIR\uninstall.exe"'
-WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\xampp" "NoModify" 1
-WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\xampp" "NoRepair" 1
-WriteUninstaller "$INSTDIR\Uninstall.exe"
-
-ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion" CurrentVersion
-   StrCmp $R0 "" 0 NTsec
-   MessageBox MB_OK "No Service Installation avaible on Windows 98/ME/Home"
-  ; StrCmp $LANGUAGE "1041" japanese1
-   StrCmp $LANGUAGE "1031" german1
-  ;Read a value from an InstallOptions INI file
-  !insertmacro MUI_INSTALLOPTIONS_READ $INI_VALUE "xampp_home.ini" "Field 2" "State"
-  !insertmacro MUI_INSTALLOPTIONS_READ $INI_VALUE2 "xampp_home.ini" "Field 4" "State"
-  Goto no_srv
-  german1:
-  !insertmacro MUI_INSTALLOPTIONS_READ $INI_VALUE "xampp_home-german.ini" "Field 2" "State"
-  !insertmacro MUI_INSTALLOPTIONS_READ $INI_VALUE2 "xampp_home-german.ini" "Field 4" "State"
-   Goto no_srv
- ; japanese1:
- ; !insertmacro MUI_INSTALLOPTIONS_READ $INI_VALUE "xampp_home-japanese.ini" "Field 2" "State"
- ; !insertmacro MUI_INSTALLOPTIONS_READ $INI_VALUE2 "xampp_home-japanese.ini" "Field 4" "State"
- ;  Goto no_srv
-NTsec:
-; FULL SERVICES --------------
-  ; StrCmp $LANGUAGE "1041" japanese2
-   StrCmp $LANGUAGE "1031" german2
-  ;Read a value from an InstallOptions INI file
-  !insertmacro MUI_INSTALLOPTIONS_READ $INI_VALUE "xampp.ini" "Field 2" "State"
-  !insertmacro MUI_INSTALLOPTIONS_READ $INI_VALUE2 "xampp.ini" "Field 4" "State"
-  !insertmacro MUI_INSTALLOPTIONS_READ $INI_VALUE3 "xampp.ini" "Field 6" "State"
-  !insertmacro MUI_INSTALLOPTIONS_READ $INI_VALUE4 "xampp.ini" "Field 7" "State"
-  !insertmacro MUI_INSTALLOPTIONS_READ $INI_VALUE5 "xampp.ini" "Field 8" "State"
-  Goto defaultlang2
-  german2:
-  !insertmacro MUI_INSTALLOPTIONS_READ $INI_VALUE "xampp-german.ini" "Field 2" "State"
-  !insertmacro MUI_INSTALLOPTIONS_READ $INI_VALUE2 "xampp-german.ini" "Field 4" "State"
-  !insertmacro MUI_INSTALLOPTIONS_READ $INI_VALUE3 "xampp-german.ini" "Field 6" "State"
-  !insertmacro MUI_INSTALLOPTIONS_READ $INI_VALUE4 "xampp-german.ini" "Field 7" "State"
-  !insertmacro MUI_INSTALLOPTIONS_READ $INI_VALUE5 "xampp-german.ini" "Field 8" "State"
-  Goto defaultlang2
-  ; japanese2:
-  ; !insertmacro MUI_INSTALLOPTIONS_READ $INI_VALUE "xampp-japanese.ini" "Field 2" "State"
-  ; !insertmacro MUI_INSTALLOPTIONS_READ $INI_VALUE2 "xampp-japanese.ini" "Field 4" "State"
-  ; !insertmacro MUI_INSTALLOPTIONS_READ $INI_VALUE3 "xampp-japanese.ini" "Field 6" "State"
-  ; !insertmacro MUI_INSTALLOPTIONS_READ $INI_VALUE4 "xampp-japanese.ini" "Field 7" "State"
-  ; !insertmacro MUI_INSTALLOPTIONS_READ $INI_VALUE5 "xampp-japanese.ini" "Field 8" "State"
-  defaultlang2:
-
-  
-  StrCmp $INI_VALUE3 "1" "" noapache2
-  WriteRegStr HKLM "Software\xampp" "apacheservice" "1"
-  WriteRegStr HKLM "Software\xampp" "services" "1"
-  noapache2:
-  StrCmp $INI_VALUE4 "1" "" nomysql5
-  WriteRegStr HKLM "Software\xampp" "mysqlservice" "1"
-  WriteRegStr HKLM "Software\xampp" "services" "1"
-  nomysql5:
-  StrCmp $INI_VALUE5 "1" "" noftp2
-  WriteRegStr HKLM "Software\xampp" "filezillaservice" "1"
-  WriteRegStr HKLM "Software\xampp" "services" "1"
-  noftp2:
-  no_srv:
-
-StrCmp $INI_VALUE "1" "" nodesktop
-WriteRegStr HKLM "Software\xampp" "desktopicon" "1"
-nodesktop:
-StrCmp $INI_VALUE2 "1" "" noprofiles
-WriteRegStr HKLM "Software\xampp" "programfiles" "1"
-noprofiles:
-
-SectionEnd
-
-; ---------------------------------------
-
+;Fuctions
 Function .onInit
-  !insertmacro MUI_LANGDLL_DISPLAY
-  !insertmacro MUI_INSTALLOPTIONS_EXTRACT "xampp.ini"
- ; !insertmacro MUI_INSTALLOPTIONS_EXTRACT "xampp-japanese.ini"
-  !insertmacro MUI_INSTALLOPTIONS_EXTRACT "xampp_home.ini"
-  ; !insertmacro MUI_INSTALLOPTIONS_EXTRACT "xampp_home-japanese.ini"
-  !insertmacro MUI_INSTALLOPTIONS_EXTRACT "xampp-german.ini"
-  !insertmacro MUI_INSTALLOPTIONS_EXTRACT "xampp_home-german.ini"
 
+!insertmacro MUI_LANGDLL_DISPLAY
+; User Account Control (UAC) warning for VISTA/WIN7
   ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion" CurrentVersion
         StrCmp $R1 "6.0" detection_VISTA
         StrCmp $R1 "6.1" detection_VISTA
@@ -237,164 +108,182 @@ Function .onInit
                         IS_UACE:
                         MessageBox MB_OK "Important! Because an activated User Account Control (UAC) on your sytem some functions of XAMPP are possibly restricted. With UAC please avoid to install XAMPP to $PROGRAMFILES (missing write permisssions). Or deactivate UAC with msconfig after this setup."
                         no_vista:
+                        
+; Missing MS C++ 2008 runtime library warning here
+  ReadRegStr $R2 HKLM 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{FF66E9F6-83E7-3A3E-AF14-8DE9A809A6A4}' DisplayVersion
+  ReadRegStr $R3 HKLM 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{350AA351-21FA-3270-8B7A-835434E766AD}' DisplayVersion
+  ReadRegStr $R4 HKLM 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{2B547B43-DB50-3139-9EBE-37D419E0F5FA}' DisplayVersion
+
+  ReadRegStr $R5 HKLM 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{9A25302D-30C0-39D9-BD6F-21E6EC160475}' DisplayVersion
+  ReadRegStr $R6 HKLM 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{8220EEFE-38CD-377E-8595-13398D740ACE}' DisplayVersion
+  ReadRegStr $R7 HKLM 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{5827ECE1-AEB0-328E-B813-6FC68622C1F9}' DisplayVersion
+
+  ReadRegStr $R8 HKLM 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{1F1C2DFC-2D24-3E06-BCB8-725134ADF989}' DisplayVersion
+  ReadRegStr $R9 HKLM 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{4B6C7001-C7D6-3710-913E-5BC23FCE91E6}' DisplayVersion
+  ReadRegStr $R0 HKLM 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{977AD349-C2A8-39DD-9273-285C08987C7B}' DisplayVersion
+  
+  
+  ; VC 2010
+  ;ReadRegStr $A1 HKLM 'SOFTWARE\Microsoft\VisualStudio\10.0\VC\VCRedist\x86' Installed
+  ;ReadRegStr $A2 HKLM 'SOFTWARE\Microsoft\VisualStudio\10.0\VC\VCRedist\x64' Installed
+  ;ReadRegStr $A3 HKLM 'SOFTWARE\Microsoft\VisualStudio\10.0\VC\VCRedist\ia64' Installed
+  ;ReadRegStr $A4 HKLM 'SOFTWARE\Wow6432Node\Microsoft\VisualStudio\10.0\VC\VCRedist\x64' Installed
+  
+  StrCmp $R2 "" vc9_test2
+  GOTO init_end
+  vc9_test2:
+  StrCmp $R3 "" vc9_test3
+  GOTO init_end
+  vc9_test3:
+  StrCmp $R4 "" vc9_test4
+  GOTO init_end
+  vc9_test4:
+  StrCmp $R5 "" vc9_test5
+  GOTO init_end
+  vc9_test5:
+  StrCmp $R6 "" vc9_test6
+  GOTO init_end
+  vc9_test6:
+  StrCmp $R7 "" vc9_test7
+  GOTO init_end
+  vc9_test7:
+  StrCmp $R8 "" vc9_test8
+  GOTO init_end
+  vc9_test8:
+  StrCmp $R9 "" vc9_test9
+  GOTO init_end
+  vc9_test9:
+  StrCmp $R0 "" no_vc9
+  GOTO init_end
+
+  no_vc9:
+        StrCmp $LANGUAGE "1031" lang_de
+               MessageBox MB_YESNO "Warning: XAMPP (PHP) cannot work without the Microsoft Visual C++ 2008 Redistributable Package. Now open the Microsoft page for this download?" IDNO MsPageOut
+               ;MessageBox MB_YESNO "MS C++ 2008 runtime package not found! It is required for PHP. Now open the Microsoft site for this download?" IDNO MsPageOut
+               ExecShell "open" "http://www.microsoft.com/en-us/download/details.aspx?id=5582"
+               GOTO MsPageOut
+               lang_de:
+               MessageBox MB_YESNO "Warnung: XAMPP (PHP) benigt das Microsoft Visual C++ 2008 Redistributable Package! Die Microsoft Seite f�r diesen Download jetzt fnen?" IDNO MsPageOut
+               ; MessageBox MB_YESNO "MS C++ 2008 runtime Installation fehlt auf Ihrem Rechner! Diese wird f�r PHP benigt. Die Microsoft Seite f�r diesen Download jetzt fnen?" IDNO MsPageOut
+               ExecShell "open" "http://www.microsoft.com/en-us/download/details.aspx?id=5582"
+        MsPageOut:
+               ; StrCmp $LANGUAGE "1031" lang_de2
+               ; MessageBox MB_YESNO "Perhaps XAMPP do not work without the MS VC++ 2008 runtime library. Still go on with the XAMPP installation?" IDNO GoOut
+               ; GOTO init_end
+               ; lang_de2:
+               ; MessageBox MB_YESNO "Ohne die MS VC++ 2008 Runtime Bibliothek knte XAMPP nicht funktionieren! Die XAMPP Installation trotzdem weiterf�hren?" IDNO GoOut
+               ; GOTO init_end
+               ; GoOut:
+               ; Abort "Exit by user."
+  init_end:
 FunctionEnd
 
-
-Function CustomPageC
-ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion" CurrentVersion
-   StrCmp $R1 "" 0 NTsrv
-  ;  StrCmp $LANGUAGE "1041" japanesehome
-   StrCmp $LANGUAGE "1031" germanhome
-  !insertmacro MUI_HEADER_TEXT "XAMPP Options" "Install options on Windows Home systems."
-  !insertmacro MUI_INSTALLOPTIONS_DISPLAY "xampp_home.ini"
-   Goto no_srv
-   germanhome:
-  !insertmacro MUI_HEADER_TEXT "XAMPP Optionen" "Konfiguration f�r Windows Home Systeme."
-  !insertmacro MUI_INSTALLOPTIONS_DISPLAY "xampp_home-german.ini"
-   Goto no_srv
-  ; japanesehome:
-  ; !insertmacro MUI_HEADER_TEXT "XAMPP Options" "Windowsのシステムのオプションをインストールします。"
-  ; !insertmacro MUI_INSTALLOPTIONS_DISPLAY "xampp_home-japanese.ini"
-  ; Goto no_srv
-NTsrv:
-  ; StrCmp $LANGUAGE "1041" japanese
-  StrCmp $LANGUAGE "1031" german
-  !insertmacro MUI_HEADER_TEXT "XAMPP Options" "Install options on NT/2000/XP Professional systems."
-  !insertmacro MUI_INSTALLOPTIONS_DISPLAY "xampp.ini"
-  Goto no_srv
-  german:
-  !insertmacro MUI_HEADER_TEXT "XAMPP Optionen" "Konfiguration f�r NT/2000/XP Professional Systeme."
-  !insertmacro MUI_INSTALLOPTIONS_DISPLAY "xampp-german.ini"
-  Goto no_srv
-  ; japanese:
-  ; !insertmacro MUI_HEADER_TEXT "XAMPP Options" "Windows NT/2000/XP/2003にシステムオプションをインストールします"
-  ; !insertmacro MUI_INSTALLOPTIONS_DISPLAY "xampp-japanese.ini"
-no_srv:
-
+Function un.onInit
+!insertmacro MUI_LANGDLL_DISPLAY
+;!insertmacro MUI_UNGETLANGUAGE
 FunctionEnd
 
-!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-    !insertmacro MUI_DESCRIPTION_TEXT ${SEC01} "SERVICES:"
-!insertmacro MUI_FUNCTION_DESCRIPTION_END
+Function WriteToFile
+Exch $0 ;file to write to
+Exch
+Exch $1 ;text to write
+
+  FileOpen $0 $0 a #open file
+  FileSeek $0 0 END #go to end
+  FileWrite $0 $1 #write to file
+  FileClose $0
+
+Pop $1
+Pop $0
+FunctionEnd
+
+!macro WriteToFile NewLine File String
+  !if `${NewLine}` == true
+  Push `${String}$\r$\n`
+  !else
+  Push `${String}`
+  !endif
+  Push `${File}`
+  Call WriteToFile
+!macroend
+!define WriteToFile `!insertmacro WriteToFile false`
+!define WriteLineToFile `!insertmacro WriteToFile true`
+
 
 Function .onInstSuccess
 
-; SERVICE INSTALLATION
-ReadRegStr $4 HKLM "Software\xampp" "lang"
-ReadRegStr $0 HKLM "Software\xampp" "services"
-StrCmp $0 "0" no_srv
-ExecWait 'cmd /C cd "$INSTDIR\install" & portcheck.bat' $7
-ReadRegStr $1 HKLM "Software\xampp" "apacheservice"
-StrCmp $1 "0" no_httpd
-       ReadINIStr $R0 "$INSTDIR\install\portcheck.ini" "Ports" "Port80"
-       StrCmp $R0 "BLOCKED" Port80Abort
-       ReadINIStr $R1 "$INSTDIR\install\portcheck.ini" "Ports" "Port443"
-       StrCmp $R1 "BLOCKED" Port80Abort
-       ExecWait 'cmd /C cd "$INSTDIR\apache\bin" & httpd.exe -k install & net start Apache2.4' $9
-       Goto no_httpd
-       Port80Abort:
-       StrCmp $4 "1031" german
-    ;   StrCmp $4 "1041" japan
-       StrCpy $INST_MESS1 "Ports 80 or 443 (SSL) already in use! Installing Apache2.4 service failed!"
-       Goto mess1
-       ; japan:
-       ; StrCpy $INST_MESS1 "ポート 80 または 443 (SSL) はすでに利用されています。Apache2.4をサービスとしてインストールするのに失敗しました。"
-       ; Goto mess1
-       german:
-       StrCpy $INST_MESS1 "Ports 80 oder 443 (SSL) bereits in Nutzung! Apache2.4-Dienst konnte nicht eingerichtet werden."
-       mess1:
-       WriteRegStr HKLM "Software\xampp" "apacheservice" "0"
-       MessageBox MB_OK "$INST_MESS1"
-       
-no_httpd:
-ReadRegStr $2 HKLM "Software\xampp" "mysqlservice"
-StrCmp $2 "0" no_mysql
-       ReadINIStr $R0 "$INSTDIR\install\portcheck.ini" "Ports" "Port3306"
-       StrCmp $R0 "BLOCKED" Port3306Abort
-       ExecWait 'cmd /C cd "$INSTDIR\mysql\bin" & mysqld.exe --install mysql --defaults-file="$INSTDIR\mysql\bin\my.ini" & net start mysql' $9
-       Goto no_mysql
-       Port3306Abort:
-       StrCmp $4 "1031" german1
-       ;StrCmp $4 "1041" japan1
-       StrCpy $INST_MESS2 "Port 3306 already in use! Installing MySQL service failed!"
-       Goto mess2
-      ; japan1:
-      ; StrCpy $INST_MESS2 "ポート3306 はすでに使用されています。MySQLをサービスとしてインストールするのに失敗しました。"
-      ; Goto mess2
-       german1:
-       StrCpy $INST_MESS2 "Port 3306 bereits in Nutzung! MySQL-Dienst kann nicht eingerichtet werden."
-       mess2:
-       WriteRegStr HKLM "Software\xampp" "mysqlservice" "0"
-       MessageBox MB_OK "$INST_MESS2"
-
+StrCmp $OPT_MYSQL "" no_mysql
+${WriteLineToFile} `$INSTDIR\xampp-control.ini` `MySQL=1`
+Goto mysql_out
 no_mysql:
-ReadRegStr $3 HKLM "Software\xampp" "filezillaservice"
-StrCmp $3 "0" no_ftp
-       ReadINIStr $R0 "$INSTDIR\install\portcheck.ini" "Ports" "Port21"
-       StrCmp $R0 "BLOCKED" Port21Abort
-       ExecWait '"$INSTDIR\FileZillaFTP\FileZillaServer.exe" /install' $9
-       ExecWait '"$INSTDIR\FileZillaFTP\FileZillaServer.exe" /start' $9
-       Goto no_ftp
-       Port21Abort:
-       StrCmp $4 "1031" german2
-      ;  StrCmp $4 "1041" japan2
-       StrCpy $INST_MESS3 "Port 21 already in use! Installing FileZilla FTPD service failed!"
-       Goto mess3
-      ; japan2:
-      ; StrCpy $INST_MESS3 "ポート 21 はすでに使用されています。FileZilla FTPD をサービスとしてインストールすることに失敗しました。"
-      ; Goto mess3
-       german2:
-       StrCpy $INST_MESS3 "Port 21 bereits in Nutzung! FileZilla-Dienst kann nicht eingerichtet werden!"
-       mess3:
-       WriteRegStr HKLM "Software\xampp" "filezillaservice" "0"
-       MessageBox MB_OK "$INST_MESS3"
+${WriteLineToFile} `$INSTDIR\xampp-control.ini` `MySQL=0`
+Delete "$INSTDIR\mysql_start.bat"
+Delete "$INSTDIR\mysql_stop.bat"
+mysql_out:
 
-no_ftp:
-       StrCmp $4 "1031" german3
-  ;     StrCmp $4 "1041" japan3
-       StrCpy $INST_MESS4 "Service installation finished! Hint: Use also the XAMPP Control Panel to manage services."
-       Goto mess4
-      ; japan3:
-      ; StrCpy $INST_MESS4 "サービスとしてインストールに成功しました。Xamppコントロールパネルを確認し、サービスを管理してください。"
-      ; Goto mess4
-       german3:
-       StrCpy $INST_MESS4 "Dienste-Installation abgeschlossen! Tipp: Dienste knen Sie auch mit XAMPP Control Panel verwalten."
-       mess4:
-       MessageBox MB_OK "$INST_MESS4"
-       
-no_srv:
-; DESKTOP & START MENU SECTION
-ReadRegStr $0 HKLM "Software\xampp" "desktopicon"
-StrCmp $0 "0" no_icon
-CreateShortCut "$DESKTOP\XAMPP Control Panel.lnk" "$INSTDIR\xampp-control.exe" ""
+StrCmp $OPT_FTPD "" no_ftpd
+${WriteLineToFile} `$INSTDIR\xampp-control.ini` `FileZilla=1`
+Goto ftpd_out
+no_ftpd:
+${WriteLineToFile} `$INSTDIR\xampp-control.ini` `FileZilla=0`
+Delete "$INSTDIR\htdocs\xampp\navilinks\02_filezilla.tools"
+Delete "$INSTDIR\filezilla_start.bat"
+Delete "$INSTDIR\filezilla_stop.bat"
+Delete "$INSTDIR\filezilla_setup.bat"
+ftpd_out:
 
-no_icon:
-ReadRegStr $1 HKLM "Software\xampp" "programfiles"
-StrCmp $1 "0" no_pfiles
-   CreateDirectory "$SMPROGRAMS\Apache Friends\XAMPP"
-   CreateShortCut "$SMPROGRAMS\Apache Friends\XAMPP" "" ""
-   CreateShortCut "$SMPROGRAMS\Apache Friends\XAMPP\XAMPP Control Panel.lnk" "$INSTDIR\xampp-control.exe" "" "$INSTDIR\install\xampp.ico"
-   CreateShortCut "$SMPROGRAMS\Apache Friends\XAMPP\XAMPP htdocs folder.lnk" "$INSTDIR\htdocs" "" "$INSTDIR\install\folder.ico"
-   ;CreateShortCut "$SMPROGRAMS\Apache Friends\XAMPP\Port check.lnk" "$INSTDIR\xampp-portcheck.exe" "" "$INSTDIR\install\xamppcontrol.ico"
-   ;CreateShortCut "$SMPROGRAMS\Apache Friends\XAMPP\PHP switch.lnk" "$INSTDIR\php-switch.bat" "" "$INSTDIR\install\php.ico"
-   CreateShortCut "$SMPROGRAMS\Apache Friends\XAMPP\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\install\xampp-icon-uninstall.ico"
+StrCmp $OPT_MERCUR "" no_mercury
+${WriteLineToFile} `$INSTDIR\xampp-control.ini` `Mercury=1`
+Goto mercury_out
+no_mercury:
+${WriteLineToFile} `$INSTDIR\xampp-control.ini` `Mercury=0`
+Delete "$INSTDIR\mercury_start.bat"
+Delete "$INSTDIR\mercury_stop.bat"
+mercury_out:
 
-no_pfiles:
-; StrCmp $4 "1041" japanese
-; Delete "$INSTDIR\xampp-control-jp.exe"
-; Rename "$INSTDIR\xampp-control-default.exe" "$INSTDIR\xampp-control.exe"
-; Goto xamppcontrol_out
-; japanese:
-; Delete "$INSTDIR\xampp-control-default.exe"
-; Rename "$INSTDIR\xampp-control-jp.exe" "$INSTDIR\xampp-control.exe"
-xamppcontrol_out:
+StrCmp $OPT_TOMCAT "" no_tomcat
+${WriteLineToFile} `$INSTDIR\xampp-control.ini` `Tomcat=1`
+Goto tomcat_out
+no_tomcat:
+${WriteLineToFile} `$INSTDIR\xampp-control.ini` `Tomcat=0`
+Delete "$INSTDIR\htdocs\xampp\navilinks\tomcat.j2ee"
+Delete "$INSTDIR\catalina_start.bat"
+Delete "$INSTDIR\catalina_stop.bat"
+Delete "$INSTDIR\catalina_service.bat"
+tomcat_out:
+
+StrCmp $OPT_PERL "" no_perl
+Goto perl_out
+no_perl:
+Delete "$INSTDIR\htdocs\xampp\navilinks\perlexamples.perl"
+perl_out:
+
+StrCmp $OPT_PMA "" no_pma
+Goto pma_out
+no_pma:
+Delete "$INSTDIR\htdocs\xampp\navilinks\01_phpmyadmin.tools"
+pma_out:
+
+StrCmp $OPT_WEBA "" no_weba
+Goto weba_out
+no_weba:
+Delete "$INSTDIR\htdocs\xampp\navilinks\03_webalizer.tools"
+weba_out:
+
+StrCmp $LANGUAGE "1031" detection_de
+GOTO no_de
+detection_de:
+no_de:
+
+WriteUninstaller "$INSTDIR\Uninstall.exe"
+ReadRegStr $4 HKLM "Software\xampp" "lang"
 
 StrCmp $4 "1031" german4
 ; StrCmp $4 "1041" japan4
-StrCpy $INST_MESS "Congratulations! The installation was successful! Start the XAMPP Control Panel now?"
+StrCpy $INST_MESS "You can manage all the servers (services) with the XAMPP Control Panel. Do you want to start the Control Panel now?"
 GOTO Xcontrol
 german4:
-StrCpy $INST_MESS "Herzlichen Gl�ckwunsch! Die Installation war erfolgreich! Das XAMPP Control Panel jetzt starten?"
+StrCpy $INST_MESS "Sie knen alle Server (Dienste) mit dem XAMPP Control Panel steuern. Wollen Sie das Control Panel jetzt starten?"
 GOTO Xcontrol
 ; japan4:
 ; StrCpy $INST_MESS "おめでとうございます。インストールに成功しました。Xamppコントロールパネルを今すぐ起動しますか？"
@@ -404,57 +293,213 @@ MessageBox MB_YESNO "$INST_MESS" IDNO NoXcontrol
 NoXcontrol:
 FunctionEnd
 
+Section "-XAMPP Files"
+SetOverwrite ifnewer
+SetOutPath "$INSTDIR"
+File "F:\release181\xampp\service.exe"
+File "F:\release181\xampp\setup_xampp.bat"
+File "F:\release181\xampp\readme_en.txt"
+File "F:\release181\xampp\xampp-control.exe"
+File "F:\release181\xampp\xampp_start.exe"
+File "F:\release181\xampp\xampp_stop.exe"
+File "F:\release181\xampp\xampp-control.exe"
+File "F:\release181\xampp\apache_start.bat"
+File "F:\release181\xampp\apache_stop.bat"
+File "F:\release181\xampp\catalina_service.bat"
+File "F:\release181\xampp\catalina_start.bat"
+File "F:\release181\xampp\catalina_stop.bat"
+File "F:\release181\xampp\filezilla_setup.bat"
+File "F:\release181\xampp\filezilla_start.bat"
+File "F:\release181\xampp\filezilla_stop.bat"
+File "F:\release181\xampp\mercury_start.bat"
+File "F:\release181\xampp\mercury_stop.bat"
+File "F:\release181\xampp\mysql_start.bat"
+File "F:\release181\xampp\mysql_stop.bat"
+File "F:\release181\xampp\passwords.txt"
+File "F:\release181\xampp\readme_de.txt"
+File "F:\release181\xampp\test_php.bat"
+File "xampp-control.ini"
+
+SetOutPath "$INSTDIR\cgi-bin"
+File /r "F:\release181\xampp\cgi-bin\*.*"
+SetOutPath "$INSTDIR\contrib"
+File /r "F:\release181\xampp\contrib\*.*"
+SetOutPath "$INSTDIR\htdocs"
+File /r "F:\release181\xampp\htdocs\*.*"
+SetOutPath "$INSTDIR\install"
+File /r "F:\release181\xampp\install\*.*"
+SetOutPath "$INSTDIR\licenses"
+File /r "F:\release181\xampp\licenses\*.*"
+SetOutPath "$INSTDIR\locale"
+File /r "F:\release181\xampp\locale\*.*"
+CreateDirectory "$INSTDIR\mailoutput"
+SetOutPath "$INSTDIR\mailtodisk"
+File /r "F:\release181\xampp\mailtodisk\*.*"
+SetOutPath "$INSTDIR\security"
+File /r "F:\release181\xampp\security\*.*"
+SetOutPath "$INSTDIR\webdav"
+File /r "F:\release181\xampp\webdav\*.*"
+SetOutPath "$INSTDIR\src"
+File /r "F:\release181\xampp\src\*.*"
+SetOutPath "$INSTDIR\tmp"
+File /r "F:\release181\xampp\tmp\*.*"
+
+${WriteLineToFile} `$INSTDIR\xampp-control.ini` ``
+${WriteLineToFile} `$INSTDIR\xampp-control.ini` `[Common]`
+${WriteLineToFile} `$INSTDIR\xampp-control.ini` `Edition=3.1.0`
+${WriteLineToFile} `$INSTDIR\xampp-control.ini` `Editor=notepad.exe`
+${WriteLineToFile} `$INSTDIR\xampp-control.ini` `Browser=`
+${WriteLineToFile} `$INSTDIR\xampp-control.ini` `Debug=0`
+${WriteLineToFile} `$INSTDIR\xampp-control.ini` `Debuglevel=0`
+${WriteLineToFile} `$INSTDIR\xampp-control.ini` `TomcatVisible=1`
+
+StrCmp $LANGUAGE "1031" lang_de
+${WriteLineToFile} `$INSTDIR\xampp-control.ini` `Language=en`
+Goto lang_out
+lang_de:
+${WriteLineToFile} `$INSTDIR\xampp-control.ini` `Language=de`
+lang_out:
+
+${WriteLineToFile} `$INSTDIR\xampp-control.ini` ` `
+${WriteLineToFile} `$INSTDIR\xampp-control.ini` `[EnableModules]`
+
+WriteRegStr HKLM "Software\xampp" "Install_Dir" "$INSTDIR"
+WriteRegStr HKLM "Software\xampp" "apache" "2430"
+WriteRegStr HKLM "Software\xampp" "version" "1810"
+WriteRegStr HKLM "Software\xampp" "lang" "$LANGUAGE"
+WriteRegStr HKLM "Software\xampp" "programfiles" "0"
+WriteRegStr HKLM "Software\xampp" "desktopicon" "0"
+WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\xampp" "DisplayName" "${PRODUCT_NAME} ${PRODUCT_VERSION}"
+WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\xampp" "UninstallString" '"$INSTDIR\uninstall.exe"'
+WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\xampp" "NoModify" 1
+WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\xampp" "NoRepair" 1
+SectionEnd
+
+SectionGroup "XAMPP"
+Section "Apachefriends Start Menu"
+CreateDirectory "$SMPROGRAMS\Apache Friends\XAMPP"
+CreateShortCut "$SMPROGRAMS\Apache Friends\XAMPP" "" ""
+CreateShortCut "$SMPROGRAMS\Apache Friends\XAMPP\XAMPP Control Panel.lnk" "$INSTDIR\xampp-control.exe" "" "$INSTDIR\install\xampp.ico"
+CreateShortCut "$SMPROGRAMS\Apache Friends\XAMPP\XAMPP htdocs folder.lnk" "$INSTDIR\htdocs" "" "$INSTDIR\install\folder.ico"
+CreateShortCut "$SMPROGRAMS\Apache Friends\XAMPP\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\install\xampp-icon-uninstall.ico"
+WriteRegStr HKLM "Software\xampp" "programfiles" "1"
+SectionEnd
+
+Section "XAMPP Desktop Icon"
+CreateShortCut "$DESKTOP\XAMPP Control Panel.lnk" "$INSTDIR\xampp-control.exe" ""
+WriteRegStr HKLM "Software\xampp" "desktopicon" "1"
+SectionEnd
+SectionGroupEnd
+
+
+SectionGroup "Server"
+Section "Apache"
+SetOverwrite ifnewer
+SetOutPath "$INSTDIR\apache"
+File /r "F:\release181\xampp\apache\*.*"
+SectionIn RO
+${WriteLineToFile} `$INSTDIR\xampp-control.ini` `Apache=1`
+SectionEnd
+
+Section "MySQL"
+SetOverwrite ifnewer
+SetOutPath "$INSTDIR\mysql"
+File /r "F:\release181\xampp\mysql\*.*"
+StrCpy $OPT_MYSQL "true"
+SectionEnd
+
+Section "FileZilla FTP Server"
+SetOverwrite ifnewer
+SetOutPath "$INSTDIR\FileZillaFTP"
+File /r "F:\release181\xampp\FileZillaFTP\*.*"
+CreateDirectory "$INSTDIR\anonymous"
+StrCpy $OPT_FTPD "true"
+SectionEnd
+
+Section "Mercury Mail Server"
+SetOverwrite ifnewer
+SetOutPath "$INSTDIR\MercuryMail"
+File /r "F:\release181\xampp\MercuryMail\*.*"
+StrCpy $OPT_MERCUR "true"
+SectionEnd
+
+Section "Tomcat"
+SetOverwrite ifnewer
+SetOutPath "$INSTDIR\tomcat"
+File /r "F:\release181\xampp\tomcat\*.*"
+StrCpy $OPT_TOMCAT "true"
+SectionEnd
+SectionGroupEnd
+
+
+SectionGroup "Program languages"
+Section "PHP"
+SetOverwrite ifnewer
+SetOutPath "$INSTDIR\php"
+File /r "F:\release181\xampp\php\*.*"
+SectionIn RO
+SectionEnd
+
+Section "Perl"
+SetOverwrite ifnewer
+SetOutPath "$INSTDIR\perl"
+File /r "F:\release181\xampp\perl\*.*"
+StrCpy $OPT_PERL "true"
+SectionEnd
+SectionGroupEnd
+
+
+SectionGroup "Tools"
+Section "phpMyAdmin"
+SetOverwrite ifnewer
+SetOutPath "$INSTDIR\phpmyadmin"
+File /r "F:\release181\xampp\phpmyadmin\*.*"
+StrCpy $OPT_PMA "true"
+SectionEnd
+
+Section "Webalizer"
+SetOverwrite ifnewer
+SetOutPath "$INSTDIR\webalizer"
+File /r "F:\release181\xampp\webalizer\*.*"
+StrCpy $OPT_WEBA "true"
+SectionEnd
+
+Section "Fake Sendmail"
+SetOverwrite ifnewer
+SetOutPath "$INSTDIR\sendmail"
+File /r "F:\release181\xampp\sendmail\*.*"
+SectionEnd
+
+SectionGroupEnd
+
+Section "-XAMPPSETUP"
+SetOutPath "$INSTDIR"
+ExecWait '"$INSTDIR\php\php.exe" -n -d output_buffering=0 "$INSTDIR\install\install.php"' $0
+StrCmp $0 "0" php_done
+       StrCmp $LANGUAGE "1031" lang_de
+              MessageBox MB_OK "Installation failed (php.exe). Perhaps you have to install the Microsoft Visual C++ 2008 Redistributable package. After that please execute the setup_xampp.bat in the xampp folder manually."
+              GOTO php_done
+        lang_de:
+              MessageBox MB_OK "Installation gescheitert. Vielleicht sollten Sie das Microsoft Visual C++ 2008 Redistributable Paket auf Ihrem System installieren. Bitte danach die setup_xampp.bat manuell noch einmal ausf�hren."
+php_done:
+
+SectionEnd
+
 
 Section "Uninstall"
+
+;ReadRegStr $9 HKLM "Software\xampp" "lang"
+;StrCmp $9 "1031" german0
+;MessageBox MB_YESNO "Really uninstall XAMPP?" IDYES NoAbort1
+;Abort
+;NoAbort1:
+;GOTO mess_out
+;german0:
+;MessageBox MB_YESNO "Wollen Sie wirklich XAMPP desinstallieren?" IDYES mess_out
+;Abort
+;mess_out:
+
 Exec '"$INSTDIR\apache\bin\pv.exe" -f -k xampp-control.exe'
-
-ReadRegStr $9 HKLM "Software\xampp" "lang"
-; StrCmp $9 "1041" japanese0
-StrCmp $9 "1031" german0
-StrCpy $INST_MESS "Really uninstall XAMPP with all services?"
-GOTO mess_box
-german0:
-StrCpy $INST_MESS "XAMPP mit allen Server-Diensten wirklich deinstallieren?"
-GOTO mess_box
-; japanese0:
-; StrCpy $INST_MESS "本当にXamppをサービスを含めいてアンインストールしますか？"
-mess_box:
-MessageBox MB_YESNO|MB_ICONQUESTION "$INST_MESS" IDNO ExitDel
-
-ReadRegStr $5 HKLM "Software\xampp" "services"
-StrCmp $5 "0" srv_Abort
-ReadRegStr $2 HKLM "Software\xampp" "apacheservice"
-StrCmp $2 "0" no_httpd
-ExecWait 'cmd /C net stop Apache2.4 & "$INSTDIR\apache\bin\httpd.exe" -k uninstall' $9
-no_httpd:
-ReadRegStr $3 HKLM "Software\xampp" "mysqlservice"
-StrCmp $3 "0" no_mysql
-ExecWait 'cmd /C net stop mysql & "$INSTDIR\mysql\bin\mysqld.exe" --remove mysql' $9
-no_mysql:
-ReadRegStr $4 HKLM "Software\xampp" "filezillaservice"
-StrCmp $4 "0" no_ftpd
-; Starte: "F:\temp\program files\xampp\FileZillaFTP\FileZillaServer.exe" /stop
-; Starte: "F:\temp\program files\xampp\FileZillaFTP\FileZillaServer.exe" /uninstall
-; net stop "FileZilla Server FTP server"
-ExecWait 'cmd /C net stop FileZillaServer' $8
-;ExecWait '"$INSTDIR\FileZillaFTP\FileZillaServer.exe" /stop' $8
-ExecWait '"$INSTDIR\FileZillaFTP\FileZillaServer.exe" /uninstall' $8
-ExecWait '"$INSTDIR\FileZillaFTP\FileZillaServer.exe" /uninstall' $9
-no_ftpd:
-
-ReadRegStr $6 HKLM "Software\xampp" "tomcatservice"
-StrCmp $6 "0" NoJavaAddon
-ReadRegStr $7 HKLM "SYSTEM\CurrentControlSet\Services\Tomcat7" "ImagePath"
-StrCmp $7 "$INSTDIR\tomcat\bin\tomcat6.exe //RS//Tomcat7" Tomcat5Uninstall
-Goto Tomcat5Abort
-Tomcat5Uninstall:
-MessageBox MB_OK "Service detected! Uninstall Tomcat 7 as service!"
-ExecWait 'cmd /C net stop Tomcat7 & cd "$INSTDIR\tomcat\bin" & service.bat remove Tomcat7' $9
-Tomcat5Abort:
-NoJavaAddon:
-
-srv_Abort:
-
 ReadRegStr $0 HKLM "Software\xampp" "desktopicon"
 StrCmp $0 "0" no_icon
 Delete "$DESKTOP\XAMPP Control Panel.lnk"
@@ -465,7 +510,6 @@ StrCmp $8 "0" no_pfiles
   RMDir "$SMPROGRAMS\Apache Friends\xampp"
   RMDir "$SMPROGRAMS\Apache Friends"
 no_pfiles:
-
 
 RMDir /r "$INSTDIR\anonymous"
 RMDir /r "$INSTDIR\apache"
@@ -488,7 +532,10 @@ RMDir /r "$INSTDIR\nsis"
 RMDir /r "$INSTDIR\contrib"
 RMDir /r "$INSTDIR\src"
 RMDir /r "$INSTDIR\locale"
-
+RMDir /r "$INSTDIR\mailoutput"
+RMDir /r "$INSTDIR\mailtodisk"
+RMDir /r "$INSTDIR\locale"
+RMDir /r "$INSTDIR\mysql"
 Delete "$INSTDIR\apache_start.bat"
 Delete "$INSTDIR\apache_stop.bat"
 Delete "$INSTDIR\filezilla_setup.bat"
@@ -525,31 +572,11 @@ Delete "$INSTDIR\xampp-control.exe"
 Delete "$INSTDIR\xampp-control-old.exe"
 Delete "$INSTDIR\xampp-control.ini"
 Delete "$INSTDIR\xampp-control.log"
-;Delete "$INSTDIR\msvcr71.dll"
+Delete "$INSTDIR\test_php.bat"
+Delete "$INSTDIR\changes.txt"
 
 DeleteRegKey HKLM "Software\xampp"
 DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\xampp"
-
-; StrCmp $LANGUAGE "1041" japanese1
-StrCmp $LANGUAGE "1031" german1
-StrCpy $INST_MESS1 "Remove all MySQL data bases from $INSTDIR\mysql\data?"
-GOTO messa1
-german1:
-StrCpy $INST_MESS1 "Alle MySQL Datenbanken in $INSTDIR\mysql\data lchen?"
-GOTO messa1
-; japanese1:
-; StrCpy $INST_MESS1 "MySQLデータベースを $INSTDIR\mysql\data から削除しますか？"
-messa1:
-MessageBox MB_YESNO|MB_ICONQUESTION "$INST_MESS1" IDYES NoMysql
-Delete "$INSTDIR\mysql\*.*"
-RMDir /r "$INSTDIR\mysql\bin"
-RMDir /r "$INSTDIR\mysql\scripts"
-RMDir /r "$INSTDIR\mysql\share"
-StrCpy $DB_DEL "0"
-Goto DeleteHtdocs
-NoMysql:
-RMDir /r "$INSTDIR\mysql"
-DeleteHtdocs:
 
 ; StrCmp $LANGUAGE "1041" japanese2
 StrCmp $LANGUAGE "1031" german2
@@ -591,8 +618,7 @@ NoXaDir:
 ExitDel:
 SectionEnd
 
-;--------------------------------
-;Uninstaller Functions
-Function un.onInit
-  !insertmacro MUI_UNGETLANGUAGE
-FunctionEnd
+
+
+
+

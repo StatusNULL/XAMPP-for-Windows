@@ -12,7 +12,7 @@ Moose::Manual::Roles - Roles, an alternative to deep hierarchies and base classe
 
 =head1 VERSION
 
-version 2.0602
+version 2.0603
 
 =head1 WHAT IS A ROLE?
 

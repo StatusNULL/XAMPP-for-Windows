@@ -10,11 +10,8 @@ if %errorlevel% == 9009 echo You do not have Perl in your PATH.
 if errorlevel 1 goto script_failed_so_exit_with_non_zero_val 2>nul
 goto endofperl
 @rem ';
-#!perl
-#line 15
-    eval 'exec C:\strawberry\perl\bin\perl.exe -S $0 ${1+"$@"}'
-	if $running_under_some_shell;
 #!./perl
+#line 15
 # $Id: piconv,v 2.4 2009/07/08 13:34:15 dankogai Exp $
 #
 use 5.8.0;

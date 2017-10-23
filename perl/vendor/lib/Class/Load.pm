@@ -1,6 +1,6 @@
 package Class::Load;
 {
-  $Class::Load::VERSION = '0.19';
+  $Class::Load::VERSION = '0.20';
 }
 use strict;
 use warnings;
@@ -36,7 +36,7 @@ sub load_class {
     my $options = shift;
 
     my ($res, $e) = try_load_class($class, $options);
-    return 1 if $res;
+    return $class if $res;
 
     _croak($e);
 }
@@ -129,7 +129,7 @@ sub load_optional_class {
     return 0
         if $e =~ _nonexistent_fail_re($class);
 
-    _croak($ERROR);
+    _croak($e);
 }
 
 sub try_load_class {
@@ -184,14 +184,19 @@ sub try_load_class {
 }
 
 sub _error {
-    $ERROR = shift;
+    my $e = shift;
+
+    $e =~ s/ at .+?Runtime\.pm line [0-9]+\.$//;
+    chomp $e;
+
+    $ERROR = $e;
     return 0 unless wantarray;
     return 0, $ERROR;
 }
 
 sub _croak {
     require Carp;
-    local $Carp::CarpLevel = $Carp::CarpLevel + 1;
+    local $Carp::CarpLevel = $Carp::CarpLevel + 2;
     Carp::croak(shift);
 }
 
@@ -209,7 +214,7 @@ Class::Load - a working (require "Class::Name") and more
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -255,6 +260,8 @@ The C<%options> hash currently accepts one key, C<-version>. If you specify a
 version, then this subroutine will call C<< Class::Name->VERSION(
 $options{-version} ) >> internally, which will throw an error if the class's
 version is not equal to or greater than the version you requested.
+
+This method will return the name of the class on success.
 
 =head2 try_load_class Class::Name, \%options -> (0|1, error message)
 

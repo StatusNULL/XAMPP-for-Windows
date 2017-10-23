@@ -19,13 +19,6 @@
 				<td align="left" width="600"><?php echo $TEXT['filezilla-install']; ?></td>
 			</tr>
 
-			<tr>
-				<td align="left" width="600">&nbsp;</td>
-			</tr>
-
-			<tr>
-				<td align="left" width="600"><img src="img/filezilla1.gif" alt=""></td>
-			</tr>
 
 			<tr>
 				<td align="left" width="600">&nbsp;</td>
@@ -35,12 +28,20 @@
 				<td align="left" width="600"><?php echo $TEXT['filezilla-install2']; ?></td>
 			</tr>
 
+      <tr>
+				<td align="left" width="600">&nbsp;</td>
+			</tr>
+
+			<tr>
+				<td align="left" width="600"><img src="img/cp-filezilla-login.gif" alt="Connect to FileZilla Server"></td>
+			</tr>		
+			
 			<tr>
 				<td align="left" width="600">&nbsp;</td>
 			</tr>
 
 			<tr>
-				<td align="left" width="600"><?php echo $TEXT['filezilla-install3']; ?></td>
+				<td align="left" width="600"><img src="img/filezilla-panel.gif" alt="Filezilla Management Interface"></td>
 			</tr>
 
 			<tr>
@@ -49,14 +50,6 @@
 
 			<tr>
 				<td align="left" width="600"><?php echo $TEXT['filezilla-install4'];?></td>
-			</tr>
-
-			<tr>
-				<td align="left" width="600">&nbsp;</td>
-			</tr>
-
-			<tr>
-				<td align="left" width="600"><img src="img/filezilla2.gif" alt=""></td>
 			</tr>
 
 			<tr>

@@ -358,12 +358,12 @@
 
 	$TEXT['filezilla-head'] = "FileZilla FTP Server";
 	$TEXT['filezilla-install'] = "Apache is <U>not</U> a FTP Server ... but FileZilla FTP is one. Please consider the following references.";
-	$TEXT['filezilla-install2'] = "Into the main directory of xampp, start \"filezilla_setup.bat\" for setup. Attention: For Windows NT, 2000 and XP Professional, FileZilla needs to install as service.";
+	$TEXT['filezilla-install2'] = "Start the FileServer configuration via the \"Admin\" button in the XAMPP Control Panel. Note: The FileZilla Interface have password on localhost. FileZilla Server needs to install as service. Only then you can start this service.";
 	$TEXT['filezilla-install3'] = "Configure \"FileZilla FTP\". For this, please use the FileZilla Interface with the \"FileZilla Server Interface.exe\". Two Users are in this example:<br><br>
 	A: A default user \"newuser\", password \"wampp\". The home directory is xampp\htdocs.<br>
 	B: An anonymous user \"anonymous\", no password. The home directory is xampp\anonymous.<br><br>
 	The default interface is the loopback address 127.0.0.1.";
-	$TEXT['filezilla-install4'] = "The FTP Server is shutdown with the \"FileZillaFTP_stop.bat\". For FileZilla FTP as service, please use the \"FileZillaServer.exe\" directly. Then, you can configure all start options.";
+	$TEXT['filezilla-install4'] = "Stop the FTP Server with the XAMPP Control Panel or with \"FileZillaFTP_stop.bat\".";
 	$TEXT['filezilla-url'] = "<br><br><a href=\"http://filezilla.sourceforge.net\" target=\"_top\">http://filezilla.sourceforge.net</a>";
 
 	// ---------------------------------------------------------------------

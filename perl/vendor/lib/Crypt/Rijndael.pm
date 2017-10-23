@@ -34,7 +34,7 @@ no warnings;
 
 require DynaLoader;
 
-$VERSION = '1.09';
+$VERSION = '1.11';
 @ISA = qw/DynaLoader/;
 
 bootstrap Crypt::Rijndael $VERSION;
@@ -61,7 +61,7 @@ codebook mode, the default), C<MODE_CBC> (cipher block chaining, the
 same that C<Crypt::CBC> does), C<MODE_CFB> (128-bit cipher feedback),
 C<MODE_OFB> (128-bit output feedback), or C<MODE_CTR> (counter mode).
 
-ECB mode is very insecure (read a book on cryptography if you dont
+ECB mode is very insecure (read a book on cryptography if you don't
 know why!), so you should probably use CBC mode.
 
 =item $cipher->set_iv($iv)
@@ -126,8 +126,8 @@ This code is in Github:
 	
 =head1 LICENSE
 
-This software is licensed under the Lesser GNU Public License. See the included
-COPYING file for details.
+This software is licensed under the Lesser GNU Public License v3 (29
+June 2007). See the included COPYING file for details.
 
 =cut
 

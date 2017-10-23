@@ -2,9 +2,50 @@
 
 DBI::Changes - List of significant changes to the DBI
 
-(As of $Date: 2012-02-25 14:14:52 +0000 (Sat, 25 Feb 2012) $ $Revision: 15179 $)
+(As of $Date: 2012-06-06 17:37:26 +0100 (Wed, 06 Jun 2012) $ $Revision: 15327 $)
+
+=encoding ISO8859-1
 
 =cut
+
+=head2 Changes in DBI 1.622 (svn r15327) 6th June 2012
+
+  Fixed lack of =encoding in non-ASCII pod docs. RT#77588
+
+  Corrected typo in DBI::ProfileDumper thanks to Finn Hakansson.
+
+=head2 Changes in DBI 1.621 (svn r15315) 21st May 2012
+
+  Fixed segmentation fault when a thread is created from
+    within another thread RT#77137, thanks to Dave Mitchell.
+  Updated previous Changes to credit Booking.com for sponsoring
+    Dave Mitchell's recent DBI optimization work.
+
+=head2 Changes in DBI 1.620 (svn r15300) 25th April 2012
+
+  Modified column renaming in fetchall_arrayref, added in 1.619,
+    to work on column index numbers not names (an incompatible change).
+  Reworked the fetchall_arrayref documentation.
+  Hash slices in fetchall_arrayref now detect invalid column names.
+
+=head2 Changes in DBI 1.619 (svn r15294) 23rd April 2012
+
+  Fixed the connected method to stop showing the password in
+    trace file (Martin J. Evans).
+  Fixed _install_method to set CvFILE correctly
+    thanks to sprout RT#76296
+  Fixed SqlEngine "list_tables" thanks to David McMath
+    and Norbert Gruener. RT#67223 RT#69260
+
+  Optimized DBI method dispatch thanks to Dave Mitchell.
+  Optimized driver access to DBI internal state thanks to Dave Mitchell.
+  Optimized driver access to handle data thanks to Dave Mitchell.
+    Dave's work on these optimizations was sponsored by Booking.com.
+  Optimized fetchall_arrayref with hash slice thanks
+    to Dagfinn Ilmari Mannsåker. RT#76520
+  Allow renaming columns in fetchall_arrayref hash slices
+    thanks to Dagfinn Ilmari Mannsåker. RT#76572
+  Reserved snmp_ and tree_ for DBD::SNMP and DBD::TreeData
 
 =head2 Changes in DBI 1.618 (svn r15170) 25rd February 2012
 
@@ -15,6 +56,7 @@ DBI::Changes - List of significant changes to the DBI
 
   Significantly optimized method dispatch via cache (Dave Mitchell)
   Significantly optimized DBI internals for threads (Dave Mitchell)
+    Dave's work on these optimizations was sponsored by Booking.com.
   Xsub to xsub calling optimization now enabled for threaded perls.
   Corrected typo in example in docs (David Precious)
   Added note that calling clone() without an arg may warn in future.
@@ -37,6 +79,7 @@ DBI::Changes - List of significant changes to the DBI
   Fixed is_nested_call logic error RT73118 (Reini Urban)
 
   Enhanced performance for threaded perls (Dave Mitchell, Tim Bunce)
+    Dave's work on this optimization was sponsored by Booking.com.
   Enhanced and standardized driver trace level mechanism (Tim Bunce)
   Removed old code that was an inneffective attempt to detect
     people doing DBI->{Attrib}.

@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Socket );
 
-our $VERSION = '0.10';
+our $VERSION = '0.16';
 
 use Carp;
 
@@ -28,7 +28,7 @@ use Socket 1.97 qw(
 my $AF_INET6 = eval { Socket::AF_INET6() }; # may not be defined
 my $AI_ADDRCONFIG = eval { Socket::AI_ADDRCONFIG() } || 0;
 use POSIX qw( dup2 );
-use Errno qw( EINVAL EINPROGRESS );
+use Errno qw( EINVAL EINPROGRESS EISCONN );
 
 use constant HAVE_MSWIN32 => ( $^O eq "MSWin32" );
 
@@ -306,7 +306,8 @@ detail.
 
 If neither C<Type> nor C<Proto> hints are provided, a default of
 C<SOCK_STREAM> and C<IPPROTO_TCP> respectively will be set, to maintain
-compatibility with C<IO::Socket::INET>.
+compatibility with C<IO::Socket::INET>. Other named arguments that are not
+recognised are ignored.
 
 If the constructor fails, it will set C<$@> to an appropriate error message;
 this may be from C<$!> or it may be some other string; not every failure
@@ -370,20 +371,17 @@ sub _configure
    my @localinfos;
    my @peerinfos;
 
-   $hints{flags} = ( delete $arg->{GetAddrInfoFlags} || 0 ) | $AI_ADDRCONFIG;
+   $hints{flags} = ( $arg->{GetAddrInfoFlags} || 0 ) | $AI_ADDRCONFIG;
 
-   # Check for definedness of args, but delete them anyway even if they're
-   # not defined. Then the only remaining keys will be unrecognised ones.
-
-   if( defined( my $family = delete $arg->{Family} ) ) {
+   if( defined( my $family = $arg->{Family} ) ) {
       $hints{family} = $family;
    }
 
-   if( defined( my $type = delete $arg->{Type} ) ) {
+   if( defined( my $type = $arg->{Type} ) ) {
       $hints{socktype} = $type;
    }
 
-   if( defined( my $proto = delete $arg->{Proto} ) ) {
+   if( defined( my $proto = $arg->{Proto} ) ) {
       unless( $proto =~ m/^\d+$/ ) {
          my $protonum = getprotobyname( $proto );
          defined $protonum or croak "Unrecognised protocol $proto";
@@ -407,7 +405,7 @@ sub _configure
       $hints{socktype} = SOCK_DGRAM  if $hints{protocol} == IPPROTO_UDP;
    }
 
-   if( my $info = delete $arg->{LocalAddrInfo} ) {
+   if( my $info = $arg->{LocalAddrInfo} ) {
       ref $info eq "ARRAY" or croak "Expected 'LocalAddrInfo' to be an ARRAY ref";
       @localinfos = @$info;
    }
@@ -434,17 +432,15 @@ sub _configure
          return;
       }
    }
-   delete $arg->{LocalHost};
-   delete $arg->{LocalService};
 
-   if( my $info = delete $arg->{PeerAddrInfo} ) {
+   if( my $info = $arg->{PeerAddrInfo} ) {
       ref $info eq "ARRAY" or croak "Expected 'PeerAddrInfo' to be an ARRAY ref";
       @peerinfos = @$info;
    }
    elsif( defined $arg->{PeerHost} or defined $arg->{PeerService} ) {
-      defined( my $host = delete $arg->{PeerHost} ) or
+      defined( my $host = $arg->{PeerHost} ) or
          croak "Expected 'PeerHost'";
-      defined( my $service = delete $arg->{PeerService} ) or
+      defined( my $service = $arg->{PeerService} ) or
          croak "Expected 'PeerService'";
 
       local $1; # Placate a taint-related bug; [perl #67962]
@@ -463,22 +459,20 @@ sub _configure
          return;
       }
    }
-   delete $arg->{PeerHost};
-   delete $arg->{PeerService};
 
    my @sockopts_enabled;
-   push @sockopts_enabled, SO_REUSEADDR if delete $arg->{ReuseAddr};
-   push @sockopts_enabled, SO_REUSEPORT if delete $arg->{ReusePort};
-   push @sockopts_enabled, SO_BROADCAST if delete $arg->{Broadcast};
+   push @sockopts_enabled, SO_REUSEADDR if $arg->{ReuseAddr};
+   push @sockopts_enabled, SO_REUSEPORT if $arg->{ReusePort};
+   push @sockopts_enabled, SO_BROADCAST if $arg->{Broadcast};
 
-   my $listenqueue = delete $arg->{Listen};
+   my $listenqueue = $arg->{Listen};
 
    croak "Cannot Listen with a PeerHost" if defined $listenqueue and @peerinfos;
 
-   my $blocking = delete $arg->{Blocking};
+   my $blocking = $arg->{Blocking};
    defined $blocking or $blocking = 1;
 
-   my $v6only = delete $arg->{V6Only};
+   my $v6only = $arg->{V6Only};
 
    # IO::Socket::INET defines this key. IO::Socket::IP always implements the
    # behaviour it requests, so we can ignore it, unless the caller is for some
@@ -486,9 +480,6 @@ sub _configure
    if( defined $arg->{MultiHomed} and !$arg->{MultiHomed} ) {
       croak "Cannot disable the MultiHomed parameter";
    }
-   delete $arg->{MultiHomed};
-
-   keys %$arg and croak "Unexpected keys - " . join( ", ", sort keys %$arg );
 
    my @infos;
    foreach my $local ( @localinfos ? @localinfos : {} ) {
@@ -529,9 +520,9 @@ sub _configure
 
    ${*$self}{io_socket_ip_errors} = [ undef, undef, undef ];
 
-   if( $blocking ) {
-      $self->setup or return undef;
-   }
+   # ->setup is allowed to return false in nonblocking mode
+   $self->setup or !$blocking or return undef;
+
    return $self;
 }
 
@@ -569,17 +560,15 @@ sub setup
       }
 
       if( defined( my $addr = $info->{peeraddr} ) ) {
-         # It seems that IO::Socket hides EINPROGRESS errors, making them look
-         # like a success. This is annoying here.
-         # Instead of putting up with its frankly-irritating intentional
-         # breakage of useful APIs I'm just going to end-run around it and
-         # call CORE::connect() directly
-         if( CORE::connect( $self, $addr ) ) {
+         if( $self->connect( $addr ) ) {
             $! = 0;
             return 1;
          }
 
-         return 0 if $! == EINPROGRESS or HAVE_MSWIN32 && $! == Errno::EWOULDBLOCK();
+         if( $! == EINPROGRESS or HAVE_MSWIN32 && $! == Errno::EWOULDBLOCK() ) {
+            ${*$self}{io_socket_ip_connect_in_progress} = 1;
+            return 0;
+         }
 
          ${*$self}{io_socket_ip_errors}[0] = $!;
          next;
@@ -587,8 +576,6 @@ sub setup
 
       return 1;
    }
-
-   $self->close;
 
    # Pick the most appropriate error, stringified
    $! = ( grep defined, @{ ${*$self}{io_socket_ip_errors}} )[0];
@@ -599,16 +586,47 @@ sub setup
 sub connect
 {
    my $self = shift;
-   return $self->SUPER::connect( @_ ) if @_;
 
-   $! = 0, return 1 if $self->fileno and defined $self->peername;
+   # It seems that IO::Socket hides EINPROGRESS errors, making them look like
+   # a success. This is annoying here.
+   # Instead of putting up with its frankly-irritating intentional breakage of
+   # useful APIs I'm just going to end-run around it and call CORE::connect()
+   # directly
 
-   if( $self->fileno ) {
-      # A connect has just failed, get its error value
-      ${*$self}{io_socket_ip_errors}[0] = $self->getsockopt( SOL_SOCKET, SO_ERROR );
+   return CORE::connect( $self, $_[0] ) if @_;
+
+   return 1 if !${*$self}{io_socket_ip_connect_in_progress};
+
+   # See if a connect attempt has just failed with an error
+   if( my $errno = $self->getsockopt( SOL_SOCKET, SO_ERROR ) ) {
+      delete ${*$self}{io_socket_ip_connect_in_progress};
+      ${*$self}{io_socket_ip_errors}[0] = $! = $errno;
+      return $self->setup;
    }
 
-   return $self->setup;
+   # No error, so either connect is still in progress, or has completed
+   # successfully. We can tell by trying to connect() again; either it will
+   # succeed or we'll get EISCONN (connected successfully), or EALREADY
+   # (still in progress). This even works on MSWin32.
+   my $addr = ${*$self}{io_socket_ip_infos}[${*$self}{io_socket_ip_idx}]{peeraddr};
+
+   if( $self->connect( $addr ) or $! == EISCONN ) {
+      delete ${*$self}{io_socket_ip_connect_in_progress};
+      $! = 0;
+      return 1;
+   }
+   else {
+      $! = EINPROGRESS;
+      return 0;
+   }
+}
+
+sub connected
+{
+   my $self = shift;
+   return defined $self->fileno &&
+          !${*$self}{io_socket_ip_connect_in_progress} &&
+          defined $self->peername;
 }
 
 =head1 METHODS

@@ -8,9 +8,9 @@
     require DBI::Gofer::Response;
     require Carp;
 
-    our $VERSION = sprintf("0.%06d", q$Revision: 15057 $ =~ /(\d+)/o);
+    our $VERSION = sprintf("0.%06d", q$Revision: 15326 $ =~ /(\d+)/o);
 
-#   $Id: Gofer.pm 15057 2012-01-02 13:59:32Z timbo $
+#   $Id: Gofer.pm 15326 2012-06-06 16:32:38Z timbo $
 #
 #   Copyright (c) 2007, Tim Bunce, Ireland
 #
@@ -838,6 +838,8 @@ The C<...> represents attributes that influence the operation of the Gofer
 driver or transport. These are described below or in the documentation of the
 transport module being used.
 
+=encoding ISO8859-1
+
 =head1 DESCRIPTION
 
 DBD::Gofer is a DBI database driver that forwards requests to another DBI
@@ -964,7 +966,7 @@ implemented the private_attribute_info() method (added in DBI 1.54).
 
 Driver-private sth attributes can be set in the prepare() call. TODO
 
-Some driver-private dbh attributes may not be available if the driver has not
+Some driver-private sth attributes may not be available if the driver has not
 implemented the private_attribute_info() method (added in DBI 1.54).
 
 =head2 Multiple Resultsets

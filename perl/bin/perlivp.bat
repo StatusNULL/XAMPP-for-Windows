@@ -15,7 +15,7 @@ goto endofperl
     eval 'exec C:\strawberry\perl\bin\perl.exe -S $0 ${1+"$@"}'
         if $running_under_some_shell;
 
-# perlivp v5.16.0
+# perlivp v5.16.1
 
 sub usage {
     warn "@_\n" if @_;
@@ -78,7 +78,7 @@ $tests_total++;
 
 print "## Checking Perl version via variable '\$]'.\n" if $opt{'p'};
 
-my $ivp_VERSION = "5.016000";
+my $ivp_VERSION = "5.016001";
 
 
 $label = 'Perl version correct';

@@ -1,20 +1,23 @@
-###### ApacheFriends XAMPP Version 1.8.0 ######
+###### ApacheFriends XAMPP Version 1.8.1 ######
 
-  + Apache 2.4.2
-  + MySQL 5.5.25a (Community Server)
-  + PHP 5.4.4 (VC9 X86 32bit thread safe) + PEAR 
-  + XAMPP Control Panel Version 3.0.12 von hackattack142 (Ein großes Danke Schön!)
-    Vgl.: http://www.apachefriends.org/f/viewtopic.php?f=16&t=46743
-  + phpMyAdmin 3.5.2
+Wichtig! PHP in diesem Paket benötigt die Microsoft Visual C++ 2008 Redistributable Erweiterung von
+http://www.microsoft.com/en-us/download/details.aspx?id=5582. Bitte stellen Sie sicher das die VC++ 2008 
+Runtime Bibliothek auf Ihrem System installiert ist.
+
+  + Apache 2.4.3
+  + MySQL 5.5.27 (Community Server)
+  + PHP 5.4.7 (VC9 X86 32bit thread safe) + PEAR 
+  + phpMyAdmin 3.5.2.2
   + OpenSSL 1.0.1c
-  + ADOdb 5.15
-  + XAMPP Security
+  + ADOdb 5.17
   + Mercury Mail Transport System v4.62 (nicht in der Portable Version)
   + FileZilla FTP Server 0.9.41 (nicht in der Portable Version)
   + Webalizer 2.23-04 (nicht in der Portable Version) 
-  + Strawberry Perl 5.16.0.1 Portable
-  + Tomcat 7.0.28 (nicht in der Portable Version)
-  + Old XAMPP Control Panel Version 2.5 von www.nat32.com (depricated)
+  + Strawberry Perl 5.16.1.1 Portable
+  + Tomcat 7.0.30
+  + XAMPP Control Panel Version 3.1.0 von hackattack142 (Ein großes Danke Schön!)
+    Vgl.: http://www.apachefriends.org/f/viewtopic.php?f=16&t=46743 
+  + XAMPP Security
   + XAMPP mailToDisk 1.0 (schreibt verdendete Mails über PHP auf die Festplatte unter <xampp>\mailoutput. In der php.ini als Mail Default aktiviert.)
 
 --------------------------------------------------------------- 
@@ -22,7 +25,7 @@
 * System-Voraussetzungen:
   
   + 64 MB RAM (EMPFOHLEN)
-  + 350 MB freier Speicherplatz
+  + 750 MB freier Speicherplatz
   + Windows 2003, XP (EMPFOHLEN), VISTA, Windows 7
   
 * ACHTUNG!!!!
@@ -75,11 +78,7 @@ ACHTUNG: Wenn sie im Installationspfad Leerzeichen verwenden (wie c:\program fil
 
 2) FileZilla FTP:
 
-   Benutzer: newuser
-   Passwort: wampp 
-
-   Benutzer: anonymous
-   Passwort: some@mail.net
+   [ Sie müssen erst einen neuen Benutzer über das User FileZilla Interface erstellen. ] 
 
 3) Mercury: 
 

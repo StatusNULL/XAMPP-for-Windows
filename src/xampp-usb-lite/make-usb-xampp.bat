@@ -1,24 +1,24 @@
 @ECHO OFF
-
 rmdir /S/Q MercuryMail
-rmdir /S/Q tomcat
+REM rmdir /S/Q tomcat
 rmdir /S/Q FileZillaFTP
 rmdir /S/Q anonymous
 rmdir /S/Q webalizer
+rmdir /S/Q src
 rmdir /S/Q mysql\mysql-test
 rmdir /S/Q mysql\sql-bench
 rmdir /S/Q mysql\scripts
 rmdir /S/Q mysql\include
 rmdir /S/Q mysql\lib
-rmdir /S/Q php\PEAR
-rmdir /S/Q perl\lib
-rmdir /S/Q perl\site
-rmdir /S/Q perl\vendor
-del /F/Q perl\bin\libeay32.dll
-del /F/Q perl\bin\ssleay32.dll
-del /F/Q perl\bin\libmysql.dll
-del /F/Q catalina_start.bat
-del /F/Q catalina_stop.bat
+REM rmdir /S/Q php\PEAR
+REM rmdir /S/Q perl\lib
+REM rmdir /S/Q perl\site
+REM rmdir /S/Q perl\vendor
+REM rmdir /S/Q perl\bin
+REM mkdir perl\bin
+REM del /F/Q catalina_start.bat
+REM del /F/Q catalina_stop.bat
+REM del /F/Q catalina_service.bat
 del /F/Q filezilla_setup.bat
 del /F/Q filezilla_start.bat
 del /F/Q filezilla_stop.bat
@@ -29,19 +29,8 @@ del /F/Q apache\apache_installservice.bat
 del /F/Q apache\apache_uninstallservice.bat
 del /F/Q mysql\mysql_installservice.bat
 del /F/Q mysql\mysql_uninstallservice.bat
-del /F/Q htdocs\xampp\navitools.inc
-del /F/Q htdocs\xampp\naviperl.inc
-del /F/Q htdocs\xampp\navijava.inc
 del /F/Q htdocs\xampp\.modell
-del /F/Q apache\conf\extra\httpd-perl.conf
 del /F/Q setup_xampp.bat
-del /F/Q xampp-control.exe
-del /F/Q xampp-control-old.exe
 copy src\xampp-usb-lite\setup_xampp.bat .
-copy src\xampp-usb-lite\usb-control-panel\Release\xampp-control.exe .
-mv htdocs\xampp\navitools-usb.inc htdocs\xampp\navitools.inc
-mv htdocs\xampp\naviperl-usb.inc htdocs\xampp\naviperl.inc
-mv htdocs\xampp\navijava-usb.inc htdocs\xampp\navijava.inc
-mv apache\conf\extra\httpd-perl-usb.conf apache\conf\extra\httpd-perl.conf
+copy src\xampp-usb-lite\xampp-control.ini .
 mv htdocs\xampp\.modell-usb htdocs\xampp\.modell
-

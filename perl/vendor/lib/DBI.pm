@@ -1,4 +1,4 @@
-# $Id: DBI.pm 15137 2012-02-09 15:22:56Z timbo $
+# $Id: DBI.pm 15327 2012-06-06 16:37:26Z timbo $
 # vim: ts=8:sw=4:et
 #
 # Copyright (c) 1994-2012  Tim Bunce  Ireland
@@ -11,7 +11,7 @@ package DBI;
 require 5.008_001;
 
 BEGIN {
-$VERSION = "1.618"; # ==> ALSO update the version in the pod text below!
+$VERSION = "1.622"; # ==> ALSO update the version in the pod text below!
 }
 
 =head1 NAME
@@ -93,17 +93,16 @@ I don't recommend the DBI cpanforum (at http://www.cpanforum.com/dist/DBI)
 because relatively few people read it compared with dbi-users@perl.org.
 
 To help you make the best use of the dbi-users mailing list,
-and any other lists or forums you may use, I I<strongly>
-recommend that you read "How To Ask Questions The Smart Way"
-by Eric Raymond: L<http://www.catb.org/~esr/faqs/smart-questions.html>.
+and any other lists or forums you may use, I recommend that you read
+"Getting Answers" by Mike Ash: L<http://mikeash.com/getting_answers.html>.
 
 If you think you've found a bug then please also read
 "How to Report Bugs Effectively" by Simon Tatham:
 L<http://www.chiark.greenend.org.uk/~sgtatham/bugs.html>.
 
 The DBI home page at L<http://dbi.perl.org/> and the DBI FAQ
-at L<http://faq.dbi-support.com/> are always worth a visit.
-They include links to other resources.
+at L<http://faq.dbi-support.com/> may be worth a visit.
+They include links to other resources, but are rather out-dated.
 
 Before asking any questions, reread this document, consult the
 archives and read the DBI FAQ. The archives are listed
@@ -126,8 +125,8 @@ Tim he is very likely to just forward it to the mailing list.
 
 =head2 NOTES
 
-This is the DBI specification that corresponds to the DBI version 1.618
-($Revision: 15137 $).
+This is the DBI specification that corresponds to DBI version 1.622
+(see L<DBI::Changes> for details).
 
 The DBI is evolving at a steady pace, so it's good to check that
 you have the latest copy.
@@ -343,6 +342,7 @@ my $dbd_prefix_registry = {
   ram_         => { class => 'DBD::RAM',            },
   rdb_         => { class => 'DBD::RDB',            },
   sapdb_       => { class => 'DBD::SAP_DB',         },
+  snmp_        => { class => 'DBD::SNMP',           },
   solid_       => { class => 'DBD::Solid',          },
   spatialite_  => { class => 'DBD::Spatialite',     },
   sponge_      => { class => 'DBD::Sponge',         },
@@ -353,6 +353,7 @@ my $dbd_prefix_registry = {
   tdat_        => { class => 'DBD::Teradata',       },
   tmpl_        => { class => 'DBD::Template',       },
   tmplss_      => { class => 'DBD::TemplateSS',     },
+  tree_        => { class => 'DBD::TreeData',       },
   tuber_       => { class => 'DBD::Tuber',          },
   uni_         => { class => 'DBD::Unify',          },
   vt_          => { class => 'DBD::Vt',             },
@@ -419,7 +420,7 @@ my $keeperr = { O=>0x0004 };
 	data_sources	=> { U =>[1,2,'[\%attr]' ], O=>0x0200 },
 	take_imp_data	=> { U =>[1,1], O=>0x10000 },
 	clone   	=> { U =>[1,2,'[\%attr]'], T=>0x200 },
-	connected   	=> { U =>[1,0], O => 0x0004, T=>0x200 },
+	connected   	=> { U =>[1,0], O => 0x0004, T=>0x200, H=>3 },
 	begin_work   	=> { U =>[1,2,'[ \%attr ]'], O=>0x0400, T=>0x1000 },
 	commit     	=> { U =>[1,1], O=>0x0480|0x0800, T=>0x1000 },
 	rollback   	=> { U =>[1,1], O=>0x0480|0x0800, T=>0x1000 },
@@ -520,10 +521,8 @@ END {
 
 
 sub CLONE {
-    my $olddbis = $DBI::_dbistate;
     _clone_dbis() unless $DBI::PurePerl; # clone the DBIS structure
-    DBI->trace_msg(sprintf "CLONE DBI for new thread %s\n",
-	$DBI::PurePerl ? "" : sprintf("(dbis %x -> %x)",$olddbis, $DBI::_dbistate));
+    DBI->trace_msg("CLONE DBI for new thread\n");
     while ( my ($driver, $drh) = each %DBI::installed_drh) {
 	no strict 'refs';
 	next if defined &{"DBD::${driver}::CLONE"};
@@ -2013,8 +2012,9 @@ sub _new_sth {	# called by DBD::<drivername>::db::prepare)
 
 	my $mode = ref($slice) || 'ARRAY';
 	my @rows;
-	my $row;
+
 	if ($mode eq 'ARRAY') {
+	    my $row;
 	    # we copy the array here because fetch (currently) always
 	    # returns the same array ref. XXX
 	    if ($slice && @$slice) {
@@ -2029,27 +2029,42 @@ sub _new_sth {	# called by DBD::<drivername>::db::prepare)
 	    else {
 		push @rows, [ @$row ] while($row = $sth->fetch);
 	    }
+	    return \@rows
+	}
+
+	my %row;
+	if ($mode eq 'REF' && ref($$slice) eq 'HASH') { # \{ $idx => $name }
+            keys %$$slice; # reset the iterator
+            while ( my ($idx, $name) = each %$$slice ) {
+                $sth->bind_col($idx+1, \$row{$name});
+            }
 	}
 	elsif ($mode eq 'HASH') {
-	    $max_rows = -1 unless defined $max_rows;
-	    if (keys %$slice) {
-		my @o_keys = keys %$slice;
-		my @i_keys = map { lc } keys %$slice;
-                # XXX this could be made faster by pre-binding a local hash
-                # using bind_columns and then copying it per row
-		while ($max_rows-- and $row = $sth->fetchrow_hashref('NAME_lc')) {
-		    my %hash;
-		    @hash{@o_keys} = @{$row}{@i_keys};
-		    push @rows, \%hash;
-		}
+            if (keys %$slice) {
+                keys %$slice; # reset the iterator
+                my $name2idx = $sth->FETCH('NAME_lc_hash');
+                while ( my ($name, $unused) = each %$slice ) {
+                    my $idx = $name2idx->{lc $name};
+                    return $sth->set_err($DBI::stderr, "Invalid column name '$name' for slice")
+                        if not defined $idx;
+                    $sth->bind_col($idx+1, \$row{$name});
+                }
 	    }
 	    else {
-		# XXX assumes new ref each fetchhash
-		push @rows, $row
-		    while ($max_rows-- and $row = $sth->fetchrow_hashref());
+		$sth->bind_columns( \( @row{ @{$sth->FETCH($sth->FETCH('FetchHashKeyName')) } } ) );
 	    }
 	}
-	else { Carp::croak("fetchall_arrayref($mode) invalid") }
+	else {
+            return $sth->set_err($DBI::stderr, "fetchall_arrayref($mode) invalid");
+        }
+
+        if (not defined $max_rows) {
+            push @rows, { %row } while ($sth->fetch); # full speed ahead!
+        }
+        else {
+            push @rows, { %row } while ($max_rows-- and $sth->fetch);
+        }
+
 	return \@rows;
     }
 
@@ -6397,16 +6412,6 @@ start at 1).
 With no parameters, or if $slice is undefined, C<fetchall_arrayref>
 acts as if passed an empty array ref.
 
-If $slice is a hash reference, C<fetchall_arrayref> uses L</fetchrow_hashref>
-to fetch each row as a hash reference. If the $slice hash is empty then
-fetchrow_hashref() is simply called in a tight loop and the keys in the hashes
-have whatever name lettercase is returned by default from fetchrow_hashref.
-(See L</FetchHashKeyName> attribute.) If the $slice hash is not
-empty, then it is used as a slice to select individual columns by
-name.  The values of the hash should be set to 1.  The key names
-of the returned hashes match the letter case of the names in the
-parameter hash, regardless of the L</FetchHashKeyName> attribute.
-
 For example, to fetch just the first column of every row:
 
   $tbl_ary_ref = $sth->fetchall_arrayref([0]);
@@ -6415,17 +6420,35 @@ To fetch the second to last and last column of every row:
 
   $tbl_ary_ref = $sth->fetchall_arrayref([-2,-1]);
 
-To fetch all fields of every row as a hash ref:
+Those two examples both return a reference to an array of array refs.
+
+If $slice is a hash reference, C<fetchall_arrayref> fetches each row as a hash
+reference. If the $slice hash is empty then the keys in the hashes have
+whatever name lettercase is returned by default. (See L</FetchHashKeyName>
+attribute.) If the $slice hash is I<not> empty, then it is used as a slice to
+select individual columns by name. The values of the hash should be set to 1.
+The key names of the returned hashes match the letter case of the names in the
+parameter hash, regardless of the L</FetchHashKeyName> attribute.
+
+For example, to fetch all fields of every row as a hash ref:
 
   $tbl_ary_ref = $sth->fetchall_arrayref({});
 
 To fetch only the fields called "foo" and "bar" of every row as a hash ref
-(with keys named "foo" and "BAR"):
+(with keys named "foo" and "BAR", regardless of the original capitalization):
 
   $tbl_ary_ref = $sth->fetchall_arrayref({ foo=>1, BAR=>1 });
 
-The first two examples return a reference to an array of array refs.
-The third and forth return a reference to an array of hash refs.
+Those two examples both return a reference to an array of hash refs.
+
+If $slice is a I<reference to a hash reference>, that hash is used to select
+and rename columns. The keys are 0-based column index numbers and the values
+are the corresponding keys for the returned row hashes.
+
+For example, to fetch only the first and second columns of every row as a hash
+ref (with keys named "k" and "v" regardless of their original names):
+
+  $tbl_ary_ref = $sth->fetchall_arrayref( \{ 0 => 'k', 1 => 'v' } );
 
 If $max_rows is defined and greater than or equal to zero then it
 is used to limit the number of rows fetched before returning.
@@ -6574,7 +6597,7 @@ Binds a Perl variable and/or some attributes to an output column
 You do not need to bind output columns in order to fetch data.
 For maximum portability between drivers, bind_col() should be called
 after execute() and not before.
-See also C<bind_columns> for an example.
+See also L</bind_columns> for an example.
 
 The binding is performed at a low level using Perl aliasing.
 Whenever a row is fetched from the database $var_to_bind appears
@@ -6747,7 +6770,7 @@ statement, like SELECT. Typically the attribute will be C<undef>
 in these situations.
 
 For drivers which support stored procedures and multiple result sets
-(see more_results) these attributes relate to the I<current> result set.
+(see L</more_results>) these attributes relate to the I<current> result set.
 
 See also L</finish> to learn more about the effect it
 may have on some attributes.

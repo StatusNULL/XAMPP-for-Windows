@@ -5,20 +5,21 @@ common::sense - save a tree AND a kitten, use common::sense!
 
 =head1 SYNOPSIS
 
- use common::sense;
+   use common::sense;
 
- # supposed to be the same, with much lower memory usage, as:
- #
- # use utf8;
- # use strict qw(vars subs);
- # use feature qw(say state switch);
- # no warnings;
- # use warnings qw(FATAL closed threads internal debugging pack
- #                 portable prototype inplace io pipe unpack malloc
- #                 deprecated glob digit printf layer
- #                 reserved taint closure semicolon);
- # no warnings qw(exec newline unopened);
-
+   # Supposed to be mostly the same, with much lower memory usage, as:
+  
+   # use utf8;
+   # use strict qw(vars subs);
+   # use feature qw(say state switch);
+   # use feature qw(unicode_strings unicode_eval current_sub fc evalbytes);
+   # no feature qw(array_base);
+   # no warnings;
+   # use warnings qw(FATAL closed threads internal debugging pack
+   #                 portable prototype inplace io pipe unpack malloc
+   #                 deprecated glob digit printf layer
+   #                 reserved taint closure semicolon);
+   # no warnings qw(exec newline unopened);
 
 =head1 DESCRIPTION
 
@@ -119,7 +120,7 @@ C<use strict> in scope:
 If that isn't hypocrisy! And all that from a mere program!
 
 
-=item use feature qw(say state given)
+=item use feature qw(say state given ...)
 
 We found it annoying that we always have to enable extra features. If
 something breaks because it didn't anticipate future changes, so be
@@ -139,6 +140,12 @@ There is also an important other mode where having additional features by
 default is useful: commandline hacks and internal use scripts: See "much
 reduced typing", below.
 
+There is one notable exception: C<unicode_eval> is not enabled by
+default. In our opinion, C<use feature> had one main effect - newer perl
+versions don't value backwards compatibility and the ability to write
+modules for multiple perl versions much, after all, you can use feature.
+
+C<unicode_eval> doesn't add a new feature, it breaks an existing function.
 
 =item no warnings, but a lot of new errors
 
@@ -228,20 +235,17 @@ often be modules that pull in the monster pragmas. But one can hope...
 
 package common::sense;
 
-our $VERSION = '3.5';
+our $VERSION = '3.6';
 
 # overload should be included
 
 sub import {
-   local $^W; # work around perl 5.16 spewing out warnings for next line
+   local $^W; # work around perl 5.16 spewing out warnings for next statement
    # use warnings
    ${^WARNING_BITS} ^= ${^WARNING_BITS} ^ "";
-   # use strict, use utf8;
-   $^H |= 0x8006c0;
-   # use feature
-   $^H{feature_switch} =
-   $^H{feature_say}    =
-   $^H{feature_state}  = 1;
+   # use strict, use utf8; use feature;
+   $^H |= 0x1c820ec0;
+   @^H{qw(feature___SUB__ feature_fc feature_unicode feature_evalbytes feature_say feature_state feature_switch)} = (1) x 7;
 }
 
 1;

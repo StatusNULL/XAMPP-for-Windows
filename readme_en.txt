@@ -1,28 +1,31 @@
-###### ApacheFriends XAMPP Version 1.8.0 ######
+###### ApacheFriends XAMPP Version 1.8.1 ######
 
-  + Apache 2.4.2
-  + MySQL 5.5.25a (Community Server)
-  + PHP 5.4.4 (VC9 X86 32bit thread safe) + PEAR 
-  + XAMPP Control Panel Version 3.0.12 by hackattack142 (Great Thanks!!))
-    Vgl.: http://www.apachefriends.org/f/viewtopic.php?f=16&t=46743
-  + phpMyAdmin 3.5.2
+Important! PHP in this package needs the Microsoft Visual C++ 2008 Redistributable package from
+http://www.microsoft.com/en-us/download/details.aspx?id=5582. Please ensure that the VC++ 2008 runtime
+libraries are installed on your system.    
+
+  + Apache 2.4.3
+  + MySQL 5.5.27 (Community Server)
+  + PHP 5.4.7 (VC9 X86 32bit thread safe) + PEAR 
+  + phpMyAdmin 3.5.2.2
   + OpenSSL 1.0.1c
-  + ADOdb 5.15
-  + XAMPP Security
+  + ADOdb 5.17
   + Mercury Mail Transport System v4.62 (not included in the portable version)
   + FileZilla FTP Server 0.9.41 (not included in the portable version)
   + Webalizer 2.23-04 (not included in the portable version) 
-  + Strawberry Perl 5.16.0.1 Portable
-  + Tomcat 7.0.28 (not included in the portable version)
-  + Old XAMPP Control Panel Version 2.5 von www.nat32.com (depricated)
-  + XAMPP mailToDisk 1.0 (write sendet emails via PHP on local disk in <xampp>\mailoutput. Is activated in the php.ini as mail default.)
+  + Strawberry Perl 5.16.1.1 Portable
+  + Tomcat 7.0.30 
+  + XAMPP Control Panel Version 3.1.0 by hackattack142 (Great Thanks!!))
+    See: http://www.apachefriends.org/f/viewtopic.php?f=16&t=46743
+  + XAMPP Security
+  + XAMPP mailToDisk 1.0 (write emails via PHP on local disk in <xampp>\mailoutput. Activated in the php.ini as mail default.)
 
 --------------------------------------------------------------- 
 
 * System Requirements:
  
   + 64 MB RAM (RECOMMENDED)
-  + 350 MB free fixed disk 
+  + 750 MB free fixed disk 
   + Windows 2003, XP (RECOMMENDED), VISTA, Windows 7
 
 ---------------------------------------------------------------
@@ -79,11 +82,7 @@ Attention : If XAMPP is installed in a base directory with spaces (e.g. c:\progr
 
 2) FileZilla FTP:
 
-   User: newuser
-   Password: wampp 
-
-   User: anonymous
-   Password: some@mail.net
+   [ You have to create a new user on the FileZilla Interface ] 
 
 3) Mercury: 
 

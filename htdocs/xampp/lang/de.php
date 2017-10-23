@@ -367,11 +367,11 @@ $TEXT['phonebook-button2']="HINZUFÜGEN";
 
 	$TEXT['filezilla-head'] = "FileZilla FTP Server";
 	$TEXT['filezilla-install'] = "Der Apache ist <U>kein</U> FTP Server ... aber FileZilla FTP ist einer. Bitte beachtet die folgenden Hinweise.";
-	$TEXT['filezilla-install2'] = "Einfach die Datei \"filezilla_setup.bat\" im Hauptverzeichnis des xampp starten, um den FTP Server einzurichten. Unter Windows NT, 2000 und XP Professional Betrienssystemen wird der Nutzer nun automatisch aufgefordert, FileZilla als Dienst zu installieren, damit der Server starten kann.";
+	$TEXT['filezilla-install2'] = "Bitte einfach über das XAMPP Control Panel (Admin) das FileZilla Interface (Login ohne Passwort auf localhost) starten, um den FTP Server einzurichten bzw. neue FTP User anzulegen. FileZilla Server muss als Dienst installiert sein, damit der Server startet.";
 	$TEXT['filezilla-install3'] = "Nun könnt ihr \"FileZilla FTP\" konfigurieren. Nutzt dazu das FileZilla Interface namens \"FileZilla Server Interface.exe\" im FileZilla-Verzeichnis. Natürlich könnt ihr euch an der Beispielkonfiguration orientieren. Zwei Nutzer wurde in dem Beispiel angelegt:<br><br>
 	A: Ein Standardnutzer namens \"newuser\", Kennwort \"wampp\". Das Heimatverzeichnis ist xampp\htdocs.<br>
 	B: Ein Anonymous User namens \"anonymous\", kein Kennwort. Das Heimatverzeichnis ist xampp\anonymous. Kann via Browser mit <a href=\"ftp://127.0.0.1\" target=\"_new\">ftp://127.0.0.1</a> angesprochen werden.<br><br>Der FileZilla ist hier erst einmal nur über die Loopback Adresse 127.0.0.1 gebunden, ihr könnt den zu nutzenden IP Addressbereich aber noch über das FileZilla Interface ändern.";
-	$TEXT['filezilla-install4'] = "Den FTP Server stoppen mit \"FileZillaFTP_stop.bat\". Wer den Server als Dienst starten möchte, sollte die Exekute-Datei mal mit Doppelklick auf \"FileZillaServer.exe\" starten. Dieser fragt dann nach den ganzen Startoptionen.";
+	$TEXT['filezilla-install4'] = "Den FTP Server stoppen über das XAMPP Control Pamel oder mit \"FileZillaFTP_stop.bat\".";
 	$TEXT['filezilla-url'] = "<br><br><a href=\"http://filezilla.sourceforge.net\" target=\"_top\">http://filezilla.sourceforge.net</a>";
 
 	// ---------------------------------------------------------------------

@@ -1,10 +1,8 @@
-# $Id: DH.pm 1860 2005-06-11 06:15:44Z btrott $
-
 package Crypt::DH;
 use strict;
 
 use Math::BigInt lib => "GMP,Pari";
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub new {
     my $class = shift;
@@ -236,15 +234,26 @@ I<priv_key> parameter for this I<Crypt::DH> object.
 
 Returns the public key.
 
-=head1 AUTHOR & COPYRIGHT
+=head1 AUTHOR
 
-Benjamin Trott, ben@rhumba.pair.com
+Benjamin Trott (cpan:BTROTT) <ben+cpan@stupidfool.org>
 
-Brad Fitzpatrick, brad@danga.com
+Brad Fitzpatrick (cpan:BRADFITZ) <brad@danga.com>
 
-Except where otherwise noted, Crypt::DH is Copyright 2001
-Benjamin Trott. All rights reserved. Crypt::DH is free
-software; you may redistribute it and/or modify it under
-the same terms as Perl itself.
+=head1 CONTRIBUTORS
+
+BinGOs - Chris Williams (cpan:BINGOS) <chris@bingosnet.co.uk>
+
+Mithaldu - Christian Walde (cpan:MITHALDU) <walde.christian@googlemail.com>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2012 the Crypt::DH L</AUTHOR> and L</CONTRIBUTORS> as listed
+above.
+
+=head1 LICENSE
+
+This library is free software and may be distributed under the same terms
+as perl itself.
 
 =cut

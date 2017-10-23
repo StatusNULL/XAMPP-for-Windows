@@ -3,7 +3,7 @@ BEGIN {
   $Moose::Cookbook::Meta::Labeled_AttributeMetaclass::AUTHORITY = 'cpan:STEVAN';
 }
 {
-  $Moose::Cookbook::Meta::Labeled_AttributeMetaclass::VERSION = '2.0602';
+  $Moose::Cookbook::Meta::Labeled_AttributeMetaclass::VERSION = '2.0603';
 }
 
 # ABSTRACT: A meta-attribute, attributes with labels
@@ -18,7 +18,7 @@ Moose::Cookbook::Meta::Labeled_AttributeMetaclass - A meta-attribute, attributes
 
 =head1 VERSION
 
-version 2.0602
+version 2.0603
 
 =head1 SYNOPSIS
 

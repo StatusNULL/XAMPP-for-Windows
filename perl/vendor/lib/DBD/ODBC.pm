@@ -1,4 +1,4 @@
-# $Id: ODBC.pm 15265 2012-04-07 13:53:28Z mjevans $
+# $Id: ODBC.pm 15339 2012-06-26 10:13:40Z mjevans $
 #
 # Copyright (c) 1994,1995,1996,1998  Tim Bunce
 # portions Copyright (c) 1997-2004  Jeff Urlwin
@@ -19,7 +19,7 @@ require 5.008;
 # see discussion on dbi-users at
 # http://www.nntp.perl.org/group/perl.dbi.dev/2010/07/msg6096.html and
 # http://www.dagolden.com/index.php/369/version-numbers-should-be-boring/
-$DBD::ODBC::VERSION = '1.37';
+$DBD::ODBC::VERSION = '1.39';
 
 {
     ## no critic (ProhibitMagicNumbers ProhibitExplicitISA)
@@ -32,7 +32,7 @@ $DBD::ODBC::VERSION = '1.37';
 
     @ISA = qw(Exporter DynaLoader);
 
-    # my $Revision = substr(q$Id: ODBC.pm 15265 2012-04-07 13:53:28Z mjevans $, 13,2);
+    # my $Revision = substr(q$Id: ODBC.pm 15339 2012-06-26 10:13:40Z mjevans $, 13,2);
 
     require_version DBI 1.609;
 
@@ -60,12 +60,28 @@ $DBD::ODBC::VERSION = '1.37';
         SQL_DIAG_ROW_NUMBER => -1248,
         SQL_DIAG_SERVER_NAME => 11,
         SQL_DIAG_SQLSTATE => 4,
-        SQL_DIAG_SUBCLASS_ORIGIN => 9
+        SQL_DIAG_SUBCLASS_ORIGIN => 9,
+        # TAF constants - these are just copies of Oracle constants
+        # events:
+        OCI_FO_END     => 0x00000001,
+        OCI_FO_ABORT   => 0x00000002,
+        OCI_FO_REAUTH  => 0x00000004,
+        OCI_FO_BEGIN   => 0x00000008,
+        OCI_FO_ERROR   => 0x00000010,
+        # callback return codes:
+        OCI_FO_RETRY   => 25410,
+        # types:
+        OCI_FO_NONE    => 0x00000001,
+        OCI_FO_SESSION => 0x00000002,
+        OCI_FO_SELECT  => 0x00000004,
+        OCI_FO_TXNAL   => 0x00000008
     };
     our @EXPORT_DIAGS = qw(SQL_DIAG_CURSOR_ROW_COUNT SQL_DIAG_DYNAMIC_FUNCTION SQL_DIAG_DYNAMIC_FUNCTION_CODE SQL_DIAG_NUMBER SQL_DIAG_RETURNCODE SQL_DIAG_ROW_COUNT SQL_DIAG_CLASS_ORIGIN SQL_DIAG_COLUMN_NUMBER SQL_DIAG_CONNECTION_NAME SQL_DIAG_MESSAGE_TEXT SQL_DIAG_NATIVE SQL_DIAG_ROW_NUMBER SQL_DIAG_SERVER_NAME SQL_DIAG_SQLSTATE SQL_DIAG_SUBCLASS_ORIGIN);
-    our @EXPORT_OK = (@EXPORT_DIAGS);
+    our @EXPORT_TAF = qw(OCI_FO_END OCI_FO_ABORT OCI_FO_REAUTH OCI_FO_BEGIN OCI_FO_ERROR OCI_FO_RETRY OCI_FO_NONE OCI_FO_SESSION OCI_FO_SELECT OCI_FO_TXNAL);
+    our @EXPORT_OK = (@EXPORT_DIAGS, @EXPORT_TAF);
     our %EXPORT_TAGS = (
-        diags => \@EXPORT_DIAGS);
+        diags => \@EXPORT_DIAGS,
+        taf => \@EXPORT_TAF);
 
     sub parse_trace_flag {
         my ($class, $name) = @_;
@@ -178,8 +194,9 @@ $DBD::ODBC::VERSION = '1.37';
             odbc_column_display_size       => undef, # sth and dbh
             odbc_utf8_on                   => undef, # sth and dbh
             odbc_driver_complete           => undef,
-            odbc_batch_size                => undef,
+            odbc_batch_size                      => undef,
             odbc_array_operations          => undef, # sth and dbh
+            odbc_taf_callback                    => undef
         };
     }
 
@@ -633,7 +650,7 @@ DBD::ODBC - ODBC Driver for DBI
 
 =head1 VERSION
 
-This documentation refers to DBD::ODBC version 1.37.
+This documentation refers to DBD::ODBC version 1.39.
 
 =head1 SYNOPSIS
 
@@ -1261,6 +1278,94 @@ When set to 0 array operations are used no matter what. I know this is
 slightly counter intuitive but I've found it difficult to change the
 name (it got picked up and used in a few places very quickly).
 
+=head3 odbc_taf_callback
+
+NOTE: this is experimental until I at least see more than one ODBC
+driver which supports TAF.
+
+Transparent Application Failover (TAF) is a feature in OCI that
+allows for clients to automatically reconnect to an instance in the
+event of a failure of the instance. The reconnect happens
+automatically from within the OCI (Oracle Call Interface)
+library.
+
+TAF supports a callback function which once registered is called
+by the driver to let you know what is happening and which allows
+you to a degree, to control how the failover is handled.
+
+You need to set up TAF on your instance first and that process
+is beyond the scope of this document. Once TAF is enabled you simply
+set C<odbc_taf_callback> to a code reference which should look like
+this:
+
+  sub taf_handler {
+   my ($dbh, $event, $type) = @_;
+   # do something here
+  }
+
+DBD::ODBC will pass the connection handle ($dbh), the Oracle event
+type (OCI_FO_END, OCI_FO_ABORT, OCI_FO_REAUTH, OCI_FO_BEGIN,
+OCI_FO_ERROR) and the Oracle type (OCI_FO_NONE, OCI_FO_SESSION,
+OCI_FO_SELECT, OCI_FO_TXNAL).  Consult the Oracle documentation for
+what these are. You can import these constants using the :taf export
+tag. If your instance is not TAF enabled it is likely an attempt to
+register a callback will fail but this is driver dependent (all
+DBD::ODBC does is make a SQLSetConnectAttr call and provide a C
+wrapper which calls your Perl subroutine).
+
+Here is a commented example:
+
+  my $h = DBI->connect('dbi:ODBC:oracle','xxx','yyy',
+                       {RaiseError => 1,
+                        odbc_taf_callback => \&taf_handler}) or die "connect";
+  while (1) {
+      my $s = $h->selectall_arrayref(q/select 1 from dual/);
+      sleep 5;
+  }
+
+  sub taf_handler {
+     my ($dbh, $event, $type) = @_;
+
+     #print "taf_handler $dbh, $event, $type\n";
+
+     if ($event == OCI_FO_BEGIN) {
+         print "Instance unavailable, stand by\n";
+         print "Your TAF type is : ",
+             ($type == OCI_FO_NONE ? "NONE" :
+                  ($type == OCI_FO_SESSION ? "SESSION" :
+                       ($type == OCI_FO_SELECT ? "SELECT" : "?"))) , "\n";
+         # start a counter and each time OCI_FO_ERROR is passed in we will
+         # count down and abort the failover when we hit 0.
+         $count = 10;
+         return 0;
+     } elsif ($event == OCI_FO_ERROR) {
+         # We get an OCI_FO_ERROR each time the failover fails
+         # sleep a while until the count hits 0
+         if (--$count < 1) {
+             print "Giving up\n";
+             return 0;            # give up
+         } else {
+             print "Retrying...\n";
+             sleep 1;
+             return OCI_FO_RETRY; # tell Oracle to retry
+         }
+     } elsif ($event == OCI_FO_REAUTH) {
+         print "Failed over user. Resuming Services\n";
+     } elsif ($event == OCI_FO_END) {
+         print "Failover ended - resuming\n";
+     }
+     return 0;
+  }
+
+NOTE: The above example is for use with the Easysoft Oracle ODBC
+Driver. ODBC does not define any standard way of supporting TAF and so
+different drivers may use different connection attributes to set it up
+or may even pass the callback different arguments. Unfortunately, I
+don't have access to any other ODBC driver which supports TAF. Until I
+see others I cannot create a generic interface. I'll happily accept
+patches for any other driver or if you send me a working copy of the
+driver and the documentation I will add support for it.
+
 =head2 Private statement attributes
 
 =head3 odbc_more_results
@@ -1539,8 +1644,11 @@ DiscardString to the prepare attributes then if the returned bound
 data is capable of being converted to that type the scalar's pv (the
 string portion of a scalar) is cleared.
 
+NOTE: post DBD::ODBC 1.37, DBD::ODBC binds all SQL_INTEGER columns as
+SQL_C_LONG and DiscardString is irrelevant.
+
 This is especially useful if you are using a module which uses a
-scalars flags and/or pv to decide if a scalar is a number. JSON::XS
+scalar's flags and/or pv to decide if a scalar is a number. JSON::XS
 does this and without this flag you have to add 0 to all bound column
 data returning numbers to get JSON::XS to encode it is N instead of
 "N".
@@ -1562,7 +1670,7 @@ an SQL_INTEGER and the data is not able to be converted to an integer
 the ODBC driver will problably return "Invalid character value for
 cast specification (SQL-22018)".
 
-NOTE: For DiscardString you need at least DBI 1.611.
+NOTE: For StrictlyTyped you need at least DBI 1.611.
 
 =head3 TreatAsLOB
 
@@ -1735,7 +1843,7 @@ The DBI specification post 1.608 says in bind_param:
   The data type is 'sticky' in that bind values passed to execute()
   are bound with the data type specified by earlier bind_param()
   calls, if any.  Portable applications should not rely on being able
-  to change the data type after the first C<bind_param> call.
+  to change the data type after the first bind_param call.
 
 DBD::ODBC does allow a parameter to be rebound with another data type as
 ODBC inherently allows this. Therefore you can do:
@@ -1767,6 +1875,12 @@ which binds arrays of parameters and can send multiple rows
 when inserting, updating or deleting many rows in one go. Note,
 execute_array uses execute_for_fetch when the parameters are passed
 for column-wise binding.
+
+NOTE: DBD::ODBC 1.34_1 to DBD::ODBC 1.36_1 set the default to use
+DBD::ODBC's own execute_for_fetch but quite a few ODBC drivers just
+cannot handle it. As such, from DBD::ODBC 1.36_2 the default was
+changed to not use DBD::ODBC's execute_for_fetch (i.e., you need to
+enable it with odbc_array_operations).
 
 However, there are a small number of differences between using
 DBD::ODBC's execute_for_fetch compared with using DBI's default
@@ -1833,10 +1947,38 @@ DBI's inbuilt execute_* methods. See rt 75687.
 =head3 type_info_all
 
 Many ODBC drivers now return 20 columns in type_info_all rather than
-the 19 DBI documents DBI documents. The 20th column is usually called
+the 19 DBI documents. The 20th column is usually called
 "USERTYPE".  Recent MS SQL Server ODBC drivers do this. Fortunately
 this should not adversely affect you so long as you are using the keys
 provided at the start of type_info_all.
+
+=head3 Binding Columns
+
+The DBI specification allows a column type to be overriden in the call
+to the bind_col method. Mostly, DBD::ODBC ignores this type as it
+binds integers (SQL_INTEGER) as a SQL_C_LONG (since DBD::ODBC 1.38_1)
+and all other columns as SQL_C_CHAR or SQL_C_WCHAR and it is too late
+to change the bind type after the result-set has been described
+anyway. The only time when the TYPE passed to bind_col is used in
+DBD::ODBC is when it is SQL_NUMERIC or SQL_DOUBLE in which case
+DBD::ODBC will call DBI's sql_type_cast method.
+
+Since DBD::ODBC 1.38_1 if you attempt to change the bind type after
+the column has already bound DBD::ODBC will issue a warning and ignore
+your column type change e.g.,
+
+  my $s = $h->prepare(q/select a from mytable);
+  $s->execute;  # The column type was determined here
+  my $r;
+  $s->bind_col(1, \$r); # and bound as the right type here
+  $s->execute;
+  $s->bind_col(1, \$r, {TYPE => SQL_XXX}); # warning, type changed
+
+Basically, if you are passing a TYPE to bind_col with DBD::ODBC (other
+than SQL_NUMERIC or SQL_DOUBLE) your code is probably wrong.
+
+Significant changes occurred in DBD::ODBC at 1.38_1 for binding
+columns. Please see the Changes file.
 
 =head2 Unicode
 

@@ -1,0 +1,64 @@
+unit uHelp;
+
+interface
+
+uses
+  GnuGettext, Windows, Messages, SysUtils, Variants, Classes, Graphics,
+  Controls, Forms,
+  Dialogs, StdCtrls, Buttons, Vcl.ExtCtrls, uTools;
+
+type
+  TfHelp = class(TForm)
+    lAbout: TLabel;
+    BitBtn1: TBitBtn;
+    Label1: TLabel;
+    Label2: TLabel;
+    Label4: TLabel;
+    LinkLabel1: TLinkLabel;
+    LinkLabel2: TLinkLabel;
+    procedure BitBtn1Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure LinkLabel1LinkClick(Sender: TObject; const Link: string;
+      LinkType: TSysLinkType);
+  private
+    { Private-Deklarationen }
+  public
+    { Public-Deklarationen }
+  end;
+
+var
+  fHelp: TfHelp;
+
+implementation
+
+{$R *.dfm}
+
+procedure TfHelp.BitBtn1Click(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TfHelp.FormCreate(Sender: TObject);
+begin
+  TranslateComponent(Self);
+end;
+
+procedure TfHelp.LinkLabel1LinkClick(Sender: TObject; const Link: string;
+  LinkType: TSysLinkType);
+var
+  App: string;
+begin
+  if Config.BrowserApp <> '' then
+  begin
+    App := Config.BrowserApp;
+    ExecuteFile(App, Link, '', SW_SHOW);
+    AddLog(Format(_('Executing "%s" "%s"'), [App, Link]), ltDebug);
+  end
+  else
+  begin
+    ExecuteFile(Link, '', '', SW_SHOW);
+    AddLog(Format(_('Executing "%s"'), [Link]), ltDebug);
+  end;
+end;
+
+end.

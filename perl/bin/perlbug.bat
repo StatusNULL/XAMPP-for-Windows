@@ -15,9 +15,9 @@ goto endofperl
     eval 'exec C:\strawberry\perl\bin\perl.exe -S $0 ${1+"$@"}'
 	if $running_under_some_shell;
 
-my $config_tag1 = '5.16.0 - Mon May 21 22:08:30 2012';
+my $config_tag1 = '5.16.1 - Thu Aug  9 09:55:53 2012';
 
-my $patchlevel_date = 1337518360;
+my $patchlevel_date = 1344121589;
 my $patch_tags = '';
 my @patches = (
     ''

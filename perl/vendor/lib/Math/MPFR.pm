@@ -28,6 +28,8 @@
                 RMPFR_PREC_MIN RMPFR_PREC_MAX);
 
     use overload
+    '++'   => \&overload_inc,
+    '--'   => \&overload_dec,
     '+'    => \&overload_add,
     '-'    => \&overload_sub,
     '*'    => \&overload_mul,
@@ -144,9 +146,10 @@ Rmpfr_set_divby0 Rmpfr_clear_divby0 Rmpfr_divby0_p
 Rmpfr_buildopt_tune_case Rmpfr_frexp Rmpfr_grandom Rmpfr_z_sub Rmpfr_buildopt_gmpinternals_p
 );
 
-    $Math::MPFR::VERSION = '3.12';
+    our $VERSION = '3.14';
+    $VERSION = eval $VERSION;
 
-    DynaLoader::bootstrap Math::MPFR $Math::MPFR::VERSION;
+    DynaLoader::bootstrap Math::MPFR $VERSION;
 
     %Math::MPFR::EXPORT_TAGS =(mpfr => [qw(
 GMP_RNDN GMP_RNDZ GMP_RNDU GMP_RNDD
@@ -1335,8 +1338,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    $si = Rmpfr_rec_sqrt($rop, $op, $rnd);
     Set $rop to the reciprocal square root of $op rounded in the
-    direction $rnd. Return +Inf if OP is ±0, and +0 if OP is +Inf.
-    Set $rop to NaN if $op is negative.
+    direction $rnd. Set $rop to +Inf if $op is 0, and 0 if $op is
+    +Inf. Set $rop to NaN if $op is negative.
 
    $si = Rmpfr_cbrt($rop, $op, $rnd);
     Set $rop to the cubic root (defined over the real numbers)
@@ -1366,7 +1369,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    $si = Rmpfr_abs($rop, $op, $rnd);
     Set $rop to the absolute value of $op, rounded in the direction
-    $rnd. Return 0 if the result is exact, a positive value if ROP
+    $rnd. Return 0 if the result is exact, a positive value if $rop
     is larger than the absolute value of $op, and a negative value 
     otherwise.
 
@@ -1522,7 +1525,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     results are exact.
 
    $si = Rmpfr_sinh_cosh($rop1, $rop2, $op, $rnd);
-    Set simultaneously $rop1SOP to the hyperbolic sine of $op and
+    Set simultaneously $rop1 to the hyperbolic sine of $op and
     $rop2 to the hyperbolic cosine of $op, rounded in the direction
     $rnd with the corresponding precision of $rop1 and $rop2 which
     must be different variables. Return 0 iff both results are
@@ -1552,7 +1555,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     Set $rop to the hyperbolic cosine/hyperbolic sine/hyperbolic
     tangent respectively of $op, rounded to the direction $rnd
     with the precision of $rop.  Return 0 iff the result is exact
-    (this occurs in fact only when OP is 0 i.e. the result is 1).
+    (this occurs in fact only when $op is 0 i.e. the result is 1).
     Return a negative value iff the result is less than the actual
     value. Return a positive result iff the return is greater than
     the actual value.
@@ -1590,13 +1593,13 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $bool = Rmpfr_log1p($rop, $op, $rnd);
     Set $rop to the logarithm of one plus $op, rounded to the
     direction $rnd with the precision of $rop.  Return 0 iff 
-    the result is exact (this occurs in fact only when OP is 0
+    the result is exact (this occurs in fact only when $op is 0
     i.e. the result is 0).
 
    $bool = Rmpfr_expm1($rop, $op, $rnd);
     Set $rop to the exponential of $op minus one, rounded to the
     direction $rnd with the precision of $rop.  Return 0 iff the
-    result is exact (this occurs in fact only when OP is 0 i.e
+    result is exact (this occurs in fact only when $op is 0 i.e
     the result is 0).
 
    $si = Rmpfr_fma($rop, $op1, $op2, $op3, $rnd);
@@ -1685,7 +1688,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     The sign (1 or -1) of Gamma($op) is returned in $signp.
     When $op is an infinity or a non-positive integer, +Inf is
     returned. When $op is NaN, -Inf or a negative integer, $signp
-    is undefined, and when OP is ±0, $signp is the sign of the zero.
+    is undefined, and when $op is 0, $signp is the sign of the zero.
 
    $si = Rmpfr_digamma ($rop, $op, $rnd); # mpfr-3.0.0 and later only
     Set $rop to the value of the Digamma (sometimes also called Psi)
@@ -1725,7 +1728,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $si = Rmpfr_y1 ($rop, $op, $rnd);
    $si = Rmpfr_yn ($rop, $si2, $op, $rnd);
      Set $rop to the value of the second order Bessel function of
-     order 0, 1 and $si2 on OP, rounded in the direction $rnd.
+     order 0, 1 and $si2 on $op, rounded in the direction $rnd.
      When $op is NaN or negative, $rop is always set to NaN.
      When $op is +Inf, $rop is +0. When $op is zero, $rop is +Inf
      or -Inf depending on the parity and sign of $si2.
@@ -1910,7 +1913,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
      mathematical function).
 
    $si = Rmpfr_frac($rop, $op, $round);
-    Set $rop to the fractional part of OP, having the same sign as $op,
+    Set $rop to the fractional part of $op, having the same sign as $op,
     rounded in the direction $round (unlike in `mpfr_rint', $round
     affects only how the exact fractional part is rounded, not how
     the fractional part is generated).
@@ -2136,7 +2139,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
     The following operators are overloaded:
      + - * / ** sqrt (Return object has default precision)
-     += -= *= /= **= (Precision remains unchanged)
+     += -= *= /= **= ++ -- (Precision remains unchanged)
      < <= > >= == != <=>
      ! bool
      abs atan2 cos sin log exp (Return object has default precision)
@@ -2145,15 +2148,44 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
      = (The copy has the same precision as the copied object.)
      ""
 
-    Attempting to use the overloaded operators with objects that
-    have been blessed into some package other than 'Math::MPFR'
-    will not (currently) work. It would be fun (and is tempting)
-    to implement cross-class overloading - but it could also
-    easily lead to user confusion and frustration, so I'll resist
-    the temptation until someone convinces me that I should do
-    otherwise.
-    The workaround is to convert this "foreign" object to a
-    format that *will* work with the overloaded operator.
+    As of version 3.13 of Math::MPFR, some cross-class overloading
+    is allowed.
+    Let $M be a Math::MPFR object, and $G be any one of a Math::GMPz,
+    Math::GMPq or Math::GMPf object. Then it is now permissible to
+    do:
+     
+     $M + $G;
+     $M - $G;
+     $M * $G;
+     $M / $G;
+     $M ** $G;
+
+    In each of the above, a Math::MPFR object containing the result
+    of the operation is returned. It is also now permissible to do:
+
+     $M += $G;
+     $M -= $G;
+     $M *= $G;
+     $M /= $G;
+
+    If you have version 0.35 (or later) of Math::GMPz, Math::GMPq
+    and Math::GMPf, it is also permissible to do:
+
+     $G + $M;
+     $G - $M;
+     $G * $M;
+     $G / $M;
+     $G ** $M;
+
+    Again, each of those operations returns a Math::MPFR object
+    containing the result of the operation.
+    The following is still NOT ALLOWED, and will cause a fatal error:
+
+     $G += $M;
+     $G -= $M;
+     $G *= $M;
+     $G /= $M;
+     $G **= $M; 
 
     In those situations where the overload subroutine operates on 2
     perl variables, then obviously one of those perl variables is
@@ -2188,8 +2220,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
        or '0X' it is regarded as a base 16 number. Otherwise it is
        regarded as a base 10 number.
 
-    5. If the variable is a Math::MPFR object then the value of that
-       object is used.
+    5. If the variable is a Math::MPFR, Math::GMPz, Math::GMPf, or
+       Math::GMPq object then the value of that object is used.
 
     6. If none of the above is true, then the second variable is
        deemed to be of an invalid type. The subroutine croaks with
