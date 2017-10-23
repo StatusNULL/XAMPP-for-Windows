@@ -10,7 +10,7 @@ $TEXT['global-xampp']="XAMPP für Windows";
 // NAVIGATION
 // ---------------------------------------------------------------------
 
-$TEXT['navi-xampp']="XAMPP 1.4.4";
+$TEXT['navi-xampp']="XAMPP 1.4.5";
 $TEXT['navi-welcome']="Willkommen";
 $TEXT['navi-status']="Status";
 $TEXT['navi-security']="Sicherheitscheck";
@@ -32,6 +32,7 @@ $TEXT['navi-adodb']="ADOdb";
 $TEXT['navi-perl']="Perl";
 $TEXT['navi-python']="Python";
 $TEXT['navi-jsp']="Java";
+$TEXT['navi-phpswitch']="PHP Umschalter";
 
 $TEXT['navi-tools']="Tools";
 $TEXT['navi-phpmyadmin']="phpMyAdmin";
@@ -121,7 +122,7 @@ $TEXT['start-subhead']="Herzlichen Glückwunsch:<br>XAMPP wurde erfolgreich auf d
 
 $TEXT['start-text1']="Nun kann es losgehen. :) Als erstes bitte einmal auf der linken Seite auf »Status« klicken. Damit bekommt man einen Überblick was alles schon funktioniert. Ein paar Funktionen werden ausgeschaltet sein. Das ist Absicht so. Es sind Funktionen, die nicht überall funktionieren oder evtl. Probleme bereiten könnten.";
 
-$TEXT['start-text2']="Achtung: Der XAMPP wurde ab Version 1.4.4 auf eine Einzelpaketverwaltung umgestellt. Es gibt nun die folgenden Pakete/Addons: <UL><LI>XAMPP Basis Paket</LI><LI>XAMPP Perl addon</LI><LI>XAMPP Python addon<LI></LI>XAMPP Utility addon (Zubehör aber noch inaktiv)</LI><LI>XAMPP Server addon (weitere Server aber noch inaktiv)</LI><LI>XAMPP Other addon (weitere nützliche Sachen aber noch inaktiv)</LI></UL>";
+$TEXT['start-text2']="Achtung: Der XAMPP wurde ab Version 1.4.5 auf eine Einzelpaketverwaltung umgestellt. Es gibt nun die folgenden Pakete/Addons: <UL><LI>XAMPP Basis Paket</LI><LI>XAMPP Perl addon</LI><LI>XAMPP Python addon<LI></LI>XAMPP Utility addon (Zubehör aber noch inaktiv)</LI><LI>XAMPP Server addon (weitere Server aber noch inaktiv)</LI><LI>XAMPP Other addon (weitere nützliche Sachen aber noch inaktiv)</LI></UL>";
 
 $TEXT['start-text3']="Bitte \"installiert\" die Zusatzpakete, die ihr noch benötigt, einfach hinterher. Nach dem erfolgreichen raufspielen bitte immer die \"setup_xampp.bat\" betätigen, um den XAMPP neu zu initialisieren. Ach so, die Installerversionen der einzelnen Addons funktionieren nur wenn das XAMPP Basispaket ebenfalls über eine Installerversion eingerichtet wurde.";
 
@@ -362,5 +363,22 @@ $TEXT['info-tomcatok']="OK! Der Tomcat ist auf Port 8080 erfolgreich gestartet."
 $TEXT['info-tryjava']="Das Java Beispiel (JSP) über Apache MOD_JK.";
 $TEXT['info-nococoon']="Warnung! Tomcat ist nicht auf Port 8080 gestartet. So kann ich nicht \"Cocoon\" installieren!";
 $TEXT['info-okcocoon']="Ok! Der Tomcat ist hochgefahren. Die Installation kann ein paar Minuten dauern. Zum installieren von \"Cocoon\" klicke nun hier ...";
+
+// ---------------------------------------------------------------------
+// PHP Switch
+// ---------------------------------------------------------------------
+
+$TEXT['switch-head']="PHP Switch 1.0 win32 für XAMPP";
+$TEXT['switch-phpversion']="<i><b>Aktuell in diesem XAMPP ist ";
+$TEXT['switch-whatis']="<B>Was macht eigentlich der PHP Switch?</B><br>Der ApacheFriends PHP Switch für den XAMPP wechselt zwischen der PHP Version 4 zu der Version 5 UND zurück. Damit kannst du deine Skripte mit PHP 4 oder PHP 5 testen.<p>";
+$TEXT['switch-find']="<B>Wo ist der PHP Switch?</B><br>PHP Switch für den XAMPP ist eine PHP Datei im XAMPP install Ordner mit dem Namen \"php-switch.php\" ausführt. Ausgeführt wird der Wechsel mit dem Batchfile ";
+$TEXT['switch-care']="<B>Was muss ich beachten?</B><br>PHP Switch weigert sich den Wechsel vorzunehmen, wenn a) der Apache noch läuft und b) \".phpversion\" Datei im install Ordner fehlt oder fehlerhaft ist. In der \".phpversion\" steht die (Haupt) Nummer der gerade benutzen PHP Version. Also zu Beginn \"shutdown\" Apache und erst dann die  \"php-switch.bat\" ausführen.<p>";
+$TEXT['switch-where4']="<B>Wo sind danach meine (alten) Konfigurationsdateien?</B><br><br>Für PHP 4:<br>";
+$TEXT['switch-where5']="<br><br>Für PHP 5:<br>";
+$TEXT['switch-make1']="<B>Werden denn Änderungen übernommen?</B><br><br>Ja! Für PHP4 oder PHP5 jeweils in der<br>";
+$TEXT['switch-make2']="<br><br> .. gesichert bei PHP4 ...<br>";
+$TEXT['switch-make3']="<br><br> .. gesichert bei PHP5 ...<br>";
+$TEXT['switch-make4']="<br><br>Und auch wieder bei einem \"switch\" zurückgeführt!!<p>";
+$TEXT['switch-not']="<B>Ich bin so zufrieden und möchte keinen \"Switch\" !!!</B><br>Super! Dann vergiß das ganze  hier ... ;-)<br>";
 
 ?>

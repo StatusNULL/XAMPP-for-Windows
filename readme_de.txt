@@ -1,8 +1,9 @@
-  ApacheFriends XAMPP (basic package) version 1.4.4 (win32)
+  ApacheFriends XAMPP (basic package) version 1.4.5 (win32)
 
   + Apache 2.0.50
   + MySQL 4.0.20
-  + PHP 4.3.7 + PEAR
+  + PHP 5.0.0 + PHP 4.3.8 + PEAR
+  + PHP-Switch win32 1.0 (von Apachefriends, man nehme die "php-switch.bat")   	
   + mod_php 4.3.7
   + MiniPerl 5.8.3
   + SQLite 3.0.1
@@ -16,7 +17,7 @@
 * System Vorrausetzungen:
   
   + 64 MB RAM (recommended)
-  + 110 MB free Fixed Disk 
+  + 115 MB free Fixed Disk 
   + Windows 98, ME, XP Home
   + Windows NT, 2000, XP Professional (Recommended)
 

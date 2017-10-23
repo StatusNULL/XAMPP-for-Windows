@@ -9,7 +9,7 @@ $TEXT['global-xampp']="XAMPP for Windows";
 // NAVIGATION
 // ---------------------------------------------------------------------
 
-$TEXT['navi-xampp']="XAMPP 1.4.4";
+$TEXT['navi-xampp']="XAMPP 1.4.5";
 $TEXT['navi-welcome']="Welcome";
 $TEXT['navi-status']="Status";
 $TEXT['navi-security']="Security";
@@ -31,6 +31,7 @@ $TEXT['navi-adodb']="ADOdb";
 $TEXT['navi-perl']="Perl";
 $TEXT['navi-python']="Python";
 $TEXT['navi-jsp']="Java";
+$TEXT['navi-phpswitch']="PHP Switch";
 
 $TEXT['navi-tools']="Tools";
 $TEXT['navi-phpmyadmin']="phpMyAdmin";
@@ -120,7 +121,7 @@ $TEXT['start-subhead']="Congratulations:<br>You successfully installed XAMPP on 
 
 $TEXT['start-text1']="Now you can start using Apache and Co. Firstly you should try »Status« on the left navigation to make sure everything works fine.";
 
-$TEXT['start-text2']="Attention: The XAMPP in version 1.4.4 is modified for a package management. There are following packages/addons: <UL><LI>XAMPP basic package</LI><LI>XAMPP Perl addon</LI><LI>XAMPP Python addon<LI></LI>XAMPP Utility addon (more utils but inactiv)</LI><LI>XAMPP Server addon (more server but inactiv)</LI><LI>XAMPP Other addon (other things but inactiv)</LI></UL>";
+$TEXT['start-text2']="Attention: The XAMPP in version 1.4.5 is modified for a package management. There are following packages/addons: <UL><LI>XAMPP basic package</LI><LI>XAMPP Perl addon</LI><LI>XAMPP Python addon<LI></LI>XAMPP Utility addon (more utils but inactiv)</LI><LI>XAMPP Server addon (more server but inactiv)</LI><LI>XAMPP Other addon (other things but inactiv)</LI></UL>";
 
 $TEXT['start-text3']="Please arrange your personality XAMPP. But take care. For a normal initialization of each additional addon, please execute the \"setup_xampp.bat\" once. For the installer versions: All installer addons need the installer version of XAMPP! Otherwise you can always use the zip or 7zip-exe addons.";
 
@@ -362,4 +363,22 @@ $TEXT['info-tryjava']="The java example (JSP) with Apache MOD_JK.";
 $TEXT['info-nococoon']="Warning! Tomcat is not started on port 8080. Cannot install
 \"Cocoon\" without running Tomcat server!";
 $TEXT['info-okcocoon']="Ok! The Tomcat is running normaly. The installation works can last some minutes! To install \"Cocoon\" now click here ...";
+
+// ---------------------------------------------------------------------
+// PHP Switch
+// ---------------------------------------------------------------------
+
+$TEXT['switch-head']="PHP Switch 1.0 win32 for XAMPP";
+$TEXT['switch-phpversion']="<i><b>Current in THIS XAMPP is ";
+$TEXT['switch-whatis']="<B>What make the PHP switch?</B><br>The apachefriends PHP Switch for XAMPP switching between the PHP version 4 to version 5 AND (!) back. So you can test your scripts with PHP 4 or PHP 5.<p>";
+$TEXT['switch-find']="<B>Where is the PHP Switch?</B><br>PHP Switch for XAMPP will execute a PHP file (XAMPP install folder) with the name \"php-switch.php\". You should use this batch file for executing: ";
+$TEXT['switch-care']="<B>What can be difficult?</B><br>PHP Switch will not change your PHP version, when a) the Apache HTTPD is running or/and b) the \".phpversion\" file in the install folder is vacant or have a bug. In the \".phpversion\", there was written the XAMPP current main PHP version number like \"4\" or \"5\". Please beginn with a \"shutdown\" for the Apache HTTPD and THEN execute the  \"php-switch.bat\".<p>";
+$TEXT['switch-where4']="<B>After That! Where are my (old) config files?</B><br><br>For PHP 4:<br>";
+$TEXT['switch-where5']="<br><br>For PHP 5:<br>";
+$TEXT['switch-make1']="<B>What is with changes in my config files?</B><br><br>There lives! For PHP4 or PHP5 in the<br>";
+$TEXT['switch-make2']="<br><br> .. secured for PHP4 ...<br>";
+$TEXT['switch-make3']="<br><br> .. secured for PHP5 ...<br>";
+$TEXT['switch-make4']="<br><br>And these files are going back with the PHP switching!!<p>";
+$TEXT['switch-not']="<B>My PHP is okay AND i will NOT a \"switch\" !!!</B><br>Super! Then forget this here ... ;-)<br>";
+
 ?>

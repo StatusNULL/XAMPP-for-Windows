@@ -384,6 +384,69 @@ if ($system=="Windows")
 				}
 			}
 	fclose($datei);
+
+	$confhttpdroot=$partwampp."\php\\php4\\httpd4.conf";
+	if (file_exists($confhttpdroot))
+	{
+	$includewin="Win32DisableAcceptEx ON\r\n";
+	$datei = fopen($confhttpdroot,'r');
+	unset($newzeile);
+	$i=0;
+	while(!feof($datei)) 
+	{
+	$zeile = fgets($datei,255);
+	$newzeile[]=$zeile; 
+	$i++; 
+	}
+	fclose($datei);
+	 $datei = fopen($confhttpdroot,'w'); 
+        if($datei) 
+            { 
+                for($z=0;$z<$i+1;$z++) 
+                { 
+					if (eregi("Win32DisableAcceptEx",$newzeile[$z]))
+					{
+						fputs($datei, $includewin);
+					}
+					else 
+					{ 
+					fputs($datei,$newzeile[$z]); 
+					}
+				}
+			}
+	fclose($datei);
+	}
+	$confhttpdroot=$partwampp."\php\\httpd5.conf";
+	if (file_exists($confhttpdroot))
+	{
+	$includewin="Win32DisableAcceptEx ON\r\n";
+	$datei = fopen($confhttpdroot,'r');
+	unset($newzeile);
+	$i=0;
+	while(!feof($datei)) 
+	{
+	$zeile = fgets($datei,255);
+	$newzeile[]=$zeile; 
+	$i++; 
+	}
+	fclose($datei);
+	 $datei = fopen($confhttpdroot,'w'); 
+        if($datei) 
+            { 
+                for($z=0;$z<$i+1;$z++) 
+                { 
+					if (eregi("Win32DisableAcceptEx",$newzeile[$z]))
+					{
+						fputs($datei, $includewin);
+					}
+					else 
+					{ 
+					fputs($datei,$newzeile[$z]); 
+					}
+				}
+			}
+	fclose($datei);
+	}
 }
 else
 {
@@ -416,6 +479,69 @@ else
 				}
 			}
 	fclose($datei);
+
+	$confhttpdroot=$partwampp."\php\\php4\\httpd4.conf";
+	if (file_exists($confhttpdroot))
+	{
+	$includewin="# Win32DisableAcceptEx ON\r\n";
+	$datei = fopen($confhttpdroot,'r');
+	$i=0;
+	unset($newzeile);
+	while(!feof($datei)) 
+	{
+	$zeile = fgets($datei,255);
+	$newzeile[]=$zeile; 
+	$i++; 
+	}
+	fclose($datei);
+	 $datei = fopen($confhttpdroot,'w'); 
+        if($datei) 
+            { 
+                for($z=0;$z<$i+1;$z++) 
+                { 
+					if (eregi("Win32DisableAcceptEx",$newzeile[$z]))
+					{
+						fputs($datei, $includewin);
+					}
+					else 
+					{ 
+					fputs($datei,$newzeile[$z]); 
+					}
+				}
+			}
+	fclose($datei);
+	}
+	$confhttpdroot=$partwampp."\php\\httpd5.conf";
+	if (file_exists($confhttpdroot))
+	{
+	$includewin="# Win32DisableAcceptEx ON\r\n";
+	$datei = fopen($confhttpdroot,'r');
+	$i=0;
+	unset($newzeile);
+	while(!feof($datei)) 
+	{
+	$zeile = fgets($datei,255);
+	$newzeile[]=$zeile; 
+	$i++; 
+	}
+	fclose($datei);
+	 $datei = fopen($confhttpdroot,'w'); 
+        if($datei) 
+            { 
+                for($z=0;$z<$i+1;$z++) 
+                { 
+					if (eregi("Win32DisableAcceptEx",$newzeile[$z]))
+					{
+						fputs($datei, $includewin);
+					}
+					else 
+					{ 
+					fputs($datei,$newzeile[$z]); 
+					}
+				}
+			}
+	fclose($datei);
+	}
 }
 }
 $substit="\"".$substit."\"";
