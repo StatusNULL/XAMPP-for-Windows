@@ -5,4 +5,5 @@ print '<head>';
 print '<meta name="author" content="Kay Vogelgesang">';
 print '<link href="../styles.css" rel="stylesheet" type="text/css">';
 print '</head>';
-print "<body><center>&nbsp;<p><h1>Hello World!</h1></body></html>";
+print "<body>&nbsp;<p><h1>GCI with MiniPerl</h1>";
+print  "CGI with MiniPerl is ready ...</body></html>";

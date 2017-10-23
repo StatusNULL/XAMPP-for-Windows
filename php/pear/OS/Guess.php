@@ -1,9 +1,9 @@
 <?php
 //
 // +----------------------------------------------------------------------+
-// | PHP Version 4                                                        |
+// | PHP Version 5                                                        |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2003 The PHP Group                                |
+// | Copyright (c) 1997-2004 The PHP Group                                |
 // +----------------------------------------------------------------------+
 // | This source file is subject to version 3.0 of the PHP license,       |
 // | that is bundled with this package in the file LICENSE, and is        |
@@ -17,7 +17,7 @@
 // |                                                                      |
 // +----------------------------------------------------------------------+
 //
-// $Id: Guess.php,v 1.11 2003/08/18 16:43:46 cellog Exp $
+// $Id: Guess.php,v 1.13 2004/01/08 17:33:11 sniper Exp $
 
 // {{{ uname examples
 
@@ -176,7 +176,7 @@ class OS_Guess
         }
         pclose($cpp);
         unlink($tmpfile);
-        if (!($major && $minor) && file_exists('/lib/libc.so.6')) {
+        if (!($major && $minor) && is_link('/lib/libc.so.6')) {
             // Let's try reading the libc.so.6 symlink
             if (ereg('^libc-([.*])\.so$', basename(readlink('/lib/libc.so.6')), $matches)) {
                 list($major, $minor) = explode('.', $matches);

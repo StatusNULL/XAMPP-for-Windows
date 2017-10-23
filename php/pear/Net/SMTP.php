@@ -29,6 +29,8 @@ require_once 'Net/Socket.php';
  * @author  Chuck Hagenbuch <chuck@horde.org>
  * @author  Jon Parise <jon@php.net>
  * @author  Damian Alejandro Fernandez Sosa <damlists@cnba.uba.ar>
+ *
+ * @example basic.php   A basic implementation of the Net_SMTP package.
  */
 class Net_SMTP
 {
@@ -273,16 +275,18 @@ class Net_SMTP
      *
      * @param   int     $timeout    The timeout value (in seconds) for the
      *                              socket connection.
+     * @param   bool    $persistent Should a persistent socket connection
+     *                              be used?
      *
      * @return mixed Returns a PEAR_Error with an error message on any
      *               kind of failure, or true on success.
      * @access public
      * @since  1.0
      */
-    function connect($timeout = null)
+    function connect($timeout = null, $persistent = false)
     {
         $result = $this->_socket->connect($this->host, $this->port,
-                                          false, $timeout);
+                                          $persistent, $timeout);
         if (PEAR::isError($result)) {
             return new PEAR_Error('Failed to connect socket: ' .
                                   $result->getMessage());
@@ -454,7 +458,8 @@ class Net_SMTP
         return true;
     }
 
-    /* Authenticates the user using the DIGEST-MD5 method.
+    /**
+     * Authenticates the user using the DIGEST-MD5 method.
      *
      * @param string The userid to authenticate as.
      * @param string The password to authenticate with.
@@ -504,7 +509,8 @@ class Net_SMTP
         }
     }
 
-    /* Authenticates the user using the CRAM-MD5 method.
+    /**
+     * Authenticates the user using the CRAM-MD5 method.
      *
      * @param string The userid to authenticate as.
      * @param string The password to authenticate with.

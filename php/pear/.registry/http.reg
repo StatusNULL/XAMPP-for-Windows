@@ -1,0 +1,14 @@
+a:13:{s:8:"provides";a:0:{}s:8:"filelist";a:2:{s:8:"HTTP.php";a:2:{s:4:"role";s:3:"php";s:12:"installed_as";s:26:"C:\xampp\php\pear\HTTP.php";}s:7:"dirtree";a:1:{s:17:"C:\xampp\php\pear";b:1;}}s:7:"package";s:4:"HTTP";s:7:"summary";s:28:"Miscellaneous HTTP utilities";s:11:"description";s:134:"The HTTP class is a class with static methods for doing miscellaneous
+HTTP-related stuff like date formatting or language negotiation.";s:11:"maintainers";a:2:{i:0;a:4:{s:6:"handle";s:3:"ssb";s:4:"name";s:18:"Stig Sæther Bakken";s:5:"email";s:12:"stig@php.net";s:4:"role";s:4:"lead";}i:1;a:4:{s:6:"handle";s:6:"pajoye";s:4:"name";s:17:"Pierre-Alain Joye";s:5:"email";s:14:"pajoye@php.net";s:4:"role";s:4:"lead";}}s:7:"version";s:5:"1.2.3";s:12:"release_date";s:10:"2004-02-25";s:15:"release_license";s:11:"PHP License";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:111:"- Fix bug #802 (use $_SERVER variables 
+, Silence fsock_open) (mj)
+- Fix bug #799 (lost of the query part) (mj)";s:9:"changelog";a:5:{i:0;a:4:{s:7:"version";s:5:"1.2.2";s:12:"release_date";s:10:"2003-12-09";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:28:"- PEAR.php missing include
+
+";}i:1;a:4:{s:7:"version";s:5:"1.2.1";s:12:"release_date";s:10:"2003-08-05";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:16:"Fix bug #22085
+
+";}i:2;a:4:{s:7:"version";s:3:"1.2";s:12:"release_date";s:10:"2002-04-08";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:32:"New methods: head and redirect
+
+";}i:3;a:4:{s:7:"version";s:3:"1.1";s:12:"release_date";s:10:"2002-02-18";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:39:"Fixes some language negotiation bugs.
+
+";}i:4;a:3:{s:7:"version";s:3:"1.0";s:12:"release_date";s:10:"2001-08-03";s:13:"release_notes";s:62:"This is the initial independent release of the HTTP package.
+
+";}}s:13:"_lastmodified";i:1080135149;}

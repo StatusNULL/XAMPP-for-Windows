@@ -14,6 +14,10 @@
 
 <?php
 	
+	$curdir = getcwd();
+	list ($partwampp, $directorwampp) = spliti ('\\\htdocs\\\xampp', $curdir);
+
+
 	$i=0;
 
 	$up="";
@@ -72,34 +76,21 @@
 	$cgi=$a[0];
 	$a=@file("$b/xampp/ssi.shtml");
 	$ssi=$a[0];
-	$a=@file("$b/modperl/perl.pl");
-	$perl=$a[0];
+	
 
-	if(extension_loaded('Turck MMCache'))
-		$mmcache="OK";
-	else
-		$mmcache="NOK";
+	
 
 		$host = "127.0.0.1";
 		$timeout= 1;
 	
-		if (($handle = @fsockopen($host, 110, $errno, $errstr, $timeout)) == false)
-		$smtp="NOK";
+		
+
+
+	if (($handle = @fsockopen($host, 443, $errno, $errstr, $timeout)) == false)
+		$ssl="NOK";
 		else
-		$smtp="OK";
+		$ssl="OK";
 		@fclose($handle);
-
-		if (($handle = @fsockopen($host, 21, $errno, $errstr, $timeout)) == false)
-		$ftp="NOK";
-		else
-		$ftp="OK";
-		@fclose($handle);
-
-
-	/* if(extension_loaded('oci8'))
-		$oci8="OK";
-	else
-		$oci8="NOK"; */
 	
 
 	echo '<table border=0 cellpadding=0 cellspacing=0>';
@@ -112,12 +103,56 @@
 	echo "</tr>";
 	line($TEXT['status-mysql'],$mysql);
 	line($TEXT['status-php'],$php);
-	line($TEXT['status-perl'],$perl);
+	line($TEXT['status-ssl'],$ssl);
 	line($TEXT['status-cgi'],$cgi);
 	line($TEXT['status-ssi'],$ssi);
-	line($TEXT['status-mmcache'],$mmcache,$TEXT['status-mmcache-url']);
-	line($TEXT['status-smtp'],$smtp);
-	line($TEXT['status-ftp'],$ftp);
+	
+	
+	
+	if ((file_exists("$partwampp\htdocs\python\default.py")) && (file_exists("$partwampp\apache\conf\python.conf")))
+	{ $a=@file("$b/python/default.py"); $python=$a[0]; line($TEXT['status-python'],$python);}
+	
+	if ((file_exists("$partwampp\htdocs\modperl\perl.pl")) && (file_exists("$partwampp\apache\conf\perl.conf")))
+	{ $a=@file("$b/modperl/perl.pl"); $perl=$a[0]; line($TEXT['status-perl'],$perl);}
+	
+	if (file_exists("$partwampp\MercuryMail\MERCURY.INI"))
+	{ 
+	if (($handle = @fsockopen($host, 110, $errno, $errstr, $timeout)) == false)
+		$smtp="NOK";
+		else
+		$smtp="OK";
+		@fclose($handle);
+		line($TEXT['status-smtp'],$smtp);
+	}
+	if (file_exists("$partwampp\FileZillaFTP\FzGSS.dll"))
+	{
+	if (($handle = @fsockopen($host, 21, $errno, $errstr, $timeout)) == false)
+		$ftp="NOK";
+		else
+		$ftp="OK";
+		@fclose($handle);	
+		line($TEXT['status-ftp'],$ftp);
+	}
+
+	if (file_exists("$partwampp\tomcat\bin\tomcat.exe"))
+	{
+	if (($handle = @fsockopen($host, 8080, $errno, $errstr, $timeout)) == false)
+		$tomcat="NOK";
+		else
+		$tomcat="OK";
+		@fclose($handle);
+		line($TEXT['status-tomcat'],$tomcat);
+	}
+	
+if (file_exists("$partwampp\PosadisDNS\posadis.exe"))
+	{
+	if (($handle = @fsockopen($host, 53, $errno, $errstr, $timeout)) == false)
+		$named="NOK";
+		else
+		$named="OK";
+		@fclose($handle);
+		line($TEXT['status-named'],$named);
+	}
 	// line($TEXT['status-oci8'],$oci8,$TEXT['status-oci8-url']);
 
 	echo "<tr valign=bottom>";

@@ -1,9 +1,9 @@
 <?php
 //
 // +----------------------------------------------------------------------+
-// | PHP Version 4                                                        |
+// | PHP Version 5                                                        |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2003 The PHP Group                                |
+// | Copyright (c) 1997-2004 The PHP Group                                |
 // +----------------------------------------------------------------------+
 // | This source file is subject to version 3.0 of the PHP license,       |
 // | that is bundled with this package in the file LICENSE, and is        |
@@ -16,7 +16,7 @@
 // | Author: Stig Bakken <ssb@php.net>                                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: Remote.php,v 1.46 2003/08/04 11:18:26 cox Exp $
+// $Id: Remote.php,v 1.49 2004/01/08 17:33:12 sniper Exp $
 
 require_once 'PEAR.php';
 require_once 'PEAR/Config.php';
@@ -209,7 +209,9 @@ class PEAR_Remote extends PEAR
             $proxy_user = @$proxy['user'];
             $proxy_pass = @$proxy['pass'];
             $fp = @fsockopen($proxy_host, $proxy_port);
+            $use_proxy = true;
         } else {
+            $use_proxy = false;
             $fp = @fsockopen($server_host, $server_port);
         }
         if (!$fp && $http_proxy) {
@@ -234,7 +236,7 @@ class PEAR_Remote extends PEAR
             $maxAge = '';
         };
 
-        if ($proxy_host != '' && $proxy_user != '') {
+        if ($use_proxy && $proxy_host != '' && $proxy_user != '') {
             $req_headers .= 'Proxy-Authorization: Basic '
                 .base64_encode($proxy_user.':'.$proxy_pass)
                 ."\r\n";
@@ -247,7 +249,7 @@ class PEAR_Remote extends PEAR
             var_dump($request);
         }
 
-        if ($proxy_host != '') {
+        if ($use_proxy && $proxy_host != '') {
             $post_string = "POST http://".$server_host;
             if ($proxy_port > '') {
                 $post_string .= ':'.$server_port;
@@ -305,7 +307,8 @@ class PEAR_Remote extends PEAR
                                              null, null, $ret['userinfo']);
                 }
             }
-        } elseif (is_array($ret) && sizeof($ret) == 1 && is_array($ret[0]) &&
+        } elseif (is_array($ret) && sizeof($ret) == 1 && isset($ret[0])
+                  && is_array($ret[0]) &&
                   !empty($ret[0]['faultString']) &&
                   !empty($ret[0]['faultCode'])) {
             extract($ret[0]);

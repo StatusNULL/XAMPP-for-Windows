@@ -1,31 +1,31 @@
-<p align="center"><b><u>FileZilla Server version 0.8.8 beta</u></b></p>
+<p align="center"><b><u>FileZilla Server version 0.8.9 beta</u></b></p>
 <p align="center">Copyright 2001<br>
 by <a href="mailto:Tim.Kosse@gmx.de">Tim Kosse</a><a href="http://sourceforge.net/projects/filezilla/"><br>
 http://sourceforge.net/projects/filezilla/</a></p>
 <p align="left"><u><b>Features:</b></u></p>
 <ul>
   <li>
-    <p align="left">almost unlimited number of users</li>
+    almost unlimited number of users</li>
   <li>
-    <p align="left">multi-threaded engine</li>
+    multi-threaded engine</li>
   <li>
-    <p align="left">runs as service under Windows NT4, 2000 and XP</li>
+    runs as service under Windows NT4, 2000 and XP</li>
   <li>
-    <p align="left">still supports Win95</li>
+    still supports Win95</li>
   <li>
-    <p align="left">anti fxp / bounce attack filter</li>
+    anti fxp / bounce attack filter</li>
   <li>
-    <p align="left">secure password storage (as MD5 hash)</li>
+    secure password storage (as MD5 hash)</li>
   <li>
-    <p align="left">real-time user/group management</li>
+    real-time user/group management</li>
   <li>
-    <p align="left">all options can be set at runtime, there's no need to take 
+    all options can be set at runtime, there's no need to take 
     the server offline</li>
   <li>
-    <p align="left">no-transfer timeout which can kick idle users which use 
+    no-transfer timeout which can kick idle users which use 
     basic keep alive systems</li>
   <li>
-    <p align="left">Server and user/group speed limits based on rule sets.</li>
+    Server and user/group speed limits based on rule sets.</li>
 </ul>
 <p align="left"><u><b>Release Notes:</b></u></p>
 <p align="left">Please report any bugs immediately to <a href="mailto:Tim.Kosse@gmx.de">Tim.Kosse@gmx.de</a> 
@@ -72,13 +72,23 @@ as restoring it to normal size.</p>
   </tr>
 </table>
 <p align="left"><b><u>Version History:</u></b></p>
+<p><b>Version 0.8.9</b></p>
+<blockquote>
+  <u>fixed bugs:</u>
+  <ul>
+    <li>Interface could crash if kicking user</li>
+    <li>group ip based connection limit did not work</li>
+    <li>fixed alignment of years in directory listings</li>
+    <li>fixed crash if listening socket can't be created</li>
+    <li>changed MKD return code to 257</li>
+  </ul>
+</blockquote>
 <p><b>Version 0.8.8</b></p>
 <blockquote>
   <u>new features:</u>
   <ul>
     <li>added hostname support for external PASV IP address</li>
     <li>support for remote IP detection scripts</li>
-    <li>config file can be reloaded by calling <u>"FileZilla Server.exe" /reload-config</u>
   </ul>
   <u>fixed bugs:</u>
   <ul>
@@ -148,29 +158,23 @@ as restoring it to normal size.</p>
 </blockquote>
 <p align="left"><b>version 0.8.3:</b></p>
 <blockquote>
-<p align="left"><u>new features:</u></p>
+  <u>new features:</u></p>
   <ul>
+    <li>remote administration</li>
     <li>
-<p align="left">remote administration</p>
-    </li>
-    <li>
-<p align="left">logging to file</p>
+      logging to file
     </li>
   </ul>
-<p align="left"><u>fixed bugs:</u></p>
+  <u>fixed bugs:</u>
   <ul>
-    <li>
-<p align="left">admin interface could hang during connect (fixed in 0.8.3a)</li>
-    <li>
-<p align="left">F2 to rename user accounts / dirs in users dialog now works correctly
-    </li>
-    <li>
-<p align="left">sometimes files sent to clients were not sent correctly</li>
+    <li>admin interface could hang during connect (fixed in 0.8.3a)</li>
+    <li>F2 to rename user accounts / dirs in users dialog now works correctly</li>
+    <li>sometimes files sent to clients were not sent correctly</li>
   </ul>
 </blockquote>
 <p align="left"><b>version 0.8.2</b></p>
 <blockquote>
-<p align="left"><u>fixed bugs:</u></p>
+  <u>fixed bugs:</u></p>
   <ul>
     <li>
 <p align="left">fixed &quot;account duplication&quot; if taking server offline and back 

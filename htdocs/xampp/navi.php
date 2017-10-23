@@ -28,7 +28,13 @@
 <tr><td bgcolor=#fb7922 colspan=1 background="img/strichel.gif" class=white><img src=img/blank.gif width=1 height=1></td></tr>
 <tr valign=top><td align=right class=navi>
 
-<?include("navidemos.inc");?>
+
+
+<?include("navibasics.inc");?>
+<?include("naviperl.inc");?>
+<?include("navipython.inc");?>
+<?include("navijava.inc");?>
+
 
 <br>&nbsp;<br>
 
@@ -37,6 +43,8 @@
 <tr><td bgcolor=#fb7922 colspan=1 background="img/strichel.gif" class=white><img src=img/blank.gif width=1 height=1></td></tr>
 <tr valign=top><td align=right class=navi>
 <?include("navitools.inc");?>
+<?include("naviservers.inc");?>
+<?include("naviother.inc");?>
 <br>&nbsp;<br>
 
 <span class=nh><?=$TEXT['navi-languages']?></span><br>

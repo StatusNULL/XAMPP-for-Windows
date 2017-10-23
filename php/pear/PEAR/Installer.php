@@ -1,9 +1,9 @@
 <?php
 //
 // +----------------------------------------------------------------------+
-// | PHP Version 4                                                        |
+// | PHP Version 5                                                        |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2003 The PHP Group                                |
+// | Copyright (c) 1997-2004 The PHP Group                                |
 // +----------------------------------------------------------------------+
 // | This source file is subject to version 3.0 of the PHP license,       |
 // | that is bundled with this package in the file LICENSE, and is        |
@@ -18,16 +18,18 @@
 // |          Martin Jansen <mj@php.net>                                  |
 // +----------------------------------------------------------------------+
 //
-// $Id: Installer.php,v 1.128 2003/09/18 04:32:56 cellog Exp $
+// $Id: Installer.php,v 1.147 2004/01/08 17:33:12 sniper Exp $
 
 require_once 'PEAR/Common.php';
 require_once 'PEAR/Registry.php';
 require_once 'PEAR/Dependency.php';
+require_once 'PEAR/Downloader.php';
 require_once 'System.php';
 
 define('PEAR_INSTALLER_OK',       1);
 define('PEAR_INSTALLER_FAILED',   0);
 define('PEAR_INSTALLER_SKIPPED', -1);
+define('PEAR_INSTALLER_ERROR_NO_PREF_STATE', 2);
 
 /**
  * Administration class used to install PEAR packages and maintain the
@@ -42,8 +44,9 @@ define('PEAR_INSTALLER_SKIPPED', -1);
  * @since PHP 4.0.2
  * @author Stig Bakken <ssb@php.net>
  * @author Martin Jansen <mj@php.net>
+ * @author Greg Beaver <cellog@php.net>
  */
-class PEAR_Installer extends PEAR_Common
+class PEAR_Installer extends PEAR_Downloader
 {
     // {{{ properties
 
@@ -164,19 +167,21 @@ class PEAR_Installer extends PEAR_Common
      */
     function _installFile($file, $atts, $tmp_path, $options)
     {
+        // {{{ return if this file is meant for another platform
         static $os;
         if (isset($atts['platform'])) {
             if (empty($os)) {
                 include_once "OS/Guess.php";
                 $os = new OS_Guess();
             }
-            // return if this file is meant for another platform
             if (!$os->matchSignature($atts['platform'])) {
                 $this->log(3, "skipped $file (meant for $atts[platform], we are ".$os->getSignature().")");
                 return PEAR_INSTALLER_SKIPPED;
             }
         }
+        // }}}
 
+        // {{{ assemble the destination paths
         switch ($atts['role']) {
             case 'doc':
             case 'data':
@@ -222,6 +227,8 @@ class PEAR_Installer extends PEAR_Common
         $final_dest_file = $this->_prependPath($dest_file, $this->installroot);
         $dest_dir = dirname($final_dest_file);
         $dest_file = $dest_dir . DIRECTORY_SEPARATOR . '.tmp' . basename($final_dest_file);
+        // }}}
+
         if (!@is_dir($dest_dir)) {
             if (!$this->mkDirHier($dest_dir)) {
                 return $this->raiseError("failed to mkdir $dest_dir",
@@ -243,6 +250,7 @@ class PEAR_Installer extends PEAR_Common
                 $md5sum = md5_file($dest_file);
             }
         } else {
+            // {{{ file with replacements
             if (!file_exists($orig_file)) {
                 return $this->raiseError("file does not exist",
                                          PEAR_INSTALLER_FAILED);
@@ -296,7 +304,9 @@ class PEAR_Installer extends PEAR_Common
                                          PEAR_INSTALLER_FAILED);
             }
             fclose($wp);
+            // }}}
         }
+        // {{{ check the md5
         if (isset($md5sum)) {
             if (strtolower($md5sum) == strtolower($atts['md5sum'])) {
                 $this->log(2, "md5sum ok: $final_dest_file");
@@ -311,6 +321,8 @@ class PEAR_Installer extends PEAR_Common
                 }
             }
         }
+        // }}}
+        // {{{ set file permissions
         if (!OS_WINDOWS) {
             if ($atts['role'] == 'script') {
                 $mode = 0777 & ~(int)octdec($this->config->get('umask'));
@@ -323,6 +335,7 @@ class PEAR_Installer extends PEAR_Common
                 $this->log(0, "failed to change mode of $dest_file");
             }
         }
+        // }}}
         $this->addFileOperation("rename", array($dest_file, $final_dest_file));
         // Store the full path where the file was installed for easy unistall
         $this->addFileOperation("installed_as", array($file, $installed_as,
@@ -390,7 +403,7 @@ class PEAR_Installer extends PEAR_Common
     {
         $n = count($this->file_operations);
         $this->log(2, "about to commit $n file operations");
-        // first, check permissions and such manually
+        // {{{ first, check permissions and such manually
         $errors = array();
         foreach ($this->file_operations as $tr) {
             list($type, $data) = $tr;
@@ -422,6 +435,7 @@ class PEAR_Installer extends PEAR_Common
             }
 
         }
+        // }}}
         $m = sizeof($errors);
         if ($m > 0) {
             foreach ($errors as $error) {
@@ -429,7 +443,7 @@ class PEAR_Installer extends PEAR_Common
             }
             return false;
         }
-        // really commit the transaction
+        // {{{ really commit the transaction
         foreach ($this->file_operations as $tr) {
             list($type, $data) = $tr;
             switch ($type) {
@@ -465,6 +479,7 @@ class PEAR_Installer extends PEAR_Common
                     break;
             }
         }
+        // }}}
         $this->log(2, "successfully committed $n file operations");
         $this->file_operations = array();
         return true;
@@ -493,7 +508,9 @@ class PEAR_Installer extends PEAR_Common
                 case 'delete':
                     break;
                 case 'installed_as':
-                    unset($this->pkginfo['filelist'][$data[0]]['installed_as']);
+                    if (isset($this->pkginfo['filelist'])) {
+                        unset($this->pkginfo['filelist'][$data[0]]['installed_as']);
+                    }
                     if (isset($this->pkginfo['filelist']['dirtree'][dirname($data[1])])) {
                         unset($this->pkginfo['filelist']['dirtree'][dirname($data[1])]);
                         while(!empty($data[3]) && $data[3] != '/' && $data[3] != '\\'
@@ -503,33 +520,14 @@ class PEAR_Installer extends PEAR_Common
                             $data[3] = dirname($data[3]);
                         }
                     }
-                    if (!count($this->pkginfo['filelist']['dirtree'])) {
+                    if (isset($this->pkginfo['filelist']['dirtree'])
+                          && !count($this->pkginfo['filelist']['dirtree'])) {
                         unset($this->pkginfo['filelist']['dirtree']);
                     }
                     break;
             }
         }
         $this->file_operations = array();
-    }
-
-    // }}}
-    // {{{ getPackageDownloadUrl()
-
-    function getPackageDownloadUrl($package, $version = null)
-    {
-        if ($version) {
-            $package .= "-$version";
-        }
-        if ($this === null || $this->config === null) {
-            $package = "http://pear.php.net/get/$package";
-        } else {
-            $package = "http://" . $this->config->get('master_server') .
-                "/get/$package";
-        }
-        if (!extension_loaded("zlib")) {
-            $package .= '?uncompress=yes';
-        }
-        return $package;
     }
 
     // }}}
@@ -557,101 +555,6 @@ class PEAR_Installer extends PEAR_Common
     }
 
     // }}}
-    // {{ extractDownloadFileName($pkgfile, &$version)
-
-    function extractDownloadFileName($pkgfile, &$version)
-    {
-        if (@is_file($pkgfile)) {
-            return $pkgfile;
-        }
-        // regex defined in Common.php
-        if (preg_match(PEAR_COMMON_PACKAGE_DOWNLOAD_PREG, $pkgfile, $m)) {
-            $version = (isset($m[3])) ? $m[3] : null;
-            return $m[1];
-        }
-        $version = null;
-        return $pkgfile;
-    }
-
-    // }}}
-    // {{{ _downloadFile()
-    /**
-     * @param string filename to download
-     * @param PEAR_Config Configuration object
-     * @param array options returned from Console_GetOpt
-     * @param array empty array to populate with error messages, if any
-     * @param string version/state
-     * @param string original value passed to command-line
-     * @param string preferred state (snapshot/devel/alpha/beta/stable)
-     * @access private
-     */
-    function _downloadFile($pkgfile, &$config, $options, &$errors, $version,
-                           $origpkgfile, $state)
-    {
-        $need_download = false;
-        if (preg_match('#^(http|ftp)://#', $pkgfile)) {
-            $need_download = true;
-        } elseif (!@is_file($pkgfile)) {
-            if ($this->validPackageName($pkgfile)) {
-                if ($this->registry->packageExists($pkgfile)) {
-                    if (empty($options['upgrade']) && empty($options['force'])) {
-                        $errors[] = "$pkgfile already installed";
-                        return;
-                    }
-                }
-                $pkgfile = $this->getPackageDownloadUrl($pkgfile, $version);
-                $need_download = true;
-            } else {
-                if (strlen($pkgfile)) {
-                    $errors[] = "Could not open the package file: $pkgfile";
-                } else {
-                    $errors[] = "No package file given";
-                }
-                return;
-            }
-        }
-
-        // Download package -----------------------------------------------
-        if ($need_download) {
-            $downloaddir = $config->get('download_dir');
-            if (empty($downloaddir)) {
-                if (PEAR::isError($downloaddir = System::mktemp('-d'))) {
-                    return $downloaddir;
-                }
-                $this->log(3, '+ tmp dir created at ' . $downloaddir);
-            }
-            $callback = $this->ui ? array(&$this, '_downloadCallback') : null;
-            $this->pushErrorHandling(PEAR_ERROR_RETURN);
-            $file = $this->downloadHttp($pkgfile, $this->ui, $downloaddir, $callback);
-            $this->popErrorHandling();
-            if (PEAR::isError($file)) {
-                if ($this->validPackageName($origpkgfile)) {
-                    include_once 'PEAR/Remote.php';
-                    $remote = new PEAR_Remote($config);
-                    if (!PEAR::isError($info = $remote->call('package.info',
-                          $origpkgfile))) {
-                        if (!count($info['releases'])) {
-                            return $this->raiseError('Package ' . $origpkgfile .
-                            ' has no releases');
-                        } else {
-                            return $this->raiseError('No releases of preferred state "'
-                            . $state . '" exist for package ' . $origpkgfile .
-                            '.  Use ' . $origpkgfile . '-state to install another' .
-                            ' state (like ' . $origpkgfile .'-beta)');
-                        }
-                    } else {
-                        return $pkgfile;
-                    }
-                } else {
-                    return $this->raiseError($file);
-                }
-            }
-            $pkgfile = $file;
-        }
-        return $pkgfile;
-    }
-
-    // }}}
     // {{{ download()
 
     /**
@@ -672,181 +575,19 @@ class PEAR_Installer extends PEAR_Common
      * @param false private recursion variable
      * @param false private recursion variable
      * @param false private recursion variable
+     * @deprecated in favor of PEAR_Downloader
      */
     function download($packages, $options, &$config, &$installpackages,
                       &$errors, $installed = false, $willinstall = false, $state = false)
     {
-        // recognized options:
-        // - onlyreqdeps   : install all required dependencies as well
-        // - alldeps       : install all dependencies, including optional
-        //
-        if (!$willinstall) {
-            $willinstall = array();
-        }
-        if (!$state) {
-            $state = $config->get('preferred_state');
-            if (!$state) {
-                // don't inadvertantly use a non-set preferred_state
-                $state = null;
-            }
-        }
-        $mywillinstall = array();
-        $php_dir = $config->get('php_dir');
-        if (isset($options['installroot'])) {
-            if (substr($options['installroot'], -1) == DIRECTORY_SEPARATOR) {
-                $options['installroot'] = substr($options['installroot'], 0, -1);
-            }
-            $php_dir = $this->_prependPath($php_dir, $options['installroot']);
-            $this->installroot = $options['installroot'];
-        } else {
-            $this->installroot = '';
-        }
-        $this->registry = &new PEAR_Registry($php_dir);
-
-        // download files in this list if necessary
-        foreach($packages as $pkgfile) {
-            if (!is_file($pkgfile)) {
-                $origpkgfile = $pkgfile;
-                $pkgfile = $this->extractDownloadFileName($pkgfile, $version);
-                if ($version === null) {
-                    // use preferred state if no version number was specified
-                    $version = $state;
-                }
-                if ($this->validPackageName($pkgfile) && !isset($options['upgrade'])) {
-                    if ($this->registry->packageExists($pkgfile)) {
-                        $this->log(0, "Package '$pkgfile' already installed, skipping");
-                        // ignore dependencies that are installed unless we are upgrading
-                        continue;
-                    }
-                }
-                $pkgfile = $this->_downloadFile($pkgfile, $config, $options, $errors,
-                                                $version, $origpkgfile, $state);
-                if (PEAR::isError($pkgfile)) {
-                    return $pkgfile;
-                }
-            }
-            $tempinfo = $this->infoFromAny($pkgfile);
-            if (isset($options['alldeps']) || isset($options['onlyreqdeps'])) {
-                // ignore dependencies if there are any errors
-                if (!PEAR::isError($tempinfo)) {
-                    $mywillinstall[strtolower($tempinfo['package'])] = @$tempinfo['release_deps'];
-                }
-            }
-            $installpackages[] = array('pkg' => $tempinfo['package'],
-                                       'file' => $pkgfile, 'info' => $tempinfo);
-        }
-
-        // extract dependencies from downloaded files and then download them
-        // if necessary
-        if (isset($options['alldeps']) || isset($options['onlyreqdeps'])) {
-            include_once "PEAR/Remote.php";
-            $remote = new PEAR_Remote($config);
-            if (!$installed) {
-                $installed = $this->registry->listPackages();
-                array_walk($installed, create_function('&$v,$k','$v = strtolower($v);'));
-                $installed = array_flip($installed);
-            }
-            $deppackages = array();
-            // construct the list of dependencies for each file
-            foreach ($mywillinstall as $package => $alldeps) {
-                if (!is_array($alldeps)) {
-                    continue;
-                }
-                foreach($alldeps as $info) {
-                    if ($info['type'] != 'pkg') {
-                        continue;
-                    }
-                    if (!isset($options['alldeps']) && isset($info['optional']) &&
-                          $info['optional'] == 'yes') {
-                        // skip optional deps
-                        $this->log(0, "skipping Package $package optional dependency $info[name]");
-                        continue;
-                    }
-                    // get releases
-                    $releases = $remote->call('package.info', $info['name'], 'releases');
-                    if (PEAR::isError($releases)) {
-                        return $releases;
-                    }
-                    if (!count($releases)) {
-                        if (!isset($installed[strtolower($info['name'])])) {
-                            $errors[] = "Package $package dependency $info[name] ".
-                                "has no releases";
-                        }
-                        continue;
-                    }
-                    $found = false;
-                    $save = $releases;
-                    while(count($releases) && !$found) {
-                        if (!empty($state) && $state != 'any') {
-                            list($release_version,$release) = each($releases);
-                            if ($state != $release['state'] &&
-                                  !in_array($release['state'],
-                                    $this->betterStates($state))) {
-                                // drop this release - it ain't stable enough
-                                array_shift($releases);
-                            } else {
-                                $found = true;
-                            }
-                        } else {
-                            $found = true;
-                        }
-                    }
-                    if (!count($releases) && !$found) {
-                        $get = array();
-                        foreach($save as $release) {
-                            $get = array_merge($get,
-                                $this->betterStates($release['state'], true));
-                        }
-                        $savestate = array_shift($get);
-                        $errors[] = "Release for $package dependency $info[name] " .
-                            "has state '$savestate', requires $state";
-                        continue;
-                    }
-                    if (in_array(strtolower($info['name']), $willinstall) ||
-                          isset($mywillinstall[strtolower($info['name'])])) {
-                        // skip upgrade check for packages we will install
-                        continue;
-                    }
-                    if (!isset($installed[strtolower($info['name'])])) {
-                        // skip upgrade check for packages we don't have installed
-                        $deppackages[] = $info['name'];
-                        continue;
-                    }
-
-                    // see if a dependency must be upgraded
-                    $inst_version = $this->registry->packageInfo($info['name'], 'version');
-                    if (!isset($info['version'])) {
-                        // this is a rel='has' dependency, check against latest
-                        if (version_compare($release_version, $inst_version, 'le')) {
-                            continue;
-                        } else {
-                            $deppackages[] = $info['name'];
-                            continue;
-                        }
-                    }
-                    if (version_compare($info['version'], $inst_version, 'le')) {
-                        // installed version is up-to-date
-                        continue;
-                    }
-                    $deppackages[] = $info['name'];
-                } // foreach($alldeps
-            } // foreach($willinstall
-
-            if (count($deppackages)) {
-                // check dependencies' dependencies
-                // combine the list of packages to install
-                $temppack = array();
-                foreach($installpackages as $p) {
-                    $temppack[] = strtolower($p['info']['package']);
-                }
-                foreach($deppackages as $pack) {
-                    $temppack[] = strtolower($pack);
-                }
-                $willinstall = array_merge($willinstall, $temppack);
-                $this->download($deppackages, $options, $config, $installpackages,
-                    $errors, $installed, $willinstall, $state);
-            }
-        } // if --alldeps or --onlyreqdeps
+        // trickiness: initialize here
+        parent::PEAR_Downloader($this->ui, $options, $config);
+        $ret = parent::download($packages);
+        $errors = $this->getErrorMsgs();
+        $installpackages = $this->getDownloadedPackages();
+        trigger_error("PEAR Warning: PEAR_Installer::download() is deprecated " .
+                      "in favor of PEAR_Downloader class", E_USER_WARNING);
+        return $ret;
     }
 
     // }}}
@@ -867,7 +608,7 @@ class PEAR_Installer extends PEAR_Common
      * - alldeps       : install all dependencies
      * - onlyreqdeps   : install only required dependencies
      *
-     * @return array package info if successful, null if not
+     * @return array|PEAR_Error package info if successful
      */
 
     function install($pkgfile, $options = array())
@@ -889,14 +630,10 @@ class PEAR_Installer extends PEAR_Common
         if (substr($pkgfile, -4) == '.xml') {
             $descfile = $pkgfile;
         } else {
-            // Decompress pack in tmp dir -------------------------------------
+            // {{{ Decompress pack in tmp dir -------------------------------------
 
             // To allow relative package file names
-            $oldcwd = getcwd();
-            if (@chdir(dirname($pkgfile))) {
-                $pkgfile = getcwd() . DIRECTORY_SEPARATOR . basename($pkgfile);
-                chdir($oldcwd);
-            }
+            $pkgfile = realpath($pkgfile);
 
             if (PEAR::isError($tmpdir = System::mktemp('-d'))) {
                 return $tmpdir;
@@ -908,7 +645,7 @@ class PEAR_Installer extends PEAR_Common
                 return $this->raiseError("unable to unpack $pkgfile");
             }
 
-            // ----- Look for existing package file
+            // {{{ Look for existing package file
             $descfile = $tmpdir . DIRECTORY_SEPARATOR . 'package.xml';
 
             if (!is_file($descfile)) {
@@ -924,7 +661,9 @@ class PEAR_Installer extends PEAR_Common
                 $flag_old_format = true;
                 $this->log(0, "warning : you are using an archive with an old format");
             }
+            // }}}
             // <== XXX This part should be removed later on
+            // }}}
         }
 
         if (!is_file($descfile)) {
@@ -950,7 +689,7 @@ class PEAR_Installer extends PEAR_Common
 
         $pkgname = $pkginfo['package'];
 
-        // Check dependencies -------------------------------------------
+        // {{{ Check dependencies -------------------------------------------
         if (isset($pkginfo['release_deps']) && empty($options['nodeps'])) {
             $dep_errors = '';
             $error = $this->checkDeps($pkginfo, $dep_errors);
@@ -966,9 +705,10 @@ class PEAR_Installer extends PEAR_Common
                 }
             }
         }
+        // }}}
 
+        // {{{ checks to do when not in "force" mode
         if (empty($options['force'])) {
-            // checks to do when not in "force" mode
             $test = $this->registry->checkFileMap($pkginfo);
             if (sizeof($test)) {
                 $tmp = $test;
@@ -988,6 +728,7 @@ class PEAR_Installer extends PEAR_Common
                 }
             }
         }
+        // }}}
 
         $this->startFileTransaction();
 
@@ -997,10 +738,6 @@ class PEAR_Installer extends PEAR_Common
                 return $this->raiseError("$pkgname already installed");
             }
         } else {
-            // checks to do only when upgrading packages
-/*            if (!$this->registry->packageExists($pkgname)) {
-                return $this->raiseError("$pkgname not installed");
-            }*/
             if ($this->registry->packageExists($pkgname)) {
                 $v1 = $this->registry->packageInfo($pkgname, 'version');
                 $v2 = $pkginfo['version'];
@@ -1017,7 +754,7 @@ class PEAR_Installer extends PEAR_Common
             }
         }
 
-        // Copy files to dest dir ---------------------------------------
+        // {{{ Copy files to dest dir ---------------------------------------
 
         // info from the package it self we want to access from _installFile
         $this->pkginfo = &$pkginfo;
@@ -1030,12 +767,9 @@ class PEAR_Installer extends PEAR_Common
                                          null, PEAR_ERROR_DIE);
             }
 
-            // don't want strange characters
-            $pkgname    = ereg_replace ('[^a-zA-Z0-9._]', '_', $pkginfo['package']);
-            $pkgversion = ereg_replace ('[^a-zA-Z0-9._\-]', '_', $pkginfo['version']);
             $tmp_path = dirname($descfile);
             if (substr($pkgfile, -4) != '.xml') {
-                $tmp_path .= DIRECTORY_SEPARATOR . $pkgname . '-' . $pkgversion;
+                $tmp_path .= DIRECTORY_SEPARATOR . $pkgname . '-' . $pkginfo['version'];
             }
 
             //  ==> XXX This part should be removed later on
@@ -1044,6 +778,7 @@ class PEAR_Installer extends PEAR_Common
             }
             // <== XXX This part should be removed later on
 
+            // {{{ install files
             foreach ($pkginfo['filelist'] as $file => $atts) {
                 $this->expectError(PEAR_INSTALLER_FAILED);
                 $res = $this->_installFile($file, $atts, $tmp_path, $options);
@@ -1064,7 +799,9 @@ class PEAR_Installer extends PEAR_Common
                     unset($pkginfo['filelist'][$file]);
                 }
             }
+            // }}}
 
+            // {{{ compile and install source files
             if ($this->source_files > 0 && empty($options['nobuild'])) {
                 $this->log(1, "$this->source_files source files, building");
                 $bob = &new PEAR_Builder($this->ui);
@@ -1077,6 +814,11 @@ class PEAR_Installer extends PEAR_Common
                 $this->log(1, "\nBuild process completed successfully");
                 foreach ($built as $ext) {
                     $bn = basename($ext['file']);
+                    list($_ext_name, ) = explode('.', $bn);
+                    if (extension_loaded($_ext_name)) {
+                        $this->raiseError("Extension '$_ext_name' already loaded. Please unload it ".
+                                          "in your php.ini file prior to install or upgrade it.");
+                    }
                     $dest = $this->config->get('ext_dir') . DIRECTORY_SEPARATOR . $bn;
                     $this->log(1, "Installing '$bn' at ext_dir ($dest)");
                     $this->log(3, "+ cp $ext[file] ext_dir ($dest)");
@@ -1094,14 +836,17 @@ class PEAR_Installer extends PEAR_Common
                         );
                 }
             }
+            // }}}
         }
 
         if (!$this->commitFileTransaction()) {
             $this->rollbackFileTransaction();
             return $this->raiseError("commit failed", PEAR_INSTALLER_FAILED);
         }
+        // }}}
 
-        // Register that the package is installed -----------------------
+        $ret = false;
+        // {{{ Register that the package is installed -----------------------
         if (empty($options['upgrade'])) {
             // if 'force' is used, replace the info in registry
             if (!empty($options['force']) && $this->registry->packageExists($pkgname)) {
@@ -1117,8 +862,9 @@ class PEAR_Installer extends PEAR_Common
             }
         }
         if (!$ret) {
-            return null;
+            return $this->raiseError("Adding package $pkgname to registry failed");
         }
+        // }}}
         return $pkginfo;
     }
 
@@ -1134,6 +880,8 @@ class PEAR_Installer extends PEAR_Common
      * @param array Command-line options.  Possibilities include:
      *
      *              - installroot: base installation dir, if not the default
+     *              - nodeps: do not process dependencies of other packages to ensure
+     *                        uninstallation does not break things
      */
     function uninstall($package, $options = array())
     {
@@ -1162,8 +910,8 @@ class PEAR_Installer extends PEAR_Common
                 $this->log(0, $warning);
             }
         }
+        // {{{ Delete the files
         $this->startFileTransaction();
-        // Delete the files
         if (PEAR::isError($err = $this->_deletePackageFiles($package))) {
             $this->rollbackFileTransaction();
             return $this->raiseError($err);
@@ -1185,6 +933,7 @@ class PEAR_Installer extends PEAR_Common
                 $this->rollbackFileTransaction();
             }
         }
+        // }}}
 
         // Register that the package is no longer installed
         return $this->registry->deletePackage($package);
@@ -1222,17 +971,13 @@ class PEAR_Installer extends PEAR_Common
                 $code = $depchecker->callCheckMethod($error, $dep);
                 if ($code) {
                     if (isset($dep['optional']) && $dep['optional'] == 'yes') {
-/* die ugly hack die
-                        // Ugly hack to adjust the error messages
-                        $error = str_replace('requires ', '', $error);
-                        $error = ucfirst($error);
-                        $error = $error . ' is recommended to utilize some features.';*/
                         $optional_deps[] = array($dep, $code, $error);
                     } else {
                         $failed_deps[] = array($dep, $code, $error);
                     }
                 }
             }
+            // {{{ failed dependencies
             $n = count($failed_deps);
             if ($n > 0) {
                 for ($i = 0; $i < $n; $i++) {
@@ -1261,7 +1006,9 @@ class PEAR_Installer extends PEAR_Common
                 }
                 return true;
             }
+            // }}}
 
+            // {{{ optional dependencies
             $count_optional = count($optional_deps);
             if ($count_optional > 0) {
                 $errors = "Optional dependencies:";
@@ -1282,38 +1029,9 @@ class PEAR_Installer extends PEAR_Common
                 }
                 return false;
             }
+            // }}}
         }
         return false;
-    }
-
-    // }}}
-    // {{{ _downloadCallback()
-
-    function _downloadCallback($msg, $params = null)
-    {
-        switch ($msg) {
-            case 'saveas':
-                $this->log(1, "downloading $params ...");
-                break;
-            case 'done':
-                $this->log(1, '...done: ' . number_format($params, 0, '', ',') . ' bytes');
-                break;
-            case 'bytesread':
-                static $bytes;
-                if (empty($bytes)) {
-                    $bytes = 0;
-                }
-                if (!($bytes % 10240)) {
-                    $this->log(1, '.', false);
-                }
-                $bytes += $params;
-                break;
-            case 'start':
-                $this->log(1, "Starting to download {$params[0]} (".number_format($params[1], 0, '', ',')." bytes)");
-                break;
-        }
-        if (method_exists($this->ui, '_downloadCallback'))
-            $this->ui->_downloadCallback($msg, $params);
     }
 
     // }}}
@@ -1330,6 +1048,7 @@ class PEAR_Installer extends PEAR_Common
     // }}}
 }
 
+// {{{ md5_file() utility function
 if (!function_exists("md5_file")) {
     function md5_file($filename) {
         $fp = fopen($filename, "r");
@@ -1339,5 +1058,6 @@ if (!function_exists("md5_file")) {
         return md5($contents);
     }
 }
+// }}}
 
 ?>

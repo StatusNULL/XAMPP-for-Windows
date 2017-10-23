@@ -1,11 +1,11 @@
 <?php
-/* vim: set ts=4 sw=4: */
+//
 // +----------------------------------------------------------------------+
 // | PHP version 4.0                                                      |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 2001 The PHP Group                                     |
+// | Copyright (c) 1997-2003 The PHP Group                                |
 // +----------------------------------------------------------------------+
-// | This source file is subject to version 2.0 of the PHP license,       |
+// | This source file is subject to version 2.02 of the PHP license,      |
 // | that is bundled with this package in the file LICENSE, and is        |
 // | available at through the world-wide-web at                           |
 // | http://www.php.net/license/2_02.txt.                                 |
@@ -14,39 +14,37 @@
 // | license@php.net so we can mail you a copy immediately.               |
 // +----------------------------------------------------------------------+
 // | Authors: Colin Viebrock <colin@easydns.com>                          |
-// |          Mike Glover <mpg4@duluoz.net>                               |
 // +----------------------------------------------------------------------+
+//
+// $Id: CBC.php,v 1.5 2003/03/13 20:52:38 cmv Exp $
 //
 
 require_once 'PEAR.php';
 
 
 /**
-* Class to emulate Perl's Crypt::CBC module
-*
-* Blowfish support is not completely working, mainly because of a bug
-* discovered in libmcrypt (version 2.4.8 and earlier).  If you are running
-* a later version of libmcrypt > 2.4.8, you can do Blowfish encryption
-* that is compatable with Perl.  However, check the libmcrypt documenation
-* as to whether you should use 'BLOWFISH' or 'BLOWFISH-COMPAT' when
-* specifying the cipher.
-*
-* If you are using libmcrypt <= 2.4.8, Blowfish encryption will work,
-* but your data will not be readable by Perl scripts.  It will work
-* "internally" .. i.e. this class will be able to encode/decode the data.
-*
-* This class will no longer work with libmcrypt 2.2.x versions.
-*
-* NOTE: the cipher names in this class may change depending on how
-* the author of libcrypt decides to name things internally.
-*
-*
-* @version  $Id: CBC.php,v 1.13 2001/12/20 17:20:24 cmv Exp $
-* @author   Colin Viebrock <colin@easydns.com>
-* @author   Mike Glover <mpg4@duluoz.net>
-* @access   public
-* @package Crypt
-*/
+ * Class to emulate Perl's Crypt::CBC module
+ *
+ * Blowfish support that is compatable with Perl requires libmcrypt >= 2.4.9.
+ * If you are using libmcrypt <= 2.4.8, Blowfish encryption will work,
+ * but your data will not be readable by Perl scripts.  It will work
+ * "internally" .. i.e. this class will be able to encode/decode the data.
+ *
+ * Blowfish support that is compatable with PHP applications using
+ * libmcrypt <= 2.4.8 requies you to use 'BLOWFISH-COMPAT' when
+ * specifying the cipher.  Check the libmcrypt docs when in doubt.
+ *
+ * This class no longer works with libmcrypt 2.2.x versions.
+ *
+ * NOTE: the cipher names in this class may change depending on how
+ * the author of libcrypt decides to name things internally.
+ *
+ *
+ * @version  $Revision: 1.5 $
+ * @author   Colin Viebrock <colin@easydns.com>
+ * @access   public
+ * @package  Crypt
+ */
 
 class Crypt_CBC extends PEAR {
 
@@ -71,6 +69,12 @@ class Crypt_CBC extends PEAR {
     * @var string
     */  
     var $TD;
+
+    /**
+    * crypt deinit function, for backwards compatability
+    * @var string
+    */  
+    var $deinit_function;
 
     /**
     * blocksize of cipher
@@ -137,9 +141,18 @@ class Crypt_CBC extends PEAR {
                 PEAR_ERROR_DIE, null, 'compile PHP using "--with-mcrypt"' );
         }
         if (!function_exists('mcrypt_module_open')) {
-            return $this->raiseError('libmcrypt is 2.2.x', null, 
-                PEAR_ERROR_DIE, null, 'this class only works with libmcrypt 2.4.x and later' );
+            return $this->raiseError('libmcrypt version insufficient', null, 
+                PEAR_ERROR_DIE, null, 'this class requires libmcrypt >= 2.4.x, preferably >= 2.5.5' );
         }
+        if (function_exists('mcrypt_generic_deinit')) {
+			$this->deinit_function = 'mcrypt_generic_deinit';
+		} else if (function_exists('mcrypt_generic_end')) {
+			$this->deinit_function = 'mcrypt_generic_end';
+		} else {
+            return $this->raiseError('PHP version insufficient', null, 
+                PEAR_ERROR_DIE, null, 'this class requires PHP >= 4.0.2, preferably >= 4.1.1' );
+        }
+
 
         /* seed randomizer */
 
@@ -166,9 +179,9 @@ class Crypt_CBC extends PEAR {
 
         /* initialize cipher */
 
-        $this->blocksize = mcrypt_get_block_size($this->cipher,'cbc');
-        $this->keysize = mcrypt_get_key_size($this->cipher,'cbc');
         $this->TD = mcrypt_module_open ($this->cipher, '', 'ecb', '');
+        $this->blocksize = mcrypt_enc_get_block_size($this->TD);
+        $this->keysize = mcrypt_enc_get_key_size($this->TD);
 
         /* mangle key with MD5 */
 
@@ -191,7 +204,6 @@ class Crypt_CBC extends PEAR {
 
     function _Crypt_CBC ()
     {
-        @mcrypt_generic_end($this->TD);
         @mcrypt_module_close($this->TD);
     }
 
@@ -237,6 +249,7 @@ class Crypt_CBC extends PEAR {
             $cblock = mcrypt_generic($this->TD, $iv^$block );
             $iv = $cblock;
             $crypt .= $cblock;
+            call_user_func($this->deinit_function, $this->TD);
         }
 
         $this->last_crypt = $crypt;
@@ -285,6 +298,7 @@ class Crypt_CBC extends PEAR {
             $block = $iv ^ mdecrypt_generic($this->TD, $cblock);
             $iv = $cblock;
             $clear .= $block;
+            call_user_func($this->deinit_function, $this->TD);
         }
 
         /* remove the padding from the end of the cleartext */

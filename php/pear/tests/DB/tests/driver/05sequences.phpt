@@ -1,11 +1,18 @@
 --TEST--
 DB_driver::sequences
 --SKIPIF--
-<?php chdir(dirname(__FILE__)); require "skipif.inc"; ?>
+<?php
+chdir(dirname(__FILE__));
+require_once './skipif.inc';
+$tableInfo = $db->dropSequence('ajkdslfajoijkadie');
+if (DB::isError($tableInfo) && $tableInfo->code == DB_ERROR_NOT_CAPABLE) {
+    die("skip $tableInfo->message");
+}
+?>
 --FILE--
 <?php
-require "connect.inc";
-require "../sequences.inc";
+require_once './connect.inc';
+require_once '../sequences.inc';
 ?>
 --EXPECT--
 DB Error: no such table

@@ -1,16 +1,19 @@
 --TEST--
-DB::parseDSN test
+DB::parseDSN
 --SKIPIF--
-<?php if (!@include(dirname(__FILE__)."/../DB.php")) print "skip"; ?>
+<?php chdir(dirname(__FILE__)); require_once './skipif.inc'; ?>
 --FILE--
 <?php // -*- C++ -*-
-include_once './include.inc';
-// Test for: DB::parseDSN()
-
-include_once dirname(__FILE__)."/../DB.php";
+require_once './include.inc';
+require_once 'DB.php';
 
 function test($dsn) {
     echo "DSN: $dsn\n";
+    print_r(DB::parseDSN($dsn));
+}
+
+function testArray($dsn) {
+    echo "DSN: array\n";
     print_r(DB::parseDSN($dsn));
 }
 
@@ -18,6 +21,9 @@ print "testing DB::parseDSN...\n\n";
 
 test("mysql");
 test("odbc(mssql)");
+test('odbc(db2)://user:password@/database');
+test('odbc(access):///database');
+test('odbc://admin@/datasourceName');
 test("mysql://localhost");
 test("mysql://remote.host.com/db");
 test("oci8://system:manager@");
@@ -41,6 +47,22 @@ test("pgsql://user:pass@word@tcp(somehost:7777)/pear");
 // special backend options
 test('ibase://user:pass@localhost//var/lib/dbase.dbf?role=foo');
 test('dbase://@/?role=foo&dialect=bar');
+test('sqlite:////unix/path/to/database?option=value&anotheroption=anothervalue');
+test('sqlite:///c:/win/path/to/database?option=value');
+
+// some examples from manual
+test('mysql://username@hostspec');
+test('mysql://hostspec/database');
+test('mysql://hostspec');
+test('mysql:///database');
+
+// array tests
+$array = array(
+    'phptype'  => 'mysql',
+    'hostspec' => 'foobar',
+);
+testArray($array);
+
 ?>
 --GET--
 --POST--
@@ -72,6 +94,45 @@ Array
     [port] => 
     [socket] => 
     [database] => 
+)
+DSN: odbc(db2)://user:password@/database
+Array
+(
+    [phptype] => odbc
+    [dbsyntax] => db2
+    [username] => user
+    [password] => password
+    [protocol] => tcp
+    [hostspec] => 
+    [port] => 
+    [socket] => 
+    [database] => database
+)
+DSN: odbc(access):///database
+Array
+(
+    [phptype] => odbc
+    [dbsyntax] => access
+    [username] => 
+    [password] => 
+    [protocol] => tcp
+    [hostspec] => 
+    [port] => 
+    [socket] => 
+    [database] => database
+)
+DSN: odbc://admin@/datasourceName
+Array
+(
+    [phptype] => odbc
+    [dbsyntax] => odbc
+    [username] => admin
+    [password] => 
+    [protocol] => tcp
+    [hostspec] => 
+    [port] => 
+    [socket] => 
+    [database] => datasourceName
 )
 DSN: mysql://localhost
 Array
@@ -322,4 +383,98 @@ Array
     [database] => 
     [role] => foo
     [dialect] => bar
+)
+DSN: sqlite:////unix/path/to/database?option=value&anotheroption=anothervalue
+Array
+(
+    [phptype] => sqlite
+    [dbsyntax] => sqlite
+    [username] => 
+    [password] => 
+    [protocol] => tcp
+    [hostspec] => 
+    [port] => 
+    [socket] => 
+    [database] => /unix/path/to/database
+    [option] => value
+    [anotheroption] => anothervalue
+)
+DSN: sqlite:///c:/win/path/to/database?option=value
+Array
+(
+    [phptype] => sqlite
+    [dbsyntax] => sqlite
+    [username] => 
+    [password] => 
+    [protocol] => tcp
+    [hostspec] => 
+    [port] => 
+    [socket] => 
+    [database] => c:/win/path/to/database
+    [option] => value
+)
+DSN: mysql://username@hostspec
+Array
+(
+    [phptype] => mysql
+    [dbsyntax] => mysql
+    [username] => username
+    [password] => 
+    [protocol] => tcp
+    [hostspec] => hostspec
+    [port] => 
+    [socket] => 
+    [database] => 
+)
+DSN: mysql://hostspec/database
+Array
+(
+    [phptype] => mysql
+    [dbsyntax] => mysql
+    [username] => 
+    [password] => 
+    [protocol] => tcp
+    [hostspec] => hostspec
+    [port] => 
+    [socket] => 
+    [database] => database
+)
+DSN: mysql://hostspec
+Array
+(
+    [phptype] => mysql
+    [dbsyntax] => mysql
+    [username] => 
+    [password] => 
+    [protocol] => tcp
+    [hostspec] => hostspec
+    [port] => 
+    [socket] => 
+    [database] => 
+)
+DSN: mysql:///database
+Array
+(
+    [phptype] => mysql
+    [dbsyntax] => mysql
+    [username] => 
+    [password] => 
+    [protocol] => tcp
+    [hostspec] => 
+    [port] => 
+    [socket] => 
+    [database] => database
+)
+DSN: array
+Array
+(
+    [phptype] => mysql
+    [dbsyntax] => mysql
+    [username] => 
+    [password] => 
+    [protocol] => 
+    [hostspec] => foobar
+    [port] => 
+    [socket] => 
+    [database] => 
 )

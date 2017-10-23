@@ -1,0 +1,5 @@
+a:12:{s:8:"provides";a:0:{}s:8:"filelist";a:2:{s:23:"Contact_Vcard_Parse.php";a:2:{s:4:"role";s:3:"php";s:12:"installed_as";s:41:"C:\xampp\php\pear\Contact_Vcard_Parse.php";}s:7:"dirtree";a:1:{s:17:"C:\xampp\php\pear";b:1;}}s:7:"package";s:19:"Contact_Vcard_Parse";s:7:"summary";s:30:"Parse vCard 2.1 and 3.0 files.";s:11:"description";s:121:"Allows you to parse vCard files and text blocks, and get back an array of the elements of each vCard in the file or text.";s:11:"maintainers";a:1:{i:0;a:4:{s:6:"handle";s:7:"pmjones";s:4:"name";s:13:"Paul M. Jones";s:5:"email";s:17:"pjones@ciaweb.net";s:4:"role";s:4:"lead";}}s:7:"version";s:4:"1.30";s:12:"release_date";s:10:"2004-02-18";s:15:"release_license";s:11:"PHP License";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:352:"* Now deals with Mac OS X Address Book unicode by stripping all \x00 nulls from the source text (suggested simultaneously by Jose Luis Pellicer and Nick Lo)
+* Updated line-ending conversion method
+* Updated comments
+* Added a fileGetContents() method to support users who have PHP earlier than 4.3.0
+* Updated fromFile() to use fileGetContents() method";s:13:"_lastmodified";i:1080134251;}

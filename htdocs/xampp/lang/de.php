@@ -10,7 +10,7 @@ $TEXT['global-xampp']="XAMPP für Windows";
 // NAVIGATION
 // ---------------------------------------------------------------------
 
-$TEXT['navi-xampp']="XAMPP";
+$TEXT['navi-xampp']="XAMPP 1.4.2";
 $TEXT['navi-welcome']="Willkommen";
 $TEXT['navi-status']="Status";
 $TEXT['navi-security']="Sicherheitscheck";
@@ -29,7 +29,9 @@ $TEXT['navi-phonebook']="Telefonbuch";
 $TEXT['navi-perlasp']="Perl:ASP";
 $TEXT['navi-pear']="PEAR:Excel_Writer";
 $TEXT['navi-adodb']="ADOdb";
-$TEXT['navi-perl']="Module Perl";
+$TEXT['navi-perl']="Perl";
+$TEXT['navi-python']="Python";
+$TEXT['navi-jsp']="Java";
 
 $TEXT['navi-tools']="Tools";
 $TEXT['navi-phpmyadmin']="phpMyAdmin";
@@ -51,12 +53,16 @@ $TEXT['status-text1']="Auf dieser Übersicht kann man sehen welche XAMPP-Komponen
 $TEXT['status-text2']="Dieser Check funktioniert nur zuverlässig solange nichts an der Konfiguration des Apache geändert wurde. Durch bestimmte Änderungen kann das Ergebnis dieses Tests verfälscht werden. Mit SSL (https://localhost) funktionieren die Statuschecks nicht!";
 
 $TEXT['status-mysql']="MySQL-Datenbank";
+$TEXT['status-ssl']="HTTPS (SSL)";
 $TEXT['status-php']="PHP";
 $TEXT['status-perl']="Perl mit mod_perl";
 $TEXT['status-cgi']="Common Gateway Interface (CGI)";
 $TEXT['status-ssi']="Server Side Includes (SSI)";
+$TEXT['status-python']="Python mit mod_python";
 $TEXT['status-smtp']="SMTP Server";
 $TEXT['status-ftp']="FTP Server";
+$TEXT['status-tomcat']="Tomcat Server";
+$TEXT['status-named']="Domain Name Server (DNS)";
 $TEXT['status-mmcache']="PHP-Erweiterung »Turck MMCache«";
 $TEXT['status-mmcache-url']="http://www.apachefriends.org/faq-wampp.html#mmcache";
 $TEXT['status-oci8']="PHP-Erweiterung »OCI8/Oracle«";
@@ -115,16 +121,15 @@ $TEXT['start-subhead']="Herzlichen Glückwunsch:<br>XAMPP wurde erfolgreich auf d
 
 $TEXT['start-text1']="Nun kann es losgehen. :) Als erstes bitte einmal auf der linken Seite auf »Status« klicken. Damit bekommt man einen Überblick was alles schon funktioniert. Ein paar Funktionen werden ausgeschaltet sein. Das ist Absicht so. Es sind Funktionen, die nicht überall funktionieren oder evtl. Probleme bereiten könnten.";
 
-$TEXT['start-text2']="Wer Lust hat kann sich danach mal die Beispielprogramme/Demos darunter anschauen.";
+$TEXT['start-text2']="Achtung: Der XAMPP wurde ab Version 1.4.2 auf eine Einzelpaketverwaltung umgestellt. Es gibt nun die folgenden Pakete/Addons: <UL><LI>XAMPP Basis Paket</LI><LI>XAMPP Perl addon</LI><LI>XAMPP Python addon<LI></LI>XAMPP Utility addon (Zubehör aber noch inaktiv)</LI><LI>XAMPP Server addon (weitere Server aber noch inaktiv)</LI><LI>XAMPP Other addon (weitere nützliche Sachen aber noch inaktiv)</LI></UL>";
 
-$TEXT['start-text3']="Wen das alles nicht interessiert, sondern gleich anfangen möchte zu programmieren oder Webseiten zu erstellen,
-der sollte einfach in die <a href=readme_de.txt>XAMPP Anleitung</a> gucken, wo welche Dateien liegen bzw. hingehören.";
+$TEXT['start-text3']="Bitte \"installiert\" die Zusatzpakete, die ihr noch benötigt, einfach hinterher. Nach dem erfolgreichen raufspielen bitte immer die \"setup_xampp.bat\" betätigen, um den XAMPP neu zu initialisieren. Ach so, die Installerversionen der einzelnen Addons funktionieren nur wenn das XAMPP Basispaket ebenfalls über eine Installerversion eingerichtet wurde.";
 
 $TEXT['start-text4']="Für die OpenSSL Unterstützung benutzt bitte das Testzertifikat mit der URL <a href='https://127.0.0.1' target='_top'>https://127.0.0.1</a> bzw. <a href='https://localhost' target='_top'>https://localhost</a>";
 
 $TEXT['start-text5']="Und ganz wichtig! Einen großen Dank für die Mitarbeit und Mithilfe an Nemesis, KriS, Boppy, Pc-Dummy und allen anderen Freunden von XAMPP!";
 
-$TEXT['start-text6']="Viel Spaß,<br>Oswald + Kay Vogelgesang";
+$TEXT['start-text6']="Viel Spaß, Kay Vogelgesang + Kai 'Oswald' Seidler";
 
 // ---------------------------------------------------------------------
 // MANUALS
@@ -334,7 +339,6 @@ $TEXT['ADOdb-database']="Datenbank auf dem Datenbankserver";
 $TEXT['ADOdb-table']="Tabelle dieser Datenbank";
 $TEXT['ADOdb-nottable']="<p><B>Tabelle nicht gefunden!</B>";
 $TEXT['ADOdb-notdbserver']="<p><B>Der Treiber für diesen Datenbankserver existiert nicht oder es handelt es ich um ein ODBC, ADO oder OLEDB Treiber!</B>";
-
 
 // ---------------------------------------------------------------------
 // INFO

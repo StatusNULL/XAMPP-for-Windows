@@ -9,7 +9,7 @@ $TEXT['global-xampp']="XAMPP for Windows";
 // NAVIGATION
 // ---------------------------------------------------------------------
 
-$TEXT['navi-xampp']="XAMPP";
+$TEXT['navi-xampp']="XAMPP 1.4.2";
 $TEXT['navi-welcome']="Welcome";
 $TEXT['navi-status']="Status";
 $TEXT['navi-security']="Security";
@@ -28,7 +28,9 @@ $TEXT['navi-phonebook']="Phone Book";
 $TEXT['navi-perlasp']="Perl:ASP";
 $TEXT['navi-pear']="PEAR:Excel_Writer";
 $TEXT['navi-adodb']="ADOdb";
-$TEXT['navi-perl']="Module Perl";
+$TEXT['navi-perl']="Perl";
+$TEXT['navi-python']="Python";
+$TEXT['navi-jsp']="Java";
 
 $TEXT['navi-tools']="Tools";
 $TEXT['navi-phpmyadmin']="phpMyAdmin";
@@ -50,14 +52,18 @@ $TEXT['status-text1']="This page offers you on one view all information about wh
 $TEXT['status-text2']="Some changes to the configuration sometime may cause false negative status reports. With SSL (https://localhost) all these reports do not function!";
 
 $TEXT['status-mysql']="MySQL database";
+$TEXT['status-ssl']="HTTPS (SSL)";
 $TEXT['status-php']="PHP";
 $TEXT['status-perl']="Perl with mod_perl";
 $TEXT['status-cgi']="Common Gateway Interface (CGI)";
 $TEXT['status-ssi']="Server Side Includes (SSI)";
+$TEXT['status-python']="Python with mod_python";
 $TEXT['status-mmcache']="PHP extension »Turck MMCache«";
 $TEXT['status-mmcache-url']="http://www.apachefriends.org/faq-wampp-en.html#mmcache";
-$TEXT['status-smtp']="SMTP Server";
-$TEXT['status-ftp']="FTP Server";
+$TEXT['status-smtp']="SMTP Service";
+$TEXT['status-ftp']="FTP Service";
+$TEXT['status-tomcat']="Tomcat Service";
+$TEXT['status-named']="Domain Name Service (DNS)";
 $TEXT['status-oci8']="PHP extension »OCI8/Oracle«";
 $TEXT['status-oci8-url']="http://www.apachefriends.org/faq-lampp-en.html#oci8";
 
@@ -114,15 +120,15 @@ $TEXT['start-subhead']="Congratulations:<br>You successfully installed XAMPP on 
 
 $TEXT['start-text1']="Now you can start using Apache and Co. Firstly you should try »Status« on the left navigation to make sure everything works fine.";
 
-$TEXT['start-text2']="After testing you may take a look at the examples below the test link.";
+$TEXT['start-text2']="Attention: The XAMPP in version 1.4.2 is modified for a package management. There are following packages/addons: <UL><LI>XAMPP basic package</LI><LI>XAMPP Perl addon</LI><LI>XAMPP Python addon<LI></LI>XAMPP Utility addon (more utils but inactiv)</LI><LI>XAMPP Server addon (more server but inactiv)</LI><LI>XAMPP Other addon (other things but inactiv)</LI></UL>";
 
-$TEXT['start-text3']="If you want to start programming PHP or Perl (or whatever ;) please take a look at the <a href=readme_en.txt>XAMPP readme</a> first and get more information about your XAMPP installation.";
+$TEXT['start-text3']="Please arrange your personality XAMPP. But take care. For a normal initialization of each additional addon, please execute the \"setup_xampp.bat\" once. For the installer versions: All installer addons need the installer version of XAMPP! Otherwise you can always use the zip or 7zip-exe addons.";
 
 $TEXT['start-text4']="For OpenSSL support please use the test certificate with <a href='https://127.0.0.1' target='_top'>https://127.0.0.1</a> or <a href='https://localhost' target='_top'>https://localhost</a>";
 
 $TEXT['start-text5']="And very important! Big thanks for help and support to Nemesis, KriS, Boppy, Pc-Dummy and all other friends of XAMPP!";
 
-$TEXT['start-text6']="Good luck,<br>Oswald + Kay Vogelgesang";
+$TEXT['start-text6']="Good luck, Kay Vogelgesang + Kai 'Oswald' Seidler";
 
 // ---------------------------------------------------------------------
 // MANUALS
@@ -356,5 +362,4 @@ $TEXT['info-tryjava']="The java example (JSP) with Apache MOD_JK.";
 $TEXT['info-nococoon']="Warning! Tomcat is not started on port 8080. Cannot install
 \"Cocoon\" without running Tomcat server!";
 $TEXT['info-okcocoon']="Ok! The Tomcat is running normaly. The installation works can last some minutes! To install \"Cocoon\" now click here ...";
-
 ?>

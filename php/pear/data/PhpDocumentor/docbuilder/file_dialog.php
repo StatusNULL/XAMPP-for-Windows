@@ -29,7 +29,7 @@
 */
 require_once 'PhpDocumentor/phpDocumentor/common.inc.php';
 require_once 'PhpDocumentor/HTML_TreeMenu-1.1.2/TreeMenu.php';
-require_once( 'M:\xampp\php\pear\data' . PATH_DELIMITER . 'PhpDocumentor/docbuilder/includes/utilities.php' );
+require_once( 'C:\xampp\php\pear\data' . PATH_DELIMITER . 'PhpDocumentor/docbuilder/includes/utilities.php' );
 
 $root_dir = 'PhpDocumentor';
 
@@ -42,11 +42,11 @@ if (!function_exists( 'version_compare' )) {
 $GLOBALS['_phpDocumentor_install_dir'] = $root_dir;
 
 // find the .ini directory by parsing phpDocumentor.ini and extracting _phpDocumentor_options[userdir]
-$ini = phpDocumentor_parse_ini_file('M:\xampp\php\pear\data' . PATH_DELIMITER . 'PhpDocumentor/phpDocumentor.ini', true);
+$ini = phpDocumentor_parse_ini_file('C:\xampp\php\pear\data' . PATH_DELIMITER . 'PhpDocumentor/phpDocumentor.ini', true);
 if (isset($ini['_phpDocumentor_options']['userdir'])) {
     $configdir = $ini['_phpDocumentor_options']['userdir'];
 } else {
-    $configdir = 'M:\xampp\php\pear\data' . PATH_DELIMITER . 'PhpDocumentor/user';
+    $configdir = 'C:\xampp\php\pear\data' . PATH_DELIMITER . 'PhpDocumentor/user';
 }
 
 // allow the user to change this at runtime

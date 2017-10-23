@@ -8,7 +8,7 @@
 &nbsp;<p>
 <pre>
 <?
-shell_exec("..\..\webalizer\webalizer.bat");
+shell_exec("..\webalizer\webalizer.bat");
 ?>
 <script>
 	document.location="/webalizer/";

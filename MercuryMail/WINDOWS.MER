@@ -1,6 +1,6 @@
 Frame,146,83,768,537
 i:\wampp2\MERCURY\mercurye.dll,421,36,331,278
-Core,5,5,331,278
+Core,349,64,331,278
 i:\wampp2\MERCURY\mercurys.dll,284,35,331,337
 i:\wampp2\MERCURY\mercuryp.dll,428,58,331,337
 i:\wampp2\MERCURY\mercuryd.dll,430,59,331,273
@@ -21,3 +21,7 @@ Logging,342,15,323,270
 \wampp1-smart\mailserver\mercuryp.dll,314,20,331,337
 \wampp1-smart\mailserver\mercurye.dll,327,24,331,278
 \wampp1-smart\mailserver\mercurys.dll,231,21,331,337
+M:\xampp\MercuryMail\mercuryd.dll,193,62,331,273
+M:\xampp\MercuryMail\mercuryp.dll,312,80,331,337
+M:\xampp\MercuryMail\mercurye.dll,99,53,331,278
+M:\xampp\MercuryMail\mercurys.dll,19,66,331,337

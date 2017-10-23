@@ -8,8 +8,6 @@ This product is subordinate the License Agreements of the different software
 components contains in xampp. The most software are designed under the GNU General 
 Public License. But note:
 
--  ActiveState Perl is not GNU (generally free for personal or non-commercia use)
--  ActiveState Python is not GNU (generally free for personal or non-commercial use)
 -  MySQL is not GNU (generally free for personal or non-commercial use)
 -  Some other software contains in xampp could be not GNU! 
 

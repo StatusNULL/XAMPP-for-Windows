@@ -17,7 +17,7 @@
 // |          Urs Gehrig <urs@circle.ch>                                  |
 // +----------------------------------------------------------------------+
 //
-// $Id: Form.php,v 1.22.2.2 2002/04/09 19:04:19 ssb Exp $
+// $Id: Form.php,v 1.2 2003/02/14 11:12:08 mj Exp $
 //
 // HTML form utility functions.
 //
@@ -322,7 +322,7 @@ class HTML_Form
         print " <tr>\n";
         print "  <th align=\"right\" valign=\"top\">$title</th>\n";
         print "  <td>";
-        $this->displayTextarea($name, &$default, $width, $height, $maxlength);
+        $this->displayTextarea($name, $default, $width, $height, $maxlength);
         print "</td>\n";
         print " </tr>\n";
     }

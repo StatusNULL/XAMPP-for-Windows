@@ -16,10 +16,11 @@
 // | Author: Colin Viebrock <colin@easyDNS.com>                           |
 // +----------------------------------------------------------------------+
 //
-// $Id: Dig.php,v 1.4 2002/02/28 08:27:15 sebastian Exp $
+// $Id: Dig.php,v 1.1 2002/04/25 14:57:23 cmv Exp $
 //
 // A nice friendly OO interface to dig
 //
+
 require_once('PEAR.php');
 
 class Net_Dig extends PEAR

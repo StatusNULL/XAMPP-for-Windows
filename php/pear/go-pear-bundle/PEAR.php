@@ -3,7 +3,7 @@
 // +----------------------------------------------------------------------+
 // | PEAR, the PHP Extension and Application Repository                   |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2003 The PHP Group                                |
+// | Copyright (c) 1997-2004 The PHP Group                                |
 // +----------------------------------------------------------------------+
 // | This source file is subject to version 2.0 of the PHP license,       |
 // | that is bundled with this package in the file LICENSE, and is        |
@@ -18,7 +18,7 @@
 // |          Tomas V.V.Cox <cox@idecnet.com>                             |
 // +----------------------------------------------------------------------+
 //
-// $Id: PEAR.php,v 1.69 2003/09/11 16:45:03 cellog Exp $
+// $Id: PEAR.php,v 1.77 2004/02/07 04:42:07 cellog Exp $
 //
 
 define('PEAR_ERROR_RETURN',     1);
@@ -38,6 +38,15 @@ if (substr(PHP_OS, 0, 3) == 'WIN') {
     define('OS_WINDOWS', false);
     define('OS_UNIX',    true);
     define('PEAR_OS',    'Unix'); // blatant assumption
+}
+
+// instant backwards compatibility
+if (!defined('PATH_SEPARATOR')) {
+    if (OS_WINDOWS) {
+        define('PATH_SEPARATOR', ';');
+    } else {
+        define('PATH_SEPARATOR', ':');
+    }
 }
 
 $GLOBALS['_PEAR_default_error_mode']     = PEAR_ERROR_RETURN;
@@ -232,8 +241,7 @@ class PEAR
      */
     function isError($data, $code = null)
     {
-        if (is_object($data) && (get_class($data) == 'pear_error' ||
-                                 is_subclass_of($data, 'pear_error'))) {
+        if (is_a($data, 'PEAR_Error')) {
             if (is_null($code)) {
                 return true;
             } elseif (is_string($code)) {
@@ -289,8 +297,7 @@ class PEAR
 
     function setErrorHandling($mode = null, $options = null)
     {
-        if (isset($this) &&
-            (get_class($this) == 'pear' || is_subclass_of($this, 'pear'))) {
+        if (isset($this) && is_a($this, 'PEAR')) {
             $setmode     = &$this->_default_error_mode;
             $setoptions  = &$this->_default_error_options;
         } else {
@@ -416,7 +423,7 @@ class PEAR
             // $error_code is a non-empty array here;
             // we walk through it trying to unset all
             // values
-            foreach($error_code AS $key => $error) {
+            foreach($error_code as $key => $error) {
                 if ($this->_checkDelExpect($error)) {
                     $deleted =  true;
                 } else {
@@ -490,6 +497,7 @@ class PEAR
             $code        = $message->getCode();
             $userinfo    = $message->getUserInfo();
             $error_class = $message->getType();
+            $message->error_message_prefix = '';
             $message     = $message->getMessage();
         }
 
@@ -537,7 +545,7 @@ class PEAR
      * @param string $message
      *
      */
-    function &throwError($message = null,
+    function throwError($message = null,
                          $code = null,
                          $userinfo = null)
     {
@@ -566,8 +574,7 @@ class PEAR
     function pushErrorHandling($mode, $options = null)
     {
         $stack = &$GLOBALS['_PEAR_error_handler_stack'];
-        if (isset($this) &&
-            (get_class($this) == 'pear' || is_subclass_of($this, 'pear'))) {
+        if (isset($this) && is_a($this, 'PEAR')) {
             $def_mode    = &$this->_default_error_mode;
             $def_options = &$this->_default_error_options;
         } else {
@@ -576,8 +583,7 @@ class PEAR
         }
         $stack[] = array($def_mode, $def_options);
 
-        if (isset($this) &&
-            (get_class($this) == 'pear' || is_subclass_of($this, 'pear'))) {
+        if (isset($this) && is_a($this, 'PEAR')) {
             $this->setErrorHandling($mode, $options);
         } else {
             PEAR::setErrorHandling($mode, $options);
@@ -602,8 +608,7 @@ class PEAR
         array_pop($stack);
         list($mode, $options) = $stack[sizeof($stack) - 1];
         array_pop($stack);
-        if (isset($this) &&
-            (get_class($this) == 'pear' || is_subclass_of($this, 'pear'))) {
+        if (isset($this) && is_a($this, 'PEAR')) {
             $this->setErrorHandling($mode, $options);
         } else {
             PEAR::setErrorHandling($mode, $options);
@@ -765,14 +770,8 @@ class PEAR_Error
             die(sprintf($format, $msg));
         }
         if ($this->mode & PEAR_ERROR_CALLBACK) {
-            if (is_string($this->callback) && strlen($this->callback)) {
+            if (is_callable($this->callback)) {
                 call_user_func($this->callback, $this);
-            } elseif (is_array($this->callback) &&
-                      sizeof($this->callback) == 2 &&
-                      is_object($this->callback[0]) &&
-                      is_string($this->callback[1]) &&
-                      strlen($this->callback[1])) {
-                      call_user_func($this->callback, $this);
             }
         }
         if (PEAR_ZE2 && $this->mode & PEAR_ERROR_EXCEPTION) {

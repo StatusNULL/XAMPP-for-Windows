@@ -16,7 +16,7 @@
 // | Author: Sterling Hughes <sterling@php.net>                           |
 // +----------------------------------------------------------------------+
 //
-// $Id: Find.php,v 1.24 2002/02/28 08:27:12 sebastian Exp $
+// $Id: Find.php,v 1.1 2002/10/24 21:31:57 tuupola Exp $
 //
 
 require_once 'PEAR.php';
@@ -25,7 +25,7 @@ require_once 'PEAR.php';
 *  Commonly needed functions searching directory trees
 *
 * @access public
-* @version $Id: Find.php,v 1.24 2002/02/28 08:27:12 sebastian Exp $
+* @version $Id: Find.php,v 1.1 2002/10/24 21:31:57 tuupola Exp $
 * @package File
 * @author Sterling Hughes <sterling@php.net>
 */
@@ -121,6 +121,8 @@ class File_Find
      *
      * @param string $directory contains the directory path that you
      * want to map.
+     * @param integer $maxrecursion maximun number of folders to recursive 
+     * map
      *
      * @return array a multidimensional array containing all subdirectories
      * and their files. For example:
@@ -139,12 +141,14 @@ class File_Find
      * @access public
      */
 
-    function &mapTreeMultiple($directory)
+    function &mapTreeMultiple($directory, $maxrecursion=0, $count=0)
     {   
 
         $retval = array();
 
-        $directory .= '/';
+        $count++;
+
+        $directory .= DIRECTORY_SEPARATOR;
         $dh=opendir($directory);
         while ($entry = readdir($dh)) {
             if ($entry != "." && $entry != "..") {
@@ -156,12 +160,16 @@ class File_Find
      
         while (list($key, $val) = each($retval)) {
             $path = $directory . $val;
-            $path = str_replace("//","/",$path);
+            $path = str_replace(DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR,
+                                DIRECTORY_SEPARATOR, $path);
       
             if (!(is_array($val))) {
                 if (is_dir($path)) {
                     unset($retval[$key]);
-                    $retval[$val] = File_Find::mapTreeMultiple($path);
+                    if ($maxrecursion == 0 || $count < $maxrecursion) {
+                        $retval[$val] = File_Find::mapTreeMultiple($path, 
+                                        $maxrecursion, $count);
+                    }
                 }
             }
         }
@@ -242,7 +250,7 @@ class File_Find
             if ($entry != '.' &&
                 $entry != '..') {
 
-                $entry = "$directory/$entry";
+                $entry = $directory.DIRECTORY_SEPARATOR.$entry;
 
                 if (is_dir($entry))
                     array_push($this->_dirs, $entry);

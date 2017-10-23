@@ -1,79 +1,52 @@
-  ApacheFriends XAMPP for windows Version 1.4 (25.03.2004) 
+  ApacheFriends XAMPP (basic package) version 1.4.2 (win32)
 
   + Apache 2.0.49
   + MySQL 4.0.18
-  + PHP 4.3.4 + PEAR
-  + mod_php 4.3.4 
-  + Perl 5.8.3 
-  + mod_perl 1.99_13
-  + mod_ssl 2.0.49
-  + openssl 0.9.7d
-  + SQLite 2.8.11  + mod_auth_mysql (only experimental)
-
-  + PHPMyAdmin 2.5.6
+  + PHP 4.3.6 + PEAR
+  + mod_php 4.3.6 
+  + MiniPerl 5.8.3
+  + SQLite 2.8.11
+  + PHPMyAdmin 2.5.6 
+  + ADODB 4.21
+  + Mercury Mail Transport System for Win32 and NetWare Systems v4.01a
+  + FileZilla FTP Server 0.8.9
   + Webalizer 2.01-10
-  + Mercury Mail Transport System for Win32 and NetWare Systems v3.32
-  + JpGraph 1.14 (only for non-commercial, open-source and educational use)
-  + FileZilla FTP Server 0.8.8
-  + Oswalds CD Collection v0.2 (!)
-  + PHP mcrypt() 2.4
-  + Turck MMCache 2.4.6 (PHP accelerator, optimizer, encoder and dynamic content cache for PHP) 
-  + ADODB 4.04
-  + PHPBlender 0.9 (only NT systems PHP compiler)
  
 * System Requirements:
-  
+ 
   + 64 MB RAM (recommended)
-  + 175 MB free Fixed Disk 
+  + 98 MB free Fixed Disk 
   + Windows 98, ME, XP Home
   + Windows NT, 2000, XP Professional (Recommended)
 
 QUICK INSTALLATION:
 
-Step 1: Unpack the package into a directory of your choice.
+[Step 1: Unpack the package to your usb stick or a partition of your choice.
+There it must be on the highest level like E:\ or W:\. It will 
+build E:\xampp or W:\xampp or something like this. Please do not
+use the "setup_xampp.bat" for an USB stick installation!]   
 
-Step 2: Please start "setup_xampp.bat". Enter the number 1 to 
-beginning the installation with MOD_PERL. Without MOD_PERL use 
-number2. MOD_PERL in this Configuration delaying START and STOP
-of the Apache Server.
+Step 1: Unpack the package into a directory of your choice. Please start the 
+"setup_xampp.bat" and beginning the installation. Note: xampp makes no 
+entries in the windows registry and no settings for the system variables. 
 
-[or alternatve: Unpack the package to a partition of your choice.
-There it must be on the highest level like C:\ or E:\. It will 
-build c:\xampp or e:\xampp or something like
-this.]  
-
-Step 3: If installation ends successfully, start the Apache 2 with 
+Step 2: If installation ends successfully, start the Apache 2 with 
 "apache_start".bat", MySQL with "mysql_start".bat". Stop the MySQL 
 Server with "mysql_stop.bat". For shutdown the Apache HTTPD, only 
 close the Apache Command (CMD).  
 
-Step 4: Start your browser and type http://127.0.0.1 or 
+Step 3: Start your browser and type http://127.0.0.1 or 
 http://localhost in the location bar. You should see our pre-made
 start page with certain examples and test screens. 
 
-Step 5: PHP (with mod_php, as *.php, *.php4, *.php3, *.phtml), Perl
+Step 4: PHP (with mod_php, as *.php, *.php4, *.php3, *.phtml), Perl
 by default with *.cgi, SSI with *.shtml are all located in 
 => \...\xampp\htdocs\.
 Beispiele (Examples):
 => \...\xampp\htdocs\test.php => http://localhost/test.php
 => \...\xampp\myhome\test.php => http://localhost/myhome/test.php
 
-Step 6: Perl with mod_perl will execute in 
-=> \...\xampp\htdocs\modperl
-Test ist with http://localhost/perl/modperl.pl
-Perl:ASP will execute in 
-=> \...\xampp\htdocs\modperlasp
-Test ist with http://localhost/perlasp/loop.asp
-
-Step 7: Start Mercury Mail Server with
-=> \...\xampp\mercury_start.bat
-
-Step 8: Configure FileZilla FTP Server with 
-=> \...\xampp\filezilla_setup.bat
-In the "FileZilla Server.xml", please change all relative paths into absolute paths  
-=> \...\xampp\FileZillaFTP\FileZilla Server.xml
-
-Step 9: XAMPP UNINSTALL? Simply remove the "xampp" Directory.
+Step 5: XAMPP UNINSTALL? Simply remove the "xampp" Directory.
 But before please shutdown the apache and mysql.  
 
 ---------------------------------------------------------------
@@ -108,24 +81,21 @@ password: xampp
 ONLY FOR NT SYSTEMS
 (NT4 | windows 2000 | windows xp professional)
 
-\...\xampp\apache\apache_installservice.bat
+\...\xampp\apache\apache_installservice.bat =
 ==> Install Apache 2 as service   
 
-\...\xampp\apache\apache_uninstallservice.bat
+\...\xampp\apache\apache_uninstallservice.bat =
 ==> Uninstall Apache 2 as service   
 
-\...\xampp\apache\mysql_installservice.bat
-==> Install MySQL as service 
-Before, please copy the my.cnf with absolute paths to c:\ (c:\my.cnf)!    
+\...\xampp\apache\mysql_installservice.bat =
+==> Install MySQL as service   
 
-\...\xampp\apache\mysql_uninstallservice.bat
+\...\xampp\apache\mysql_uninstallservice.bat =
 ==> Uninstall MySQL as service   
 
-\...\xampp\filezilla_setup.bat
-==> Install or uninstall FileZilla FTP Server as service 
-
 ==> After all Service (un)installations, better restart system!
----------------------------------------------------------------
+----------------------------------------------------------------
+
 
 Apache Notes:
 
@@ -134,15 +104,14 @@ with the command "apache -k shutdown". These functions only for
 an installations as service by NT systems. So, simply close
 the Apache START command for shutdown. 
   
-(2) To use the experimental version of Mod_Dav load the Modules 
+(2) To use the experimental version of mod_auth_mysql remove the # in
+the httpd.conf. Detailed information about this topic can be found on 
+the left menu of xampp, once you started it.
+
+(3) To use Mod_Dav load the Modules 
 mod_dav.so + mod_dav_fs.so in the httpd.conf by removing the # on 
 the beginning of their lines. Then try http://127.0.0.1:81 (not 
 for Frontpage, but for Dreamweaver)
-
-
-(3) To use the experimental version of mod_auth_mysql remove the # in
-the httpd.conf. Detailed information about this topic can be found on 
-the left menu of xampp, once you started it.
 
 
 MYSQL NOTES:
@@ -192,5 +161,5 @@ MYSQL NOTES:
   	    	
 ---------------------------------------------------------------    
 Have a lot of fun! Viel Spaﬂ! Bonne Chance!
-Last revised version 25.03.2004 Kay Vogelgesang
+Last revised version 16.04.2004 Kay Vogelgesang
      

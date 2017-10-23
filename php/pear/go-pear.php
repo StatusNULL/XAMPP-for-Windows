@@ -17,7 +17,7 @@
 # |			 Christian Dickmann <dickmann@php.net>						 |
 # |			 Pierre-Alain Joye <pajoye@pearfr.org>						 |
 # +----------------------------------------------------------------------+
-# $Id: go-pear,v 1.52 2003/09/25 07:01:01 pajoye Exp $
+# $Id: go-pear,v 1.57 2004/02/15 00:49:10 pajoye Exp $
 #
 # Automatically download all the files needed to run the "pear" command
 # (the PEAR package installer).  Requires PHP 4.1.0 or newer.
@@ -61,7 +61,7 @@
 #
 # 2.: Place the go-pear file somewhere under the document root of your webserver.
 # The easiest way is to create a new directory for pear and to put the file in there.
-# Be sure your web server is setup to recognize PHP, and that you use an appropriate 
+# Be sure your web server is setup to recognize PHP, and that you use an appropriate
 # extension.  For example, you might name this file gopear.php
 #
 # 3.: Access go-pear through your webserver and follow the instructions. Please
@@ -77,7 +77,7 @@
 #
 $sapi_name = php_sapi_name();
 set_time_limit(0);
-@ob_end_flush();
+@ob_end_clean();
 ob_implicit_flush(true);
 define('WEBINSTALLER', (php_sapi_name() != 'cli' && !( substr(php_sapi_name(),0,3)=='cgi' && !isset($_SERVER['GATEWAY_INTERFACE']))));
 
@@ -120,17 +120,13 @@ if (WEBINSTALLER && isset($_GET['action']) && $_GET['action'] == 'img' && isset(
 }
 
 // Check if PHP version is sufficient
-if (!function_exists("version_compare")) {
+if (function_exists("version_compare") && version_compare(phpversion(), "4.2.0",'<')) {
     die("Sorry!  Your PHP version is too old.  PEAR and this script requires at
-least PHP 4.1.0 for stable operation.
+least PHP 4.2.0 for stable operation.
 
 It may be that you have a newer version of PHP installed in your web
 server, but an older version installed as the 'php' command.  In this
 case, you need to rebuilt PHP from source.
-
-If your source is 4.1.x, you need to run 'configure' without any SAPI
-options such as --with-apache.  After rebuilding you will find the
-'php' binary in the top-level directory.
 
 If your source is 4.2.x, you need to run 'configure' with the
 --enable-cli option, rebuild and copy sapi/cli/php somewhere.
@@ -155,14 +151,26 @@ if (WEBINSTALLER) {
 	$installer_packages[] = 'Net_UserAgent_Detect';
 	$installer_packages[] = 'PEAR_Frontend_Web';
 }
-$pfc_packages = array(
-    'DB',
-    'Net_Socket',
-    'Net_SMTP',
-    'Mail',
-    'XML_Parser',
-    'phpUnit'
-    );
+$version_n = explode(".",phpversion());
+if ($version_n[0]=="4") {
+    $pfc_packages = array(
+        'DB',
+        'Net_Socket',
+        'Net_SMTP',
+        'Mail',
+        'XML_Parser',
+        'PHPUnit-0.6.2'
+        );
+} else {
+    $pfc_packages = array(
+        'DB',
+        'Net_Socket',
+        'Net_SMTP',
+        'Mail',
+        'XML_Parser',
+        'PHPUnit'
+        );
+}
 $config_desc = array(
     'prefix' => 'Installation prefix',
     'bin_dir' => 'Binaries directory',

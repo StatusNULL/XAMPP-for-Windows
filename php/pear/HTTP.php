@@ -3,7 +3,7 @@
 // +----------------------------------------------------------------------+
 // | PHP Version 4                                                        |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2002 The PHP Group                                |
+// | Copyright (c) 1997-2003 The PHP Group                                |
 // +----------------------------------------------------------------------+
 // | This source file is subject to version 2.02 of the PHP license,      |
 // | that is bundled with this package in the file LICENSE, and is        |
@@ -13,30 +13,30 @@
 // | obtain it through the world-wide-web, please send a note to          |
 // | license@php.net so we can mail you a copy immediately.               |
 // +----------------------------------------------------------------------+
-// | Author: Stig Bakken <ssb@fast.no>                                    |
+// | Authors: Stig Bakken <ssb@fast.no>                                   |
+// |                                                                      |
 // +----------------------------------------------------------------------+
 //
-// $Id: HTTP.php,v 1.15 2002/02/28 08:27:05 sebastian Exp $
+// $Id: HTTP.php,v 1.23 2004/02/24 11:25:24 pajoye Exp $
 //
 // HTTP utility functions.
 //
 
-if (!empty($GLOBALS['USED_PACKAGES']['HTTP'])) return;
-$GLOBALS['USED_PACKAGES']['HTTP'] = true;
-
-class HTTP {
+class HTTP
+{
     /**
      * Format a RFC compliant HTTP header.  This function
      * honors the "y2k_compliance" php.ini directive.
      *
-     * @param $time int UNIX timestamp
+     * @param int $time UNIX timestamp
      *
-     * @return HTTP date string, or false for an invalid timestamp.
+     * @return mixed HTTP date string, or false for an invalid timestamp.
      *
      * @author Stig Bakken <ssb@fast.no>
      * @author Sterling Hughes <sterling@php.net>
      */
-    function Date($time) {
+    function Date($time)
+    {
         /* If we're y2k compliant, use the newer, reccomended RFC 822
            format */
         if (ini_get("y2k_compliance") == true) {
@@ -63,30 +63,33 @@ class HTTP {
      *
      *  Accept-Language: en-UK;q=0.7, en-US;q=0.6, no;q=1.0, dk;q=0.8
      *
-     * @param $supported an associative array indexed by language
+     * @param array $supported an associative array indexed by language
      * codes (country codes) supported by the application.  Values
      * must evaluate to true.
      *
-     * @param $default the default language to use if none is found
+     * @param string $default the default language to use if none is found
      * during negotiation, defaults to "en-US" for U.S. English
+     *
+     * @return string the negotiated language result
      *
      * @author Stig Bakken <ssb@fast.no>
      */
-    function negotiateLanguage(&$supported, $default = 'en-US') {
-        global $HTTP_SERVER_VARS;
+    function negotiateLanguage(&$supported, $default = 'en-US')
+    {
+        $supported = array_change_key_case($supported, CASE_LOWER);
 
         /* If the client has sent an Accept-Language: header, see if
          * it contains a language we support.
          */
-        if (isset($HTTP_SERVER_VARS['HTTP_ACCEPT_LANGUAGE'])) {
-            $accepted = split(',[[:space:]]*', $HTTP_SERVER_VARS['HTTP_ACCEPT_LANGUAGE']);
+        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+            $accepted = split(',[[:space:]]*', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
             for ($i = 0; $i < count($accepted); $i++) {
-                if (eregi('^([a-z]+);[[:space:]]*q=([0-9\.]+)', $accepted[$i], $arr)) {
+                if (eregi('^([a-z_-]+);[[:space:]]*q=([0-9\.]+)', $accepted[$i], $arr)) {
                     $q = (double)$arr[2];
                     $l = $arr[1];
                 } else {
                     $q = 42;
-                    $l = $accepted[$i];
+                    $l = strtolower($accepted[$i]);
                 }
 
                 if (!empty($supported[$l]) && ($q > 0.0)) {
@@ -106,8 +109,8 @@ class HTTP {
         /* Check for a valid language code in the top-level domain of
          * the client's host address.
          */
-        if (isset($HTTP_SERVER_VARS['REMOTE_HOST']) &&
-            ereg("\.[^\.]+$", $HTTP_SERVER_VARS['REMOTE_HOST'], $arr)) {
+        if (isset($_SERVER['REMOTE_HOST']) &&
+            ereg("\.[^\.]+$", $_SERVER['REMOTE_HOST'], $arr)) {
             $lang = strtolower($arr[1]);
             if (!empty($supported[$lang])) {
                 return $lang;
@@ -132,7 +135,7 @@ class HTTP {
     *    )
     *
     * @param string $url A valid url, for ex: http://pear.php.net/credits.php
-    * @return mixed Assoc array or PEAR error on no conection
+    * @return mixed Assoc array or PEAR error
     *
     * @author Tomas V.V.Cox <cox@idecnet.com>
     */
@@ -140,14 +143,17 @@ class HTTP {
     {
         $purl = parse_url($url);
         $port = (isset($purl['port'])) ? $purl['port'] : 80;
-        $fp = fsockopen($purl['host'], $port, $errno, $errstr, 10);
+        $fp = @fsockopen($purl['host'], $port, $errno, $errstr, 10);
         if (!$fp) {
-            return PEAR::raiseError("HTTP::head Error $errstr ($erno)");
+            include_once "PEAR.php";
+            return PEAR::raiseError("HTTP::head error $errstr ($erno)");
         }
         $path = (!empty($purl['path'])) ? $purl['path'] : '/';
+        $path .= (!empty($purl['query'])) ? '?' . $purl['query'] : '';
 
         fputs($fp, "HEAD $path HTTP/1.0\r\n");
-        fputs($fp, "Host: " . $purl['host'] . "\r\n\r\n");
+        fputs($fp, "Host: " . $purl['host'] . "\r\n");
+        fputs($fp, "Connection: close\r\n\r\n");
 
         $response = rtrim(fgets($fp, 4096));
         if(preg_match("|^HTTP/[^\s]*\s(.*?)\s|", $response, $status)) {
@@ -167,6 +173,36 @@ class HTTP {
         }
         fclose($fp);
         return $headers;
+    }
+
+    /**
+    * This function redirects the client. This is done by issuing
+    * a Location: header and exiting.
+    *
+    * @author Richard Heyes <richard@php.net>
+    * @param  string $url URL where the redirect should go to
+    */
+    function redirect($url)
+    {
+        if (!preg_match('/^(https?|ftp):\/\//', $url)) {
+            $server = 'http' . (@$_SERVER['HTTPS'] == 'on' ? 's' : '') . '://' . $_SERVER['SERVER_NAME'];
+            if ($_SERVER['SERVER_PORT'] != 80 &&
+                $_SERVER['SERVER_PORT'] != 443) {
+                $server .= ':' . $_SERVER['SERVER_PORT'];
+            }
+			
+			$path = dirname($_SERVER['PHP_SELF']);
+            if ($url{0} != '/') {
+				$path   .= $url;
+                $server .= dirname($_SERVER['PHP_SELF']);
+                $url = $server . '/' . preg_replace('!^\./!', '', $url);
+            } else {
+                $url = $server . $url;
+            }
+        }
+
+        header('Location: ' . $url);
+        exit;
     }
 }
 ?>

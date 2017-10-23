@@ -1,0 +1,135 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="author" content="Laurent Laville" />
+<title>PEAR/HTML/Progress-Class Examples</title>
+<style type="text/css">
+<!--
+body { 
+	font-family: Verdana, Arial, Helvetica, sans-serif; 
+}
+img { 
+	border: 0; 
+}
+h1, h2 {
+	border: 1px solid yellow; 
+}
+h1 {
+	background-color: #006600; 
+	color: white; 
+	font-family: Arial, Helvetica, sans-serif; 
+	padding: 4px; 
+	text-align: center;
+}
+h2 {
+	background-color: #e4e4e4; 
+	color: black; 
+	padding: 2px;
+}
+h1 span.chapter {
+	font-size: 48px; 
+}
+li.r1 {
+	color: black; 
+	padding: 2px; 
+	background-color: silver; 
+}
+li.r2 {
+	color: black; 
+	padding: 2px; 
+	background-color: #e0e0e0;}
+-->
+</style>
+</head>
+<body bgcolor="lightgrey">
+
+<a name="top">
+
+<h1><img src="pear-power.png"> :: HTML_Progress 
+<br /><span class="chapter">Examples</span>
+</h1>
+
+<div align="right">$Date: 2004/02/13 15:49:19 $</div>
+
+<h2>&nbsp;Horizontal loading bar </h2>
+<h3>Table of contents</h3>
+<ul>
+<li class="r1"><a href="ancestor.php">Ancestor</a> - Basic Horizontal ProgressBar v0.5 style example.
+<li class="r2"><a href="bgimages.php">Background Images</a> - Natural Horizontal with background images ProgressBar example.
+<li class="r1"><a href="bluesand.php">BlueSand</a> - Natural Horizontal ProgressBar example with blue skin.
+<li class="r2"><a href="bluesandplus.php">BlueSandPlus</a> - Natural Horizontal ProgressBar example with JavaScript customization.
+<li class="r1"><a href="bullit.php">BullIt</a> - Natural Horizontal plain ProgressBar example.
+<li class="r2"><a href="javadanse.php">JavaDanse</a> - 20 cells Reverse Horizontal ProgressBar example with JavaScript customization.
+<li class="r1"><a href="redsandback.php">RedSandBack</a> - 5 cells Reverse Horizontal ProgressBar example with red skin.
+<li class="r2"><a href="smallest.php">Smallest</a> - Natural Horizontal smallest ProgressBar example.
+</ul>
+
+<p align="right">[<a href="#top">Top</a>]</p>
+
+<h2>&nbsp;Constructor tests with progress structure dump </h2>
+<h3>Table of contents</h3>
+<ul>
+<li class="r1"><a href="constructor_basic.php">Basic</a> - Basic Horizontal ProgressBar example.
+<li class="r2"><a href="constructor_horizontal_limit.php">HorizontalLimit</a> - Horizontal limit ProgressBar example.
+<li class="r1"><a href="constructor_model.php">Model</a> - ProgressBar model example.
+<li class="r2"><a href="constructor_vertical.php">Vertical</a> - Basic Vertical ProgressBar example.
+<li class="r1"><a href="constructor_vertical_limit.php">VerticalLimit</a> - Vertical limit ProgressBar example.
+<li class="r2"><a href="horizontal_nostring.php">Without String</a> - Horizontal no String ProgressBar example.
+<li class="r1"><a href="horizontal_string.php">With String</a> - Horizontal String ProgressBar example.
+</ul>
+
+<p align="right">[<a href="#top">Top</a>]</p>
+
+<h2>&nbsp;Indeterminate Mode </h2>
+<h3>Table of contents</h3>
+<ul>
+<li class="r1"><a href="indeterminate.php">Expert</a> - Adding indeterminate mode to ProgressBar.
+</ul>
+
+<p align="right">[<a href="#top">Top</a>]</p>
+
+<h2>&nbsp;GUI Monitor </h2>
+<h3>Table of contents</h3>
+<ul>
+<li class="r1"><a href="monitor_default1.php">Default 1</a> - Uses default QF renderer without any customization.</li>
+<li class="r2"><a href="monitor_default2.php">Default 2</a> - Uses default QF renderer with a PEAR::Log user callback.</li>
+<li class="r1"><a href="monitor_method_callback.php">Determinate</a> - Customs default QF renderer and a Method-Handler callback.</li>
+<li class="r2"><a href="monitor_function_callback.php">Indeterminate</a> - Customs default QF renderer and a Function-Handler callback.</li>
+<li class="r1"><a href="monitor_itdynamic.php">ITDynamic</a> - Customs ITDynamic QF renderer and a Method-Handler callback.</li>
+<li class="r2"><a href="monitor_htmlpage.php">HTML_Page</a> - Uses HTML_Page generator without user-callback.</li>
+</ul>
+
+<p align="right">[<a href="#top">Top</a>]</p>
+
+<h2>&nbsp;Observer </h2>
+<h3>Table of contents</h3>
+<ul>
+<li class="r1"><a href="observer_standard.php">Default</a> - Observer ProgressBar example. Uses the default observer class.
+<li class="r2"><a href="observer_simple.php">Basic</a> - Observer ProgressBar example. Uses a custom observer class.
+<li class="r1"><a href="observer_complex.php">Complex</a> - Observer ProgressBar example. Uses a custom observer class that handled progress of the 2nd bar.
+</ul>
+
+<p align="right">[<a href="#top">Top</a>]</p>
+
+<h2>&nbsp;Multiple progress bar on same page </h2>
+<h3>Table of contents</h3>
+<ul>
+<li class="r1"><a href="multiple_vertical.php">VuMeter</a> - Renders 2 vertical progress bar.
+</ul>
+
+<p align="right">[<a href="#top">Top</a>]</p>
+
+<h2>&nbsp;Progress Generator </h2>
+<h3>Table of contents</h3>
+<p>Build your own progress bar with interactive tools. 
+Run demo, and save PHP/CSS source-code.</p>
+<ul>
+<li class="r1"><a href="generator_htmlpage.php">Standard</a> - Uses HTML_Page generator for form rendering.</li>
+<li class="r2"><a href="generator_embedded.php">HTML embedded</a> - Include Progress Generator in your own pages with Actions customized.</li>
+</ul>
+
+<p align="right">[<a href="#top">Top</a>]</p>
+
+</body>
+</html>

@@ -1,9 +1,9 @@
 <?php
 //
 // +----------------------------------------------------------------------+
-// | PHP Version 4                                                        |
+// | PHP Version 5                                                        |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2003 The PHP Group                                |
+// | Copyright (c) 1997-2004 The PHP Group                                |
 // +----------------------------------------------------------------------+
 // | This source file is subject to version 3.0 of the PHP license,       |
 // | that is bundled with this package in the file LICENSE, and is        |
@@ -18,7 +18,7 @@
 // |                                                                      |
 // +----------------------------------------------------------------------+
 //
-// $Id: Registry.php,v 1.48 2003/09/28 05:07:26 cellog Exp $
+// $Id: Registry.php,v 1.50 2004/01/08 17:33:12 sniper Exp $
 
 /*
 TODO:
@@ -239,7 +239,10 @@ class PEAR_Registry extends PEAR
             return $this->raiseError('PEAR_Registry: could not open filemap', PEAR_REGISTRY_ERROR_FILE, null, null, $php_errormsg);
         }
         $fsize = filesize($this->filemap);
+        $rt = get_magic_quotes_runtime();
+        set_magic_quotes_runtime(0);
         $data = fread($fp, $fsize);
+        set_magic_quotes_runtime($rt);
         fclose($fp);
         $tmp = unserialize($data);
         if (!$tmp && $fsize > 7) {
@@ -334,7 +337,10 @@ class PEAR_Registry extends PEAR
         if ($fp === null) {
             return null;
         }
+        $rt = get_magic_quotes_runtime();
+        set_magic_quotes_runtime(0);
         $data = fread($fp, filesize($this->_packageFileName($package)));
+        set_magic_quotes_runtime($rt);
         $this->_closePackageFile($fp);
         $data = unserialize($data);
         if ($key === null) {

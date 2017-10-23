@@ -48,7 +48,7 @@ Please visit http://sourceforge.net/projects/filezilla/</Item>
 <Option Name="User Limit">0</Option>
 <Option Name="IP Limit">0</Option>
 <Permissions>
-<Permission Dir="C:\xampp\anonymous">
+<Permission Dir="C:\superxampp\anonymous">
 <Option Name="FileRead">1</Option>
 <Option Name="FileWrite">0</Option>
 <Option Name="FileDelete">0</Option>
@@ -60,7 +60,7 @@ Please visit http://sourceforge.net/projects/filezilla/</Item>
 <Option Name="IsHome">1</Option>
 <Option Name="AutoCreate">0</Option>
 </Permission>
-<Permission Dir="C:\xampp\anonymous\incoming">
+<Permission Dir="C:\superxampp\anonymous\incoming">
 <Option Name="FileRead">1</Option>
 <Option Name="FileWrite">1</Option>
 <Option Name="FileDelete">0</Option>
@@ -78,7 +78,7 @@ Please visit http://sourceforge.net/projects/filezilla/</Item>
 <Upload/>
 </SpeedLimits>
 </User>
-<User Name="xampp">
+<User Name="superxampp">
 <Option Name="Pass">92eb8879a82524686acdd0058e1cd4f5</Option>
 <Option Name="Group"/>
 <Option Name="Resolve Shortcuts">0</Option>
@@ -87,7 +87,7 @@ Please visit http://sourceforge.net/projects/filezilla/</Item>
 <Option Name="User Limit">0</Option>
 <Option Name="IP Limit">0</Option>
 <Permissions>
-<Permission Dir="C:\xampp\htdocs">
+<Permission Dir="C:\superxampp\htdocs">
 <Option Name="FileRead">1</Option>
 <Option Name="FileWrite">1</Option>
 <Option Name="FileDelete">1</Option>

@@ -3,7 +3,7 @@
 // +----------------------------------------------------------------------+
 // | PHP Version 4                                                        |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2002 The PHP Group                                |
+// | Copyright (c) 1997-2003 The PHP Group                                |
 // +----------------------------------------------------------------------+
 // | This source file is subject to version 2.02 of the PHP license,      |
 // | that is bundled with this package in the file LICENSE, and is        |
@@ -13,16 +13,16 @@
 // | obtain it through the world-wide-web, please send a note to          |
 // | license@php.net so we can mail you a copy immediately.               |
 // +----------------------------------------------------------------------+
-// | Author: Sterling Hughes <sterling@php.net>                           |
+// | Author: Sterling Hughes <sterling@php.net>                          |
 // +----------------------------------------------------------------------+
 //
-// $Id: Curl.php,v 1.9 2002/02/28 08:27:14 sebastian Exp $
+// $Id: Curl.php,v 1.5 2003/05/15 23:43:54 sterling Exp $
 //
 // A nice friendly OO interface for CURL
 //
 require_once('PEAR.php');
 
-class Net_Curl extends PEAR
+class Net_Curl 
 {
 	// {{{ Public Properties
 	
@@ -33,8 +33,23 @@ class Net_Curl extends PEAR
 	 * @access public
 	 */
 	var $url;
-	
 	/**
+	 * The Username for standard HTTP Authentication
+	 *
+	 * @var string $username
+	 * @access public
+	 */
+	var $username="";
+	
+        /**
+	 * The Password for standard HTTP Authentication
+	 *
+	 * @var string $password
+	 * @access public
+	 */
+	var $password="";	
+	
+        /**
 	 * The SSL version for the transfer
 	 *
 	 * @var integer $sslVersion
@@ -159,6 +174,14 @@ class Net_Curl extends PEAR
 	var $cookies;
 	
 	/**
+	 * Additional HTTP headers to send to the remote site
+	 *
+	 * @var array $http_headers
+	 * @access public
+	 */
+	var $http_headers;
+	
+	/**
 	 * The fields to send in a 'POST' request
 	 *
 	 * @var array $fields
@@ -245,7 +268,6 @@ class Net_Curl extends PEAR
 	{
 		$ch  = &$this->_ch;
 		$ret = true;
-		
 		// Basic stuff
 		
 		$ret = curl_setopt($ch, CURLOPT_URL,    $this->url);
@@ -255,7 +277,13 @@ class Net_Curl extends PEAR
 		if ($this->return_transfer && !isset($this->file)) {
 			$ret = curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		}
-
+		
+		// HTTP Authentication
+		
+		if ($this->username != "") {
+			$ret = curl_setopt($ch, CURLOPT_USERPWD, "{$this->username}:{$this->password}");
+		}
+		
 		// SSL Checks
 		
 		if (isset($this->sslVersion)) {
@@ -332,6 +360,7 @@ class Net_Curl extends PEAR
 			$ret = curl_setopt($ch, CURLOPT_MUTE, 0);
 		}
 
+
 		// Other stuff
 
 		$ret = curl_setopt($ch, CURLOPT_FOLLOWLOCATION, $this->follow_location);
@@ -343,20 +372,26 @@ class Net_Curl extends PEAR
 		if (isset($this->userAgent)) {
 			$ret = curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
 		}
-
-
 		
-		
-		// Cookies and the such
+
+		// Cookies
 		
 		if (isset($this->cookies)) {
 			foreach ($this->cookies as $name => $value) {
-				$cookie_data .= urlencode($name) . ": " . urlencode($value) . ";";
+				$cookie_data .= urlencode($name) . '=' . urlencode($value) . ';';
 			}
 		
 			$ret = curl_setopt($ch, CURLOPT_COOKIE, $cookie_data);
 		}
 		
+
+		// Other HTTP headers
+
+		if (isset($this->http_headers)) {
+			$ret = curl_setopt($ch, CURLOPT_HTTPHEADER, $this->http_headers );
+		}
+
+
 		$ret = curl_exec($ch);
 		if (!$ret) {
 			$errObj = new PEAR_Error(curl_error($ch), curl_errno($ch));

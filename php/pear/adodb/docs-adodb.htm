@@ -11,7 +11,7 @@
 <body bgcolor="#FFFFFF">
 
 <h2>ADOdb Library for PHP</h2>
-<p>V4.04 13 Nov 2003 (c) 2000-2003 John Lim (jlim#natsoft.com)</p>
+<p>V4.21 20 Mar 2004 (c) 2000-2004 John Lim (jlim#natsoft.com)</p>
 <p><font size="1">This software is dual licensed using BSD-Style and LGPL. This 
   means you can use it in compiled proprietary and commercial products.</font></p>
 	<p>Useful ADOdb links:  <a href=http://php.weblogs.com/adodb>Download</a> &nbsp; <a href=http://php.weblogs.com/adodb_manual>Other Docs</a>
@@ -23,12 +23,14 @@
 	</b><b><a href="#install">Installation</a><br>
 	<a href="#mininstall">Minimum Install</a><br>
 	<a href="#coding">Initializing Code and Connection Examples</a><br>
-	<a href="#speed">High Speed ADOdb</a></b><br>
-	<b><a href="#hack">Hacking ADOdb Safely</a></b><br>
-	 <font size="2"><a href=#adonewconnection>ADONewConnection</a></font> 
+	<font size="2"><a href=#adonewconnection>ADONewConnection</a></font> 
 	<font size="2"><a href=#adonewconnection>NewADOConnection</a></font><br>
+	<a href="#speed">High Speed ADOdb - tuning tips</a></b><br>
+	<b><a href="#hack">Hacking and Modifying ADOdb Safely</a><br>
+	<a href="#php5">PHP5 Features</a></b><br>
+	<font size="2"><a href=#php5iterators>foreach iterators</a> <a href=#php5exceptions>exceptions</a></font><br>
 	<b> <a href="#drivers">Supported Databases</a></b><br>
-	<b> <a href="#quickstart">Tutorial</a></b><br>
+	<b> <a href="#quickstart">Tutorials</a></b><br>
 	<a href="#ex1">Example 1: Select</a><br>
 	<a href="#ex2">Example 2: Advanced Select</a><br>
 	<a href="#ex3">Example 3: Insert</a><br>
@@ -58,7 +60,8 @@
   Executing SQL: <a href="#execute">Execute</a> <a href="#cacheexecute"><i>CacheExecute</i></a> 
   <a href="#SelectLimit">SelectLimit</a> <a href="#cacheSelectLimit"><i>CacheSelectLimit</i></a> 
   <a href="#param">Param</a> <a href="#prepare">Prepare</a> <a href=#preparesp>PrepareSP</a> 
-  <a href="#parameter">Parameter</a><br>
+  <a href="#inparameter">InParameter</a> <a href="#outparameter">OutParameter</a>
+  <br>
   &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#getone">GetOne</a> 
   <a href="#cachegetone"><i>CacheGetOne</i></a> <a href="#getrow">GetRow</a> <a href="#cachegetrow"><i>CacheGetRow</i></a> 
   <a href="#getall">GetAll</a> <a href="#cachegetall"><i>CacheGetAll</i></a> <a href="#getcol">GetCol</a> 
@@ -67,7 +70,8 @@
   &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#executecursor">ExecuteCursor</a> 
   (oci8 only)<br>
   Generates SQL strings: <a href="#getupdatesql">GetUpdateSQL</a> <a href="#getinsertsql">GetInsertSQL</a> 
-  <a href="#concat">Concat</a> <a href="#ifnull">IfNull</a> <a href="#substr">substr</a> <a href="#random">random</a> <a href="#qstr">qstr</a> <a href="#param">Param</a> 
+  <a href="#concat">Concat</a> <a href="#ifnull">IfNull</a> <a href="#length">length</a> <a href="#random">random</a> <a href="#substr">substr</a> 
+  <a href="#qstr">qstr</a> <a href="#param">Param</a> 
   <a href="#prepare"></a><a href="#OffsetDate">OffsetDate</a> <a href="#SQLDate">SQLDate</a> 
   <a href="#dbdate">DBDate</a> <a href="#dbtimestamp"></a> <a href="#dbtimestamp">DBTimeStamp</a>
   <br>
@@ -81,7 +85,7 @@
   <a href="#begintrans">BeginTrans</a> <a href="#committrans">CommitTrans</a> 
   <a href="#rollbacktrans">RollbackTrans</a> <br>
   Fetching Data: </font> <font size="2"><a href="#setfetchmode">SetFetchMode</a><br>
-  Strings: <a href="#concat">concat</a> <a href="#qstr">qstr</a> <a href="#quote">quote</a> <a href="#substr">substr</a><br>
+  Strings: <a href="#concat">concat</a> <a href="#length">length</a>  <a href="#qstr">qstr</a> <a href="#quote">quote</a> <a href="#substr">substr</a><br>
   Dates: <a href="#dbdate">DBDate</a> <a href="#dbtimestamp">DBTimeStamp</a> <a href="#unixdate">UnixDate</a> 
   <a href="#unixtimestamp">UnixTimeStamp</a> <a href="#OffsetDate">OffsetDate</a> 
   <a href="#SQLDate">SQLDate</a> <br>
@@ -96,7 +100,8 @@
   <a href="#serverinfo">ServerInfo</a> <br>
   Statistics and Query-Rewriting: <a href="#logsql">LogSQL</a> <a href="#fnexecute">fnExecute 
   and fnCacheExecute</a><br>
-  </font><font size="2">Deprecated: <a href="#bind">Bind</a> <a href="#blankrecordset">BlankRecordSet</a></font><br>
+  </font><font size="2">Deprecated: <a href="#bind">Bind</a> <a href="#blankrecordset">BlankRecordSet</a>
+  <a href="#parameter">Parameter</a></font>
   <a href="#adorecordSet"><b><br>
   ADORecordSet</b></a><br>
   <font size="2">
@@ -197,24 +202,31 @@ visit <a href="http://php.weblogs.com/adodb-cool-applications">http://php.weblog
 <li>adodb.inc.php
 <li>adodb-lib.inc.php
 <li>adodb-time.inc.php
-<li>adodb-csvlib.inc.php (if you use cached recordsets - CacheExecute(), etc)
-<li>adodb-error.inc.php (if you use MetaError())
 <li>drivers/adodb-$database.inc.php
 <li>license.txt (for legal reasons)
+<li>adodb-php4.inc.php
+<li>adodb-iterator.inc.php
+</ul>
+Optional:
+<ul>
+<li>adodb-error.inc.php and lang/adodb-$lang.inc.php (if you use MetaError())
+<li>adodb-csvlib.inc.php (if you use cached recordsets - CacheExecute(), etc)
+<li>adodb-exceptions.inc.php and adodb-errorhandler.inc.php (if you use adodb error handler or php5 exceptions).
 </ul>
 
 <h3>Code Initialization Examples<a name="coding"></a></h3>
 <p>When running ADOdb, at least two files are loaded. First is adodb/adodb.inc.php, 
  which contains all functions used by all database classes. The code specific 
  to a particular database is in the adodb/driver/adodb-????.inc.php file.</p>
+ <a name="adonewconnection">
 <p>For example, to connect to a mysql database:</p>
 <pre>
 include('/path/to/set/here/adodb.inc.php');
 $conn = &amp;ADONewConnection('mysql');
 </pre>
 <p>Whenever you need to connect to a database, you create a Connection object 
-  using the <a name="adonewconnection">ADONewConnection</a>($driver) function. 
-  NewADOConnection($driver) is an alternative name for the same function.</p>
+  using the <b>ADONewConnection</b></a>($driver) function. 
+  <b>NewADOConnection</b>($driver) is an alternative name for the same function.</p>
 
 <p>At this point, you are not connected to the database. You will first need to decide
 whether to use <i>persistent</i> or <i>non-persistent</i> connections. The advantage of <i>persistent</i>
@@ -257,7 +269,12 @@ You define the database in the $host parameter:
 	$conn = &ADONewConnection('ibase'); 
 	$conn->PConnect('localhost:c:\ibase\employee.gdb','sysdba','masterkey');
 </pre>
-
+<h4>SQLite</h4>
+Sqlite will create database if it does not exist.
+<pre>
+	$conn = &ADONewConnection('sqlite'); 
+	$conn->PConnect('c:\path\to\sqlite.db'); # sqlite will create if does not exist
+</pre>
 <h4>Oracle</h4>
 <p>With Oracle, you can connect in multiple ways.</p>
 <p>a. PHP and Oracle reside on the same machine, use default SID.</p>
@@ -279,7 +296,7 @@ You define the database in the $host parameter:
 <p>For Microsoft Access:</a></p>
 <pre>
 	$db =& ADONewConnection('access');
-	$dsn = <strong>"Driver=&#123;Microsoft Access Driver (*.mdb)&#125;;Dbq=d:\northwind.mdb;Uid=Admin;Pwd=;";</strong>
+	$dsn = <strong>"Driver=&#123;Microsoft Access Driver (*.mdb)&#125;;Dbq=d:\\northwind.mdb;Uid=Admin;Pwd=;";</strong>
 	$db->Connect($dsn);
 </pre>
 For Microsoft SQL Server: 
@@ -295,7 +312,6 @@ using the ADOdb library and Microsoft's ADO:
 <pre>
 &lt;?php
 	include('adodb.inc.php'); 
-	ADOLoadCode("ado_mssql");
 	$db = &ADONewConnection("ado_mssql");
 	print "&lt;h1>Connecting DSN-less $db->databaseType...&lt;/h1>";
 		
@@ -308,7 +324,7 @@ using the ADOdb library and Microsoft's ADO:
 	print_r($arr);
 ?>
 </pre><a name=speed></a>
-<h2>High Speed ADOdb</h2>
+<h2>High Speed ADOdb - tuning tips</h2>
 <p>ADOdb is a big class library, yet it <a href=http://phplens.com/lens/adodb/>consistently beats</a> all other PHP class 
   libraries in performance. This is because it is designed in a layered fashion, 
   like an onion, with the fastest functions in the innermost layer. Stick to the 
@@ -321,18 +337,20 @@ using the ADOdb library and Microsoft's ADO:
     <td><p align="center">Connect, PConnect, NConnect<br>
         Execute, CacheExecute<br>
         SelectLimit, SelectLimit<br>
-        MoveNext, Close </p></td>
+        MoveNext, Close <br>
+		qstr, Affected_Rows, Insert_ID</p></td>
   </tr>
 </table>
 <p>The fastest way to access the fields is by accessing the array $recordset->fields 
   directly. Also set the global variables <a href="#adodb_fetch_mode">$ADODB_FETCH_MODE</a> 
-  = ADODB_FETCH_NUM, and <a href="#adodb_countrecs">$ADODB_COUNTRECS</a> = false 
-  before you connect to your database.</p>
+  = ADODB_FETCH_NUM, and (for oci8, ibase/firebird and odbc) <a href="#adodb_countrecs">$ADODB_COUNTRECS</a> = false 
+  before you connect to your database. At the time of writing (Dec 2003).</p>
 <p>Consider using bind parameters if your database supports it, as it improves 
   query plan reuse. Use ADOdb's performance tuning system to identify bottlenecks 
-  quickly.</p>
+  quickly. At the time of writing (Dec 2003), this means oci8 and odbc drivers.</p>
 <p>Lastly make sure you have a PHP accelerator cache installed such as APC, Turck 
   MMCache, Zend Accelerator or ionCube.</p>
+ <p>Informix tips: Disable scrollable cursors with $db->cursorType = 0.
 <p><a name=hack></a> </p>
 <h2>Hacking ADOdb Safely</h2>
 <p>You might want to modify ADOdb for your own purposes. Luckily you can
@@ -380,6 +398,35 @@ include_once('adodb.inc.php');
 
 </pre>
 <p>Don't forget to call the constructor of the parent class.
+<a name="php5">
+<h2>PHP5 Features</h2>
+ ADOdb 4.02 or later will transparently determine which version of PHP you are using.
+If PHP5 is detected, the following features become available:
+<ul>
+<a name="php5iterators">
+<li><b>Foreach iterators</b>: This is a very natural way of going through a recordset:
+<pre>
+	$ADODB_FETCH_MODE = ADODB_FETCH_NUM;
+	$rs = $db->Execute($sql);
+	foreach($rs as $k => $row) {
+		echo "r1=".$row[0]." r2=".$row[1]."&lt;br>";
+	}
+</pre>
+<p>
+<a name="php5exceptions">
+<li><b>Exceptions</b>: Just include <i>adodb-exceptions.inc.php</i> and you can now 
+catch exceptions on errors as they occur.
+<pre>
+	<b>include("../adodb-exceptions.inc.php");</b> 
+	include("../adodb.inc.php");	 
+	try { 
+		$db = NewADOConnection("oci8"); 
+		$db->Connect('','scott','bad-password'); 
+	} catch (exception $e) { 
+		var_dump($e); 
+	} 
+</pre>
+</ul> 
 <h3><a name="drivers"></a>Databases Supported</h3>
 <table width="100%" border="1">
   <tr valign="top"> 
@@ -435,7 +482,7 @@ include_once('adodb.inc.php');
     <td height="54"><font size="2">Y/N</font></td>
     <td height="54"><font size="2">DB2 CLI/ODBC interface</font></td>
     <td height="54"> <p><font size="2">Unix and Windows. <a href="http://www.faqts.com/knowledge_base/view.phtml/aid/6283/fid/14">Unix 
-        install hints</a>.</font></p></td>
+        install hints</a>. I have had reports that the $host and $database params have to be reversed in Connect() when using the CLI interface.</font></p></td>
   </tr>
   <tr valign="top"> 
     <td><b><font size="2">vfp</font></b></td>
@@ -612,6 +659,15 @@ include_once('adodb.inc.php');
     <td><font size="2">ODBC</font></td>
     <td><font size="2">Unix and Windows. </font></td>
   </tr>
+    <tr valign="top"> 
+    <td><b><font size="2">odbtp</font></b></td>
+    <td><font size="2">C</font></td>
+    <td><font size="2">Generic odbtp driver. <a href=http://odbtp.sourceforge.net/>Odbtp</a> is a software for
+	accessing Windows ODBC data sources from other operating systems.</font></td>
+    <td><font size="2">Y/N</font></td>
+    <td><font size="2">odbtp</font></td>
+    <td><font size="2">Unix and Windows</font></td>
+  </tr>
   <tr valign="top"> 
     <td height="34"><b><font size="2">oracle</font></b></td>
     <td height="34"><font size="2">C</font></td>
@@ -682,7 +738,7 @@ include_once('adodb.inc.php');
   </tr>
   <p> 
 </table>
-<h3></h3>
+
 <p>The &quot;Tested&quot; column indicates how extensively the code has been tested 
   and used. <br>
   A = well tested and used by many people<br>
@@ -700,7 +756,7 @@ include_once('adodb.inc.php');
   is executed, so you can selectively choose which recordsets to count.</p>
 <p> 
 <hr>
-<h1>Tutorial<a name="quickstart"></a></h1>
+<h1>Tutorials<a name="quickstart"></a></h1>
 <h3>Example 1: Select Statement<a name="ex1"></a></h3>
 <p>Task: Connect to the Access Northwind DSN, display the first 2 columns of each 
   row.</p>
@@ -1165,7 +1221,7 @@ include('tohtml.inc.php');
 $c = NewADOConnection('mysql');
 $c->PConnect('localhost','root','','northwind');
 $rs=$c->Execute('select * from productsz'); #invalid table productsz');
-if ($rs) $rs2html($rs);
+if ($rs) rs2html($rs);
 ?>
 </pre>
 <p> If you want to log the error message, you can do so by defining the following 
@@ -1186,7 +1242,7 @@ include('tohtml.inc.php');
 $c = NewADOConnection('mysql');
 $c->PConnect('localhost','root','','northwind');
 $rs=$c->Execute('select * from productsz'); ## invalid table productsz
-if ($rs) $rs2html($rs);
+if ($rs) rs2html($rs);
 ?>
 </pre>
 The following message will be logged in the error.log file: 
@@ -1205,7 +1261,7 @@ include('tohtml.inc.php');
 $c = NewADOConnection('mysql');
 $c->PConnect('localhost','root','','northwind');
 $rs=$c->Execute('select * from productsz'); #invalid table productsz');
-if ($rs) $rs2html($rs);
+if ($rs) rs2html($rs);
 else &#123;
 	<b>$e = ADODB_Pear_Error();
 	echo '&lt;p>',$e->message,'&lt;/p>';</b>
@@ -1632,6 +1688,7 @@ ADODB_NEVER_PERSIST  before you call PConnect.
 Variable binding speeds the compilation and caching of SQL statements, leading 
 to higher performance. Currently Oracle, Interbase and ODBC supports variable binding. 
 Interbase/ODBC style ? binding is emulated in databases that do not support binding. 
+Note that you do not have to quote strings if you use binding.
 <p> Variable binding in the odbc, interbase and oci8po drivers. 
 <pre>
 $rs = $db->Execute('select * from table where val=?', array('10'));
@@ -1699,7 +1756,7 @@ only with SELECT statements.
     # $rs is now just like any other ADOdb recordset object<br>    rs2html($rs);</pre>
 <p>ExecuteCursor() is a helper function that does the following internally: 
 <pre>
-	$stmt = $db->Prepare("BEGIN :RS := SP_FOO(); END;");
+	$stmt = $db->Prepare("BEGIN :RS := SP_FOO(); END;", true); 
 	$db->Parameter($stmt, $cur, 'RS', false, -1, OCI_B_CURSOR);
 	$rs = $db->Execute($stmt);</pre>
 <p><b>SelectLimit<a name="selectlimit"></a>($sql,$numrows=-1,$offset=-1,$inputarr=false)</b></p>
@@ -1765,13 +1822,19 @@ will return -1 (DB_ERROR).</p>
 <p><b>MetaErrorMsg<a name="metaerrormsg"></a>($errno)</b></p>
 <p>Pass the error number returned by MetaError() for the equivalent textual error message.</p>
 <p><b>ErrorMsg<a name="errormsg"></a>()</b></p>
-<p>Returns the last status or error message. This can return a string even if 
+<p>Returns the last status or error message. The error message is reset after every 
+call to Execute(). 
+<p>
+This can return a string even if 
 	no error occurs. In general you do not need to call this function unless an 
 	ADOdb function returns false on an error. </p>
 <p>Note: If <b>debug</b> is enabled, the SQL error message is always displayed 
 	when the <b>Execute</b> function is called.</p>
 <p><b>ErrorNo<a name="errorno"></a>()</b></p>
-<p>Returns the last error number. Note that old versions of PHP (pre 4.0.6) do 
+<p>Returns the last error number. The error number is reset after every call to Execute(). 
+If 0 is returned, no error occurred.
+<p>
+Note that old versions of PHP (pre 4.0.6) do 
 	not support error number for ODBC. In general you do not need to call this 
 	function unless an ADOdb function returns false on an error.</p>
 </font>
@@ -2093,7 +2156,7 @@ convention.
 for ($i=0; $i &lt; $max; $i++)<br></font>	$DB-&gt;<font color="#000000">Execute($stmt,array((string) rand(), $i));
 </font></pre>
 <font color="#000000"> 
-<p>Also see PrepareSP() and Parameter() below. Only supported internally by interbase, 
+<p>Also see InParameter(), OutParameter() and PrepareSP() below. Only supported internally by interbase, 
   oci8 and selected ODBC-based drivers, otherwise it is emulated. There is no 
   performance advantage to using Prepare() with emulation. 
 <p> Important: Due to limitations or bugs in PHP, if you are getting errors when 
@@ -2104,6 +2167,19 @@ for ($i=0; $i &lt; $max; $i++)<br></font>	$DB-&gt;<font color="#000000">Execute(
   the function that checks whether a $field is null for the given database, and 
   if null, change the value returned to $nullReplacementValue. Eg.</p>
 <pre>$sql = <font color="#993300">'SELECT '</font>.$db-&gt;IfNull('name', <font color="#993300">&quot;'- unknown -'&quot;</font>).<font color="#993300"> ' FROM table'</font>;</pre>
+
+<p><b>length<a name="length"></a></b></p>
+<p>This is not a function, but a property. Some databases have "length" and others "len"
+as the function to measure the length of a string. To use this property:
+<pre>
+  $sql = <font color="#993300">"SELECT "</font>.$db->length.<font color="#993300">"(field) from table"</font>;
+  $rs = $db->Execute($sql);
+</pre>
+
+<p><b>random<a name="random"></a></b></p>
+<p>This is not a function, but a property. This is a string that holds the sql to
+generate a random number between 0.0 and 1.0 inclusive.
+
 <p><b>substr<a name="substr"></a></b></p>
 <p>This is not a function, but a property. Some databases have "substr" and others "substring"
 as the function to retrieve a sub-string. To use this property:
@@ -2113,10 +2189,9 @@ as the function to retrieve a sub-string. To use this property:
 </pre>
 <p>For all databases, the 1st parameter of <i>substr</i> is the field, the 2nd is the
 offset (1-based) to the beginning of the sub-string, and the 3rd is the length of the sub-string.
-<p><b>random<a name="random"></a></b></p>
-<p>This is not a function, but a property. This is a string that holds the sql to
-generate a random number between 0.0 and 1.0 inclusive.
-<p><b>Param<a name="param"></a>($name )</b></p>
+
+
+<p><b>Param<a name="param"></a>($name)</b></p>
 <p>Generates a bind placeholder portably. For most databases, the bind placeholder 
   is "?". However some databases use named bind parameters such as Oracle, eg 
   ":somevar". This allows us to portably define an SQL statement with bind parameters: 
@@ -2128,18 +2203,80 @@ $stmt = $DB-&gt;Execute($stmt,array('one','two'));
 </font></pre>
 <font color="#000000"> 
 <p></p>
-<p><b>PrepareSP</b><b><a name="preparesp"></a></b><b>($sql)</b></p>
+<p><b>PrepareSP</b><b><a name="preparesp"></a></b><b>($sql, $cursor=false )</b></p>
 <p>When calling stored procedures in mssql and oci8 (oracle), and you might want 
   to directly bind to parameters that return values, or for special LOB handling. 
   PrepareSP() allows you to do so. 
 <p>Returns the same array or $sql string as Prepare( ) above. If you do not need 
   to bind to return values, you should use Prepare( ) instead.</p>
-<p>For examples of usage of PrepareSP( ), see Parameter( ) below. 
+<p>The 2nd parameter, $cursor is not used except with oci8. Setting it to true will
+force OCINewCursor to be called; this is to support output REF CURSORs.
+<p>For examples of usage of PrepareSP( ), see InParameter( ) below. 
 <p>Note: in the mssql driver, preparing stored procedures requires a special function 
   call, mssql_init( ), which is called by this function. PrepareSP( ) is available 
   in all other drivers, and is emulated by calling Prepare( ). </p>
+<p><b> InParameter<a name="inparameter"></a>($stmt, $var, $name,
+  $maxLen = 4000, $type = false )</b></p>
+Binds a PHP variable as input to a stored procedure variable. The parameter <i>$stmt</i>
+ is the value returned by PrepareSP(), <i>$var</i> is the PHP variable you want to bind, $name
+ is the name of the stored procedure variable. Optional is <i>$maxLen</i>, the maximum length of the
+ data to bind, and $type which is database dependant. 
+ Consult <a href=http://php.net/mssql_bind>mssql_bind</a> and <a href=http://php.net/ocibindbyname>ocibindbyname</a> docs
+  at php.net for more info on legal values for $type. 
+ <p>
+InParameter() is a wrapper function that calls Parameter() with $isOutput=false. 
+The advantage of this function is that it is self-documenting, because
+the $isOutput parameter is no longer needed.  Only for mssql 
+  and oci8 currently.
+  <p>Here is an example using oci8:
+  <pre><font color="green"># For oracle, Prepare and PrepareSP are identical</font>
+$stmt = $db-&gt;PrepareSP(
+	<font color="#993300">&quot;declare RETVAL integer; 
+	begin
+	:RETVAL := </font><font color="#993300">SP_RUNSOMETHING</font><font color="#993300">(:myid,:group);
+	end;&quot;</font>);
+$db-&gt;InParameter($stmt,$id,'myid');
+$db-&gt;InParameter($stmt,$group,'group',64);
+$db-&gt;OutParameter($stmt,$ret,'RETVAL');<br>$db-&gt;Execute($stmt);
+</pre>
+<p> The same example using mssql:</p>
+</font> 
+<pre><font color="#000000"><font color="green"># @RETVAL = SP_RUNSOMETHING @myid,@group</font>
+$stmt = $db-&gt;PrepareSP(<font color="#993333">'<font color="#993300">SP_RUNSOMETHING</font>'</font>); <br><font color="green"># note that the parameter name does not have @ in front!</font>
+$db-&gt;InParameter($stmt,$id,'myid');
+$db-&gt;InParameter($stmt,$group,'group',64);
+<font color="green"># return value in mssql - RETVAL is hard-coded name</font> 
+$db-&gt;OutParameter($stmt,$ret,'RETVAL');
+$db-&gt;Execute($stmt); </font></pre>
+
+<p>Note that the only difference between the oci8 and mssql implementations is $sql.</p>
+  <p>
+ If $type parameter is set to false, in mssql, $type will be dynamicly determined 
+based on the type of the PHP variable passed <font face="Courier New, Courier, mono">(string 
+=&gt; SQLCHAR, boolean =&gt;SQLINT1, integer =&gt;SQLINT4 or float/double=&gt;SQLFLT8)</font>.
+<p> 
+In oci8, $type can be set to OCI_B_FILE (Binary-File), OCI_B_CFILE (Character-File), 
+OCI_B_CLOB (Character-LOB), OCI_B_BLOB (Binary-LOB) and OCI_B_ROWID (ROWID). To 
+pass in a null, use<font face="Courier New, Courier, mono"> $db-&gt;Parameter($stmt, 
+$null=null, 'param')</font>. 
+  <p><b> OutParameter<a name="outparameter"></a>($stmt, $var, $name, 
+  $maxLen = 4000, $type = false )</b></p>
+  Binds a PHP variable as output from a stored procedure variable. The parameter <i>$stmt</i>
+ is the value returned by PrepareSP(), <i>$var</i> is the PHP variable you want to bind, <i>$name</i>
+ is the name of the stored procedure variable. Optional is <i>$maxLen</i>, the maximum length of the
+ data to bind, and <i>$type</i> which is database dependant. 
+  <p>
+  OutParameter() is a wrapper function that calls Parameter() with $isOutput=true. 
+  The advantage of this function is that it is self-documenting, because
+the $isOutput parameter is no longer needed.  Only for mssql 
+  and oci8 currently.
+<p>
+For an example, see <a href=#inparameter>InParameter</a>.
+
 <p><b> Parameter<a name="parameter"></a>($stmt, $var, $name, $isOutput=false, 
   $maxLen = 4000, $type = false )</b></p>
+<p>Note: This function is deprecated, because of the new InParameter() and OutParameter() functions.
+These are superior because they are self-documenting, unlike Parameter().
 <p>Adds a bind parameter suitable for return values or special data handling (eg. 
   LOBs) after a statement has been prepared using PrepareSP(). Only for mssql 
   and oci8 currently. The parameters are:<br>
@@ -2153,25 +2290,6 @@ $stmt = $DB-&gt;Execute($stmt,array('one','two'));
   [$<b>type</b>] Consult <a href="http://php.net/mssql_bind">mssql_bind</a> and 
   <a href="http://php.net/ocibindbyname">ocibindbyname</a> docs at php.net for 
   more info on legal values for type.</p>
-<p> Example:</p>
-</font> 
-<pre><font color="#000000"><font color="green"># @RETVAL = SP_RUNSOMETHING @myid,@group</font><br>$stmt = $db-&gt;PrepareSP(<font color="#993333">'<font color="#993300">SP_RUNSOMETHING</font>'</font>); <br><font color="green"># note that the parameter name does not have @ in front!</font><br>$db-&gt;Parameter($stmt,$id,'myid'); <br>$db-&gt;Parameter($stmt,$group,'group',false,64);<br><font color="green"># return value in mssql - RETVAL is hard-coded name</font> <br>$db-&gt;Parameter($stmt,$ret,'RETVAL',true); <br>$db-&gt;Execute($stmt); </font></pre>
-<p><font color="#000000">An oci8 example: </font></p>
-<font color="#000000"> 
-<pre><font color="green"># For oracle, Prepare and PrepareSP are identical</font>
-$stmt = $db-&gt;PrepareSP(
-	<font color="#993300">&quot;declare RETVAL integer; <br>	 begin <br>		:RETVAL := </font><font color="#993300">SP_RUNSOMETHING</font><font color="#993300">(:myid,:group); <br>	 end;&quot;</font>);<br>$db-&gt;Parameter($stmt,$id,'myid');<br>$db-&gt;Parameter($stmt,$group,'group',false,64);
-$db-&gt;Parameter($stmt,$ret,'RETVAL',true);<br>$db-&gt;Execute($stmt);
-</pre>
-<p>Note that the only difference between the oci8 and mssql implementations is 
-  the syntax of $sql.</p>
-If $type parameter is set to false, in mssql, $type will be dynamicly determined 
-based on the type of the PHP variable passed <font face="Courier New, Courier, mono">(string 
-=&gt; SQLCHAR, boolean =&gt;SQLINT1, integer =&gt;SQLINT4 or float/double=&gt;SQLFLT8)</font>. 
-In oci8, $type can be set to OCI_B_FILE (Binary-File), OCI_B_CFILE (Character-File), 
-OCI_B_CLOB (Character-LOB), OCI_B_BLOB (Binary-LOB) and OCI_B_ROWID (ROWID). To 
-pass in a null, use<font face="Courier New, Courier, mono"> $db-&gt;Parameter($stmt, 
-$null=null, 'param')</font>. 
 <p>Lastly, in oci8, bind parameters can be reused without calling PrepareSP( ) 
   or Parameters again. This is not possible with mssql. An oci8 example:</p>
 <pre>$id = 0; $i = 0;
@@ -2281,6 +2399,14 @@ Usage:
 </pre>
 <p>One limitation of logging is that rollback also prevents SQL from being logged.
 <p>
+If you prefer to use another name for the table used to store the SQL, you can override it by calling 
+adodb_perf::table($tablename), where $tablename is the new table name (you will still need to manually
+create the table yourself). An example:
+<pre>
+	include('adodb.inc.php');
+	include('adodb-perf.inc.php');
+	adodb_perf::table('my_logsql_table');
+</pre>
 Also see <a href=docs-perf.htm>Performance Monitor</a>. 
 <p><font color="#000000"><b>fnExecute and fnCacheExecute properties<a name="fnexecute" id="fnexecute"></a></b></font></p>
 <p>These two properties allow you to define bottleneck functions for all sql statements 
@@ -2368,7 +2494,7 @@ printf(&quot;&lt;p&gt;Total queries=%d; total cached=%d&lt;/p&gt;&quot;,$EXECS+$
 <p>Returns the last autonumbering ID inserted. Returns false if function not supported. 
 </p>
 <p>Only supported by databases that support auto-increment or object id's, such 
-  as PostgreSQL, MySQL and MSSQL currently. PostgreSQL returns the OID, which 
+  as PostgreSQL, MySQL and MS SQL Server currently. PostgreSQL returns the OID, which 
   can change on a database reload.</p>
 <p><b>RowLock<a name="rowlock"></a>($table,$where)</b></p>
 <p>Lock a table row for the duration of a transaction. For example to lock record $id in table1:
@@ -2393,10 +2519,15 @@ printf(&quot;&lt;p&gt;Total queries=%d; total cached=%d&lt;/p&gt;&quot;,$EXECS+$
 <p>You can define a mask for matching. For example, setting $mask = 'TMP%' will 
   match all tables that begin with 'TMP'. Currently only mssql, oci8, odbc_mssql 
   and postgres* support $mask. 
-<p><b>MetaColumns<a name="metacolumns"></a>($table)</b></p>
+<p><b>MetaColumns<a name="metacolumns"></a>($table,$toupper=true)</b></p>
 <p>Returns an array of ADOFieldObject's, one field object for every column of 
-  $table. Currently Sybase does not recognise date types, and ADO cannot identify 
-  the correct data type (so we default to varchar).. </p>
+  $table. A field object is a class instance with (name, type, max_length) defined.
+  Currently Sybase does not recognise date types, and ADO cannot identify 
+  the correct data type (so we default to varchar).   
+ <p> The $toupper parameter determines whether we uppercase the table name 
+ (required for some databases).
+ <p>For schema support, pass in the $table parameter, "$schema.$tablename". This is only
+ supported for selected databases.
 <p><b>MetaColumnNames<a name="metacolumnames"></a>($table)</b></p>
 <p>Returns an array of column names for $table. 
 <p><font color="#000000"><b>MetaPrimaryKeys<a name="metaprimarykeys"></a>($table, 
@@ -2404,6 +2535,24 @@ printf(&quot;&lt;p&gt;Total queries=%d; total cached=%d&lt;/p&gt;&quot;,$EXECS+$
 <p><font color="#000000">Returns an array containing column names that are the 
   primary keys of $table. Supported by mysql, odbc (including db2, odbc_mssql, 
   etc), mssql, postgres, interbase/firebird, oci8 currently. </font><font color="#000000"> 
+<p>Views (and some tables) have primary keys, but sometimes this information is not available from the
+database. You can define a function  ADODB_View_PrimaryKeys($databaseType, $database, $view, $owner) that
+should return an array containing the fields that make up the primary key. If that function exists,
+it will be called when MetaPrimaryKeys() cannot find a primary key for a table or view.
+<pre>
+// In this example: dbtype = 'oci8', $db = 'mydb', $view = 'dataView', $owner = false 
+function ADODB_View_PrimaryKeys($dbtype,$db,$view,$owner)
+{
+	switch(strtoupper($view)) {
+	case 'DATAVIEW': return array('DATAID');
+	default: return false;
+	}
+}
+
+$db = NewADOConnection('oci8');
+$db->Connect('localhost','root','','mydb'); 
+$db->MetaPrimaryKeys('dataView');
+</pre>
 <p><font color="#000000"><b>ServerInfo<a name="serverinfo" id="serverinfo"></a>($table)</b></font></font> 
 <p><font color="#000000">Returns an array of containing two elements 'description' 
   and 'version'. The 'description' element contains the string description of 
@@ -2547,6 +2696,7 @@ supports:
 <pre>
  Y: 4-digit Year
  Q: Quarter (1-4)
+ M: Month (Jan-Dec)
  m: Month (01-12)
  d: Day (01-31)
  H: Hour (00-23)
@@ -2729,7 +2879,12 @@ For example, $db-&gt;MetaType('char') will return 'C'.
   parameter, instead of $nativeDBType. </font></p>
 <font color="#000000"> 
 <p><b>Close( )<a name="rsclose"></a></b></p>
-<p>Close the recordset.</p>
+<p>Closes the recordset, cleaning all memory and resources associated with the recordset. 
+<p>
+If memory management is not an issue, you do not need to call this function as recordsets
+are closed for you by PHP at the end of the script. 
+SQL statements such as INSERT/UPDATE/DELETE do not really return a recordset, so you do not have to call Close()
+for such SQL statements.</p>
 <hr>
 <h3>function rs2html<a name="rs2html"></a>($adorecordset,[$tableheader_attributes], 
   [$col_titles])</h3>
@@ -2841,14 +2996,93 @@ $<font color="#663300">rs</font>   = $<font color="#663300">conn</font>->Execute
   your education, visit <a href=http://palslib.com/>palslib.com</a> for database info, 
   and read this article on <a href=http://phplens.com/lens/php-book/optimizing-debugging-php.php>Optimizing 
   PHP</a>. </p>
-</font> 
+</font>
 <h2>Change Log<a name="Changes"></a><a name="changes"></a><a name="changelog"></a></h2>
-<p><b>4.04 ? Nov 2003 </b>
+<p><b>4.21 20 Mar 2004</b>
+<p>Pim Koeman contributed dutch language file adodb-nl.inc.php.
+<p>Rick Hickerson added CLOB support to db2 datadict.
+<p>Added odbtp driver. Thx to "stefan bogdan" sbogdan#rsb.ro.
+<p>Changed PrepareSP() 2nd parameter, $cursor, to default to true (formerly false). Fixes oci8 backward
+compat problems with OUT params.
+<p>Fixed month calculation error in adodb-time.inc.php. 2102-June-01 appeared as 2102-May-32.
+<p>Updated PHP5 RC1 iterator support. API changed, hasMore() renamed to valid().
+<p>Changed internal format of serialized cache recordsets. As we store a version number, this should be
+backward compatible.
+<p>Error handling when driver file not found was flawed in ADOLoadCode(). Fixed.
+<p><b>4.20 27 Feb 2004</b>
+<p>Updated to AXMLS 1.01.
+<p>MetaForeignKeys for postgres7 modified by Edward Jaramilla, works on pg 7.4.
+<p>Now numbers accepts function calls or sequences for GetInsertSQL/GetUpdateSQL numeric fields.
+<p>Changed quotes of 'delete from $perf_table' to "". Thx Kehui (webmaster#kehui.net)
+<p>Added ServerInfo() for ifx, and putenv trim fix. Thx Fernando Ortiz.
+<p>Added addq(), which is analogous to addslashes().
+<p>Tested with php5b4. Fix some php5 compat problems with exceptions and sybase.
+<P>Carl-Christian Salvesen added patch to mssql _query to support binds greater than 4000 chars.
+<p>Mike suggested patch to PHP5 exception handler. $errno must be numeric.
+<p>Added double quotes (") to ADODB_TABLE_REGEX.
+<p>For oci8, Prepare(...,$cursor), $cursor's meaning was accidentally inverted in 4.11. This causes problems with ExecuteCursor() too, which calls Prepare() internally. Thx to William Lovaton.
+<p>Now dateHasTime property in connection object renamed to datetime for consistency. This could break bc.
+<p>Csongor Halmai reports that db2 SelectLimit with input array is not working. Fixed..
+<p><b>4.11 27 Jan 2004</b>
+<p>Csongor Halmai reports db2 binding not working. Reverted back to emulated binding.
+<p>Dan Cech modifies datadict code. Adds support for DropIndex. Minor cleanups.
+<p>Table misspelt in perf-oci8.inc.php. Changed v$conn_cache_advice to v$db_cache_advice. Reported by Steve W.
+<p>UserTimeStamp and DBTimeStamp did not handle YYYYMMDDHHMMSS format properly. Reported by Mike Muir. Fixed.
+<p>Changed oci8 Prepare(). Does not auto-allocate OCINewCursor automatically, unless 2nd param is set to true.
+This will break backward compat, if Prepare/Execute is used instead of ExecuteCursor. Reported by Chris Jones.
+<p>Added InParameter() and OutParameter(). Wrapper functions to Parameter(), but nicer because they
+are self-documenting.
+<p>Added 'R' handling in ActualType() to datadict-mysql.inc.php
+<p>Added ADOConnection::SerializableRS($rs). Returns a recordset that can be serialized in a session.
+<p>Added "Run SQL" to performance UI().
+<p>Misc spelling corrections in adodb-mysqli.inc.php, adodb-oci8.inc.php and datadict-oci8.inc.php, from Heinz Hombergs.
+<p>MetaIndexes() for ibase contributed by Heinz Hombergs.
+<p><b>4.10 12 Jan 2004</b>
+<p>Dan Cech contributed extensive changes to data dictionary to support name quoting (with `), and drop table/index.
+<p>Informix added cursorType property. Default remains IFX_SCROLL, but you can change to 0 (non-scrollable cursor) for performance.
+<p>Added ADODB_View_PrimaryKeys() for returning view primary keys to MetaPrimaryKeys().
+<p>Simplified chinese file, adodb-cn.inc.php from cysoft.
+<p>Added check for ctype_alnum in adodb-datadict.inc.php. Thx to Jason Judge.
+<p>Added connection parameter to ibase Prepare(). Fix by Daniel Hassan.
+<p>Added nameQuote for quoting identifiers and names to connection obj. Requested by Jason Judge. Also the
+data dictionary parser now detects `field name` and generates column names with spaces correctly.
+<p>BOOL type not recognised correctly as L. Fixed.
+<p>Fixed paths in ADODB_DIR for session files, and back-ported it to 4.05 (15 Dec 2003)
+<p>Added Schema to postgresql MetaTables. Thx to col#gear.hu
+<p>Empty postgresql recordsets that had blob fields did not set EOF properly. Fixed.
+<p>CacheSelectLimit internal parameters to SelectLimit were wrong. Thx to Nio.
+<p>Modified adodb_pr() and adodb_backtrace() to support command-line usage (eg. no html).
+<p>Fixed some fr and it lang errors. Thx to Gaetano G.
+<p>Added contrib directory, with adodb rs to xmlrpc convertor by Gaetano G.
+<p>Fixed array recordset bugs when _skiprow1 is true. Thx to Gaetano G.
+<p>Fixed pivot table code when count is false.
+<p>
+
+<p><b>4.05 13 Dec 2003 </b>
+<p>Added MetaIndexes - thx to Dan Cech.
+<p>Rewritten session code by Ross Smith. Moved code to adodb/session directory.
+<p>Added function exists check on connecting to most drivers, so we don't crash with the unknown function error.
+<p>Smart Transactions failed with GenID() when it no seq table has been created because the sql
+	statement fails. Fix by Mark Newnham.
+<p>Added $db->length, which holds name of function that returns strlen.
+<p>Fixed error handling for bad driver in ADONewConnection - passed too few params to error-handler.
+<p>Datadict did not handle types like 16.0 properly in _GetSize. Fixed.
+<p>Oci8 driver SelectLimit() bug &= instead of =& used. Thx to Swen Thümmler.
+<p>Jesse Mullan suggested not flushing outp when output buffering enabled. Due to Apache 2.0 bug. Added.
+<p>MetaTables/MetaColumns return ref bug with PHP5 fixed in adodb-datadict.inc.php.
+<p>New mysqli driver contributed by Arjen de Rijke. Based on adodb 3.40 driver.
+Then jlim added BeginTrans, CommitTrans, RollbackTrans, IfNull, SQLDate. Also fixed return ref bug.
+<p>$ADODB_FLUSH added, if true then force flush in debugging outp. Default is false.  In earlier
+versions, outp defaulted to flush, which is not compat with apache 2.0.
+<p>Mysql driver's GenID() function did not work when when sql logging is on. Fixed.
+<p>$ADODB_SESSION_TBL not declared as global var. Not available if adodb-session.inc.php included in function. Fixed.
+<p>The input array not passed to Execute() in _adodb_getcount(). Fixed.
+<p><b>4.04 13 Nov 2003 </b>
 <p>Switched back to foreach - faster than list-each.
 <p>Fixed bug in ado driver - wiping out $this->fields with date fields.
 <p>Performance Monitor, View SQL, Explain Plan did not work if strlen($SQL)>max($_GET length). Fixed.
 <p>Performance monitor, oci8 driver added memory sort ratio.
-<p>Added Random, returns SQL to generate a floating point number between 0 and 1;
+<p>Added random property, returns SQL to generate a floating point number between 0 and 1;
 <p><b>4.03 6 Nov 2003 </b>
 <p>The path to adodb-php4.inc.php and adodb-iterators.inc.php was not setup properly.
 <p>Patched SQLDate in interbase to support hours/mins/secs. Thx to ari kuorikoski.

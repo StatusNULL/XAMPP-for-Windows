@@ -14,9 +14,9 @@
 <?=$TEXT['start-text2']?><p>
 <?=$TEXT['start-text3']?><p>
 <?=$TEXT['start-text4']?><p>
-<?=$TEXT['start-text5']?><p>
-<?=$TEXT['start-text6']?>
+<?=$TEXT['start-text5']?>
 <? echo "<p>&nbsp;<br><i>".getenv("SERVER_SOFTWARE")."</i><br>"; ?>
+
 
 </body>
 </html>

@@ -1,3 +1,0 @@
-@echo off
-echo Mysql shutdowm ... 
-bin\mysqladmin shutdown
