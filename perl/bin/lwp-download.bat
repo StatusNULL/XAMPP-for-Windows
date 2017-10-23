@@ -13,11 +13,11 @@ goto endofperl
 #!/usr/bin/perl -w
 #line 15
 
-# $Id: lwp-download,v 2.1 2002/01/03 02:09:24 gisle Exp $
+# $Id: lwp-download,v 2.5 2003/10/26 14:39:18 gisle Exp $
 
 =head1 NAME
 
-lwp-download - fetch large files from the net
+lwp-download - Fetch large files from the web
 
 =head1 SYNOPSIS
 
@@ -53,6 +53,8 @@ Gisle Aas <gisle@aas.no>
 
 =cut
 
+#' get emacs out of quote mode
+
 use strict;
 
 use LWP::UserAgent ();
@@ -73,7 +75,7 @@ unless (getopts('a', \%opt)) {
 
 my $url = URI->new(shift || usage());
 my $argfile = shift;
-my $version = q$Revision: 2.1 $;
+my $version = q$Revision: 2.5 $;
 
 my $ua = new LWP::UserAgent;
 
@@ -121,12 +123,14 @@ my $res = $ua->request($req,
 		      $file = "index";
 		      my $suffix = media_suffix($res->content_type);
 		      $file .= ".$suffix" if $suffix;
-		  } elsif ($rurl->scheme eq 'ftp' ||
-			   $file =~ /\.tgz$/      ||
-			   $file =~ /\.tar(\.(Z|gz))?$/
+		  }
+		  elsif ($rurl->scheme eq 'ftp' ||
+			   $file =~ /\.t[bg]z$/   ||
+			   $file =~ /\.tar(\.(Z|gz|bz2?))?$/
 			  ) {
 		      # leave the filename as it was
-		  } else {
+		  }
+		  else {
 		      my $ct = guess_media_type($file);
 		      unless ($ct eq $res->content_type) {
 			  # need a better suffix for this type
@@ -138,13 +142,25 @@ my $res = $ua->request($req,
 
 	      # Check if the file is already present
 	      if (-f $file && -t) {
+		  $shown = 1;
 		  print "Overwrite $file? [y] ";
 		  my $ans = <STDIN>;
-		  exit if !defined($ans) || !($ans =~ /^y?\n/);
-	      } else {
+		  unless (defined($ans) && $ans =~ /^y?\n/) {
+		      if (defined $ans) {
+			  print "Ok, aborting.\n";
+		      }
+		      else {
+			  print "\nAborting.\n";
+		      }
+		      exit 1;
+		  }
+		  $shown = 0;
+	      }
+	      else {
 		  print "Saving to '$file'...\n";
 	      }
-	  } else {
+	  }
+	  else {
 	      $file = $argfile;
 	  }
 	  open(FILE, ">$file") || die "Can't open $file: $!";
@@ -154,8 +170,10 @@ my $res = $ua->request($req,
 	  $start_t = time;
 	  $last_dur = 0;
       }
+
+      print FILE $_[0] or die "Can't write to $file: $!";
       $size += length($_[0]);
-      print FILE $_[0];
+
       if (defined $length) {
 	  my $dur  = time - $start_t;
 	  if ($dur != $last_dur) {  # don't update too often
@@ -169,13 +187,16 @@ my $res = $ua->request($req,
 	      $show .= " (at $speed, $secs_left remaining)" if $speed;
 	      show($show, 1);
 	  }
-      } else {
+      }
+      else {
 	  show( fbytes($size) . " received");
       }
   }
 );
 
-if ($res->is_success || $res->message =~ /^Interrupted/) {
+if (fileno(FILE)) {
+    close(FILE) || die "Can't write to $file: $!";
+
     show("");  # clear text
     print "\r";
     print fbytes($size);
@@ -187,21 +208,42 @@ if ($res->is_success || $res->message =~ /^Interrupted/) {
 	print " in ", fduration($dur), " ($speed)";
     }
     print "\n";
-    my $died = $res->header("X-Died");
-    if ($died || !$res->is_success) {
+
+    if (my $mtime = $res->last_modified) {
+	utime time, $mtime, $file;
+    }
+
+    if ($res->header("X-Died") || !$res->is_success) {
 	if (-t) {
 	    print "Transfer aborted.  Delete $file? [n] ";
 	    my $ans = <STDIN>;
-	    unlink($file) if defined($ans) && $ans =~ /^y\n/;
-	} else {
+	    if (defined($ans) && $ans =~ /^y\n/) {
+		unlink($file) && print "Deleted.\n";
+	    }
+	    elsif ($length > $size) {
+		print "Truncated file kept: ", fbytes($length - $size), " missing\n";
+	    }
+	    else {
+		print "File kept.\n";
+	    }
+            exit 1;
+	}
+	else {
 	    print "Transfer aborted, $file kept\n";
 	}
     }
-} else {
-    print "\n" if $shown;
-    print "$progname: ", $res->status_line, "\n";
-    exit 1;
+    exit 0;
 }
+
+# Did not manage to create any file
+print "\n" if $shown;
+if ($res->header("X-Died")) {
+    print "$progname: Aborted\n";
+}
+else {
+    print "$progname: ", $res->status_line, "\n";
+}
+exit 1;
 
 
 sub fbytes
@@ -209,9 +251,11 @@ sub fbytes
     my $n = int(shift);
     if ($n >= 1024 * 1024) {
 	return sprintf "%.3g MB", $n / (1024.0 * 1024);
-    } elsif ($n >= 1024) {
+    }
+    elsif ($n >= 1024) {
 	return sprintf "%.3g KB", $n / 1024.0;
-    } else {
+    }
+    else {
 	return "$n bytes";
     }
 }
@@ -226,9 +270,11 @@ sub fduration
     $secs %= 60;
     if ($hours) {
 	return "$hours hours $mins minutes";
-    } elsif ($mins >= 2) {
+    }
+    elsif ($mins >= 2) {
 	return "$mins minutes";
-    } else {
+    }
+    else {
 	$secs += $mins * 60;
 	return "$secs seconds";
     }

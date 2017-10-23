@@ -3,7 +3,7 @@
 # See AutoSplit.pm.
 package POSIX;
 
-#line 77 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\assert.al)"
+#line 80 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\assert.al)"
 sub assert {
     usage "assert(expr)" if @_ != 1;
     if (!$_[0]) {

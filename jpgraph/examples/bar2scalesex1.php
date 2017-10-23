@@ -16,6 +16,9 @@ $graph->SetY2Scale("lin");
 $graph->yaxis->scale->SetGrace(30);
 $graph->y2axis->scale->SetGrace(30);
 
+//$graph->ygrid->Show(true,true);
+$graph->ygrid->SetColor('gray','lightgray@0.5');
+
 // Setup graph colors
 $graph->SetMarginColor('white');
 $graph->y2axis->SetColor('darkred');

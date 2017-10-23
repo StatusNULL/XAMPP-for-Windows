@@ -2,7 +2,7 @@
 include ("../jpgraph.php");
 include ("../jpgraph_bar.php");
 
-$datay=array(2,3,5,8,12,6,3);
+$datay=array(2,3,-5,8,12,6,3);
 $datax=array("Jan","Feb","Mar","Apr","May","Jun","Jul");
 
 // Size of graph
@@ -18,6 +18,8 @@ $bottom = 80;
 $left = 50;
 $right = 20;
 $graph->Set90AndMargin($left,$right,$top,$bottom);
+
+$graph->xaxis->SetPos('min');
 
 // Nice shadow
 $graph->SetShadow();
@@ -68,8 +70,6 @@ $graph->yaxis->title->Align('right');
 
 $graph->yaxis->title->SetFont(FF_ARIAL,FS_BOLD,12);
 $graph->yaxis->title->SetAngle(0);
-
-
 
 $graph->yaxis->SetFont(FF_FONT2,FS_NORMAL);
 // If you want the labels at an angle other than 0 or 90

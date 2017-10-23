@@ -3,7 +3,7 @@
 # See AutoSplit.pm.
 package POSIX;
 
-#line 541 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\strspn.al)"
+#line 548 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\strspn.al)"
 sub strspn {
     unimpl "strspn() is C-specific, stopped";
 }

@@ -20,8 +20,8 @@ $graph->Add($bplot);
 
 // Create and add a new text
 $txt=new Text("This is a text");
-$txt->Pos(0,0);
-$txt->SetFont(FF_FONT2,FS_BOLD);
+$txt->Pos(10,25);
+$txt->SetFont(FF_FONT1,FS_BOLD);
 $txt->SetBox('yellow','navy','gray');
 $txt->SetColor("red");
 $graph->AddText($txt);

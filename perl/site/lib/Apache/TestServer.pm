@@ -12,6 +12,7 @@ use Apache::TestConfig ();
 use Apache::TestRequest ();
 
 use constant COLOR => Apache::TestConfig::COLOR;
+use constant WIN32 => Apache::TestConfig::WIN32;
 
 my $CTRL_M = COLOR ? "\r" : "\n";
 
@@ -104,9 +105,8 @@ my %one_process = (1 => '-X', 2 => '-DONE_PROCESS');
 sub start_cmd {
     my $self = shift;
     #XXX: threaded mpm does not respond to SIGTERM with -DONE_PROCESS
-    my $one = $self->{rev} == 1 ? '-X' : '';
     my $args = $self->args;
-    return "$self->{config}->{vars}->{httpd} $one $args";
+    return "$self->{config}->{vars}->{httpd} $args";
 }
 
 sub default_gdbinit {
@@ -265,16 +265,16 @@ sub pid {
     $pid;
 }
 
-sub select_port {
+sub select_next_port {
     my $self = shift;
 
     my $max_tries = 100; #XXX
-
-    while (! $self->port_available(++$self->{port_counter})) {
-        return 0 if --$max_tries <= 0;
+    while ($max_tries-- > 0) {
+        return $self->{port_counter}
+            if $self->port_available(++$self->{port_counter});
     }
 
-    return $self->{port_counter};
+    return 0;
 }
 
 sub port_available {
@@ -314,17 +314,18 @@ sub stop {
     my $self = shift;
     my $aborted = shift;
 
-    if (Apache::TestConfig::WIN32) {
-        if ($self->{config}->{win32obj}) {
-            $self->{config}->{win32obj}->Kill(0);
-            return 1;
+    if (WIN32) {
+        require Win32::Process;
+        my $obj = $self->{config}->{win32obj};
+        my $pid = -1;
+        if ($pid = $obj ? $obj->GetProcessID : $self->pid) {
+            if (kill(0, $pid)) {
+                Win32::Process::KillProcess($pid, 0);
+                warning "server $self->{name} shutdown";
+            }
         }
-        else {
-            require Win32::Process;
-            my $pid = $self->pid;
-            Win32::Process::KillProcess($pid, 0);
-            return 1;
-	}
+        unlink $self->pid_file if -e $self->pid_file;
+        return $pid;
     }
 
     my $pid = 0;
@@ -344,7 +345,10 @@ sub stop {
 
                 for (1..6) {
                     if (! $self->ping) {
-                        return $pid if $_ == 1;
+                        if ($_ == 1) {
+                            unlink $self->pid_file if -e $self->pid_file;
+                            return $pid;
+                        }
                         last;
                     }
                     if ($_ == 1) {
@@ -379,10 +383,12 @@ sub stop {
         if (--$tries <= 0) {
             error "cannot shutdown server on Port $port, ".
                   "please shutdown manually";
+            unlink $self->pid_file if -e $self->pid_file;
             return -1;
         }
     }
 
+    unlink $self->pid_file if -e $self->pid_file;
     return $pid;
 }
 
@@ -414,7 +420,24 @@ use constant USE_SIGCHLD => $^O eq 'linux';
 
 sub start {
     my $self = shift;
-    my $old_pid = $self->stop;
+
+    my $old_pid = -1;
+    if (WIN32) {
+        # Stale PID files (e.g. left behind from a previous test run
+        # that crashed) cannot be trusted on Windows because PID's are
+        # re-used too frequently, so just remove it. If there is an old
+        # server still running then the attempt to start a new one below
+        # will simply fail because the port will be unavailable.
+        if (-f $self->pid_file) {
+            error "Removing old PID file -- " .
+                "Unclean shutdown of previous test run?\n";
+            unlink $self->pid_file;
+        }
+        $old_pid = 0;
+    }
+    else {
+        $old_pid = $self->stop;
+    }
     my $cmd = $self->start_cmd;
     my $config = $self->{config};
     my $vars = $config->{vars};
@@ -435,18 +458,25 @@ sub start {
     print "$cmd\n";
     my $old_sig;
 
-    if (Apache::TestConfig::WIN32) {
+    if (WIN32) {
         #make sure only 1 process is started for win32
         #else Kill will only shutdown the parent
         my $one_process = $self->version_of(\%one_process);
         require Win32::Process;
         my $obj;
+        # We need the "1" below to inherit the calling processes
+        # handles when running Apache::TestSmoke so as to properly
+        # dup STDOUT/STDERR
         Win32::Process::Create($obj,
                                $httpd,
                                "$cmd $one_process",
-                               0,
+                               1,
                                Win32::Process::NORMAL_PRIORITY_CLASS(),
-                               '.') || die Win32::Process::ErrorReport();
+                               '.');
+        unless ($obj) {
+            die "Could not start the server: " .
+                Win32::FormatMessage(Win32::GetLastError());
+        }
         $config->{win32obj} = $obj;
     }
     else {
@@ -492,10 +522,12 @@ sub start {
     $mpm = "($mpm MPM)" if $mpm;
     print "using $version $mpm\n";
 
-    my $timeout = 60; # secs XXX: make a constant?
+    my $timeout = $vars->{startup_timeout} ||
+                  $ENV{APACHE_TEST_STARTUP_TIMEOUT} ||
+                  60;
 
     my $start_time = time;
-    my $preamble = "${CTRL_M}waiting for server to start: ";
+    my $preamble = "${CTRL_M}waiting $timeout seconds for server to start: ";
     print $preamble unless COLOR;
     while (1) {
         my $delta = time - $start_time;
@@ -552,10 +584,9 @@ sub wait_till_is_up {
 
     my $server_up = sub {
         local $SIG{__WARN__} = sub {}; #avoid "cannot connect ..." warnings
-        if (my $r = Apache::TestRequest::GET('/index.html')) {
-            return $r->code;
-        }
-        0;
+        # avoid fatal errors when LWP is not available
+        my $r = eval { Apache::TestRequest::GET('/index.html') };
+        return !$@ && defined $r ? $r->code : 0;
     };
 
     if ($server_up->()) {

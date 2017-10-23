@@ -1,26 +1,17 @@
 <?php
-/* $Id: server_common.inc.php,v 1.8 2003/04/17 18:50:38 lem9 Exp $ */
+/* $Id: server_common.inc.php,v 2.2 2003/11/26 22:52:24 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
  * Gets some core libraries
  */
-if (!defined('PMA_GRAB_GLOBALS_INCLUDED')) {
-    include('./libraries/grab_globals.lib.php');
-}
-if (!defined('PMA_COMMON_LIB_INCLUDED')) {
-    include('./libraries/common.lib.php');
-}
+require_once('./libraries/grab_globals.lib.php');
+require_once('./libraries/common.lib.php');
 
 /**
  * Handles some variables that may have been sent by the calling script
  */
-if (isset($db)) {
-    unset($db);
-}
-if (isset($table)) {
-    unset($table);
-}
+unset($db, $table);
 
 /**
  * Set parameters for links
@@ -35,7 +26,7 @@ $err_url = 'main.php' . $url_query;
 /**
  * Displays the headers
  */
-require('./header.inc.php');
+require_once('./header.inc.php');
 
 /**
  * Checks for superuser privileges

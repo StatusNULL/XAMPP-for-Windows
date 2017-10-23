@@ -1,10 +1,10 @@
-=head2 Thu Oct 30 21:35:52 2003: C<Module> L<mod_perl|mod_perl>
+=head2 Tue Dec  9 10:28:57 2003: C<Module> L<Win32|Win32>
 
 =over 4
 
 =item *
 
-C<installed into: c:\perl\site\lib>
+C<installed into: C:\wampp2\perl\site\lib>
 
 =item *
 
@@ -12,11 +12,737 @@ C<LINKTYPE: dynamic>
 
 =item *
 
-C<VERSION: 1.99_11-dev>
+C<VERSION: 0.21>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec  9 10:29:04 2003: C<Module> L<Win32::AuthenticateUser|Win32::AuthenticateUser>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec  9 10:29:09 2003: C<Module> L<ActiveState::RelocateTree|ActiveState::RelocateTree>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.03>
+
+=item *
+
+C<EXE_FILES: bin/reloc_perl>
+
+=back
+
+=head2 Tue Dec  9 10:29:19 2003: C<Module> L<Compress::Zlib|Compress::Zlib>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.22>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec  9 10:29:23 2003: C<Module> L<IO::Zlib|IO::Zlib>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.01>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec  9 10:29:27 2003: C<Module> L<Archive::Tar|Archive::Tar>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.07>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec  9 10:29:30 2003: C<Module> L<MD5|MD5>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec  9 10:29:36 2003: C<Module> L<Digest::MD2|Digest::MD2>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec  9 10:29:42 2003: C<Module> L<Digest::MD4|Digest::MD4>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.1>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec  9 10:29:48 2003: C<Module> L<Digest::SHA1|Digest::SHA1>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.06>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec  9 10:29:52 2003: C<Module> L<Digest::HMAC|Digest::HMAC>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.01>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec  9 10:29:55 2003: C<Module> L<Data::Dump|Data::Dump>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.01>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec  9 10:29:59 2003: C<Module> L<File::CounterFile|File::CounterFile>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.01>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec  9 10:30:02 2003: C<Module> L<Font::AFM|Font::AFM>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.18>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec  9 10:30:06 2003: C<Module> L<HTML::Tagset|HTML::Tagset>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec  9 10:30:13 2003: C<Module> L<HTML::Parser|HTML::Parser>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.34>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec  9 10:30:16 2003: C<Module> L<HTML-Tree|HTML-Tree>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.18>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec  9 10:30:21 2003: C<Module> L<URI|URI>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.27>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec  9 10:30:32 2003: C<Module> L<libwww-perl|libwww-perl>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 5.75>
+
+=item *
+
+C<EXE_FILES: bin/lwp-request bin/lwp-mirror bin/lwp-rget bin/lwp-download bin/GET bin/HEAD bin/POST>
+
+=back
+
+=head2 Tue Dec  9 10:30:50 2003: C<Module> L<XML::Parser|XML::Parser>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.34>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec  9 10:30:54 2003: C<Module> L<XML::Simple|XML::Simple>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.09>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec  9 10:31:01 2003: C<Module> L<SOAP::Lite|SOAP::Lite>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.55>
+
+=item *
+
+C<EXE_FILES: bin/SOAPsh.pl bin/XMLRPCsh.pl bin/stubmaker.pl>
+
+=back
+
+=head2 Tue Dec  9 10:31:26 2003: C<Module> L<Archive::Zip|Archive::Zip>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.06>
+
+=item *
+
+C<EXE_FILES: crc32>
+
+=back
+
+=head2 Tue Dec  9 10:31:27 2003: C<Module> L<Text::Autoformat|Text::Autoformat>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.12>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec  9 10:31:28 2003: C<Module> L<Text::Reform|Text::Reform>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.11>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec  9 10:31:28 2003: C<Module> L<Unicode::String|Unicode::String>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.07>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec  9 10:31:30 2003: C<Module> L<PPM3|PPM3>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: undef>
+
+=item *
+
+C<EXE_FILES: bin/ppm3-bin bin/ppm3>
+
+=back
+
+=head2 Tue Dec  9 10:31:49 2003: C<Module> L<ActiveState::Rx|ActiveState::Rx>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.60>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec  9 10:31:52 2003: C<Module> L<ActivePerl::DocTools|ActivePerl::DocTools>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.04>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec  9 10:37:42 2003: C<Module> L<Tk|Tk>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 800.024>
+
+=item *
+
+C<EXE_FILES: ptksh ptked>
+
+=back
+
+=head2 Mon Feb  2 20:32:14 2004: C<Module> L<mod_perl|mod_perl>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.99_12>
 
 =item *
 
 C<EXE_FILES: bin/mp2doc bin/mp2bug>
+
+=back
+
+=head2 Mon Feb  2 22:08:11 2004: C<Module> L<DBI|DBI>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.40>
+
+=item *
+
+C<EXE_FILES: dbiproxy dbiprof>
+
+=back
+
+=head2 Mon Feb  2 22:12:50 2004: C<Module> L<DBD::Multiplex|DBD::Multiplex>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.9>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Feb  2 22:13:48 2004: C<Module> L<DBI|DBI>
+
+=over 4
+
+=item *
+
+C<installed into: C:\wampp2\perl\site\lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.40>
+
+=item *
+
+C<EXE_FILES: dbiproxy dbiprof>
 
 =back
 

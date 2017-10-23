@@ -1,8 +1,8 @@
-package URI;  # $Date: 2003/01/02 05:11:26 $
+package URI;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = "1.23";
+$VERSION = "1.27"; # $Date: 2003/10/06 10:38:31 $
 
 use vars qw($ABS_REMOTE_LEADING_DOTS $ABS_ALLOW_RELATIVE_SCHEME);
 
@@ -42,10 +42,12 @@ sub new
     my $impclass;
     if ($uri =~ m/^($scheme_re):/so) {
 	$scheme = $1;
-    } else {
+    }
+    else {
 	if (($impclass = ref($scheme))) {
 	    $scheme = $scheme->scheme;
-	} elsif ($scheme && $scheme =~ m/^($scheme_re)(?::|$)/o) {
+	}
+	elsif ($scheme && $scheme =~ m/^($scheme_re)(?::|$)/o) {
 	    $scheme = $1;
         }
     }
@@ -159,12 +161,14 @@ sub _scheme
 	my $newself = URI->new("$new:$$self");
 	$$self = $$newself; 
 	bless $self, ref($newself);
-    } else {
+    }
+    else {
 	if ($self->_no_scheme_ok) {
 	    $old = $1 if $$self =~ s/^($scheme_re)://o;
 	    Carp::carp("Oops, opaque part now look like scheme")
 		if $^W && $$self =~ m/^$scheme_re:/o
-	} else {
+	}
+	else {
 	    $old = $1 if $$self =~ m/^($scheme_re):/o;
 	}
     }
@@ -269,6 +273,17 @@ sub eq {
 # generic-URI transformation methods
 sub abs { $_[0]; }
 sub rel { $_[0]; }
+
+# help out Storable
+sub STORABLE_freeze {
+       my($self, $cloning) = @_;
+       return $$self;
+}
+
+sub STORABLE_thaw {
+       my($self, $cloning, $str) = @_;
+       $$self = $str;
+}
 
 1;
 
@@ -427,7 +442,7 @@ you can use the $uri->_scheme method instead.
 
 =item $uri->opaque( [$new_opaque] )
 
-This method sets and returns the scheme specific part of the $uri 
+This method sets and returns the scheme specific part of the $uri
 (everything between the scheme and the fragment)
 as an escaped string.
 
@@ -858,11 +873,14 @@ As an alternative to this module, the following (official) regular
 expression can be used to decode a URI:
 
   my($scheme, $authority, $path, $query, $fragment) =
-  $uri =~ m|^(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
+  $uri =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
+
+The C<URI::Split> module provide the function uri_split() as a
+readable alternative.
 
 =head1 SEE ALSO
 
-L<URI::file>, L<URI::WithBase>, L<URI::Escape>, L<URI::Heuristic>
+L<URI::file>, L<URI::WithBase>, L<URI::Escape>, L<URI::Split>, L<URI::Heuristic>
 
 RFC 2396: "Uniform Resource Identifiers (URI): Generic Syntax",
 Berners-Lee, Fielding, Masinter, August 1998.
@@ -875,7 +893,7 @@ http://www.w3.org/Addressing/
 
 =head1 COPYRIGHT
 
-Copyright 1995-2002 Gisle Aas.
+Copyright 1995-2003 Gisle Aas.
 
 Copyright 1995 Martijn Koster.
 

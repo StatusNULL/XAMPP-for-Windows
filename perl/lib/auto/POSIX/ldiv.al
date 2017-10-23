@@ -3,9 +3,9 @@
 # See AutoSplit.pm.
 package POSIX;
 
-#line 442 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\ldiv.al)"
+#line 449 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\ldiv.al)"
 sub ldiv {
-    unimpl "ldiv() is C-specific, use / and int instead";
+    unimpl "ldiv() is C-specific, use /, % and int instead";
 }
 
 # end of POSIX::ldiv

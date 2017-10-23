@@ -3,7 +3,7 @@
 # See AutoSplit.pm.
 package POSIX;
 
-#line 608 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\alarm.al)"
+#line 615 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\alarm.al)"
 sub alarm {
     usage "alarm(seconds)" if @_ != 1;
     CORE::alarm($_[0]);

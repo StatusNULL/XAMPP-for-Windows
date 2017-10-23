@@ -1,25 +1,18 @@
+<html>
+<head>
+<title>XAMPP webalizer</title>
+<link href="xampp.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+&nbsp;<p>
+<pre>
 <?
 shell_exec("..\..\webalizer\webalizer.bat");
 ?>
-<html>
-<head>
-<link href="xampp.css" rel="stylesheet" type="text/css">
-<meta http-equiv="refresh" content="2;URL=/webalizer/">
-</head>
-<body>
-<table border="0" width="100%" height="100%">
-  <tr>
-    <td width="100%">
-      <table border="0" width="100%">
-        <tr>
-          <td width="100%">
-            <center><h2>Statistik wird nun aktualisiert!</h2></td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-</table>
-
-
+<script>
+	document.location="/webalizer/";
+</script>
+</pre>
 </body>
 </html>

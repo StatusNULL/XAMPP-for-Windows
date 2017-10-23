@@ -1,7 +1,7 @@
 <?php
-include_once ("jpgraph.php");
-include_once ("jpgraph_pie.php");
-include_once ("jpgraph_pie3d.php");
+include_once ("../jpgraph.php");
+include_once ("../jpgraph_pie.php");
+include_once ("../jpgraph_pie3d.php");
 
 //$gJpgBrandTiming=true;
 
@@ -36,7 +36,7 @@ $graph->Add($p1);
 
 // Send back the HTML page which will call this script again
 // to retrieve the image.
-$graph->StrokeCSIM('pie3d_csimex1.php','pie3d_csimex1');
+$graph->StrokeCSIM('pie3d_csimex1.php');
 
 ?>
 

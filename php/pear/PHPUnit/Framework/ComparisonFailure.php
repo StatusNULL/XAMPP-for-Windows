@@ -3,7 +3,7 @@
 // +------------------------------------------------------------------------+
 // | PEAR :: PHPUnit                                                        |
 // +------------------------------------------------------------------------+
-// | Copyright (c) 2002-2003 Sebastian Bergmann <sb@sebastian-bergmann.de>. |
+// | Copyright (c) 2002-2004 Sebastian Bergmann <sb@sebastian-bergmann.de>. |
 // +------------------------------------------------------------------------+
 // | This source file is subject to version 3.00 of the PHP License,        |
 // | that is available at http://www.php.net/license/3_0.txt.               |
@@ -12,7 +12,7 @@
 // | license@php.net so we can mail you a copy immediately.                 |
 // +------------------------------------------------------------------------+
 //
-// $Id: ComparisonFailure.php,v 1.4 2003/09/01 21:30:22 sebastian Exp $
+// $Id: ComparisonFailure.php,v 1.8 2004/01/04 10:25:10 sebastian Exp $
 //
 
 require_once 'PHPUnit/Framework/AssertionFailedError.php';
@@ -30,13 +30,13 @@ class PHPUnit_Framework_ComparisonFailure extends PHPUnit_Framework_AssertionFai
     * @var    string
     * @access private
     */
-    private $fExpected = '';
+    private $expected = '';
 
     /**
     * @var    string
     * @access private
     */
-    private $fActual = '';
+    private $actual = '';
 
     // }}}
     // {{{ public function __construct($expected, $actual, $message = '')
@@ -52,8 +52,8 @@ class PHPUnit_Framework_ComparisonFailure extends PHPUnit_Framework_AssertionFai
     public function __construct($expected, $actual, $message = '') {
         parent::__construct($message);
 
-        $this->fExpected = $expected;
-        $this->fActual   = $actual;
+        $this->expected = $expected;
+        $this->actual   = $actual;
     }
 
     // }}}
@@ -67,48 +67,48 @@ class PHPUnit_Framework_ComparisonFailure extends PHPUnit_Framework_AssertionFai
     * @access public
     */
     public function toString() {
-        if ($this->fExpected == null && $this->fActual == null) {
+        if ($this->expected == null && $this->actual == null) {
             return PHPUnit_Framework_Assert::format(
-                $this->fExpected,
-                $this->fActual,
+                $this->expected,
+                $this->actual,
                 parent::getMessage()
             );
         }
 
-        $end = min(strlen($this->fExpected), strlen($this->fActual));
+        $end = min(strlen($this->expected), strlen($this->actual));
         $i   = 0;
-        $j   = strlen($this->fExpected) - 1;
-        $k   = strlen($this->fActual) - 1;
+        $j   = strlen($this->expected) - 1;
+        $k   = strlen($this->actual)   - 1;
 
         for (; $i < $end; $i++) {
-            if ($this->fExpected[$i] != $this->fActual[$i]) {
+            if ($this->expected[$i] != $this->actual[$i]) {
                 break;
             }
         }
 
         for (; $k >= $i && $j >= $i; $k--,$j--) {
-            if ($this->fExpected[$j] != $this->fActual[$k]) {
+            if ($this->expected[$j] != $this->actual[$k]) {
                 break;
             }
         }
 
         if ($j < $i && $k < $i) {
-            $expected = $this->fExpected;
-            $actual   = $this->fActual;
+            $expected = $this->expected;
+            $actual   = $this->actual;
         } else {
-            $expected = substr($this->fExpected, $i, ($j + 1 - $i));
-            $actual   = substr($this->fActual,   $i, ($k + 1 - $i));;
+            $expected = substr($this->expected, $i, ($j + 1 - $i));
+            $actual   = substr($this->actual,   $i, ($k + 1 - $i));;
 
             if ($i <= $end && $i > 0) {
                 $expected = '...' . $expected;
                 $actual   = '...' . $actual;
             }
       
-            if ($j < strlen($this->fExpected) - 1) {
+            if ($j < strlen($this->expected) - 1) {
                 $expected .= '...';
             }
 
-            if ($k < strlen($this->fActual) - 1) {
+            if ($k < strlen($this->actual) - 1) {
                 $actual .= '...';
             }
 

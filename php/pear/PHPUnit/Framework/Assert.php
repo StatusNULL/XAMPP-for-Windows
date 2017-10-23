@@ -3,7 +3,7 @@
 // +------------------------------------------------------------------------+
 // | PEAR :: PHPUnit                                                        |
 // +------------------------------------------------------------------------+
-// | Copyright (c) 2002-2003 Sebastian Bergmann <sb@sebastian-bergmann.de>. |
+// | Copyright (c) 2002-2004 Sebastian Bergmann <sb@sebastian-bergmann.de>. |
 // +------------------------------------------------------------------------+
 // | This source file is subject to version 3.00 of the PHP License,        |
 // | that is available at http://www.php.net/license/3_0.txt.               |
@@ -12,7 +12,7 @@
 // | license@php.net so we can mail you a copy immediately.                 |
 // +------------------------------------------------------------------------+
 //
-// $Id: Assert.php,v 1.6 2003/07/24 06:39:52 sebastian Exp $
+// $Id: Assert.php,v 1.11 2004/01/04 10:43:25 sebastian Exp $
 //
 
 require_once 'PHPUnit/Framework/AssertionFailedError.php';
@@ -62,15 +62,21 @@ class PHPUnit_Framework_Assert {
             return;
         }
 
-        if (is_object($expected) && is_object($actual)) {
-            if (serialize($expected) != serialize($actual)) {
+        if (is_object($expected)) {
+            if (!is_object($actual) || (serialize($expected) != serialize($actual))) {
                 self::failNotEquals($expected, $actual, $message);
             }
+
+            return;
         }
 
-        if (is_array($expected) && is_array($actual)) {
-            ksort($actual);
-            ksort($expected);
+        if (is_array($expected)) {
+            if (!is_array($actual)) {
+                self::failNotEquals($expected, $actual, $message);
+            }
+
+            self::sortArrayRecursively($actual);
+            self::sortArrayRecursively($expected);
 
             if (self::$looselyTyped) {
                 $actual   = self::convertToString($actual);
@@ -78,43 +84,31 @@ class PHPUnit_Framework_Assert {
             }
 
             self::assertEquals(serialize($expected), serialize($actual));
-        }
 
-        if (is_string($expected) && is_string($actual)) {
-            if ($expected != $actual) {
-                throw new PHPUnit_Framework_ComparisonFailure($expected, $actual, $message);
-            }
+            return;
         }
 
         if (is_double($expected) && is_double($actual)) {
             if (!(abs($expected - $actual) <= $delta)) {
                 self::failNotEquals($expected, $actual, $message);
             }
+
+            return;
         }
 
         if (is_float($expected) && is_float($actual)) {
             if (!(abs($expected - $actual) <= $delta)) {
                 self::failNotEquals($expected, $actual, $message);
             }
+
+            return;
         }
 
-        if (is_long($expected) && is_long($actual)) {
-            if ($expected != $actual) {
-                self::failNotEquals($expected, $actual, $message);
-            }
+        if (self::$looselyTyped) {
+            settype($actual, gettype($expected));
         }
 
-        if (is_integer($expected) && is_integer($actual)) {
-            if ($expected != $actual) {
-                self::failNotEquals($expected, $actual, $message);
-            }
-        }
-
-        if (is_bool($expected) && is_bool($actual)) {
-            if ($expected != $actual) {
-                self::failNotEquals($expected, $actual, $message);
-            }
-        }
+        self::assertSame($expected, $actual, $message);
     }
 
     // }}}
@@ -323,6 +317,8 @@ class PHPUnit_Framework_Assert {
         foreach ($value as $k => $v) {
             if (is_array($v)) {
                 $value[$k] = self::convertToString($value[$k]);
+            } else if (is_object($v)) {
+                $value[$k] = self::objectToString($value[$k]);
             } else {
                 settype($value[$k], 'string');
             }
@@ -363,6 +359,10 @@ class PHPUnit_Framework_Assert {
     * @static
     */
     private static function failNotSame($expected, $actual, $message) {
+        if (is_string($expected) && is_string($actual)) {
+            throw new PHPUnit_Framework_ComparisonFailure($expected, $actual, $message);
+        }
+
         self::fail(
           sprintf(
             '%s%sexpected same: <%s> was not: <%s>',
@@ -405,6 +405,27 @@ class PHPUnit_Framework_Assert {
         }
 
         return $object;
+    }
+
+    // }}}
+    // {{{ private static function sortArrayRecursively(&$array) {
+
+    /**
+    * Sorts an array recursively by its keys.
+    *
+    * @param  array $array
+    * @access private
+    * @static
+    * @author Adam Maccabee Trachtenberg <adam@trachtenberg.com>
+    */
+    private static function sortArrayRecursively(&$array) {
+        ksort($array);
+
+        foreach($array as $k => $v) {
+            if (is_array($v)) {
+                self::sortArrayRecursively($array[$k]);
+            }
+        }  
     }
 
     // }}}

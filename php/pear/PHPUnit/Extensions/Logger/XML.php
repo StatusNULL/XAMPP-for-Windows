@@ -3,7 +3,7 @@
 // +------------------------------------------------------------------------+
 // | PEAR :: PHPUnit                                                        |
 // +------------------------------------------------------------------------+
-// | Copyright (c) 2002-2003 Sebastian Bergmann <sb@sebastian-bergmann.de>. |
+// | Copyright (c) 2002-2004 Sebastian Bergmann <sb@sebastian-bergmann.de>. |
 // +------------------------------------------------------------------------+
 // | This source file is subject to version 3.00 of the PHP License,        |
 // | that is available at http://www.php.net/license/3_0.txt.               |
@@ -12,14 +12,14 @@
 // | license@php.net so we can mail you a copy immediately.                 |
 // +------------------------------------------------------------------------+
 //
-// $Id: XML.php,v 1.4 2003/07/24 06:39:52 sebastian Exp $
+// $Id: XML.php,v 1.10 2004/01/18 08:36:37 sebastian Exp $
 //
 
 require_once 'PHPUnit/Framework/TestFailure.php';
 require_once 'PHPUnit/Framework/TestListener.php';
 require_once 'PHPUnit/Framework/TestResult.php';
 
-require_once 'XML/Tree.php';
+@include_once 'XML/Tree.php';
 
 /**
  * A TestListener that generates an XML-based logfile
@@ -36,12 +36,10 @@ class PHPUnit_Extensions_Logger_XML implements PHPUnit_Framework_TestListener {
     // {{{ Members
 
     /**
-    * Filename.
-    *
-    * @var    string
+    * @var    resource
     * @access private
     */
-    private $file;
+    private $out;
 
     /**
     * XML Tree.
@@ -57,7 +55,7 @@ class PHPUnit_Extensions_Logger_XML implements PHPUnit_Framework_TestListener {
     * @var    XML_Tree_Node
     * @access private
     */
-    private $xml;
+    private $root;
 
     /**
     * @var    boolean
@@ -66,14 +64,21 @@ class PHPUnit_Extensions_Logger_XML implements PHPUnit_Framework_TestListener {
     private $testFailed = false;
 
     // }}}
-    // {{{ public function __construct($file = 'phpunit-log.xml')
+    // {{{ public function __construct($out = null)
 
     /**
-    * @param  optional string $file
+    * Constructor.
+    *
+    * @param  resource  $out
     * @access public
     */
-    public function __construct($file = 'phpunit-log.xml') {
-        $this->file = $file;
+    public function __construct($out = null) {
+        if ($out === null) {
+            $out = fopen('php://stdout', 'r');
+        }
+
+        $this->out = $out;
+
         $this->tree = new XML_Tree;
         $this->root = $this->tree->addRoot('run');
     }
@@ -85,10 +90,8 @@ class PHPUnit_Extensions_Logger_XML implements PHPUnit_Framework_TestListener {
     * @access public
     */
     public function __destruct() {
-        if ($fp = @fopen($this->file, 'w')) {
-            @fwrite($fp, $this->root->get());
-            @fclose($fp);
-        }
+        fwrite($this->out, $this->root->get());
+        fclose($this->out);
     }
 
     // }}}

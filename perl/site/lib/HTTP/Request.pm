@@ -1,60 +1,14 @@
-#
-# $Id: Request.pm,v 1.30 2001/11/15 06:42:40 gisle Exp $
-
 package HTTP::Request;
 
-=head1 NAME
-
-HTTP::Request - Class encapsulating HTTP Requests
-
-=head1 SYNOPSIS
-
- require HTTP::Request;
- $request = HTTP::Request->new(GET => 'http://www.oslo.net/');
-
-=head1 DESCRIPTION
-
-C<HTTP::Request> is a class encapsulating HTTP style requests,
-consisting of a request line, some headers, and some (potentially empty)
-content. Note that the LWP library also uses this HTTP style requests
-for non-HTTP protocols.
-
-Instances of this class are usually passed to the C<request()> method
-of an C<LWP::UserAgent> object:
-
- $ua = LWP::UserAgent->new;
- $request = HTTP::Request->new(GET => 'http://www.oslo.net/');
- $response = $ua->request($request);
-
-C<HTTP::Request> is a subclass of C<HTTP::Message> and therefore
-inherits its methods.  The inherited methods most often used are header(),
-push_header(), remove_header(), and content(). See L<HTTP::Message> for details.
-
-The following additional methods are available:
-
-=over 4
-
-=cut
+# $Id: Request.pm,v 1.34 2003/10/24 10:25:16 gisle Exp $
 
 require HTTP::Message;
 @ISA = qw(HTTP::Message);
-$VERSION = sprintf("%d.%02d", q$Revision: 1.30 $ =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q$Revision: 1.34 $ =~ /(\d+)\.(\d+)/);
 
 use strict;
 
-=item $r = HTTP::Request->new($method, $uri)
 
-=item $r = HTTP::Request->new($method, $uri, $header)
-
-=item $r = HTTP::Request->new($method, $uri, $header, $content)
-
-Constructs a new C<HTTP::Request> object describing a request on the
-object C<$uri> using method C<$method>.  The C<$uri> argument can be
-either a string, or a reference to a C<URI> object.  The optional $header
-argument should be a reference to an C<HTTP::Headers> object.
-The optional $content argument should be a string.
-
-=cut
 
 sub new
 {
@@ -76,27 +30,11 @@ sub clone
 }
 
 
-=item $r->method([$val])
+sub method
+{
+    shift->_elem('_method', @_);
+}
 
-=item $r->uri([$val])
-
-These methods provide public access to the attributes containing
-respectively the method of the request and the URI object of the
-request.
-
-If an argument is given the attribute is given that as its new
-value. If no argument is given the value is not touched. In either
-case the previous value is returned.
-
-The method() method argument should be a string.
-
-The uri() method accept both a reference to a URI object and a
-string as its argument.  If a string is given, then it should be
-parseable as an absolute URI.
-
-=cut
-
-sub method  { shift->_elem('_method', @_); }
 
 sub uri
 {
@@ -106,7 +44,8 @@ sub uri
 	my $uri = shift;
 	if (!defined $uri) {
 	    # that's ok
-	} elsif (ref $uri) {
+	}
+	elsif (ref $uri) {
 	    Carp::croak("A URI can't be a " . ref($uri) . " reference")
 		if ref($uri) eq 'HASH' or ref($uri) eq 'ARRAY';
 	    Carp::croak("Can't use a " . ref($uri) . " object as a URI")
@@ -117,7 +56,8 @@ sub uri
 		eval { local $SIG{__DIE__}; $uri = $uri->abs; };
 		die $@ if $@ && $@ !~ /Missing base argument/;
 	    }
-	} else {
+	}
+	else {
 	    $uri = $HTTP::URI_CLASS->new($uri);
 	}
 	$self->{'_uri'} = $uri;
@@ -125,14 +65,8 @@ sub uri
     $old;
 }
 
-*url = \&uri;  # this is the same for now
+*url = \&uri;  # legacy
 
-=item $r->as_string()
-
-Method returning a textual representation of the request.
-Mainly useful for debugging purposes. It takes no arguments.
-
-=cut
 
 sub as_string
 {
@@ -156,13 +90,98 @@ sub as_string
     join("\n", @result, "");
 }
 
+
 1;
+
+__END__
+
+=head1 NAME
+
+HTTP::Request - HTTP style request message
+
+=head1 SYNOPSIS
+
+ require HTTP::Request;
+ $request = HTTP::Request->new(GET => 'http://www.example.com/');
+
+and usually used like this:
+
+ $ua = LWP::UserAgent->new;
+ $response = $ua->request($request);
+
+=head1 DESCRIPTION
+
+C<HTTP::Request> is a class encapsulating HTTP style requests,
+consisting of a request line, some headers, and a content body. Note
+that the LWP library uses HTTP style requests even for non-HTTP
+protocols.  Instances of this class are usually passed to the
+request() method of an C<LWP::UserAgent> object.
+
+C<HTTP::Request> is a subclass of C<HTTP::Message> and therefore
+inherits its methods.  The following additional methods are available:
+
+=over 4
+
+=item $r = HTTP::Request->new( $method, $uri )
+
+=item $r = HTTP::Request->new( $method, $uri, $header )
+
+=item $r = HTTP::Request->new( $method, $uri, $header, $content )
+
+Constructs a new C<HTTP::Request> object describing a request on the
+object $uri using method $method.  The $method argument must be a
+string.  The $uri argument can be either a string, or a reference
+to a C<URI> object.  The optional $header argument should be a
+reference to an C<HTTP::Headers> object.  The optional $content
+argument should be a string of bytes.
+
+=item $r->method
+
+=item $r->method( $val )
+
+This is used to get/set the method attribute.  The method should be a
+short string like "GET", "HEAD", "PUT" or "POST".
+
+=item $r->uri
+
+=item $r->uri( $val )
+
+This is used to get/set the uri attribute.  The $val can be a
+reference to a URI object or a plain string.  If a string is given,
+then it should be parseable as an absolute URI.
+
+=item $r->header( $field )
+
+=item $r->header( $field => $value )
+
+This is used to get/set header values and it is inherited from
+C<HTTP::Headers> via C<HTTP::Message>.  See L<HTTP::Headers> for
+details and other similar methods that can be used to access the
+headers.
+
+=item $r->content
+
+=item $r->content( $content )
+
+This is used to get/set the content and it is inherited from the
+C<HTTP::Message> base class.  See L<HTTP::Message> for details and
+other methods that can be used to access the content.
+
+Note that the content should be a string of bytes.  Strings in perl
+can contain characters outside the range of a byte.  The C<Encode>
+module can be used to turn such strings into a string of bytes.
+
+=item $r->as_string
+
+Method returning a textual representation of the request.
+Mainly useful for debugging purposes. It takes no arguments.
 
 =back
 
 =head1 SEE ALSO
 
-L<HTTP::Headers>, L<HTTP::Message>, L<HTTP::Request::Common>
+L<HTTP::Headers>, L<HTTP::Message>, L<HTTP::Request::Common>,
+L<HTTP::Response>
 
 =head1 COPYRIGHT
 
@@ -171,4 +190,3 @@ Copyright 1995-2001 Gisle Aas.
 This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-=cut

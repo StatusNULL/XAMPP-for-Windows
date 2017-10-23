@@ -1,5 +1,5 @@
 <?php
-/* $Id: main.php,v 1.144 2003/08/01 00:09:30 rabus Exp $ */
+/* $Id: main.php,v 2.7 2003/12/09 15:06:08 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -10,12 +10,8 @@ define('PMA_DISPLAY_HEADING', 0);
 /**
  * Gets some core libraries and displays a top message if required
  */
-if (!defined('PMA_GRAB_GLOBALS_INCLUDED')) {
-    include('./libraries/grab_globals.lib.php');
-}
-if (!defined('PMA_COMMON_LIB_INCLUDED'))  {
-    include('./libraries/common.lib.php');
-}
+require_once('./libraries/grab_globals.lib.php');
+require_once('./libraries/common.lib.php');
 // Puts the language to use in a cookie that will expire in 30 days
 if (!isset($pma_uri_parts)) {
     $pma_uri_parts = parse_url($cfg['PmaAbsoluteUri']);
@@ -33,7 +29,7 @@ if (isset($table)) {
     unset($table);
 }
 $show_query = '1';
-require('./header.inc.php');
+require_once('./header.inc.php');
 if (isset($message)) {
     PMA_showMessage($message);
 }
@@ -119,8 +115,7 @@ if ($server == 0 || count($cfg['Servers']) > 1) {
             <select name="server">
     <?php
     echo "\n";
-    reset($cfg['Servers']);
-    while (list($key, $val) = each($cfg['Servers'])) {
+    foreach($cfg['Servers'] AS $key => $val) {
         if (!empty($val['host'])) {
             echo '                <option value="' . $key . '"';
             if (!empty($server) && ($server == $key)) {
@@ -134,11 +129,6 @@ if ($server == 0 || count($cfg['Servers']) > 1) {
                 if (!empty($val['port'])) {
                     echo ':' . $val['port'];
                 }
-                // loic1: skip this because it's not a so good idea to display
-                //        sockets used to everybody
-                // if (!empty($val['socket']) && PMA_PHP_INT_VERSION >= 30010) {
-                //     echo ':' . $val['socket'];
-                // }
             }
             // loic1: if 'only_db' is an array and there is more than one
             //        value, displaying such informations may not be a so good
@@ -178,6 +168,8 @@ $is_superuser        = FALSE;
 if ($server > 0) {
     // Get user's global privileges ($dbh and $userlink are links to MySQL
     // defined in the "common.lib.php" library)
+    // Note: if no controluser is defined, $dbh contains $userlink
+
     $is_create_priv  = FALSE;
     $is_process_priv = TRUE;
     $is_reload_priv  = FALSE;
@@ -207,7 +199,6 @@ if ($server > 0) {
             mysql_free_result($rs_usr);
         } // end if
     } // end if
-
     // If the user has Create priv on a inexistant db, show him in the dialog
     // the first inexistant db name that we find, in most cases it's probably
     // the one he just dropped :)
@@ -228,7 +219,7 @@ if ($server > 0) {
             } // end while
             mysql_free_result($rs_usr);
         } // end if
-        else if (PMA_MYSQL_INT_VERSION >= 32304) {
+        else {
             // Finally, let's try to get the user's privileges by using SHOW
             // GRANTS...
             // Maybe we'll find a little CREATE priv there :)
@@ -255,13 +246,14 @@ if ($server > 0) {
                         else if (ereg($re0 . '%|_', $show_grants_dbname) || !PMA_mysql_select_db($show_grants_dbname, $userlink) && @mysql_errno() != 1044) {
                             $db_to_create = ereg_replace($re0 . '%', '\\1...', ereg_replace($re0 . '_', '\\1?', $show_grants_dbname));
                             $db_to_create = ereg_replace($re1 . '(%|_)', '\\1\\3', $db_to_create);
+                            // and remove backquotes
+                            $db_to_create = str_replace('`','',$db_to_create);
                             $is_create_priv     = TRUE;
                             break;
                         } // end elseif
                     } // end if
                 } // end while
-                unset($show_grants_dbname);
-                unset($show_grants_str);
+                unset($show_grants_dbname, $show_grants_str);
                 mysql_free_result($rs_usr);
             } // end if
         } // end elseif
@@ -516,8 +508,7 @@ if (empty($cfg['Lang'])) {
     } // end of the 'PMA_cmp()' function
 
     uasort($available_languages, 'PMA_cmp');
-    reset($available_languages);
-    while (list($id, $tmplang) = each($available_languages)) {
+    foreach($available_languages AS $id => $tmplang) {
         $lang_name = ucfirst(substr(strstr($tmplang[0], '|'), 1));
         if ($lang == $id) {
             $selected = ' selected="selected"';
@@ -551,15 +542,14 @@ if (isset($cfg['AllowAnywhereRecoding']) && $cfg['AllowAnywhereRecoding']
                     <select name="convcharset" dir="ltr" onchange="this.form.submit();">
     <?php
     echo "\n";
-    reset($cfg['AvailableCharsets']);
-    while (list($id, $tmpcharset) = each($cfg['AvailableCharsets'])) {
+    foreach($cfg['AvailableCharsets'] AS $id => $tmpcharset) {
         if ($convcharset == $tmpcharset) {
             $selected = ' selected="selected"';
         } else {
             $selected = '';
         }
-        echo '                        ';
-        echo '<option value="' . $tmpcharset . '"' . $selected . '>' . $tmpcharset . '</option>' . "\n";
+        echo '                        '
+           . '<option value="' . $tmpcharset . '"' . $selected . '>' . $tmpcharset . '</option>' . "\n";
     }
     ?>
                     </select>
@@ -638,8 +628,24 @@ if (PMA_PHP_INT_VERSION == 40203 && @extension_loaded('mbstring')) {
 }
 
 /**
+ * Warning for old PHP version
+ */
+
+if (PMA_PHP_INT_VERSION < 40100) {
+    echo '<p class="warning">' . sprintf($strUpgrade, 'PHP', '4.1.0') . '</p>' . "\n";
+}
+
+/**
+ * Warning for old MySQL version
+ */
+
+if (PMA_MYSQL_INT_VERSION < 32332) {
+    echo '<p class="warning">' . sprintf($strUpgrade, 'MySQL', '3.23.32') . '</p>' . "\n";
+}
+
+/**
  * Displays the footer
  */
 echo "\n";
-require('./footer.inc.php');
+require_once('./footer.inc.php');
 ?>

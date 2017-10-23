@@ -1,14 +1,14 @@
 <?php
-/* $Id: tbl_alter.php,v 1.42 2003/07/19 11:58:24 lem9 Exp $ */
+/* $Id: tbl_alter.php,v 2.3 2003/11/26 22:52:24 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
 /**
  * Gets some core libraries
  */
-require('./libraries/grab_globals.lib.php');
+require_once('./libraries/grab_globals.lib.php');
 $js_to_run = 'functions.js';
-include('./header.inc.php');
+require_once('./header.inc.php');
 
 // Check parameters
 PMA_checkParameters(array('db', 'table'));
@@ -26,11 +26,6 @@ $abort = false;
 if (isset($submit)) {
     $field_cnt = count($field_orig);
     for ($i = 0; $i < $field_cnt; $i++) {
-        if (PMA_MYSQL_INT_VERSION < 32306) {
-            PMA_checkReservedWords($field_name[$i], $err_url);
-        }
-
-        // Some fields have been urlencoded or double quotes have been translated
         // to "&quot;" in tbl_properties.php
         $field_orig[$i]     = urldecode($field_orig[$i]);
         if (strcmp(str_replace('"', '&quot;', $field_orig[$i]), $field_name[$i]) == 0) {
@@ -52,7 +47,7 @@ if (isset($submit)) {
         $query .= PMA_backquote($field_orig[$i]) . ' ' . PMA_backquote($field_name[$i]) . ' ' . $field_type[$i];
         // Some field types shouldn't have lengths
         if ($field_length[$i] != ''
-            && !eregi('^(DATE|DATETIME|TIME|TINYBLOB|TINYTEXT|BLOB|TEXT|MEDIUMBLOB|MEDIUMTEXT|LONGBLOB|LONGTEXT)$', $field_type[$i])) {
+            && !preg_match('@^(DATE|DATETIME|TIME|TINYBLOB|TINYTEXT|BLOB|TEXT|MEDIUMBLOB|MEDIUMTEXT|LONGBLOB|LONGTEXT)$@i', $field_type[$i])) {
             $query .= '(' . $field_length[$i] . ')';
         }
         if ($field_attribute[$i] != '') {
@@ -89,23 +84,21 @@ if (isset($submit)) {
         $btnDrop   = 'Fake';
 
         // garvin: If comments were sent, enable relation stuff
-        require('./libraries/relation.lib.php');
-        require('./libraries/transformations.lib.php');
+        require_once('./libraries/relation.lib.php');
+        require_once('./libraries/transformations.lib.php');
 
         $cfgRelation = PMA_getRelationsParam();
 
         // garvin: Update comment table, if a comment was set.
         if (isset($field_comments) && is_array($field_comments) && $cfgRelation['commwork']) {
-            @reset($field_comments);
-            while(list($fieldindex, $fieldcomment) = each($field_comments)) {
+            foreach($field_comments AS $fieldindex => $fieldcomment) {
                 PMA_setComment($db, $table, $field_name[$fieldindex], $fieldcomment, $field_orig[$fieldindex]);
             }
         }
 
         // garvin: Rename relations&display fields, if altered.
         if (($cfgRelation['displaywork'] || $cfgRelation['relwork']) && isset($field_orig) && is_array($field_orig)) {
-            @reset($field_orig);
-            while(list($fieldindex, $fieldcontent) = each($field_orig)) {
+            foreach($field_orig AS $fieldindex => $fieldcontent) {
                 if ($field_name[$fieldindex] != $fieldcontent) {
                     if ($cfgRelation['displaywork']) {
                         $table_query = 'UPDATE ' . PMA_backquote($cfgRelation['table_info'])
@@ -143,15 +136,13 @@ if (isset($submit)) {
 
         // garvin: Update comment table for mime types [MIME]
         if (isset($field_mimetype) && is_array($field_mimetype) && $cfgRelation['commwork'] && $cfgRelation['mimework'] && $cfg['BrowseMIME']) {
-            @reset($field_mimetype);
-            while(list($fieldindex, $mimetype) = each($field_mimetype)) {
+            foreach($field_mimetype AS $fieldindex => $mimetype) {
                 PMA_setMIME($db, $table, $field_name[$fieldindex], $mimetype, $field_transformation[$fieldindex], $field_transformation_options[$fieldindex]);
             }
         }
 
         $active_page = 'tbl_properties_structure.php';
-        include('./tbl_properties_structure.php');
-        exit();
+        require('./tbl_properties_structure.php');
     } else {
         PMA_mysqlDie('', '', '', $err_url, FALSE);
         // garvin: An error happened while inserting/updating a table definition.
@@ -192,12 +183,12 @@ if ($abort == FALSE) {
 
     $num_fields  = count($fields_meta);
     $action      = 'tbl_alter.php';
-    include('./tbl_properties.inc.php');
+    require('./tbl_properties.inc.php');
 }
 
 
 /**
  * Displays the footer
  */
-require('./footer.inc.php');
+require_once('./footer.inc.php');
 ?>

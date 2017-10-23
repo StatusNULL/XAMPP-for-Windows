@@ -1,6 +1,6 @@
 <?php
-include_once ("jpgraph.php");
-include_once ("jpgraph_scatter.php");
+include_once ("../jpgraph.php");
+include_once ("../jpgraph_scatter.php");
 
 // Some data for the points
 $datax = array(3.5,13.7,3,4,6.2,6,3.5,8,14,8,11.1,13.7);
@@ -39,6 +39,6 @@ $graph->Add($sp1);
 
 // Send back the HTML page which will call this script again
 // to retrieve the image.
-$graph->StrokeCSIM('Examples/scatter_csimex1.php','scatter_csimex1');
+$graph->StrokeCSIM('scatter_csimex1.php');
 
 ?>

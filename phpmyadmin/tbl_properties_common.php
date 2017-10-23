@@ -1,20 +1,14 @@
 <?php
-/* $Id: tbl_properties_common.php,v 1.12 2003/07/19 12:14:51 lem9 Exp $ */
+/* $Id: tbl_properties_common.php,v 2.2 2003/11/26 22:52:24 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
 /**
  * Gets some core libraries
  */
-if (!defined('PMA_GRAB_GLOBALS_INCLUDED')) {
-    include('./libraries/grab_globals.lib.php');
-}
-if (!defined('PMA_COMMON_LIB_INCLUDED')) {
-    include('./libraries/common.lib.php');
-}
-if (!defined('PMA_BOOKMARK_LIB_INCLUDED')) {
-    include('./libraries/bookmark.lib.php');
-}
+require_once('./libraries/grab_globals.lib.php');
+require_once('./libraries/common.lib.php');
+require_once('./libraries/bookmark.lib.php');
 
 // Check parameters
 PMA_checkParameters(array('db','table'));
@@ -29,7 +23,7 @@ $err_url   = $cfg['DefaultTabTable'] . '?' . PMA_generate_common_url($db, $table
 /**
  * Ensures the database and the table exist (else move to the "parent" script)
  */
-require('./libraries/db_table_exists.lib.php');
+require_once('./libraries/db_table_exists.lib.php');
 
 
 /**
@@ -37,7 +31,7 @@ require('./libraries/db_table_exists.lib.php');
  */
 if (!isset($message)) {
     $js_to_run = 'functions.js';
-    include('./header.inc.php');
+    require_once('./header.inc.php');
 } else {
     PMA_showMessage($message);
     unset($message);

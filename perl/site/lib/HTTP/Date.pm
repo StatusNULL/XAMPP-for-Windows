@@ -1,6 +1,6 @@
-package HTTP::Date;  # $Date: 2002/03/08 03:36:50 $
+package HTTP::Date;  # $Date: 2003/10/23 19:11:32 $
 
-$VERSION = sprintf("%d.%02d", q$Revision: 1.44 $ =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q$Revision: 1.46 $ =~ /(\d+)\.(\d+)/);
 
 require 5.004;
 require Exporter;
@@ -188,7 +188,7 @@ sub parse_date ($)
     # Translate month name to number
     $mon = $MoY{$mon} ||
            $MoY{"\u\L$mon"} ||
-	   ($mon >= 1 && $mon <= 12 && int($mon)) ||
+	   ($mon =~ /^\d\d?$/ && $mon >= 1 && $mon <= 12 && int($mon)) ||
            return;
 
     # If the year is missing, we assume first date before the current,
@@ -229,7 +229,8 @@ sub parse_date ($)
 
     if (defined $tz) {
 	$tz = "Z" if $tz =~ /^(GMT|UTC?|[-+]?0+)$/;
-    } else {
+    }
+    else {
 	$tz = "";
     }
     return sprintf("%04d-%02d-%02d %02d:%02d:%02d%s",

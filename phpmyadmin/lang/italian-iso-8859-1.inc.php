@@ -1,5 +1,5 @@
 <?php
-/* $Id: italian-iso-8859-1.inc.php,v 1.139.2.1 2003/08/18 10:44:09 nijel Exp $ */
+/* $Id: italian-iso-8859-1.inc.php,v 2.2 2003/11/20 13:48:52 nijel Exp $ */
 
 /**
  * Translated by: Pietro Danesi <danone at users.sourceforge.net>  2002-03-29
@@ -76,8 +76,10 @@ $strBeginCut = 'INIZIO CUT';
 $strBeginRaw = 'INIZIO RAW';
 $strBinary = 'Binario';
 $strBinaryDoNotEdit = 'Tipo di dato Binario - non modificare';
+$strBookmarkAllUsers = 'Permetti ad ogni utente di accedere a questo bookmark';
 $strBookmarkDeleted = 'Il bookmark è stato cancellato.';
 $strBookmarkLabel = 'Etichetta';
+$strBookmarkOptions = 'Opzioni bookmarks';
 $strBookmarkQuery = 'Query SQL aggiunte ai preferiti';
 $strBookmarkThis = 'Aggiungi ai preferiti questa query SQL';
 $strBookmarkView = 'Visualizza solo';
@@ -114,6 +116,7 @@ $strCharsets = 'Set di caratteri';
 $strCharsetsAndCollations = 'Set di Caratteri e Collations';
 $strCheckAll = 'Seleziona tutti';
 $strCheckDbPriv = 'Controlla i privilegi del database';
+$strCheckOverhead = 'Controllo addizionale';
 $strCheckPrivs = 'Controlla i privilegi';
 $strCheckPrivsLong = 'Controlla i privilegi per il database &quot;%s&quot;.';
 $strCheckTable = 'Controlla tabella';
@@ -131,6 +134,8 @@ $strConfigFileError = 'phpMyAdmin non riesce a leggere il file di configurazione
 $strConfigureTableCoord = 'Prego, configurare le coordinate per la tabella %s';
 $strConfirm = 'Sicuro di volerlo fare?';
 $strConnections = 'Connessioni';
+$strConstraintsForDumped = 'Limiti per le tabelle scaricate';
+$strConstraintsForTable = 'Limiti per la tabella';
 $strCookiesRequired = 'Da questo punto in poi, i cookies devono essere abilitati.';
 $strCopyTable = 'Copia la tabella nel (database<b>.</b>tabella):';
 $strCopyTableOK = 'La tabella %s è stata copiata su %s.';
@@ -143,6 +148,7 @@ $strCreateNewDatabase = 'Crea un nuovo database';
 $strCreateNewTable = 'Crea una nuova tabella nel database %s';
 $strCreatePage = 'Crea una nuova Page';
 $strCreatePdfFeat = 'Creazione di PDF';
+$strCreationDates = 'Creazione/Aggiornamento/Controllo date';
 $strCriteria = 'Criterio';
 $strCroatian = 'Croato';
 $strCyrillic = 'Cirillico';
@@ -222,6 +228,7 @@ $strEnglish = 'Inglese';
 $strEnglishPrivileges = 'Nota: i nomi dei privilegi di MySQL sono in Inglese';
 $strError = 'Errore';
 $strEstonian = 'Estone';
+$strExcelEdition = 'Edizione Excel';
 $strExcelOptions = 'Opzioni di Excel';
 $strExecuteBookmarked = 'Esegue la query dalle preferite';
 $strExplain = 'Spiega SQL';
@@ -298,6 +305,8 @@ $strInsertTextfiles = 'Inserisci un file di testo nella tabella';
 $strInsertedRowId = 'Inserito id riga:';
 $strInsertedRows = 'Righe inserite:';
 $strInstructions = 'Istruzioni';
+$strInternalNotNecessary = '* Non è necessaria una relazione interna quando già esiste in InnoDB.';
+$strInternalRelations = 'Relazioni interne';
 $strInvalidName = '"%s" è una parola riservata; non è possibile utilizzarla come nome di database/tabella/campo.';
 
 $strJapanese = 'Giapponese';
@@ -313,6 +322,13 @@ $strKorean = 'Coreano';
 $strLaTeX = 'LaTeX';
 $strLaTeXOptions = 'opzioni LaTeX';
 $strLandscape = 'Orizzontale';
+$strLatexCaption = 'Sottotitolo della tabella';
+$strLatexContent = 'Contenuto della tabella __TABLE__';
+$strLatexContinued = '(continua)';
+$strLatexContinuedCaption = 'Sottotitolo della tabella continuato';
+$strLatexIncludeCaption = 'Includi sottotitolo della tabella';
+$strLatexLabel = 'Chiave etichetta';
+$strLatexStructure = 'Struttura della tabella __TABLE__';
 $strLength = 'Lunghezza';
 $strLengthSet = 'Lunghezza/Set*';
 $strLimitNumRows = 'record per pagina';
@@ -327,6 +343,7 @@ $strLoadMethod = 'Metodo di CARICAMENTO';
 $strLocalhost = 'Locale';
 $strLocationTextfile = 'Percorso del file';
 $strLogPassword = 'Password:';
+$strLogServer = 'Server';
 $strLogUsername = 'Nome utente:';
 $strLogin = 'Connetti';
 $strLoginInformation = 'Informazioni di Login';
@@ -436,6 +453,7 @@ $strPrimaryKeyName = 'Il nome della chiave primaria deve essere... PRIMARY!';
 $strPrimaryKeyWarning = '("PRIMARY" <b>deve</b> essere il nome di, e <b>solo di</b>, una chiave primaria!)';
 $strPrint = 'Stampa';
 $strPrintView = 'Visualizza per stampa';
+$strPrintViewFull = 'Vista stampa (con full text)';
 $strPrivDescAllPrivileges = 'Comprende tutti i privilegi tranne GRANT.';
 $strPrivDescAlter = 'Permette di alterare la struttura di tabelle esistenti.';
 $strPrivDescCreateDb = 'Permette di creare nuove tabelle e nuovi databases.';
@@ -584,6 +602,7 @@ $strSimplifiedChinese = 'Cinese Semplificato';
 $strSingly = '(singolarmente)';
 $strSize = 'Dimensione';
 $strSort = 'Ordinamento';
+$strSortByKey = 'Ordina per chiave';
 $strSpaceUsage = 'Spazio utilizzato';
 $strSplitWordsWithSpace = 'Le parole sono spezzate sulle spaziature (" ").';
 $strStatCheckTime = 'Ultimo controllo';
@@ -656,6 +675,7 @@ $strUpdatePrivMessage = 'Hai aggiornato i permessi per %s.';
 $strUpdateProfile = 'Aggiorna profilo:';
 $strUpdateProfileMessage = 'Il profilo è stato aggiornato.';
 $strUpdateQuery = 'Aggiorna Query';
+$strUpgrade = 'Si dovrebbe aggiornare %s alla versione %s o successiva.';
 $strUsage = 'Utilizzo';
 $strUseBackquotes = 'Usa i backquotes con i nomi delle tabelle e dei campi';
 $strUseHostTable = 'Utilizza la Tabella dell\'Host';
@@ -699,4 +719,9 @@ $strZeroRemovesTheLimit = 'N.B.: 0 (zero) significa nessun limite.';
 $strZip = '"compresso con zip"';
 // To translate
 
+$strDelayedInserts = 'Use delayed inserts';  //to translate
+
+$strSQLExportType = 'Export type';  //to translate
+
+$strAddConstraints = 'Add constraints';  //to translate
 ?>

@@ -4,10 +4,10 @@
 // Description:	Pie plot extension for JpGraph
 // Created: 	2001-02-14
 // Author:	Johan Persson (johanp@aditus.nu)
-// Ver:		$Id: jpgraph_pie.php,v 1.48 2003/03/20 19:57:22 aditus Exp $
+// Ver:		$Id: jpgraph_pie.php,v 1.49.2.14 2003/11/04 19:47:37 aditus Exp $
 //
 // License:	This code is released under QPL
-// Copyright (C) 2001,2002 Johan Persson
+// Copyright (C) 2001,2002,2003 Johan Persson
 //========================================================================
 */
 
@@ -16,6 +16,8 @@
 DEFINE("PIE_VALUE_ABS",1);
 DEFINE("PIE_VALUE_PER",0);
 DEFINE("PIE_VALUE_PERCENTAGE",0);
+DEFINE("PIE_VALUE_ADJPERCENTAGE",2);
+DEFINE("PIE_VALUE_ADJPER",2);
 
 //===================================================
 // CLASS PiePlot
@@ -48,7 +50,7 @@ class PiePlot {
     var $ilabelposadj=1;
     var $legendcsimtargets = array();
     var $legendcsimalts = array();
-
+    var $adjusted_data = array();
 	
 //---------------
 // CONSTRUCTOR
@@ -71,7 +73,11 @@ class PiePlot {
     function SetColor($aColor) {
 	$this->color = $aColor;
     }
-
+	
+    function SetSliceColors($aColors) {
+	$this->setslicecolors = $aColors;
+    }
+	
     function SetShadow($aColor='darkgray',$aDropWidth=4) {
 	$this->ishadowcolor = $aColor;
 	$this->ishadowdrop = $aDropWidth;
@@ -116,14 +122,15 @@ class PiePlot {
 	$xp = floor($radius*cos($sa)+$xc);
 	$yp = floor($yc-$radius*sin($sa));
 	$coords.= ", $xp, $yp";
-	if( !empty($this->csimtargets[$i]) )
+	if( !empty($this->csimtargets[$i]) ) {
 	    $this->csimareas .= "<area shape=\"poly\" coords=\"$coords\" href=\"".
 		$this->csimtargets[$i]."\"";
-	if( !empty($this->csimalts[$i]) ) {
-	    $tmp=sprintf($this->csimalts[$i],$this->data[$i]);
-	    $this->csimareas .= " alt=\"$tmp\" title=\"$tmp\"";
+	    if( !empty($this->csimalts[$i]) ) {
+		$tmp=sprintf($this->csimalts[$i],$this->data[$i]);
+		$this->csimareas .= " alt=\"$tmp\" title=\"$tmp\"";
+	    }
+	    $this->csimareas .= ">\n";
 	}
-	$this->csimareas .= ">\n";
     }
 
 	
@@ -135,6 +142,8 @@ class PiePlot {
     }
 	
     function ExplodeSlice($e,$radius=20) {
+	if( ! is_integer($e) ) 
+	    JpGraphError::Raise('Argument to PiePlot::ExplodeSlice() must be an integer');
 	$this->explode_radius[$e]=$radius;
     }
 
@@ -145,21 +154,17 @@ class PiePlot {
 
     function Explode($aExplodeArr) {
 	if( !is_array($aExplodeArr) ) {
-	    JpGraphError::Raise("Argument to PiePlot::Explode() must be an array.");
+	    JpGraphError::Raise("Argument to PiePlot::Explode() must be an array with integer distances.");
 	}
 	$this->explode_radius = $aExplodeArr;
     }
-	
-    function SetSliceColors($aColors) {
-	
-	$this->setslicecolors = array_reverse($aColors);
-    }
-	
+
     function SetStartAngle($aStart) {
 	if( $aStart < 0 || $aStart > 360 ) {
 	    JpGraphError::Raise('Slice start angle must be between 0 and 360 degrees.');
 	}
 	$this->startangle = 360-$aStart;
+	$this->startangle *= M_PI/180;
     }
 	
     function SetFont($family,$style=FS_NORMAL,$size=10) {
@@ -197,7 +202,7 @@ class PiePlot {
 	
     // Should we display actual value or percentage?
     function SetLabelType($t) {
-	if( $t<0 || $t>1 ) 
+	if( $t < 0 || $t > 2 ) 
 	    JpGraphError::Raise("PiePlot::SetLabelType() Type for pie plots must be 0 or 1 (not $t).");
 	$this->labeltype=$t;
     }
@@ -205,7 +210,6 @@ class PiePlot {
     function SetValueType($aType) {
 	$this->SetLabelType($aType);
     }
-
 
     // Should the circle around a pie plot be displayed
     function ShowBorder($exterior=true,$interior=true) {
@@ -218,14 +222,24 @@ class PiePlot {
 	$colors = array_keys($graph->img->rgb->rgb_table);
    	sort($colors);	
    	$ta=$this->themearr[$this->theme];	
-   	
-   	if( $this->setslicecolors==null ) 
+   	$n = count($this->data);
+
+   	if( $this->setslicecolors==null ) {
 	    $numcolors=count($ta);
-   	else
-	    $numcolors=count($this->setslicecolors);
+	    if( get_class($this)==='pieplot3d' ) {
+		$ta = array_reverse(array_slice($ta,0,$n));
+	    }
+	}
+   	else {
+	    $this->setslicecolors = array_slice($this->setslicecolors,0,$n);
+	    $numcolors=count($this->setslicecolors); 
+	    if( $graph->pieaa && get_class($this)==='pieplot' ) { 
+		$this->setslicecolors = array_reverse($this->setslicecolors);
+	    }
+	}
 		
 	$sum=0;
-	for($i=0; $i<count($this->data); ++$i)
+	for($i=0; $i < $n; ++$i)
 	    $sum += $this->data[$i];
 
 	// Bail out with error if the sum is 0
@@ -235,29 +249,89 @@ class PiePlot {
 	// Make sure we don't plot more values than data points
 	// (in case the user added more legends than data points)
 	$n = min(count($this->legends),count($this->data));
-	if( $this->legends != "" )
-	    $this->legends = array_reverse($this->legends);
+	if( $this->legends != "" ) {
+	    $this->legends = array_reverse(array_slice($this->legends,0,$n));
+	}
 	for( $i=$n-1; $i >= 0; --$i ) {
 	    $l = $this->legends[$i];
 	    // Replace possible format with actual values
 	    if( $this->labeltype==0 ) {
 		$l = sprintf($l,100*$this->data[$i]/$sum);
+		$alt = sprintf($this->csimalts[$i],$this->data[$i]);
+
+	    }
+	    elseif( $this->labeltype == 1)  {
+		$l = sprintf($l,$this->data[$i]);
+		$alt = sprintf($this->csimalts[$i],$this->data[$i]);
+	    
 	    }
 	    else {
-		$l = sprintf($l,$this->data[$i]);
+		$l = sprintf($l,$this->adjusted_data[$i]);
+		$alt = sprintf($this->csimalts[$i],$this->adjusted_data[$i]);
 	    }
 	    
-	    $alt = sprintf($this->csimalts[$i],$this->data[$i]);
 				
-	    if( $this->setslicecolors==null ) 
+	    if( $this->setslicecolors==null ) {
 		$graph->legend->Add($l,$colors[$ta[$i%$numcolors]],"",0,
 				    $this->csimtargets[$i],$alt);
-	    else
+	    }
+	    else {
 		$graph->legend->Add($l,$this->setslicecolors[$i%$numcolors],"",0,
 				    $this->csimtargets[$i],$alt);
+	    }
 	}
     }
 	
+    // Adjust the rounded percetage value so that the sum of
+    // of the pie slices are always 100%
+    // Using the Hare/Niemeyer method
+    function AdjPercentage($aData,$aPrec=0) {
+	$mul=100;
+	if( $aPrec > 0 && $aPrec < 3 ) {
+	    if( $aPrec == 1 ) 
+		$mul=1000;
+		else
+		    $mul=10000;
+	}
+	
+	$tmp = array();
+	$result = array();
+	$quote_sum=0;
+	$n = count($aData) ;
+	for( $i=0, $sum=0; $i < $n; ++$i )
+	    $sum+=$aData[$i];
+	foreach($aData as $index => $value) {
+	    $tmp_percentage=$value/$sum*$mul;
+	    $result[$index]=floor($tmp_percentage);
+	    $tmp[$index]=$tmp_percentage-$result[$index];
+	    $quote_sum+=$result[$index];
+	}
+	if( $quote_sum == $mul) {
+	    if( $mul > 100 ) {
+		$tmp = $mul / 100;
+		for( $i=0; $i < $n; ++$i ) {
+		    $result[$i] /= $tmp ;
+		}
+	    }
+	    return $result;
+	}
+	arsort($tmp,SORT_NUMERIC);
+	reset($tmp);
+	for($i=0; $i < $mul-$quote_sum; $i++)
+	{
+	    $result[key($tmp)]++;
+	    next($tmp);
+	}
+	if( $mul > 100 ) {
+	    $tmp = $mul / 100;
+	    for( $i=0; $i < $n; ++$i ) {
+		$result[$i] /= $tmp ;
+	    }
+	}
+	return $result;
+    }
+
+
     function Stroke(&$img,$aaoption=0) {
 	// aaoption is used to handle antialias
 	// aaoption == 0 a normal pie
@@ -268,18 +342,30 @@ class PiePlot {
 	// twice and we also need to scale the exploding distance
 	$expscale = $aaoption === 1 ? 2 : 1;
 
+	if( $this->labeltype == 2 ) {
+	    // Adjust the data so that it will add up to 100%
+	    $this->adjusted_data = $this->AdjPercentage($this->data);
+	}
+
 	$colors = array_keys($img->rgb->rgb_table);
    	sort($colors);	
    	$ta=$this->themearr[$this->theme];	
+	$n = count($this->data);
    	
-   	if( $this->setslicecolors==null ) 
+   	if( $this->setslicecolors==null ) {
 	    $numcolors=count($ta);
-   	else
-	    $numcolors=count($this->setslicecolors);
-   	
+	}
+   	else {
+	    $this->setslicecolors = array_reverse(array_slice($this->setslicecolors,0,$n));
+	    $numcolors=count($this->setslicecolors); 
+	    $tt = array_slice($this->setslicecolors,$n % $numcolors);
+	    $tt2 = array_slice($this->setslicecolors,0,$n % $numcolors);
+	    $tt2 = array_merge($tt, $tt2);
+	    $this->setslicecolors = $tt + $tt2;
+	}
+
 	// Draw the slices
 	$sum=0;
-	$n = count($this->data);
 	for($i=0; $i < $n; ++$i)
 	    $sum += $this->data[$i];
 	
@@ -304,30 +390,29 @@ class PiePlot {
 	else
 	    $yc = $this->posy ;
 		
-	$this->startangle = $this->startangle*M_PI/180;
-
 	$n = count($this->data);
 
 	if( $this->explode_all )
 	    for($i=0; $i < $n; ++$i)
-		$this->explode_radius[$i]=$this->explode_r;;
-
+		$this->explode_radius[$i]=$this->explode_r;
 
 	if( $this->ishadowcolor != "" && $aaoption !== 2) {
 	    $accsum=0;
 	    $angle2 = $this->startangle;
 	    $img->SetColor($this->ishadowcolor);
-	    for($i=0; $sum>0 && $i < $n; ++$i) {
+	    for($i=0; $sum > 0 && $i < $n; ++$i) {
+		$j = $n-$i-1;
 		$d = $this->data[$i];
 		$angle1 = $angle2;
 		$accsum += $d;
 		$angle2 = $this->startangle+2*M_PI*$accsum/$sum;
-		if( empty($this->explode_radius[$i]) )
-		    $this->explode_radius[$i]=0;
+		if( empty($this->explode_radius[$j]) )
+		    $this->explode_radius[$j]=0;
 
 		$la = 2*M_PI - (abs($angle2-$angle1)/2.0+$angle1);
-		$xcm = $xc + $this->explode_radius[$i]*cos($la)*$expscale;
-		$ycm = $yc - $this->explode_radius[$i]*sin($la)*$expscale;
+
+		$xcm = $xc + $this->explode_radius[$j]*cos($la)*$expscale;
+		$ycm = $yc - $this->explode_radius[$j]*sin($la)*$expscale;
 		
 		$xcm += $this->ishadowdrop*$expscale;
 		$ycm += $this->ishadowdrop*$expscale;
@@ -341,12 +426,17 @@ class PiePlot {
 	$accsum=0;
 	$angle2 = $this->startangle;
 	$img->SetColor($this->color);
-
 	for($i=0; $sum>0 && $i < $n; ++$i) {
+	    $j = $n-$i-1;
+	    if( empty($this->explode_radius[$j]) )
+		$this->explode_radius[$j]=0;
 	    $d = $this->data[$i];
 	    $angle1 = $angle2;
 	    $accsum += $d;
 	    $angle2 = $this->startangle+2*M_PI*$accsum/$sum;
+	    $this->la[$i] = 2*M_PI - (abs($angle2-$angle1)/2.0+$angle1);
+
+	    if( $d == 0 ) continue;
 
 	    if( $this->setslicecolors==null )
 		$slicecolor=$colors[$ta[$i%$numcolors]];
@@ -360,40 +450,39 @@ class PiePlot {
 
 	    $arccolor = $this->pie_border && $aaoption===0 ? $this->color : "";
 
-	    $this->la[$i] = 2*M_PI - (abs($angle2-$angle1)/2.0+$angle1);
-
-	    if( empty($this->explode_radius[$i]) )
-		$this->explode_radius[$i]=0;
-
-	    $xcm = $xc + $this->explode_radius[$i]*cos($this->la[$i])*$expscale;
-	    $ycm = $yc - $this->explode_radius[$i]*sin($this->la[$i])*$expscale;
+	    $xcm = $xc + $this->explode_radius[$j]*cos($this->la[$i])*$expscale;
+	    $ycm = $yc - $this->explode_radius[$j]*sin($this->la[$i])*$expscale;
 
 	    if( $aaoption !== 2 ) {
 		$img->CakeSlice($xcm,$ycm,$radius-1,$radius-1,
 				$angle1*180/M_PI,$angle2*180/M_PI,$slicecolor,$arccolor);
 	    }
 
-	    if ($this->csimtargets && $aaoption !== 1 ) 
+	    if( $this->csimtargets && $aaoption !== 1 ) 
 		$this->AddSliceToCSIM($i,$xcm,$ycm,$radius,$angle1,$angle2);
+	}
 
+	// Format the titles for each slice
+	for( $i=0; $i < $n; ++$i) {
+	    if( $this->labeltype==0 ) {
+		if( $sum != 0 )
+		    $l = 100.0*$this->data[$i]/$sum;
+		else
+		    $l = 0.0;
+	    }
+	    elseif( $this->labeltype==1 ) {
+		$l = $this->data[$i]*1.0;
+	    }
+	    else {
+		$l = $this->adjusted_data[$i];
+	    }
+	    if( isset($this->labels[$i]) && is_string($this->labels[$i]) )
+		$this->labels[$i]=sprintf($this->labels[$i],$l);
+	    else
+		$this->labels[$i]=$l;
 	}
 
 	if( $this->value->show && $aaoption !== 1 ) {
-	    // Format the titles for each slice
-	    for( $i=0; $i < $n; ++$i) {
-		if( $this->labeltype==0 )
-		    if( $sum != 0 )
-			$l = 100.0*$this->data[$i]/$sum;
-		    else
-			$l = 0.0;
-		else
-		    $l = $this->data[$i]*1.0;
-		if( isset($this->labels[$i]) && is_string($this->labels[$i]) )
-		    $this->labels[$i]=sprintf($this->labels[$i],$l);
-		else
-		    $this->labels[$i]=$l;
-	    }
-
 	    $this->StrokeAllLabels($img,$xc,$yc,$radius);
 	}
 
@@ -404,7 +493,7 @@ class PiePlot {
 			  "center","bottom");
 	    $this->title->Stroke($img);
 	}
-		
+
     }
 
 //---------------
@@ -413,8 +502,9 @@ class PiePlot {
     function StrokeAllLabels($img,$xc,$yc,$radius) {
 	$n = count($this->labels);
 	for($i=0; $i < $n; ++$i) {
-	    $this->StrokeLabel($this->labels[$i],$img,$xc,$yc,$this->la[$i],
-			       $radius + $this->explode_radius[$i]); 
+	    $this->StrokeLabel($this->labels[$i],$img,$xc,$yc,
+			       $this->la[$i],
+			       $radius + $this->explode_radius[$n-$i-1]); 
 	}
     }
 
@@ -470,7 +560,9 @@ class PiePlot {
 	    $xt=round($r*cos($a)+$xc);
 	    $yt=round($yc-$r*sin($a));
 
+	    while( $a < 0 ) $a += 2*M_PI;
 	    while( $a > 2*M_PI ) $a -= 2*M_PI;
+
 	    if( $a>=7*M_PI/4 || $a <= M_PI/4 ) $dx=0;
 	    if( $a>=M_PI/4 && $a <= 3*M_PI/4 ) $dx=($a-M_PI/4)*2/M_PI; 
 	    if( $a>=3*M_PI/4 && $a <= 5*M_PI/4 ) $dx=1;
@@ -579,14 +671,15 @@ class PiePlotC extends PiePlot {
 	$yp = floor($yc-($this->imidsize*$radius*sin($ea)));
 	$coords .= ", $xp, $yp";
 
-	if( !empty($this->csimtargets[$i]) )
+	if( !empty($this->csimtargets[$i]) ) {
 	    $this->csimareas .= "<area shape=\"poly\" coords=\"$coords\" href=\"".
 		$this->csimtargets[$i]."\"";
-	if( !empty($this->csimalts[$i]) ) {
-	    $tmp=sprintf($this->csimalts[$i],$this->data[$i]);
-	    $this->csimareas .= " alt=\"$tmp\" title=\"$tmp\"";
+	    if( !empty($this->csimalts[$i]) ) {
+		$tmp=sprintf($this->csimalts[$i],$this->data[$i]);
+		$this->csimareas .= " alt=\"$tmp\" title=\"$tmp\"";
+	    }
+	    $this->csimareas .= ">\n";
 	}
-	$this->csimareas .= ">\n";
     }
 
 
@@ -684,6 +777,8 @@ class PieGraph extends Graph {
 
 	if( $cl == 'text' ) 
 	    $this->AddText($aObj);
+	elseif( $cl == 'iconplot' ) 
+	    $this->AddIcon($aObj);
 	else
 	    $this->plots[] = $aObj;
     }
@@ -767,6 +862,14 @@ class PieGraph extends Graph {
 	    $this->img->SetColor( $this->margin_color );
 	    $this->img->FilledRectangle(0,0,2*$w-1,2*$h-1);
 
+	    // Make all icons *2 i size since we will be scaling down the
+	    // imahe to do the anti aliasing
+	    $ni = count($this->iIcons);
+	    for($i=0; $i < $ni; ++$i) {
+		$this->iIcons[$i]->iScale *= 2 ;
+	    }
+	    $this->StrokeIcons();
+
 	    for($i=0; $i < $n; ++$i) {
 		if( $this->plots[$i]->posx > 1 ) 
 		    $this->plots[$i]->posx *= 2 ;
@@ -791,7 +894,7 @@ class PieGraph extends Graph {
 	    $this->img->height = $h ;
 
 	    for($i=0; $i < $n; ++$i) {
-		$this->plots[$i]->Stroke($this->img,2);
+		$this->plots[$i]->Stroke($this->img,2); // Stroke labels
 		$this->plots[$i]->Legend($this);
 	    }
 
@@ -806,7 +909,9 @@ class PieGraph extends Graph {
 		    $this->StrokeFrame();		
 		}
 	    }
-	    
+
+	    $this->StrokeIcons();
+
 	    for($i=0; $i < $n; ++$i) {
 		$this->plots[$i]->Stroke($this->img);
 		$this->plots[$i]->Legend($this);
@@ -828,9 +933,25 @@ class PieGraph extends Graph {
 		}
 	    }
 
-	    if( JPG_DEBUG ) {
+	    if( _JPG_DEBUG ) {
 		$this->DisplayCSIMAreas();
 	    }
+
+	    // Should we do any final image transformation
+	    if( $this->iImgTrans ) {
+		if( !class_exists('ImgTrans') ) {
+		    require_once('jpgraph_imgtrans.php');
+		    //JpGraphError::Raise('In order to use image transformation you must include the file jpgraph_imgtrans.php in your script.');
+		}
+	       
+		$tform = new ImgTrans($this->img->img);
+		$this->img->img = $tform->Skew3D($this->iImgTransHorizon,$this->iImgTransSkewDist,
+						 $this->iImgTransDirection,$this->iImgTransHighQ,
+						 $this->iImgTransMinSize,$this->iImgTransFillColor,
+						 $this->iImgTransBorder);
+	    }
+
+
 	    // If the filename is given as the special "__handle"
 	    // then the image handler is returned and the image is NOT
 	    // streamed back

@@ -3,7 +3,7 @@
 # See AutoSplit.pm.
 package POSIX;
 
-#line 254 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\fprintf.al)"
+#line 257 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\fprintf.al)"
 sub fprintf {
     unimpl "fprintf() is C-specific--use printf instead";
 }

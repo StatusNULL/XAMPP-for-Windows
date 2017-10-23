@@ -4,7 +4,7 @@
 // Description:	Canvas drawing extension for JpGraph
 // Created: 	2001-01-08
 // Author:	Johan Persson (johanp@aditus.nu)
-// Ver:		$Id: jpgraph_canvas.php,v 1.12 2003/01/09 12:56:56 aditus Exp $
+// Ver:		$Id: jpgraph_canvas.php,v 1.12.2.1 2003/10/07 02:59:33 aditus Exp $
 //
 // License:	This code is released under QPL
 // Copyright (C) 2001,2002 Johan Persson
@@ -41,6 +41,20 @@ class CanvasGraph extends Graph {
 	    }
 	}				
 	$this->StrokeTitles();
+
+	// Should we do any final image transformation
+	if( $this->iImgTrans ) {
+	    if( !class_exists('ImgTrans') ) {
+		require_once('jpgraph_imgtrans.php');
+	    }
+	    
+	    $tform = new ImgTrans($this->img->img);
+	    $this->img->img = $tform->Skew3D($this->iImgTransHorizon,$this->iImgTransSkewDist,
+					     $this->iImgTransDirection,$this->iImgTransHighQ,
+					     $this->iImgTransMinSize,$this->iImgTransFillColor,
+					     $this->iImgTransBorder);
+	}
+	
 
 	// If the filename is given as the special _IMG_HANDLER
 	// then the image handler is returned and the image is NOT

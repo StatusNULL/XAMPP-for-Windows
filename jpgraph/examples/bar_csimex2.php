@@ -1,6 +1,6 @@
 <?php
-include_once ("jpgraph.php");
-include_once ("jpgraph_bar.php");
+include_once ("../jpgraph.php");
+include_once ("../jpgraph_bar.php");
 
 $data1y=array(12,8,19,3,10,5);
 $data2y=array(8,2,12,7,14,4);
@@ -46,6 +46,6 @@ $graph->xaxis->title->SetFont(FF_FONT1,FS_BOLD);
 
 // Send back the HTML page which will call this script again
 // to retrieve the image.
-$graph->StrokeCSIM('Examples/bar_csimex2.php','bar_csimex2');
+$graph->StrokeCSIM('bar_csimex2.php');
 
 ?>

@@ -3,7 +3,7 @@
 # See AutoSplit.pm.
 package POSIX;
 
-#line 71 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\unimpl.al)"
+#line 74 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\unimpl.al)"
 sub unimpl {
     my ($mess) = @_;
     $mess =~ s/xxx//;

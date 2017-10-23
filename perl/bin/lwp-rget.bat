@@ -15,7 +15,7 @@ goto endofperl
 
 =head1 NAME
 
-lwp-rget - Retrieve WWW documents recursively
+lwp-rget - Retrieve web documents recursively
 
 =head1 SYNOPSIS
 
@@ -163,7 +163,7 @@ my $progname = $0;
 $progname =~ s|.*/||;  # only basename left
 $progname =~ s/\.\w*$//; #strip extension if any
 
-$VERSION = sprintf("%d.%02d", q$Revision: 2.1 $ =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q$Revision: 2.3 $ =~ /(\d+)\.(\d+)/);
 
 #$Getopt::Long::debug = 1;
 #$Getopt::Long::ignorecase = 0;
@@ -359,7 +359,8 @@ s/
 	}
 	save($name, $doc);
 	return $name;
-    } else {
+    }
+    else {
 	print STDERR $res->code . " " . $res->message . "\n" if $VERBOSE;
 	$seen{$plain_url->as_string} = $url->as_string;
 	return $url->as_string;
@@ -540,7 +541,8 @@ sub find_name
     my $dirname = ".$1";
     if (!$HIER) {
 	$dirname = "";
-    } elsif (! -d $dirname) {
+    }
+    elsif (! -d $dirname) {
 	mkdirp($dirname, 0775);
     }
 
@@ -549,7 +551,8 @@ sub find_name
 
     if ($KEEPEXT{lc($type)}) {
         $suffix = ($path =~ m/\.(.*)/) ? $1 : "";
-    } else {
+    }
+    else {
         $suffix = media_suffix($type);
     }
 

@@ -1,13 +1,13 @@
 <?php
-/* $Id: index.php,v 1.54 2003/07/11 09:35:05 rabus Exp $ */
+/* $Id: index.php,v 2.2 2003/11/26 22:52:24 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
 /**
  * Gets core libraries and defines some variables
  */
-require('./libraries/grab_globals.lib.php');
-require('./libraries/common.lib.php');
+require_once('./libraries/grab_globals.lib.php');
+require_once('./libraries/common.lib.php');
 
 // Gets the default font sizes
 PMA_setFontSizes();
@@ -17,9 +17,6 @@ PMA_setFontSizes();
 if (empty($HTTP_HOST)) {
     if (!empty($_ENV) && isset($_ENV['HTTP_HOST'])) {
         $HTTP_HOST = $_ENV['HTTP_HOST'];
-    }
-    else if (!empty($HTTP_ENV_VARS) && isset($HTTP_ENV_VARS['HTTP_HOST'])) {
-        $HTTP_HOST = $HTTP_ENV_VARS['HTTP_HOST'];
     }
     else if (@getenv('HTTP_HOST')) {
         $HTTP_HOST = getenv('HTTP_HOST');
@@ -44,7 +41,7 @@ $url_query = PMA_generate_common_url(isset($db) ? $db : '');
 
 header('Content-Type: text/html; charset=' . $GLOBALS['charset']);
 
-require('./libraries/relation.lib.php');
+require_once('./libraries/relation.lib.php');
 $cfgRelation = PMA_getRelationsParam();
 
 if ($cfg['QueryHistoryDB'] && $cfgRelation['historywork']) {

@@ -1,7 +1,3 @@
-C:\Perl\bin\ptar
-C:\Perl\bin\ptar.bat
-C:\Perl\site\lib\Archive\Tar.pm
-C:\Perl\site\lib\Archive\Tar\Constant.pm
-C:\Perl\site\lib\Archive\Tar\File.pm
-C:\Perl\site\lib\Archive\Tar\Std.pm
-C:\Perl\site\lib\Archive\Tar\Win32.pm
+C:\wampp2\perl\site\lib\Archive\Tar.pm
+C:\wampp2\perl\site\lib\Archive\Tar\Constant.pm
+C:\wampp2\perl\site\lib\Archive\Tar\File.pm

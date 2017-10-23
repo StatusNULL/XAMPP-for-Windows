@@ -1,5 +1,5 @@
 <?php
-/* $Id: hebrew-iso-8859-8-i.inc.php,v 1.99 2003/08/17 23:36:28 lem9 Exp $ */
+/* $Id: hebrew-iso-8859-8-i.inc.php,v 2.2 2003/11/20 13:48:52 nijel Exp $ */
 
 /* Translated by: Yuval "Etus" Sarna */
 
@@ -717,4 +717,28 @@ $strThai = 'Thai';  //to translate
 $strUseThisValue = 'Use this value';  //to translate
 $strWindowNotFound = 'The target browser window could not be updated. Maybe you have closed the parent window or your browser is blocking cross-window updates of your security settings';  //to translate
 $strBrowseForeignValues = 'Browse foreign values';  //to translate
+$strInternalRelations = 'Internal relations';  //to translate
+$strInternalNotNecessary = '* An internal relation is not necessary when it exists also in InnoDB.';  //to translate
+$strUpgrade = 'You should upgrade to %s %s or later.';  //to translate
+$strLatexStructure = 'Structure of table __TABLE__';//to translate
+$strLatexContinued = '(continued)';//to translate
+$strLatexContent = 'Content of table __TABLE__';//to translate
+$strLatexIncludeCaption = 'Include table caption';//to translate
+$strLatexCaption = 'Table caption';//to translate
+$strLatexLabel = 'Label key';//to translate
+$strLatexContinuedCaption = 'Continued table caption';//to translate
+
+$strPrintViewFull = 'Print view (with full texts)';  //to translate
+$strLogServer = 'Server';  //to translate
+$strSortByKey = 'Sort by key';  //to translate
+$strBookmarkAllUsers = 'Let every user access this bookmark';  //to translate
+$strConstraintsForDumped = 'Constraints for dumped tables';  //to translate
+$strConstraintsForTable = 'Constraints for table';  //to translate
+$strBookmarkOptions = 'Bookmark options';  //to translate
+$strCreationDates = 'Creation/Update/Check dates';  //to translate
+$strCheckOverhead = 'Check overheaded';  //to translate
+$strExcelEdition = 'Excel edition';  //to translate
+$strDelayedInserts = 'Use delayed inserts';  //to translate
+$strSQLExportType = 'Export type';  //to translate
+$strAddConstraints = 'Add constraints';  //to translate
 ?>

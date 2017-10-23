@@ -12,7 +12,7 @@ goto endofperl
 @rem ';
 #!perl
 #line 15
-    eval 'exec c:\xampp\perl\bin\perl.exe -S $0 ${1+"$@"}'
+    eval 'exec C:\wampp2\perl\bin\perl.exe -S $0 ${1+"$@"}'
         if $running_under_some_shell;
 
 # pod2text -- Convert POD data to formatted ASCII text.
@@ -58,8 +58,8 @@ my %options;
 $options{sentence} = 0;
 Getopt::Long::config ('bundling');
 GetOptions (\%options, 'alt|a', 'code', 'color|c', 'help|h', 'indent|i=i',
-            'loose|l', 'overstrike|o', 'quotes|q=s', 'sentence|s',
-            'termcap|t', 'width|w=i') or exit 1;
+            'loose|l', 'margin|left-margin|m=i', 'overstrike|o',
+            'quotes|q=s', 'sentence|s', 'termcap|t', 'width|w=i') or exit 1;
 pod2usage (1) if $options{help};
 
 # Figure out what formatter we're going to use.  -c overrides -t.
@@ -141,6 +141,12 @@ Print a blank line after a C<=head1> heading.  Normally, no blank line is
 printed after C<=head1>, although one is still printed after C<=head2>,
 because this is the expected formatting for manual pages; if you're
 formatting arbitrary text documents, using this option is recommended.
+
+=item B<-m> I<width>, B<--left-margin>=I<width>, B<--margin>=I<width>
+
+The width of the left margin in spaces.  Defaults to 0.  This is the margin
+for all text, including headings, not the amount by which regular text is
+indented; for the latter, see B<-i> option.
 
 =item B<-o>, B<--overstrike>
 

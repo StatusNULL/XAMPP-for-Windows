@@ -3,7 +3,7 @@
 # See AutoSplit.pm.
 package POSIX;
 
-#line 533 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\strpbrk.al)"
+#line 540 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\strpbrk.al)"
 sub strpbrk {
     unimpl "strpbrk() is C-specific, stopped";
 }

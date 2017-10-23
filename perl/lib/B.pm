@@ -7,7 +7,7 @@
 #
 package B;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use XSLoader ();
 require Exporter;
@@ -21,7 +21,9 @@ require Exporter;
 		amagic_generation perlstring
 		walkoptree_slow walkoptree walkoptree_exec walksymtable
 		parents comppadlist sv_undef compile_stats timing_info
-		begin_av init_av end_av regex_padav);
+		begin_av init_av check_av end_av regex_padav dowarn
+		defstash curstash warnhook diehook inc_gv
+		);
 
 sub OPf_KIDS ();
 use strict;
@@ -51,7 +53,6 @@ use strict;
 @B::SVOP::ISA = 'B::OP';
 @B::PADOP::ISA = 'B::OP';
 @B::PVOP::ISA = 'B::OP';
-@B::CVOP::ISA = 'B::OP';
 @B::LOOP::ISA = 'B::LISTOP';
 @B::PMOP::ISA = 'B::LISTOP';
 @B::COP::ISA = 'B::OP';
@@ -176,7 +177,7 @@ sub walkoptree_exec {
 	$op->$method($level);
 	$ppname = $op->name;
 	if ($ppname =~
-	    /^(or|and|mapwhile|grepwhile|entertry|range|cond_expr)$/)
+	    /^(or(assign)?|and(assign)?|mapwhile|grepwhile|entertry|range|cond_expr)$/)
 	{
 	    print $prefix, uc($1), " => {\n";
 	    walkoptree_exec($op->other, $method, $level + 1);
@@ -370,9 +371,13 @@ which can then be followed with the other access methods.
 
 Returns the SV object corresponding to the C variable C<amagic_generation>.
 
-=item C<init_av>
+=item init_av
 
 Returns the AV object (i.e. in class B::AV) representing INIT blocks.
+
+=item check_av
+
+Returns the AV object (i.e. in class B::AV) representing CHECK blocks.
 
 =item begin_av
 
@@ -390,7 +395,7 @@ Returns the AV object (i.e. in class B::AV) of the global comppadlist.
 
 Only when perl was compiled with ithreads.
 
-=item C<main_cv>
+=item main_cv
 
 Return the (faked) CV corresponding to the main part of the Perl
 program.
@@ -564,6 +569,14 @@ C<REFCNT> (corresponding to the C function C<SvREFCNT>).
 =item REFCNT
 
 =item FLAGS
+
+=item object_2svref
+
+Returns a reference to the regular scalar corresponding to this
+B::SV object. In other words, this method is the inverse operation
+to the svref_2object() subroutine. This scalar and other data it points
+at should be considered read-only: modifying them is neither safe nor
+guaranteed to have a sensible effect.
 
 =back
 
@@ -815,6 +828,11 @@ IoIFP($io) == PerlIO_stdin() ).
 
 =item ARRAY
 
+=item ARRAYelt
+
+Like C<ARRAY>, but takes an index as an argument to get only one element,
+rather than a list of all of them.
+
 =item AvFLAGS
 
 =back
@@ -838,6 +856,8 @@ IoIFP($io) == PerlIO_stdin() ).
 =item PADLIST
 
 =item OUTSIDE
+
+=item OUTSIDE_SEQ
 
 =item XSUB
 
@@ -874,7 +894,7 @@ For constant subroutines, returns the constant SV returned by the subroutine.
 =head2 OP-RELATED CLASSES
 
 C<B::OP>, C<B::UNOP>, C<B::BINOP>, C<B::LOGOP>, C<B::LISTOP>, C<B::PMOP>,
-C<B::SVOP>, C<B::PADOP>, C<B::PVOP>, C<B::CVOP>, C<B::LOOP>, C<B::COP>.
+C<B::SVOP>, C<B::PADOP>, C<B::PVOP>, C<B::LOOP>, C<B::COP>.
 
 These classes correspond in the obvious way to the underlying C
 structures of similar names. The inheritance hierarchy mimics the
@@ -882,9 +902,9 @@ underlying C "inheritance":
 
                                  B::OP
                                    |
-                   +---------------+--------+--------+------+
-                   |               |        |        |      |
-                B::UNOP          B::SVOP B::PADOP B::CVOP B::COP
+                   +---------------+--------+--------+
+                   |               |        |        |
+                B::UNOP          B::SVOP B::PADOP  B::COP
                  ,'  `-.
                 /       `--.
            B::BINOP     B::LOGOP
@@ -984,7 +1004,7 @@ This returns the op description from the global C PL_op_desc array
 
 =item precomp
 
-=item pmoffet
+=item pmoffset
 
 Only when perl was compiled with ithreads.
 
@@ -1036,6 +1056,8 @@ Only when perl was compiled with ithreads.
 
 =item stash
 
+=item stashpv
+
 =item file
 
 =item cop_seq
@@ -1043,6 +1065,10 @@ Only when perl was compiled with ithreads.
 =item arybase
 
 =item line
+
+=item warnings
+
+=item io
 
 =back
 

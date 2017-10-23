@@ -3,7 +3,7 @@
 // +------------------------------------------------------------------------+
 // | PEAR :: PHPUnit                                                        |
 // +------------------------------------------------------------------------+
-// | Copyright (c) 2002-2003 Sebastian Bergmann <sb@sebastian-bergmann.de>. |
+// | Copyright (c) 2002-2004 Sebastian Bergmann <sb@sebastian-bergmann.de>. |
 // +------------------------------------------------------------------------+
 // | This source file is subject to version 3.00 of the PHP License,        |
 // | that is available at http://www.php.net/license/3_0.txt.               |
@@ -12,7 +12,7 @@
 // | license@php.net so we can mail you a copy immediately.                 |
 // +------------------------------------------------------------------------+
 //
-// $Id: TestSuite.php,v 1.8 2003/08/29 12:45:26 sebastian Exp $
+// $Id: TestSuite.php,v 1.14 2004/01/04 10:25:10 sebastian Exp $
 //
 
 require_once 'PHPUnit/Framework/Test.php';
@@ -24,7 +24,7 @@ require_once 'PHPUnit/Framework/Warning.php';
  *
  * Here is an example using the dynamic test definition.
  *
- *   $suite = new PHPUnit_Framework_TestSuite();
+ *   $suite = new PHPUnit_Framework_TestSuite;
  *   $suite->addTest(new MathTest('testPass'));
  *
  * Alternatively, a TestSuite can extract the tests to be run automatically.
@@ -48,7 +48,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test {
     * @var    string
     * @access private
     */
-    private $fName = '';
+    private $name = '';
 
     /**
     * The tests in the test suite.
@@ -56,7 +56,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test {
     * @var    array
     * @access private
     */
-    private $fTests = array();
+    private $tests = array();
 
     // }}}
     // {{{ public function __construct($theClass = '', $name = '')
@@ -99,7 +99,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test {
             $this->addTestMethod($method, $names, $theClass);
         }
 
-        if (empty($this->fTests)) {
+        if (empty($this->tests)) {
             $this->addTest(
               self::warning(
                 sprintf(
@@ -113,6 +113,19 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test {
     }
 
     // }}}
+    // {{{ public function toString()
+
+    /**
+    * Returns a string representation of the test suite.
+    *
+    * @return string
+    * @access public
+    */
+    public function toString() {
+        return $this->getName();
+    }
+
+    // }}}
     // {{{ public function addTest(PHPUnit_Framework_Test $test)
 
     /**
@@ -122,20 +135,28 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test {
     * @access public
     */
     public function addTest($test) {
-        $this->fTests[] = $test;
+        $this->tests[] = $test;
     }
 
     // }}}
-    // {{{ public function addTestSuite(Reflection_Class $testClass)
+    // {{{ public function addTestSuite($testClass)
 
     /**
     * Adds the tests from the given class to the suite.
     *
-    * @param  Reflection_Class $testClass
+    * @param  mixed $testClass
     * @access public
     */
-    public function addTestSuite(Reflection_Class $testClass) {
-        $this->addTest(new PHPUnit_Framework_TestSuite($testClass));
+    public function addTestSuite($testClass) {
+        if (is_string($testClass) &&
+            class_exists($testClass)) {
+            $testClass = new Reflection_Class($testClass);
+        }
+
+        if (is_object($testClass) &&
+            $testClass instanceof Reflection_Class) {
+            $this->addTest(new PHPUnit_Framework_TestSuite($testClass));
+        }
     }
 
     // }}}
@@ -150,7 +171,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test {
     public function countTestCases() {
         $count = 0;
 
-        foreach ($this->fTests as $test) {
+        foreach ($this->tests as $test) {
             $count += $test->countTestCases();
         }
 
@@ -195,7 +216,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test {
     * @access public
     */
     public function getName() {
-        return $this->fName;
+        return $this->name;
     }
 
     // }}}
@@ -208,7 +229,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test {
     * @access public
     */
     public function run(PHPUnit_Framework_TestResult $result) {
-        foreach ($this->fTests as $test) {
+        foreach ($this->tests as $test) {
             if ($result->shouldStop()) {
                 break;
             }
@@ -241,7 +262,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test {
     * @access public
     */
     public function setName($name) {
-        $this->fName = $name;
+        $this->name = $name;
     }
 
     // }}}
@@ -255,8 +276,8 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test {
     * @access public
     */
     public function testAt($index) {
-        if (isset($this->fTests[$index])) {
-            return $this->fTests[$index];
+        if (isset($this->tests[$index])) {
+            return $this->tests[$index];
         } else {
             return false;
         }
@@ -272,7 +293,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test {
     * @access public
     */
     public function testCount() {
-        return sizeof($this->fTests);
+        return sizeof($this->tests);
     }
 
     // }}}
@@ -285,20 +306,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test {
     * @access public
     */
     public function tests() {
-        return $this->fTests;
-    }
-
-    // }}}
-    // {{{ public function toString()
-
-    /**
-    * Returns a string representation of the test suite.
-    *
-    * @return string
-    * @access public
-    */
-    public function toString() {
-        return $this->getName();
+        return $this->tests;
     }
 
     // }}}

@@ -12,7 +12,7 @@ goto endofperl
 @rem ';
 #!perl
 #line 15
-    eval 'exec c:\xampp\perl\bin\perl.exe -S $0 ${1+"$@"}'
+    eval 'exec C:\wampp2\perl\bin\perl.exe -S $0 ${1+"$@"}'
 	if $running_under_some_shell;
 #!./perl
 BEGIN {
@@ -25,7 +25,7 @@ use strict;
 use warnings;
 use Getopt::Std;
 my @orig_ARGV = @ARGV;
-our $VERSION  = do { my @r = (q$Revision: 1.31 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
+our $VERSION  = do { my @r = (q$Revision: 1.32 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
 
 # These may get re-ordered.
 # RAW is a do_now as inserted by &enter
@@ -175,7 +175,7 @@ my $hname = $cname;
 
 my ($doC,$doEnc,$doUcm,$doPet);
 
-if ($cname =~ /\.(c|xs)$/)
+if ($cname =~ /\.(c|xs)$/i) # VMS may have upcased filenames with DECC$ARGV_PARSE_STYLE defined
  {
   $doC = 1;
   $dname =~ s/(\.[^\.]*)?$/.exh/;

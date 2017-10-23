@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_details_structure.php,v 1.65 2003/08/15 17:15:57 garvinhicking Exp $ */
+/* $Id: db_details_structure.php,v 2.2.2.2 2004/01/02 11:58:40 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -8,26 +8,22 @@
  * because there is no table in the database ($is_info is TRUE)
  */
 if (empty($is_info)) {
-    if (!defined('PMA_GRAB_GLOBALS_INCLUDED')) {
-        include('./libraries/grab_globals.lib.php');
-    }
-    if (!defined('PMA_COMMON_LIB_INCLUDED')) {
-        include('./libraries/common.lib.php');
-    }
+    require_once('./libraries/grab_globals.lib.php');
+    require_once('./libraries/common.lib.php');
 
     // Drops/deletes/etc. multiple tables if required
     if ((!empty($submit_mult) && isset($selected_tbl))
        || isset($mult_btn)) {
         $action = 'db_details_structure.php';
         $err_url = 'db_details_structure.php?'. PMA_generate_common_url($db);
-        include('./mult_submits.inc.php');
+        require('./mult_submits.inc.php');
     }
-    include('./db_details_common.php');
+    require('./db_details_common.php');
     $url_query .= '&amp;goto=db_details_structure.php';
 
     // Gets the database structure
     $sub_part = '_structure';
-    include('./db_details_db_info.php');
+    require('./db_details_db_info.php');
     echo "\n";
 
     /**
@@ -69,6 +65,7 @@ function pma_TableHeader($alternate = FALSE) {
                 <?php
                 if ($GLOBALS['cfg']['ShowStats']) {
                     echo '<th>' . $GLOBALS['strSize'] . '</th>';
+                    echo '<th>' . $GLOBALS['strOverhead'] . '</th>';
                 }
                 echo "\n";
                 ?>
@@ -81,7 +78,7 @@ function pma_TableHeader($alternate = FALSE) {
 /**
  * Settings for relations stuff
  */
-require('./libraries/relation.lib.php');
+require_once('./libraries/relation.lib.php');
 $cfgRelation = PMA_getRelationsParam();
 
 /**
@@ -111,9 +108,9 @@ if ($cfg['PropertiesIconic'] == true) {
     }
 
     $titles['Browse']     = $iconic_spacer . '<img hspace="7" width="12" height="13" src="images/button_browse.png" alt="' . $strBrowse . '" title="' . $strBrowse . '" border="0" />';
-    $titles['Select']     = $iconic_spacer . '<img hspace="7" width="14" height="13" src="images/button_select.png" alt="' . $strSelect . '" title="' . $strSelect . '" border="0" />';
+    $titles['Search']     = $iconic_spacer . '<img hspace="7" width="14" height="13" src="images/button_select.png" alt="' . $strSearch . '" title="' . $strSearch . '" border="0" />';
     $titles['NoBrowse']   = $iconic_spacer . '<img hspace="7" width="12" height="13" src="images/button_nobrowse.png" alt="' . $strBrowse . '" title="' . $strBrowse . '" border="0" />';
-    $titles['NoSelect']   = $iconic_spacer . '<img hspace="7" width="14" height="13" src="images/button_noselect.png" alt="' . $strSelect . '" title="' . $strSelect . '" border="0" />';
+    $titles['NoSearch']   = $iconic_spacer . '<img hspace="7" width="14" height="13" src="images/button_noselect.png" alt="' . $strSearch . '" title="' . $strSearch . '" border="0" />';
     $titles['Insert']     = $iconic_spacer . '<img hspace="7" width="13" height="13" src="images/button_insert.png" alt="' . $strInsert . '" title="' . $strInsert . '" border="0" />';
     $titles['Properties'] = $iconic_spacer . '<img hspace="7" width="18" height="13" src="images/button_properties.png" alt="' . $strProperties . '" title="' . $strProperties . '" border="0" />';
     $titles['Drop']       = $iconic_spacer . '<img hspace="7" width="11" height="13" src="images/button_drop.png" alt="' . $strDrop . '" title="' . $strDrop . '" border="0" />';
@@ -122,9 +119,9 @@ if ($cfg['PropertiesIconic'] == true) {
 
     if ($propicon == 'both') {
         $titles['Browse']     .= '&nbsp;' . $strBrowse . '</nobr>';
-        $titles['Select']     .= '&nbsp;' . $strSelect . '</nobr>';
+        $titles['Search']     .= '&nbsp;' . $strSearch . '</nobr>';
         $titles['NoBrowse']   .= '&nbsp;' . $strBrowse . '</nobr>';
-        $titles['NoSelect']   .= '&nbsp;' . $strSelect . '</nobr>';
+        $titles['NoSearch']   .= '&nbsp;' . $strSearch . '</nobr>';
         $titles['Insert']     .= '&nbsp;' . $strInsert . '</nobr>';
         $titles['Properties'] .= '&nbsp;' . $strProperties . '</nobr>';
         $titles['Drop']       .= '&nbsp;' . $strDrop . '</nobr>';
@@ -133,9 +130,9 @@ if ($cfg['PropertiesIconic'] == true) {
     }
 } else {
     $titles['Browse']     = $strBrowse;
-    $titles['Select']     = $strSelect;
+    $titles['Search']     = $strSearch;
     $titles['NoBrowse']   = $strBrowse;
-    $titles['NoSelect']   = $strSelect;
+    $titles['NoSearch']   = $strSearch;
     $titles['Insert']     = $strInsert;
     $titles['Properties'] = $strProperties;
     $titles['Drop']       = $strDrop;
@@ -147,8 +144,8 @@ if ($cfg['PropertiesIconic'] == true) {
 if ($num_tables == 0) {
     echo $strNoTablesFound . "\n";
 }
-// 2. Shows table informations on mysql >= 3.23.03 - staybyte - 11 June 2001
-else if (PMA_MYSQL_INT_VERSION >= 32303) {
+// 2. Shows table informations - staybyte - 11 June 2001
+else {
     // Get additional information about tables for tooltip
     if ($cfg['ShowTooltip']) {
         $tooltip_truename = array();
@@ -200,15 +197,17 @@ else if (PMA_MYSQL_INT_VERSION >= 32303) {
         <td valign="top">
 <?php
     }
-    
+
     pma_TableHeader();
 
     $i = $sum_entries = 0;
     (double) $sum_size = 0;
+    (double) $overhead_size = 0;
+    $overhead_check = '';
     $checked   = (!empty($checkall) ? ' checked="checked"' : '');
     $num_columns = ($cfg['PropertiesNumColumns'] > 1 ? (ceil($num_tables / $cfg['PropertiesNumColumns']) + 1) : 0);
     $row_count = 0;
-    while (list($keyname, $sts_data) = each($tables)) {
+    foreach($tables AS $keyname => $sts_data) {
         $table         = $sts_data['Name'];
         $table_encoded = urlencode($table);
         $table_name    = htmlspecialchars($table);
@@ -248,9 +247,9 @@ else if (PMA_MYSQL_INT_VERSION >= 32303) {
                 </td>
                 <td align="center" bgcolor="<?php echo $bgcolor; ?>">
         <?php
-        include('./libraries/bookmark.lib.php');
+        require_once('./libraries/bookmark.lib.php');
         $book_sql_query = PMA_queryBookmarks($db, $cfg['Bookmark'], '\'' . PMA_sqlAddslashes($table) . '\'', 'label');
-        
+
         if (!empty($sts_data['Rows'])) {
             echo '<a href="sql.php?' . $tbl_url_query . '&amp;sql_query='
                  . (isset($book_sql_query) && $book_sql_query != FALSE ? urlencode($book_sql_query) : urlencode('SELECT * FROM ' . PMA_backquote($table)))
@@ -264,9 +263,9 @@ else if (PMA_MYSQL_INT_VERSION >= 32303) {
         <?php
         if (!empty($sts_data['Rows'])) {
             echo '<a href="tbl_select.php?' . $tbl_url_query . '">'
-                 . $titles['Select'] . '</a>';
+                 . $titles['Search'] . '</a>';
         } else {
-            echo $titles['NoSelect'];
+            echo $titles['NoSearch'];
         }
         ?>
                 </td>
@@ -313,11 +312,15 @@ else if (PMA_MYSQL_INT_VERSION >= 32303) {
         if (isset($sts_data['Rows'])) {
             // MyISAM, ISAM or Heap table: Row count, data size and index size
             // is accurate.
-            if (isset($sts_data['Type']) && ereg('^(MyISAM|ISAM|HEAP)$', $sts_data['Type'])) {
+            if (isset($sts_data['Type']) && preg_match('@^(MyISAM|ISAM|HEAP)$@', $sts_data['Type'])) {
                 if ($cfg['ShowStats']) {
                     $tblsize                    =  doubleval($sts_data['Data_length']) + doubleval($sts_data['Index_length']);
                     $sum_size                   += $tblsize;
                     list($formated_size, $unit) =  PMA_formatByteDown($tblsize, 3, ($tblsize > 0) ? 1 : 0);
+                    if (isset($sts_data['Data_free']) && $sts_data['Data_free'] > 0) {
+                        list($formated_overhead, $overhead_unit)     = PMA_formatByteDown($sts_data['Data_free']);
+                        $overhead_size           += $sts_data['Data_free'];
+                    }
                 }
                 $sum_entries                    += $sts_data['Rows'];
                 $display_rows                   =  number_format($sts_data['Rows'], 0, $number_decimal_separator, $number_thousands_separator);
@@ -349,7 +352,7 @@ else if (PMA_MYSQL_INT_VERSION >= 32303) {
             }
 
             // Merge or BerkleyDB table: Only row count is accurate.
-            else if (isset($sts_data['Type']) && ereg('^(MRG_MyISAM|BerkeleyDB)$', $sts_data['Type'])) {
+            else if (isset($sts_data['Type']) && preg_match('@^(MRG_MyISAM|BerkeleyDB)$@', $sts_data['Type'])) {
                 if ($cfg['ShowStats']) {
                     $formated_size              =  '&nbsp;-&nbsp;';
                     $unit                       =  '';
@@ -380,13 +383,25 @@ else if (PMA_MYSQL_INT_VERSION >= 32303) {
                 </td>
             <?php
             }
-            
+
             if ($cfg['ShowStats']) {
                 echo "\n";
                 ?>
                 <td align="right" bgcolor="<?php echo $bgcolor; ?>" nowrap="nowrap">
                     &nbsp;&nbsp;
                     <a href="tbl_properties_structure.php?<?php echo $tbl_url_query; ?>#showusage"><?php echo $formated_size . ' ' . $unit; ?></a>
+                </td>
+                <td align="right" bgcolor="<?php echo $bgcolor; ?>" nowrap="nowrap">
+                    &nbsp;&nbsp;
+                    <?php
+                    if (isset($formated_overhead)) {
+                        echo '<a href="tbl_properties_structure.php?' . $tbl_url_query . '#showusage">' . $formated_overhead . ' ' . $overhead_unit . '</a>' . "\n";
+                        unset($formated_overhead);
+                        $overhead_check .= "document.getElementById('checkbox_tbl_$i').checked = true;";
+                    } else {
+                        echo "&nbsp;-&nbsp;\n";
+                    }
+                    ?>
                 </td>
                 <?php
                 echo "\n";
@@ -406,6 +421,7 @@ else if (PMA_MYSQL_INT_VERSION >= 32303) {
     // Show Summary
     if ($cfg['ShowStats']) {
         list($sum_formated, $unit) = PMA_formatByteDown($sum_size, 3, 1);
+        list($overhead_formated, $overhead_unit) = PMA_formatByteDown($overhead_size, 3, 1);
     }
     echo "\n";
     ?>
@@ -436,6 +452,10 @@ else if (PMA_MYSQL_INT_VERSION >= 32303) {
                     &nbsp;
                     <b><?php echo $sum_formated . ' ' . $unit; ?></b>
                 </th>
+                <th align="right" nowrap="nowrap">
+                    &nbsp;
+                    <b><?php echo $overhead_formated . ' ' . $overhead_unit; ?></b>
+                </th>
         <?php
     }
     echo "\n";
@@ -455,6 +475,11 @@ else if (PMA_MYSQL_INT_VERSION >= 32303) {
                     &nbsp;/&nbsp;
                     <a href="<?php echo $checkall_url; ?>" onclick="setCheckboxes('tablesForm', false); return false;">
                         <?php echo $strUncheckAll; ?></a>
+                    <?php if ($overhead_check != '') { ?>
+                    &nbsp;/&nbsp;
+                    <a href="#" onclick="setCheckboxes('tablesForm', false); <?php echo $overhead_check; ?> return false;">
+                        <?php echo $strCheckOverhead; ?></a>
+                    <?php } ?>
                     &nbsp;&nbsp;&nbsp;
                     <img src="./images/spacer.gif" border="0" width="38" height="1" alt="" />
                     <select name="submit_mult" dir="ltr" onchange="this.form.submit();">
@@ -500,144 +525,11 @@ if ($cfg['PropertiesNumColumns'] > 1) {
 ?>
 </form>
     <?php
-} // end case mysql >= 3.23.03
-
-// 3. Shows tables list mysql < 3.23.03
-else {
-    if ($cfgRelation['commwork']) {
-        $comment = PMA_getComments($db);
-
-        /**
-         * Displays table comment
-         */
-        if (is_array($comment)) {
-            ?>
-        <!-- DB comment -->
-        <p><i>
-            <?php echo htmlspecialchars(implode(' ', $comment)) . "\n"; ?>
-        </i></p>
-            <?php
-        } // end if
-    }
-
-    $i = 0;
-    echo "\n";
-    ?>
-<form action="db_details_structure.php">
-    <?php PMA_generate_common_hidden_inputs($db); ?>
-
-<?php
-    if ($cfg['PropertiesNumColumns'] > 1) {
-?>
-<table cellspacing="0" cellpadding="0" border="0">
-    <tr>
-        <td valign="top">
-<?php
-    }
-
-    pma_TableHeader(true);
-    
-    $checked = (!empty($checkall) ? ' checked="checked"' : '');
-    $num_columns = ($cfg['PropertiesNumColumns'] > 1 ? (ceil($num_tables / $cfg['PropertiesNumColumns']) + 1) : 0);
-    $row_count = 0;
-    while ($i < $num_tables) {
-        $table         = $tables[$i];
-        $table_encoded = urlencode($table);
-        $table_name    = htmlspecialchars($table);
-
-        // Sets parameters for links
-        $tbl_url_query = $url_query . '&amp;table=' . $table_encoded;
-        $bgcolor       = ($i % 2) ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo'];
-        echo "\n";
-        $row_count++;
-        if($num_columns > 0 && $num_tables > $num_columns && (($row_count % ($num_columns)) == 0)) {
-            $bgcolor       = $cfg['BgcolorTwo'];
-            $row_count = 1;
-        ?>
-            </tr>
-        </table>
-    </td>
-    <td><img src="./images/spacer.gif" border="0" width="10" height="1" alt="" /></td>
-    <td valign="top">
-        <?php
-            pma_TableHeader(true);
-        }
-        ?>
-            <tr>
-                <td align="center" bgcolor="<?php echo $bgcolor; ?>">
-                    <input type="checkbox" name="selected_tbl[]" value="<?php echo $table_encoded; ?>" id="checkbox_tbl_<?php echo $i; ?>"<?php echo $checked; ?> />
-                </td>
-                <td bgcolor="<?php echo $bgcolor; ?>" class="data">
-                    <b>&nbsp;<label for="checkbox_tbl_<?php echo $i; ?>"><?php echo $table_name; ?></label>&nbsp;</b>
-                </td>
-                <td bgcolor="<?php echo $bgcolor; ?>">
-                    <a href="sql.php?<?php echo $tbl_url_query; ?>&amp;sql_query=<?php echo urlencode('SELECT * FROM ' . PMA_backquote($table)); ?>&amp;pos=0"><?php echo $strBrowse; ?></a>
-                </td>
-                <td align="center" bgcolor="<?php echo $bgcolor; ?>">
-                    <a href="tbl_select.php?<?php echo $tbl_url_query; ?>"><?php echo $titles['Select']; ?></a>
-                </td>
-                <td bgcolor="<?php echo $bgcolor; ?>">
-                    <a href="tbl_change.php?<?php echo $tbl_url_query; ?>"><?php echo $titles['Insert']; ?></a>
-                </td>
-                <td bgcolor="<?php echo $bgcolor; ?>">
-                    <a href="tbl_properties.php?<?php echo $tbl_url_query; ?>"><?php echo $titles['Properties']; ?></a>
-                </td>
-                <td bgcolor="<?php echo $bgcolor; ?>">
-                    <a href="sql.php?<?php echo $tbl_url_query; ?>&amp;reload=1&amp;purge=1&amp;sql_query=<?php echo urlencode('DROP TABLE ' . PMA_backquote($table)); ?>&amp;zero_rows=<?php echo urlencode(sprintf($strTableHasBeenDropped, $table_name)); ?>"><?php echo $titles['Drop']; ?></a>
-                </td>
-                <td bgcolor="<?php echo $bgcolor; ?>">
-                    <a href="sql.php?<?php echo $tbl_url_query; ?>&amp;sql_query=<?php echo urlencode('DELETE FROM ' . PMA_backquote($table)); ?>&amp;zero_rows=<?php echo urlencode(sprintf($strTableHasBeenEmptied, $table_name)); ?>"><?php echo $titles['Empty']; ?></a>
-                </td>
-                <td align="right" bgcolor="<?php echo $bgcolor; ?>">
-                    <?php PMA_countRecords($db, $table); echo "\n"; ?>
-                </td>
-            </tr>
-        <?php
-        $i++;
-    } // end while
-    echo "\n";
-
-    // Check all tables url
-    $checkall_url = 'db_details_structure.php?' . PMA_generate_common_url($db);
-    ?>
-            <tr>
-                <td colspan="9">
-                    <img src="./images/arrow_<?php echo $text_dir; ?>.gif" border="0" width="38" height="22" alt="<?php echo $strWithChecked; ?>" />
-                    <a href="<?php echo $checkall_url; ?>&amp;checkall=1" onclick="setCheckboxes('tablesForm', true); return false;">
-                        <?php echo $strCheckAll; ?></a>
-                    &nbsp;/&nbsp;
-                    <a href="<?php echo $checkall_url; ?>" onclick="setCheckboxes('tablesForm', false); return false;">
-                        <?php echo $strUncheckAll; ?></a>
-                </td>
-            </tr>
-            
-            <tr>
-                <td colspan="9">
-                    <img src="./images/spacer.gif" border="0" width="38" height="1" alt="" />
-                    <i><?php echo $strWithChecked; ?></i>&nbsp;&nbsp;
-                    <input type="submit" name="submit_mult" value="<?php echo $strDrop; ?>" />
-                    &nbsp;<?php $strOr . "\n"; ?>&nbsp;
-                    <input type="submit" name="submit_mult" value="<?php echo $strEmpty; ?>" />
-                </td>
-            </tr>
-            </table>
-<?php
-    if ($cfg['PropertiesNumColumns'] > 1) {
-?>
-        </td>
-    </tr>
-</table>
-<?php
-    }
-?>
-</form>
-    <?php
-} // end case mysql < 3.23.03
+} // end if more than one table
 
 echo "\n";
 ?>
 <hr />
-
 
 <?php
 /**
@@ -761,7 +653,7 @@ if ($cfgRelation['pdfwork'] && $num_tables > 0) {
             <?php echo $strPaperSize; ?>
             <select name="paper">
             <?php
-                while (list($key,$val) = each($cfg['PDFPageSizes'])) {
+                foreach($cfg['PDFPageSizes'] AS $key => $val) {
                     echo '<option value="' . $val . '"';
                     if ($val == $cfg['PDFDefaultPageSize']) {
                         echo ' selected="selected"';
@@ -778,7 +670,9 @@ if ($cfgRelation['pdfwork'] && $num_tables > 0) {
 } // end if
 
 if ($num_tables > 0
-    && $cfgRelation['relwork'] && $cfgRelation['commwork']) {
+    && $cfgRelation['relwork'] && $cfgRelation['commwork']
+    && isset($cfg['docSQLDir']) && !empty($cfg['docSQLDir'])
+    ) {
     ?>
     <!-- import docSQL files -->
     <li>
@@ -793,5 +687,5 @@ echo "\n" . '</ul>';
  * Displays the footer
  */
 echo "\n";
-require('./footer.inc.php');
+require_once('./footer.inc.php');
 ?>

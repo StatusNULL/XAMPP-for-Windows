@@ -4,7 +4,7 @@
 // Description: Scatter (and impuls) plot extension for JpGraph
 // Created: 	2001-02-11
 // Author:	Johan Persson (johanp@aditus.nu)
-// Ver:		$Id: jpgraph_scatter.php,v 1.31 2003/03/09 18:24:06 aditus Exp $
+// Ver:		$Id: jpgraph_scatter.php,v 1.31.2.1 2003/08/15 15:27:40 aditus Exp $
 //
 // License:	This code is released under QPL
 // Copyright (C) 2001,2002 Johan Persson
@@ -94,8 +94,7 @@ class FieldPlot extends Plot {
 
 	    $f = $this->iCallback;
 	    if( $f != "" ) {
-		list($cc,$cs,$cas) = $f($this->coords[1][$i],$this->coords[0][$i],
-					$this->iAngles[$i]);
+		list($cc,$cs,$cas) = call_user_func($f,$this->coords[1][$i],$this->coords[0][$i],$this->iAngles[$i]);
 		// Fall back on global data if the callback isn't set
 		if( $cc  == "" ) $cc = $bc;
 		if( $cs  == "" ) $cs = $bs;

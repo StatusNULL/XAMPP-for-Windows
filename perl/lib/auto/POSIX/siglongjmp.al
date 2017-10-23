@@ -3,7 +3,7 @@
 # See AutoSplit.pm.
 package POSIX;
 
-#line 200 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\siglongjmp.al)"
+#line 203 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\siglongjmp.al)"
 sub siglongjmp {
     unimpl "siglongjmp() is C-specific: use die instead";
 }

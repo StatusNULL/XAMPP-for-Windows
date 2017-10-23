@@ -26,12 +26,12 @@ sub InitSite
  my $w = $site->widget;
  $w->BindClientMessage(WM_DROPFILES,[\&Win32Drop,$site]);
  DragAcceptFiles($w,1);
- warn "Enable $w";
+ # warn "Enable $w";
 }
 
 sub Win32Drop
 {
- print join(',',@_),"\n";
+ # print join(',',@_),"\n";
  my ($w,$site,$msg,$wParam,$lParam) = @_;
  my ($x,$y,@files) = DropInfo($wParam);
  my $cb = $site->{'-dropcommand'};
@@ -39,7 +39,7 @@ sub Win32Drop
   {
    foreach my $file (@files)
     {
-     print "$file @ $x,$y\n";
+     # print "$file @ $x,$y\n";
      $w->clipboardClear;
      $w->clipboardAppend('--',$file);
      $cb->Call('CLIPBOARD',$x,$y);

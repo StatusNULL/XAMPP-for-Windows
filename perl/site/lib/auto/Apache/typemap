@@ -5,11 +5,11 @@
 #  * Any changes made here will be lost
 #  * ***********************************
 #  * 01: lib/ModPerl/Code.pm:666
-#  * 02: G:\compile\sources\mod_perl-1.99_10/lib/ModPerl/WrapXS.pm:539
-#  * 03: G:\compile\sources\mod_perl-1.99_10/lib/ModPerl/WrapXS.pm:977
-#  * 04: Makefile.PL:271
-#  * 05: Makefile.PL:219
-#  * 06: Makefile.PL:47
+#  * 02: lib/ModPerl/WrapXS.pm:539
+#  * 03: lib/ModPerl/WrapXS.pm:977
+#  * 04: Makefile.PL:275
+#  * 05: Makefile.PL:223
+#  * 06: Makefile.PL:49
 #  */
 # 
 
@@ -72,6 +72,9 @@ apr_byte_t                  T_CHAR
 apr_byte_t *                T_CHAR
 apr_dev_t                   T_NV
 apr_dev_t *                 T_NV
+apr_fileperms_t             T_IV
+apr_fileperms_t *           T_IV
+apr_filetype_e              T_IV
 apr_gid_t                   T_IV
 apr_gid_t *                 T_IV
 apr_ino_t                   T_IV
@@ -115,6 +118,7 @@ char const *                T_PV
 const ap_input_mode_t *     T_IV
 const apr_byte_t *          T_CHAR
 const apr_dev_t *           T_NV
+const apr_fileperms_t *     T_IV
 const apr_gid_t *           T_IV
 const apr_ino_t *           T_IV
 const apr_int16_t *         T_IV

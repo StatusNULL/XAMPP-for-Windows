@@ -1,9 +1,9 @@
 <?php
-/* $Id: display_export.lib.php,v 1.21.2.1 2003/08/28 14:36:22 nijel Exp $ */
+/* $Id: display_export.lib.php,v 2.2 2003/11/26 22:52:23 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 // Get relations & co. status
-require('./libraries/relation.lib.php');
+require_once('./libraries/relation.lib.php');
 $cfgRelation = PMA_getRelationsParam();
 
 function PMA_exportCheckboxCheck($str) {
@@ -53,6 +53,35 @@ if (isset($sql_query)) {
 <?php } ?>
         getElement("none_options").style.display = 'none';
     }
+
+    function show_checked_option() {
+        hide_them_all();
+        if (getElement('radio_dump_latex').checked) {
+            getElement('latex_options').style.display = 'block';
+<?php if (!$hide_sql) { ?>
+        } else if (getElement('radio_dump_sql').checked) {
+            getElement('sql_options').style.display = 'block';
+<?php } ?>
+<?php if (!$hide_xml) { ?>
+        } else if (getElement('radio_dump_xml').checked) {
+            getElement('none_options').style.display = 'block';
+<?php } ?>
+        } else if (getElement('radio_dump_csv').checked) {
+            getElement('csv_options').style.display = 'block';
+        } else if (getElement('radio_dump_excel').checked) {
+            getElement('excel_options').style.display = 'block';
+        } else {
+            if (getElement('radio_dump_sql')) {
+                getElement('radio_dump_sql').checked = true;
+                getElement('sql_options').style.display = 'block';
+            } else if (getElement('radio_dump_csv')) {
+                getElement('radio_dump_csv').checked = true;
+                getElement('csv_options').style.display = 'block';
+            } else {
+                getElement('none_options').style.display = 'block';
+            }
+        }
+    }
     //-->
     </script>
 
@@ -60,7 +89,7 @@ if (isset($sql_query)) {
     <tr>
 
         <!-- Formats to export to -->
-        <td nowrap="nowrap" valign="top">
+        <td nowrap="nowrap" valign="top" onclick="if (typeof(window.opera) != 'undefined')setTimeout('show_checked_option()', 1); return true">
             <fieldset <?php echo ((!isset($multi_values) || isset($multi_values) && $multi_values == '') ? 'style="height: 220px;"' : ''); ?>>
             <legend><?php echo $strExport; ?></legend>
             <br>
@@ -133,17 +162,12 @@ if ($export_type == 'server') {
                     <label for="checkbox_dump_drop"><?php echo $strStrucDrop; ?></label><br />
                     <input type="checkbox" name="auto_increment" value="1" id="checkbox_auto_increment" <?php PMA_exportCheckboxCheck('sql_auto_increment'); ?> />
                     <label for="checkbox_auto_increment"><?php echo $strAddAutoIncrement; ?></label><br />
-<?php
-// Add backquotes checkbox
-if (PMA_MYSQL_INT_VERSION >= 32306) {
-    ?>
                     <input type="checkbox" name="use_backquotes" value="1" id="checkbox_dump_use_backquotes" <?php PMA_exportCheckboxCheck('sql_backquotes'); ?> />
                     <label for="checkbox_dump_use_backquotes"><?php echo $strUseBackquotes; ?></label><br />
-    <?php
-} // end backquotes feature
-?>
                     <fieldset>
                         <legend><?php echo $strAddIntoComments; ?></legend>
+                        <input type="checkbox" name="sql_dates" value="yes" id="checkbox_sql_dates" <?php PMA_exportCheckboxCheck('sql_dates'); ?> />
+                        <label for="checkbox_sql_dates"><?php echo $strCreationDates; ?></label><br />
 <?php
 if (!empty($cfgRelation['relation'])) {
 ?>
@@ -152,10 +176,12 @@ if (!empty($cfgRelation['relation'])) {
 <?php
  } // end relation
 
+if (!empty($cfgRelation['commwork'])) {
 ?>
                         <input type="checkbox" name="sql_comments" value="yes" id="checkbox_sql_use_comments" <?php PMA_exportCheckboxCheck('sql_comments'); ?> />
                         <label for="checkbox_sql_use_comments"><?php echo $strComments; ?></label><br />
 <?php
+} // end comments
 
 if ($cfgRelation['mimework']) {
      ?>
@@ -178,6 +204,17 @@ if ($cfgRelation['mimework']) {
                     <label for="checkbox_dump_showcolumns"><?php echo $strCompleteInserts; ?></label><br />
                     <input type="checkbox" name="extended_ins" value="yes" id="checkbox_dump_extended_ins" <?php PMA_exportCheckboxCheck('sql_extended'); ?> />
                     <label for="checkbox_dump_extended_ins"><?php echo $strExtendedInserts; ?></label><br />
+                    <input type="checkbox" name="delayed" value="yes" id="checkbox_dump_delayed" <?php PMA_exportCheckboxCheck('sql_delayed'); ?> />
+                    <label for="checkbox_dump_delayed"><?php echo $strDelayedInserts; ?></label><br />
+
+                    <label for="select_sql_type">
+                        <?php echo $strSQLExportType; ?>:&nbsp;
+                    </label>
+                    <select name="sql_type" id="select_sql_type" />
+                        <option value="insert"<?php echo $cfg['Export']['sql_type'] == 'insert' ? ' selected="selected"' : ''; ?>>INSERT</option>
+                        <option value="update"<?php echo $cfg['Export']['sql_type'] == 'update' ? ' selected="selected"' : ''; ?>>UPDATE</option>
+                        <option value="replace"<?php echo $cfg['Export']['sql_type'] == 'replace' ? ' selected="selected"' : ''; ?>>REPLACE</option>
+                    </select>
                 </fieldset>
             </fieldset>
 <?php } ?>
@@ -186,6 +223,9 @@ if ($cfgRelation['mimework']) {
              <fieldset id="latex_options">
                  <legend><?php echo $strLaTeXOptions; ?></legend>
 
+                     <input type="checkbox" name="latex_caption" value="yes" id="checkbox_latex_show_caption" <?php PMA_exportCheckboxCheck('latex_caption'); ?> />
+                     <label for="checkbox_latex_show_caption"><?php echo $strLatexIncludeCaption; ?></label><br />
+
 <?php if (!$hide_structure) { ?>
                  <!-- For structure -->
                  <fieldset>
@@ -193,6 +233,32 @@ if ($cfgRelation['mimework']) {
                          <input type="checkbox" name="latex_structure" value="structure" id="checkbox_latex_structure" <?php PMA_exportCheckboxCheck('latex_structure'); ?> onclick="if(!this.checked && !getElement('checkbox_latex_data').checked) return false; else return true;" />
                          <label for="checkbox_latex_structure"><?php echo $strStructure; ?></label><br />
                      </legend>
+                    <table border="0" cellspacing="1" cellpadding="0">
+                        <tr>
+                            <td>
+                                <?php echo $strLatexCaption; ?>&nbsp;
+                            </td>
+                            <td>
+                                <input type="text" name="latex_structure_caption" size="30" value="<?php echo $strLatexStructure; ?>" class="textfield" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <?php echo $strLatexContinuedCaption; ?>&nbsp;
+                            </td>
+                            <td>
+                                <input type="text" name="latex_structure_continued_caption" size="30" value="<?php echo $strLatexStructure . ' ' . $strLatexContinued; ?>" class="textfield" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <?php echo $strLatexLabel; ?>&nbsp;
+                            </td>
+                            <td>
+                                <input type="text" name="latex_structure_label" size="30" value="<?php echo $cfg['Export']['latex_structure_label']; ?>" class="textfield" />
+                            </td>
+                        </tr>
+                    </table>
 <?php
 if (!empty($cfgRelation['relation'])) {
 ?>
@@ -227,6 +293,30 @@ if ($cfgRelation['mimework']) {
                      <input type="checkbox" name="latex_showcolumns" value="yes" id="ch_latex_showcolumns" <?php PMA_exportCheckboxCheck('latex_columns'); ?> />
                      <label for="ch_latex_showcolumns"><?php echo $strColumnNames; ?></label><br />
                     <table border="0" cellspacing="1" cellpadding="0">
+                        <tr>
+                            <td>
+                                <?php echo $strLatexCaption; ?>&nbsp;
+                            </td>
+                            <td>
+                                <input type="text" name="latex_data_caption" size="30" value="<?php echo $strLatexContent; ?>" class="textfield" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <?php echo $strLatexContinuedCaption; ?>&nbsp;
+                            </td>
+                            <td>
+                                <input type="text" name="latex_data_continued_caption" size="30" value="<?php echo $strLatexContent . ' ' . $strLatexContinued; ?>" class="textfield" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <?php echo $strLatexLabel; ?>&nbsp;
+                            </td>
+                            <td>
+                                <input type="text" name="latex_data_label" size="30" value="<?php echo $cfg['Export']['latex_data_label']; ?>" class="textfield" />
+                            </td>
+                        </tr>
                         <tr>
                             <td>
                                 <?php echo $strReplaceNULLBy; ?>&nbsp;
@@ -302,9 +392,26 @@ if ($cfgRelation['mimework']) {
                             <input type="text" name="excel_replace_null" size="20" value="<?php echo $cfg['Export']['excel_null']; ?>" class="textfield" />
                         </td>
                     </tr>
+                    <tr>
+                        <td colspan="2">
+                            <input type="checkbox" name="showexcelnames" value="yes" id="checkbox_dump_showexcelnames" <?php PMA_exportCheckboxCheck('excel_columns'); ?> />
+                            <label for="checkbox_dump_showexcelnames"><?php echo $strPutColNames; ?></label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label for="select_excel_edition">
+                                <?php echo $strExcelEdition; ?>:&nbsp;
+                            </label>
+                        </td>
+                        <td>
+                            <select name="excel_edition" id="select_excel_edition" />
+                                <option value="win"<?php echo $cfg['Export']['excel_edition'] == 'win' ? ' selected="selected"' : ''; ?>>Windows</option>
+                                <option value="mac"<?php echo $cfg['Export']['excel_edition'] == 'mac' ? ' selected="selected"' : ''; ?>>Macintosh</option>
+                            </select>
+                        </td>
+                    </tr>
                 </table>
-                <input type="checkbox" name="showexcelnames" value="yes" id="checkbox_dump_showexcelnames" <?php PMA_exportCheckboxCheck('excel_columns'); ?> />
-                <label for="checkbox_dump_showexcelnames"><?php echo $strPutColNames; ?></label>
             </fieldset>
 
             <fieldset id="none_options">
@@ -314,32 +421,7 @@ if ($cfgRelation['mimework']) {
 
             <script type="text/javascript">
             <!--
-                hide_them_all();
-                if (getElement('radio_dump_latex').checked) {
-                    getElement('latex_options').style.display = 'block';
-<?php if (!$hide_sql) { ?>
-                } else if (getElement('radio_dump_sql').checked) {
-                    getElement('sql_options').style.display = 'block';
-<?php } ?>
-<?php if (!$hide_xml) { ?>
-                } else if (getElement('radio_dump_xml').checked) {
-                    getElement('none_options').style.display = 'block';
-<?php } ?>
-                } else if (getElement('radio_dump_csv').checked) {
-                    getElement('csv_options').style.display = 'block';
-                } else if (getElement('radio_dump_excel').checked) {
-                    getElement('excel_options').style.display = 'block';
-                } else {
-                    if (getElement('radio_dump_sql')) {
-                        getElement('radio_dump_sql').checked = true;
-                        getElement('sql_options').style.display = 'block';
-                    } else if (getElement('radio_dump_csv')) {
-                        getElement('radio_dump_csv').checked = true;
-                        getElement('csv_options').style.display = 'block';
-                    } else {
-                        getElement('none_options').style.display = 'block';
-                    }
-                }
+                show_checked_option();
             //-->
             </script>
         </td>
@@ -383,24 +465,18 @@ if (isset($table) && !empty($table) && !isset($num_tables)) {
                     if ($export_type == 'database') {
                         if (isset($_COOKIE) && !empty($_COOKIE['pma_db_filename_template'])) {
                             echo $_COOKIE['pma_db_filename_template'];
-                        } elseif (isset($HTTP_COOKIE_VARS) && !empty($HTTP_COOKIE_VARS['pma_db_filename_template'])) {
-                            echo $HTTP_COOKIE_VARS['pma_db_filename_template'];
                         } else {
                             echo '__DB__';
                         }
                     } elseif ($export_type == 'table') {
                         if (isset($_COOKIE) && !empty($_COOKIE['pma_table_filename_template'])) {
                             echo $_COOKIE['pma_table_filename_template'];
-                        } elseif (isset($HTTP_COOKIE_VARS) && !empty($HTTP_COOKIE_VARS['pma_table_filename_template'])) {
-                            echo $HTTP_COOKIE_VARS['pma_table_filename_template'];
                         } else {
                             echo '__TABLE__';
                         }
                     } else {
                         if (isset($_COOKIE) && !empty($_COOKIE['pma_server_filename_template'])) {
                             echo $_COOKIE['pma_server_filename_template'];
-                        } elseif (isset($HTTP_COOKIE_VARS) && !empty($HTTP_COOKIE_VARS['pma_server_filename_template'])) {
-                            echo $HTTP_COOKIE_VARS['pma_server_filename_template'];
                         } else {
                             echo '__SERVER__';
                         }
@@ -447,31 +523,29 @@ if (isset($table) && !empty($table) && !isset($num_tables)) {
 <?php
 
 // zip, gzip and bzip2 encode features
-if (PMA_PHP_INT_VERSION >= 40004) {
-    $is_zip  = (isset($cfg['ZipDump']) && $cfg['ZipDump'] && @function_exists('gzcompress'));
-    $is_gzip = (isset($cfg['GZipDump']) && $cfg['GZipDump'] && @function_exists('gzencode'));
-    $is_bzip = (isset($cfg['BZipDump']) && $cfg['BZipDump'] && @function_exists('bzcompress'));
-    if ($is_zip || $is_gzip || $is_bzip) {
-        if ($is_zip) {
-            ?>
-                    <input type="radio" name="compression" value="zip" id="radio_compression_zip" onclick="getElement('checkbox_dump_asfile').checked = true;" <?php PMA_exportIsActive('compression', 'zip'); ?> />
-                    <label for="radio_compression_zip"><?php echo $strZip; ?></label><?php echo (($is_gzip || $is_bzip) ? '&nbsp;' : ''); ?>
-            <?php
-        }
-        if ($is_gzip) {
-            echo "\n"
-            ?>
-                    <input type="radio" name="compression" value="gzip" id="radio_compression_gzip" onclick="getElement('checkbox_dump_asfile').checked = true;" <?php PMA_exportIsActive('compression', 'gzip'); ?> />
-                    <label for="radio_compression_gzip"><?php echo $strGzip; ?></label><?php echo ($is_bzip ? '&nbsp;' : ''); ?>
-            <?php
-        }
-        if ($is_bzip) {
-            echo "\n"
-            ?>
-                    <input type="radio" name="compression" value="bzip" id="radio_compression_bzip" onclick="getElement('checkbox_dump_asfile').checked = true;" <?php PMA_exportIsActive('compression', 'bzip'); ?> />
-                    <label for="radio_compression_bzip"><?php echo $strBzip; ?></label>
-            <?php
-        }
+$is_zip  = (isset($cfg['ZipDump']) && $cfg['ZipDump'] && @function_exists('gzcompress'));
+$is_gzip = (isset($cfg['GZipDump']) && $cfg['GZipDump'] && @function_exists('gzencode'));
+$is_bzip = (isset($cfg['BZipDump']) && $cfg['BZipDump'] && @function_exists('bzcompress'));
+if ($is_zip || $is_gzip || $is_bzip) {
+    if ($is_zip) {
+        ?>
+                <input type="radio" name="compression" value="zip" id="radio_compression_zip" onclick="getElement('checkbox_dump_asfile').checked = true;" <?php PMA_exportIsActive('compression', 'zip'); ?> />
+                <label for="radio_compression_zip"><?php echo $strZip; ?></label><?php echo (($is_gzip || $is_bzip) ? '&nbsp;' : ''); ?>
+        <?php
+    }
+    if ($is_gzip) {
+        echo "\n"
+        ?>
+                <input type="radio" name="compression" value="gzip" id="radio_compression_gzip" onclick="getElement('checkbox_dump_asfile').checked = true;" <?php PMA_exportIsActive('compression', 'gzip'); ?> />
+                <label for="radio_compression_gzip"><?php echo $strGzip; ?></label><?php echo ($is_bzip ? '&nbsp;' : ''); ?>
+        <?php
+    }
+    if ($is_bzip) {
+        echo "\n"
+        ?>
+                <input type="radio" name="compression" value="bzip" id="radio_compression_bzip" onclick="getElement('checkbox_dump_asfile').checked = true;" <?php PMA_exportIsActive('compression', 'bzip'); ?> />
+                <label for="radio_compression_bzip"><?php echo $strBzip; ?></label>
+        <?php
     }
 }
 echo "\n";

@@ -1,5 +1,5 @@
 <?php
-/* $Id: csv.php,v 1.5 2003/08/12 08:33:11 nijel Exp $ */
+/* $Id: csv.php,v 2.1 2003/11/20 16:31:51 garvinhicking Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -34,7 +34,7 @@ function PMA_exportHeader() {
     // Here we just prepare some values for export
     if ($what == 'excel') {
         $add_character      = "\015\012";
-        $separator          = ',';
+        $separator          = isset($GLOBALS['excel_edition']) && $GLOBALS['excel_edition'] == 'mac' ? ';' : ',';
         $enclosed           = '"';
         $escaped            = '"';
         if (isset($GLOBALS['showexcelnames']) && $GLOBALS['showexcelnames'] == 'yes') {

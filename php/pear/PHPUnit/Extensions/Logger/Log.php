@@ -3,7 +3,7 @@
 // +------------------------------------------------------------------------+
 // | PEAR :: PHPUnit                                                        |
 // +------------------------------------------------------------------------+
-// | Copyright (c) 2002-2003 Sebastian Bergmann <sb@sebastian-bergmann.de>. |
+// | Copyright (c) 2002-2004 Sebastian Bergmann <sb@sebastian-bergmann.de>. |
 // +------------------------------------------------------------------------+
 // | This source file is subject to version 3.00 of the PHP License,        |
 // | that is available at http://www.php.net/license/3_0.txt.               |
@@ -12,7 +12,7 @@
 // | license@php.net so we can mail you a copy immediately.                 |
 // +------------------------------------------------------------------------+
 //
-// $Id: Log.php,v 1.4 2003/07/24 06:39:52 sebastian Exp $
+// $Id: Log.php,v 1.6 2004/01/04 11:15:21 sebastian Exp $
 //
 
 require_once 'PHPUnit/Framework/TestFailure.php';
@@ -68,6 +68,14 @@ class PHPUnit_Extensions_Logger_Log implements PHPUnit_Framework_TestListener {
     * @access public
     */
     public function addError(PHPUnit_Framework_Test $test, Exception $e) {
+        $this->log->crit(
+          sprintf(
+            'Test "%s" failed: %s',
+
+            $test->getName(),
+            $e->getMessage()
+          )
+        );
     }
 
     // }}}
@@ -81,6 +89,14 @@ class PHPUnit_Extensions_Logger_Log implements PHPUnit_Framework_TestListener {
     * @access public
     */
     public function addFailure(PHPUnit_Framework_Test $test, PHPUnit_Framework_AssertionFailedError $e) {
+        $this->log->err(
+          sprintf(
+            'Test "%s" failed: %s',
+
+            $test->getName(),
+            $e->getMessage()
+          )
+        );
     }
 
     // }}}
@@ -93,6 +109,13 @@ class PHPUnit_Extensions_Logger_Log implements PHPUnit_Framework_TestListener {
     * @access public
     */
     public function endTest(PHPUnit_Framework_Test $test) {
+        $this->log->info(
+          sprintf(
+            'Test "%s" ended.',
+
+            $test->getName()
+          )
+        );
     }
 
     // }}}
@@ -105,6 +128,13 @@ class PHPUnit_Extensions_Logger_Log implements PHPUnit_Framework_TestListener {
     * @access public
     */
     public function startTest(PHPUnit_Framework_Test $test) {
+        $this->log->info(
+          sprintf(
+            'Test "%s" started.',
+
+            $test->getName()
+          )
+        );
     }
 
     // }}}

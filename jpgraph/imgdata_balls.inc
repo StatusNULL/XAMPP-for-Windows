@@ -1,10 +1,10 @@
-<?
+<?php
 //=======================================================================
 // File:	IMGDATA_ROUNDBALLS.INC
 // Description:	Base64 encoded images for small round markers
 // Created: 	2003-03-20
 // Author:	Johan Persson (johanp@aditus.nu)
-// Ver:		$Id: imgdata_balls.inc,v 1.3 2003/03/23 18:41:12 aditus Exp $
+// Ver:		$Id: imgdata_balls.inc,v 1.4 2003/04/26 10:03:50 aditus Exp $
 //
 // License:	This code is released under QPL 1.0 
 // Copyright (C) 2003 Johan Persson 

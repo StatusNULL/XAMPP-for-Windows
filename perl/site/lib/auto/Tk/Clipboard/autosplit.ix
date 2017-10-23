@@ -1,4 +1,4 @@
-# Index created by AutoSplit for blib\lib\Tk/Clipboard.pm
+# Index created by AutoSplit for blib\lib\Tk\Clipboard.pm
 #    (file acts as timestamp)
 package Tk::Clipboard;
 sub getSelected 

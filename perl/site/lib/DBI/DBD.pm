@@ -2,10 +2,10 @@ package DBI::DBD;
 
 use vars qw($VERSION);	# set $VERSION early so we don't confuse PAUSE/CPAN etc
 
-$VERSION = sprintf("%d.%02d", q$Revision: 11.16 $ =~ /(\d+)\.(\d+)/o);
+$VERSION = sprintf("%d.%02d", q$Revision: 11.20 $ =~ /(\d+)\.(\d+)/o);
 
 
-# $Id: DBD.pm,v 11.16 2003/05/14 11:08:17 timbo Exp $
+# $Id: DBD.pm,v 11.20 2004/01/07 17:38:51 timbo Exp $
 #
 # Copyright (c) 1997-2003 Jonathan Leffler, Jochen Wiedmann, Steffen
 # Goeldner and Tim Bunce
@@ -58,8 +58,8 @@ DBI::DBD - Perl DBI Database Driver Writer's Guide
 
 =head2 Version and volatility
 
-  $Revision: 11.16 $
-  $Date: 2003/05/14 11:08:17 $
+  $Revision: 11.20 $
+  $Date: 2004/01/07 17:38:51 $
 
 This document is I<still> a minimal draft which is in need of further work.
 
@@ -708,7 +708,7 @@ version 1.10 to precede version 1.9, so that using a raw CVS, RCS or
 SCCS version number is probably not appropriate (despite being very
 common). For RCS or CVS you can use this code:
 
-  $VERSION = sprintf "%d.%02d", '$Revision: 11.16 $ ' =~ /(\d+)\.(\d+)/;
+  $VERSION = sprintf "%d.%02d", '$Revision: 11.20 $ ' =~ /(\d+)\.(\d+)/;
 
 which pads out the fractional part with leading zeros so all is well
 (so long as you don't go past x.99)
@@ -1229,6 +1229,9 @@ The DBI will actually store and fetch driver-specific attributes (with all
 lowercase names) without warning or error, so there's actually no need to
 implement driver-specific any code in your FETCH and STORE methods unless
 you need extra logic/checks, beyond getting or setting the value.
+
+Unless your driver documentation indicates otherwise, the return value of
+the STORE method is unspecified and the caller shouldn't use that value.
 
 =cut
 
@@ -2092,7 +2095,7 @@ to I<imp_drh_t>, I<imp_dbh_t> or I<imp_sth_t>.
   sv_setiv(DBIc_ERR(imp_xxh), (IV)rc);  /* set err early        */
   sv_setpv(errstr, what);
 
-If your database supports SQLSTATE, you shoudl also set the SQLSTATE value; for example,
+If your database supports SQLSTATE, you should also set the SQLSTATE value; for example,
 DBD::Informix includes the line:
 
   sv_setpv(DBIc_STATE(imp_xxh), SQLSTATE);
@@ -3086,6 +3089,8 @@ You should review the output to ensure that it is sensible.
 
 =pod
 
+=back
+
 =over 2
 
 =item Generating the type_info method
@@ -3117,12 +3122,14 @@ your Driver.pm file and the code that should be written to
 lib/DBD/Driver/TypeInfo.pm.
 You should review the output to ensure that it is sensible.
 
+=back
+
 =head2 Writing DBD::Driver::db::get_info
 
-If you use the DBI::DBD::GetInfo module, then the code you need is
+If you use the DBI::DBD::Metadata module, then the code you need is
 generated for you.
 
-If you decide not to use the DBI::DBD::GetInfo module, you should
+If you decide not to use the DBI::DBD::Metadata module, you should
 probably borrow the code from a driver that has done so (eg
 DBD::Informix from version 1.05 onwards) and crib the code from there,
 or look at the code that generates that module and follow that.
@@ -3137,10 +3144,10 @@ below.
 
 =head2 Writing DBD::Driver::db::type_info_all
 
-If you use the DBI::DBD::TypeInfo module, then the code you need is
+If you use the DBI::DBD::Metadata module, then the code you need is
 generated for you.
 
-If you decide not to use the DBI::DBD::TypeInfo module, you should
+If you decide not to use the DBI::DBD::Metadata module, you should
 probably borrow the code from a driver that has done so (eg
 DBD::Informix from version 1.05 onwards) and crib the code from there,
 or look at the code that generates that module and follow that.
@@ -3531,6 +3538,7 @@ For example, consider this STORE method from the I<DBD::CSV> class:
 use Exporter ();
 use Config qw(%Config);
 use Carp;
+use Cwd;
 use strict;
 use vars qw(
     @ISA @EXPORT
@@ -3558,12 +3566,20 @@ BEGIN {
     require DBI unless $is_dbi;
 }
 
+sub _cwd_check {
+    my $cwd = cwd();
+    return unless $cwd =~ /$Config{path_sep}/;
+    warn "*** Warning: Path separator characters (`$Config{path_sep}') in the current directory path ($cwd) may cause problems\a\n";
+    sleep 2;
+}
+
 sub dbd_edit_mm_attribs {
     # this both edits the attribs in-place and returns the flattened attribs
     my $mm_attr = shift;
     my $dbd_attr = shift || {};
     croak "dbd_edit_mm_attribs( \%makemaker [, \%other ]): too many parameters"
 	if @_;
+    _cwd_check();
 
     # decide what needs doing
 
@@ -3604,24 +3620,25 @@ sub dbd_dbi_dir {
 }
 
 sub dbd_dbi_arch_dir {
-    if ($is_dbi) {
-	return '$(INST_ARCHAUTODIR)'
-    }
+    _cwd_check();
+    return '$(INST_ARCHAUTODIR)' if $is_dbi;
     my $dbidir = dbd_dbi_dir();
     my @try = map { "$_/auto/DBI" } @INC;
     my @xst = grep { -f "$_/Driver.xst" } @try;
     Carp::croak("Unable to locate Driver.xst in @try") unless @xst;
     Carp::carp( "Multiple copies of Driver.xst found in: @xst") if @xst > 1;
-    print "Using DBI $DBI::VERSION installed in $xst[0]\n";
+    print "Using DBI $DBI::VERSION (for perl $] on $Config{archname}) installed in $xst[0]\n";
     return $xst[0];
 }
 
 sub dbd_postamble {
     my $self = shift;
+    _cwd_check();
     my $dbidir = dbd_dbi_dir();
     my $xstdir = dbd_dbi_arch_dir();
     my $xstfile= '$(DBI_INSTARCH_DIR)/Driver.xst';
     my $xstf_h = '$(DBI_INSTARCH_DIR)/Driver_xst.h';
+    my $QQ = ( $Config{make} eq 'dmake') ? '"' : '';
     if ($^O eq 'VMS') {
 	$dbidir = vmsify($dbidir.'/');
 	$xstdir = vmsify($xstdir.'/') unless $is_dbi;
@@ -3643,13 +3660,13 @@ $(BASEEXT).c: $(BASEEXT).xsi
 $(BASEEXT)$(OBJ_EXT): $(BASEEXT).xsi
 
 $(BASEEXT).xsi: $(DBI_DRIVER_XST) '.$xstf_h.'
-	$(PERL) -p -e "s/~DRIVER~/$(BASEEXT)/g" < $(DBI_DRIVER_XST) > $(BASEEXT).xsi
+	$(PERL) -p -e "s/~DRIVER~/$(BASEEXT)/g" $(DBI_DRIVER_XST) > $(BASEEXT).xsi
 
 # these two keep make -j4 working
-$(DBI_DRIVER_XST) :: pm_to_blib
+'.$QQ.'$(DBI_DRIVER_XST)'.$QQ.' :: pm_to_blib
 	$(NOECHO) $(NOOP)
 
-'.$xstf_h.' :: pm_to_blib
+'.$QQ.$xstf_h.$QQ.' :: pm_to_blib
 	$(NOECHO) $(NOOP)
 
 # ---
@@ -3662,7 +3679,7 @@ __END__
 
 Jonathan Leffler <jleffler@us.ibm.com> (previously <jleffler@informix.com>),
 Jochen Wiedmann <joe@ispsoft.de>,
-Steffen Goeldner <s.goeldner@eurodata.de>,
+Steffen Goeldner <sgoeldner@cpan.org>,
 and Tim Bunce <dbi-users@perl.org>.
 
 =cut

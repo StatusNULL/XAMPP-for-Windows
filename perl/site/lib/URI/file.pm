@@ -92,7 +92,7 @@ URI::file - URI that map to local file names
  
  $u3 = URI::file->new($path);
  $u4 = URI::file->new("c:\\windows\\", "win32");
- 
+
  $u1->file;
  $u1->file("mac");
 

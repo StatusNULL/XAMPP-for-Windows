@@ -1,9 +1,9 @@
-# NOTE: Derived from blib\lib\Tk/Frame.pm.
+# NOTE: Derived from blib\lib\Tk\Frame.pm.
 # Changes made here will be lost when autosplit is run again.
 # See AutoSplit.pm.
 package Tk::Frame;
 
-#line 194 "blib\lib\Tk/Frame.pm (autosplit into blib\lib\auto\Tk\Frame\queuePack.al)"
+#line 194 "blib\lib\Tk\Frame.pm (autosplit into blib\lib\auto\Tk\Frame\queuePack.al)"
 sub queuePack
 {
  my ($cw) = @_;

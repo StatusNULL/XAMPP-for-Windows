@@ -5,7 +5,7 @@ include ("../jpgraph_bar.php");
 
 $ydata = array(2,3,4,5,6,7,8,9,10,11); 
 $ydata2 = array(1,2,3,4,5,6,7,8,9,10); 
-$targ = array("http://","http://","http://","http://","http://","http://","http://","http://","http://","http://");
+$targ = array("#1","#2","#3","#4","#5","#6","#7","#8","#9","#10");
 $alt = array(1,2,3,4,5,6,7,8,9,10); 
 
 // Create the graph. 
@@ -35,19 +35,7 @@ $barplot->SetCSIMTargets($targ,$alt);
 $graph->Add($lineplot); 
 $graph->Add($barplot); 
 
-// Display the graph with the image map. 
-// We store the image file in the current directory. 
-// This let's us use the image in the <img> tag
-// that gets send back to the browser.
-// By using 'auto' as the file name the image file will
-// get the same name as this PHP script but with the correct
-// image postfix.
-$graph->Stroke('auto');
-
-// Now echo back the correct tags to the browser. This will
-// cause the browser to re-load the previously stored image.
-echo $graph->GetHTMLImageMap("myimagemap");
-echo "<img src=\"".GenImgName()."\" ISMAP USEMAP=\"#myimagemap\" border=0>";
+$graph->StrokeCSIM('barline_csimex1.php');
 
 ?> 
 

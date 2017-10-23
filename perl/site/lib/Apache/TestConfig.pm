@@ -23,7 +23,7 @@ use File::Find qw(finddepth);
 use File::Basename qw(dirname);
 use File::Path ();
 use File::Spec::Functions qw(catfile abs2rel splitdir canonpath
-                             catdir file_name_is_absolute);
+                             catdir file_name_is_absolute devnull);
 use Cwd qw(fastcwd);
 
 use Apache::TestConfigPerl ();
@@ -35,30 +35,31 @@ use Socket ();
 use vars qw(%Usage);
 
 %Usage = (
-   top_dir       => 'top-level directory (default is $PWD)',
-   t_dir         => 'the t/ test directory (default is $top_dir/t)',
-   t_conf        => 'the conf/ test directory (default is $t_dir/conf)',
-   t_logs        => 'the logs/ test directory (default is $t_dir/logs)',
-   t_conf_file   => 'test httpd.conf file (default is $t_conf/httpd.conf)',
-   src_dir       => 'source directory to look for mod_foos.so',
-   serverroot    => 'ServerRoot (default is $t_dir)',
-   documentroot  => 'DocumentRoot (default is $ServerRoot/htdocs',
-   port          => 'Port [port_number|select] (default ' . DEFAULT_PORT . ')',
-   servername    => 'ServerName (default is localhost)',
-   user          => 'User to run test server as (default is $USER)',
-   group         => 'Group to run test server as (default is $GROUP)',
-   bindir        => 'Apache bin/ dir (default is apxs -q BINDIR)',
-   sbindir       => 'Apache sbin/ dir (default is apxs -q SBINDIR)',
-   httpd         => 'server to use for testing (default is $bindir/httpd)',
-   target        => 'name of server binary (default is apxs -q TARGET)',
-   apxs          => 'location of apxs (default is from Apache::BuildConfig)',
-   httpd_conf    => 'inherit config from this file (default is apxs derived)',
-   maxclients    => 'maximum number of concurrent clients (default is 1)',
-   perlpod       => 'location of perl pod documents (for testing downloads)',
-   proxyssl_url  => 'url for testing ProxyPass / https (default is localhost)',
-   sslca         => 'location of SSL CA (default is $t_conf/ssl/ca)',
-   sslcaorg      => 'SSL CA organization to use for tests (default is asf)',
-   libmodperl    => 'path to mod_perl\'s .so (full or relative to LIBEXECDIR)',
+   top_dir         => 'top-level directory (default is $PWD)',
+   t_dir           => 'the t/ test directory (default is $top_dir/t)',
+   t_conf          => 'the conf/ test directory (default is $t_dir/conf)',
+   t_logs          => 'the logs/ test directory (default is $t_dir/logs)',
+   t_conf_file     => 'test httpd.conf file (default is $t_conf/httpd.conf)',
+   src_dir         => 'source directory to look for mod_foos.so',
+   serverroot      => 'ServerRoot (default is $t_dir)',
+   documentroot    => 'DocumentRoot (default is $ServerRoot/htdocs',
+   port            => 'Port [port_number|select] (default ' . DEFAULT_PORT . ')',
+   servername      => 'ServerName (default is localhost)',
+   user            => 'User to run test server as (default is $USER)',
+   group           => 'Group to run test server as (default is $GROUP)',
+   bindir          => 'Apache bin/ dir (default is apxs -q BINDIR)',
+   sbindir         => 'Apache sbin/ dir (default is apxs -q SBINDIR)',
+   httpd           => 'server to use for testing (default is $bindir/httpd)',
+   target          => 'name of server binary (default is apxs -q TARGET)',
+   apxs            => 'location of apxs (default is from Apache::BuildConfig)',
+   startup_timeout => 'seconds to wait for the server to start (default is 60)',
+   httpd_conf      => 'inherit config from this file (default is apxs derived)',
+   maxclients      => 'maximum number of concurrent clients (default is 1)',
+   perlpod         => 'location of perl pod documents (for testing downloads)',
+   proxyssl_url    => 'url for testing ProxyPass / https (default is localhost)',
+   sslca           => 'location of SSL CA (default is $t_conf/ssl/ca)',
+   sslcaorg        => 'SSL CA organization to use for tests (default is asf)',
+   libmodperl      => 'path to mod_perl\'s .so (full or relative to LIBEXECDIR)',
    (map { $_ . '_module_name', "$_ module name"} qw(cgi ssl thread access auth)),
 );
 
@@ -232,7 +233,7 @@ sub new {
 
     $vars->{scheme}       ||= 'http';
     $vars->{servername}   ||= $self->default_servername;
-    $vars->{port}           = $self->select_port;
+    $vars->{port}           = $self->select_first_port;
     $vars->{remote_addr}  ||= $self->our_remote_addr;
 
     $vars->{user}         ||= $self->default_user;
@@ -398,7 +399,7 @@ sub add_config {
         $args = join "\n", @$directive;
     }
     else {
-        $args = "$directive " .
+        $args = join " ", grep length($_), $directive,
           (ref($arg) && (ref($arg) eq 'ARRAY') ? "@$arg" : $arg || "");
     }
 
@@ -538,7 +539,7 @@ sub default_servername {
 }
 
 # memoize the selected value (so we make sure that the same port is used
-# via select). The problem is that select_port() is called 3 times after
+# via select). The problem is that select_first_port() is called 3 times after
 # -clean, and it's possible that a lower port will get released
 # between calls, leading to various places in the test suite getting a
 # different base port selection.
@@ -548,7 +549,7 @@ sub default_servername {
 # bind() will actually get the port. So there is a need in another
 # check and reconfiguration just before the server starts.
 #
-sub select_port {
+sub select_first_port {
     my $self = shift;
 
     my $port ||= $ENV{APACHE_PORT} || $self->{vars}{port} || DEFAULT_PORT;
@@ -588,7 +589,12 @@ my $remote_addr;
 sub our_remote_addr {
     my $self = shift;
     my $name = $self->default_servername;
-    $remote_addr ||= Socket::inet_ntoa((gethostbyname($name))[-1]);
+    my $iaddr = (gethostbyname($name))[-1];
+    unless (defined $iaddr) {
+        error "Can't resolve host: '$name' (check /etc/hosts)";
+        exit 1;
+    }
+    $remote_addr ||= Socket::inet_ntoa($iaddr);
 }
 
 sub default_loopback {
@@ -600,7 +606,7 @@ sub port {
 
     unless ($module) {
         my $vars = $self->{vars};
-        return $self->select_port() unless $vars->{scheme} eq 'https';
+        return $self->select_first_port() unless $vars->{scheme} eq 'https';
         $module = $vars->{ssl_module_name};
     }
     return $self->{vhosts}->{$module}->{port};
@@ -630,6 +636,8 @@ sub hostport {
 #look for mod_foo.so
 sub find_apache_module {
     my($self, $module) = @_;
+
+    die "find_apache_module: module name argument is required" unless $module;
 
     my $vars = $self->{vars};
     my $sroot = $vars->{serverroot};
@@ -780,13 +788,20 @@ sub perlscript_header {
 
     require FindBin;
 
-    # the live 'lib/' dir of the distro (e.g. modperl-2.0/ModPerl-Registry/lib)
-    my @dirs = canonpath catdir $FindBin::Bin, "lib";
+    my @dirs = ();
 
-    # the live dir of the top dir if any  (e.g. modperl-2.0/lib)
-    if (-e catfile($FindBin::Bin, "..", "Makefile.PL") &&
-        -d catdir($FindBin::Bin, "..", "lib") ) {
-        push @dirs, canonpath catdir $FindBin::Bin, "..", "lib";
+    # mp2 needs its modper-2.0/lib before blib was created
+    if (IS_MOD_PERL_2_BUILD || $ENV{APACHE_TEST_LIVE_DEV}) {
+        # the live 'lib/' dir of the distro
+        # (e.g. modperl-2.0/ModPerl-Registry/lib)
+        my $dir = canonpath catdir $FindBin::Bin, "lib";
+        push @dirs, $dir if -d $dir;
+
+        # the live dir of the top dir if any  (e.g. modperl-2.0/lib)
+        if (-e catfile($FindBin::Bin, "..", "Makefile.PL")) {
+            my $dir = canonpath catdir $FindBin::Bin, "..", "lib";
+            push @dirs, $dir if -d $dir;
+        }
     }
 
     for (qw(. ..)) {
@@ -1259,7 +1274,7 @@ sub generate_httpd_conf {
                 $entry = qq(Include "$file");
             }
             elsif ($file =~ /\.pl$/) {
-                $entry = qq(PerlRequire "$file");
+                $entry = qq(<IfModule mod_perl.c>\n    PerlRequire "$file"\n</IfModule>\n);
             }
             else {
                 next;
@@ -1315,10 +1330,12 @@ sub generate_httpd_conf {
 EOF
     }
 
+    print $out "<IfModule mod_alias.c>\n";
     for (keys %aliases) {
         next unless $vars->{$aliases{$_}};
-        print $out "Alias /getfiles-$_ $vars->{$aliases{$_}}\n";
+        print $out "    Alias /getfiles-$_ $vars->{$aliases{$_}}\n";
     }
+    print $out "</IfModule>\n";
 
     print $out "\n";
 
@@ -1331,9 +1348,13 @@ EOF
 }
 
 sub need_reconfiguration {
-    my $self = shift;
+    my($self, $conf_opts) = @_;
     my @reasons = ();
     my $vars = $self->{vars};
+
+    if (my $port = $conf_opts->{port} || $Apache::TestConfig::Argv{port}) {
+        push @reasons, "'-port $port' requires reconfiguration";
+    }
 
     my $exe = $vars->{apxs} || $vars->{httpd};
     # if httpd.conf is older than executable
@@ -1409,7 +1430,8 @@ sub which {
 sub apxs {
     my($self, $q, $ok_fail) = @_;
     return unless $self->{APXS};
-    my $val = qx($self->{APXS} -q $q 2>/dev/null);
+    my $devnull = devnull();
+    my $val = qx($self->{APXS} -q $q 2>$devnull);
     chomp $val if defined $val; # apxs post-2.0.40 adds a new line
     unless ($val) {
         if ($ok_fail) {
@@ -1440,8 +1462,18 @@ sub add_inc {
     # make sure that Apache-Test/lib will be first in @INC,
     # followed by modperl-2.0/lib (or some other project's lib/),
     # followed by blib/ and finally system-wide libs.
-    lib::->import(map "$self->{vars}->{top_dir}/$_",
-                  qw(Apache-Test/lib lib blib/lib blib/arch));
+    my $top_dir = $self->{vars}->{top_dir};
+    my @dirs = map { catdir $top_dir, "blib", $_ } qw(lib arch);
+
+    my $apache_test_dir = catdir $top_dir, "Apache-Test";
+    unshift @dirs, $apache_test_dir if -d $apache_test_dir;
+
+    if ($ENV{APACHE_TEST_LIVE_DEV}) {
+        my $lib_dir = catdir $top_dir, "lib";
+        push @dirs, $lib_dir if -d $lib_dir;
+    }
+
+    lib::->import(@dirs);
     #print join "\n", "add_inc", @INC, "";
 }
 
@@ -1652,6 +1684,29 @@ automatically removed on cleanup if found empty.
 
 =back
 
+=head1 Environment Variables
+
+The following environment variables affect the configuration and the
+run-time of the C<Apache::Test> framework:
+
+=head2 APACHE_TEST_COLOR
+
+To aid visual control over the configuration process and the run-time
+phase, C<Apache::Test> uses coloured fonts when the environment
+variable C<APACHE_TEST_COLOR> is set to a true value.
+
+=head2 APACHE_TEST_LIVE_DEV
+
+When using C<Apache::Test> during the project development phase, it's
+often convenient to have the I<project/lib> (live) directory appearing
+first in C<@INC> so any changes to the Perl modules, residing in it,
+immediately affect the server, without a need to rerun C<make> to
+update I<blib/lib>. When the environment variable
+C<APACHE_TEST_LIVE_DEV> is set to a true value during the
+configuration phase (C<t/TEST -config>, C<Apache::Test> will
+automatically unshift the I<project/lib> directory into C<@INC>, via
+the autogenerated I<t/conf/modperl_inc.pl> file.
+
 =head1 AUTHOR
 
 =head1 SEE ALSO
@@ -1710,6 +1765,12 @@ HostnameLookups Off
     MaxClients           @MaxClients@
     MaxRequestsPerChild  0
 </IfModule>
+
+<IfDefine APACHE1>
+    StartServers         1
+    MaxClients           @MaxClients@
+    MaxRequestsPerChild  0
+</IfDefine>
 
 <IfModule mpm_winnt.c>
     ThreadsPerChild      20

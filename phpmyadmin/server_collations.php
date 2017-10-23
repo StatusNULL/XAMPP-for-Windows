@@ -1,5 +1,5 @@
 <?php
-/* $Id: server_collations.php,v 1.2 2003/07/23 19:22:59 rabus Exp $ */
+/* $Id: server_collations.php,v 2.4 2003/11/26 22:52:24 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -28,15 +28,14 @@ echo '<h2>' . "\n"
  */
 if (PMA_MYSQL_INT_VERSION < 40100) {
     // TODO: Some nice Message :-)
-    include('./footer.inc.php');
-    exit;
+    require_once('./footer.inc.php');
 }
 
 
 /**
  * Includes the required charset library
  */
-require('./libraries/mysql_charsets.lib.php');
+require_once('./libraries/mysql_charsets.lib.php');
 
 
 /**
@@ -55,12 +54,10 @@ echo '<table border="0">' . "\n"
    . '                </th>' . "\n"
    . '            </tr>' . "\n";
 
-reset($mysql_charsets);
-reset($mysql_collations);
 $i = 0;
 $table_row_count = count($mysql_charsets) + $mysql_collations_count;
 
-while (list(, $current_charset) = each($mysql_charsets)) {
+foreach ($mysql_charsets as $current_charset) {
     if ($i > $table_row_count / 2) {
         $i = 0;
         echo '            </table>' . "\n"
@@ -84,8 +81,7 @@ while (list(, $current_charset) = each($mysql_charsets)) {
        . '                </td>' . "\n"
        . '            </tr>' . "\n";
     $useBgcolorOne = TRUE;
-    reset($mysql_collations[$current_charset]);
-    while (list(, $current_collation) = each($mysql_collations[$current_charset])) {
+    foreach ($mysql_collations[$current_charset] as $current_collation) {
         $i++;
         echo '            <tr>' . "\n"
            . '                <td bgcolor="' . ($mysql_default_collations[$current_charset] == $current_collation ? $cfg['BrowseMarkerColor'] : ($useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo'])) . '">' . "\n"
@@ -104,6 +100,6 @@ echo '            </table>' . "\n"
    . '    </tr>' . "\n"
    . '</table>' . "\n";
 
-require('./footer.inc.php');
+require_once('./footer.inc.php');
 
 ?>

@@ -3,7 +3,7 @@
 # See AutoSplit.pm.
 package POSIX;
 
-#line 137 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\getgrnam.al)"
+#line 140 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\getgrnam.al)"
 sub getgrnam {
     usage "getgrnam(name)" if @_ != 1;
     CORE::getgrnam($_[0]);

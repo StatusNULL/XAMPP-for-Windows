@@ -1,5 +1,5 @@
 <?php
-/* $Id: xml.php,v 1.3 2003/08/11 08:39:23 nijel Exp $ */
+/* $Id: xml.php,v 2.1 2003/11/20 16:31:51 garvinhicking Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -28,7 +28,14 @@ function PMA_exportHeader() {
     global $crlf;
     global $cfg;
     
-    $head  =  '<!--' . $crlf
+    if ($GLOBALS['output_charset_conversion']) {
+        $charset = $GLOBALS['charset_of_file'];
+    } else {
+        $charset = $GLOBALS['charset'];
+    }
+
+    $head  =  '<?xml version="1.0" encoding="' . $charset . '" ?>' . $crlf
+           .  '<!--' . $crlf
            .  '-' . $crlf
            .  '- phpMyAdmin XML Dump' . $crlf
            .  '- version ' . PMA_VERSION . $crlf

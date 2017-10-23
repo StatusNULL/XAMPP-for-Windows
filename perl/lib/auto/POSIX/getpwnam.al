@@ -3,7 +3,7 @@
 # See AutoSplit.pm.
 package POSIX;
 
-#line 182 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\getpwnam.al)"
+#line 185 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\getpwnam.al)"
 sub getpwnam {
     usage "getpwnam(name)" if @_ != 1;
     CORE::getpwnam($_[0]);

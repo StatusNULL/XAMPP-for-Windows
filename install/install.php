@@ -49,8 +49,12 @@ $perlppm_ini="$partwampp\perl\site\lib\ppm.xml";
 $webalizer_ini="$partwampp\webalizer\webalizer.conf";
 $wampp_lib="$partwampp\install\wampp.sys";
 $test_cgi="$partwampp\cgi-bin\perltest.cgi";
+$cgi_cgi="$partwampp\cgi-bin\cgi.cgi";
+$guestbooken="$partwampp\cgi-bin\guestbook-en.cgi";
+$guestbookde="$partwampp\cgi-bin\guestbook-de.cgi";
 $printenv_pl="$partwampp\cgi-bin\printenv.pl";
 $drivers_pl="$partwampp\cgi-bin\drivers.pl";
+$jpgraph="$partwampp\jpgraph\jpgraph.php";
 $htaccess_moddav="$partwampp\webdav\.htaccess";
 // $install_bat="$partwampp\install_xampp.bat";
 // $setup_bat="$partwampp\update_xampp_config.bat";
@@ -62,7 +66,7 @@ $filezilla_stop="$partwampp\filezilla_stop.bat";
 $mercury_start="$partwampp\mercury_start.bat";
 $my_example="$partwampp\my_example.cnf";
 $jpgraph_one="$partwampp\jpgraph\jpgraph.php";
-$jpgraph_two="$partwampp\php\pear\jpgraph.php";
+// $jpgraph_two="$partwampp\php\pear\jpgraph.php";
 
 
 /// Configs END //
@@ -1031,15 +1035,39 @@ etc($printenv_pl);
 }
 //   PRINTENV.PL CONFIG END ///
 
+
+//   GUESTBOOK AND OTHER ///
+if(file_exists($cgi_cgi) && fopen($cgi_cgi,'a+')) 
+{ 
+etc($cgi_cgi);
+}
+if(file_exists($guestbooken) && fopen($guestbooken,'a+')) 
+{ 
+etc($guestbooken);
+}
+if(file_exists($guestbookde) && fopen($guestbookde,'a+')) 
+{ 
+etc($guestbookde);
+}
+
+if(file_exists($jpgraph) && fopen($jpgraph,'a+')) 
+{ 
+slashconfig($jpgraph);
+}
+
+//   GUESTBOOK END ///
+
+
+
 //   JPGRAPH CONFIG START ///
 if(file_exists($jpgraph_one) && fopen($jpgraph_one,'a+')) 
 { 
 slashconfig($jpgraph_one);
 }
-if(file_exists($jpgraph_two) && fopen($jpgraph_two,'a+')) 
+/* if(file_exists($jpgraph_two) && fopen($jpgraph_two,'a+')) 
 { 
 slashconfig($jpgraph_two);
-}
+} */
 //   JPGRAPH CONFIG END ///
 
 //  MOD DAV .HTACCESS CONFIG START ///

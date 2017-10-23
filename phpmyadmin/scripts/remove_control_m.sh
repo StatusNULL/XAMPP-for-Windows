@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: remove_control_m.sh,v 1.2 2002/04/24 19:14:04 robbat2 Exp $
+# $Id: remove_control_m.sh,v 2.0 2003/11/18 15:20:45 nijel Exp $
 #
 # Script to remove ^M from files for DOS <-> UNIX conversions
 #

@@ -1,5 +1,5 @@
 <?php
-/* $Id: overview.php,v 1.2 2003/03/13 20:23:30 rabus Exp $ */
+/* $Id: overview.php,v 2.3 2003/11/26 22:52:24 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -16,17 +16,11 @@ define('PMA_DISPLAY_HEADING', 0);
 /**
  * Gets some core libraries and displays a top message if required
  */
-if (!defined('PMA_GRAB_GLOBALS_INCLUDED')) {
-    include('./libraries/grab_globals.lib.php');
-}
-if (!defined('PMA_COMMON_LIB_INCLUDED'))  {
-    include('./libraries/common.lib.php');
-}
-
-require('./header.inc.php');
-
-require('./libraries/relation.lib.php');
-require('./libraries/transformations.lib.php');
+require_once('./libraries/grab_globals.lib.php');
+require_once('./libraries/common.lib.php');
+require_once('./header.inc.php');
+require_once('./libraries/relation.lib.php');
+require_once('./libraries/transformations.lib.php');
 $cfgRelation = PMA_getRelationsParam();
 
 $types = PMA_getAvailableMIMEtypes();
@@ -34,8 +28,7 @@ $types = PMA_getAvailableMIMEtypes();
 
 <h2><?php echo $strMIME_available_mime; ?></h2>
 <?php
-@reset($types);
-while(list($key, $mimetype) = each($types['mimetype'])) {
+foreach($types['mimetype'] AS $key => $mimetype) {
 
     if (isset($types['empty_mimetype'][$mimetype])) {
         echo '<i>' . $mimetype . '</i><br />';
@@ -61,9 +54,9 @@ while(list($key, $mimetype) = each($types['mimetype'])) {
 <?php
 @reset($types);
 $i = 0;
-while(list($key, $transform) = each($types['transformation'])) {
+foreach($types['transformation'] AS $key => $transform) {
     $i++;
-    $func = strtolower(str_replace('.inc.php', '', $types['transformation_file'][$key]));
+    $func = strtolower(preg_replace('@(\.inc\.php3?)$@i', '', $types['transformation_file'][$key]));
     $desc = 'strTransformation_' . $func;
 ?>
     <tr bgcolor="<?php echo ($i % 2 ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']); ?>">
@@ -79,5 +72,6 @@ while(list($key, $transform) = each($types['transformation'])) {
  * Displays the footer
  */
 echo "\n";
-require('./footer.inc.php');
+require_once('./footer.inc.php');
+
 ?>

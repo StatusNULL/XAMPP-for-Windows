@@ -3,7 +3,7 @@
 // +------------------------------------------------------------------------+
 // | PEAR :: PHPUnit                                                        |
 // +------------------------------------------------------------------------+
-// | Copyright (c) 2002-2003 Sebastian Bergmann <sb@sebastian-bergmann.de>. |
+// | Copyright (c) 2002-2004 Sebastian Bergmann <sb@sebastian-bergmann.de>. |
 // +------------------------------------------------------------------------+
 // | This source file is subject to version 3.00 of the PHP License,        |
 // | that is available at http://www.php.net/license/3_0.txt.               |
@@ -12,7 +12,7 @@
 // | license@php.net so we can mail you a copy immediately.                 |
 // +------------------------------------------------------------------------+
 //
-// $Id: SuiteTest.php,v 1.2 2003/06/13 08:52:00 sebastian Exp $
+// $Id: SuiteTest.php,v 1.4 2004/01/04 10:25:11 sebastian Exp $
 //
 
 require_once 'PHPUnit/Framework/TestCase.php';
@@ -27,10 +27,10 @@ require_once 'PHPUnit/Tests/Framework/NoTestCases.php';
 require_once 'PHPUnit/Tests/Framework/OneTestCase.php';
 
 class PHPUnit_Tests_Framework_SuiteTest extends PHPUnit_Framework_TestCase {
-    protected $fResult;
+    protected $result;
 
     protected function setUp() {
-        $this->fResult = new PHPUnit_Framework_TestResult;
+        $this->result = new PHPUnit_Framework_TestResult;
     }
 
     public static function suite() {

@@ -18,7 +18,7 @@ $graph->ShowHeaders(GANTT_HDAY | GANTT_HWEEK | GANTT_HMONTH);
 $graph->scale->tableTitle->Set("(Rev: 1.22)");
 $graph->scale->tableTitle->SetFont(FF_FONT1,FS_BOLD);
 $graph->scale->SetTableTitleBackground("silver");
-
+$graph->scale->tableTitle->Show();
 
 // Use the short name of the month together with a 2 digit year
 // on the month scale

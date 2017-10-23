@@ -17,7 +17,7 @@
 // |          Stig Bakken <ssb@php.net>                                   |
 // +----------------------------------------------------------------------+
 //
-// $Id: Dependency.php,v 1.27 2003/10/05 16:42:18 mj Exp $
+// $Id: Dependency.php,v 1.26 2003/08/30 15:59:50 cellog Exp $
 
 require_once "PEAR.php";
 
@@ -39,7 +39,6 @@ define('PEAR_DEPENDENCY_MISSING_OPTIONAL', -6);
  */
 class PEAR_Dependency
 {
-    // {{{ constructor
     /**
      * Constructor
      *
@@ -51,9 +50,6 @@ class PEAR_Dependency
     {
         $this->registry = &$registry;
     }
-
-    // }}}
-    // {{{ callCheckMethod()
 
     /**
     * This method maps the XML dependency definition to the
@@ -108,9 +104,6 @@ class PEAR_Dependency
                 return "'{$opts['type']}' dependency type not supported";
         }
     }
-
-    // }}}
-    // {{{ checkPackage()
 
     /**
      * Package dependencies check method
@@ -170,9 +163,6 @@ class PEAR_Dependency
         return PEAR_DEPENDENCY_BAD_DEPENDENCY;
     }
 
-    // }}}
-    // {{{ checkPackageUninstall()
-
     /**
      * Check package dependencies on uninstall
      *
@@ -206,9 +196,6 @@ class PEAR_Dependency
         }
         return ($error) ? true : false;
     }
-
-    // }}}
-    // {{{ checkExtension()
 
     /**
      * Extension dependencies check method
@@ -254,9 +241,6 @@ class PEAR_Dependency
         return $code;
     }
 
-    // }}}
-    // {{{ checkOS()
-
     /**
      * Operating system  dependencies check method
      *
@@ -281,9 +265,6 @@ class PEAR_Dependency
         return PEAR_DEPENDENCY_CONFLICT;
     }
 
-    // }}}
-    // {{{ checkPHP()
-
     /**
      * PHP version check method
      *
@@ -306,9 +287,6 @@ class PEAR_Dependency
         }
         return false;
     }
-
-    // }}}
-    // {{{ checkProgram()
 
     /**
      * External program check method.  Looks for executable files in
@@ -333,9 +311,6 @@ class PEAR_Dependency
         $errmsg = "'$program' program is not present in the PATH";
         return PEAR_DEPENDENCY_MISSING;
     }
-
-    // }}}
-    // {{{ checkSAPI()
 
     /**
      * SAPI backend check method.  Version comparison is not yet
@@ -362,8 +337,6 @@ class PEAR_Dependency
         return PEAR_DEPENDENCY_CONFLICT;
     }
 
-    // }}}
-    // {{{ checkZend()
 
     /**
      * Zend version check method
@@ -388,9 +361,6 @@ class PEAR_Dependency
         return false;
     }
 
-    // }}}
-    // {{{ signOperator()
-
     /**
      * Converts text comparing operators to them sign equivalents
      *
@@ -413,9 +383,6 @@ class PEAR_Dependency
                 return $operator;
         }
     }
-
-    // }}}
-    // {{{ codeFromRelation()
 
     /**
      * Convert relation into corresponding code
@@ -446,7 +413,5 @@ class PEAR_Dependency
         }
         return $code;
     }
-
-    // }}}
 }
 ?>

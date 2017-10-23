@@ -65,8 +65,8 @@ $bplot = new BarPlot($data_freq);
 
 // Create targets and alt texts for the image maps. One for each bar
 // (In this example this is just "dummy" targets)
-$targ=array("#1","#2","#3","#4","#5","#6");
-$alts=array("val=%d","val=%d","val=%d","val=%d","val=%d","val=%d");
+$targ=array("#1","#2","#3","#4","#5","#6","#7");
+$alts=array("val=%d","val=%d","val=%d","val=%d","val=%d","val=%d","val=%d");
 $bplot->SetCSIMTargets($targ,$alts);
 
 
@@ -95,6 +95,6 @@ $graph->Add($bplot);
 
 // Send back the HTML page which will call this script again
 // to retrieve the image.
-$graph->StrokeCSIM('test_barline.php');
+$graph->StrokeCSIM('barlinefreq_csimex1.php');
 
 ?>

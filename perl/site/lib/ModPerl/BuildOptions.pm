@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Apache::Build ();
+use Apache::TestTrace;
 my $param_qr = qr([\s=]+);
 
 use constant VERBOSE => 1;
@@ -21,8 +22,9 @@ sub init {
     parse_file($build);
     parse_argv($build);
 
-    if ($build->{MP_DEBUG} and $build->{MP_USE_GTOP}) {
-        $build->{MP_USE_GTOP} = 0 unless $build->find_dlfile('gtop');
+    if ($build->{MP_DEBUG} and $build->{MP_USE_GTOP} and !$build->find_gtop) {
+        error "Can't find libgtop, resetting MP_USE_GTOP=0";
+        $build->{MP_USE_GTOP} = 0;
     }
 
     unless ($build->{MP_USE_DSO} or $build->{MP_USE_STATIC}) {
@@ -83,10 +85,12 @@ sub parse {
                 }
             }
 
-            if ($self->{$key}) {
-                $self->{$key} .= ' ';
+            if ($table->{$key}->{append}){
+                $self->{$key} = join " ", grep $_, $self->{$key}, $val;
             }
-            $self->{$key} .= $val;
+            else {
+                $self->{$key} = $val;
+            }
 
             print "   $key = $val\n" if $opts & VERBOSE;
         }
@@ -102,8 +106,9 @@ sub parse_file {
     my $self = shift;
 
     my $fh;
-    my @files = map { $_ . 'makepl_args.mod_perl2' }
-      qw(./ ../ ./. ../.), "$ENV{HOME}/.";
+    my @dirs = qw(./ ../ ./. ../.);
+    push @dirs, "$ENV{HOME}/." if exists $ENV{HOME};
+    my @files = map { $_ . 'makepl_args.mod_perl2' } @dirs;
     unshift @files, $self->{MP_OPTIONS_FILE} if $self->{MP_OPTIONS_FILE};
 
     for my $file (@files) {
@@ -137,7 +142,7 @@ sub parse_argv {
 
 sub usage {
     my $table = table();
-    my @opts = map { "$_ - $table->{$_}" } sort keys %$table;
+    my @opts = map { "$_ - $table->{$_}->{val}" } sort keys %$table;
     join "\n", @opts;
 }
 
@@ -151,8 +156,8 @@ sub parse_table {
         s/^\s+//; s/\s+$//;
         next if /^\#/ || /^$/;
         last if /^__END__/;
-        my($key, $val) = split /\s+/, $_, 2;
-        $table{'MP_' . $key} = $val;
+        my($key, $append, $val) = split /\s+/, $_, 3;
+        $table{'MP_' . $key} = { append => $append, val => $val };
     }
 
     return \%table;
@@ -166,24 +171,32 @@ sub table {
 
 1;
 
-__DATA__
+# __DATA__ format:
+# key        append     description
+# where:
+#     key:    is the option name
+#     append: is whether we want to replace a default option (0)
+#             or append the arg to the option (1)
+#     desc:   description for this option
 
-USE_GTOP	Link with libgtop and enable libgtop reporting
-DEBUG		Turning on debugging (-g -lperld) and tracing
-MAINTAINER	Maintainer mode: DEBUG=1 -DAP_DEBUG -Wall ...
-CCOPTS		Add to compiler flags
-TRACE		Turn on tracing
-USE_DSO		Build mod_perl as a dso
-USE_STATIC	Build mod_perl static
-INST_APACHE2	Install *.pm relative to Apache2/ directory
-PROMPT_DEFAULT	Accept default value for all would-be prompts
-OPTIONS_FILE	Read options from given file
-STATIC_EXTS	Build Apache::*.xs as static extensions
-APXS            Path to apxs
-AP_PREFIX	Apache installation or source tree prefix
-APR_CONFIG	Path to apr-config
-XS_GLUE_DIR     Directories containing extension glue
-INCLUDE_DIR     Add directories to search for header files
-GENERATE_XS     Generate XS code based on httpd version
-LIBNAME         Name of the modperl dso library (default is mod_perl)
-COMPAT_1X       Compile-time mod_perl 1.0 backcompat (default is on)
+__DATA__
+USE_GTOP       0    Link with libgtop and enable libgtop reporting
+DEBUG          0    Turning on debugging (-g -lperld) and tracing
+MAINTAINER     0    Maintainer mode: DEBUG=1 -DAP_DEBUG -Wall ...
+CCOPTS         1    Add to compiler flags
+TRACE          0    Turn on tracing
+USE_DSO        0    Build mod_perl as a dso
+USE_STATIC     0    Build mod_perl static
+INST_APACHE2   0    Install *.pm relative to Apache2/ directory
+PROMPT_DEFAULT 0    Accept default value for all would-be prompts
+OPTIONS_FILE   0    Read options from given file
+STATIC_EXTS    0    Build Apache::*.xs as static extensions
+APXS           0    Path to apxs
+AP_PREFIX      0    Apache installation or source tree prefix
+APR_CONFIG     0    Path to apr-config
+XS_GLUE_DIR    1    Directories containing extension glue
+INCLUDE_DIR    1    Add directories to search for header files
+GENERATE_XS    0    Generate XS code based on httpd version
+LIBNAME        0    Name of the modperl dso library (default is  mod_perl)
+COMPAT_1X      0    Compile-time mod_perl 1.0 backcompat (default is  on)
+

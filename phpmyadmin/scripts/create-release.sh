@@ -1,6 +1,13 @@
 #!/bin/sh
 #
-# $Id: create-release.sh,v 1.32 2003/07/27 11:43:10 lem9 Exp $
+# $Id: create-release.sh,v 2.3 2003/11/26 22:52:24 rabus Exp $
+#
+# 2003-11-18, nijel@users.sourceforge.net:
+# - switch php3 -> php
+#
+# 2003-10-10, nijel@users.sourceforge.net:
+# - cvsserver set on just one place to ease testing
+# - echoes md5 sums to include on download page
 #
 # 2003-06-22, robbat2@users.sourceforge.net:
 # - Moved to using updatedocs.sh for updating documentation
@@ -32,6 +39,7 @@
 # - added release todo list
 #
 
+cvsserver=cvs1
 
 if [ $# == 0 ]
 then
@@ -56,20 +64,18 @@ cat <<END
 
 Please ensure you have:
   1. incremented rc count or version in CVS :
-     - in libraries/defines_php.lib.php3 the line
+     - in libraries/defines.lib.php the line
           " define('PMA_VERSION', '$1'); "
      - in Documentation.html the 2 lines
           " <title>phpMyAdmin $1 - Documentation</title> "
           " <h1>phpMyAdmin $1 Documentation</h1> "
      - in translators.html
      - in README
-  2. built the new "Documentation.txt" version using:
-       "./scripts/updatedocs.sh"
-  3. synchronized the language files:
+  2. synchronized the language files:
        cd lang
        ./sync_lang.sh
      and checked all language files are valid (use
-     the "./scripts/check_lang.php3" script to do it).
+     the "./scripts/check_lang.php" script to do it).
 
 Continue (y/n)?
 END
@@ -89,12 +95,12 @@ fi
 mkdir cvs
 cd cvs
 echo "Press [ENTER]!"
-cvs -d:pserver:anonymous@cvs1:/cvsroot/phpmyadmin login
+cvs -d:pserver:anonymous@$cvsserver:/cvsroot/phpmyadmin login
 if [ $? -ne 0 ] ; then
     echo "CVS login failed, bailing out"
     exit 1
 fi
-cvs -z3 -d:pserver:anonymous@cvs1:/cvsroot/phpmyadmin co -P $branch phpMyAdmin
+cvs -z3 -d:pserver:anonymous@$cvsserver:/cvsroot/phpmyadmin co -P $branch phpMyAdmin
 if [ $? -ne 0 ] ; then
     echo "CVS checkout failed, bailing out"
     exit 2
@@ -102,27 +108,23 @@ fi
 
 # Cleanup release dir
 LC_ALL=C date -u > phpMyAdmin/RELEASE-DATE-$1
-find phpMyAdmin \( -name .cvsignore -o -name CVS \) -print0 | xargs -0 rm -rf 
+find phpMyAdmin \( -name .cvsignore -o -name CVS \) -print0 | xargs -0 rm -rf
 find phpMyAdmin -type d -print0 | xargs -0 chmod 755
 find phpMyAdmin -type f -print0 | xargs -0 chmod 644
 find phpMyAdmin \( -name '*.sh' -o -name '*.pl' \) -print0 | xargs -0 chmod 755
+
+# Building Documentation.txt
+lynx --dont_wrap_pre --nolist --dump phpMyAdmin/Documentation.html > phpMyAdmin/Documentation.txt
+
+# Renaming directory
 mv phpMyAdmin phpMyAdmin-$1
 
-# Roll up '.php3' release
-zip -9 -r phpMyAdmin-$1-php3.zip phpMyAdmin-$1
-tar cvf phpMyAdmin-$1-php3.tar phpMyAdmin-$1
-bzip2 -9kv phpMyAdmin-$1-php3.tar
-gzip -9v phpMyAdmin-$1-php3.tar
+# Building distribution kits
+zip -9 -r phpMyAdmin-$1.zip phpMyAdmin-$1
+tar cvf phpMyAdmin-$1.tar phpMyAdmin-$1
+bzip2 -9kv phpMyAdmin-$1.tar
+gzip -9v phpMyAdmin-$1.tar
 
-# Setup for '.php' release
-cd phpMyAdmin-$1
-./scripts/extchg.sh php3 php
-cd ..
-# Roll up '.php' release
-zip -9 -r phpMyAdmin-$1-php.zip phpMyAdmin-$1
-tar cvf phpMyAdmin-$1-php.tar phpMyAdmin-$1
-bzip2 -9kv phpMyAdmin-$1-php.tar
-gzip -9v phpMyAdmin-$1-php.tar
 
 echo ""
 echo ""
@@ -131,6 +133,22 @@ echo "Files:"
 echo "------"
 
 ls -la *.gz *.zip *.bz2
+
+echo
+echo "MD5 sums:"
+echo "--------"
+
+md5sum *.{gz,zip,bz2} | sed "s/\([^ ]*\)[ ]*\([^ ]*\)/\$md5sum['\2'] = '\1';/"
+
+echo
+echo "Sizes:"
+echo "------"
+
+ls -l --block-size=k *.{gz,zip,bz2} | sed -r "s/[a-z-]+[[:space:]]+[0-9]+[[:space:]]+[^[:space:]]+[[:space:]]+[^[:space:]]+[[:space:]]+([0-9]*)K.*[[:space:]]([^[:space:]]+)\$/\$size['\2'] = \1;/"
+
+echo
+echo "Add these to /home/groups/p/ph/phpmyadmin/htdocs/home_page/files.inc.php on sf"
+
 cd ..
 find cvs -type d -print0 | xargs -0 chmod 775
 find cvs -type f -print0 | xargs -0 chmod 664
@@ -150,14 +168,16 @@ Todo now:
         mput cvs/*.gz *.zip *.bz2
  3. add files to SF files page (cut and paste changelog since last release)
  4. add SF news item to phpMyAdmin project
- 5. update the download page: /home/groups/p/ph/phpmyadmin/htdocs
+ 5. update web page:
+        - add MD5s and file sizes to /home/groups/p/ph/phpmyadmin/htdocs/home_page/md5.inc.php
+        - add release to /home/groups/p/ph/phpmyadmin/htdocs/home_page/config.inc.php
  6. announce release on freshmeat (http://freshmeat.net/projects/phpmyadmin/)
  7. send a short mail (with list of major changes) to
         phpmyadmin-devel@lists.sourceforge.net
         phpmyadmin-news@lists.sourceforge.net
         phpmyadmin-users@lists.sourceforge.net
  8. increment rc count or version in CVS :
-        - in libraries/defines_php.lib.php3 the line
+        - in libraries/defines.lib.php the line
               " define('PHPMYADMIN_VERSION', '2.2.2-rc1'); "
         - in Documentation.html the 2 lines
               " <title>phpMyAdmin 2.2.2-rc1 - Documentation</title> "

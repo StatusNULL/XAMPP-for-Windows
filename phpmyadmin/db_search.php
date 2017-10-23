@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_search.php,v 1.11 2003/03/02 17:26:23 rabus Exp $ */
+/* $Id: db_search.php,v 2.2 2003/11/26 22:52:24 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 /**
  * Credits for this script goes to Thomas Chaumeny <chaume92 at aol.com>
@@ -379,5 +379,5 @@ echo"\n";
  * Displays the footer
  */
 echo "\n";
-require('./footer.inc.php');
+require_once('./footer.inc.php');
 ?>

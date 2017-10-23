@@ -3,7 +3,7 @@
 # See AutoSplit.pm.
 package POSIX;
 
-#line 404 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\atoi.al)"
+#line 411 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\atoi.al)"
 sub atoi {
     unimpl "atoi() is C-specific, stopped";
 }

@@ -1,11 +1,11 @@
 <?php
-/* $Id: phpmyadmin.css.php,v 1.9 2003/07/29 09:58:59 garvinhicking Exp $ */
+/* $Id: phpmyadmin.css.php,v 2.2 2003/11/26 22:52:24 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 chdir('..');
 $is_minimum_common = TRUE;
-require('./libraries/grab_globals.lib.php');
-require('./libraries/common.lib.php');
+require_once('./libraries/grab_globals.lib.php');
+require_once('./libraries/common.lib.php');
 
 // Gets the default font sizes
 // garvin: TODO: Should be optimized to not include the whole common.lib.php bunch
@@ -13,7 +13,7 @@ require('./libraries/common.lib.php');
 PMA_setFontSizes();
 
 $ctype = 'css';
-require('./libraries/header_http.inc.php');
+require_once('./libraries/header_http.inc.php');
 
 if (!isset($js_frame)) {
     $js_frame = 'left';
@@ -31,8 +31,6 @@ if ($js_frame == 'left') {
     ?>
 /* No layer effects neccessary */
 div     {font-family: <?php echo $left_font_family; ?>; font-size: <?php echo $font_size; ?>; color: #000000}
-input   {font-family: <?php echo $left_font_family; ?>; font-size: <?php echo $font_size; ?>}
-select  {font-family: <?php echo $left_font_family; ?>; font-size: <?php echo $font_size; ?>; background-color: #ffffff; color: #000000}
 .heada  {font-family: <?php echo $left_font_family; ?>; font-size: <?php echo $font_size; ?>; color: #000000}
 .parent {font-family: <?php echo $left_font_family; ?>; color: #000000; text-decoration: none}
 .item, .item:active, .item:hover, .tblItem, .tblItem:active {font-family: <?php echo $left_font_family; ?>; font-size: <?php echo $font_smaller; ?>; color: #333399; text-decoration: none}
@@ -97,6 +95,8 @@ div {font-family: <?php echo $left_font_family; ?>; font-size: <?php echo $font_
     ?>
 /* Always enabled stylesheets (left frame) */
 body {font-family: <?php echo $left_font_family; ?>; font-size: <?php echo $font_size; ?>}
+input   {font-family: <?php echo $left_font_family; ?>; font-size: <?php echo $font_size; ?>}
+select  {font-family: <?php echo $left_font_family; ?>; font-size: <?php echo $font_size; ?>; background-color: #ffffff; color: #000000}
     <?php
 } elseif ($js_frame == 'print') {
 /************************************************************************************

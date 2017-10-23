@@ -1,9 +1,9 @@
-# NOTE: Derived from blib\lib\Tk/Toplevel.pm.
+# NOTE: Derived from blib\lib\Tk\Toplevel.pm.
 # Changes made here will be lost when autosplit is run again.
 # See AutoSplit.pm.
 package Tk::Toplevel;
 
-#line 188 "blib\lib\Tk/Toplevel.pm (autosplit into blib\lib\auto\Tk\Toplevel\FG_Out.al)"
+#line 188 "blib\lib\Tk\Toplevel.pm (autosplit into blib\lib\auto\Tk\Toplevel\FG_Out.al)"
 # tkFocusGroup_Out --
 #
 #	Handles the <FocusOut> event. Checks if this is really a lose

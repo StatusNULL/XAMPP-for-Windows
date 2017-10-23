@@ -1,14 +1,14 @@
 <?php
-/* $Id: tbl_rename.php,v 1.26 2003/08/05 17:12:48 nijel Exp $ */
+/* $Id: tbl_rename.php,v 2.4 2003/11/26 22:52:24 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
 /**
  * Gets some core libraries
  */
-require('./libraries/grab_globals.lib.php');
+require_once('./libraries/grab_globals.lib.php');
 $js_to_run = 'functions.js';
-require('./libraries/common.lib.php');
+require_once('./libraries/common.lib.php');
 
 PMA_checkParameters(array('db','table'));
 
@@ -21,7 +21,7 @@ $err_url = 'tbl_properties.php?' . PMA_generate_common_url($db, $table);
 /**
  * A new name has been submitted -> do the work
  */
-if (isset($new_name) && trim($new_name) != '') {
+if (isset($new_name) && trim($new_name) != '' && strpos($new_name,'.') === FALSE) {
     $old_name     = $table;
     $table        = $new_name;
 
@@ -29,11 +29,8 @@ if (isset($new_name) && trim($new_name) != '') {
     if (count($dblist) > 0 && PMA_isInto($db, $dblist) == -1) {
         exit();
     }
-    if (PMA_MYSQL_INT_VERSION < 32306) {
-        PMA_checkReservedWords($new_name, $err_url);
-    }
 
-    include('./header.inc.php');
+    require_once('./header.inc.php');
     PMA_mysql_select_db($db);
     $sql_query = 'ALTER TABLE ' . PMA_backquote($old_name) . ' RENAME ' . PMA_backquote($new_name);
     $result    = PMA_mysql_query($sql_query) or PMA_mysqlDie('', '', '', $err_url);
@@ -41,7 +38,7 @@ if (isset($new_name) && trim($new_name) != '') {
     $reload    = 1;
 
     // garvin: Move old entries from comments to new table
-    include('./libraries/relation.lib.php');
+    require_once('./libraries/relation.lib.php');
     $cfgRelation = PMA_getRelationsParam();
     if ($cfgRelation['commwork']) {
         $remove_query = 'UPDATE ' . PMA_backquote($cfgRelation['column_info'])
@@ -79,7 +76,7 @@ if (isset($new_name) && trim($new_name) != '') {
         unset($table_query);
         unset($tb_rs);
     }
-    
+
     if ($cfgRelation['pdfwork']) {
         $table_query = 'UPDATE ' . PMA_backquote($cfgRelation['table_coords'])
                         . ' SET     table_name = \'' . PMA_sqlAddslashes($table) . '\''
@@ -97,13 +94,17 @@ if (isset($new_name) && trim($new_name) != '') {
  * No new name for the table!
  */
 else {
-    include('./header.inc.php');
-    PMA_mysqlDie($strTableEmpty, '', '', $err_url);
+    require_once('./header.inc.php');
+    if (strpos($new_name,'.') === FALSE) {
+        PMA_mysqlDie($strTableEmpty, '', '', $err_url);
+    } else {
+        PMA_mysqlDie($strError . ': ' . $new_name, '', '', $err_url);
+    }
 }
 
 
 /**
  * Back to the calling script
  */
-require('./tbl_properties.php');
+require('./tbl_properties_operations.php');
 ?>

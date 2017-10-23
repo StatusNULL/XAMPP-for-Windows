@@ -1,9 +1,9 @@
 package open;
 use warnings;
 use Carp;
-$open::hint_bits = 0x20000;
+$open::hint_bits = 0x20000; # HINT_LOCALIZE_HH
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 my $locale_encoding;
 
@@ -80,7 +80,7 @@ sub import {
 	foreach my $layer (split(/\s+/,$dscp)) {
             $layer =~ s/^://;
 	    if ($layer eq 'locale') {
-		use Encode;
+		require Encode;
 		_get_locale_encoding()
 		    unless defined $locale_encoding;
 		(warnings::warnif("layer", "Cannot figure out an encoding to use"), last)
@@ -166,9 +166,12 @@ Perl is configured to use PerlIO as its IO system (which is now the
 default).
 
 The C<open> pragma serves as one of the interfaces to declare default
-"layers" (also known as "disciplines") for all I/O. Any open(),
-readpipe() (aka qx//) and similar operators found within the lexical
-scope of this pragma will use the declared defaults.
+"layers" (also known as "disciplines") for all I/O. Any two-argument
+open(), readpipe() (aka qx//) and similar operators found within the
+lexical scope of this pragma will use the declared defaults.
+Three-argument opens are not affected by this pragma since there you
+(can) explicitly specify the layers and are supposed to know what you
+are doing.
 
 With the C<IN> subpragma you can declare the default layers
 of input streams, and with the C<OUT> subpragma you can declare

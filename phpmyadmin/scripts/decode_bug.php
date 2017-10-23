@@ -1,5 +1,5 @@
 <?php
-/* $Id: decode_bug.php,v 1.7 2002/10/23 04:17:27 robbat2 Exp $ */
+/* $Id: decode_bug.php,v 2.1 2003/11/22 20:57:48 garvinhicking Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4 foldmarker={,} fdm=marker:
 
 
@@ -76,9 +76,6 @@ function PMA_printDecodedBug($textdata)
 
 if (!empty($_POST) && isset($_POST['bug_encoded'])) {
     $bug_encoded = $_POST['bug_encoded'];
-}
-else if (!empty($HTTP_POST_VARS) && isset($HTTP_POST_VARS['bug_encoded'])) {
-    $bug_encoded = $HTTP_POST_VARS['bug_encoded'];
 }
 
 if (!empty($bug_encoded)) {

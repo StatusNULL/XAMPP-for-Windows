@@ -21,6 +21,12 @@ $graph->ShowHeaders(GANTT_HDAY | GANTT_HWEEK | GANTT_HMONTH);
 $graph->scale->tableTitle->Set("(Rev: 1.22)");
 $graph->scale->tableTitle->SetFont(FF_FONT1,FS_BOLD);
 $graph->scale->SetTableTitleBackground("silver");
+$graph->scale->tableTitle->Show();
+
+$graph->scale->divider->SetStyle('solid');
+$graph->scale->divider->SetWeight(2);
+$graph->scale->divider->SetColor('black');
+
 
 $graph->SetBox(true,"navy",2);
 

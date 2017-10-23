@@ -1,9 +1,9 @@
-# NOTE: Derived from blib\lib\Tk/Widget.pm.
+# NOTE: Derived from blib\lib\Tk\Widget.pm.
 # Changes made here will be lost when autosplit is run again.
 # See AutoSplit.pm.
 package Tk::Widget;
 
-#line 1248 "blib\lib\Tk/Widget.pm (autosplit into blib\lib\auto\Tk\Widget\clipboardKeysyms.al)"
+#line 1248 "blib\lib\Tk\Widget.pm (autosplit into blib\lib\auto\Tk\Widget\clipboardKeysyms.al)"
 # clipboardKeysyms --
 # This procedure is invoked to identify the keys that correspond to
 # the "copy", "cut", and "paste" functions for the clipboard.

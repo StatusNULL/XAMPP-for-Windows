@@ -1,9 +1,9 @@
-# NOTE: Derived from blib\lib\Tk/Frame.pm.
+# NOTE: Derived from blib\lib\Tk\Frame.pm.
 # Changes made here will be lost when autosplit is run again.
 # See AutoSplit.pm.
 package Tk::Frame;
 
-#line 211 "blib\lib\Tk/Frame.pm (autosplit into blib\lib\auto\Tk\Frame\freeze_on_map.al)"
+#line 211 "blib\lib\Tk\Frame.pm (autosplit into blib\lib\auto\Tk\Frame\freeze_on_map.al)"
 sub freeze_on_map
 {
  my ($w) = @_;

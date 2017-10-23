@@ -3,7 +3,7 @@
 // +------------------------------------------------------------------------+
 // | PEAR :: PHPUnit                                                        |
 // +------------------------------------------------------------------------+
-// | Copyright (c) 2002-2003 Sebastian Bergmann <sb@sebastian-bergmann.de>. |
+// | Copyright (c) 2002-2004 Sebastian Bergmann <sb@sebastian-bergmann.de>. |
 // +------------------------------------------------------------------------+
 // | This source file is subject to version 3.00 of the PHP License,        |
 // | that is available at http://www.php.net/license/3_0.txt.               |
@@ -12,7 +12,7 @@
 // | license@php.net so we can mail you a copy immediately.                 |
 // +------------------------------------------------------------------------+
 //
-// $Id: TestListenerTest.php,v 1.2 2003/06/13 08:52:00 sebastian Exp $
+// $Id: TestListenerTest.php,v 1.4 2004/01/04 10:25:11 sebastian Exp $
 //
 
 require_once 'PHPUnit/Framework/TestCase.php';
@@ -24,59 +24,59 @@ require_once 'PHPUnit/Tests/Framework/Failure.php';
 require_once 'PHPUnit/Tests/Framework/Success.php';
 
 class PHPUnit_Tests_Framework_TestListenerTest extends PHPUnit_Framework_TestCase implements PHPUnit_Framework_TestListener {
-    private $fResult;
-    private $fStartCount;
-    private $fEndCount;
-    private $fFailureCount;
-    private $fErrorCount;
+    private $result;
+    private $startCount;
+    private $endCount;
+    private $failureCount;
+    private $errorCount;
 
     public function addError(PHPUnit_Framework_Test $test, Exception $e) {
-        $this->fErrorCount++;
+        $this->errorCount++;
     }
 
     public function addFailure(PHPUnit_Framework_Test $test, PHPUnit_Framework_AssertionFailedError $e) {
-        $this->fFailureCount++;
+        $this->failureCount++;
     }
 
     public function endTest(PHPUnit_Framework_Test $test) {
-        $this->fEndCount++;
+        $this->endCount++;
     }
 
     public function startTest(PHPUnit_Framework_Test $test) {
-        $this->fStartCount++;
+        $this->startCount++;
     }
 
     protected function setUp() {
-        $this->fResult = new PHPUnit_Framework_TestResult;
-        $this->fResult->addListener($this);
+        $this->result = new PHPUnit_Framework_TestResult;
+        $this->result->addListener($this);
 
-        $this->fFailureCount = 0;
-        $this->fEndCount     = 0;
-        $this->fStartCount   = 0;
+        $this->failureCount = 0;
+        $this->endCount     = 0;
+        $this->startCount   = 0;
     }
 
     public function testError() {
         $test = new PHPUnit_Tests_Framework_Error;
-        $test->run($this->fResult);
+        $test->run($this->result);
 
-        $this->assertEquals(1, $this->fErrorCount);
-        $this->assertEquals(1, $this->fEndCount);
+        $this->assertEquals(1, $this->errorCount);
+        $this->assertEquals(1, $this->endCount);
     }
 
     public function testFailure() {
         $test = new PHPUnit_Tests_Framework_Failure;
-        $test->run($this->fResult);
+        $test->run($this->result);
 
-        $this->assertEquals(1, $this->fFailureCount);
-        $this->assertEquals(1, $this->fEndCount);
+        $this->assertEquals(1, $this->failureCount);
+        $this->assertEquals(1, $this->endCount);
     }
 
     public function testStartStop() {
         $test = new PHPUnit_Tests_Framework_Success;
-        $test->run($this->fResult);
+        $test->run($this->result);
 
-        $this->assertEquals(1, $this->fStartCount);
-        $this->assertEquals(1, $this->fEndCount);
+        $this->assertEquals(1, $this->startCount);
+        $this->assertEquals(1, $this->endCount);
     }
 }
 

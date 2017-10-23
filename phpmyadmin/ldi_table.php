@@ -1,5 +1,5 @@
 <?php
-/* $Id: ldi_table.php,v 1.29 2003/07/28 17:47:07 lem9 Exp $ */
+/* $Id: ldi_table.php,v 2.2 2003/11/26 22:52:24 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -7,12 +7,10 @@
  * This file defines the forms used to insert a textfile into a table
  */
 
-require('./libraries/grab_globals.lib.php');
+require_once('./libraries/grab_globals.lib.php');
 
 // Check parameters
-if (!defined('PMA_COMMON_LIB_INCLUDED')) {
-    include('./libraries/common.lib.php');
-}
+require_once('./libraries/common.lib.php');
 PMA_checkParameters(array('db', 'table'));
 
 
@@ -34,8 +32,10 @@ require('./tbl_properties_table_info.php');
         <td><?php echo $strLocationTextfile; ?></td>
         <td colspan="2"><input type="file" name="textfile" />
         <?php
-if ($cfg['UploadDir'] != '') {
-
+if (!empty($cfg['UploadDir'])) {
+    if (substr($cfg['UploadDir'], -1) != '/') {
+        $cfg['UploadDir'] .= '/';
+    }
     if ($handle = @opendir($cfg['UploadDir'])) {
         $is_first = 0;
         while ($file = @readdir($handle)) {
@@ -163,7 +163,7 @@ if (PMA_MYSQL_INT_VERSION > 40003) {
     <tr>
         <td><?php echo $strLoadMethod; ?>
         </td>
-        <td> 
+        <td>
             <input type="radio" id="radio_local_option_0" name="local_option" value="0" <?php echo (!$local_option_selected ? ' checked="checked" ' : ''); ?>/><label for="radio_local_option_0">...DATA</label><br />
             <input type="radio" id="radio_local_option_1" name="local_option" value="1" <?php echo ($local_option_selected ? ' checked="checked" ' : ''); ?>/><label for="radio_local_option_1">...DATA LOCAL</label>
         </td>
@@ -192,5 +192,5 @@ if (PMA_MYSQL_INT_VERSION > 40003) {
 /**
  * Displays the footer
  */
-require('./footer.inc.php');
+require_once('./footer.inc.php');
 ?>

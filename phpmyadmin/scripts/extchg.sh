@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: extchg.sh,v 1.2 2002/04/24 19:10:32 robbat2 Exp $ 
+# $Id: extchg.sh,v 2.0 2003/11/18 15:20:45 nijel Exp $ 
 #
 # original php3->phtml converter by Pavel Piankov <pashah@spb.sitek.net>
 # modified by Tobias Ratschiller to allow any file extension
@@ -23,5 +23,13 @@ for i in `find . -name "*.$1"`
 	 echo $i
 	 sed -e 's/\.'$1'/\.'$2'/g' $i > `ls $i|sed -e 's/'$1'/'$2'/g'`
 	 rm $i
+	done;
+
+for i in `find . -name "generator.sh"`
+	 do 
+	 echo $i
+	 sed -e 's/\.'$1'/\.'$2'/g' $i > $i.new 
+	 rm $i
+         mv $i.new $i
 	done;
 

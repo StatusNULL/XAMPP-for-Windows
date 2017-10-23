@@ -1,5 +1,5 @@
 #!/bin/bash
-# $Id: generator.sh,v 1.3 2003/03/09 11:16:54 lem9 Exp $
+# $Id: generator.sh,v 2.0 2003/11/18 15:20:44 nijel Exp $
 #
 # Shell script that adds a new function file using a template. Should not be called directly
 # but instead by template_Generator.sh and template_generator_mimetype.sh
@@ -18,7 +18,7 @@ fi
 functionupper="`echo $2 | tr [:lower:] [:upper:]`"
 functionlower="`echo $2 | tr [:upper:] [:lower:]`"
 
-cat $1 | sed "s/\[ENTER_FILENAME_HERE\]/$functionupper/" | sed "s/\[enter_filename_here\]/$functionlower/" >> $2.inc.php3
+cat $1 | sed "s/\[ENTER_FILENAME_HERE\]/$functionupper/" | sed "s/\[enter_filename_here\]/$functionlower/" >> $2.inc.php
 
 if [ "$3" ]
 then
@@ -29,5 +29,5 @@ then
     echo ""
 fi
 
-echo "Created $2.inc.php3"
+echo "Created $2.inc.php"
 echo ""

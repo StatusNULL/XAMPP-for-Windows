@@ -1,11 +1,17 @@
 #!/bin/bash
-# $Id: add_message.sh,v 1.6 2003/02/08 22:20:30 rabus Exp $
+# $Id: add_message.sh,v 2.0 2003/11/18 15:20:38 nijel Exp $
 #
 # Shell script that adds a message to all message files (Lem9)
 #
 # Example:  add_message.sh '$strNewMessage' 'new message contents'
 #
-for file in *.inc.php3
+
+if [ $# -ne 2 ] ; then
+    echo "usage: add_message.sh '\$strNewMessage' 'new message contents'"
+    exit 1
+fi
+    
+for file in *.inc.php
 do
         echo $file " "
         grep -v '?>' ${file} > ${file}.new

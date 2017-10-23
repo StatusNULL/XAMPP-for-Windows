@@ -1,9 +1,9 @@
-# NOTE: Derived from blib\lib\Tk/Widget.pm.
+# NOTE: Derived from blib\lib\Tk\Widget.pm.
 # Changes made here will be lost when autosplit is run again.
 # See AutoSplit.pm.
 package Tk::Widget;
 
-#line 1291 "blib\lib\Tk/Widget.pm (autosplit into blib\lib\auto\Tk\Widget\pathname.al)"
+#line 1291 "blib\lib\Tk\Widget.pm (autosplit into blib\lib\auto\Tk\Widget\pathname.al)"
 sub pathname
 {
  my ($w,$id) = @_;

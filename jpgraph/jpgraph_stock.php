@@ -4,7 +4,7 @@
 // Description:	Stock plot extension for JpGraph
 // Created: 	2003-01-27
 // Author:	Johan Persson (johanp@aditus.nu)
-// Ver:		$Id: jpgraph_stock.php,v 1.5 2003/02/10 16:38:04 aditus Exp $
+// Ver:		$Id: jpgraph_stock.php,v 1.5.2.1 2003/11/24 15:39:11 aditus Exp $
 //
 // License:	This code is released under QPL
 // Copyright (C) 2003 Johan Persson
@@ -88,7 +88,7 @@ class StockPlot extends Plot {
 	    else $x=$i;
 	    $xt = $xscale->Translate($x);
 	    
-	    $neg = $this->coords[0][$i*4] > $this->coords[0][$i*$ts+1] ;
+	    $neg = $this->coords[0][$i*$ts] > $this->coords[0][$i*$ts+1] ;
 	    $yopen  = $yscale->Translate($this->coords[0][$i*$ts]);
 	    $yclose = $yscale->Translate($this->coords[0][$i*$ts+1]);
 	    $ymin   = $yscale->Translate($this->coords[0][$i*$ts+2]);

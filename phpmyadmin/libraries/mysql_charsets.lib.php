@@ -1,9 +1,8 @@
 <?php
-/* $Id: mysql_charsets.lib.php,v 1.5.2.1 2003/09/01 11:33:48 nijel Exp $ */
+/* $Id: mysql_charsets.lib.php,v 2.3 2003/11/26 22:52:23 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
-if (!defined('PMA_MYSQL_CHARSETS_LIB_INCLUDED')){
-    define('PMA_MYSQL_CHARSETS_LIB_INCLUDED', 1);
+if (PMA_MYSQL_INT_VERSION >= 40100){
 
     $res = PMA_mysql_query('SHOW CHARACTER SET;', $userlink)
         or PMA_mysqlDie(PMA_mysql_error($userlink), 'SHOW CHARACTER SET;');
@@ -15,17 +14,12 @@ if (!defined('PMA_MYSQL_CHARSETS_LIB_INCLUDED')){
         $mysql_charsets_descriptions[$row['Charset']] = $row['Description'];
     }
     @mysql_free_result($res);
-    unset($res);
-    unset($row);
+    unset($res, $row);
 
     $res = PMA_mysql_query('SHOW COLLATION;', $userlink)
         or PMA_mysqlDie(PMA_mysql_error($userlink), 'SHOW COLLATION;');
 
-    if (PMA_PHP_INT_VERSION >= 40000) {
-        sort($mysql_charsets, SORT_STRING);
-    } else {
-        sort($mysql_charsets);
-    }
+    sort($mysql_charsets, SORT_STRING);
 
     $mysql_collations = array_flip($mysql_charsets);
     $mysql_default_collations = array();;
@@ -40,22 +34,15 @@ if (!defined('PMA_MYSQL_CHARSETS_LIB_INCLUDED')){
         }
     }
 
-    reset($mysql_collations);
     $mysql_collations_count = 0;
-    while (list($key, $value) = each($mysql_collations)) {
+    foreach($mysql_collations AS $key => $value) {
         $mysql_collations_count += count($mysql_collations[$key]);
-        if (PMA_PHP_INT_VERSION >= 40000) {
-            sort($mysql_collations[$key], SORT_STRING);
-        } else {
-            sort($mysql_collations[$key]);
-        }
+        sort($mysql_collations[$key], SORT_STRING);
         reset($mysql_collations[$key]);
     }
-    reset($mysql_collations);
 
     @mysql_free_result($res);
-    unset($res);
-    unset($row);
+    unset($res, $row);
 
     function PMA_getCollationDescr($collation) {
         if ($collation == 'binary') {
@@ -215,6 +202,6 @@ if (!defined('PMA_MYSQL_CHARSETS_LIB_INCLUDED')){
         return $descr;
     }
 
-} // $__PMA_MYSQL_CHARSETS_LIB__
+}
 
 ?>

@@ -4,18 +4,85 @@ DBI::Changes - List of significant changes to the DBI
 
 =cut
 
-Need to add docs for DbTypeSubclass (ala DBIx::AnyDBD)
-Move TIEHASH etc to XS (and pureperl)
-
-$dbh->{Statement} can be wrong because fetch doesn't update value
-maybe imp_dbh holds imp_sth (or inner handle) of last sth method
-called (if not DESTROY) and sth outer DESTROY clears it (to reduce ref count)
-Then $dbh->{LastSth} would work (returning outer handle if valid).
-Then $dbh->{Statement} would be the same as $dbh->{LastSth}->{Statement}
-Also $dbh->{ParamValues} would be the same as $dbh->{LastSth}->{ParamValues}.
-Add more macro hooks to Driver.xst: ping, quote etc.
-
 =head1 CHANGES
+
+=head2 Changes in DBI 1.40,    7th January 2004
+
+  Fixed handling of CachedKids when DESTROYing threaded handles.
+  Fixed sql_user_name() in DBI::DBD::Metadata (used by write_getinfo_pm)
+    to use $dbh->{Username}. Driver authors please update your code.
+
+  Changed connect_cached() when running under Apache::DBI
+    to route calls to Apache::DBI::connect().
+
+  Added CLONE() to DBD::Sponge and DBD::ExampleP.
+  Added warning when starting a new thread about any loaded driver
+    which does not have a CLONE() function.
+  Added new prepare_cache($sql, \%attr, 3) option to manage Active handles.
+  Added SCALE and NULLABLE support to DBD::Sponge.
+  Added missing execute() in fetchall_hashref docs thanks to Iain Truskett.
+  Added a CONTRIBUTING section to the docs with notes on creating patches.
+
+=head2 Changes in DBI 1.39,    27th November 2003
+
+  Fixed STORE to not clear error during nested DBI call, again/better,
+    thanks to Tony Bowden for the report and helpful test case.
+  Fixed DBI dispatch to not try to use AUTOLOAD for driver methods unless
+    the method has been declared (as methods should be when using AUTOLOAD).
+    This fixes a problem when the Attribute::Handlers module is loaded.
+  Fixed cwd check code to use $Config{path_sep} thanks to Steve Hay.
+  Fixed unqualified croak() calls thanks to Steffen Goeldner.
+  Fixed DBD::ExampleP TYPE and PRECISION attributes thanks to Tom Lowery.
+  Fixed tracing of methods that only get traced at high trace levels.
+
+  The level 1 trace no longer includes nested method calls so it generally
+    just shows the methods the application explicitly calls.
+  Added line to trace log (level>=4) when err/errstr is cleared.
+  Updated docs for InactiveDestroy and point out where and when the
+    trace includes the process id.
+  Update DBI::DBD docs thanks to Steffen Goeldner.
+  Removed docs saying that the DBI->data_sources method could be
+    passed a $dbh. The $dbh->data_sources method should be used instead.
+  Added link to 'DBI recipes' thanks to Giuseppe Maxia:
+    http://gmax.oltrelinux.com/dbirecipes.html (note that this
+    is not an endorsement that the recipies are 'optimal')
+
+  Note: There is a bug in perl 5.8.2 when configured with threads
+  and debugging enabled (bug #24463) which causes a DBI test to fail.
+
+=head2 Changes in DBI 1.38,    21th August 2003
+
+  NOTE: The DBI now requires perl version 5.6.0 or later.
+  (As per notice in DBI 1.33 released 27th February 2003)
+
+  Fixed spurious t/03handles failure on 64bit perls reported by H.Merijn Brand.
+  Fixed spurious t/15array failure on some perl versions thanks to Ed Avis.
+  Fixed build using dmake on windows thanks to Steffen Goeldner.
+  Fixed build on using some shells thanks to Gurusamy Sarathy.
+  Fixed ParamValues to only be appended to ShowErrorStatement if not empty.
+  Fixed $dbh->{Statement} not being writable by drivers in some cases.
+  Fixed occasional undef warnings on connect failures thanks to Ed Avis.
+  Fixed small memory leak when using $sth->{NAME..._hash}.
+  Fixed 64bit warnings thanks to Marian Jancar.
+  Fixed DBD::Proxy::db::DESTROY to not alter $@ thanks to Keith Chapman.
+  Fixed Makefile.PL status from WriteMakefile() thanks to Leon Brocard.
+
+  Changed "Can't set ...->{Foo}: unrecognised attribute" from an error to a
+    warning when running with DBI::ProxyServer to simplify upgrades.
+  Changed execute_array() to no longer require ArrayTupleStatus attribute.
+  Changed DBI->available_drivers to not hide DBD::Sponge.
+  Updated/moved placeholder docs to a better place thanks to Johan Vromans.
+  Changed dbd_db_do4 api in Driver.xst to match dbd_st_execute (return int,
+    not bool), relevant only to driver authors.
+  Changed neat(), and thus trace(), so strings marked as utf8 are presented
+    in double quotes instead of single quotes and are not sanitized.
+
+  Added $dbh->data_sources method.
+  Added $dbh->last_insert_id method.
+  Added $sth->execute_for_fetch($fetch_tuple_sub, \@tuple_status) method.
+  Added DBI->installed_versions thanks to Jeff Zucker.
+  Added $DBI::Profile::ON_DESTROY_DUMP variable.
+  Added docs for DBD::Sponge thanks to Mark Stosberg.
 
 =head2 Changes in DBI 1.37,    15th May 2003
 

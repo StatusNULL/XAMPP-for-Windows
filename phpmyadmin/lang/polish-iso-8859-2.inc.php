@@ -1,5 +1,5 @@
 <?php
-/* $Id: polish-iso-8859-2.inc.php,v 1.123.2.1 2003/08/23 12:18:40 lem9 Exp $ */
+/* $Id: polish-iso-8859-2.inc.php,v 2.2 2003/11/20 13:48:52 nijel Exp $ */
 
 $charset = 'iso-8859-2';
 $text_dir = 'ltr';
@@ -71,8 +71,10 @@ $strBeginCut = 'TNIJ ST¡D';
 $strBeginRaw = 'SUROWE DANE ST¡D';
 $strBinary = ' Binarne ';
 $strBinaryDoNotEdit = ' Binarne - nie do edycji ';
+$strBookmarkAllUsers = 'Pozwolenie na dostêp do zapytania przez ka¿dego u¿ytkownika';
 $strBookmarkDeleted = 'Zapamiêtane zapytanie SQL zosta³o usuniête.';
 $strBookmarkLabel = 'Nazwa';
+$strBookmarkOptions = 'Opcje zapamiêtanych zapytañ';
 $strBookmarkQuery = 'Zapamiêtane zapytanie SQL';
 $strBookmarkThis = 'Zapamiêtanie zapytania SQL';
 $strBookmarkView = 'Tylko do pokazania';
@@ -126,6 +128,8 @@ $strConfigFileError = 'phpMyAdmin nie zdo³a³ odczytaæ Twojego pliku konfiguracj!
 $strConfigureTableCoord = 'Proszê skonfigurowaæ wspó³rzêdnie dla tabeli %s';
 $strConfirm = 'Czy na pewno to zrobiæ?';
 $strConnections = 'Po³±czenia';
+$strConstraintsForDumped = 'Ograniczenia dla zrzutów tabel';
+$strConstraintsForTable = 'Ograniczenia dla tabeli';
 $strCookiesRequired = 'Odt±d musi byæ w³±czona obs³uga "cookies".';
 $strCopyTable = 'Skopiuj tabelê do (bazadanych<b>.</b>tabela):';
 $strCopyTableOK = 'Tabela %s zosta³a skopiowana do %s.';
@@ -293,6 +297,8 @@ $strInsertTextfiles = 'Dodanie pliku tekstowego do tabeli';
 $strInsertedRowId = 'Id wstawionego wiersza:';
 $strInsertedRows = 'Wprowadzone rekordy:';
 $strInstructions = 'Instrukcje';
+$strInternalNotNecessary = '* Wewnêtrzna relacja nie jest konieczna gdy istnieje równie¿ w InnoDB.';
+$strInternalRelations = 'Wewnêtrzne relacje';
 $strInvalidName = '"%s" jest s³owem zarezerwowanym, nie mo¿na u¿yæ go jako nazwy bazy danych/tabeli/pola.';
 
 $strJapanese = 'Japoñski';
@@ -308,6 +314,13 @@ $strKorean = 'Koreañski';
 $strLaTeX = 'LaTeX';
 $strLaTeXOptions = 'opcje LaTeX\'a';
 $strLandscape = 'Orientacja pozioma';
+$strLatexCaption = 'Nag³ówek tabeli';
+$strLatexContent = 'Zawarto¶æ tabeli __TABLE__';
+$strLatexContinued = '(kontynuacja)';
+$strLatexContinuedCaption = 'Kontynuacja nag³ówka tabeli';
+$strLatexIncludeCaption = 'Za³±cz nag³ówek tabeli';
+$strLatexLabel = 'Etykieta klucza';
+$strLatexStructure = 'Struktura tabeli __TABLE__';
 $strLength = 'D³ugo¶æ';
 $strLengthSet = 'D³ugo¶æ/Warto¶ci*';
 $strLimitNumRows = 'rekordów na stronie';
@@ -322,6 +335,7 @@ $strLoadMethod = 'Metoda LOAD';
 $strLocalhost = 'Host lokalny';
 $strLocationTextfile = 'Lokalizacja pliku tekstowego';
 $strLogPassword = 'Has³o:';
+$strLogServer = 'Serwer';
 $strLogUsername = 'U¿ytkownik:';
 $strLogin = 'Login';
 $strLoginInformation = 'Dane u¿ytkownika';
@@ -431,6 +445,7 @@ $strPrimaryKeyName = 'Nazw± podstawowego klucza musi byæ... PRIMARY!';
 $strPrimaryKeyWarning = '("PRIMARY" <b>musi</b> byæ nazw± <b>jedynie</b> klucza podstawowego!)';
 $strPrint = 'Drukowanie';
 $strPrintView = 'Widok do wydruku';
+$strPrintViewFull = 'Widok do wydruku (z pe³nymi tekstami)';
 $strPrivDescAllPrivileges = 'Zawiera wszystkie uprawnienia, oprócz GRANT.';
 $strPrivDescAlter = 'Pozwala zmieniaæ strukturê istniej±cych tabel.';
 $strPrivDescCreateDb = 'Pozwala tworzyæ nowe bazy danych i tabele.';
@@ -579,6 +594,7 @@ $strSimplifiedChinese = 'Chiñski uproszczony';
 $strSingly = '(pojedynczo)';
 $strSize = 'Rozmiar';
 $strSort = 'Sortuj';
+$strSortByKey = 'Sortowanie wg klucza';
 $strSpaceUsage = 'Wykorzystanie przestrzeni';
 $strSplitWordsWithSpace = 'S³owa s± rozdzielane znakiem spacji (" ").';
 $strStatCheckTime = 'Ostatnie sprawdzenie';
@@ -651,6 +667,7 @@ $strUpdatePrivMessage = 'Uaktualni³e¶ uprawnienia dla %s.';
 $strUpdateProfile = 'Uaktualnienie profilu:';
 $strUpdateProfileMessage = 'Profil zosta³ uaktualniony.';
 $strUpdateQuery = 'Zmiana zapytania';
+$strUpgrade = 'Poleca siê aktualizacjê do %s w wersji %s lub pó¼niejszej.';
 $strUsage = 'Wykorzystanie';
 $strUseBackquotes = 'U¿ycie cudzys³owów z nazwami tabel i pól';
 $strUseHostTable = 'U¿ycie tabeli hostów';
@@ -694,4 +711,10 @@ $strZeroRemovesTheLimit = 'Uwaga: Ustawienie tych opcji na 0 (zero) usuwa ograni
 $strZip = '".zip"';
 // To translate
 
+$strCreationDates = 'Creation/Update/Check dates';  //to translate
+$strCheckOverhead = 'Check overheaded';  //to translate
+$strExcelEdition = 'Excel edition';  //to translate
+$strDelayedInserts = 'Use delayed inserts';  //to translate
+$strSQLExportType = 'Export type';  //to translate
+$strAddConstraints = 'Add constraints';  //to translate
 ?>

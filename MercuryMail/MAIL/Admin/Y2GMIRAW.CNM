@@ -1,0 +1,11 @@
+Received: from spooler by localhost (Mercury/32 v3.32); 7 Feb 04 15:31:38 +0100
+X-Envelope-To: <postmaster@localhost>
+Return-path: <postmaster@localhost>
+Received: from kvo (127.0.0.1) by localhost (Mercury/32 v3.32) ID MG000001;
+   7 Feb 04 15:31:29 +0100
+Date: Sat, 07 Feb 2004 15:31:29 +0100
+Subject: test
+To: postmaster@localhost
+From: postmaster@localhost
+
+bla

@@ -1,9 +1,9 @@
-# NOTE: Derived from blib\lib\Tk/Clipboard.pm.
+# NOTE: Derived from blib\lib\Tk\Clipboard.pm.
 # Changes made here will be lost when autosplit is run again.
 # See AutoSplit.pm.
 package Tk::Clipboard;
 
-#line 103 "blib\lib\Tk/Clipboard.pm (autosplit into blib\lib\auto\Tk\Clipboard\getSelected.al)"
+#line 103 "blib\lib\Tk\Clipboard.pm (autosplit into blib\lib\auto\Tk\Clipboard\getSelected.al)"
 sub getSelected
 {
  my $w   = shift;

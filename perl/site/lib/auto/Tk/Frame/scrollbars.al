@@ -1,9 +1,9 @@
-# NOTE: Derived from blib\lib\Tk/Frame.pm.
+# NOTE: Derived from blib\lib\Tk\Frame.pm.
 # Changes made here will be lost when autosplit is run again.
 # See AutoSplit.pm.
 package Tk::Frame;
 
-#line 343 "blib\lib\Tk/Frame.pm (autosplit into blib\lib\auto\Tk\Frame\scrollbars.al)"
+#line 343 "blib\lib\Tk\Frame.pm (autosplit into blib\lib\auto\Tk\Frame\scrollbars.al)"
 sub scrollbars
 {
  my ($cw,$opt) = @_;

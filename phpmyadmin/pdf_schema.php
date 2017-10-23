@@ -1,5 +1,5 @@
 <?php
-/* $Id: pdf_schema.php,v 1.56 2003/07/10 13:10:53 lem9 Exp $ */
+/* $Id: pdf_schema.php,v 2.2 2003/11/26 22:52:24 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -11,15 +11,15 @@
 /**
  * Gets some core scripts
  */
-require('./libraries/grab_globals.lib.php');
-require('./libraries/common.lib.php');
+require_once('./libraries/grab_globals.lib.php');
+require_once('./libraries/common.lib.php');
 
 
 /**
  * Settings for relation stuff
  */
-require('./libraries/relation.lib.php');
-require('./libraries/transformations.lib.php');
+require_once('./libraries/relation.lib.php');
+require_once('./libraries/transformations.lib.php');
 
 $cfgRelation = PMA_getRelationsParam();
 
@@ -42,30 +42,8 @@ if (!$cfgRelation['pdfwork']) {
 /**
  * Gets the "fpdf" libraries and defines the pdf font path
  */
-require('./libraries/fpdf/fpdf.php');
-// loic1: PHP3 compatibility
-// define('FPDF_FONTPATH', './libraries/fpdf/font/');
+require_once('./libraries/fpdf/fpdf.php');
 $FPDF_font_path = './libraries/fpdf/font/';
-
-
-/**
- * Emulates the "array_search" function with PHP < 4.0.5
- */
-if (PMA_PHP_INT_VERSION < 40005) {
-    function array_search($needle, $haystack) {
-        $match         = FALSE;
-
-        reset($haystack);
-        while (list($key, $value) = each($haystack)) {
-            if ($value == $needle) {
-                $match = $key;
-            }
-        } // end while
-
-        return $match;
-    } // end of the "array_search" function
-} // end if
-
 
 
 /**
@@ -121,8 +99,7 @@ class PMA_PDF extends FPDF
         if(count($this->Alias) > 0)
         {
             $nb=$this->page;
-            @reset($this->Alias);
-            while(list($alias, $value) = each($this->Alias)) {
+            foreach($this->Alias AS $alias => $value) {
                 for($n=1;$n<=$nb;$n++)
                 $this->pages[$n]=str_replace($alias,$value,$this->pages[$n]);
             }
@@ -290,7 +267,7 @@ class PMA_PDF extends FPDF
         global $server, $lang, $convcharset, $db;
         global $charset, $text_dir, $strRunning, $strDatabase;
 
-        include('./header.inc.php');
+        require_once('./header.inc.php');
 
         echo '<p><b>PDF - '. $GLOBALS['strError'] . '</b></p>' . "\n";
         if (!empty($error_message)) {
@@ -304,8 +281,7 @@ class PMA_PDF extends FPDF
              . '">' . $GLOBALS['strBack'] . '</a>';
         echo "\n";
 
-        include('./footer.inc.php');
-        exit();
+        require_once('./footer.inc.php');
     } // end of the "PMA_PDF_die()" function
 
 
@@ -472,14 +448,16 @@ function Row($data,$links)
 {
    // line height
    $nb=0;
-   for($i=0;$i<count($data);$i++)
+   $data_cnt = count($data);
+   for($i=0;$i<$data_cnt;$i++)
       $nb=max($nb,$this->NbLines($this->widths[$i],$data[$i]));
    $il = $this->FontSize;
    $h=($il+1)*$nb;
    // page break if necessary
    $this->CheckPageBreak($h);
    // draw the cells
-   for($i=0;$i<count($data);$i++)
+   $data_cnt = count($data);
+   for($i=0;$i<$data_cnt;$i++)
    {
       $w=$this->widths[$i];
       // save current position
@@ -598,8 +576,7 @@ class PMA_RT_Table
         //  there are fields that require wider cells than the name of the table?
         global $pdf;
 
-        reset($this->fields);
-        while (list(, $field) = each($this->fields)) {
+        foreach($this->fields AS $field) {
             $this->width = max($this->width, $pdf->GetStringWidth($field));
         }
         $this->width += $pdf->GetStringWidth('  ');
@@ -625,7 +602,7 @@ class PMA_RT_Table
      *
      * @param   boolean   Whether to display table position or not
      * @param   integer   The font size
-     * @param   boolean   Whether all tables should have the same width or not
+     * @param   boolean   Whether to display color
      * @param   integer   The max. with among tables
      *
      * @global  object    The current PDF document
@@ -634,41 +611,44 @@ class PMA_RT_Table
      *
      * @see     PMA_PDF
      */
-    function PMA_RT_Table_draw($show_info, $ff)
+    function PMA_RT_Table_draw($show_info, $ff, $setcolor=0)
     {
         global $pdf, $with_doc;
 
         $pdf->PMA_PDF_setXyScale($this->x, $this->y);
         $pdf->SetFont($ff, 'B');
-        $pdf->SetTextColor(200);
-        $pdf->SetFillColor(0, 0, 128);
+        if ($setcolor) {
+            $pdf->SetTextColor(200);
+            $pdf->SetFillColor(0, 0, 128);
+        }
         if ($with_doc) $pdf->SetLink($pdf->PMA_links['RT'][$this->table_name]['-'],-1);
         else $pdf->PMA_links['doc'][$this->table_name]['-'] = '';
         if ($show_info){
-            $pdf->PMA_PDF_cellScale($this->width, $this->height_cell, sprintf('%.0f', $this->width) . 'x' . sprintf('%.0f', $this->height) . ' ' . $this->table_name, 1, 1, 'C', 1,$pdf->PMA_links['doc'][$this->table_name]['-']);
+            $pdf->PMA_PDF_cellScale($this->width, $this->height_cell, sprintf('%.0f', $this->width) . 'x' . sprintf('%.0f', $this->height) . ' ' . $this->table_name, 1, 1, 'C', $setcolor, $pdf->PMA_links['doc'][$this->table_name]['-']);
         } else {
-            $pdf->PMA_PDF_cellScale($this->width, $this->height_cell, $this->table_name, 1, 1, 'C', 1,$pdf->PMA_links['doc'][$this->table_name]['-']);
+            $pdf->PMA_PDF_cellScale($this->width, $this->height_cell, $this->table_name, 1, 1, 'C', $setcolor, $pdf->PMA_links['doc'][$this->table_name]['-']);
         }
         $pdf->PMA_PDF_setXScale($this->x);
         $pdf->SetFont($ff, '');
         $pdf->SetTextColor(0);
         $pdf->SetFillColor(255);
 
-        reset($this->fields);
-        while (list(, $field) = each($this->fields)) {
+        foreach($this->fields AS $field) {
             // loic1 : PHP3 fix
             // if (in_array($field, $this->primary)) {
-            if (PMA_isInto($field, $this->primary) != -1) {
-                $pdf->SetFillColor(215, 121, 123);
-            }
-            if ($field == $this->displayfield) {
-                $pdf->SetFillColor(142, 159, 224);
+            if ($setcolor) {
+                if (PMA_isInto($field, $this->primary) != -1) {
+                    $pdf->SetFillColor(215, 121, 123);
+                }
+                if ($field == $this->displayfield) {
+                    $pdf->SetFillColor(142, 159, 224);
+                }
             }
             if ($with_doc) $pdf->SetLink($pdf->PMA_links['RT'][$this->table_name][$field],-1);
             else $pdf->PMA_links['doc'][$this->table_name][$field] = '';
 
 
-            $pdf->PMA_PDF_cellScale($this->width, $this->height_cell, ' ' . $field, 1, 1, 'L', 1,$pdf->PMA_links['doc'][$this->table_name][$field]);
+            $pdf->PMA_PDF_cellScale($this->width, $this->height_cell, ' ' . $field, 1, 1, 'L', $setcolor,$pdf->PMA_links['doc'][$this->table_name][$field]);
             $pdf->PMA_PDF_setXScale($this->x);
             $pdf->SetFillColor(255);
         } // end while
@@ -1015,8 +995,7 @@ class PMA_RT
     function PMA_RT_drawRelations($change_color)
     {
         $i = 0;
-        reset($this->relations);
-        while (list(, $relation) = each($this->relations)) {
+        foreach($this->relations AS $relation) {
             $relation->PMA_RT_Relation_draw($change_color, $i);
             $i++;
         } // end while
@@ -1032,11 +1011,10 @@ class PMA_RT
      *
      * @see     PMA_RT_Table::PMA_RT_Table_draw()
      */
-    function PMA_RT_drawTables($show_info)
+    function PMA_RT_drawTables($show_info,$draw_color=0)
     {
-        reset($this->tables);
-        while (list(, $table) = each($this->tables)) {
-            $table->PMA_RT_Table_draw($show_info, $this->ff);
+        foreach($this->tables AS $table) {
+            $table->PMA_RT_Table_draw($show_info, $this->ff,$draw_color);
         }
     } // end of the "PMA_RT_drawTables()" method
 
@@ -1084,7 +1062,9 @@ class PMA_RT
      * @param   integer  The page number to draw (from the
      *                   $cfg['Servers'][$i]['table_coords'] table)
      * @param   boolean  Whether to display table position or not
-     * @param   boolean  Whether to use one color per relation or not
+     * @param   boolean  Was originally whether to use one color per
+     *                   relation or not, now enables/disables color
+     *                   everywhere, due to some problems printing with color
      * @param   boolean  Whether to draw grids or not
      * @param   boolean  Whether all tables should have the same width or not
      *
@@ -1159,14 +1139,11 @@ class PMA_RT
 
                                 /* snip */
 
-        reset ($alltables);
-        while (list(, $table) = each ($alltables)) {
+        foreach($alltables AS $table) {
             if (!isset($this->tables[$table])) {
                 $this->tables[$table] = new PMA_RT_Table($table, $this->ff, $this->tablewidth);
             }
-        } // while
-        reset($alltables);
-        while (list(, $table) = each ($alltables)) {
+
             if($this->same_wide){
                 $this->tables[$table]->width = $this->tablewidth;
             }
@@ -1194,21 +1171,20 @@ class PMA_RT
 //                .   ' AND foreign_table IN (' . $intable . ')';
 //        $result =  PMA_query_as_cu($sql);
 //
-// lem9: 
+// lem9:
 // previous logic was checking master tables and foreign tables
 // but I think that looping on every table of the pdf page as a master
 // and finding its foreigns is OK (then we can support innodb)
 
         $seen_a_relation = FALSE;
-        reset($alltables);
-        while (list(,$one_table) = each($alltables)) {
+        foreach($alltables AS $one_table) {
 
             $exist_rel = PMA_getForeigners($db, $one_table, '', 'both');
             if ($exist_rel) {
                 $seen_a_relation = TRUE;
-                while (list($master_field,$rel) = each($exist_rel)) {
+                foreach($exist_rel AS $master_field => $rel) {
                     // put the foreign table on the schema only if selected
-                    // by the user 
+                    // by the user
                     // (do not use array_search() because we would have to
                     // to do a === FALSE and this is not PHP3 compatible)
 
@@ -1235,7 +1211,7 @@ class PMA_RT
             $this->PMA_RT_drawRelations($change_color);
         }
 
-        $this->PMA_RT_drawTables($show_info);
+        $this->PMA_RT_drawTables($show_info,$change_color);
 
         $this->PMA_RT_showRt();
     } // end of the "PMA_RT()" method
@@ -1248,8 +1224,7 @@ function PMA_RT_DOC($alltables ){
     $pdf->Cell(0,9, $GLOBALS['strTableOfContents'],1,0,'C');
     $pdf->Ln(15);
     $i = 1;
-    @reset($alltables);
-    while(list(, $table) = each($alltables)) {
+    foreach($alltables AS $table) {
         $pdf->PMA_links['doc'][$table]['-'] = $pdf->AddLink();
         $pdf->SetX(10);
         //$pdf->Ln(1);
@@ -1275,8 +1250,7 @@ function PMA_RT_DOC($alltables ){
     $pdf->SetX(10);
     $pdf->Cell(0,6,$i.' '. $GLOBALS['strRelationalSchema'],0,1,'L',0,$pdf->PMA_links['RT']['-']);
     $z = 0;
-    @reset($alltables);
-    while(list(, $table) = each($alltables)) {
+    foreach($alltables AS $table) {
         $z++;
         $pdf->addpage($GLOBALS['orientation']);
         $pdf->Bookmark($table);
@@ -1299,24 +1273,15 @@ function PMA_RT_DOC($alltables ){
         /**
          * Gets table informations
          */
-        // The 'show table' statement works correct since 3.23.03
-        if (PMA_MYSQL_INT_VERSION >= 32303) {
-             $local_query  = "SHOW TABLE STATUS LIKE '" . PMA_sqlAddslashes($table, TRUE) . "'";
-             $result       = PMA_mysql_query($local_query) or PMA_mysqlDie('', $local_query, '', $err_url);
-             $showtable    = PMA_mysql_fetch_array($result);
-             $num_rows     = (isset($showtable['Rows']) ? $showtable['Rows'] : 0);
-             $show_comment = (isset($showtable['Comment']) ? $showtable['Comment'] : '');
-             $create_time  = (isset($showtable['Create_time']) ? PMA_localisedDate(strtotime($showtable['Create_time'])) : '');
-             $update_time  = (isset($showtable['Update_time']) ? PMA_localisedDate(strtotime($showtable['Update_time'])) : '');
-             $check_time   = (isset($showtable['Check_time']) ? PMA_localisedDate(strtotime($showtable['Check_time'])) : '');
-        } else {
-             $showtable    = array();
-             $num_rows     = PMA_countRecords($db, $table, TRUE);
-             $show_comment = '';
-             $create_time  = '';
-             $update_time  = '';
-             $check_time   = '';
-        } // end display comments
+        $local_query  = "SHOW TABLE STATUS LIKE '" . PMA_sqlAddslashes($table, TRUE) . "'";
+        $result       = PMA_mysql_query($local_query) or PMA_mysqlDie('', $local_query, '', $err_url);
+        $showtable    = PMA_mysql_fetch_array($result);
+        $num_rows     = (isset($showtable['Rows']) ? $showtable['Rows'] : 0);
+        $show_comment = (isset($showtable['Comment']) ? $showtable['Comment'] : '');
+        $create_time  = (isset($showtable['Create_time']) ? PMA_localisedDate(strtotime($showtable['Create_time'])) : '');
+        $update_time  = (isset($showtable['Update_time']) ? PMA_localisedDate(strtotime($showtable['Update_time'])) : '');
+        $check_time   = (isset($showtable['Check_time']) ? PMA_localisedDate(strtotime($showtable['Check_time'])) : '');
+
         if ($result) {
              mysql_free_result($result);
         }
@@ -1454,8 +1419,8 @@ function PMA_RT_DOC($alltables ){
             $type             = $row['Type'];
             // reformat mysql query output - staybyte - 9. June 2001
             // loic1: set or enum types: slashes single quotes inside options
-            if (eregi('^(set|enum)\((.+)\)$', $type, $tmp)) {
-                $tmp[2]       = substr(ereg_replace("([^,])''", "\\1\\'", ',' . $tmp[2]), 1);
+            if (preg_match('@^(set|enum)\((.+)\)$@i', $type, $tmp)) {
+                $tmp[2]       = substr(preg_replace("@([^,])''@", "\\1\\'", ',' . $tmp[2]), 1);
                 $type         = $tmp[1] . '(' . str_replace(',', ', ', $tmp[2]) . ')';
                 $type_nowrap  = '';
 
@@ -1464,16 +1429,16 @@ function PMA_RT_DOC($alltables ){
                 $zerofill     = 0;
             } else {
                 $type_nowrap  = ' nowrap="nowrap"';
-                $type         = eregi_replace('BINARY', '', $type);
-                $type         = eregi_replace('ZEROFILL', '', $type);
-                $type         = eregi_replace('UNSIGNED', '', $type);
+                $type         = preg_replace('@BINARY@i', '', $type);
+                $type         = preg_replace('@ZEROFILL@i', '', $type);
+                $type         = preg_replace('@UNSIGNED@i', '', $type);
                 if (empty($type)) {
                     $type     = '&nbsp;';
                 }
 
-                $binary       = eregi('BINARY', $row['Type'], $test);
-                $unsigned     = eregi('UNSIGNED', $row['Type'], $test);
-                $zerofill     = eregi('ZEROFILL', $row['Type'], $test);
+                $binary       = stristr($row['Type'], 'BINARY');
+                $unsigned     = stristr($row['Type'], 'UNSIGNED');
+                $zerofill     = stristr($row['Type'], 'ZEROFILL');
             }
             $strAttribute     = ' ';
             if ($binary) {

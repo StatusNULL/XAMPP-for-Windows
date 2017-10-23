@@ -1,10 +1,10 @@
 package URI::Heuristic;
 
-# $Id: Heuristic.pm,v 4.15 2003/01/02 05:30:42 gisle Exp $
+# $Id: Heuristic.pm,v 4.16 2003/07/23 23:47:52 gisle Exp $
 
 =head1 NAME
 
-uf_uristr - Expand URI using heuristics
+URI::Heuristic - Expand URI using heuristics
 
 =head1 SYNOPSIS
 
@@ -30,11 +30,11 @@ The following functions are provided:
 
 =item uf_uristr($str)
 
-The uf_uristr() function will try to make the string passed as argument 
-into a proper absolute URI string.  The "uf_" prefix stands for "User 
-Friendly".  Under MacOS, it assumes that any string with a common URL 
-scheme (http, ftp, etc.) is a URL rather than a local path.  So don't name 
-your volumes after common URL schemes and expect uf_uristr() to construct 
+The uf_uristr() function will try to make the string passed as argument
+into a proper absolute URI string.  The "uf_" prefix stands for "User
+Friendly".  Under MacOS, it assumes that any string with a common URL
+scheme (http, ftp, etc.) is a URL rather than a local path.  So don't name
+your volumes after common URL schemes and expect uf_uristr() to construct
 valid file: URL's on those volumes for you, because it won't.
 
 =item uf_uri($str)
@@ -89,7 +89,7 @@ use vars qw(@EXPORT_OK $VERSION $MY_COUNTRY %LOCAL_GUESSING $DEBUG);
 require Exporter;
 *import = \&Exporter::import;
 @EXPORT_OK = qw(uf_uri uf_uristr uf_url uf_urlstr);
-$VERSION = sprintf("%d.%02d", q$Revision: 4.15 $ =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q$Revision: 4.16 $ =~ /(\d+)\.(\d+)/);
 
 sub MY_COUNTRY() {
     for ($MY_COUNTRY) {

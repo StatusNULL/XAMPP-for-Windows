@@ -5,11 +5,11 @@
 #  * Any changes made here will be lost
 #  * ***********************************
 #  * 01: lib/ModPerl/Code.pm:666
-#  * 02: G:\compile\sources\mod_perl-1.99_10/lib/ModPerl/WrapXS.pm:628
-#  * 03: G:\compile\sources\mod_perl-1.99_10/lib/ModPerl/WrapXS.pm:998
-#  * 04: Makefile.PL:271
-#  * 05: Makefile.PL:219
-#  * 06: Makefile.PL:47
+#  * 02: lib/ModPerl/WrapXS.pm:628
+#  * 03: lib/ModPerl/WrapXS.pm:998
+#  * 04: Makefile.PL:275
+#  * 05: Makefile.PL:223
+#  * 06: Makefile.PL:49
 #  */
 # 
 
@@ -301,6 +301,12 @@ my $methods = {
                                 'Apache::RequestRec'
                               ]
                             ],
+          'atime' => [
+                       [
+                         'APR::Finfo',
+                         'APR::Finfo'
+                       ]
+                     ],
           'auth_name' => [
                            [
                              'Apache::Access',
@@ -497,6 +503,18 @@ my $methods = {
                         undef
                       ]
                     ],
+          'csize' => [
+                       [
+                         'APR::Finfo',
+                         'APR::Finfo'
+                       ]
+                     ],
+          'ctime' => [
+                       [
+                         'APR::Finfo',
+                         'APR::Finfo'
+                       ]
+                     ],
           'ctx' => [
                      [
                        'Apache::Filter',
@@ -537,12 +555,6 @@ my $methods = {
                           undef
                         ]
                       ],
-          'default_port_for_scheme' => [
-                                         [
-                                           'APR::URI',
-                                           'APR::URI'
-                                         ]
-                                       ],
           'default_type' => [
                               [
                                 'Apache::RequestUtil',
@@ -559,6 +571,12 @@ my $methods = {
                            'APR::Pool'
                          ]
                        ],
+          'device' => [
+                        [
+                          'APR::Finfo',
+                          'APR::Finfo'
+                        ]
+                      ],
           'die' => [
                      [
                        'Apache::HookRun',
@@ -733,6 +751,12 @@ my $methods = {
                                      'APR'
                                    ]
                                  ],
+          'filetype' => [
+                          [
+                            'APR::Finfo',
+                            'APR::Finfo'
+                          ]
+                        ],
           'filter_flush' => [
                               [
                                 'Apache::Filter',
@@ -751,6 +775,12 @@ my $methods = {
                                     'Apache::Module'
                                   ]
                                 ],
+          'finfo' => [
+                       [
+                         'Apache::RequestRec',
+                         'Apache::RequestRec'
+                       ]
+                     ],
           'first' => [
                        [
                          'APR::Brigade',
@@ -769,6 +799,12 @@ my $methods = {
                                 'APR::Bucket'
                               ]
                             ],
+          'fname' => [
+                       [
+                         'APR::Finfo',
+                         'APR::Finfo'
+                       ]
+                     ],
           'format' => [
                         [
                           'APR::UUID',
@@ -893,6 +929,12 @@ my $methods = {
                                    'Apache'
                                  ]
                                ],
+          'group' => [
+                       [
+                         'APR::Finfo',
+                         'APR::Finfo'
+                       ]
+                     ],
           'handler' => [
                          [
                            'Apache::RequestRec',
@@ -949,6 +991,12 @@ my $methods = {
                         undef
                       ]
                     ],
+          'inode' => [
+                       [
+                         'APR::Finfo',
+                         'APR::Finfo'
+                       ]
+                     ],
           'input_filters' => [
                                [
                                  'Apache::Connection',
@@ -1002,12 +1050,6 @@ my $methods = {
                                            ]
                                          ],
           'ip_get' => [
-                        [
-                          'APR::SockAddr',
-                          'APR::SockAddr'
-                        ]
-                      ],
-          'ip_set' => [
                         [
                           'APR::SockAddr',
                           'APR::SockAddr'
@@ -1317,6 +1359,10 @@ my $methods = {
                             ],
           'mtime' => [
                        [
+                         'APR::Finfo',
+                         'APR::Finfo'
+                       ],
+                       [
                          'Apache::RequestRec',
                          'Apache::RequestRec'
                        ]
@@ -1329,6 +1375,10 @@ my $methods = {
                       [
                         'Apache::FilterRec',
                         'Apache::FilterRec'
+                      ],
+                      [
+                        'APR::Finfo',
+                        'APR::Finfo'
                       ],
                       [
                         'Apache::Module',
@@ -1409,6 +1459,12 @@ my $methods = {
                         'Apache::Filter'
                       ]
                     ],
+          'nlink' => [
+                       [
+                         'APR::Finfo',
+                         'APR::Finfo'
+                       ]
+                     ],
           'no_cache' => [
                           [
                             'Apache::RequestUtil',
@@ -1605,6 +1661,10 @@ my $methods = {
                       ],
           'pool' => [
                       [
+                        'APR::Finfo',
+                        'APR::Finfo'
+                      ],
+                      [
                         'Apache::CmdParms',
                         'Apache::CmdParms'
                       ],
@@ -1629,6 +1689,10 @@ my $methods = {
                         ],
           'port' => [
                       [
+                        'APR::SockAddr',
+                        'APR::SockAddr'
+                      ],
+                      [
                         'Apache::Server',
                         'Apache::Server'
                       ],
@@ -1637,18 +1701,12 @@ my $methods = {
                         'APR::URI'
                       ]
                     ],
-          'port_get' => [
-                          [
-                            'APR::SockAddr',
-                            'APR::SockAddr'
-                          ]
-                        ],
-          'port_set' => [
-                          [
-                            'APR::SockAddr',
-                            'APR::SockAddr'
-                          ]
-                        ],
+          'port_of_scheme' => [
+                                [
+                                  'APR::URI',
+                                  'APR::URI'
+                                ]
+                              ],
           'prev' => [
                       [
                         'APR::Brigade',
@@ -1681,6 +1739,12 @@ my $methods = {
                            'Apache::Server'
                          ]
                        ],
+          'protection' => [
+                            [
+                              'APR::Finfo',
+                              'APR::Finfo'
+                            ]
+                          ],
           'proto_input_filters' => [
                                      [
                                        'Apache::RequestRec',
@@ -1737,6 +1801,10 @@ my $methods = {
                        [
                          'APR::URI',
                          'APR::URI'
+                       ],
+                       [
+                         'Apache::MPM',
+                         'Apache::MPM'
                        ]
                      ],
           'r' => [
@@ -2111,6 +2179,12 @@ my $methods = {
                                        'Apache::RequestRec'
                                      ]
                                    ],
+          'size' => [
+                      [
+                        'APR::Finfo',
+                        'APR::Finfo'
+                      ]
+                    ],
           'slurp_filename' => [
                                 [
                                   'Apache::RequestUtil',
@@ -2159,6 +2233,12 @@ my $methods = {
                          'APR::Bucket'
                        ]
                      ],
+          'stat' => [
+                      [
+                        'APR::Finfo',
+                        'APR::Finfo'
+                      ]
+                    ],
           'status' => [
                         [
                           'Apache::RequestRec',
@@ -2305,6 +2385,10 @@ my $methods = {
                               ],
           'user' => [
                       [
+                        'APR::Finfo',
+                        'APR::Finfo'
+                      ],
+                      [
                         'APR::URI',
                         'APR::URI'
                       ],
@@ -2313,6 +2397,12 @@ my $methods = {
                         'Apache::RequestRec'
                       ]
                     ],
+          'valid' => [
+                       [
+                         'APR::Finfo',
+                         'APR::Finfo'
+                       ]
+                     ],
           'version' => [
                          [
                            'Apache::Module',
@@ -2407,6 +2497,8 @@ my $methods_compat = {
                           ''],
     SERVER_VERSION    => ['get_server_version',
                           ''],
+    can_stack_handlers=> [undef,
+                          'there is no more need for that method'],
 
     # Apache::RequestRec
     soft_timeout      => [undef,
@@ -2442,8 +2534,6 @@ my $methods_compat = {
     chdir_file        => [undef, # XXX: to be resolved
                           'temporary unavailable till the issue with chdir' .
                           ' in the threaded env is resolved'],
-    finfo             => [undef,
-                          'not in the Apache 2.0 API'],
     log_reason        => ['log_error',
                           'not in the Apache 2.0 API'],
     READLINE          => [undef, # XXX: to be resolved
@@ -3042,8 +3132,6 @@ map file):
 
  modperl_filter_attributes     | MODIFY_CODE_ATTRIBUTES
  modperl_spawn_proc_prog       | spawn_proc_prog
- apr_sockaddr_ip_get           | sockaddr
- apr_sockaddr_port_get         | sockaddr
  apr_ipsubnet_create           | new
 
 Please report if you find any other missing methods. But remember that

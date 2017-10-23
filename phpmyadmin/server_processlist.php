@@ -1,12 +1,12 @@
 <?php
-/* $Id: server_processlist.php,v 1.7 2003/03/27 21:39:23 rabus Exp $ */
+/* $Id: server_processlist.php,v 2.3 2003/11/26 22:52:24 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
 /**
  * Does the common work
  */
-require('./server_common.inc.php');
+require_once('./server_common.inc.php');
 
 
 /**
@@ -56,7 +56,7 @@ unset($row);
 ?>
 <table border="0">
     <tr>
-        <th><?php echo PMA_MYSQL_INT_VERSION < 32307 ? '' : '<a href="./server_processlist.php?'. $url_query . (empty($full) ? '&amp;full=1' : '') . '" title="' . (empty($full) ? $strShowFullQueries : $strTruncateQueries) . '"><img src="./images/' . (empty($full) ? 'full' : 'partial') . 'text.png" width="50" height="20" border="0" alt="' . (empty($full) ? $strShowFullQueries : $strTruncateQueries) . '" /></a>';  ?></th>
+        <th><a href="./server_processlist.php?<?php echo $url_query . (empty($full) ? '&amp;full=1' : ''); ?>" title="<?php echo empty($full) ? $strShowFullQueries : $strTruncateQueries; ?>"><img src="./images/<?php echo empty($full) ? 'full' : 'partial'; ?>text.png" width="50" height="20" border="0" alt="<?php echo empty($full) ? $strShowFullQueries : $strTruncateQueries; ?>" /></a></th>
         <th>&nbsp;<?php echo $strId; ?>&nbsp;</th>
         <th>&nbsp;<?php echo $strUser; ?>&nbsp;</th>
         <th>&nbsp;<?php echo $strHost; ?>&nbsp;</th>
@@ -68,7 +68,7 @@ unset($row);
     </tr>
 <?php
 $useBgcolorOne = TRUE;
-while (list($name, $value) = each($serverProcesses)) {
+foreach($serverProcesses AS $name => $value) {
 ?>
     <tr>
         <td bgcolor="<?php echo $useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']; ?>">&nbsp;<a href="./server_processlist.php?<?php echo $url_query . '&amp;kill=' . $value['Id']; ?>"><?php echo $strKill; ?></a>&nbsp;</td>
@@ -94,6 +94,6 @@ while (list($name, $value) = each($serverProcesses)) {
 /**
  * Sends the footer
  */
-require('./footer.inc.php');
+require_once('./footer.inc.php');
 
 ?>

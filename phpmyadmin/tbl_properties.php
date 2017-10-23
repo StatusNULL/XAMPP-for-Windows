@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_properties.php,v 1.181 2002/10/23 04:17:43 robbat2 Exp $ */
+/* $Id: tbl_properties.php,v 2.2 2003/11/26 22:52:24 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -35,5 +35,5 @@ require('./tbl_query_box.php');
  * Displays the footer
  */
 echo "\n";
-require('./footer.inc.php');
+require_once('./footer.inc.php');
 ?>

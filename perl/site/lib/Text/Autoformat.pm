@@ -2,27 +2,65 @@ package Text::Autoformat;
 
 use strict; use vars qw($VERSION @ISA @EXPORT @EXPORT_OK); use Carp;
 use 5.005;
-$VERSION = '1.10';
+$VERSION = '1.12';
 
 require Exporter;
 
-use Text::Reform qw( form tag break_with break_wrap break_TeX );
+use Text::Reform qw( form tag break_at break_with break_wrap break_TeX );
 
 @ISA = qw(Exporter);
 @EXPORT = qw( autoformat );
-@EXPORT_OK = qw( form tag break_with break_wrap break_TeX );
+@EXPORT_OK =
+	qw( form tag break_at break_with break_wrap break_TeX ignore_headers );
 
 
-my $IGNORABLES = join "|", qw {
+my %ignore = map {$_=>1} qw {
 	a an at as and are
 	but by 
+	ere
 	for from
-	in is
-	of on or
-	the to that 
-	with while whilst with without
+	in into is
+	of on onto or over
+	per
+	the to that than
+	until unto upon
+	via
+	with while whilst within without
 };
 
+my @entities = qw {
+	&Aacute;   &aacute;      &Acirc;    &acirc;        &AElig;    &aelig;
+	&Agrave;   &agrave;      &Alpha;    &alpha;        &Atilde;   &atilde;
+	&Auml;     &auml;        &Beta;     &beta;         &Ccedil;   &ccedil;
+	&Chi;      &chi;         &Delta;    &delta;        &Eacute;   &eacute;
+	&Ecirc;    &ecirc;       &Egrave;   &egrave;       &Epsilon;  &epsilon;
+	&Eta;      &eta;         &ETH;      &eth;          &Euml;     &euml;
+	&Gamma;    &gamma;       &Iacute;   &iacute;       &Icirc;    &icirc;
+	&Igrave;   &igrave;      &Iota;     &iota;         &Iuml;     &iuml;
+	&Kappa;    &kappa;       &Lambda;   &lambda;       &Mu;       &mu;
+	&Ntilde;   &ntilde;      &Nu;       &nu;           &Oacute;   &oacute;
+	&Ocirc;    &ocirc;       &OElig;    &oelig;        &Ograve;   &ograve;
+	&Omega;    &omega;       &Omicron;  &omicron;      &Otilde;   &otilde;
+	&Ouml;     &ouml;        &Phi;      &phi;          &Pi;       &pi;
+	&Prime;    &prime;       &Psi;      &psi;          &Rho;      &rho;
+	&Scaron;   &scaron;      &Sigma;    &sigma;        &Tau;      &tau;
+	&Theta;    &theta;       &THORN;    &thorn;        &Uacute;   &uacute;
+	&Ucirc;    &ucirc;       &Ugrave;   &ugrave;       &Upsilon;  &upsilon;
+	&Uuml;     &uuml;        &Xi;       &xi;           &Yacute;   &yacute;
+	&Yuml;     &yuml;        &Zeta;     &zeta;         
+};
+
+my %lower_entities = @entities;
+my %upper_entities = reverse @entities;
+
+my %casing = (
+	lower => [ \%lower_entities,  \%lower_entities,
+		   sub { $_ = lc },   sub { $_ = lc } ],
+	upper => [ \%upper_entities,  \%upper_entities,
+		   sub { $_ = uc },   sub { $_ = uc } ],
+	title => [ \%upper_entities,  \%lower_entities,
+		   sub { $_ = ucfirst lc }, sub { $_ = lc } ],
+);
 
 my $default_margin = 72;
 my $default_widow  = 10;
@@ -35,6 +73,11 @@ sub defn($)
 	return $_[0] if defined $_[0];
 	return "";
 }
+
+my $ignore_headers = qr/\A(From\b.*$)?([^:]+:.*$([ \t].*$)*)+\s*\Z/m;
+my $ignore_indent  = qr/^[^\S\n].*(\n[^\S\n].*)*$/;
+
+sub ignore_headers { $_[0]==1 && /$ignore_headers/ }
 
 # BITS OF A TEXT LINE
 
@@ -74,7 +117,7 @@ sub autoformat	# ($text, %args)
 	$args{case}    = '' unless exists $args{case};
 	$args{squeeze} = 1 unless exists $args{squeeze};
 	$args{gap}     = 0 unless exists $args{gap};
-	$args{ignore}  = 0 unless exists $args{ignore};
+	$args{break}  = break_at('-') unless exists $args{break};
 	$args{impfill} = ! exists $args{fill};
 	$args{expfill} = $args{fill};
 	$args{renumber} = 1 unless exists $args{renumber};
@@ -82,16 +125,22 @@ sub autoformat	# ($text, %args)
 	$args{_centred} = 1 if $args{justify} =~ /cent(er(ed)?|red?)/;
 
 	# SPECIAL IGNORANCE...
-	my $ig_type = ref $args{ignore};
-	if ($ig_type eq 'Regexp') {
-		my $regex = $args{ignore};
-		$args{ignore} = sub { /$regex/ };
+	if ($args{ignore}) {
+		$args{all} = 1;
+		my $ig_type = ref $args{ignore};
+		if ($ig_type eq 'Regexp') {
+			my $regex = $args{ignore};
+			$args{ignore} = sub { /$regex/ };
+		}
+		elsif ($args{ignore} =~ /^indent/i) {
+			$args{ignore} = sub { ignore_headers(@_) || /$ignore_indent/ };
+		}
+		croak "Expected suboutine reference as value for -ignore option"
+			if ref $args{ignore} ne 'CODE';
 	}
-	elsif ($args{ignore} =~ /^indent/i) {
-		$args{ignore} = sub { /\A[^\S\n].*(\n[^\S\n].*)*\Z/ }
+	else {
+		$args{ignore} = \&ignore_headers;
 	}
-	croak "Expected suboutine reference as value for -ignore option"
-		if $args{ignore} && ref $args{ignore} ne 'CODE';
 	
 	# DETABIFY
 	my @rawlines = split /\n/, $text;
@@ -206,13 +255,14 @@ sub autoformat	# ($text, %args)
 	# SELECT PARAS TO HANDLE
 
 	my $remainder = "";
-	if ($args{all}) {
-		# NOTHING TO DO
-	}
-	elsif ($args{ignore}) {
-		for my $para (@paras) {
-			local $_ = $para->{raw};
-			$para->{ignore} = $args{ignore}->();
+	if ($args{all}) { # STOP AT MAIL TERMINATOR
+		for my $index (0..$#paras) {
+		    local $_ = $paras[$index]{raw};
+		    $paras[$index]{ignore} = $args{ignore}($index+1);
+		    next unless /^--$/;
+		    $remainder = join "\n", map { $_->{raw} } splice @paras, $index;
+	            $remainder .= "\n" unless $remainder =~ /\n\z/;
+		    last;
 		}
 	}
 	else { # JUST THE FIRST PARA
@@ -226,17 +276,16 @@ sub autoformat	# ($text, %args)
 		foreach my $para ( @paras ) {
 			next if $para->{ignore};
 			if ($args{case} =~ /upper/i) {
-				$para->{text} =~ tr/a-z/A-Z/;
+				$para->{text} = recase($para->{text}, 'upper');
 			}
 			if ($args{case} =~ /lower/i) {
-				$para->{text} =~ tr/A-Z/a-z/;
+				$para->{text} = recase($para->{text}, 'lower');
 			}
 			if ($args{case} =~ /title/i) {
-				$para->{text} =~ s/(\S+)/entitle($1)/ge;
+				entitle($para->{text},0);
 			}
 			if ($args{case} =~ /highlight/i) {
-				$para->{text} =~ s/(\S+)/entitle($1,1)/ge;
-				$para->{text} =~ s/([a-z])/\U$1/i;
+				entitle($para->{text},1);
 			}
 			if ($args{case} =~ /sentence(\s*)/i) {
 				my $trailer = $1;
@@ -384,6 +433,7 @@ sub autoformat	# ($text, %args)
 		    my $tryformat = "$format$tfield";
 		    $newtext = (!$para->{empty} ? "\n"x($args{gap}-$gap) : "") 
 		             . form( { squeeze=>$args{squeeze}, trim=>1,
+				       break=>$args{break},
 				       fill => !(!($args{expfill}
 					    || $args{impfill} &&
 					       !$para->{centred}))
@@ -393,9 +443,6 @@ sub autoformat	# ($text, %args)
 		    $firsttext ||= $newtext;
 		    $newtext =~ /\s*([^\n]*)$/;
 		    $widow_okay = $para->{empty} || length($1) >= $args{widow};
-		    # print "[$rightindent <= $rightslack : $widow_okay : $1]\n";
-		    # print $tryformat;
-		    # print $newtext;
 	        } until $widow_okay || ++$rightindent > $rightslack;
     
 	        $text .= $widow_okay ? $newtext : $firsttext;
@@ -410,13 +457,59 @@ sub autoformat	# ($text, %args)
 	return $text . $remainder;
 }
 
+use utf8;
+
+my $alpha = qr/[^\W\d_]/;
+my $notalpha = qr/[\W\d_]/;
+my $word = qr/\pL(?:\pL'?)*/;
+my $upper = qr/[^\Wa-z\d_]/;
+my $lower = qr/[^\WA-Z\d_]/;
+my $mixed = qr/$alpha*?(?:$lower$upper|$upper$lower)$alpha*/;
+
+sub recase {
+	my ($origtext, $case) = @_;
+	my ($entities, $other_entities, $first, $rest) = @{$casing{$case}};
+
+	my $text = "";
+	my @pieces = split /(&[a-z]+;)/i, $origtext;
+	use Data::Dumper 'Dumper';
+	push @pieces, "" if @pieces % 2;
+	return $text unless @pieces;
+	local $_ = shift @pieces;
+	if (length $_) {
+		$entities = $other_entities;
+		&$first;
+		$text .= $_;
+	}
+	return $text unless @pieces;
+	$_ = shift @pieces;
+	$text .= $entities->{$_} || $_;
+	while (@pieces) {
+		$_ = shift @pieces; &$rest; $text .= $_;
+		$_ = shift @pieces; $text .= $other_entities->{$_} || $_;
+	}
+	return $text;
+}
+
+my $alword = qr{(?:\pL|&[a-z]+;)(?:[\pL']|&[a-z]+;)*}i;
+
 sub entitle {
-	my ($str,$ignore) = @_;
-	my $mixedcase = $str =~ /[a-z].*[A-Z]|[A-Z].*[a-z]/;
-	my $ignorable = $ignore && $str =~ /^[^a-z]*($IGNORABLES)[^a-z]*$/i;
-	$str = lc $str if $ignorable || ! $mixedcase ;
-	$str =~ s/([a-z])/\U$1/i unless $ignorable;
-	return $str;
+	my $ignore = pop;
+	local *_ = \shift;
+
+	# put into lowercase if on stop list, else titlecase
+	s{($alword)}
+	 { $ignore && $ignore{lc $1} ? recase($1,'lower') : recase($1,'title') }gex;
+
+	s/^($alword) /recase($1,'title')/ex;  # last word always to cap
+	s/ ($alword)$/recase($1,'title')/ex;  # first word always to cap
+
+	# treat parethesized portion as a complete title
+	s/\( ($alword) /'('.recase($1,'title')/ex;
+	s/($alword) \) /recase($1,'title').')'/ex;
+
+	# capitalize first word following colon or semi-colon
+	s/ ( [:;] \s+ ) ($alword) /$1 . recase($2,'title')/ex;
 }
 
 my $abbrev = join '|', qw{
@@ -539,7 +632,7 @@ sub toRoman($$)
 
 # BITS OF A NUMERIC VALUE
 
-my $num = q/(?:\d+)/;
+my $num = q/(?:\d{1,3}\b)/;
 my $rom = qq/(?:(?=[MDCLXVI])(?:$rpat))/;
 my $let = q/[A-Za-z]/;
 my $pbr = q/[[(<]/;
@@ -547,7 +640,7 @@ my $sbr = q/])>/;
 my $ows = q/[ \t]*/;
 my %close = ( '[' => ']', '(' => ')', '<' => '>', "" => '' );
 
-my $hangPS      = qq{(?i:ps:|(?:p\\.?)+s\\.?(?:[ \\t]*:)?)};
+my $hangPS      = qq{(?i:ps:|(?:p\\.?)+s\\b\\.?(?:[ \\t]*:)?)};
 my $hangNB      = qq{(?i:n\\.?b\\.?(?:[ \\t]*:)?)};
 my $hangword    = qq{(?:(?:Note)[ \\t]*:)};
 my $hangbullet  = qq{[*.+-]};
@@ -728,8 +821,8 @@ Text::Autoformat - Automatic text wrapping and reformatting
 
 =head1 VERSION
 
-This document describes version 1.10 of Text::Autoformat,
-released April  9, 2003.
+This document describes version 1.12 of Text::Autoformat,
+released May 27, 2003.
 
 =head1 SYNOPSIS
 
@@ -873,6 +966,22 @@ These are placed after the text to be formatted, in a hash reference:
 By default, C<autoformat> uses a left margin of 1 (first column) and a
 right margin of 72.
 
+You can also control whether (and how) C<autoformat> breaks words at the
+end of a line, using the C<'break'> option:
+
+	# Turn off all hyphenation
+	use Text::Autoformat qw(autoformat break_wrap);
+        $tidied = autoformat($messy, {break=>break_wrap});
+
+	# Default hyphenation
+	use Text::Autoformat qw(autoformat break_at);
+        $tidied = autoformat($messy, {break=>break_at('-')});
+
+	# Use TeX::Hyphen module's hyphenation (module must be installed)
+	use Text::Autoformat qw(autoformat break_TeX);
+        $tidied = autoformat($messy, {break=>break_TeX});
+
+
 Normally, C<autoformat> only reformats the first paragraph it encounters,
 and leaves the remainder of the text unaltered. This behaviour is useful
 because it allows a one-liner invoking the subroutine to be mapped
@@ -973,28 +1082,59 @@ more characters long.
 If automatic renumbering isn't wanted, just specify the C<'renumber'>
 option with a false value.
 
+Note that numbers above 1000 at the start of a line are no longer
+considered to be paragraph numbering. Numbered paragraphs running that
+high are exceptionally rare, and much rarer than paragraphs that look
+like this:
+
+        Although it has long been popular (especially in the year
+        2001) to point out that we now live in the Future, many
+        of the promised miracles of Future Life have failed to
+        eventuate. This is a new phenomenon (it didn't happen in
+        1001) because the idea that the future might be different
+        is a new phenomenon.
+
+which the former numbering rules caused to be formatted like this:
+
+        Although it has long been popular (especially in the year
+
+        2001) to point out that we now live in the Future, many of the
+              promised miracles of Future Life have failed to eventuate.
+              This is a new phenomenon (it didn't happen in
+
+        2002) because the idea that the future might be different is a
+              new phenomenon.
+
+but which are now formatted:
+
+        Although it has long been popular (especially in the year 2001)
+        to point out that we now live in the Future, many of the
+        promised miracles of Future Life have failed to eventuate. This
+        is a new phenomenon (it didn't happen in 1001) because the idea
+        that the future might be different is a new phenomenon.
 
 =head2 Quoting
 
 Another case in which contiguous lines may be interpreted as belonging
-to different paragraphs, is where they are quoted with distinct
-quoters. For example:
+to different paragraphs, is where they are quoted with distinct quoters.
+For example:
 
-        : > CN> So anyway, how can I stop reloads on a web page?
-        : > CN> Email replies only, thanks - I don't read this newsgroup.
+        : > CN> So anyway, how can I stop reloads on a web page? Email
+        : > CN> replies only, thanks - I don't read this newsgroup.
         : > Begone, sirrah! You are a pathetic, Bill-loving,
         : > microcephalic script-infant.
         : Sheesh, what's with this group - ask a question, get toasted!
         : And how *dare* you accuse me of Ianuphilia!
 
-C<autoformat> recognizes the various quoting conventions used in this example
-and treats it as three paragraphs to be independently reformatted.
+C<autoformat> recognizes the various quoting conventions used in this
+example and treats it as three paragraphs to be independently
+reformatted.
 
-Block quotations present a different challenge. A typical formatter would
-render the following quotation:
+Block quotations present a different challenge. A typical formatter
+would render the following quotation:
 
-        "We are all of us in the gutter,
-         but some of us are looking at the stars"
+        "We are all of us in the gutter, but some of us are looking at
+         the stars"
                                 -- Oscar Wilde
 
 like so:
@@ -1002,28 +1142,26 @@ like so:
         "We are all of us in the gutter, but some of us are looking at
         the stars" -- Oscar Wilde
 
-C<autoformat> recognizes the quotation structure by matching the following regular
-expression against the text component of each paragraph:
+C<autoformat> recognizes the quotation structure by matching the
+following regular expression against the text component of each
+paragraph:
 
-        / \A(\s*)               # leading whitespace for quotation
-          (["']|``)             # opening quotemark
-          (.*)                  # quotation
-          (''|\2)               # closing quotemark
-          \s*?\n                # trailing whitespace after quotation
-          (\1[ ]+)              # leading whitespace for attribution
-                                #   (must be indented more than quotation)
-          (--|-)                # attribution introducer
-          ([^\n]*?\n)           # first attribution line
-          ((\5[^\n]*?$)*)       # other attribution lines 
+        / \A(\s*) # leading whitespace for quotation (["']|``) # opening
+        quotemark (.*) # quotation (''|\2) # closing quotemark \s*?\n #
+        trailing whitespace after quotation (\1[ ]+) # leading
+        whitespace for attribution
+                                #   (must be indented more than
+                                #   quotation)
+          (--|-) # attribution introducer ([^\n]*?\n) # first
+          attribution line ((\5[^\n]*?$)*) # other attribution lines
                                 #   (indented no less than first line)
-          \s*\Z                 # optional whitespace to end of paragraph
-        /xsm
+          \s*\Z # optional whitespace to end of paragraph /xsm
 
 When reformatted (see below), the indentation and the attribution
 structure will be preserved:
 
-        "We are all of us in the gutter, but some of us are looking
-         at the stars"
+        "We are all of us in the gutter, but some of us are looking at
+         the stars"
                                 -- Oscar Wilde
 
 =head2 Widow control
@@ -1034,22 +1172,21 @@ the full margin width had been used, the formatting would have left the
 last two words by themselves on an oddly short last line:
 
         "We are all of us in the gutter, but some of us are looking at
-         the stars"
+        the stars"
 
 This phenomenon is known as "widowing" and is heavily frowned upon in
-typesetting circles. It looks ugly in plaintext too, so C<autoformat> 
-avoids it by stealing extra words from earlier lines in a
-paragraph, so as to leave enough for a reasonable last line. The heuristic
-used is that final lines must be at least 10 characters long (though
-this number may be adjusted by passing a C<widow =E<gt> I<minlength>>
-argument to C<autoformat>).
+typesetting circles. It looks ugly in plaintext too, so C<autoformat>
+avoids it by stealing extra words from earlier lines in a paragraph, so
+as to leave enough for a reasonable last line. The heuristic used is
+that final lines must be at least 10 characters long (though this number
+may be adjusted by passing a C<widow =E<gt> I<minlength>> argument to
+C<autoformat>).
 
-If the last line is too short,
-the paragraph's right margin is reduced by one column, and the paragraph
-is reformatted. This process iterates until either the last line exceeds
-nine characters or the margins have been narrowed by 10% of their
-original separation. In the latter case, the reformatter gives up and uses its
-original formatting.
+If the last line is too short, the paragraph's right margin is reduced
+by one column, and the paragraph is reformatted. This process iterates
+until either the last line exceeds nine characters or the margins have
+been narrowed by 10% of their original separation. In the latter case,
+the reformatter gives up and uses its original formatting.
 
 
 =head2 Justification
@@ -1058,31 +1195,31 @@ The C<autoformat> subroutine also takes a named argument: C<{justify
 =E<gt> I<type>}>, which specifies how each paragraph is to be justified.
 The options are: C<'left'> (the default), C<'right',> C<'centre'> (or
 C<'center'>), and C<'full'>. These act on the complete paragraph text
-(but I<not> on any quoters before that text). For example, with C<'right'>
-justification:
+(but I<not> on any quoters before that text). For example, with
+C<'right'> justification:
 
-        R3>     Now is the Winter of our discontent made
-        R3> glorious Summer by this son of York. And all
-        R3> the clouds that lour'd upon our house In the
-        R3>              deep bosom of the ocean buried.
+         R3>     Now is the Winter of our discontent made
+         R4> glorious Summer by this son of York. And all
+         R5> the clouds that lour'd upon our house In the
+         R6>              deep bosom of the ocean buried.
 
 Full justification is interesting in a fixed-width medium like plaintext
 because it usually results in uneven spacing between words. Typically,
 formatters provide this by distributing the extra spaces into the first
 available gaps of each line:
 
-        R3> Now  is  the  Winter  of our discontent made
-        R3> glorious Summer by this son of York. And all
-        R3> the  clouds  that  lour'd  upon our house In
-        R3> the deep bosom of the ocean buried.
+         R7> Now is the Winter of our discontent made
+         R8> glorious Summer by this son of York. And all
+         R9> the clouds that lour'd upon our house In
+        R10> the deep bosom of the ocean buried.
 
 This produces a rather jarring visual effect, so C<autoformat> reverses
 the strategy and inserts extra spaces at the end of lines:
 
-        R3> Now is the Winter  of  our  discontent  made
-        R3> glorious Summer by this son of York. And all
-        R3> the clouds that lour'd  upon  our  house  In
-        R3> the deep bosom of the ocean buried.
+        R11> Now is the Winter of our discontent made
+        R12> glorious Summer by this son of York. And all
+        R13> the clouds that lour'd upon our house In
+        R14> the deep bosom of the ocean buried.
 
 Most readers find this less disconcerting.
 
@@ -1095,11 +1232,11 @@ asking: "if this line were part of a centred paragraph, where would the
 centre line have been?"
 
 The answer can be determined by adding the length of leading whitespace
-before the first word, plus half the length of the full set of words
-on the line. That is, for a single line:
+before the first word, plus half the length of the full set of words on
+the line. That is, for a single line:
 
-        $line =~ /^(\s*)(.*?)(\s*)$/
-        $centre = length($1)+0.5*length($2);
+        $line =~ /^(\s*)(.*?)(\s*)$/ $centre =
+        length($1)+0.5*length($2);
 
 By making the same estimate for every line, and then comparing the
 estimates, it is possible to deduce whether all the lines are centred
@@ -1115,27 +1252,29 @@ C<"autocentre"> argument false.
 
 =head2 Case transformations
 
-The C<autoformat> subroutine can also optionally perform case conversions
-on the text it processes. The C<{case =E<gt> I<type>}> argument allows the
-user to specify five different conversions:
+The C<autoformat> subroutine can also optionally perform case
+conversions on the text it processes. The C<{case =E<gt> I<type>}>
+argument allows the user to specify five different conversions:
 
 =over 4
 
 =item C<'upper'>
 
-This mode unconditionally converts every letter in the reformatted text to upper-case;
+This mode unconditionally converts every letter in the reformatted text
+to upper-case;
 
 =item C<'lower'>
 
-This mode unconditionally converts every letter in the reformatted text to lower-case;
+This mode unconditionally converts every letter in the reformatted text
+to lower-case;
 
 =item C<'sentence'>
 
-This mode attempts to generate correctly-cased sentences from the input text.
-That is, the first letter after a sentence-terminating punctuator is converted
-to upper-case. Then, each subsequent word in the sentence is converted to
-lower-case, unless that word is originally mixed-case or contains punctuation.
-For example, under C<{case =E<gt> 'sentence'}>:
+This mode attempts to generate correctly-cased sentences from the input
+text. That is, the first letter after a sentence-terminating punctuator
+is converted to upper-case. Then, each subsequent word in the sentence
+is converted to lower-case, unless that word is originally mixed-case or
+contains punctuation. For example, under C<{case =E<gt> 'sentence'}>:
 
         'POVERTY, MISERY, ETC. are the lot of the PhD candidate. alas!'
 
@@ -1143,14 +1282,15 @@ becomes:
 
         'Poverty, misery, etc. are the lot of the PhD candidate. Alas!'
 
-Note that C<autoformat> is clever enough to recognize that the period after abbreviations such as C<etc.> is not a sentence terminator.
+Note that C<autoformat> is clever enough to recognize that the period
+after abbreviations such as C<etc.> is not a sentence terminator.
 
-If the argument is specified as C<'sentence  '> (with one or more trailing
-whitespace characters) those characters are used to replace the single space
-that appears at the end of the sentence. For example,
-C<autoformat($text, {case=E<gt>'sentence  '}>) would produce:
+If the argument is specified as C<'sentence '> (with one or more
+trailing whitespace characters) those characters are used to replace the
+single space that appears at the end of the sentence. For example,
+C<autoformat($text, {case=E<gt>'sentence '}>) would produce:
 
-        'Poverty, misery, etc. are the lot of the PhD candidate.  Alas!'
+        'Poverty, misery, etc. are the lot of the PhD candidate. Alas!'
 
 =item C<'title'>
 
@@ -1170,7 +1310,24 @@ capitalized:
 
 =head2 Selective reformatting
 
-You can select which paragraphs C<autoformat> actually reformats
+You can select which paragraphs C<autoformat> actually reformats (or,
+rather, those it I<doesn't> reformat) using the C<"ignore"> flag.
+
+For example:
+
+        # Reformat all paras except those containing "verbatim"...
+        print autoformat { all => 1, ignore => qr/verbatim/i }, $text;
+
+        # Reformat all paras except those less that 3 lines long...
+        print autoformat { all => 1, ignore => sub { tr/\n/\n/ < 3
+        } }, $text;
+
+        # Reformat all paras except those that are indented...
+        print autoformat { all => 1, ignore => qr/^\s/m }, $text;
+
+        # Reformat all paras except those that are indented (easier)...
+        print autoformat { all => 1, ignore => 'indented' }, $text;
+
 
 =head1 SEE ALSO
 
@@ -1182,12 +1339,12 @@ Damian Conway (damian@conway.org)
 
 =head1 BUGS
 
-There are undoubtedly serious bugs lurking somewhere in code this funky :-)
-Bug reports and other feedback are most welcome.
+There are undoubtedly serious bugs lurking somewhere in code this funky
+:-) Bug reports and other feedback are most welcome.
 
 =head1 COPYRIGHT
 
-Copyright (c) 1997-2000, Damian Conway. All Rights Reserved.
-This module is free software. It may be used, redistributed
-and/or modified under the terms of the Perl Artistic License
-  (see http://www.perl.com/perl/misc/Artistic.html)
+Copyright (c) 1997-2000, Damian Conway. All Rights Reserved. This module
+is free software. It may be used, redistributed and/or modified under
+the terms of the Perl Artistic License (see
+http://www.perl.com/perl/misc/Artistic.html)

@@ -3,7 +3,7 @@
 # See AutoSplit.pm.
 package POSIX;
 
-#line 266 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\fread.al)"
+#line 269 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\fread.al)"
 sub fread {
     unimpl "fread() is C-specific--use read instead";
 }

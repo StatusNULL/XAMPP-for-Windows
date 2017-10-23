@@ -1,5 +1,5 @@
 <?php
-/* $Id: server_status.php,v 1.11 2003/08/10 20:10:37 lem9 Exp $ */
+/* $Id: server_status.php,v 2.4 2003/11/26 22:52:24 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -29,8 +29,7 @@ if (!empty($innodbstatus)) {
        . htmlspecialchars($row[0]) . "\n"
        . '</pre>' . "\n";
     mysql_free_result($res);
-    include('./footer.inc.php');
-    exit;
+    require_once('./footer.inc.php');
 }
 
 /**
@@ -46,8 +45,7 @@ echo '<h2>' . "\n"
  */
 if (!$is_superuser && !$cfg['ShowMysqlInfo']) {
     echo $strNoPrivileges;
-    include('./footer.inc.php');
-    exit;
+    require_once('./footer.inc.php');
 }
 
 
@@ -76,7 +74,7 @@ unset($row);
 //Get query statistics
 $queryStats = array();
 $tmp_array = $serverStatus;
-while (list($name, $value) = each($tmp_array)) {
+foreach($tmp_array AS $name => $value) {
     if (substr($name, 0, 4) == 'Com_') {
         $queryStats[str_replace('_', ' ', substr($name, 4))] = $value;
         unset($serverStatus[$name]);
@@ -179,11 +177,11 @@ unset($tmp_array);
 
 $useBgcolorOne = TRUE;
 $countRows = 0;
-while (list($name, $value) = each($queryStats)) {
+foreach ($queryStats as $name => $value) {
 
 // For the percentage column, use Questions - Connections, because
 // the number of connections is not an item of the Query types
-// but is included in Questions. Then the total of the percentages is 100. 
+// but is included in Questions. Then the total of the percentages is 100.
 ?>
                         <tr>
                             <td bgcolor="<?php echo $useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']; ?>">&nbsp;<?php echo htmlspecialchars($name); ?>&nbsp;</td>
@@ -243,7 +241,7 @@ if (!empty($serverStatus)) {
 <?php
     $useBgcolorOne = TRUE;
     $countRows = 0;
-    while (list($name, $value) = each($serverStatus)) {
+    foreach($serverStatus AS $name => $value) {
 ?>
                         <tr>
                             <td bgcolor="<?php echo $useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']; ?>">&nbsp;<?php echo htmlspecialchars(str_replace('_', ' ', $name)); ?>&nbsp;</td>
@@ -301,6 +299,6 @@ if ($res) {
 /**
  * Sends the footer
  */
-require('./footer.inc.php');
+require_once('./footer.inc.php');
 
 ?>

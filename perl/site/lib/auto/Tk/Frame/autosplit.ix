@@ -1,4 +1,4 @@
-# Index created by AutoSplit for blib\lib\Tk/Frame.pm
+# Index created by AutoSplit for blib\lib\Tk\Frame.pm
 #    (file acts as timestamp)
 package Tk::Frame;
 sub labelPack 

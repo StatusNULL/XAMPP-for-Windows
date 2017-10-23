@@ -1,14 +1,14 @@
 <?php
-/* $Id: tbl_select.php,v 1.61 2003/08/17 23:36:51 lem9 Exp $ */
+/* $Id: tbl_select.php,v 2.2.2.1 2003/12/30 12:25:36 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
 /**
  * Gets some core libraries
  */
-require('./libraries/grab_globals.lib.php');
-require('./libraries/common.lib.php');
-require('./libraries/relation.lib.php'); // foreign keys
+require_once('./libraries/grab_globals.lib.php');
+require_once('./libraries/common.lib.php');
+require_once('./libraries/relation.lib.php'); // foreign keys
 
 if ($cfg['PropertiesIconic'] == true) {
     // We need to copy the value or else the == 'both' check will always return true
@@ -43,10 +43,10 @@ $textfunctions = array('LIKE', '=', '!=');
  */
 if (!isset($param) || $param[0] == '') {
     // Gets some core libraries
-    include('./tbl_properties_common.php');
+    require('./tbl_properties_common.php');
     //$err_url   = 'tbl_select.php' . $err_url;
     $url_query .= '&amp;goto=tbl_select.php&amp;back=tbl_select.php';
-    include('./tbl_properties_table_info.php');
+    require('./tbl_properties_table_info.php');
 
     if (!isset($goto)) {
         $goto = $cfg['DefaultTabTable'];
@@ -68,11 +68,11 @@ if (!isset($param) || $param[0] == '') {
             // reformat mysql query output - staybyte - 9. June 2001
             $shorttype     = substr($type, 0, 3);
             if ($shorttype == 'set' || $shorttype == 'enu') {
-                $type      = eregi_replace(',', ', ', $type);
+                $type      = str_replace(',', ', ', $type);
             } else {
-                $type          = eregi_replace('BINARY', '', $type);
-                $type          = eregi_replace('ZEROFILL', '', $type);
-                $type          = eregi_replace('UNSIGNED', '', $type);
+                $type          = preg_replace('@BINARY@i', '', $type);
+                $type          = preg_replace('@ZEROFILL@i', '', $type);
+                $type          = preg_replace('@UNSIGNED@i', '', $type);
             }
             if (empty($type)) {
                 $type      = '&nbsp;';
@@ -136,15 +136,13 @@ if (!isset($param) || $param[0] == '') {
                 <td bgcolor="<?php echo $bgcolor; ?>">
                     <select name="func[]">
             <?php
-            reset($numfunctions);
-            reset($textfunctions);
-            if (eregi('char|blob|text|set|enum', $fields_type[$i])) {
-                while (list($k, $fc) = each($textfunctions)) {
+            if (preg_match('@char|blob|text|set|enum@i', $fields_type[$i])) {
+                foreach($textfunctions AS $k => $fc) {
                     echo "\n" . '                        '
                          . '<option value="' . htmlspecialchars($fc) . '">' . htmlspecialchars($fc) . '</option>';
                 } // end while
             } else {
-                while (list($k, $fc) = each($numfunctions)) {
+                foreach($numfunctions AS $k => $fc) {
                     echo "\n" . '                        '
                          . '<option value="' .  htmlspecialchars($fc) . '">' . htmlspecialchars($fc) . '</option>';
                 } // end while
@@ -158,7 +156,7 @@ if (!isset($param) || $param[0] == '') {
             // <markus@noga.de>
             $field = $fields_list[$i];
 
-            include('./libraries/get_foreign.lib.php');
+            require('./libraries/get_foreign.lib.php');
 
             echo "\n";
             // we got a bug report: in some cases, even if $disp is true,
@@ -179,10 +177,11 @@ if (!isset($param) || $param[0] == '') {
             <?php
             } else if (substr($fields_type[$i], 0, 3)=='enu'){
                 // e n u m s
-                $enum_value=explode(", ",str_replace("'", "", substr($fields_type[$i], 5, -1)));
+                $enum_value=explode(', ', str_replace("'", '', substr($fields_type[$i], 5, -1)));
                 echo '                    <select name="fields[]">' . "\n";
                 echo '                        <option value=""></option>' . "\n";
-                for ($j=0; $j<count($enum_value);$j++){
+                $cnt_enum_value = count($enum_value);
+                for ($j=0; $j<$cnt_enum_value;$j++){
                     echo '                        <option value="' . $enum_value[$j] . '">' . $enum_value[$j] . '</option>';
                 } // end for
                 echo '                    </select>' . "\n";
@@ -227,8 +226,7 @@ if (!isset($param) || $param[0] == '') {
 </form>
         <?php
     } // end if
-    echo "\n";
-    include('./footer.inc.php');
+    require_once('./footer.inc.php');
 }
 
 
@@ -266,9 +264,10 @@ else {
     }
     else {
         $sql_query .= ' WHERE 1';
-        for ($i = 0; $i < count($fields); $i++) {
+        $cnt_fields = count($fields);
+        for ($i = 0; $i < $cnt_fields; $i++) {
             if (!empty($fields) && $fields[$i] != '') {
-                if (eregi('char|blob|text|set|enum|date|time|year', $types[$i])) {
+                if (preg_match('@char|blob|text|set|enum|date|time|year@i', $types[$i])) {
                     $quot     = '\'';
                 } else {
                     $quot     = '';
@@ -277,7 +276,10 @@ else {
                     $quot     = '';
                     $func[$i] = 'IS';
                 }
-                $sql_query    .= ' AND ' . PMA_backquote(urldecode($names[$i])) . " $func[$i] $quot$fields[$i]$quot";
+                //$sql_query    .= ' AND ' . PMA_backquote(urldecode($names[$i])) . " $func[$i] $quot$fields[$i]$quot";
+
+                $sql_query    .= ' AND ' . PMA_backquote(urldecode($names[$i])) . ' ' . $func[$i] . ' ' . $quot . PMA_sqlAddslashes($fields[$i]) . $quot;
+
             } // end if
         } // end for
     } // end if

@@ -1,13 +1,13 @@
 <?php
-/* $Id: user_password.php,v 1.19 2003/07/07 11:10:07 lem9 Exp $ */
+/* $Id: user_password.php,v 2.3 2003/11/26 22:52:24 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
 /**
  * Gets some core libraries
  */
-require('./libraries/grab_globals.lib.php');
-require('./libraries/common.lib.php');
+require_once('./libraries/grab_globals.lib.php');
+require_once('./libraries/common.lib.php');
 
 /**
  * Displays an error message and exits if the user isn't allowed to use this
@@ -17,11 +17,10 @@ if (!$cfg['ShowChgPassword']) {
     $cfg['ShowChgPassword'] = @PMA_mysql_query('USE mysql', $userlink);
 }
 if ($cfg['Server']['auth_type'] == 'config' || !$cfg['ShowChgPassword']) {
-    include('./header.inc.php');
-    echo '<p><b>' . $strError . '</b></p>' . "\n";
-    echo '<p>&nbsp;&nbsp;&nbsp;&nbsp;' .  $strNoRights . '</p>' . "\n";
-    include('./footer.inc.php');
-    exit();
+    require_once('./header.inc.php');
+    echo '<p><b>' . $strError . '</b></p>' . "\n"
+       . '<p>&nbsp;&nbsp;&nbsp;&nbsp;' .  $strNoRights . '</p>' . "\n";
+    require_once('./footer.inc.php');
 } // end if
 
 
@@ -49,7 +48,7 @@ if (isset($nopass)) {
 
         $err_url          = 'user_password.php?' . $common_url_query;
 
-        $sql_query        = 'SET password = ' . (($pma_pw == '') ? '\'\'' : 'PASSWORD(\'' . ereg_replace('.', '*', $pma_pw) . '\')');
+        $sql_query        = 'SET password = ' . (($pma_pw == '') ? '\'\'' : 'PASSWORD(\'' . preg_replace('@.@s', '*', $pma_pw) . '\')');
         $local_query      = 'SET password = ' . (($pma_pw == '') ? '\'\'' : 'PASSWORD(\'' . PMA_sqlAddslashes($pma_pw) . '\')');
         $result           = @PMA_mysql_query($local_query) or PMA_mysqlDie('', '', FALSE, $err_url);
 
@@ -64,7 +63,7 @@ if (isset($nopass)) {
                      : '';
 
         // Displays the page
-        include('./header.inc.php');
+        require_once('./header.inc.php');
         echo '<h1>' . $strChangePassword . '</h1>' . "\n\n";
         $show_query = 'y';
         PMA_showMessage($strUpdateProfileMessage);
@@ -83,7 +82,7 @@ if (isset($nopass)) {
  */
 // Loads the headers
 $js_to_run = 'user_password.js';
-require('./header.inc.php');
+require_once('./header.inc.php');
 echo '<h1>' . $strChangePassword . '</h1>' . "\n\n";
 
 // Displays an error message if required
@@ -135,6 +134,5 @@ $chg_evt_handler = (PMA_USR_BROWSER_AGENT == 'IE' && PMA_USR_BROWSER_VER >= 5)
 /**
  * Displays the footer
  */
-echo "\n";
-require('./footer.inc.php');
+require_once('./footer.inc.php');
 ?>

@@ -332,7 +332,7 @@ sub manifypods
  local $_ = $self->MM::manifypods;
  if ($] >= 5.00565)
   {
-   s/(POD2MAN_EXE.*pod2man)/$1 --center "perl\/Tk Documentation" --release "Tk\$(VERSION)"/;
+   s/(POD2MAN_EXE.*pod2man(\s+\"--\")?)/$1 --center "perl\/Tk Documentation" --release "Tk\$(VERSION)"/;
   }
  elsif ($] >= 5.003)
   {

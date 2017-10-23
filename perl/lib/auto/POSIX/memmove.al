@@ -3,7 +3,7 @@
 # See AutoSplit.pm.
 package POSIX;
 
-#line 483 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\memmove.al)"
+#line 490 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\memmove.al)"
 sub memmove {
     unimpl "memmove() is C-specific, use = instead";
 }

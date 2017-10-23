@@ -3,7 +3,7 @@
 # See AutoSplit.pm.
 package POSIX;
 
-#line 479 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\memcpy.al)"
+#line 486 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\memcpy.al)"
 sub memcpy {
     unimpl "memcpy() is C-specific, use = instead";
 }

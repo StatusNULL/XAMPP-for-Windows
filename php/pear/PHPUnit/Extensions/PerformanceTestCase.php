@@ -3,7 +3,7 @@
 // +------------------------------------------------------------------------+
 // | PEAR :: PHPUnit                                                        |
 // +------------------------------------------------------------------------+
-// | Copyright (c) 2002-2003 Sebastian Bergmann <sb@sebastian-bergmann.de>. |
+// | Copyright (c) 2002-2004 Sebastian Bergmann <sb@sebastian-bergmann.de>. |
 // +------------------------------------------------------------------------+
 // | This source file is subject to version 3.00 of the PHP License,        |
 // | that is available at http://www.php.net/license/3_0.txt.               |
@@ -12,7 +12,7 @@
 // | license@php.net so we can mail you a copy immediately.                 |
 // +------------------------------------------------------------------------+
 //
-// $Id: PerformanceTestCase.php,v 1.3 2003/07/24 06:39:52 sebastian Exp $
+// $Id: PerformanceTestCase.php,v 1.5 2004/01/04 10:25:09 sebastian Exp $
 //
 
 require_once 'Benchmark/Timer.php';
@@ -33,7 +33,7 @@ class PHPUnit_Extensions_PerformanceTestCase extends PHPUnit_Framework_TestCase 
     * @var    double
     * @access private
     */
-    private $fMaxRunningTime = 0;
+    private $maxRunningTime = 0;
 
     // }}}
     // {{{ public function __construct($name, $maxRunningTime = 0)
@@ -45,7 +45,7 @@ class PHPUnit_Extensions_PerformanceTestCase extends PHPUnit_Framework_TestCase 
     */
     public function __construct($name, $maxRunningTime = 0) {
         parent::__construct($name);
-        $this->fMaxRunningTime = $maxRunningTime;
+        $this->maxRunningTime = $maxRunningTime;
     }
 
     // }}}
@@ -61,13 +61,13 @@ class PHPUnit_Extensions_PerformanceTestCase extends PHPUnit_Framework_TestCase 
         parent::runTest();
         $timer->stop();
 
-        if ($this->fMaxRunningTime != 0 &&
-            $timer->timeElapsed() > $this->fMaxRunningTime) {
+        if ($this->maxRunningTime != 0 &&
+            $timer->timeElapsed() > $this->maxRunningTime) {
             PHPUnit_Framework_Assert::fail(
               sprintf(
                 'expected running time: <= %s but was: %s',
 
-                $this->fMaxRunningTime,
+                $this->maxRunningTime,
                 $timer->timeElapsed()
               )
             );

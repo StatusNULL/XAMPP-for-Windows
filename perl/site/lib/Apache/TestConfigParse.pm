@@ -8,7 +8,7 @@ use warnings FATAL => 'all';
 
 use Apache::TestTrace;
 
-use File::Spec::Functions qw(rel2abs splitdir);
+use File::Spec::Functions qw(rel2abs splitdir file_name_is_absolute);
 use File::Basename qw(basename);
 
 sub strip_quotes {
@@ -47,14 +47,60 @@ sub spec_add_config {
 sub server_file_rel2abs {
     my($self, $file, $base) = @_;
 
-    $base ||= $self->{inherit_config}->{ServerRoot};
+    my ($serverroot, $result) = ();
 
-    unless ($base) {
-        warning "unable to resolve $file (ServerRoot not defined yet?)";
-        return $file;
+    # order search sequence
+    my @tries = ([ $base,
+                       'user-supplied $base' ],
+                 [ $self->{inherit_config}->{ServerRoot},
+                       'httpd.conf inherited ServerRoot' ],
+                 [ $self->apxs('PREFIX'),
+                       'apxs-derived ServerRoot' ]);
+
+    # remove surrounding quotes if any
+    # e.g. Include "/tmp/foo.html"
+    $file =~ s/^\s*["']?//;
+    $file =~ s/["']?\s*$//;
+
+    if (file_name_is_absolute($file)) {
+        debug "$file is already absolute";
+        $result = $file;
+    }
+    else {
+        foreach my $try (@tries) {
+            next unless defined $try->[0];
+
+            if (-d $try->[0]) {
+                $serverroot = $try->[0];
+                debug "using $try->[1] to resolve $file";
+                last;
+            }
+        }
+
+        if ($serverroot) {
+            $result = rel2abs $file, $serverroot;
+        }
+        else {
+            warning "unable to resolve $file - cannot find a suitable ServerRoot";
+            warning "please specify a ServerRoot in your httpd.conf or use apxs";
+
+            # return early, skipping file test below
+            return $file;
+        }
+
     }
 
-    rel2abs $file, $base;
+    if (-e $result) {
+        debug "$file successfully resolved to existing file $result";
+    }
+    else {
+        warning "file $result does not exist";
+
+        # old behavior was to return the resolved but non-existent
+        # file.  preserve that behavior and return $result anyway.
+    }
+
+    return $result;
 }
 
 sub server_file {
@@ -202,8 +248,9 @@ sub inherit_config_file_or_directory {
         (my $directive, $_) = split /\s+/, $_, 2;
 
         if ($directive eq "Include") {
-            my $include = $self->server_file_rel2abs($_);
-            $self->inherit_config_file_or_directory($include);
+            foreach my $include (glob($self->server_file_rel2abs($_))) {
+                $self->inherit_config_file_or_directory($include);
+            }
         }
 
         #parse what we want
@@ -299,11 +346,13 @@ sub get_httpd_defines {
             s/\s+$//;
             my($key, $val) = split '=', $_, 2;
             $self->{httpd_defines}->{$key} = $val ? strip_quotes($val) : 1;
+            debug "isolated httpd_defines $key = " . $self->{httpd_defines}->{$key};
         }
-        elsif (/(version|built|module magic number):\s+(.*)/i) {
+        elsif (/(version|built|module magic number|server mpm):\s+(.*)/i) {
             my $val = $2;
             (my $key = uc $1) =~ s/\s/_/g;
             $self->{httpd_info}->{$key} = $val;
+            debug "isolated httpd_info $key = " . $val;
         }
     }
 
@@ -315,8 +364,16 @@ sub get_httpd_defines {
               MODULE_MAGIC_NUMBER_MINOR)} = split ':', $mmn;
     }
 
-    if (my $mpm_dir = $self->{httpd_defines}->{APACHE_MPM_DIR}) {
-        $self->{mpm} = basename $mpm_dir;
+    # get the mpm information where available
+    # lowercase for consistency across the two extraction methods
+    # XXX or maybe consider making have_apache_mpm() case-insensitive?
+    if (my $mpm = $self->{httpd_info}->{SERVER_MPM}) {
+        # 2.1
+        $self->{mpm} = lc $mpm;
+    }
+    elsif (my $mpm_dir = $self->{httpd_defines}->{APACHE_MPM_DIR}) {
+        # 2.0
+        $self->{mpm} = lc basename $mpm_dir;
     }
     else {
         # Apache 1.3 - no mpm to speak of

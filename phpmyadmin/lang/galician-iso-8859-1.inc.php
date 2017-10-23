@@ -1,5 +1,5 @@
 <?php
-/* $Id: galician-iso-8859-1.inc.php,v 1.127.2.1 2003/08/23 11:53:59 lem9 Exp $ */
+/* $Id: galician-iso-8859-1.inc.php,v 2.2 2003/11/20 13:48:52 nijel Exp $ */
 
 /**
  * Translated by Xosé Calvo <xosecalvo at terra.es>
@@ -699,4 +699,28 @@ $strZeroRemovesTheLimit = 'Nota: Se estas opcións se configuran como 0 (cero) el
 $strZip = 'comprimido no formato "zip"';
 // To translate
 
+$strInternalRelations = 'Internal relations';  //to translate
+$strInternalNotNecessary = '* An internal relation is not necessary when it exists also in InnoDB.';  //to translate
+$strUpgrade = 'You should upgrade to %s %s or later.';  //to translate
+$strLatexStructure = 'Structure of table __TABLE__';//to translate
+$strLatexContinued = '(continued)';//to translate
+$strLatexContent = 'Content of table __TABLE__';//to translate
+$strLatexIncludeCaption = 'Include table caption';//to translate
+$strLatexCaption = 'Table caption';//to translate
+$strLatexLabel = 'Label key';//to translate
+$strLatexContinuedCaption = 'Continued table caption';//to translate
+
+$strPrintViewFull = 'Print view (with full texts)';  //to translate
+$strLogServer = 'Server';  //to translate
+$strSortByKey = 'Sort by key';  //to translate
+$strBookmarkAllUsers = 'Let every user access this bookmark';  //to translate
+$strConstraintsForDumped = 'Constraints for dumped tables';  //to translate
+$strConstraintsForTable = 'Constraints for table';  //to translate
+$strBookmarkOptions = 'Bookmark options';  //to translate
+$strCreationDates = 'Creation/Update/Check dates';  //to translate
+$strCheckOverhead = 'Check overheaded';  //to translate
+$strExcelEdition = 'Excel edition';  //to translate
+$strDelayedInserts = 'Use delayed inserts';  //to translate
+$strSQLExportType = 'Export type';  //to translate
+$strAddConstraints = 'Add constraints';  //to translate
 ?>

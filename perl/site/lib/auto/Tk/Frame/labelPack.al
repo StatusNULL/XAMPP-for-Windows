@@ -1,9 +1,9 @@
-# NOTE: Derived from blib\lib\Tk/Frame.pm.
+# NOTE: Derived from blib\lib\Tk\Frame.pm.
 # Changes made here will be lost when autosplit is run again.
 # See AutoSplit.pm.
 package Tk::Frame;
 
-#line 117 "blib\lib\Tk/Frame.pm (autosplit into blib\lib\auto\Tk\Frame\labelPack.al)"
+#line 117 "blib\lib\Tk\Frame.pm (autosplit into blib\lib\auto\Tk\Frame\labelPack.al)"
 sub labelPack
 {
  my ($cw,$val) = @_;

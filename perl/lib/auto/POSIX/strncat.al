@@ -3,7 +3,7 @@
 # See AutoSplit.pm.
 package POSIX;
 
-#line 521 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\strncat.al)"
+#line 528 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\strncat.al)"
 sub strncat {
     unimpl "strncat() is C-specific, use .= instead";
 }

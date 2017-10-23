@@ -3,7 +3,7 @@
 # See AutoSplit.pm.
 package POSIX;
 
-#line 736 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\load_imports.al)"
+#line 743 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\load_imports.al)"
 sub load_imports {
 %EXPORT_TAGS = (
 
@@ -146,7 +146,7 @@ sub load_imports {
 		_SC_STREAM_MAX _SC_TZNAME_MAX _SC_VERSION
 		_exit access ctermid cuserid
 		dup2 dup execl execle execlp execv execve execvp
-		fpathconf getcwd getegid geteuid getgid getgroups
+		fpathconf fsync getcwd getegid geteuid getgid getgroups
 		getpid getuid isatty lseek pathconf pause setgid setpgid
 		setsid setuid sysconf tcgetpgrp tcsetpgrp ttyname)],
 
@@ -220,5 +220,5 @@ for (values %EXPORT_TAGS) {
 require Exporter;
 }
 
+# end of POSIX::SigAction::load_imports
 1;
-# end of POSIX::load_imports

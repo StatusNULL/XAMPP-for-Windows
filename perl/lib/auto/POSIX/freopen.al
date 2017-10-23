@@ -3,7 +3,7 @@
 # See AutoSplit.pm.
 package POSIX;
 
-#line 270 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\freopen.al)"
+#line 273 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\freopen.al)"
 sub freopen {
     unimpl "freopen() is C-specific--use open instead";
 }

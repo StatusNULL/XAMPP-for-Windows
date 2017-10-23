@@ -1,12 +1,12 @@
 #!/usr/bin/perl -w
 
-# $Id: lwp-request,v 2.1 2002/01/03 02:07:02 gisle Exp $
+# $Id: lwp-request,v 2.6 2003/10/26 14:39:18 gisle Exp $
 #
 # Simple user agent using LWP library.
 
 =head1 NAME
 
-lwp-request, GET, HEAD, POST - Simple WWW user agent
+lwp-request - Simple command line user agent
 
 =head1 SYNOPSIS
 
@@ -51,10 +51,10 @@ hours, respectively.  The default timeout is '3m', i.e. 3 minutes.
 
 =item -i <time>
 
-Set the If-Modified-Since header in the request. If I<time> it the
+Set the If-Modified-Since header in the request. If I<time> is the
 name of a file, use the modification timestamp for this file. If
 I<time> is not a file, it is parsed as a literal date. Take a look at
-L<HTTP::Date> for recogniced formats.
+L<HTTP::Date> for recognized formats.
 
 =item -c <content-type>
 
@@ -107,7 +107,7 @@ Print response status code.  This option is always on for HEAD requests.
 
 =item -S
 
-Print response status chain. This shows redirect and autorization
+Print response status chain. This shows redirect and authorization
 requests that are handled by the library.
 
 =item -e
@@ -149,7 +149,7 @@ Extra debugging output.
 
 =item -a
 
-Set text(ascii) mode for content input and output.  If this option is not 
+Set text(ascii) mode for content input and output.  If this option is not
 used, content input and output is done in binary mode.
 
 =back
@@ -178,7 +178,7 @@ $progname = $0;
 $progname =~ s,.*[\\/],,;  # use basename only
 $progname =~ s/\.\w*$//;   # strip extension, if any
 
-$VERSION = sprintf("%d.%02d", q$Revision: 2.1 $ =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q$Revision: 2.6 $ =~ /(\d+)\.(\d+)/);
 
 
 require LWP;
@@ -227,7 +227,8 @@ use HTTP::Date qw(time2str str2time);
 	my($self, $realm, $uri) = @_;
 	if ($main::options{'C'}) {
 	    return split(':', $main::options{'C'}, 2);
-	} elsif (-t) {
+	}
+	elsif (-t) {
 	    my $netloc = $uri->host_port;
 	    print "Enter username for $realm at $netloc: ";
 	    my $user = <STDIN>;
@@ -240,7 +241,8 @@ use HTTP::Date qw(time2str str2time);
 	    print "\n";  # because we disabled echo
 	    chomp($password);
 	    return ($user, $password);
-	} else {
+	}
+	else {
 	    return (undef, undef)
 	}
     }
@@ -311,10 +313,12 @@ $method = uc($options{'m'}) if defined $options{'m'};
 if ($options{'f'}) {
     if ($options{'c'}) {
         $allowed_methods{$method} = "C";  # force content
-    } else {
+    }
+    else {
         $allowed_methods{$method} = "";
     }
-} elsif (!defined $allowed_methods{$method}) {
+}
+elsif (!defined $allowed_methods{$method}) {
     die "$progname: $method is not an allowed method\n";
 }
 
@@ -338,7 +342,8 @@ if (defined $options{'t'}) {
 if (defined $options{'i'}) {
     if (-e $options{'i'}) {
         $time = (stat _)[9];
-    } else {
+    }
+    else {
         $time = str2time($options{'i'});
         die "$progname: Illegal time syntax for -i option\n"
             unless defined $time;
@@ -354,7 +359,8 @@ if ($allowed_methods{$method} eq "C") {
         $options{'c'} = ($method eq "POST") ?
               "application/x-www-form-urlencoded"
             : "text/plain";
-    } else {
+    }
+    else {
         die "$progname: Illegal Content-type format\n"
             unless $options{'c'} =~ m,^[\w\-]+/[\w\-]+(?:\s*;.*)?$,
     }
@@ -362,7 +368,8 @@ if ($allowed_methods{$method} eq "C") {
         if -t;
     binmode STDIN unless -t or $options{'a'};
     $content = join("", <STDIN>);
-} else {
+}
+else {
     die "$progname: Can't set Content-type for $method requests\n"
         if defined $options{'c'};
 }
@@ -391,7 +398,8 @@ while ($url = shift) {
 	if ($url =~ /^\w+:/ || $options{'b'}) {  # is there any scheme specification
 	    $url = URI->new($url, $options{'b'});
 	    $url = $url->abs($options{'b'}) if $options{'b'};
-	} else {
+	}
+	else {
 	    $url = uf_uri($url);
         }
     };
@@ -416,7 +424,8 @@ while ($url = shift) {
 
     if ($options{'S'}) {
 	printResponseChain($response);
-    } elsif ($options{'s'}) {
+    }
+    elsif ($options{'s'}) {
         print $response->status_line, "\n";
     }
 
@@ -426,55 +435,53 @@ while ($url = shift) {
         print "\n";  # separate headers and content
     }
 
-    if ($response->is_success) {
-	unless ($options{'d'}) {
-	    if ($options{'o'} &&
-		$response->content_type eq 'text/html') {
-		require HTML::Parse;
-		my $html = HTML::Parse::parse_html($response->content);
-		{
-		    $options{'o'} eq 'ps' && do {
-			require HTML::FormatPS;
-			my $f = HTML::FormatPS->new;
-			print $f->format($html);
-			last;
-		    };
-		    $options{'o'} eq 'text' && do {
-			require HTML::FormatText;
-			my $f = HTML::FormatText->new;
-			print $f->format($html);
-			last;
-		    };
-		    $options{'o'} eq 'html' && do {
-			print $html->as_HTML;
-			last;
-		    };
-		    $options{'o'} eq 'links' && do {
-			my $base = $response->base;
-			for ( @{ $html->extract_links } ) {
-			    my($link, $elem) = @$_;
-			    my $tag = uc $elem->tag;
-			    $link = URI->new($link)->abs($base)->as_string;
-			    print "$tag\t$link\n";
-			}
-			last;
-		    };
-		    $options{'o'} eq 'dump' && do {
-			$html->dump;
-			last;
-		    };
-		    # It is bad to not notice this before now :-(
-		    die "Illegal -o option value ($options{'o'})\n";
-		}
-	    } else {
-                binmode STDOUT unless $options{'a'};
-		print $response->content;
+    unless ($options{'d'}) {
+	if ($options{'o'} &&
+	    $response->content_type eq 'text/html') {
+	    require HTML::Parse;
+	    my $html = HTML::Parse::parse_html($response->content);
+	    {
+		$options{'o'} eq 'ps' && do {
+		    require HTML::FormatPS;
+		    my $f = HTML::FormatPS->new;
+		    print $f->format($html);
+		    last;
+		};
+		$options{'o'} eq 'text' && do {
+		    require HTML::FormatText;
+		    my $f = HTML::FormatText->new;
+		    print $f->format($html);
+		    last;
+		};
+		$options{'o'} eq 'html' && do {
+		    print $html->as_HTML;
+		    last;
+		};
+		$options{'o'} eq 'links' && do {
+		    my $base = $response->base;
+		    for ( @{ $html->extract_links } ) {
+			my($link, $elem) = @$_;
+			my $tag = uc $elem->tag;
+			$link = URI->new($link)->abs($base)->as_string;
+			print "$tag\t$link\n";
+		    }
+		    last;
+		};
+		$options{'o'} eq 'dump' && do {
+		    $html->dump;
+		    last;
+		};
+		# It is bad to not notice this before now :-(
+		die "Illegal -o option value ($options{'o'})\n";
 	    }
 	}
-    } else {
-        print STDERR $response->error_as_HTML unless $options{'d'};
-        $errors++;
+	else {
+	    binmode STDOUT unless $options{'a'};
+	    print $response->content;
+	}
     }
+
+    $errors++ unless $response->is_success;
 }
 
 exit $errors;

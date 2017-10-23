@@ -4,7 +4,7 @@
 // Description: Radar plot extension for JpGraph
 // Created: 	2001-02-04
 // Author:	Johan Persson (johanp@aditus.nu)
-// Ver:		$Id: jpgraph_radar.php,v 1.7 2003/03/20 19:57:22 aditus Exp $
+// Ver:		$Id: jpgraph_radar.php,v 1.7.2.2 2003/10/07 02:40:40 aditus Exp $
 //
 // License:	This code is released under QPL
 // Copyright (C) 2001,2002 Johan Persson
@@ -402,6 +402,8 @@ class RadarGraph extends Graph {
 	$this->SetColor(array(255,255,255));
 	$this->SetTickDensity(TICKD_NORMAL);
 	$this->SetScale("lin");
+	$this->SetGridDepth(DEPTH_FRONT);
+
     }
 
 //---------------
@@ -539,25 +541,47 @@ class RadarGraph extends Graph {
 	    $this->plots[$i]->Legend($this);
 	$this->legend->Stroke($this->img);			
 	$this->footer->Stroke($this->img);			
+
+	if( $this->grid_depth == DEPTH_BACK ) {
+	    // Draw axis and grid
+	    for( $i=0,$a=M_PI/2; $i < $nbrpnts; ++$i, $a += $astep ) {
+		$this->axis->Stroke($this->posy,$a,$grid[$i],$this->axis_title[$i],$i==0);
+	    }	
+	}
 		
 	// Plot points
 	$a=M_PI/2;
 	for($i=0; $i<count($this->plots); ++$i )
 	    $this->plots[$i]->Stroke($this->img, $this->posy, $this->yscale, $a);
 		
-	// Draw axis and grid
-	for( $i=0,$a=M_PI/2; $i<$nbrpnts; ++$i, $a+=$astep ) {
-	    $this->axis->Stroke($this->posy,$a,$grid[$i],$this->axis_title[$i],$i==0);
-	}	
+	if( $this->grid_depth != DEPTH_BACK ) {
+	    // Draw axis and grid
+	    for( $i=0,$a=M_PI/2; $i < $nbrpnts; ++$i, $a += $astep ) {
+		$this->axis->Stroke($this->posy,$a,$grid[$i],$this->axis_title[$i],$i==0);
+	    }	
+	}
 	$this->grid->Stroke($this->img,$grid);
 	$this->StrokeTitles();
 	
 	// Stroke texts
-	if( $this->texts != null )
+	if( $this->texts != null ) {
 	    foreach( $this->texts as $t) 
 		$t->Stroke($this->img);
+	}
+
+	// Should we do any final image transformation
+	if( $this->iImgTrans ) {
+	    if( !class_exists('ImgTrans') ) {
+		require_once('jpgraph_imgtrans.php');
+	    }
+	       
+	    $tform = new ImgTrans($this->img->img);
+	    $this->img->img = $tform->Skew3D($this->iImgTransHorizon,$this->iImgTransSkewDist,
+					     $this->iImgTransDirection,$this->iImgTransHighQ,
+					     $this->iImgTransMinSize,$this->iImgTransFillColor,
+					     $this->iImgTransBorder);
+	}
 	
-			
 	// If the filename is given as the special "__handle"
 	// then the image handler is returned and the image is NOT
 	// streamed back

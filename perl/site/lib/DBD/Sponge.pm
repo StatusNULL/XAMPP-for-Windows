@@ -5,9 +5,9 @@
     require Carp;
 
     @EXPORT = qw(); # Do NOT @EXPORT anything.
-    $VERSION = sprintf("%d.%02d", q$Revision: 11.8 $ =~ /(\d+)\.(\d+)/o);
+    $VERSION = sprintf("%d.%02d", q$Revision: 11.10 $ =~ /(\d+)\.(\d+)/o);
 
-#   $Id: Sponge.pm,v 11.8 2003/05/10 23:30:28 timbo Exp $
+#   $Id: Sponge.pm,v 11.10 2004/01/07 17:38:51 timbo Exp $
 #
 #   Copyright (c) 1994-2003 Tim Bunce Ireland
 #
@@ -32,8 +32,8 @@
 	$drh;
     }
 
-    sub default_user {
-        return ('','');
+    sub CLONE {
+        undef $drh;
     }
 }
 
@@ -93,6 +93,10 @@
 		    || [ (DBI::SQL_VARCHAR()) x $numFields ];
 	    $sth->{PRECISION} = $attribs->{PRECISION}
 		    || [ map { length($sth->{NAME}->[$_]) } 0..$numFields -1 ];
+	    $sth->{SCALE} = $attribs->{SCALE}
+		    || [ (0) x $numFields ];
+	    $sth->{NULLABLE} = $attribs->{NULLABLE}
+		    || [ (2) x $numFields ];
 	}
 
 	$outer;
@@ -204,3 +208,93 @@
 }
 
 1;
+
+__END__ 
+
+=pod
+
+=head1 NAME
+
+DBD::Sponge - Create a DBI statement handle from Perl data
+
+=head1 SYNOPSIS
+
+  my $sponge = DBI->connect("dbi:Sponge:","","",{ RaiseError => 1 });
+  my $sth = $sponge->prepare($statement, {
+          rows => $data,
+          NAME => $names,
+          %attr
+      }
+  );
+
+=head1 DESCRIPTION
+
+DBD::Sponge is useful for making a Perl data structure accessible through a
+standard DBI statement handle. This may be useful to DBD module authors who
+need to transform data in this way.
+
+=head1 METHODS
+
+=head2 connect()
+
+  my $sponge = DBI->connect("dbi:Sponge:","","",{ RaiseError => 1 });
+
+Here's a sample syntax for creating a database handle for the Sponge driver.
+No username and password are needed.
+
+=head2 prepare()
+
+  my $sth = $sponge->prepare($statement, {
+          rows => $data,
+          NAME => $names,
+          %attr
+      }
+  );
+
+=over 4
+
+=item o
+
+The C<$statement> here is an arbitrary statement or name you want
+to provide as identity of your data. If you're using DBI::Profile
+it will appear in the profile data.
+
+Generally it's expected that you are preparing a statement handle
+as if a C<select> statement happened.
+
+=item o
+
+C<$data> is a reference to the data you are providing, given as an array of arrays.
+
+=item o
+
+C<$names> is a reference an array of column names for the C<$data> you are providing.
+The number and order should match the number and ordering of the C<$data> columns. 
+
+=item o
+
+C<%attr> is a hash of other standard DBI attributes that you might pass to a prepare statement.
+
+Currently only NAME, TYPE, and PRECISION are supported.
+
+=back
+
+=head1 BUGS
+
+Using this module to prepare INSERT-like statements is not currently documented.
+
+=head1 AUTHOR AND COPYRIGHT
+
+This module is Copyright (c) 2003 Tim Bunce
+
+Documentation initially written by Mark Stosberg
+
+The DBD::Sponge module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. In particular permission
+is granted to Tim Bunce for distributing this as a part of the DBI.
+
+=head1 SEE ALSO
+
+L<DBI(3)>
+
+=cut

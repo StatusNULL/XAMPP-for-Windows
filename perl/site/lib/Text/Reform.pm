@@ -824,7 +824,7 @@ A single | is formatted as the literal character '|'
 A numerically formatted block field with the specified number of digits to
 either side of the decimal place.
 Just like a >>>.<<<< field, except it repeats as required on
-subsequent lines. See below. 
+subsequent lines. See below.
 
 
 =item ~
@@ -993,7 +993,7 @@ look-up table:
         \@values, \@squares, \@roots, \@logs, \@inverses;
 
 The multiline format specifier:
-        
+
         "| [[  |  [[[  |  [[[[[[[[[[ | [[[[[[[[[ | [[[[[[[[[ |
         -----------------------------------------------------",
 
@@ -1077,7 +1077,7 @@ Judging by the labels, it is far more likely that the user wanted:
 To achieve that, either explicitly interleave the formats and their data
 sources:
 
-        print form 
+        print form
         "Passed:",               ## single format (no data required)
         "   [[[[[[[[[[[[[[[",    ## single format (needs one set of data)
             \@passes,            ## data for previous format
@@ -1266,7 +1266,7 @@ The algorithm C<form> uses is:
                 2.1. determine the number of fields and shift
                      that many values off the argument list and
                      into the filling list. If insufficient
-                     arguments are available, generate as many 
+                     arguments are available, generate as many
                      empty strings as are required.
 
                 2.2. generate a text line by filling each field
@@ -1299,7 +1299,7 @@ As an example of the use of C<form>, the following:
         q{       ----------------   },
         q{       ^^^^  ]]]]]]]]]]|  },
         $count+11, $text,
-        q{                       =  
+        q{                       =
                  ]]].[[[            },
         "123 123.4\n123.456789";
 
@@ -1358,7 +1358,7 @@ produces:
 not:
 
         a line of
-          a line 
+          a line
             a line
 
 To achieve the latter effect, convert the variable arguments
@@ -1419,7 +1419,7 @@ numeric values about a fixed decimal place marker. For example:
         EONUMS
 
 would print:
-                   
+
         (    1.0 )
         (    1.0 )
         (    1.00)
@@ -1445,13 +1445,13 @@ by giving the configuration option 'numeric' a value that matches
         EONUMS
 
 would print:
-                   
+
         (    1.00)
         (    1.00)
 
 Note that although decimal digits are rounded to fit the specified width, the
 integral part of a number is never modified. If there are not enough places
-before the decimal place to represent the number, the entire number is 
+before the decimal place to represent the number, the entire number is
 replaced with hashes.
 
 If a non-numeric sequence is passed as data for a numeric field, it is
@@ -1470,7 +1470,7 @@ ignored. For example:
         EONUMS
 
 would print:
-                   
+
         (    1.0 )
         (    4.0 )
 
@@ -1785,7 +1785,7 @@ Zero or more non-"word" characters which balance some sequential portion
 of the opening tag delimiter. For example, if the opening delimiter
 is "<-(" then any of the following are acceptible closing delimiters:
 ")->", "->", or ">".
-If the closing delimiter is omitted, the "inverse" of the opening delimiter 
+If the closing delimiter is omitted, the "inverse" of the opening delimiter
 is used (for example, ")->"),
 
 =item An optional vertical spacer (zero or more newlines)

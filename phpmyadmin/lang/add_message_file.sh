@@ -1,12 +1,17 @@
 #!/bin/bash
-# $Id: add_message_file.sh,v 1.4 2002/08/10 04:19:33 robbat2 Exp $
+# $Id: add_message_file.sh,v 2.0 2003/11/18 15:20:38 nijel Exp $
 #
 # Shell script that adds a message file to all message files 
 # adding "//to translate" on each line 
 #
 # Example:  add_message_file.sh  xxx
 #
-for file in *.inc.php3
+if [ $# -ne 1 ] ; then
+    echo "usage: add_message_file.sh filename"
+    exit 1
+fi
+    
+for file in *.inc.php
 do
     echo $file " "
     grep -v '?>' ${file} > ${file}.new

@@ -1,13 +1,14 @@
 package if;
 
-our $VERSION = '0.02';
+$VERSION = '0.04';
 
 sub work {
   my $method = shift() ? 'import' : 'unimport';
   return unless shift;		# CONDITION
 
   my $p = $_[0];		# PACKAGE
-  eval "require $p" or die;	# Adds .pm etc if needed
+  (my $file = "$p.pm") =~ s!::!/!g;
+  require $file;
 
   my $m = $p->can($method);
   goto &$m if $m;

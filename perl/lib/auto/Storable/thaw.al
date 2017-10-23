@@ -22,4 +22,7 @@ sub thaw {
 }
 
 1;
+__END__
+
+1;
 # end of Storable::thaw

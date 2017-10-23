@@ -1,4 +1,4 @@
-/* $Id: user_password.js,v 1.1 2003/03/17 13:22:27 lem9 Exp $ */
+/* $Id: user_password.js,v 2.0 2003/11/18 15:20:43 nijel Exp $ */
 
 
 /**

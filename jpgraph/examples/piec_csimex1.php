@@ -1,5 +1,5 @@
 <?php
-// $Id: piec_csimex1.php,v 1.1 2002/09/08 23:23:12 aditus Exp $
+// $Id: piec_csimex1.php,v 1.1.2.1 2003/10/09 21:05:39 aditus Exp $
 // Example of pie with center circle
 include ("../jpgraph.php");
 include ("../jpgraph_pie.php");
@@ -36,7 +36,7 @@ $p1->value->SetColor('white');
 
 // Setup the title on the center circle
 $p1->midtitle->Set("Test mid\nRow 1\nRow 2");
-$p1->midtitle->SetFont(FF_HANDWRT,FS_NORMAL,14);
+$p1->midtitle->SetFont(FF_ARIAL,FS_NORMAL,14);
 
 // Set color for mid circle
 $p1->SetMidColor('yellow');
@@ -65,7 +65,7 @@ $targ=array("piec_csimex1.php#1","piec_csimex1.php#2","piec_csimex1.php#3",
 	    "piec_csimex1.php#4","piec_csimex1.php#5","piec_csimex1.php#6");
 $alts=array("val=%d","val=%d","val=%d","val=%d","val=%d","val=%d");
 $p1->SetCSIMTargets($targ,$alts);
-$p1->SetCenterCSIM("piec_csimex1.php#7","Center");
+$p1->SetMidCSIM("piec_csimex1.php#7","Center");
 
 
 // Setup a small help text in the image

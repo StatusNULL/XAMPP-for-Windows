@@ -5,10 +5,10 @@
 #  * Any changes made here will be lost
 #  * ***********************************
 #  * 01: lib/ModPerl/Code.pm:666
-#  * 02: lib/Apache/Build.pm:605
-#  * 03: lib/Apache/Build.pm:622
-#  * 04: Makefile.PL:253
-#  * 05: Makefile.PL:86
+#  * 02: lib/Apache/Build.pm:680
+#  * 03: lib/Apache/Build.pm:697
+#  * 04: Makefile.PL:257
+#  * 05: Makefile.PL:89
 #  */
 # 
 package Apache::BuildConfig;
@@ -17,76 +17,81 @@ use Apache::Build ();
 
 sub new {
     bless( {
-                 'MODPERL_AR' => 'lib',
-                 'MODPERL_OBJ_EXT' => '.obj',
-                 'ap_includedir' => 'C:\\xampp\\apache/include',
-                 'MODPERL_O_FILES' => 'mod_perl.o modperl_interp.o modperl_tipool.o modperl_log.o modperl_config.o modperl_cmd.o modperl_options.o modperl_callback.o modperl_handler.o modperl_gtop.o modperl_util.o modperl_io.o modperl_io_apache.o modperl_filter.o modperl_bucket.o modperl_mgv.o modperl_pcw.o modperl_global.o modperl_env.o modperl_cgi.o modperl_perl.o modperl_perl_global.o modperl_perl_pp.o modperl_sys.o modperl_module.o modperl_svptr_table.o modperl_const.o modperl_constants.o modperl_apache_compat.o modperl_hooks.o modperl_directives.o modperl_flags.o modperl_xsinit.o',
                  'MP_USE_DSO' => 1,
-                 'MODPERL_O_PIC_FILES' => 'mod_perl.lo modperl_interp.lo modperl_tipool.lo modperl_log.lo modperl_config.lo modperl_cmd.lo modperl_options.lo modperl_callback.lo modperl_handler.lo modperl_gtop.lo modperl_util.lo modperl_io.lo modperl_io_apache.lo modperl_filter.lo modperl_bucket.lo modperl_mgv.lo modperl_pcw.lo modperl_global.lo modperl_env.lo modperl_cgi.lo modperl_perl.lo modperl_perl_global.lo modperl_perl_pp.lo modperl_sys.lo modperl_module.lo modperl_svptr_table.lo modperl_const.lo modperl_constants.lo modperl_apache_compat.lo modperl_hooks.lo modperl_directives.lo modperl_flags.lo modperl_xsinit.lo',
-                 'MODPERL_AP_INCLUDEDIR' => 'C:\\xampp\\apache/include',
-                 'apr_bindir' => '',
-                 'MODPERL_RM' => 'del',
-                 'file_ldopts' => 'src/modules/perl/ldopts',
+                 'APXS_INCLUDEDIR' => 'C:/xampp/apache/include',
                  'MODPERL_CPPRUN' => 'cl -nologo -E',
-                 'cwd' => 'G:/compile/sources/mod_perl-1.99_10',
+                 'cwd' => 'G:/compile/sources/mod_perl-1.99_12',
                  'MODPERL_RANLIB' => 'rem',
                  'MP_GENERATE_XS' => 1,
-                 'MP_AP_PREFIX' => 'C:\\xampp\\apache',
-                 'MODPERL_LIB_LOCATION' => 'G:/compile/sources/mod_perl-1.99_10/src/modules/perl/mod_perl.lib',
-                 'MODPERL_ARCHLIBEXP' => 'c:\\xampp\\perl\\lib',
                  'MODPERL_LIB_DSO' => 'mod_perl.so',
-                 'MODPERL_XSUBPP' => '$(MODPERL_PERLPATH) $(MODPERL_PRIVLIBEXP)/ExtUtils/xsubpp -typemap $(MODPERL_PRIVLIBEXP)/ExtUtils/typemap -typemap G:/compile/sources/mod_perl-1.99_10/lib/typemap',
-                 'MODPERL_PRIVLIBEXP' => 'c:\\xampp\\perl\\lib',
-                 'MODPERL_AP_LIBDIR' => 'C:\\xampp\\apache/lib',
+                 'APXS_BINDIR' => 'C:/xampp/apache/bin',
+                 'MODPERL_PRIVLIBEXP' => 'C:\\wampp2\\perl\\lib',
                  'MODPERL_LIB_STATIC' => 'mod_perl.lib',
-                 'MODPERL_RM_F' => '$(MODPERL_PERLPATH) -MExtUtils::Command -e rm_f',
                  'MODPERL_MAKEFILE' => 'Makefile.modperl',
-                 'MODPERL_CCOPTS' => ' -nologo -Gf -W3 -MD -Zi -DNDEBUG -O1 -DWIN32 -D_CONSOLE -DNO_STRICT -DHAVE_DES_FCRYPT  -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -DUSE_PERLIO -DPERL_MSVCRT_READFIX  -I"C:\\xampp\\perl\\lib\\CORE" -DMOD_PERL -DMP_COMPAT_1X',
-                 'MODPERL_LDDLFLAGS' => '-dll -nologo -nodefaultlib -debug -opt:ref,icf  -libpath:"c:\\xampp\\perl\\lib\\CORE"  -machine:x86',
-                 'MODPERL_INC' => '-IG:/compile/sources/mod_perl-1.99_10/src/modules/perl -IG:/compile/sources/mod_perl-1.99_10/xs -IC:\\xampp\\apache/include -IC:\\xampp\\apache/include',
-                 'file_build_config' => 'lib/Apache/BuildConfig.pm',
+                 'MODPERL_CCOPTS' => ' -nologo -Gf -W3 -MD -Zi -DNDEBUG -O1 -DWIN32 -D_CONSOLE -DNO_STRICT -DHAVE_DES_FCRYPT  -DNO_HASH_SEED -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS -DUSE_PERLIO -DPERL_MSVCRT_READFIX  -I"C:\\wampp2\\perl\\lib\\CORE" -DMOD_PERL -DMP_COMPAT_1X',
+                 'MODPERL_LDDLFLAGS' => '-dll -nologo -nodefaultlib -debug -opt:ref,icf  -libpath:"C:\\wampp2\\perl\\lib\\CORE"  -machine:x86',
+                 'MODPERL_INC' => '-IG:/compile/sources/mod_perl-1.99_12/src/modules/perl -IG:/compile/sources/mod_perl-1.99_12/xs -IC:\\xampp\\apache\\include -IC:/xampp/apache/include',
                  'XS' => {},
+                 'MODPERL_LIBNAME' => 'mod_perl',
+                 'apr_config_path' => 'C:\\xampp\\apache\\bin\\apr-config.bat',
+                 'MODPERL_LIB_EXT' => '.lib',
+                 'MODPERL_TEST_F' => '$(MODPERL_PERLPATH) -MExtUtils::Command -e test_f',
+                 'dir' => 'C:\\xampp\\apache',
+                 'MODPERL_MV' => '$(MODPERL_PERLPATH) -MExtUtils::Command -e mv',
+                 'MODPERL_LDOPTS' => '    C:\\wampp2\\perl\\lib\\CORE\\perl58.lib G:\\Programme\\MiVisSt\\VC98\\lib\\oldnames.lib G:\\Programme\\MiVisSt\\VC98\\lib\\kernel32.lib G:\\Programme\\MiVisSt\\VC98\\lib\\user32.lib G:\\Programme\\MiVisSt\\VC98\\lib\\gdi32.lib G:\\Programme\\MiVisSt\\VC98\\lib\\winspool.lib G:\\Programme\\MiVisSt\\VC98\\lib\\comdlg32.lib G:\\Programme\\MiVisSt\\VC98\\lib\\advapi32.lib G:\\Programme\\MiVisSt\\VC98\\lib\\shell32.lib G:\\Programme\\MiVisSt\\VC98\\lib\\ole32.lib G:\\Programme\\MiVisSt\\VC98\\lib\\oleaut32.lib G:\\Programme\\MiVisSt\\VC98\\lib\\netapi32.lib G:\\Programme\\MiVisSt\\VC98\\lib\\uuid.lib G:\\Programme\\MiVisSt\\VC98\\lib\\wsock32.lib G:\\Programme\\MiVisSt\\VC98\\lib\\mpr.lib G:\\Programme\\MiVisSt\\VC98\\lib\\winmm.lib G:\\Programme\\MiVisSt\\VC98\\lib\\version.lib G:\\Programme\\MiVisSt\\VC98\\lib\\odbc32.lib G:\\Programme\\MiVisSt\\VC98\\lib\\odbccp32.lib G:\\Programme\\MiVisSt\\VC98\\lib\\msvcrt.lib',
+                 'file_makefile' => 'src/modules/perl/Makefile.modperl',
+                 'MODPERL_PERLPATH' => 'C:\\wampp2\\perl\\bin\\perl.exe',
+                 'MODPERL_CC' => 'cl',
+                 'MODPERL_CCCDLFLAGS' => ' ',
+                 'MODPERL_AP_LIBEXECDIR' => 'C:/xampp/apache/modules',
+                 'MODPERL_LIBPERL' => 'C:\\wampp2\\perl\\lib/CORE/perl58.lib',
+                 'APXS_APR_BINDIR' => 'C:/xampp/apache/bin',
+                 'MODPERL_AR' => 'lib',
+                 'ap_includedir' => 'C:/xampp/apache/include',
+                 'MODPERL_OBJ_EXT' => '.obj',
+                 'MODPERL_O_FILES' => 'mod_perl.o modperl_interp.o modperl_tipool.o modperl_log.o modperl_config.o modperl_cmd.o modperl_options.o modperl_callback.o modperl_handler.o modperl_gtop.o modperl_util.o modperl_io.o modperl_io_apache.o modperl_filter.o modperl_bucket.o modperl_mgv.o modperl_pcw.o modperl_global.o modperl_env.o modperl_cgi.o modperl_perl.o modperl_perl_global.o modperl_perl_pp.o modperl_sys.o modperl_module.o modperl_svptr_table.o modperl_const.o modperl_constants.o modperl_apache_compat.o modperl_hooks.o modperl_directives.o modperl_flags.o modperl_xsinit.o',
+                 'MODPERL_O_PIC_FILES' => 'mod_perl.lo modperl_interp.lo modperl_tipool.lo modperl_log.lo modperl_config.lo modperl_cmd.lo modperl_options.lo modperl_callback.lo modperl_handler.lo modperl_gtop.lo modperl_util.lo modperl_io.lo modperl_io_apache.lo modperl_filter.lo modperl_bucket.lo modperl_mgv.lo modperl_pcw.lo modperl_global.lo modperl_env.lo modperl_cgi.lo modperl_perl.lo modperl_perl_global.lo modperl_perl_pp.lo modperl_sys.lo modperl_module.lo modperl_svptr_table.lo modperl_const.lo modperl_constants.lo modperl_apache_compat.lo modperl_hooks.lo modperl_directives.lo modperl_flags.lo modperl_xsinit.lo',
+                 'apr_bindir' => 'C:\\xampp\\apache\\bin',
+                 'MODPERL_AP_INCLUDEDIR' => 'C:/xampp/apache/include',
+                 'MODPERL_RM' => 'del',
+                 'file_ldopts' => 'src/modules/perl/ldopts',
+                 'MP_AP_PREFIX' => 'C:\\xampp\\apache',
+                 'MODPERL_ARCHLIBEXP' => 'C:\\wampp2\\perl\\lib',
+                 'MODPERL_LIB_LOCATION' => 'G:/compile/sources/mod_perl-1.99_12/src/modules/perl/mod_perl.lib',
+                 'MODPERL_XSUBPP' => '$(MODPERL_PERLPATH) $(MODPERL_PRIVLIBEXP)/ExtUtils/xsubpp -typemap $(MODPERL_PRIVLIBEXP)/ExtUtils/typemap -typemap G:/compile/sources/mod_perl-1.99_12/lib/typemap',
+                 'MODPERL_AP_LIBDIR' => 'C:\\xampp\\apache/lib',
+                 'MODPERL_RM_F' => '$(MODPERL_PERLPATH) -MExtUtils::Command -e rm_f',
+                 'APXS_PREFIX' => 'C:/xampp/apache',
+                 'file_build_config' => 'lib/Apache/BuildConfig.pm',
                  'httpd_version' => {
-                                      'C:\\xampp\\apache/include' => '2.0.48'
+                                      'C:/xampp/apache/include' => '2.0.48'
                                     },
-                 'MP_COMPAT_1X' => 1,
                  'apr_config' => {
                                    'HAS_FORK' => '0',
+                                   'HAS_THREADS' => '1',
+                                   'HAS_MMAP' => '1',
                                    'HAS_RANDOM' => '1',
                                    'HAS_DSO' => '1',
                                    'HAS_SENDFILE' => '0',
                                    'HAS_LARGE_FILES' => '0',
-                                   'HAS_THREADS' => '1',
-                                   'HAS_MMAP' => '1',
                                    'HAS_INLINE' => '1'
                                  },
-                 'MODPERL_LIBNAME' => 'mod_perl',
-                 'apr_config_path' => '',
-                 'MODPERL_LIB_EXT' => '.lib',
-                 'MODPERL_C_FILES' => 'mod_perl.c modperl_interp.c modperl_tipool.c modperl_log.c modperl_config.c modperl_cmd.c modperl_options.c modperl_callback.c modperl_handler.c modperl_gtop.c modperl_util.c modperl_io.c modperl_io_apache.c modperl_filter.c modperl_bucket.c modperl_mgv.c modperl_pcw.c modperl_global.c modperl_env.c modperl_cgi.c modperl_perl.c modperl_perl_global.c modperl_perl_pp.c modperl_sys.c modperl_module.c modperl_svptr_table.c modperl_const.c modperl_constants.c modperl_apache_compat.c modperl_hooks.c modperl_directives.c modperl_flags.c modperl_xsinit.c',
+                 'MP_COMPAT_1X' => 1,
                  'MP_LIBNAME' => 'mod_perl',
+                 'MODPERL_C_FILES' => 'mod_perl.c modperl_interp.c modperl_tipool.c modperl_log.c modperl_config.c modperl_cmd.c modperl_options.c modperl_callback.c modperl_handler.c modperl_gtop.c modperl_util.c modperl_io.c modperl_io_apache.c modperl_filter.c modperl_bucket.c modperl_mgv.c modperl_pcw.c modperl_global.c modperl_env.c modperl_cgi.c modperl_perl.c modperl_perl_global.c modperl_perl_pp.c modperl_sys.c modperl_module.c modperl_svptr_table.c modperl_const.c modperl_constants.c modperl_apache_compat.c modperl_hooks.c modperl_directives.c modperl_flags.c modperl_xsinit.c',
                  'MODPERL_H_FILES' => 'mod_perl.h modperl_interp.h modperl_tipool.h modperl_log.h modperl_config.h modperl_cmd.h modperl_options.h modperl_callback.h modperl_handler.h modperl_gtop.h modperl_util.h modperl_io.h modperl_io_apache.h modperl_filter.h modperl_bucket.h modperl_mgv.h modperl_pcw.h modperl_global.h modperl_env.h modperl_cgi.h modperl_perl.h modperl_perl_global.h modperl_perl_pp.h modperl_sys.h modperl_module.h modperl_svptr_table.h modperl_const.h modperl_constants.h modperl_apache_compat.h modperl_perl_unembed.h modperl_types.h modperl_time.h modperl_apache_includes.h modperl_perl_includes.h modperl_hooks.h modperl_directives.h modperl_flags.h modperl_trace.h modperl_largefiles.h',
-                 'MODPERL_TEST_F' => '$(MODPERL_PERLPATH) -MExtUtils::Command -e test_f',
-                 'dir' => 'C:\\xampp\\apache',
-                 'MODPERL_MV' => '$(MODPERL_PERLPATH) -MExtUtils::Command -e mv',
-                 'MODPERL_LDOPTS' => '    C:\\xampp\\perl\\lib\\CORE\\perl58.lib G:\\Programme\\MiVisSt\\VC98\\lib\\oldnames.lib G:\\Programme\\MiVisSt\\VC98\\lib\\kernel32.lib G:\\Programme\\MiVisSt\\VC98\\lib\\user32.lib G:\\Programme\\MiVisSt\\VC98\\lib\\gdi32.lib G:\\Programme\\MiVisSt\\VC98\\lib\\winspool.lib G:\\Programme\\MiVisSt\\VC98\\lib\\comdlg32.lib G:\\Programme\\MiVisSt\\VC98\\lib\\advapi32.lib G:\\Programme\\MiVisSt\\VC98\\lib\\shell32.lib G:\\Programme\\MiVisSt\\VC98\\lib\\ole32.lib G:\\Programme\\MiVisSt\\VC98\\lib\\oleaut32.lib G:\\Programme\\MiVisSt\\VC98\\lib\\netapi32.lib G:\\Programme\\MiVisSt\\VC98\\lib\\uuid.lib G:\\Programme\\MiVisSt\\VC98\\lib\\wsock32.lib G:\\Programme\\MiVisSt\\VC98\\lib\\mpr.lib G:\\Programme\\MiVisSt\\VC98\\lib\\winmm.lib G:\\Programme\\MiVisSt\\VC98\\lib\\version.lib G:\\Programme\\MiVisSt\\VC98\\lib\\odbc32.lib G:\\Programme\\MiVisSt\\VC98\\lib\\odbccp32.lib G:\\Programme\\MiVisSt\\VC98\\lib\\msvcrt.lib',
                  'MODPERL_CP' => '$(MODPERL_PERLPATH) -MExtUtils::Command -e cp',
-                 'file_makefile' => 'src/modules/perl/Makefile.modperl',
                  'MODPERL_LIB_SHARED' => 'mod_perl.so',
-                 'MODPERL_PERLPATH' => 'c:\\xampp\\perl\\bin\\perl.exe',
-                 'MODPERL_CC' => 'cl',
-                 'MODPERL_CCCDLFLAGS' => ' ',
-                 'apr_includedir' => 'C:\\xampp\\apache/include',
-                 'MODPERL_AP_LIBEXECDIR' => 'C:\\xampp\\apache/modules',
+                 'apr_includedir' => 'C:\\xampp\\apache\\include',
                  'MODPERL_DLEXT' => 'so',
                  'httpd_is_source_tree' => undef,
                  'MP_USE_STATIC' => 1,
                  'MODPERL_OPTIMIZE' => '-MD -Zi -DNDEBUG -O1',
                  'MODPERL_LIB' => 'mod_perl.so mod_perl.lib',
-                 'MODPERL_LIBPERL' => 'c:\\xampp\\perl\\lib/CORE/perl58.lib',
-                 'MODPERL_AP_LIBS' => 'C:\\xampp\\apache/lib/libapr.lib C:\\xampp\\apache/lib/libaprutil.lib C:\\xampp\\apache/lib/libhttpd.lib',
+                 'MODPERL_AP_LIBS' => 'C:/xampp/apache/lib/libapr.lib C:/xampp/apache/lib/libaprutil.lib C:/xampp/apache/lib/libhttpd.lib',
+                 'VERSION' => '1.99_12',
                  'MODPERL_LD' => 'link',
-                 'VERSION' => '1.99_10'
+                 'APXS_LIBEXECDIR' => 'C:/xampp/apache/modules'
                }, 'Apache::Build' );
 }
 

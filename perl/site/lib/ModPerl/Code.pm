@@ -18,7 +18,7 @@ our @ISA = qw(Apache::Build);
 my %handlers = (
     Process    => [qw(ChildInit ChildExit)], #Restart PreConfig
     Files      => [qw(OpenLogs PostConfig)],
-    PerSrv     => [qw(PostReadRequest Trans)],
+    PerSrv     => [qw(PostReadRequest Trans MapToStorage)],
     PerDir     => [qw(HeaderParser
                       Access Authen Authz
                       Type Fixup Response Log Cleanup
@@ -217,7 +217,7 @@ sub generate_handler_hooks {
             my $ix = $self->{handler_index}->{$class}->[$i];
 
             if ($callback =~ m/modperl_callback_per_(dir|srv)/) {
-                if ($ix =~ m/AUTH|TYPE|TRANS/) {
+                if ($ix =~ m/AUTH|TYPE|TRANS|MAP/) {
                     $pass =~ s/MP_HOOK_RUN_ALL/MP_HOOK_RUN_FIRST/;
                 }
             }
@@ -368,11 +368,10 @@ sub generate_flags {
     print $h_fh "\n#define MP_SYS_$dlsrc 1\n";
 
     while (my($class, $opts) = each %{ $self->{flags} }) {
-        my $i = 0;
         my @lookup = ();
         my %lookup = ();
         my $lookup_proto = "";
-        my @dumper;
+        my %dumper;
         if ($flags_options{$class}) {
             $lookup_proto = join canon_func('flags', 'lookup', $class),
               'U32 ', '(const char *str)';
@@ -388,6 +387,7 @@ sub generate_flags {
         print $h_fh "\n#define ${class}Type $n\n";
         $n++;
 
+        my $i = 0;
         my $max_len = 0;
         for my $f (@$opts) {
             my $x = sprintf "0x%08x", $i;
@@ -405,8 +405,8 @@ sub generate_flags {
 #define ${cmd}_Off(p) ($flags(p) &= ~$flag)
 
 EOF
-            push @dumper,
-              qq{modperl_trace(NULL, " $name %s\\n", \\
+            $dumper{$name} =
+              qq{modperl_trace(NULL, " $name %s", \\
                          ($flags(p) & $x) ? "On " : "Off");};
 
             $i += $i || 1;
@@ -434,11 +434,11 @@ EOF
             print $h_fh "$lookup_proto;\n";
         }
 
-        shift @dumper; #NONE
+        delete $dumper{None}; #NONE
         print $h_fh join ' \\'."\n", 
           "#define ${class}_dump_flags(p, str)",
-                     qq{modperl_trace(NULL, "$class flags dump (%s):\\n", str);},
-                     @dumper;
+                     qq{modperl_trace(NULL, "$class flags dump (%s):", str);},
+                     map $dumper{$_}, sort keys %dumper;
     }
 
     print $h_fh "\n#define MpSrvHOOKS_ALL_On(p) MpSrvFLAGS(p) |= (",
@@ -451,7 +451,7 @@ EOF
 }
 
 my %trace = (
-#    'a' => 'all',
+    'a' => 'Apache API interaction',
     'c' => 'configuration for directive handlers',
     'd' => 'directive processing',
     'e' => 'environment variables',
@@ -481,19 +481,19 @@ sub generate_trace {
 #define MP_TRACE_OPTS "$opts"
 
 #ifdef MP_TRACE
-#define MP_TRACE_a if ($tl) modperl_trace
-#define MP_TRACE_a_do(exp) if ($tl) { \\
+#define MP_TRACE_any if ($tl) modperl_trace
+#define MP_TRACE_any_do(exp) if ($tl) { \\
 exp; \\
 }
 #else
-#define MP_TRACE_a if (0) modperl_trace
-#define MP_TRACE_a_do(exp)
+#define MP_TRACE_any if (0) modperl_trace
+#define MP_TRACE_any_do(exp)
 #endif
 
 EOF
 
     my @dumper;
-    for my $type (@trace) {
+    for my $type (sort @trace) {
         my $define = "#define MP_TRACE_$type";
         my $define_do = join '_', $define, 'do';
 
@@ -509,13 +509,13 @@ $define_do(exp)
 #endif
 EOF
         push @dumper,
-          qq{modperl_trace(NULL, " $type %s ($trace{$type})\\n", ($tl & $i) ? "On " : "Off");};
+          qq{modperl_trace(NULL, " $type %s ($trace{$type})", ($tl & $i) ? "On " : "Off");};
         $i += $i;
     }
 
     print $h_fh join ' \\'."\n", 
                      '#define MP_TRACE_dump_flags()',
-                     qq{modperl_trace(NULL, "mod_perl trace flags dump:\\n");},
+                     qq{modperl_trace(NULL, "mod_perl trace flags dump:");},
                      @dumper;
 
     ();
@@ -828,7 +828,9 @@ $ifdef[0]
           if (strEQ(name, "$name")) {
 EOF
 
-            if ($name eq 'DECLINE_CMD' || $name eq 'DIR_MAGIC_TYPE') {
+            if ($name eq 'DECLINE_CMD' || 
+                $name eq 'DIR_MAGIC_TYPE' ||
+                $name eq 'CRLF') {
                 print $c_fh <<EOF;
               return newSVpv($alias{$name}, 0);
 EOF

@@ -1,14 +1,15 @@
 package HTML::TokeParser;
 
-# $Id: TokeParser.pm,v 2.24 2001/03/26 07:32:17 gisle Exp $
+# $Id: TokeParser.pm,v 2.28 2003/10/14 10:11:05 gisle Exp $
 
 require HTML::PullParser;
 @ISA=qw(HTML::PullParser);
-$VERSION = sprintf("%d.%02d", q$Revision: 2.24 $ =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q$Revision: 2.28 $ =~ /(\d+)\.(\d+)/);
 
 use strict;
 use Carp ();
 use HTML::Entities qw(decode_entities);
+use HTML::Tagset ();
 
 my %ARGS =
 (
@@ -59,10 +60,26 @@ sub get_tag
 }
 
 
+sub _textify {
+    my($self, $token) = @_;
+    my $tag = $token->[1];
+    return undef unless exists $self->{textify}{$tag};
+
+    my $alt = $self->{textify}{$tag};
+    my $text;
+    if (ref($alt)) {
+	$text = &$alt(@$token);
+    } else {
+	$text = $token->[2]{$alt || "alt"};
+	$text = "[\U$tag]" unless defined $text;
+    }
+    return $text;
+}
+
+
 sub get_text
 {
     my $self = shift;
-    my $endat = shift;
     my @text;
     while (my $token = $self->get_token) {
 	my $type = $token->[0];
@@ -73,25 +90,19 @@ sub get_text
 	} elsif ($type =~ /^[SE]$/) {
 	    my $tag = $token->[1];
 	    if ($type eq "S") {
-		if (exists $self->{textify}{$tag}) {
-		    my $alt = $self->{textify}{$tag};
-		    my $text;
-		    if (ref($alt)) {
-			$text = &$alt(@$token);
-		    } else {
-			$text = $token->[2]{$alt || "alt"};
-			$text = "[\U$tag]" unless defined $text;
-		    }
+		if (defined(my $text = _textify($self, $token))) {
 		    push(@text, $text);
 		    next;
 		}
 	    } else {
 		$tag = "/$tag";
 	    }
-	    if (!defined($endat) || $endat eq $tag) {
+	    if (!@_ || grep $_ eq $tag, @_) {
 		 $self->unget_token($token);
 		 last;
 	    }
+	    push(@text, " ")
+		if $tag eq "br" || !$HTML::Tagset::isPhraseMarkup{$token->[1]};
 	}
     }
     join("", @text);
@@ -102,6 +113,35 @@ sub get_trimmed_text
 {
     my $self = shift;
     my $text = $self->get_text(@_);
+    $text =~ s/^\s+//; $text =~ s/\s+$//; $text =~ s/\s+/ /g;
+    $text;
+}
+
+sub get_phrase {
+    my $self = shift;
+    my @text;
+    while (my $token = $self->get_token) {
+	my $type = $token->[0];
+	if ($type eq "T") {
+	    my $text = $token->[1];
+	    decode_entities($text) unless $token->[2];
+	    push(@text, $text);
+	} elsif ($type =~ /^[SE]$/) {
+	    my $tag = $token->[1];
+	    if ($type eq "S") {
+		if (defined(my $text = _textify($self, $token))) {
+		    push(@text, $text);
+		    next;
+		}
+	    }
+	    if (!$HTML::Tagset::isPhraseMarkup{$tag}) {
+		$self->unget_token($token);
+		last;
+	    }
+	    push(@text, " ") if $tag eq "br";
+	}
+    }
+    my $text = join("", @text);
     $text =~ s/^\s+//; $text =~ s/\s+$//; $text =~ s/\s+/ /g;
     $text;
 }
@@ -118,7 +158,9 @@ HTML::TokeParser - Alternative HTML::Parser interface
 =head1 SYNOPSIS
 
  require HTML::TokeParser;
- $p = HTML::TokeParser->new("index.html") || die "Can't open: $!";
+ $p = HTML::TokeParser->new("index.html") ||
+      die "Can't open: $!";
+
  while (my $token = $p->get_token) {
      #...
  }
@@ -126,13 +168,19 @@ HTML::TokeParser - Alternative HTML::Parser interface
 =head1 DESCRIPTION
 
 The C<HTML::TokeParser> is an alternative interface to the
-C<HTML::Parser> class.  It is an C<HTML::PullParser> subclass.
+C<HTML::Parser> class.  It is an C<HTML::PullParser> subclass with a
+predeclared set of token types.  If you wish the tokens to be reported
+differently you probably want to use the C<HTML::PullParser> directly.
 
 The following methods are available:
 
 =over 4
 
-=item $p = HTML::TokeParser->new( $file_or_doc );
+=item $p = HTML::TokeParser->new( $filename );
+
+=item $p = HTML::TokeParser->new( $filehandle );
+
+=item $p = HTML::TokeParser->new( \$document );
 
 The object constructor argument is either a file name, a file handle
 object, or the complete document to be parsed.
@@ -155,13 +203,11 @@ EOF, but not closed.
 
 This method will return the next I<token> found in the HTML document,
 or C<undef> at the end of the document.  The token is returned as an
-array reference.  The first element of the array will be a (mostly)
-single character string denoting the type of this token: "S" for start
-tag, "E" for end tag, "T" for text, "C" for comment, "D" for
-declaration, and "PI" for process instructions.  The rest of the array
-is the same as the arguments passed to the corresponding HTML::Parser
-v2 compatible callbacks (see L<HTML::Parser>).  In summary, returned
-tokens look like this:
+array reference.  The first element of the array will be a string
+denoting the type of this token: "S" for start tag, "E" for end tag,
+"T" for text, "C" for comment, "D" for declaration, and "PI" for
+process instructions.  The rest of the token array depend on the type
+like this:
 
   ["S",  $tag, $attr, $attrseq, $text]
   ["E",  $tag, $text]
@@ -171,14 +217,17 @@ tokens look like this:
   ["PI", $token0, $text]
 
 where $attr is a hash reference, $attrseq is an array reference and
-the rest is plain scalars.
+the rest are plain scalars.  The L<HTML::Parser/Attrspec> explains the
+details.
 
-=item $p->unget_token($token,...)
+=item $p->unget_token( @tokens )
 
-If you find out you have read too many tokens you can push them back,
+If you find you have read too many tokens you can push them back,
 so that they are returned the next time $p->get_token is called.
 
-=item $p->get_tag( [$tag, ...] )
+=item $p->get_tag
+
+=item $p->get_tag( @tags )
 
 This method returns the next start or end tag (skipping any other
 tokens), or C<undef> if there are no more tags in the document.  If
@@ -200,23 +249,31 @@ returned like this:
 
   ["/$tag", $text]
 
-=item $p->get_text( [$endtag] )
+=item $p->get_text
+
+=item $p->get_text( @endtags )
 
 This method returns all text found at the current position. It will
-return a zero length string if the next token is not text.  The
-optional $endtag argument specifies that any text occurring before the
-given tag is to be returned.  Any entities will be converted to their
-corresponding character.
+return a zero length string if the next token is not text. Any
+entities will be converted to their corresponding character.
 
-The $p->{textify} attribute is a hash that defines how certain tags can
-be treated as text.  If the name of a start tag matches a key in this
-hash then this tag is converted to text.  The hash value is used to
-specify which tag attribute to obtain the text from.  If this tag
-attribute is missing, then the upper case name of the tag enclosed in
-brackets is returned, e.g. "[IMG]".  The hash value can also be a
-subroutine reference.  In this case the routine is called with the
-start tag token content as its argument and the return value is treated
-as the text.
+If one or more arguments are given, then we return all text occurring
+before the first of the specified tags found. For example:
+
+   $p->get_text("p", "br");
+
+will return the text up to either a paragraph of linebreak element.
+
+The text might span tags that should be I<textified>.  This is
+controlled by the $p->{textify} attribute, which is a hash that
+defines how certain tags can be treated as text.  If the name of a
+start tag matches a key in this hash then this tag is converted to
+text.  The hash value is used to specify which tag attribute to obtain
+the text from.  If this tag attribute is missing, then the upper case
+name of the tag enclosed in brackets is returned, e.g. "[IMG]".  The
+hash value can also be a subroutine reference.  In this case the
+routine is called with the start tag token content as its argument and
+the return value is treated as the text.
 
 The default $p->{textify} value is:
 
@@ -225,11 +282,24 @@ The default $p->{textify} value is:
 This means that <IMG> and <APPLET> tags are treated as text, and that
 the text to substitute can be found in the ALT attribute.
 
-=item $p->get_trimmed_text( [$endtag] )
+=item $p->get_trimmed_text
+
+=item $p->get_trimmed_text( @endtags )
 
 Same as $p->get_text above, but will collapse any sequences of white
 space to a single space character.  Leading and trailing white space is
 removed.
+
+=item $p->get_phrase
+
+This will return all text found at the current position ignoring any
+phrasal-level tags.  Text is extracted until the first non
+phrasal-level tag.  Textification of tags is the same as for
+get_text().  This method will collapse white space in the same way as
+get_trimmed_text() does.
+
+The definition of <i>phrasal-level tags</i> is obtained from the
+HTML::Tagset module.
 
 =back
 

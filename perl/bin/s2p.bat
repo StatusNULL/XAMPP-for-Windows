@@ -12,7 +12,7 @@ goto endofperl
 @rem ';
 #!perl
 #line 15
-    eval 'exec c:\xampp\perl\bin\perl.exe -S $0 ${1+"$@"}'
+    eval 'exec C:\wampp2\perl\bin\perl.exe -S $0 ${1+"$@"}'
 	if $running_under_some_shell;
 my $startperl;
 my $perlpath;
@@ -20,7 +20,7 @@ my $perlpath;
 #!perl
 /../
 ($perlpath = <<'/../') =~ s/\s*\z//;
-c:\xampp\perl\bin\perl.exe
+C:\wampp2\perl\bin\perl.exe
 /../
 
 $0 =~ s/^.*?(\w+)[\.\w]*$/$1/;
@@ -745,7 +745,7 @@ sub makey($$$){
 	my $fc = substr($fr,$i,1);
 	my $tc = substr($to,$i,1);
 	if( exists( $tr{$fc} ) && $tr{$fc} ne $tc ){
-	    Warn( "ambiguos translation for character `$fc' in `y' command",
+	    Warn( "ambiguous translation for character `$fc' in `y' command",
 		  $fl );
 	    $error++;
 	}
@@ -1819,7 +1819,7 @@ See L<"Additional Atoms">.
 
 =over 4
 
-=item ambiguos translation for character `%s' in `y' command
+=item ambiguous translation for character `%s' in `y' command
 
 The indicated character appears twice, with different translations.
 

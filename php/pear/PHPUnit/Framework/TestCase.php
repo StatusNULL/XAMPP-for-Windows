@@ -3,7 +3,7 @@
 // +------------------------------------------------------------------------+
 // | PEAR :: PHPUnit                                                        |
 // +------------------------------------------------------------------------+
-// | Copyright (c) 2002-2003 Sebastian Bergmann <sb@sebastian-bergmann.de>. |
+// | Copyright (c) 2002-2004 Sebastian Bergmann <sb@sebastian-bergmann.de>. |
 // +------------------------------------------------------------------------+
 // | This source file is subject to version 3.00 of the PHP License,        |
 // | that is available at http://www.php.net/license/3_0.txt.               |
@@ -12,19 +12,20 @@
 // | license@php.net so we can mail you a copy immediately.                 |
 // +------------------------------------------------------------------------+
 //
-// $Id: TestCase.php,v 1.5 2003/07/24 06:39:52 sebastian Exp $
+// $Id: TestCase.php,v 1.16 2004/01/04 10:25:10 sebastian Exp $
 //
 
 require_once 'PHPUnit/Framework/Assert.php';
 require_once 'PHPUnit/Framework/Test.php';
 require_once 'PHPUnit/Framework/TestResult.php';
+require_once 'PHPUnit/Util/Filter.php';
 
 /**
  * A TestCase defines the fixture to run multiple tests.
  *
  * To define a TestCase
  *
- *   1) Implement a subclass of PEAR:PHPUnit::TestCase.
+ *   1) Implement a subclass of PHPUnit_Framework_TestCase.
  *   2) Define instance variables that store the state of the fixture.
  *   3) Initialize the fixture state by overriding setUp().
  *   4) Clean-up after a test by overriding tearDown().
@@ -35,16 +36,16 @@ require_once 'PHPUnit/Framework/TestResult.php';
  * Here is an example:
  *
  *   class MathTest extends PHPUnit_Framework_TestCase {
- *     public $fValue1;
- *     public $fValue2;
+ *     public $value1;
+ *     public $value2;
  *
  *     public function __construct($name) {
  *       parent::__construct($name);
  *     }
  *
  *     public function setUp() {
- *       $this->fValue1 = 2;
- *       $this->fValue2 = 3;
+ *       $this->value1 = 2;
+ *       $this->value2 = 3;
  *     }
  *   }
  *
@@ -53,7 +54,7 @@ require_once 'PHPUnit/Framework/TestResult.php';
  * assert with a boolean.
  *
  *   public function testPass() {
- *     $this->assertTrue($this->fValue1 + $this->fValue2 == 5);
+ *     $this->assertTrue($this->value1 + $this->value2 == 5);
  *   }
  *
  * @abstract
@@ -64,12 +65,20 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
     // {{{ Members
 
     /**
+    * Code Coverage information provided by Xdebug.
+    *
+    * @var    array
+    * @access private
+    */
+    private $codeCoverageInformation = array();
+
+    /**
     * The name of the test case.
     *
     * @var    string
     * @access private
     */
-    private $fName = null;
+    private $name = null;
 
     // }}}
     // {{{ public function __construct($name = false)
@@ -87,6 +96,26 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
     }
 
     // }}}
+    // {{{ public function toString()
+
+    /**
+    * Returns a string representation of the test case.
+    *
+    * @return string
+    * @access public
+    */
+    public function toString() {
+        $class = new Reflection_Class($this);
+
+        return sprintf(
+          '%s(%s)',
+
+          $this->getName(),
+          $class->name
+        );
+    }
+
+    // }}}
     // {{{ public function countTestCases()
 
     /**
@@ -100,6 +129,19 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
     }
 
     // }}}
+    // {{{ public function getCodeCoverageInformation()
+
+    /**
+    * Returns the Code Coverage information provided by Xdebug.
+    *
+    * @return array
+    * @access public
+    */
+    public function getCodeCoverageInformation() {
+        return $this->codeCoverageInformation;
+    }
+
+    // }}}
     // {{{ public function getName()
 
     /**
@@ -109,7 +151,7 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
     * @access public
     */
     public function getName() {
-        return $this->fName;
+        return $this->name;
     }
 
     // }}}
@@ -164,18 +206,30 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
     * @access protected
     */
     protected function runTest() {
-        self::assertNotNull($this->fName);
+        self::assertNotNull($this->name);
 
         try {
             $class  = new Reflection_Class($this);
-            $method = $class->getMethod($this->fName);
+            $method = $class->getMethod($this->name);
         }
 
         catch (Exception $e) {
             self::fail($e->getMessage());
         }
 
-        $method->invoke(new $class->name);
+        if (extension_loaded('xdebug')) {
+            xdebug_start_code_coverage();
+        }
+
+        $method->invoke($this);
+
+        if (extension_loaded('xdebug')) {
+            xdebug_stop_code_coverage();
+
+            $this->codeCoverageInformation = PHPUnit_Util_Filter::getFilteredCodeCoverage(
+              xdebug_get_code_coverage()
+            );
+        }
     }
 
     // }}}
@@ -188,27 +242,7 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
     * @access public
     */
     public function setName($name) {
-        $this->fName = $name;
-    }
-
-    // }}}
-    // {{{ public function toString()
-
-    /**
-    * Returns a string representation of the test case.
-    *
-    * @return string
-    * @access public
-    */
-    public function toString() {
-        $class = new Reflection_Class($this);
-
-        return sprintf(
-          '%s(%s)',
-
-          $this->getName(),
-          $class->name
-        );
+        $this->name = $name;
     }
 
     // }}}

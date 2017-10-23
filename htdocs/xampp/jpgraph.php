@@ -5,31 +5,19 @@
 </head>
 
 <body>
+<? include("lang/".file_get_contents("lang.tmp").".php"); ?>
+
 &nbsp;<p>
-<table width=500 cellpadding=0 cellspacing=0 border=0>
-<tr><td align=center>
-<h1>JpGraph - Diagramme mit PHP</h1>
-Das Verzeichnis für alle Beispiel-Diagramme lautet im wampp: <a href="/jpgraph/examples/" target="_top">http://127.0.0.1/jpgraph/examples/</a>.<br> <br>Die Homepage von JpGraph: <a href="http://www.aditus.nu/jpgraph/" target="_top">http://www.aditus.nu/jpgraph/</a><p>   
-<h2>Ein erster "Beispiel-Kuchen" mit JpGraph</h2>
-<?
+<h1><?=$TEXT['jpgraph-head']?></h1>
+<br>&nbsp;<br>
 
+<A HREF="/jpgraph/Examples/"><IMG SRC="/jpgraph/Examples/alphabarex1.php" border="0" alt= " Examples! "></A>
+<br>&nbsp;<br>
+<?=$TEXT['jpgraph-url']?>
 
-echo "<FORM METHOD=POST ACTION=\"$php_self\">
-Wert 1: <INPUT TYPE=\"text\" NAME=\"a1\" size=\"2\" value=\"$a1\">&nbsp;&nbsp;Wert 2: <INPUT TYPE=\"text\" NAME=\"a2\" size=\"2\" value=\"$a2\">
-Wert 3: <INPUT TYPE=\"text\" NAME=\"a3\" size=\"2\" value=\"$a3\">&nbsp;&nbsp;Wert 4: <INPUT TYPE=\"text\" NAME=\"a4\" size=\"2\" value=\"$a4\">
-
-<br><br>
-<INPUT TYPE=\"submit\">
-</FORM>
-
-
-<script>
-
-    document.write(\"<img src='/jpgraph/examples/pie3dex3a.php?a1=$a1&a2=$a2&a3=$a3&a4=$a4' >\");
-    </script>";
-
-?>
-</td></tr></table>
-
+<? if ($source=="in")
+		{ include("code.php"); $beispiel = $SCRIPT_FILENAME; pagecode($beispiel);} 
+		else
+		{ print("<p><br><br><h2><U><a href=\"$PHP_SELF?source=in\">".$TEXT['srccode-in']."</a></U></h2>");} ?>
 </body>
 </html>

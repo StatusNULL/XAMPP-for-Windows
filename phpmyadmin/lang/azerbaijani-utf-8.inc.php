@@ -1,5 +1,5 @@
 <?php
-/* $Id: azerbaijani-utf-8.inc.php,v 1.1.2.1 2003/09/01 14:51:52 nijel Exp $ */
+/* $Id: azerbaijani-utf-8.inc.php,v 2.2 2003/11/20 13:48:51 nijel Exp $ */
 
 // tercümedeki eksiklerimi ve ya sehv olduğunu düşündüyünüz yerleri shehriyari@trcomm.net adresine göndere bilersiniz...
 // Şehriyar İmanov 30 Avqust 2003... Shehi
@@ -642,78 +642,83 @@ $strYes = 'Beli';
 $strZeroRemovesTheLimit = 'Qeyd: Bu variantları 0 (sıfır)-a çevirmek hüdudu (limiti) qaldıracaq.';
 $strZip = '"zip"lenmiş';
 
+$strExecuteBookmarked = 'Execute bookmarked query';  //to translate
+$strExcelOptions = 'Excel options';  //to translate
+$strReplaceNULLBy = 'Replace NULL by';  //to translate
+$strQueryWindowLock = 'Do not overwrite this query from outside the window';  //to translate
+$strPaperSize = 'Paper size';  //to translate
+$strDatabaseNoTable = 'This database contains no table!';//to translate
+$strViewDumpDatabases = 'View dump (schema) of databases';//to translate
+$strAddIntoComments = 'Add into comments';//to translate
+$strDatabaseExportOptions = 'Database export options';//to translate
+$strAddDropDatabase = 'Add DROP DATABASE';//to translate
+$strToggleScratchboard = 'toggle scratchboard';  //to translate
+$strTableOptions = 'Table options';  //to translate
+$strSecretRequired = 'The configuration file now needs a secret passphrase (blowfish_secret).';  //to translate
 $strAccessDeniedExplanation = 'phpMyAdmin tried to connect to the MySQL server, and the server rejected the connection. You should check the host, username and password in config.inc.php and make sure that they correspond to the information given by the administrator of the MySQL server.';  //to translate
 $strAddAutoIncrement = 'Add AUTO_INCREMENT value';  //to translate
-$strAddDropDatabase = 'Add DROP DATABASE';//to translate
-$strAddIntoComments = 'Add into comments';//to translate
-$strArabic = 'Arabic';  //to translate
-$strArmenian = 'Armenian';  //to translate
-
-$strBaltic = 'Baltic';  //to translate
-$strBrowseForeignValues = 'Browse foreign values';  //to translate
-$strBulgarian = 'Bulgarian';  //to translate
-
-$strCaseInsensitive = 'case-insensitive';  //to translate
-$strCaseSensitive = 'case-sensitive';  //to translate
-$strCentralEuropean = 'Central European';  //to translate
 $strCharsets = 'Charsets';  //to translate
+$strDescription = 'Description';  //to translate
 $strCharsetsAndCollations = 'Character Sets and Collations';  //to translate
 $strCollation = 'Collation';  //to translate
-$strCroatian = 'Croatian';  //to translate
-$strCyrillic = 'Cyrillic';  //to translate
-$strCzech = 'Czech';  //to translate
-
-$strDanish = 'Danish';  //to translate
-$strDatabaseExportOptions = 'Database export options';//to translate
-$strDatabaseNoTable = 'This database contains no table!';//to translate
-$strDescription = 'Description';  //to translate
-$strDictionary = 'dictionary';  //to translate
-
-$strEnglish = 'English';  //to translate
-$strEstonian = 'Estonian';  //to translate
-$strExcelOptions = 'Excel options';  //to translate
-$strExecuteBookmarked = 'Execute bookmarked query';  //to translate
-
-$strGerman = 'German';  //to translate
-$strGreek = 'Greek';  //to translate
-
-$strHebrew = 'Hebrew';  //to translate
-$strHungarian = 'Hungarian';  //to translate
-
-$strJapanese = 'Japanese';  //to translate
-
-$strKorean = 'Korean';  //to translate
-
-$strLithuanian = 'Lithuanian';  //to translate
-
 $strMultilingual = 'multilingual';  //to translate
-
-$strPaperSize = 'Paper size';  //to translate
+$strGerman = 'German';  //to translate
 $strPhoneBook = 'phone book';  //to translate
-
-$strQueryWindowLock = 'Do not overwrite this query from outside the window';  //to translate
-
-$strReplaceNULLBy = 'Replace NULL by';  //to translate
-$strRussian = 'Russian';  //to translate
-
-$strSecretRequired = 'The configuration file now needs a secret passphrase (blowfish_secret).';  //to translate
-$strSimplifiedChinese = 'Simplified Chinese';  //to translate
+$strDictionary = 'dictionary';  //to translate
 $strSwedish = 'Swedish';  //to translate
-
-$strTableOptions = 'Table options';  //to translate
-$strThai = 'Thai';  //to translate
-$strToggleScratchboard = 'toggle scratchboard';  //to translate
-$strTraditionalChinese = 'Traditional Chinese';  //to translate
+$strDanish = 'Danish';  //to translate
+$strCzech = 'Czech';  //to translate
 $strTurkish = 'Turkish';  //to translate
-
+$strEnglish = 'English';  //to translate
+$strHungarian = 'Hungarian';  //to translate
+$strCroatian = 'Croatian';  //to translate
+$strBulgarian = 'Bulgarian';  //to translate
+$strLithuanian = 'Lithuanian';  //to translate
+$strEstonian = 'Estonian';  //to translate
+$strCaseInsensitive = 'case-insensitive';  //to translate
+$strCaseSensitive = 'case-sensitive';  //to translate
 $strUkrainian = 'Ukrainian';  //to translate
-$strUnicode = 'Unicode';  //to translate
-$strUnknown = 'unknown';  //to translate
-$strUseThisValue = 'Use this value';  //to translate
-
-$strViewDumpDatabases = 'View dump (schema) of databases';//to translate
-
+$strHebrew = 'Hebrew';  //to translate
 $strWestEuropean = 'West European';  //to translate
+$strCentralEuropean = 'Central European';  //to translate
+$strTraditionalChinese = 'Traditional Chinese';  //to translate
+$strCyrillic = 'Cyrillic';  //to translate
+$strArmenian = 'Armenian';  //to translate
+$strArabic = 'Arabic';  //to translate
+$strRussian = 'Russian';  //to translate
+$strUnknown = 'unknown';  //to translate
+$strBaltic = 'Baltic';  //to translate
+$strUnicode = 'Unicode';  //to translate
+$strSimplifiedChinese = 'Simplified Chinese';  //to translate
+$strKorean = 'Korean';  //to translate
+$strGreek = 'Greek';  //to translate
+$strJapanese = 'Japanese';  //to translate
+$strThai = 'Thai';  //to translate
+$strUseThisValue = 'Use this value';  //to translate
 $strWindowNotFound = 'The target browser window could not be updated. Maybe you have closed the parent window or your browser is blocking cross-window updates of your security settings';  //to translate
+$strBrowseForeignValues = 'Browse foreign values';  //to translate
+$strInternalRelations = 'Internal relations';  //to translate
+$strInternalNotNecessary = '* An internal relation is not necessary when it exists also in InnoDB.';  //to translate
+$strUpgrade = 'You should upgrade to %s %s or later.';  //to translate
+$strLatexStructure = 'Structure of table __TABLE__';//to translate
+$strLatexContinued = '(continued)';//to translate
+$strLatexContent = 'Content of table __TABLE__';//to translate
+$strLatexIncludeCaption = 'Include table caption';//to translate
+$strLatexCaption = 'Table caption';//to translate
+$strLatexLabel = 'Label key';//to translate
+$strLatexContinuedCaption = 'Continued table caption';//to translate
 
+$strPrintViewFull = 'Print view (with full texts)';  //to translate
+$strLogServer = 'Server';  //to translate
+$strSortByKey = 'Sort by key';  //to translate
+$strBookmarkAllUsers = 'Let every user access this bookmark';  //to translate
+$strConstraintsForDumped = 'Constraints for dumped tables';  //to translate
+$strConstraintsForTable = 'Constraints for table';  //to translate
+$strBookmarkOptions = 'Bookmark options';  //to translate
+$strCreationDates = 'Creation/Update/Check dates';  //to translate
+$strCheckOverhead = 'Check overheaded';  //to translate
+$strExcelEdition = 'Excel edition';  //to translate
+$strDelayedInserts = 'Use delayed inserts';  //to translate
+$strSQLExportType = 'Export type';  //to translate
+$strAddConstraints = 'Add constraints';  //to translate
 ?>

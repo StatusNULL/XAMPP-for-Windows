@@ -12,7 +12,7 @@ goto endofperl
 @rem ';
 #!perl
 #line 15
-    eval 'exec c:\xampp\perl\bin\perl.exe -S $0 ${1+"$@"}'
+    eval 'exec C:\wampp2\perl\bin\perl.exe -S $0 ${1+"$@"}'
         if $running_under_some_shell;
 
 # perlivp V 0.02
@@ -57,7 +57,7 @@ my $pass__total = 0;
 my $error_total = 0;
 my $tests_total = 0;
 
-my $perlpath = 'c:\xampp\perl\bin\perl.exe';
+my $perlpath = 'C:\wampp2\perl\bin\perl.exe';
 my $useithreads = 'define';
 
 print "## Checking Perl binary via variable `\$perlpath' = $perlpath.\n" if $opt{'p'};
@@ -77,7 +77,7 @@ $tests_total++;
 
 print "## Checking Perl version via variable `\$]'.\n" if $opt{'p'};
 
-my $ivp_VERSION = 5.008;
+my $ivp_VERSION = 5.008002;
 
 if ($ivp_VERSION == $]) {
     print "## Perl version `$]' appears installed as expected.\n" if $opt{'v'};

@@ -24,8 +24,8 @@ ob_end_clean();
 /**
  * @nodep Gtk
  */
-if ('N:\xampp\php\pear' != '@'.'include_path'.'@') {
-    ini_set('include_path', 'N:\xampp\php\pear');
+if ('M:\xampp\php\pear' != '@'.'include_path'.'@') {
+    ini_set('include_path', 'M:\xampp\php\pear');
 }
 ini_set('allow_url_fopen', true);
 set_time_limit(0);
@@ -36,7 +36,7 @@ ini_set('magic_quotes_runtime', false);
 error_reporting(E_ALL & ~E_NOTICE);
 set_error_handler('error_handler');
 
-$pear_package_version = "1.3b3";
+$pear_package_version = "1.3b1";
 
 require_once 'PEAR.php';
 require_once 'PEAR/Config.php';

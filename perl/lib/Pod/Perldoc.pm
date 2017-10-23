@@ -12,7 +12,7 @@ use File::Spec::Functions qw(catfile catdir splitdir);
 use vars qw($VERSION @Pagers $Bindir $Pod2man
   $Temp_Files_Created $Temp_File_Lifetime
 );
-$VERSION = '3.10';
+$VERSION = '3.12';
 #..........................................................................
 
 BEGIN {  # Make a DEBUG constant very first thing...
@@ -39,6 +39,8 @@ BEGIN {
  *IS_Dos     = $^O eq 'dos'     ? \&TRUE : \&FALSE unless defined &IS_Dos;
  *IS_OS2     = $^O eq 'os2'     ? \&TRUE : \&FALSE unless defined &IS_OS2;
  *IS_Cygwin  = $^O eq 'cygwin'  ? \&TRUE : \&FALSE unless defined &IS_Cygwin;
+ *IS_Linux   = $^O eq 'linux'   ? \&TRUE : \&FALSE unless defined &IS_Linux;
+ *IS_HPUX    = $^O =~ m/hpux/   ? \&TRUE : \&FALSE unless defined &IS_HPUX;
 }
 
 $Temp_File_Lifetime ||= 60 * 60 * 24 * 5;
@@ -764,9 +766,12 @@ sub maybe_generate_dynamic_pod {
         push @{ $self->{'temp_file_list'} }, $buffer;
          # I.e., it MIGHT be deleted at the end.
         
-        print $buffd "=over 8\n\n";
+	my $in_list = $self->opt_f;
+
+        print $buffd "=over 8\n\n" if $in_list;
         print $buffd @dynamic_pod  or die "Can't print $buffer: $!";
-        print $buffd "=back\n";
+        print $buffd "=back\n"     if $in_list;
+
         close $buffd        or die "Can't close $buffer: $!";
         
         @$found_things = $buffer;

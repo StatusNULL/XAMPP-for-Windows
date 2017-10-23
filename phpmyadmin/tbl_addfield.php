@@ -1,14 +1,14 @@
 <?php
-/* $Id: tbl_addfield.php,v 1.41 2003/08/13 08:52:10 nijel Exp $ */
+/* $Id: tbl_addfield.php,v 2.3 2003/11/26 22:52:24 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
 /**
  * Get some core libraries
  */
-require('./libraries/grab_globals.lib.php');
+require_once('./libraries/grab_globals.lib.php');
 $js_to_run = 'functions.js';
-require('./header.inc.php');
+require_once('./header.inc.php');
 
 // Check parameters
 PMA_checkParameters(array('db', 'table'));
@@ -47,13 +47,10 @@ if (isset($submit)) {
         if (empty($field_name[$i])) {
             continue;
         }
-        if (PMA_MYSQL_INT_VERSION < 32306) {
-            PMA_checkReservedWords($field_name[$i], $err_url);
-        }
 
         $query .= PMA_backquote($field_name[$i]) . ' ' . $field_type[$i];
         if ($field_length[$i] != ''
-            && !eregi('^(DATE|DATETIME|TIME|TINYBLOB|TINYTEXT|BLOB|TEXT|MEDIUMBLOB|MEDIUMTEXT|LONGBLOB|LONGTEXT)$', $field_type[$i])) {
+            && !preg_match('@^(DATE|DATETIME|TIME|TINYBLOB|TINYTEXT|BLOB|TEXT|MEDIUMBLOB|MEDIUMTEXT|LONGBLOB|LONGTEXT)$@i', $field_type[$i])) {
             $query .= '(' . $field_length[$i] . ')';
         }
         if ($field_attribute[$i] != '') {
@@ -100,7 +97,7 @@ if (isset($submit)) {
         }
         $query .= ', ADD ';
     } // end for
-    $query = ereg_replace(', ADD $', '', $query);
+    $query = preg_replace('@, ADD $@', '', $query);
 
     // To allow replication, we first select the db to use and then run queries
     // on this db.
@@ -124,7 +121,7 @@ if (isset($submit)) {
                     $primary .= PMA_backquote($field_name[$j]) . ', ';
                 }
             } // end for
-            $primary     = ereg_replace(', $', '', $primary);
+            $primary     = preg_replace('@, $@', '', $primary);
             if (!empty($primary)) {
                 $sql_query      = 'ALTER TABLE ' . PMA_backquote($table) . ' ADD PRIMARY KEY (' . $primary . ')';
                 $result         = PMA_mysql_query($sql_query) or PMA_mysqlDie('', '', '', $err_url);
@@ -142,7 +139,7 @@ if (isset($submit)) {
                     $index .= PMA_backquote($field_name[$j]) . ', ';
                 }
             } // end for
-            $index     = ereg_replace(', $', '', $index);
+            $index     = preg_replace('@, $@', '', $index);
             if (!empty($index)) {
                 $sql_query      = 'ALTER TABLE ' . PMA_backquote($table) . ' ADD INDEX (' . $index . ')';
                 $result         = PMA_mysql_query($sql_query) or PMA_mysqlDie('', '', '', $err_url);
@@ -160,7 +157,7 @@ if (isset($submit)) {
                     $unique .= PMA_backquote($field_name[$j]) . ', ';
                 }
             } // end for
-            $unique = ereg_replace(', $', '', $unique);
+            $unique = preg_replace('@, $@', '', $unique);
             if (!empty($unique)) {
                 $sql_query      = 'ALTER TABLE ' . PMA_backquote($table) . ' ADD UNIQUE (' . $unique . ')';
                 $result         = PMA_mysql_query($sql_query) or PMA_mysqlDie('', '', '', $err_url);
@@ -171,13 +168,13 @@ if (isset($submit)) {
 
         // Builds the fulltext statements and updates the table
         $fulltext = '';
-        if (PMA_MYSQL_INT_VERSION >= 32323 && isset($field_fulltext)) {
+        if (isset($field_fulltext)) {
             $fulltext_cnt = count($field_fulltext);
             for ($i = 0; $i < $fulltext_cnt; $i++) {
                 $j        = $field_fulltext[$i];
                 $fulltext .= PMA_backquote($field_name[$j]) . ', ';
             } // end for
-            $fulltext = ereg_replace(', $', '', $fulltext);
+            $fulltext = preg_replace('@, $@', '', $fulltext);
             if (!empty($fulltext)) {
                 $sql_query      = 'ALTER TABLE ' . PMA_backquote($table) . ' ADD FULLTEXT (' . $fulltext . ')';
                 $result         = PMA_mysql_query($sql_query) or PMA_mysqlDie('', '', '', $err_url);
@@ -186,23 +183,21 @@ if (isset($submit)) {
         } // end if
 
         // garvin: If comments were sent, enable relation stuff
-        require('./libraries/relation.lib.php');
-        require('./libraries/transformations.lib.php');
+        require_once('./libraries/relation.lib.php');
+        require_once('./libraries/transformations.lib.php');
 
         $cfgRelation = PMA_getRelationsParam();
 
         // garvin: Update comment table, if a comment was set.
         if (isset($field_comments) && is_array($field_comments) && $cfgRelation['commwork']) {
-            @reset($field_comments);
-            while(list($fieldindex, $fieldcomment) = each($field_comments)) {
+            foreach($field_comments AS $fieldindex => $fieldcomment) {
                 PMA_setComment($db, $table, $field_name[$fieldindex], $fieldcomment);
             }
         }
 
         // garvin: Update comment table for mime types [MIME]
         if (isset($field_mimetype) && is_array($field_mimetype) && $cfgRelation['commwork'] && $cfgRelation['mimework'] && $cfg['BrowseMIME']) {
-            @reset($field_mimetype);
-            while(list($fieldindex, $mimetype) = each($field_mimetype)) {
+            foreach($field_mimetype AS $fieldindex => $mimetype) {
                 PMA_setMIME($db, $table, $field_name[$fieldindex], $mimetype, $field_transformation[$fieldindex], $field_transformation_options[$fieldindex]);
             }
         }
@@ -212,8 +207,7 @@ if (isset($submit)) {
         unset($sql_query_cpy);
         $message   = $strTable . ' ' . htmlspecialchars($table) . ' ' . $strHasBeenAltered;
         $active_page = 'tbl_properties_structure.php';
-        include('./tbl_properties_structure.php');
-        exit();
+        require('./tbl_properties_structure.php');
     } else {
         PMA_mysqlDie('', '', '', $err_url, FALSE);
         // garvin: An error happened while inserting/updating a table definition.
@@ -232,11 +226,11 @@ if (isset($submit)) {
  */
 if ($abort == FALSE) {
     $action = 'tbl_addfield.php';
-    include('./tbl_properties.inc.php');
+    require('./tbl_properties.inc.php');
 
     // Diplays the footer
     echo "\n";
-    include('./footer.inc.php');
+    require_once('./footer.inc.php');
 }
 
 ?>

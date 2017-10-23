@@ -12,7 +12,7 @@
  * did not receive this file, see http://www.fsf.org/copyleft/lgpl.html.
  *
  * @author  Mike Cochrane <mike@graftonhall.co.nz>
- * @version $Revision: 1.1 $
+ * @version $Revision: 2.2 $
  * @since   Horde 2.2
  * @package horde.cipher
  */
@@ -468,3 +468,4 @@ class Horde_Cipher_blowfish {
     }
 
 }
+?>

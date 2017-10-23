@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: translatecount.sh,v 1.1 2003/03/01 11:55:08 robbat2 Exp $
+# $Id: translatecount.sh,v 2.0 2003/11/18 15:20:42 nijel Exp $
 ##
 # Shell script to produce counts of just how out of date the translations are!
 ##
@@ -11,10 +11,10 @@
 srcfilelist=${@}
 destfilelist=""
 translationmatch='//to translate'
-suffixtoremove='.inc.php3'
+suffixtoremove='.inc.php'
 added=0
 if [ -z "${srcfilelist}" ]; then
-  srcfilelist="*.inc.php3"
+  srcfilelist="*.inc.php"
   added=1
 fi;
 for i in ${srcfilelist}; do 
@@ -25,7 +25,7 @@ for i in ${srcfilelist}; do
     destfilelist="${destfilelist} ${i}"
   fi;
 done;
-destfilelist=`echo ${destfilelist} | xargs -n1 | egrep '.inc.php3$'` 
+destfilelist=`echo ${destfilelist} | xargs -n1 | egrep '.inc.php$'` 
 if [ ! -z "${destfilelist}" ]; then
   grep -c -- "${translationmatch}" ${destfilelist} | sort -t':' -n +1  | sed -e "s/${suffixtoremove}//g" | xargs -n1 | egrep -v ':0$' 
 fi;

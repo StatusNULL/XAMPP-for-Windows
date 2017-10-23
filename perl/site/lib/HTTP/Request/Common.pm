@@ -1,4 +1,4 @@
-# $Id: Common.pm,v 1.19 2001/01/05 18:53:11 gisle Exp $
+# $Id: Common.pm,v 1.22 2003/10/23 19:11:32 uid39246 Exp $
 #
 package HTTP::Request::Common;
 
@@ -15,7 +15,7 @@ require Exporter;
 require HTTP::Request;
 use Carp();
 
-$VERSION = sprintf("%d.%02d", q$Revision: 1.19 $ =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q$Revision: 1.22 $ =~ /(\d+)\.(\d+)/);
 
 my $CRLF = "\015\012";   # "\r\n" is not portable
 
@@ -33,14 +33,16 @@ sub POST
     while (($k,$v) = splice(@_, 0, 2)) {
 	if (lc($k) eq 'content') {
 	    $content = $v;
-	} else {
+	}
+	else {
 	    $req->push_header($k, $v);
 	}
     }
     my $ct = $req->header('Content-Type');
     unless ($ct) {
 	$ct = 'application/x-www-form-urlencoded';
-    } elsif ($ct eq 'form-data') {
+    }
+    elsif ($ct eq 'form-data') {
 	$ct = 'multipart/form-data';
     }
 
@@ -66,12 +68,14 @@ sub POST
 
 	    if ($boundary_index) {
 		$v[$boundary_index] = $boundary;
-	    } else {
+	    }
+	    else {
 		push(@v, boundary => $boundary);
 	    }
 
 	    $ct = HTTP::Headers::Util::join_header_words(@v);
-	} else {
+	}
+	else {
 	    # We use a temporary URI object to format
 	    # the application/x-www-form-urlencoded content.
 	    require URI;
@@ -87,6 +91,9 @@ sub POST
 		     length($content)) unless ref($content);
 	$req->content($content);
     }
+    else {
+        $req->header('Content-Length' => 0);
+    }
     $req;
 }
 
@@ -99,7 +106,8 @@ sub _simple_req
     while (($k,$v) = splice(@_, 0, 2)) {
 	if (lc($k) eq 'content') {
 	    $req->add_content($v);
-	} else {
+	}
+	else {
 	    $req->push_header($k, $v);
 	}
     }
@@ -119,7 +127,8 @@ sub form_data   # RFC1867
 	    $k =~ s/([\\\"])/\\$1/g;  # escape quotes and backslashes
 	    push(@parts,
 		 qq(Content-Disposition: form-data; name="$k"$CRLF$CRLF$v));
-	} else {
+	}
+	else {
 	    my($file, $usename, @headers) = @$v;
 	    unless (defined $usename) {
 		$usename = $file;
@@ -138,7 +147,8 @@ sub form_data   # RFC1867
 		if ($DYNAMIC_FILE_UPLOAD) {
 		    # will read file later
 		    $content = $fh;
-		} else {
+		}
+		else {
 		    local($/) = undef; # slurp files
 		    $content = <$fh>;
 		    close($fh);
@@ -164,7 +174,8 @@ sub form_data   # RFC1867
 	    if (ref $content) {
 		push(@parts, [$head, $content]);
 		$fhparts++;
-	    } else {
+	    }
+	    else {
 		push(@parts, $head . $content);
 	    }
 	}
@@ -199,7 +210,8 @@ sub form_data   # RFC1867
 		    last;
 		}
 	    	$length += $file_size + length $head;
-	    } else {
+	    }
+	    else {
 		$length += length;
 	    }
         }
@@ -225,7 +237,8 @@ sub form_data   # RFC1867
 		if ($n) {
 		    $buflength += $n;
 		    unshift(@parts, ["", $fh]);
-		} else {
+		}
+		else {
 		    close($fh);
 		}
 		if ($buflength) {
@@ -235,7 +248,8 @@ sub form_data   # RFC1867
 	    }
 	};
 
-    } else {
+    }
+    else {
 	$boundary = boundary() unless $boundary;
 
 	my $bno = 0;
@@ -390,24 +404,24 @@ different):
 
   --6G+f
   Content-Disposition: form-data; name="name"
-  
+
   Gisle Aas
   --6G+f
   Content-Disposition: form-data; name="email"
-  
+
   gisle@aas.no
   --6G+f
   Content-Disposition: form-data; name="gender"
-  
+
   M
   --6G+f
   Content-Disposition: form-data; name="born"
-  
+
   1964
   --6G+f
   Content-Disposition: form-data; name="init"; filename=".profile"
   Content-Type: text/plain
-  
+
   PATH=/local/perl/bin:$PATH
   export PATH
 
@@ -419,7 +433,7 @@ the content attribute.  This subroutine will read the content of any
 files on demand and return it in suitable chunks.  This allow you to
 upload arbitrary big files without using lots of memory.  You can even
 upload infinite files like F</dev/audio> if you wish; however, if
-the file is not a plain file, there will be no Content-Length header 
+the file is not a plain file, there will be no Content-Length header
 defined for the request.  Not all servers (or server
 applications) like this.  Also, if the file(s) change in size between
 the time the Content-Length is calculated and the time that the last

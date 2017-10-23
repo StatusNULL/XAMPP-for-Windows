@@ -1,5 +1,5 @@
 <?php
-/* $Id: server_variables.php,v 1.6 2003/03/18 13:33:23 nijel Exp $ */
+/* $Id: server_variables.php,v 2.2 2003/11/26 22:52:24 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -28,8 +28,7 @@ echo '<h2>' . "\n"
  */
 if (!$is_superuser && !$cfg['ShowMysqlVars']) {
     echo $strNoPrivileges;
-    include('./footer.inc.php');
-    exit;
+    require_once('./footer.inc.php');
 }
 
 
@@ -78,7 +77,7 @@ echo '&nbsp;</th>' . "\n";
     </tr>
 <?php
 $useBgcolorOne = TRUE;
-while (list($name, $value) = each($serverVars)) {
+foreach ($serverVars as $name => $value) {
 ?>
     <tr>
         <td bgcolor="<?php echo $useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']; ?>">
@@ -108,6 +107,6 @@ while (list($name, $value) = each($serverVars)) {
 /**
  * Sends the footer
  */
-require('./footer.inc.php');
+require_once('./footer.inc.php');
 
 ?>

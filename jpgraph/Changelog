@@ -1,3 +1,271 @@
+25 Nov 2003 JpGraph 1.14
+========================
+
+Improved error handling:
+------------------------
+
+* [me] Added extended error check in AccBar and GroupBar so that user
+  gets a warning if non-bar objects is used as arguments.
+
+* [me] Added error check for invalid specified graph canvas size
+
+* [me] Added additional error check for wrong argument s for CSIM targets and
+  texts for Gantt charts.
+
+* [me] Added error check for Gantt graph when user specifies negative image
+  sizes and at the same time introduce backward compatibility with sizes
+  specified as -1 to indicate auto-sizing.
+
+* [me] Added error check for headers already sent before trying to send 
+  image headers. This will now give a good and informative error mesage
+  to help begnners understand why they can't mix text and image data in the
+  same HTTP stream.
+
+* [me] Imroved error handling to catch abnormal in-data to the library
+  to avoid internal PHP errors.
+
+* [me] Added error check against non-numeric data values in bar plot.
+
+* [me] Added error check for trying to load a background image in a 
+  non-supported image format.
+
+* [me] Added error check for illegal data for log scale and not only an
+  assert() statment.
+
+Bug fixes
+---------
+
+* [me] Fixed a typo in jpgraph_stock.php that casued wrong automatic
+  coloring when open < close.
+
+* [me] Cleaned up old residues in CSIM examples in the Example/ directory so
+  they work fine with the current version of the library.
+
+* [me] Fix a problem with handling Daylight Savings Time for the scales
+  with Gantt charts. (If the switchover date (depending on the locale) 
+  was somewhere in between start and end date then the 1 hour off would
+  result in wrong date alignments.)
+
+* [me] Fixed typo in image format checking which resulted in a false
+  positive for JPEG format for an installation that doesn't support JPEG
+
+* [me] Fixed color wrap around problem for pie's if you supply fewer colors
+  than slices.
+
+* [me] Fixed a rounding problem which could cause a 1 pixel overshoot for
+  gradient MIDVER and MIDHOR types if the distance between the edges was
+  not a multiple of 2.
+
+* [me] Fix for a problem were legends where in incorrect order if you added
+  more legends than slices in a pie plot.
+
+* [me] Updated piec_csimex1.php since it used an obsolete function and fonts. 
+
+
+Various feature enhancements
+----------------------------
+
+* [me] Added FF_CHINESE/FF_BIG5 which makes it possible to automatically get 
+  BIG5->UTF8 conversion. The Chinese font file is by default bkai00mp.ttf but
+  can easily be changed by setting the 'CHINESE_TTF_FONT define.
+
+* [me] Added possibility to add one or several Logo's to the graph by adding a
+  new 'semi' plot type "IconPlot()" which can be added to the graph using the 
+  normal Graph::Add(). The icon plot can also be one of the supported 
+  country flags.
+
+* [me] Visual adjustment of graphical error handler
+
+* [me] Added simple line patterns as fill options for bar plots. See
+  barpatternex1.php for an example.
+
+* [me] Added Text::SetWordwrap() to allow wordrap n text paragraph.
+
+* [me] Added Graph::Set3DPerspective() This allows a fake "3D-perspective"
+  distorsion, this is all done with a shearing transformation. Since this is
+  all done in PHP code (we don't get any help from GD here) this is somewhat
+  processor intensive. After all, this is real image processing we are doing
+  in plain old PHP.
+
+* [jigal] Improved way to auto detect GD version.
+
+* [me] Added the possibility to do "fake" 3D perspective post processing of
+  the graph by adding Graph::Set3DPerspective() to all relevant graphs.
+
+* [me] Fine tuning of positiong of text wthin it's box for StrokeBoxedText()
+
+* [me] Added SetGridDepth() functionlity to Radar graph. This way you can
+  control with a call to Graph::SetGridDepth() if the axis and grids should
+  be on top of or behind the radar plot.
+
+* [me] Workaround for a floating point comparison bug in PHP. In some 
+  circumstances the comparison $x > $y is true even when $x == $y. The
+  workaround  is to write the comparison as !( $x <= $y )
+
+* [me] Add error check in Set90AndMargin() to make sure a scale have been
+  specified.
+
+* [me] Improved positioning of displayed values for horizontal bar graphs.
+
+* [me] The automatically generated file name for cached images now
+  includes the query string to the script. (Based on a suggestion 
+  made by Christer Oterhals)
+
+* [me] Added jpgraph_imgtrans.php to make it possible to do some simple
+  image transformation which will make a "flat" 3D perspective transformation
+  of an Gd image.
+
+* [me] Behaviour change. 0 values are not printed for individual 0 in an
+  accumulated bar plot. 
+
+* [me] Added possibility to use country flags as background images with the
+  method Graph::SetBackgroundCountryFlag()
+
+* [me] Added Graph::SetBackgroundImageMix() to specify how much (in percent)
+  the background image should be merged
+
+* [me] Added Image::CopyMerge()
+
+
+23 Aug 2003 JpGraph 1.13
+========================
+* [me] Added Gradient line fill for line plots. See gradlinefillex1.php
+
+* [me] Fix bug #140. A rounding problem in Gradient fill which
+  in some circumstances could cause a 2 pixels overflow in the filling.
+
+* [me] Added option to let the user setup if the PHP error handler should
+  give an image with the error message. Useful during development. 
+  Controlled by the define INSTALL_PHP_ERR_HANDLER
+
+* [me] Added method Legend::SetReverse() to reverse the order of plots in 
+  the Legend.
+
+* [me] Since the example directory is now getting to big the example directory
+  is now split into several subdirectories depending on Graph type.
+
+* [me] Added more Gantt chart examples.
+
+* [me] Adjusted size for filled circles (as used for example in markers). By a
+  type they were previously 2 pixels to large copared to what they were
+  specified to be
+
+* [me] Fix for annoyance #147, #150. Fine tuning of legend layout and positioning of
+  markers. It should now look even better with some better calculated margins
+  and general positioning that depends on the actual markers use for the plots.
+
+* [me] Fix (bug?) #134. Don't output any coordinates for bar CSIM if the target is an
+  empty string.
+
+* [me] Fix bug #133. Fill colors for individual bars was not honoured when
+  used together with an accumulated bar. 
+
+* [me] Fix bug #136. Labels for 2D pie does not follow start label when
+  anti-alias is enabled.
+
+* [me] Feature request #154. Make it possible to use object methods as
+  callbacks wherever callbacks can be specified in the library
+
+* [me] Fix problem #152. Values for PiePlotC wasn't parsed for
+  printf-formatting. (A bug that was introduced with AntiAlising in 1.12)
+
+* [me] Fix problem #148. Explode array was specified clockwise while slices
+  are specified anti-clockwise. 
+  NOTE: THIS GIVES THE WRONG LOOK ON EXISTING 2D PIE PLOTS WITH EXPLODEDED
+  SLICES SINCE THE WRONG SLICE WIll NOW BE EXPLODED
+
+* [me] Updated class reference
+
+* [me] Make colors have the same order in both 2D and 3D pie plots
+
+* [me] Added possibility to make PiePlot percentage adjustment so that 
+  integer percetage will add up to 100%. This is done by the Hare/Niemeyer
+  method. To activate the percetage adjustment you need to specify labeltype
+  of 2, as in $pieplot->SetLabeltype(2),
+
+* [me] Y2 scale can now add lines, texts and band through a single call to
+  Graph::AddY2() in exactly the same way as Graph::Add()
+
+* [me] Make sure there are no direct calls to GD except through the Image class
+
+* [me] Make it possible to rotate polar graphs 90 degrees with Set90AndMargin()
+
+* [me] Major improvements in the Gantt charts. 
+  1. Now support for minute and hour scale as well
+  2. Suport for multiple columns in the title field, you can now have (for
+     example) Start date, end date, duration etc
+  3. Improved sizing to make the overall image as small as possible
+  4. Make it possible to use builtin or file based icons in the title columns
+  5. Improved 3D look & feel
+ 
+* [me] Added support for using country flags as image markers. This
+  is added by jpgraph_flags.php together with the image files *.dat
+  At the moment 229 countries are supported. See Example/listallflags.php
+  for a current list of supported countries. All flags are available in 4
+  standard original sizes, as markers they may also be arbitrary scaled.
+  For a simple example see Examples/markflagex1.php
+
+* [ryleyb] Multiple constrains for Gantt graphs
+
+* [me] Added possibility to use the Free Vera TTF font. The font is available
+  from http://www.gnome.org/fonts/
+
+* [me] Make PHP deault error handler show image if possible
+
+* [me] Improved look for image error handler (added icon)
+
+* [me] Fixed problem with gradient backgrounds for horizontal 
+  bar graphs.
+
+* [me] Added possibility of 'max' value position for bar graphs. This
+  positions the value just inside tha bar at the max value of the bar.
+
+* [me] Font files are now fully specified in the setup and doesn't assume an
+  extension of ttf.
+
+30 May 2003 JpGraph 1.12.2
+===========================
+* [me & A. Tang] Added support for Chinese font and character handling.
+  This requires you to install the "simhei.ttf" Chinese font. 
+
+* [J Sweat] Fix bug [#124] Make step line style ignore NULL values in data
+
+* [J Sweat] Fix bug [#123] Divide by zero for line length of zero for dashed lines
+
+* [me] Fix bug [#109]. Problem with pie color when a supplied color array
+  contains more colors than data. For anti-aliased images that meant that
+  the last n colors was used and not the first n colors.
+
+* [me] For plotmarks that use the ALT string the wrong value was in due
+  to the recent addition of both Y and X value to control the plot callback. 
+  This has now been fixed so that it will work as before and that previous
+  code that assumes one parameter in their ALT srting will see the Y-value at
+  the plotmar. New is also that the X-value is given as a second
+  parameter. This means that the ALT string can display both the Y and X value
+  for a specific point.
+ 
+* [me] Make it possible to disable individual plot legends through the method
+  Plot::HideLegend() 
+
+* [me] Fixed problem with SetTextTickInterval() together with grouped bars
+  (bug #116)
+
+* [me] Fixed a problem with shadows on accumulated bar plots (bug #111)
+
+* [me] Fixed Legend::SetMarkAbsSize() 
+
+* [me] Add error check for the case that the server (Windows) 
+  doesn't support SystemRoot and TEMP server variables.
+
+* [me] Fix short-open-tags bug that made it's way into 1.12.1 (bug #121)
+
+* [me] Make sure we only pass integers into GD when positioning texts.
+
+* [me] Always treat "" (empty string) as NULL for bar plots
+
+* [me] Allow links from vertical position 0 on gantt charts
+
+
 12 Apr 2003 JpGraph 1.12.1
 ==========================
 

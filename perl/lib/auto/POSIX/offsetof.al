@@ -3,7 +3,7 @@
 # See AutoSplit.pm.
 package POSIX;
 
-#line 218 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\offsetof.al)"
+#line 221 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\offsetof.al)"
 sub offsetof {
     unimpl "offsetof() is C-specific, stopped";
 }

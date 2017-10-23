@@ -1,12 +1,10 @@
 <?php
-/* $Id: server_links.inc.php,v 1.10 2003/07/23 19:08:11 rabus Exp $ */
+/* $Id: server_links.inc.php,v 2.2 2003/11/26 22:52:24 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 // Check parameters
 
-if (!defined('PMA_COMMON_LIB_INCLUDED')) {
-    include('./libraries/common.lib.php');
-}
+require_once('./libraries/common.lib.php');
 PMA_checkParameters(array('is_superuser', 'url_query'));
 
 /**

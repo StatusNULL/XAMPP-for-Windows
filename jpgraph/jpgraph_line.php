@@ -4,7 +4,7 @@
 // Description:	Line plot extension for JpGraph
 // Created: 	2001-01-08
 // Author:	Johan Persson (johanp@aditus.nu)
-// Ver:		$Id: jpgraph_line.php,v 1.46 2003/04/09 20:21:01 aditus Exp $
+// Ver:		$Id: jpgraph_line.php,v 1.48.2.3 2003/08/23 22:01:56 aditus Exp $
 //
 // License:	This code is released under QPL
 // Copyright (C) 2001,2002 Johan Persson
@@ -30,6 +30,7 @@ class LinePlot extends Plot{
     var $filledAreas = array(); // array of arrays(with min,max,col,filled in them)
     var $barcenter=false;  // When we mix line and bar. Should we center the line in the bar.
     var $fillFromMin = false ;
+    var $fillgrad=false,$fillgrad_fromcolor='navy',$fillgrad_tocolor='silver',$fillgrad_numcolors=100;
 
 //---------------
 // CONSTRUCTOR
@@ -61,13 +62,21 @@ class LinePlot extends Plot{
 	parent::SetColor($aColor);
     }
 	
-    function SetFillFromYMin($f = true ) {
+    function SetFillFromYMin($f=true) {
 	$this->fillFromMin = $f ;
     }
     
     function SetFillColor($aColor,$aFilled=true) {
 	$this->fill_color=$aColor;
 	$this->filled=$aFilled;
+    }
+
+    function SetFillGradient($aFromColor,$aToColor,$aNumColors=100,$aFilled=true) {
+	$this->fillgrad_fromcolor = $aFromColor;
+	$this->fillgrad_tocolor   = $aToColor;
+	$this->fillgrad_numcolors = $aNumColors;
+	$this->filled = $aFilled;
+	$this->fillgrad = true;
     }
 	
     function Legend(&$graph) {
@@ -175,7 +184,8 @@ class LinePlot extends Plot{
 	    $xt = $xscale->Translate($x);
 	    $yt = $yscale->Translate($this->coords[0][$pnts]);
 	    
-	    if( $this->step_style ) {
+	    $y=$this->coords[0][$pnts];
+	    if( $this->step_style && is_numeric($y) ) {
 		$img->StyleLineTo($xt,$yt_old);
 		$img->StyleLineTo($xt,$yt);
 
@@ -187,7 +197,6 @@ class LinePlot extends Plot{
 
 	    }
 	    else {
-		$y=$this->coords[0][$pnts];
 		if( is_numeric($y) || (is_string($y) && $y != "-") ) {
 		    $tmp1=$this->coords[0][$pnts];
 		    $tmp2=$this->coords[0][$pnts-1]; 		 			
@@ -197,7 +206,6 @@ class LinePlot extends Plot{
 		    else {
 			$img->SetStartPoint($xt,$yt);
 		    }
-
 		    if( is_numeric($tmp1)  && 
 			(is_numeric($tmp2) || $tmp2=="-" || ($this->filled && $tmp2=='') ) ) { 
 			$cord[] = $xt;
@@ -208,7 +216,6 @@ class LinePlot extends Plot{
 	    $yt_old = $yt;
 
 	    $this->StrokeDataValue($img,$this->coords[0][$pnts],$xt,$yt);
-
 	}	
 
 	if( $this->filled  ) {
@@ -217,10 +224,21 @@ class LinePlot extends Plot{
 		$cord[] = $yscale->Translate($min);
 	    else
 		$cord[] = $yscale->Translate(0);
-	    $img->SetColor($this->fill_color);	
-	    $img->FilledPolygon($cord);
-	    $img->SetColor($this->color);
-	    $img->Polygon($cord);
+	    if( $this->fillgrad ) {
+		$img->SetLineWeight(1);
+		$grad = new Gradient($img);
+		$grad->SetNumColors($this->fillgrad_numcolors);
+		$grad->FilledFlatPolygon($cord,$this->fillgrad_fromcolor,$this->fillgrad_tocolor);
+		$img->SetLineWeight($this->weight);
+	    }
+	    else {
+		$img->SetColor($this->fill_color);	
+		$img->FilledPolygon($cord);
+	    }
+	    if( $this->line_weight > 0 ) {
+		$img->SetColor($this->color);
+		$img->Polygon($cord);
+	    }
 	}
 
 	if(!empty($this->filledAreas)) {
@@ -311,7 +329,7 @@ class AccLinePlot extends Plot {
 // PUBLIC METHODS	
     function Legend(&$graph) {
 	foreach( $this->plots as $p )
-	    $p->Legend($graph);
+	    $p->DoLegend($graph);
     }
 	
     function Max() {

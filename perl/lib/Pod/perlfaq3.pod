@@ -1,6 +1,6 @@
 =head1 NAME
 
-perlfaq3 - Programming Tools ($Revision: 1.29 $, $Date: 2002/11/13 06:23:50 $)
+perlfaq3 - Programming Tools ($Revision: 1.35 $, $Date: 2003/08/24 05:26:59 $)
 
 =head1 DESCRIPTION
 
@@ -42,17 +42,17 @@ operations typically found in symbolic debuggers.
 
 =head2 Is there a Perl shell?
 
-In general, not yet.  There is psh available at
+The psh (Perl sh) is currently at version 1.8. The Perl Shell is a
+shell that combines the interactive nature of a Unix shell with the
+power of Perl. The goal is a full featured shell that behaves as
+expected for normal shell activity and uses Perl syntax and
+functionality for control-flow statements and other things.
+You can get psh at http://www.focusresearch.com/gregor/psh/ .
 
-    http://www.focusresearch.com/gregor/psh
-
-Which includes the following description:
-
-    The Perl Shell is a shell that combines the interactive nature
-    of a Unix shell with the power of Perl. The goal is to eventually
-    have a full featured shell that behaves as expected for normal
-    shell activity. But, the Perl Shell will use Perl syntax and
-    functionality for control-flow statements and other things.
+Zoidberg is a similar project and provides a shell written in perl,
+configured in perl and operated in perl. It is intended as a login shell
+and development environment. It can be found at http://zoidberg.sf.net/
+or your local CPAN mirror.
 
 The Shell.pm module (distributed with Perl) makes Perl try commands
 which aren't part of the Perl language as shell commands.  perlsh
@@ -68,7 +68,7 @@ shows up as "Perl" (although you can get those with
 Mod::CoreList).
 
 	use ExtUtils::Installed;
-	
+
 	my $inst    = ExtUtils::Installed->new();
 	my @modules = $inst->modules();
 
@@ -76,11 +76,11 @@ If you want a list of all of the Perl module filenames, you
 can use File::Find::Rule.
 
 	use File::Find::Rule;
-	
+
 	my @files = File::Find::Rule->file()->name( '*.pm' )->in( @INC );
 
 If you do not have that module, you can do the same thing
-with File::Find which is part of the standard library.  
+with File::Find which is part of the standard library.
 
     use File::Find;
     my @files;
@@ -89,10 +89,10 @@ with File::Find which is part of the standard library.
          @INC;
 
 	print join "\n", @files;
-	
+
 If you simply need to quickly check to see if a module is
 available, you can check for its documentation.  If you can
-read the documentation the module is most likely installed. 
+read the documentation the module is most likely installed.
 If you cannot read the documentation, the module might not
 have any (in rare cases).
 
@@ -102,10 +102,10 @@ You can also try to include the module in a one-liner to see if
 perl finds it.
 
 	perl -MModule::Name -e1
-	
+
 =head2 How do I debug my Perl programs?
 
-Have you tried C<use warnings> or used C<-w>?  They enable warnings 
+Have you tried C<use warnings> or used C<-w>?  They enable warnings
 to detect dubious practices.
 
 Have you tried C<use strict>?  It prevents you from using symbolic
@@ -131,9 +131,9 @@ why what it's doing isn't what it should be doing.
 =head2 How do I profile my Perl programs?
 
 You should get the Devel::DProf module from the standard distribution
-(or separately on CPAN) and also use Benchmark.pm from the standard 
-distribution.  The Benchmark module lets you time specific portions of 
-your code, while Devel::DProf gives detailed breakdowns of where your 
+(or separately on CPAN) and also use Benchmark.pm from the standard
+distribution.  The Benchmark module lets you time specific portions of
+your code, while Devel::DProf gives detailed breakdowns of where your
 code spends its time.
 
 Here's a sample use of Benchmark:
@@ -146,10 +146,8 @@ Here's a sample use of Benchmark:
   timethese($count, {
             'map' => sub { my @a = @junk;
 			   map { s/a/b/ } @a;
-			   return @a
-			 },
+			   return @a },
             'for' => sub { my @a = @junk;
-			   local $_;
 			   for (@a) { s/a/b/ };
 			   return @a },
            });
@@ -167,7 +165,7 @@ of contrasting algorithms.
 
 =head2 How do I cross-reference my Perl programs?
 
-The B::Xref module can be used to generate cross-reference reports 
+The B::Xref module can be used to generate cross-reference reports
 for Perl programs.
 
     perl -MO=Xref[,OPTIONS] scriptname.plx
@@ -471,45 +469,33 @@ module, which is curses-based, can help with this.
 
 The best way to do this is to come up with a better algorithm.  This
 can often make a dramatic difference.  Jon Bentley's book
-``Programming Pearls'' (that's not a misspelling!)  has some good tips
+I<Programming Pearls> (that's not a misspelling!)  has some good tips
 on optimization, too.  Advice on benchmarking boils down to: benchmark
 and profile to make sure you're optimizing the right part, look for
 better algorithms instead of microtuning your code, and when all else
 fails consider just buying faster hardware.  You will probably want to
-read the answer to the earlier question ``How do I profile my Perl programs?''
-if you haven't done so already.
+read the answer to the earlier question ``How do I profile my Perl
+programs?'' if you haven't done so already.
 
 A different approach is to autoload seldom-used Perl code.  See the
 AutoSplit and AutoLoader modules in the standard distribution for
 that.  Or you could locate the bottleneck and think about writing just
 that part in C, the way we used to take bottlenecks in C code and
-write them in assembler.  Similar to rewriting in C,
-modules that have critical sections can be written in C (for instance, the
-PDL module from CPAN).
+write them in assembler.  Similar to rewriting in C, modules that have
+critical sections can be written in C (for instance, the PDL module
+from CPAN).
 
-In some cases, it may be worth it to use the backend compiler to
-produce byte code (saving compilation time) or compile into C, which
-will certainly save compilation time and sometimes a small amount (but
-not much) execution time.  See the question about compiling your Perl
-programs for more on the compiler--the wins aren't as obvious as you'd
-hope.
+If you're currently linking your perl executable to a shared
+I<libc.so>, you can often gain a 10-25% performance benefit by
+rebuilding it to link with a static libc.a instead.  This will make a
+bigger perl executable, but your Perl programs (and programmers) may
+thank you for it.  See the F<INSTALL> file in the source distribution
+for more information.
 
-If you're currently linking your perl executable to a shared I<libc.so>,
-you can often gain a 10-25% performance benefit by rebuilding it to
-link with a static libc.a instead.  This will make a bigger perl
-executable, but your Perl programs (and programmers) may thank you for
-it.  See the F<INSTALL> file in the source distribution for more
-information.
-
-Unsubstantiated reports allege that Perl interpreters that use sfio
-outperform those that don't (for I/O intensive applications).  To try
-this, see the F<INSTALL> file in the source distribution, especially
-the ``Selecting File I/O mechanisms'' section.
-
-The undump program was an old attempt to speed up your Perl program
-by storing the already-compiled form to disk.  This is no longer
-a viable option, as it only worked on a few architectures, and
-wasn't a good solution anyway.
+The undump program was an ancient attempt to speed up Perl program by
+storing the already-compiled form to disk.  This is no longer a viable
+option, as it only worked on a few architectures, and wasn't a good
+solution anyway.
 
 =head2 How can I make my Perl program take less memory?
 
@@ -566,7 +552,7 @@ instead of this:
 
 When the files you're processing are small, it doesn't much matter which
 way you do it, but it makes a huge difference when they start getting
-larger. 
+larger.
 
 =item * Use map and grep selectively
 
@@ -641,7 +627,7 @@ everything works out right.
 	return \@a;
     }
 
-    for $i ( 1 .. 10 ) {
+    for ( 1 .. 10 ) {
         push @many, makeone();
     }
 
@@ -809,8 +795,8 @@ For OS/2 just use
 
 as the first line in C<*.cmd> file (C<-S> due to a bug in cmd.exe's
 `extproc' handling).  For DOS one should first invent a corresponding
-batch file and codify it in C<ALTERNATIVE_SHEBANG> (see the
-F<INSTALL> file in the source distribution for more information).
+batch file and codify it in C<ALTERNATE_SHEBANG> (see the
+F<dosish.h> file in the source distribution for more information).
 
 The Win95/NT installation, when using the ActiveState port of Perl,
 will modify the Registry to associate the C<.pl> extension with the
@@ -919,7 +905,7 @@ L<perlboot>, L<perltoot>, L<perltooc>, and L<perlbot> for reference.
 try http://www.perldoc.com/ , but consider upgrading your perl.)
 
 A good book on OO on Perl is the "Object-Oriented Perl"
-by Damian Conway from Manning Publications, 
+by Damian Conway from Manning Publications,
 http://www.manning.com/Conway/index.html
 
 =head2 Where can I learn about linking C with Perl? [h2xs, xsubpp]

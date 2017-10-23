@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_details_links.php,v 1.22 2003/06/05 18:43:19 nijel Exp $ */
+/* $Id: db_details_links.php,v 2.1 2003/11/22 20:51:45 garvinhicking Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -86,4 +86,3 @@ if (!$cfg['LightTabs']) {
 }
 ?>
 <br />
-

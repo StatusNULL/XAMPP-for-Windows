@@ -1,9 +1,9 @@
-# NOTE: Derived from blib\lib\Tk/Toplevel.pm.
+# NOTE: Derived from blib\lib\Tk\Toplevel.pm.
 # Changes made here will be lost when autosplit is run again.
 # See AutoSplit.pm.
 package Tk::Toplevel;
 
-#line 172 "blib\lib\Tk/Toplevel.pm (autosplit into blib\lib\auto\Tk\Toplevel\FG_In.al)"
+#line 172 "blib\lib\Tk\Toplevel.pm (autosplit into blib\lib\auto\Tk\Toplevel\FG_In.al)"
 # tkFocusGroup_In --
 #
 #	Handles the <FocusIn> event. Calls the FocusIn command for the newly

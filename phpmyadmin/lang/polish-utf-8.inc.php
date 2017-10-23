@@ -1,5 +1,5 @@
 <?php
-/* $Id: polish-utf-8.inc.php,v 1.124.2.1 2003/08/23 12:18:40 lem9 Exp $ */
+/* $Id: polish-utf-8.inc.php,v 2.2 2003/11/20 13:48:52 nijel Exp $ */
 
 $charset = 'utf-8';
 $allow_recoding = TRUE;
@@ -72,8 +72,10 @@ $strBeginCut = 'TNIJ STĄD';
 $strBeginRaw = 'SUROWE DANE STĄD';
 $strBinary = ' Binarne ';
 $strBinaryDoNotEdit = ' Binarne - nie do edycji ';
+$strBookmarkAllUsers = 'Pozwolenie na dostęp do zapytania przez każdego użytkownika';
 $strBookmarkDeleted = 'Zapamiętane zapytanie SQL zostało usunięte.';
 $strBookmarkLabel = 'Nazwa';
+$strBookmarkOptions = 'Opcje zapamiętanych zapytań';
 $strBookmarkQuery = 'Zapamiętane zapytanie SQL';
 $strBookmarkThis = 'Zapamiętanie zapytania SQL';
 $strBookmarkView = 'Tylko do pokazania';
@@ -127,6 +129,8 @@ $strConfigFileError = 'phpMyAdmin nie zdołał odczytać Twojego pliku konfigura
 $strConfigureTableCoord = 'Proszę skonfigurować współrzędnie dla tabeli %s';
 $strConfirm = 'Czy na pewno to zrobić?';
 $strConnections = 'Połączenia';
+$strConstraintsForDumped = 'Ograniczenia dla zrzutów tabel';
+$strConstraintsForTable = 'Ograniczenia dla tabeli';
 $strCookiesRequired = 'Odtąd musi być włączona obsługa "cookies".';
 $strCopyTable = 'Skopiuj tabelę do (bazadanych<b>.</b>tabela):';
 $strCopyTableOK = 'Tabela %s została skopiowana do %s.';
@@ -294,6 +298,8 @@ $strInsertTextfiles = 'Dodanie pliku tekstowego do tabeli';
 $strInsertedRowId = 'Id wstawionego wiersza:';
 $strInsertedRows = 'Wprowadzone rekordy:';
 $strInstructions = 'Instrukcje';
+$strInternalNotNecessary = '* Wewnętrzna relacja nie jest konieczna gdy istnieje również w InnoDB.';
+$strInternalRelations = 'Wewnętrzne relacje';
 $strInvalidName = '"%s" jest słowem zarezerwowanym, nie można użyć go jako nazwy bazy danych/tabeli/pola.';
 
 $strJapanese = 'Japoński';
@@ -309,6 +315,13 @@ $strKorean = 'Koreański';
 $strLaTeX = 'LaTeX';
 $strLaTeXOptions = 'opcje LaTeX\'a';
 $strLandscape = 'Orientacja pozioma';
+$strLatexCaption = 'Nagłówek tabeli';
+$strLatexContent = 'Zawartość tabeli __TABLE__';
+$strLatexContinued = '(kontynuacja)';
+$strLatexContinuedCaption = 'Kontynuacja nagłówka tabeli';
+$strLatexIncludeCaption = 'Załącz nagłówek tabeli';
+$strLatexLabel = 'Etykieta klucza';
+$strLatexStructure = 'Struktura tabeli __TABLE__';
 $strLength = 'Długość';
 $strLengthSet = 'Długość/Wartości*';
 $strLimitNumRows = 'rekordów na stronie';
@@ -323,6 +336,7 @@ $strLoadMethod = 'Metoda LOAD';
 $strLocalhost = 'Host lokalny';
 $strLocationTextfile = 'Lokalizacja pliku tekstowego';
 $strLogPassword = 'Hasło:';
+$strLogServer = 'Serwer';
 $strLogUsername = 'Użytkownik:';
 $strLogin = 'Login';
 $strLoginInformation = 'Dane użytkownika';
@@ -432,6 +446,7 @@ $strPrimaryKeyName = 'Nazwą podstawowego klucza musi być... PRIMARY!';
 $strPrimaryKeyWarning = '("PRIMARY" <b>musi</b> być nazwą <b>jedynie</b> klucza podstawowego!)';
 $strPrint = 'Drukowanie';
 $strPrintView = 'Widok do wydruku';
+$strPrintViewFull = 'Widok do wydruku (z pełnymi tekstami)';
 $strPrivDescAllPrivileges = 'Zawiera wszystkie uprawnienia, oprócz GRANT.';
 $strPrivDescAlter = 'Pozwala zmieniać strukturę istniejących tabel.';
 $strPrivDescCreateDb = 'Pozwala tworzyć nowe bazy danych i tabele.';
@@ -580,6 +595,7 @@ $strSimplifiedChinese = 'Chiński uproszczony';
 $strSingly = '(pojedynczo)';
 $strSize = 'Rozmiar';
 $strSort = 'Sortuj';
+$strSortByKey = 'Sortowanie wg klucza';
 $strSpaceUsage = 'Wykorzystanie przestrzeni';
 $strSplitWordsWithSpace = 'Słowa są rozdzielane znakiem spacji (" ").';
 $strStatCheckTime = 'Ostatnie sprawdzenie';
@@ -652,6 +668,7 @@ $strUpdatePrivMessage = 'Uaktualniłeś uprawnienia dla %s.';
 $strUpdateProfile = 'Uaktualnienie profilu:';
 $strUpdateProfileMessage = 'Profil został uaktualniony.';
 $strUpdateQuery = 'Zmiana zapytania';
+$strUpgrade = 'Poleca się aktualizację do %s w wersji %s lub późniejszej.';
 $strUsage = 'Wykorzystanie';
 $strUseBackquotes = 'Użycie cudzysłowów z nazwami tabel i pól';
 $strUseHostTable = 'Użycie tabeli hostów';
@@ -695,4 +712,10 @@ $strZeroRemovesTheLimit = 'Uwaga: Ustawienie tych opcji na 0 (zero) usuwa ograni
 $strZip = '".zip"';
 // To translate
 
+$strCreationDates = 'Creation/Update/Check dates';  //to translate
+$strCheckOverhead = 'Check overheaded';  //to translate
+$strExcelEdition = 'Excel edition';  //to translate
+$strDelayedInserts = 'Use delayed inserts';  //to translate
+$strSQLExportType = 'Export type';  //to translate
+$strAddConstraints = 'Add constraints';  //to translate
 ?>

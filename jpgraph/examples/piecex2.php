@@ -1,5 +1,5 @@
 <?php
-// $Id: piecex2.php,v 1.3 2002/10/25 22:44:15 aditus Exp $
+// $Id: piecex2.php,v 1.3.2.1 2003/08/19 20:40:12 aditus Exp $
 // Example of pie with center circle
 include ("../jpgraph.php");
 include ("../jpgraph_pie.php");
@@ -30,6 +30,8 @@ $p1->SetSize(0.35);
 // Label font and color setup
 $p1->value->SetFont(FF_ARIAL,FS_BOLD,12);
 $p1->value->SetColor('white');
+
+$p1->value->Show();
 
 // Setup the title on the center circle
 $p1->midtitle->Set("Test mid\nRow 1\nRow 2");

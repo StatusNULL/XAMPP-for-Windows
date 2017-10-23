@@ -1,5 +1,5 @@
 <?php
-/* $Id: header_meta_style.inc.php,v 1.3 2003/03/13 20:23:29 rabus Exp $ */
+/* $Id: header_meta_style.inc.php,v 2.0 2003/11/18 15:20:43 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**

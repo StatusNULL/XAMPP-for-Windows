@@ -1,4 +1,4 @@
-/* $Id: functions.js,v 1.40 2003/08/12 11:23:19 nijel Exp $ */
+/* $Id: functions.js,v 2.0 2003/11/18 15:20:43 nijel Exp $ */
 
 
 /**
@@ -137,7 +137,7 @@ function checkSqlQuery(theForm)
     // js1.2+ -> validation with regular expressions
     else {
         var space_re = new RegExp('\\s+');
-        if (typeof(theForm.elements['sql_file']) != 'undefined' && 
+        if (typeof(theForm.elements['sql_file']) != 'undefined' &&
                 theForm.elements['sql_file'].value.replace(space_re, '') != '') {
             return true;
         }
@@ -397,6 +397,21 @@ function setPointer(theRow, theRowNum, theAction, theDefaultColor, thePointerCol
         currentColor = theCells[0].style.backgroundColor;
         domDetect    = false;
     } // end 3
+
+    // 3.3 ... Opera changes colors set via HTML to rgb(r,g,b) format so fix it
+    if (currentColor.indexOf("rgb") >= 0) 
+    {
+        var rgbStr = currentColor.slice(currentColor.indexOf('(') + 1,
+                                     currentColor.indexOf(')'));
+        var rgbValues = rgbStr.split(",");
+        currentColor = "#";
+        var hexChars = "0123456789ABCDEF";
+        for (var i = 0; i < 3; i++)
+        {
+            var v = rgbValues[i].valueOf();
+            currentColor += hexChars.charAt(v/16) + hexChars.charAt(v%16);
+        }
+    }
 
     // 4. Defines the new color
     // 4.1 Current color is the default one
@@ -791,7 +806,7 @@ function dragPlace(no, axis, value) {
   * Returns paper sizes for a given format
   */
 function pdfPaperSize(format, axis) {
-    switch (format) {
+    switch (format.toUpperCase()) {
         case '4A0':
             if (axis == 'x') return 4767.87; else return 6740.79;
             break;

@@ -92,6 +92,8 @@ class TestDriver {
 	    }
 	}
 	echo "</ol>";
+
+	echo "<p>Done.</p>";
     }
 }
 

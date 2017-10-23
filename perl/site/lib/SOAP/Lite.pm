@@ -1693,6 +1693,18 @@ sub decode_object {
       die "Unresolved prefix '$1' for attribute '$_'\n";
   }
 
+  # Check if any of the attribute values could be qnames, in which
+  # case we replace them with a QNameValue object so that we capture
+  # the namespace that the prefix mapped to.
+  foreach (values %$attrs) {
+      if ($uris{''} && /^[a-zA-Z][\w\.\-]*$/) {
+	  $_ = SOAP::Lite::QNameValue->new($_, $uris{''}, $_);
+      }
+      elsif (/^([a-zA-Z][\w\.\-]*):([a-zA-Z][\w\.\-]*)$/ && $uris{$1}) {
+	  $_ = SOAP::Lite::QNameValue->new($_, $uris{$1}, $2);
+      }
+  }
+
   # and now check the element
   my $ns = ($name =~ s/^($SOAP::Constants::NSMASK?):// ? $1 : '');
   $ref->[5] = SOAP::Utils::longname(
@@ -1870,6 +1882,25 @@ sub splitarray {
 sub typecast { } # typecast is called for both objects AND scalar types
                  # check ref of the second parameter (first is the object)
                  # return undef if you don't want to handle it
+
+# ======================================================================
+
+package SOAP::Lite::QNameValue;
+
+use overload fallback => 1, '""' => sub { $_[0][0] };
+
+sub new {
+    my($class, $orig_val, $ns, $name) = @_;
+    bless [$orig_val, $ns, $name], $class;
+}
+
+sub qname {
+    my $self = shift;
+    return SOAP::Utils::longname($self->[1], $self->[2]);
+}
+
+sub namespace { $_[0][1] }
+sub localpart { $_[0][2] }
 
 # ======================================================================
 
@@ -2424,6 +2455,14 @@ FAKE
             $_->{endpoint} = $endpoint;
             $_->{soapaction} = $soapaction;
             $_->{uri} = $namespace;
+            foreach (@parts) {
+              my $t = $_->type || next;
+              my $tval = $t->value;
+              next unless ref $tval;
+              my $attr = $_->attr;
+              $attr->{'xmlns:ns'} = $tval->namespace;
+              $attr->{'type'} = "ns:" . $tval->localpart;
+            }
             $_->{parameters} = [@parts];
           }
         }

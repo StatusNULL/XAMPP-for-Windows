@@ -1,5 +1,5 @@
 <?php
-/* $Id: zip.lib.php,v 1.7 2002/10/23 04:17:26 robbat2 Exp $ */
+/* $Id: zip.lib.php,v 2.1 2003/11/20 16:31:50 garvinhicking Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -130,7 +130,6 @@ class zipfile
 
         // add this entry to array
         $this -> datasec[] = $fr;
-        $new_offset        = strlen(implode('', $this->datasec));
 
         // now add to central directory record
         $cdrec = "\x50\x4b\x01\x02";
@@ -150,7 +149,7 @@ class zipfile
         $cdrec .= pack('V', 32 );            // external file attributes - 'archive' bit set
 
         $cdrec .= pack('V', $this -> old_offset ); // relative offset of local header
-        $this -> old_offset = $new_offset;
+        $this -> old_offset += strlen($fr);
 
         $cdrec .= $name;
 

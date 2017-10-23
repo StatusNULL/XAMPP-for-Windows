@@ -30,8 +30,8 @@ else {
     }
 }
 
-require Apache::TestReportPerl;
-Apache::TestReportPerl->new(@ARGV)->run;
+require ModPerl::TestReport;
+ModPerl::TestReport->new(@ARGV)->run;
 
 __END__
 :endofperl

@@ -3,7 +3,7 @@
 // +------------------------------------------------------------------------+
 // | PEAR :: PHPUnit                                                        |
 // +------------------------------------------------------------------------+
-// | Copyright (c) 2002-2003 Sebastian Bergmann <sb@sebastian-bergmann.de>. |
+// | Copyright (c) 2002-2004 Sebastian Bergmann <sb@sebastian-bergmann.de>. |
 // +------------------------------------------------------------------------+
 // | This source file is subject to version 3.00 of the PHP License,        |
 // | that is available at http://www.php.net/license/3_0.txt.               |
@@ -12,7 +12,7 @@
 // | license@php.net so we can mail you a copy immediately.                 |
 // +------------------------------------------------------------------------+
 //
-// $Id: TestImplementorTest.php,v 1.2 2003/06/13 08:52:00 sebastian Exp $
+// $Id: TestImplementorTest.php,v 1.4 2004/01/04 10:25:11 sebastian Exp $
 //
 
 require_once 'PHPUnit/Framework/TestCase.php';
@@ -22,10 +22,10 @@ require_once 'PHPUnit/Tests/Framework/DoubleTestCase.php';
 require_once 'PHPUnit/Tests/Framework/Success.php';
 
 class PHPUnit_Tests_Framework_TestImplementorTest extends PHPUnit_Framework_TestCase {
-    private $fTest;
+    private $test;
 
     public function __construct() {
-        $this->fTest = new PHPUnit_Tests_Framework_DoubleTestCase(
+        $this->test = new PHPUnit_Tests_Framework_DoubleTestCase(
           new PHPUnit_Tests_Framework_Success
         );
     }
@@ -33,9 +33,9 @@ class PHPUnit_Tests_Framework_TestImplementorTest extends PHPUnit_Framework_Test
     public function testSuccessfulRun() {
         $result = new PHPUnit_Framework_TestResult;
 
-        $this->fTest->run($result);
+        $this->test->run($result);
 
-        $this->assertEquals($this->fTest->countTestCases(), $result->runCount());
+        $this->assertEquals($this->test->countTestCases(), $result->runCount());
         $this->assertEquals(0, $result->errorCount());
         $this->assertEquals(0, $result->failureCount());
     }

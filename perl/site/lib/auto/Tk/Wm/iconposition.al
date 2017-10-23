@@ -1,9 +1,9 @@
-# NOTE: Derived from blib\lib\Tk/Wm.pm.
+# NOTE: Derived from blib\lib\Tk\Wm.pm.
 # Changes made here will be lost when autosplit is run again.
 # See AutoSplit.pm.
 package Tk::Wm;
 
-#line 151 "blib\lib\Tk/Wm.pm (autosplit into blib\lib\auto\Tk\Wm\iconposition.al)"
+#line 151 "blib\lib\Tk\Wm.pm (autosplit into blib\lib\auto\Tk\Wm\iconposition.al)"
 sub iconposition
 {
  my $w = shift;

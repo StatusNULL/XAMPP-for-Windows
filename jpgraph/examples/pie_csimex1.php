@@ -1,6 +1,6 @@
 <?php
-include_once ("jpgraph.php");
-include_once ("jpgraph_pie.php");
+include_once ("../jpgraph.php");
+include_once ("../jpgraph_pie.php");
 
 // Some data
 $data = array(40,21,17,14,23);
@@ -28,7 +28,7 @@ $graph->Add($p1);
 
 // Send back the HTML page which will call this script again
 // to retrieve the image.
-$graph->StrokeCSIM('Examples/pie_csimex1.php','pie_csimex1');
+$graph->StrokeCSIM('pie_csimex1.php');
 
 ?>
 

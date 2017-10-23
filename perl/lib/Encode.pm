@@ -1,10 +1,10 @@
 #
-# $Id: Encode.pm,v 1.83 2002/11/18 17:28:29 dankogai Exp $
+# $Id: Encode.pm,v 1.98 2003/08/20 11:16:34 dankogai Exp dankogai $
 #
 package Encode;
 use strict;
-our $VERSION = do { my @r = (q$Revision: 1.83 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
-our $DEBUG = 0;
+our $VERSION = do { my @r = (q$Revision: 1.9801 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
+sub DEBUG () { 0 }
 use XSLoader ();
 XSLoader::load(__PACKAGE__, $VERSION);
 
@@ -15,7 +15,7 @@ use base qw/Exporter/;
 
 our @EXPORT = qw(
   decode  decode_utf8  encode  encode_utf8
-  encodings  find_encoding
+  encodings  find_encoding clone_encoding
 );
 
 our @FB_FLAGS  = qw(DIE_ON_ERR WARN_ON_ERR RETURN_ON_ERR LEAVE_SRC
@@ -60,7 +60,7 @@ sub encodings
     }else{
 	%enc = %Encoding;
 	for my $mod (map {m/::/o ? $_ : "Encode::$_" } @_){
-	    $DEBUG and warn $mod;
+	    DEBUG and warn $mod;
 	    for my $enc (keys %ExtModule){
 		$ExtModule{$enc} eq $mod and $enc{$enc} = $mod;
 	    }
@@ -95,7 +95,7 @@ sub getEncoding
 {
     my ($class, $name, $skip_external) = @_;
 
-    ref($name) && $name->can('new_sequence') and return $name;
+    ref($name) && $name->can('renew') and return $name;
     exists $Encoding{$name} and return $Encoding{$name};
     my $lc = lc $name;
     exists $Encoding{$lc} and return $Encoding{$lc};
@@ -116,21 +116,30 @@ sub getEncoding
     return;
 }
 
-sub find_encoding
+sub find_encoding($;$)
 {
     my ($name, $skip_external) = @_;
     return __PACKAGE__->getEncoding($name,$skip_external);
 }
 
-sub resolve_alias {
+sub resolve_alias($){
     my $obj = find_encoding(shift);
     defined $obj and return $obj->name;
     return;
 }
 
+sub clone_encoding($){
+    my $obj = find_encoding(shift);
+    ref $obj or return;
+    eval { require Storable };
+    $@ and return;
+    return Storable::dclone($obj);
+}
+
 sub encode($$;$)
 {
     my ($name, $string, $check) = @_;
+    return undef unless defined $string;
     $check ||=0;
     my $enc = find_encoding($name);
     unless(defined $enc){
@@ -138,13 +147,14 @@ sub encode($$;$)
 	Carp::croak("Unknown encoding '$name'");
     }
     my $octets = $enc->encode($string,$check);
-    return undef if ($check && length($string));
+    $_[1] = $string if $check;
     return $octets;
 }
 
 sub decode($$;$)
 {
     my ($name,$octets,$check) = @_;
+    return undef unless defined $octets;
     $check ||=0;
     my $enc = find_encoding($name);
     unless(defined $enc){
@@ -159,6 +169,7 @@ sub decode($$;$)
 sub from_to($$$;$)
 {
     my ($string,$from,$to,$check) = @_;
+    return undef unless defined $string;
     $check ||=0;
     my $f = find_encoding($from);
     unless (defined $f){
@@ -247,11 +258,11 @@ sub predefine_encodings{
 	push @Encode::utf8::ISA, 'Encode::Encoding';
 	# 
 	if ($use_xs){
-	    $DEBUG and warn __PACKAGE__, " XS on";
+	    Encode::DEBUG and warn __PACKAGE__, " XS on";
 	    *decode = \&decode_xs;
 	    *encode = \&encode_xs;
 	}else{
-	    $DEBUG and warn __PACKAGE__, " XS off";
+	    Encode::DEBUG and warn __PACKAGE__, " XS off";
 	    *decode = sub{
 		my ($obj,$octets,$chk) = @_;
 		my $str = Encode::decode_utf8($octets);
@@ -268,6 +279,19 @@ sub predefine_encodings{
 		return $octets;
 	    };
 	}
+	*cat_decode = sub{ # ($obj, $dst, $src, $pos, $trm, $chk)
+	    my ($obj, undef, undef, $pos, $trm) = @_; # currently ignores $chk
+	    my ($rdst, $rsrc, $rpos) = \@_[1,2,3];
+	    use bytes;
+	    if ((my $npos = index($$rsrc, $trm, $pos)) >= 0) {
+		$$rdst .= substr($$rsrc, $pos, $npos - $pos + length($trm));
+		$$rpos = $npos + length($trm);
+		return 1;
+	    }
+	    $$rdst .= substr($$rsrc, $pos);
+	    $$rpos = length($$rsrc);
+	    return '';
+	};
 	$Encode::Encoding{utf8} =
 	    bless {Name => "utf8"} => "Encode::utf8";
     }
@@ -527,11 +551,11 @@ except for hz and ISO-2022-kr.  For gory details, see L<Encode::Encoding> and L<
 
 =head1 Handling Malformed Data
 
-=over 2
-
 The I<CHECK> argument is used as follows.  When you omit it,
 the behaviour is the same as if you had passed a value of 0 for
 I<CHECK>.
+
+=over 2
 
 =item I<CHECK> = Encode::FB_DEFAULT ( == 0)
 
@@ -606,6 +630,8 @@ constants via C<use Encode qw(:fallback_all)>.
  HTMLCREF      0x0200
  XMLCREF       0x0400
 
+=back
+
 =head2 Unimplemented fallback schemes
 
 In the future, you will be able to use a code reference to a callback
@@ -674,7 +700,7 @@ Here is how Encode takes care of the utf8 flag.
 
 When you encode, the resulting utf8 flag is always off.
 
-=item
+=item *
 
 When you decode, the resulting utf8 flag is on unless you can
 unambiguously represent data.  Here is the definition of
@@ -712,6 +738,8 @@ implementation.  As such, they are efficient but may change.
 [INTERNAL] Tests whether the UTF-8 flag is turned on in the STRING.
 If CHECK is true, also checks the data in STRING for being well-formed
 UTF-8.  Returns true if successful, false otherwise.
+
+As of perl 5.8.1, L<utf8> also has utf8::is_utif8().
 
 =item _utf8_on(STRING)
 

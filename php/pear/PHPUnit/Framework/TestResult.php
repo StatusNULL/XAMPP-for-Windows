@@ -3,7 +3,7 @@
 // +------------------------------------------------------------------------+
 // | PEAR :: PHPUnit                                                        |
 // +------------------------------------------------------------------------+
-// | Copyright (c) 2002-2003 Sebastian Bergmann <sb@sebastian-bergmann.de>. |
+// | Copyright (c) 2002-2004 Sebastian Bergmann <sb@sebastian-bergmann.de>. |
 // +------------------------------------------------------------------------+
 // | This source file is subject to version 3.00 of the PHP License,        |
 // | that is available at http://www.php.net/license/3_0.txt.               |
@@ -12,7 +12,7 @@
 // | license@php.net so we can mail you a copy immediately.                 |
 // +------------------------------------------------------------------------+
 //
-// $Id: TestResult.php,v 1.5 2003/07/24 17:23:12 sebastian Exp $
+// $Id: TestResult.php,v 1.8 2004/01/04 10:25:10 sebastian Exp $
 //
 
 require_once 'PHPUnit/Framework/AssertionFailedError.php';
@@ -33,31 +33,39 @@ class PHPUnit_Framework_TestResult {
     * @var    array
     * @access protected
     */
-    protected $fErrors = array();
+    protected $errors = array();
 
     /**
     * @var    array
     * @access protected
     */
-    protected $fFailures = array();
+    protected $failures = array();
 
     /**
     * @var    array
     * @access protected
     */
-    protected $fListeners = array();
+    protected $listeners = array();
 
     /**
     * @var    integer
     * @access protected
     */
-    protected $fRunTests = 0;
+    protected $runTests = 0;
 
     /**
     * @var    boolean
     * @access private
     */
-    private $fStop = false;
+    private $stop = false;
+
+    /**
+    * Code Coverage information provided by Xdebug.
+    *
+    * @var    array
+    * @access private
+    */
+    private $codeCoverageInformation = array();
 
     // }}}
     // {{{ public function addError(PHPUnit_Framework_Test $test, Exception $e)
@@ -71,9 +79,9 @@ class PHPUnit_Framework_TestResult {
     * @access public
     */
     public function addError(PHPUnit_Framework_Test $test, Exception $e) {
-        $this->fErrors[] = new PHPUnit_Framework_TestFailure($test, $e);
+        $this->errors[] = new PHPUnit_Framework_TestFailure($test, $e);
 
-        foreach ($this->fListeners as $listener) {
+        foreach ($this->listeners as $listener) {
             $listener->addError($test, $e);
         }
     }
@@ -90,9 +98,9 @@ class PHPUnit_Framework_TestResult {
     * @access public
     */
     public function addFailure(PHPUnit_Framework_Test $test, PHPUnit_Framework_AssertionFailedError $e) {
-        $this->fFailures[] = new PHPUnit_Framework_TestFailure($test, $e);
+        $this->failures[] = new PHPUnit_Framework_TestFailure($test, $e);
 
-        foreach ($this->fListeners as $listener) {
+        foreach ($this->listeners as $listener) {
             $listener->addFailure($test, $e);
         }
     }
@@ -107,7 +115,7 @@ class PHPUnit_Framework_TestResult {
     * @access public
     */
     public function addListener(PHPUnit_Framework_TestListener $listener) {
-        $this->fListeners[] = $listener;
+        $this->listeners[] = $listener;
     }
 
     // }}}
@@ -120,7 +128,9 @@ class PHPUnit_Framework_TestResult {
     * @access public
     */
     public function endTest(PHPUnit_Framework_Test $test) {
-        foreach ($this->fListeners as $listener) {
+        $this->codeCoverageInformation[$test->getName()] = $test->getCodeCoverageInformation();
+
+        foreach ($this->listeners as $listener) {
             $listener->endTest($test);
         }
     }
@@ -135,7 +145,7 @@ class PHPUnit_Framework_TestResult {
     * @access public
     */
     public function errorCount() {
-        return sizeof($this->fErrors);
+        return sizeof($this->errors);
     }
 
     // }}}
@@ -148,7 +158,7 @@ class PHPUnit_Framework_TestResult {
     * @access public
     */
     public function errors() {
-        return $this->fErrors;
+        return $this->errors;
     }
 
     // }}}
@@ -161,7 +171,7 @@ class PHPUnit_Framework_TestResult {
     * @access public
     */
     public function failureCount() {
-        return sizeof($this->fFailures);
+        return sizeof($this->failures);
     }
 
     // }}}
@@ -174,7 +184,20 @@ class PHPUnit_Framework_TestResult {
     * @access public
     */
     public function failures() {
-        return $this->fFailures;
+        return $this->failures;
+    }
+
+    // }}}
+    // {{{ public function getCodeCoverageInformation()
+
+    /**
+    * Returns the Code Coverage information provided by Xdebug.
+    *
+    * @return array
+    * @access public
+    */
+    public function getCodeCoverageInformation() {
+        return $this->codeCoverageInformation;
     }
 
     // }}}
@@ -187,9 +210,9 @@ class PHPUnit_Framework_TestResult {
     * @access public
     */
     public function removeListener(PHPUnit_Framework_TestListener $listener) {
-        for ($i = 0; $i < sizeof($this->fListeners); $i++) {
-            if ($this->fListeners[$i] === $listener) {
-                unset($this->fListeners[$i]);
+        for ($i = 0; $i < sizeof($this->listeners); $i++) {
+            if ($this->listeners[$i] === $listener) {
+                unset($this->listeners[$i]);
             }
         }
     }
@@ -231,7 +254,7 @@ class PHPUnit_Framework_TestResult {
     * @access public
     */
     public function runCount() {
-        return $this->fRunTests;
+        return $this->runTests;
     }
 
     // }}}
@@ -243,7 +266,7 @@ class PHPUnit_Framework_TestResult {
     * @access public
     */
     public function shouldStop() {
-        return $this->fStop;
+        return $this->stop;
     }
 
     // }}}
@@ -256,9 +279,9 @@ class PHPUnit_Framework_TestResult {
     * @access public
     */
     public function startTest(PHPUnit_Framework_Test $test) {
-        $this->fRunTests += $test->countTestCases();
+        $this->runTests += $test->countTestCases();
 
-        foreach ($this->fListeners as $listener) {
+        foreach ($this->listeners as $listener) {
             $listener->startTest($test);
         }
     }
@@ -272,7 +295,7 @@ class PHPUnit_Framework_TestResult {
     * @access public
     */
     public function stop() {
-        $this->fStop = true;
+        $this->stop = true;
     }
 
     // }}}
@@ -285,7 +308,7 @@ class PHPUnit_Framework_TestResult {
     * @access public
     */
     public function wasSuccessful() {
-        if (empty($this->fErrors) && empty($this->fFailures)) {
+        if (empty($this->errors) && empty($this->failures)) {
             return true;
         } else {
             return false;

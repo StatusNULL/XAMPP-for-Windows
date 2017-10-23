@@ -13,6 +13,7 @@ use Apache::TestTrace;
 
 use File::Find qw(finddepth);
 use File::Spec::Functions qw(catfile);
+use File::Basename qw(basename dirname);
 use Getopt::Long qw(GetOptions);
 use Config;
 
@@ -23,7 +24,7 @@ my %core_files  = ();
 my %original_t_perms = ();
 
 my @std_run      = qw(start-httpd run-tests stop-httpd);
-my @others       = qw(verbose configure clean help ssl http11);
+my @others       = qw(verbose configure clean help ssl http11 bugreport);
 my @flag_opts    = (@std_run, @others);
 my @string_opts  = qw(order trace);
 my @ostring_opts = qw(proxy ping);
@@ -45,6 +46,7 @@ my %usage = (
    'configure'       => 'force regeneration of httpd.conf (tests will not be run)',
    'clean'           => 'remove all generated test files',
    'help'            => 'display this message',
+   'bugreport'       => 'print the hint how to report problems',
    'preamble'        => 'config to add at the beginning of httpd.conf',
    'postamble'       => 'config to add at the end of httpd.conf',
    'ping[=block]'    => 'test if server is running or port in use',
@@ -63,6 +65,17 @@ sub fixup {
     #else Test::Harness uses the perl in our PATH
     #which might not be the one we want
     $^X = $Config{perlpath} unless -e $^X;
+}
+
+# if the test suite was aborted because of a user-error we don't want
+# to call the bugreport and invite users to submit a bug report -
+# after all it's a user error. but we still want the program to fail,
+# so raise this flag in such a case.
+my $user_error = 0;
+sub user_error {
+    my $self = shift;
+    $user_error = shift if @_;
+    $user_error;
 }
 
 sub new {
@@ -304,12 +317,26 @@ sub install_sighandlers {
 
     eval 'END {
              return unless is_parent(); # because of fork
-             local $?; # preserve the exit status
-             eval {
-                Apache::TestRun->new(test_config =>
-                                     Apache::TestConfig->thaw)->scan_core;
-             };
+             $self ||=
+                 Apache::TestRun->new(test_config => Apache::TestConfig->thaw);
+             {
+                 local $?; # preserve the exit status
+                 eval {
+                    $self->scan_core;
+                 };
+             }
+             $self->try_bug_report();
          }';
+    die "failed: $@" if $@;
+
+}
+
+sub try_bug_report {
+    my $self = shift;
+    if ($? && !$self->user_error &&
+        $self->{opts}->{bugreport} && $self->can('bug_report')) {
+        $self->bug_report;
+    }
 }
 
 #throw away cached config and start fresh
@@ -336,7 +363,8 @@ sub configure_opts {
         $ENV{APACHE_TEST_HTTP11} = 1;
     }
 
-    if (my @reasons = $self->{test_config}->need_reconfiguration) {
+    if (my @reasons = 
+        $self->{test_config}->need_reconfiguration($self->{conf_opts})) {
         warning "forcing re-configuration:";
         warning "\t- $_." for @reasons;
         unless ($refreshed) {
@@ -427,6 +455,10 @@ sub try_exit_opts {
         }
         else {
             warning "server $self->{server}->{name} is not running";
+            # cleanup a stale httpd.pid file if found
+            my $t_logs  = $self->{test_config}->{vars}->{t_logs};
+            my $pid_file = catfile $t_logs, "httpd.pid";
+            unlink $pid_file if -e $pid_file;
         }
         exit_perl $ok;
     }
@@ -624,19 +656,43 @@ sub oh {
 #e.g. t/core or t/core.12499
 my $core_pat = '^core(\.\d+)?' . "\$";
 
+# $self->scan_core_incremental([$only_top_dir])
 # normally would be called after each test
 # and since it updates the list of seen core files
 # scan_core() won't report these again
 # currently used in Apache::TestSmoke
+#
+# if $only_t_dir arg is true only the t_dir dir (t/) will be scanned
 sub scan_core_incremental {
-    my $self = shift;
+    my($self, $only_t_dir) = @_;
     my $vars = $self->{test_config}->{vars};
-    my $times = 0;
-    my @msg = ();
 
-    finddepth(sub {
+    # no core files dropped on win32
+    return () if Apache::TestConfig::WIN32;
+
+    if ($only_t_dir) {
+        require IO::Dir;
+        my @cores = ();
+        for (IO::Dir->new($vars->{t_dir})->read) {
+            next unless -f;
+            next unless /$core_pat/o;
+            my $core = catfile $vars->{t_dir}, $_;
+            next if exists $core_files{$core} && $core_files{$core} == -M $core;
+            $core_files{$core} = -M $core;
+            push @cores, $core;
+        }
+        return @cores 
+            ? join "\n", "server dumped core, for stacktrace, run:",
+                map { "gdb $vars->{httpd} -core $_" } @cores
+            : ();
+    }
+
+    my @msg = ();
+    finddepth({ no_chdir => 1,
+                wanted   => sub {
         return unless -f $_;
-        return unless /$core_pat/o;
+        my $file = basename $File::Find::name;
+        return unless $file =~ /$core_pat/o;
         my $core = $File::Find::name;
         unless (exists $core_files{$core} && $core_files{$core} == -M $core) {
             # new core file!
@@ -649,12 +705,10 @@ sub scan_core_incremental {
             # other unique identifier, in case the same test is run
             # more than once and each time it caused a segfault
             $core_files{$core} = -M $core;
-            my $oh = oh();
-            my $again = $times++ ? "again" : "";
-            push @msg, "oh $oh, server dumped core $again",
-                "for stacktrace, run: gdb $vars->{httpd} -core $core";
+            push @msg, "server dumped core, for stacktrace, run:\n" .
+                "gdb $vars->{httpd} -core $core";
         }
-    }, $vars->{top_dir});
+    }}, $vars->{top_dir});
 
     return @msg;
 
@@ -665,9 +719,14 @@ sub scan_core {
     my $vars = $self->{test_config}->{vars};
     my $times = 0;
 
-    finddepth(sub {
+    # no core files dropped on win32
+    return if Apache::TestConfig::WIN32;
+
+    finddepth({ no_chdir => 1,
+                wanted   => sub {
         return unless -f $_;
-        return unless /$core_pat/o;
+        my $file = basename $File::Find::name;
+        return unless $file =~ /$core_pat/o;
         my $core = $File::Find::name;
         if (exists $core_files{$core} && $core_files{$core} == -M $core) {
             # we have seen this core file before the start of the test
@@ -679,7 +738,7 @@ sub scan_core {
             error "oh $oh, server dumped core $again";
             error "for stacktrace, run: gdb $vars->{httpd} -core $core";
         }
-    }, $vars->{top_dir});
+    }}, $vars->{top_dir});
 }
 
 # warn the user that there is a core file before the tests
@@ -689,6 +748,9 @@ sub warn_core {
     my $self = shift;
     my $vars = $self->{test_config}->{vars};
     %core_files = (); # reset global
+
+    # no core files dropped on win32
+    return if Apache::TestConfig::WIN32;
 
     finddepth(sub {
         return unless -f $_;
@@ -758,6 +820,46 @@ sub restore_t_perms {
     }
 }
 
+# this sub is executed from an external process only, since it
+# "sudo"'s into a uid/gid of choice
+sub run_root_fs_test {
+    my($uid, $gid, $dir) = @_;
+
+    # first must change gid and egid ("$gid $gid" for an empty
+    # setgroups() call as explained in perlvar.pod)
+    my $groups = "$gid $gid";
+    $( = $) = $groups;
+    die "failed to change gid to $gid" unless $( eq $groups && $) eq $groups;
+
+    # only now can change uid and euid
+    $< = $> = $uid+0;
+    die "failed to change uid to $uid" unless $< == $uid && $> == $uid;
+
+    my $file = catfile $dir, ".apache-test-file-$$-".time.int(rand);
+    eval "END { unlink q[$file] }";
+
+    # unfortunately we can't run the what seems to be an obvious test:
+    # -r $dir && -w _ && -x _
+    # since not all perl implementations do it right (e.g. sometimes
+    # acls are ignored, at other times setid/gid change is ignored)
+    # therefore we test by trying to attempt to read/write/execute
+
+    # -w
+    open TEST, ">$file" or die "failed to open $file: $!";
+
+    # -x
+    -f $file or die "$file cannot be looked up";
+    close TEST;
+
+    # -r
+    opendir DIR, $dir or die "failed to open dir $dir: $!";
+    defined readdir DIR or die "failed to read dir $dir: $!";
+    close DIR;
+
+    # all tests passed
+    print "OK";
+}
+
 sub check_perms {
     my ($self, $user, $uid, $gid) = @_;
 
@@ -765,28 +867,44 @@ sub check_perms {
     my $vars = $self->{test_config}->{vars};
     my $dir  = $vars->{t_dir};
     my $perl = $vars->{perl};
-    my $check = qq[sudo -u '#$uid' $perl -e ] . 
-        qq['print -r "$dir" &&  -w _ && -x _ ? "OK" : "NOK"'];
-    warning "$check\n";
-    my $res   = qx[$check] || '';
+
+    # find where Apache::TestRun was loaded from, so we load this
+    # exact package from the external process
+    my $inc = dirname dirname $INC{"Apache/TestRun.pm"};
+    my $sub = "Apache::TestRun::run_root_fs_test";
+    my $check = <<"EOI";
+$perl -Mlib=$inc -MApache::TestRun -e 'eval { $sub($uid, $gid, q[$dir]) }';
+EOI
+    warning "testing whether '$user' is able to -rwx $dir\n$check\n";
+
+    my $res = qx[$check] || '';
     warning "result: $res";
     unless ($res eq 'OK') {
+        $self->user_error(1);
         #$self->restore_t_perms;
-        error(<<"EOI") && die "\n";
+        error <<"EOI";
 You are running the test suite under user 'root'.
 Apache cannot spawn child processes as 'root', therefore
 we attempt to run the test suite with user '$user' ($uid:$gid).
-The problem is that the path:
+The problem is that the path (including all parent directories):
   $dir
 must be 'rwx' by user '$user', so Apache can read and write under that
 path.
 
-There several ways to resolve this issue. For example move 
-'$dir' to '/tmp/' and repeat the 'make test' phase. 
+There are several ways to resolve this issue. One is to move and
+rebuild the distribution to '/tmp/' and repeat the 'make test'
+phase. The other is not to run 'make test' as root (i.e. building
+under your /home/user directory).
 
-You can test whether the location is good by running the following test:
+You can test whether some directory is suitable for 'make test' under
+'root', by running a simple test. For example to test a directory
+'$dir', run:
+
   % $check
+Only if the test prints 'OK', the directory is suitable to be used for
+testing.
 EOI
+        exit_perl 0;
     }
 }
 
@@ -919,9 +1037,18 @@ EOM
 # generate t/TEST script (or a different filename) which will drive
 # Apache::TestRun
 sub generate_script {
-    my ($class, $file) = @_;
+    my ($class, @opts) = @_;
 
-    $file ||= catfile 't', 'TEST';
+    my %opts = ();
+
+    # back-compat
+    if (@opts == 1) {
+        $opts{file} = $opts[0];
+    }
+    else {
+        %opts = @opts;
+        $opts{file} ||= catfile 't', 'TEST';
+    }
 
     my $body = "BEGIN { eval { require blib; } }\n";
 
@@ -934,12 +1061,19 @@ sub generate_script {
     my $header = Apache::TestConfig->perlscript_header;
 
     $body .= join "\n",
-        $header, "use $class ();", "$class->new->run(\@ARGV);";
+        $header, "use $class ();";
 
-    Apache::Test::config()->write_perlscript($file, $body);
+    if (my $report = $opts{bugreport}) {
+        $body .= "\n\npackage $class;\n" .
+                 "sub bug_report { print '$report' }\n\n";
+    }
+    
+    $body .= "$class->new->run(\@ARGV);";
+
+    Apache::Test::config()->write_perlscript($opts{file}, $body);
 }
 
-# in idiomatic perl functions return 1 on success 0 on
+# in idiomatic perl functions return 1 on success and 0 on
 # failure. Shell expects the opposite behavior. So this function
 # reverses the status.
 sub exit_perl {
@@ -974,6 +1108,36 @@ of the test suite.
 Several methods are sub-classable, if the default behavior should be
 changed.
 
+=head2 C<bug_report>
+
+The C<bug_report()> method is executed when C<t/TEST> was executed
+with the C<-bugreport> option, and C<make test> (or C<t/TEST>)
+fail. Normally this is callback which you can use to tell the user how
+to deal with the problem, e.g. suggesting to read some document or
+email some details to someone who can take care of it. By default
+nothing is executed.
+
+The C<-bugreport> option is needed so this feature won't become
+annoying to developers themselves. It's automatically added to the
+C<run_tests> target in F<Makefile>. So if you repeateadly have to test
+your code, just don't use C<make test> but run C<t/TEST>
+directly. Here is an example of a custom C<t/TEST>
+
+  My::TestRun->new->run(@ARGV);
+  
+  package My::TestRun;
+  use base 'Apache::TestRun';
+
+  sub bug_report {
+      my $self = shift;
+  
+      print <<EOI;
+  +--------------------------------------------------------+
+  | Please file a bug report: http://perl.apache.org/bugs/ |
+  +--------------------------------------------------------+
+  EOI
+  }
+
 =head2 C<pre_configure>
 
 The C<pre_configure()> method is executed before the configuration for
@@ -999,5 +1163,8 @@ I<t/TEST.PL>:
 
 Notice that the extension is I<.c>, and not I<.so>.
 
+=head2 C<new_test_config>
+
+META: to be completed
 
 =cut

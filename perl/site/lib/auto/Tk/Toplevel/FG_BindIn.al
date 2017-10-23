@@ -1,9 +1,9 @@
-# NOTE: Derived from blib\lib\Tk/Toplevel.pm.
+# NOTE: Derived from blib\lib\Tk\Toplevel.pm.
 # Changes made here will be lost when autosplit is run again.
 # See AutoSplit.pm.
 package Tk::Toplevel;
 
-#line 128 "blib\lib\Tk/Toplevel.pm (autosplit into blib\lib\auto\Tk\Toplevel\FG_BindIn.al)"
+#line 128 "blib\lib\Tk\Toplevel.pm (autosplit into blib\lib\auto\Tk\Toplevel\FG_BindIn.al)"
 # tkFocusGroup_BindIn --
 #
 # Add a widget into the "FocusIn" list of the focus group. The $cmd will be

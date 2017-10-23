@@ -1,12 +1,12 @@
 <?php
-/* $Id: server_export.php,v 1.1 2003/06/10 12:35:20 nijel Exp $ */
+/* $Id: server_export.php,v 2.2 2003/11/26 22:52:24 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
 /**
  * Checks if the left frame has to be reloaded
  */
-require('./libraries/grab_globals.lib.php');
+require_once('./libraries/grab_globals.lib.php');
 
 
 /**
@@ -39,8 +39,7 @@ if ($server > 0 && empty($dblist)) {
 $multi_values = '<div align="center"><select name="db_select[]" size="6" multiple="multiple">';
 $multi_values .= "\n";
 
-reset($dblist);
-while (list(, $current_db) = each($dblist)) {
+foreach($dblist AS $current_db) {
     if (!empty($selectall) || (isset($tmp_select) && strpos(' ' . $tmp_select, '|' . $current_db . '|'))) {
         $is_selected = ' selected="selected"';
     } else {
@@ -52,7 +51,7 @@ while (list(, $current_db) = each($dblist)) {
 $multi_values .= "\n";
 $multi_values .= '</select></div>';
 
-$checkall_url = 'server_export.php?' 
+$checkall_url = 'server_export.php?'
               . PMA_generate_common_url()
               . '&amp;goto=db_details_export.php';
 
@@ -63,12 +62,11 @@ $multi_values .= '<br />
         <br /><br />';
 
 $export_type = 'server';
-require('./libraries/display_export.lib.php');
+require_once('./libraries/display_export.lib.php');
 
 
 /**
  * Displays the footer
  */
-require('./footer.inc.php');
+require_once('./footer.inc.php');
 ?>
-

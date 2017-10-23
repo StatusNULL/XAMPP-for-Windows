@@ -26,7 +26,7 @@ for($i=0; $i<$steps; ++$i) {
 
 // New graph with a background image and drop shadow
 $graph = new Graph(450,300,"auto");
-$graph->SetBackgroundImage("tiger_bkg.png",3);
+$graph->SetBackgroundImage("tiger_bkg.png",BGIMG_FILLFRAME);
 $graph->SetShadow();
 
 // Use text X-scale so we can text labels on the X-axis

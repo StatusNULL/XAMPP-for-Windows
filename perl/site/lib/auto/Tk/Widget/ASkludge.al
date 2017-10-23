@@ -1,9 +1,9 @@
-# NOTE: Derived from blib\lib\Tk/Widget.pm.
+# NOTE: Derived from blib\lib\Tk\Widget.pm.
 # Changes made here will be lost when autosplit is run again.
 # See AutoSplit.pm.
 package Tk::Widget;
 
-#line 1224 "blib\lib\Tk/Widget.pm (autosplit into blib\lib\auto\Tk\Widget\ASkludge.al)"
+#line 1224 "blib\lib\Tk\Widget.pm (autosplit into blib\lib\auto\Tk\Widget\ASkludge.al)"
 sub ASkludge
 {
  my ($hash,$sense) = @_;

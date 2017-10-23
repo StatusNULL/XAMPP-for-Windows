@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_properties_operations.php,v 1.37 2003/07/20 22:24:02 lem9 Exp $ */
+/* $Id: tbl_properties_operations.php,v 2.4 2003/11/26 22:52:24 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -14,15 +14,13 @@ $url_query .= '&amp;goto=tbl_properties_operations.php&amp;back=tbl_properties_o
 /**
  * Gets relation settings
  */
-require('./libraries/relation.lib.php');
+require_once('./libraries/relation.lib.php');
 $cfgRelation = PMA_getRelationsParam();
 
 /**
  * Gets available MySQL charsets
  */
-if (PMA_MYSQL_INT_VERSION >= 40100 && !defined('PMA_MYSQL_CHARSETS_LIB_INCLUDED')) {
-    include('./libraries/mysql_charsets.lib.php');
-}
+require_once('./libraries/mysql_charsets.lib.php');
 
 /**
  * Updates table comment, type and options if required
@@ -106,8 +104,7 @@ if (PMA_MYSQL_INT_VERSION >= 32334) {
             <select name="order_field" style="vertical-align: middle">
     <?php
     echo "\n";
-    reset($columns);
-    while (list($junk, $fieldname) = each($columns)) {
+    foreach($columns AS $junk => $fieldname) {
         echo '                <option value="' . htmlspecialchars($fieldname) . '">' . htmlspecialchars($fieldname) . '</option>' . "\n";
     }
     unset($columns);
@@ -209,9 +206,15 @@ for ($i = 0; $i < $num_dbs; $i++) {
                     <input type="checkbox" name="auto_increment" value="1" id="checkbox_auto_increment" />
                     <label for="checkbox_auto_increment"><?php echo $strAddAutoIncrement; ?></label><br />
                     <?php
+                    // display "Add constraints" choice only if there are
+                    // foreign keys
+                    if (PMA_getForeigners($db, $table, '', 'innodb')) {
+                    ?>
+                    <input type="checkbox" name="constraints" value="1" id="checkbox_constraints" />
+                    <label for="checkbox_constraints"><?php echo $strAddConstraints; ?></label><br />
+                    <?php
+                    } // endif
                     if (isset($_COOKIE) && isset($_COOKIE['pma_switch_to_new']) && $_COOKIE['pma_switch_to_new'] == 'true') {
-                        $pma_switch_to_new = 'true';
-                    } elseif (isset($HTTP_COOKIE_VARS) && isset($HTTP_COOKIE_VARS['pma_switch_to_new']) && $HTTP_COOKIE_VARS['pma_switch_to_new'] == 'true') {
                         $pma_switch_to_new = 'true';
                     }
                     ?>
@@ -231,69 +234,53 @@ for ($i = 0; $i < $num_dbs; $i++) {
         <?php echo $strTableMaintenance; ?>
         <ul>
 <?php
-if (PMA_MYSQL_INT_VERSION >= 32322) {
-    if ($tbl_type == 'MYISAM' || $tbl_type == 'BERKELEYDB' || $tbl_type == 'INNODB') {
-        echo "\n";
-        if ($tbl_type == 'MYISAM' || $tbl_type == 'INNODB') {
-            ?>
-            <li>
-                <a href="sql.php?<?php echo $url_query; ?>&amp;sql_query=<?php echo urlencode('CHECK TABLE ' . PMA_backquote($table)); ?>">
-                    <?php echo $strCheckTable; ?></a>&nbsp;
-                <?php echo PMA_showMySQLDocu('MySQL_Database_Administration', 'CHECK_TABLE') . "\n"; ?>
-            </li>
-            <?php
-        }
-        echo "\n";
-        if ($tbl_type == 'MYISAM' || $tbl_type == 'BERKELEYDB') {
-            ?>
-            <li>
-                <a href="sql.php?<?php echo $url_query; ?>&amp;sql_query=<?php echo urlencode('ANALYZE TABLE ' . PMA_backquote($table)); ?>">
-                    <?php echo $strAnalyzeTable; ?></a>&nbsp;
-                <?php echo PMA_showMySQLDocu('MySQL_Database_Administration', 'ANALYZE_TABLE') . "\n";?>
-            </li>
-            <?php
-        }
-        echo "\n";
-        if ($tbl_type == 'MYISAM') {
-            ?>
-            <li>
-                <a href="sql.php?<?php echo $url_query; ?>&amp;sql_query=<?php echo urlencode('REPAIR TABLE ' . PMA_backquote($table)); ?>">
-                    <?php echo $strRepairTable; ?></a>&nbsp;
-                <?php echo PMA_showMySQLDocu('MySQL_Database_Administration', 'REPAIR_TABLE') . "\n"; ?>
-            </li>
-            <?php
-        }
-        echo "\n";
-        if ($tbl_type == 'MYISAM' || $tbl_type == 'BERKELEYDB') {
-            ?>
-            <li>
-                <a href="sql.php?<?php echo $url_query; ?>&amp;sql_query=<?php echo urlencode('OPTIMIZE TABLE ' . PMA_backquote($table)); ?>">
-                    <?php echo $strOptimizeTable; ?></a>&nbsp;
-                <?php echo PMA_showMySQLDocu('MySQL_Database_Administration', 'OPTIMIZE_TABLE') . "\n"; ?>
-            </li>
-            <?php
-        }
-        echo "\n";
+if ($tbl_type == 'MYISAM' || $tbl_type == 'BERKELEYDB' || $tbl_type == 'INNODB') {
+    echo "\n";
+    if ($tbl_type == 'MYISAM' || $tbl_type == 'INNODB') {
         ?>
+        <li>
+            <a href="sql.php?<?php echo $url_query; ?>&amp;sql_query=<?php echo urlencode('CHECK TABLE ' . PMA_backquote($table)); ?>">
+                <?php echo $strCheckTable; ?></a>&nbsp;
+            <?php echo PMA_showMySQLDocu('MySQL_Database_Administration', 'CHECK_TABLE') . "\n"; ?>
+        </li>
         <?php
-    } // end MYISAM or BERKELEYDB case
+    }
     echo "\n";
-} // end MySQL >= 3.23.22
-
-// loic1: "OPTIMIZE" statement is available for MyISAM and BERKELEYDB tables only and
-//        MyISAM/BERKELEYDB tables exists since MySQL 3.23.06/3.23.34
-else if (PMA_MYSQL_INT_VERSION >= 32306
-         && ($tbl_type == 'MYISAM' or $tbl_type == 'BERKELEYDB')) {
-    ?>
-            <li>
-                <a href="sql.php?<?php echo $url_query; ?>&amp;sql_query=<?php echo urlencode('OPTIMIZE TABLE ' . PMA_backquote($table)); ?>">
+    if ($tbl_type == 'MYISAM' || $tbl_type == 'BERKELEYDB') {
+        ?>
+        <li>
+            <a href="sql.php?<?php echo $url_query; ?>&amp;sql_query=<?php echo urlencode('ANALYZE TABLE ' . PMA_backquote($table)); ?>">
+                <?php echo $strAnalyzeTable; ?></a>&nbsp;
+            <?php echo PMA_showMySQLDocu('MySQL_Database_Administration', 'ANALYZE_TABLE') . "\n";?>
+        </li>
+        <?php
+    }
+    echo "\n";
+    if ($tbl_type == 'MYISAM') {
+        ?>
+        <li>
+            <a href="sql.php?<?php echo $url_query; ?>&amp;sql_query=<?php echo urlencode('REPAIR TABLE ' . PMA_backquote($table)); ?>">
+                <?php echo $strRepairTable; ?></a>&nbsp;
+            <?php echo PMA_showMySQLDocu('MySQL_Database_Administration', 'REPAIR_TABLE') . "\n"; ?>
+        </li>
+        <?php
+    }
+    echo "\n";
+    if ($tbl_type == 'MYISAM' || $tbl_type == 'BERKELEYDB') {
+        ?>
+        <li>
+            <a href="sql.php?<?php echo $url_query; ?>&amp;sql_query=<?php echo urlencode('OPTIMIZE TABLE ' . PMA_backquote($table)); ?>">
                 <?php echo $strOptimizeTable; ?></a>&nbsp;
-                <?php echo PMA_showMySQLDocu('MySQL_Database_Administration', 'OPTIMIZE_TABLE') . "\n"; ?>
-            </li>
-    <?php
+            <?php echo PMA_showMySQLDocu('MySQL_Database_Administration', 'OPTIMIZE_TABLE') . "\n"; ?>
+        </li>
+        <?php
+    }
     echo "\n";
-} // end 3.23.06 < MySQL < 3.23.22
     ?>
+    <?php
+} // end MYISAM or BERKELEYDB case
+echo "\n";
+?>
             <li>
                 <a href="sql.php?<?php echo $url_query; ?>&amp;sql_query=<?php echo urlencode('FLUSH TABLE ' . PMA_backquote($table)); ?>&amp;zero_rows=<?php echo urlencode(sprintf($strTableHasBeenFlushed, htmlspecialchars($table))); if ($cfg['ShowTooltip']) echo '&amp;reload=1'; ?>">
                     <?php echo $strFlushTable; ?></a>&nbsp;
@@ -302,7 +289,7 @@ else if (PMA_MYSQL_INT_VERSION >= 32306
 
 <?php
 // Referential integrity check
-// The Referential integrity check was intended for the non-InnoDB 
+// The Referential integrity check was intended for the non-InnoDB
 // tables for which the relations are defined in pmadb
 // so I assume that if the current table is InnoDB, I don't display
 // this choice (InnoDB maintains integrity by itself)
@@ -322,7 +309,7 @@ if ($cfgRelation['relwork'] && $tbl_type != "INNODB") {
                 <?php echo $strReferentialIntegrity; ?><br />
                 <?php
                 echo "\n";
-                while (list($master, $arr) = each($foreign)){
+                foreach($foreign AS $master => $arr) {
                     $join_query  = 'SELECT ' . PMA_backquote($table) . '.* FROM '
                                  . PMA_backquote($table) . ' LEFT JOIN '
                                  . PMA_backquote($arr['foreign_table']);
@@ -366,14 +353,13 @@ if ($cfgRelation['relwork'] && $tbl_type != "INNODB") {
 /**
  * Displays form controls
  */
-if (PMA_MYSQL_INT_VERSION >= 32322) {
-    ?>
+?>
     <!-- Table comments -->
     <li>
         <form method="post" action="tbl_properties_operations.php">
             <?php echo PMA_generate_common_hidden_inputs($db, $table); ?>
             <?php echo $strTableComments; ?>&nbsp;:&nbsp;
-            <?php $comment = ereg_replace('; InnoDB free:[^;]*$' , '', ereg_replace('^InnoDB free:[^;]*$', '', $show_comment)); ?>
+            <?php $comment = ereg_replace('; InnoDB free:.*$' , '', ereg_replace('^InnoDB free:.*$', '', $show_comment)); ?>
             <input type="hidden" name="prev_comment" value="<?php echo urlencode($comment); ?>" />&nbsp;
             <input type="text" name="comment" maxlength="60" size="30" value="<?php echo htmlspecialchars($comment); ?>" class="textfield" style="vertical-align: middle" onfocus="this.select()" />&nbsp;
             <input type="submit" name="submitcomment" value="<?php echo $strGo; ?>" style="vertical-align: middle" />
@@ -516,12 +502,11 @@ if (PMA_MYSQL_INT_VERSION >= 32322) {
         </table>
     </li>
 </ul>
-    <?php
-} // end if (PMA_MYSQL_INT_VERSION >= 32322)
+<?php
 
 /**
  * Displays the footer
  */
 echo "\n";
-require('./footer.inc.php');
+require_once('./footer.inc.php');
 ?>

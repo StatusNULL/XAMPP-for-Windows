@@ -3,7 +3,7 @@
 # See AutoSplit.pm.
 package POSIX;
 
-#line 412 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\bsearch.al)"
+#line 419 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\bsearch.al)"
 sub bsearch {
     unimpl "bsearch() not supplied";
 }

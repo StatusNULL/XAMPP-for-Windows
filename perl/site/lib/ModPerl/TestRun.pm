@@ -10,12 +10,30 @@ use base qw(Apache::TestRunPerl);
 # become available
 use constant MIN_MAXCLIENTS => 2;
 
+use Apache::Build;
+my $build = Apache::Build->build_config;
+
 sub new_test_config {
     my $self = shift;
 
-    $self->{conf_opts}->{maxclients} = MIN_MAXCLIENTS;
+    # timeout in secs (threaded mpms are extremely slow to startup,
+    # due to a slow perl_clone operation)
+    $self->{conf_opts}->{startup_timeout} =
+        $build->mpm_is_threaded() ? 180 : 120;
+
+    $self->{conf_opts}->{maxclients} ||= MIN_MAXCLIENTS;
 
     ModPerl::TestConfig->new($self->{conf_opts});
+}
+
+sub bug_report {
+    my $self = shift;
+
+    print <<EOI;
++--------------------------------------------------------+
+| Please file a bug report: http://perl.apache.org/bugs/ |
++--------------------------------------------------------+
+EOI
 }
 
 package ModPerl::TestConfig;

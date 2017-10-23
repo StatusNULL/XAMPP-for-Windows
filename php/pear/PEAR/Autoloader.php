@@ -17,7 +17,7 @@
 // |                                                                      |
 // +----------------------------------------------------------------------+
 //
-// $Id: Autoloader.php,v 1.8 2003/10/05 16:42:18 mj Exp $
+// $Id: Autoloader.php,v 1.7 2003/06/10 20:03:43 imajes Exp $
 
 if (!extension_loaded("overload")) {
     // die hard without ext/overload
@@ -42,8 +42,6 @@ require_once "PEAR.php";
  */
 class PEAR_Autoloader extends PEAR
 {
-    // {{{ properties
-
     /**
      * Map of methods and classes where they are defined
      *
@@ -61,9 +59,6 @@ class PEAR_Autoloader extends PEAR
      * @access private
      */
     var $_method_map = array();
-
-    // }}}
-    // {{{ addAutoload()
 
     /**
      * Add one or more autoload entries.
@@ -90,9 +85,6 @@ class PEAR_Autoloader extends PEAR
         }
     }
 
-    // }}}
-    // {{{ removeAutoload()
-
     /**
      * Remove an autoload entry.
      *
@@ -108,9 +100,6 @@ class PEAR_Autoloader extends PEAR
         unset($this->_autoload_map[$method]);
         return $ok;
     }
-
-    // }}}
-    // {{{ addAggregateObject()
 
     /**
      * Add an aggregate object to this object.  If the specified class
@@ -142,9 +131,6 @@ class PEAR_Autoloader extends PEAR
         }
     }
 
-    // }}}
-    // {{{ removeAggregateObject()
-
     /**
      * Remove an aggregate object.
      *
@@ -167,9 +153,6 @@ class PEAR_Autoloader extends PEAR
         }
         return $ok;
     }
-
-    // }}}
-    // {{{ __call()
 
     /**
      * Overloaded object call handler, called each time an
@@ -196,8 +179,6 @@ class PEAR_Autoloader extends PEAR
         }
         return false;
     }
-
-    // }}}
 }
 
 overload("PEAR_Autoloader");

@@ -1,15 +1,15 @@
 <?php
-/* $Id: chk_rel.php,v 1.3 2002/10/23 04:17:42 robbat2 Exp $ */
+/* $Id: chk_rel.php,v 2.2 2003/11/26 22:52:24 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
 /**
  * Gets some core libraries
  */
-require('./libraries/grab_globals.lib.php');
-require('./libraries/common.lib.php');
-require('./db_details_common.php');
-require('./libraries/relation.lib.php');
+require_once('./libraries/grab_globals.lib.php');
+require_once('./libraries/common.lib.php');
+require_once('./db_details_common.php');
+require_once('./libraries/relation.lib.php');
 
 
 /**
@@ -21,6 +21,5 @@ $cfgRelation = PMA_getRelationsParam(TRUE);
 /**
  * Displays the footer
  */
-echo "\n";
-require('./footer.inc.php');
+require_once('./footer.inc.php');
 ?>

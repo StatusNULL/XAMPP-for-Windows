@@ -3,7 +3,7 @@
 # See AutoSplit.pm.
 package POSIX;
 
-#line 172 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\sin.al)"
+#line 175 "..\..\lib\POSIX.pm (autosplit into ..\..\lib\auto\POSIX\sin.al)"
 sub sin {
     usage "sin(x)" if @_ != 1;
     CORE::sin($_[0]);

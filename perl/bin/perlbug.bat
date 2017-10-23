@@ -12,15 +12,39 @@ goto endofperl
 @rem ';
 #!perl
 #line 15
-    eval 'exec c:\xampp\perl\bin\perl.exe -S $0 ${1+"$@"}'
+    eval 'exec C:\wampp2\perl\bin\perl.exe -S $0 ${1+"$@"}'
 	if $running_under_some_shell;
 
-my $config_tag1 = 'v5.8.0 - Mon Nov  3 22:13:19 2003';
+my $config_tag1 = 'v5.8.2 - Tue Dec  9 10:19:27 2003';
 
-my $patchlevel_date = 1048638302;
-my $patch_tags = '+ACTIVEPERL_LOCAL_PATCHES_ENTRY ';
+my $patchlevel_date = 1070960079;
+my $patch_tags = '+ACTIVEPERL_LOCAL_PATCHES_ENTRY +21846 +21739 +21737 +21735 +21734 +21733 +21732 +21728 +21723 +21718 +21714 +21706 +21693 +21691 +21687 +21677 +21676 +21673 +21672 +21671 +21662 +21586 +21548 +21540 ';
 my @patches = (
-    'ACTIVEPERL_LOCAL_PATCHES_ENTRY'
+    'ACTIVEPERL_LOCAL_PATCHES_ENTRY',
+    '21846 Configure gets d_u32align wrong',
+    '21739 [perl #24493] install.html not working',
+    '21737 Ooops. left an XXX comment in, and worse still it\'s a // comment',
+    '21735 utf8 keys now work for tied hashes',
+    '21734 Accessing unicode keys in tie hashes via hv_exists was broken',
+    '21733 ext/threads/t/problem.t',
+    '21732 Config::myconfig() fails under ithreads',
+    '21728 Update perlhist with 5.6.2',
+    '21723 Include \'SCCS\' in the list of dir names ignored by installperl',
+    '21718 Empty subroutine as object method segfaults in 5.8.2 (sometimes)',
+    '21714 Fix bug #24380: assigning list with duplicated keys to a hash',
+    '21706 [perl #24460] [DOC PATCH] the begincheck program',
+    '21693 must copy changes from win32/makeifle.mk to wince/makefile.ce',
+    '21691 Update the list of pumpkings in perlhist.pod',
+    '21687 [PATCH 5.6.2-RC1 pod/perlhist.pod]  Updated',
+    '21677 OS/2 docu',
+    '21676 Bug #24407: key for shared hash got stringified into wrong pool',
+    '21673 Be sure to use -fPIC not -fpic on Linux/SPARC',
+    '21672 extending the hash attack test',
+    '21671 Benchmark.pm cmpthese segfault',
+    '21662 \'make minitest\' fails for op/cproto and op/pat',
+    '21586 Comment that this \'optimisation\' is actually a necessary fixup',
+    '21548 Sync with Pod::Perldoc 3.12',
+    '21540 Fix backward-compatibility issues in if.pm'
 );
 
 use Config;
@@ -84,7 +108,8 @@ my $Version = "1.34";
 
 my( $file, $usefile, $cc, $address, $perlbug, $testaddress, $filename, $messageid, $domain,
     $subject, $from, $verbose, $ed, $outfile, $Is_MacOS, $category, $severity,
-    $fh, $me, $Is_MSWin32, $Is_Linux, $Is_VMS, $msg, $body, $andcc, %REP, $ok);
+    $fh, $me, $Is_MSWin32, $Is_Linux, $Is_VMS, $msg, $body, $andcc, %REP, $ok,
+    $Is_OpenBSD);
 
 my $perl_version = $^V ? sprintf("v%vd", $^V) : $];
 
@@ -157,6 +182,7 @@ sub Init {
     $Is_MSWin32 = $^O eq 'MSWin32';
     $Is_VMS = $^O eq 'VMS';
     $Is_Linux = lc($^O) eq 'linux';
+    $Is_OpenBSD = lc($^O) eq 'openbsd';
     $Is_MacOS = $^O eq 'MacOS';
 
     @ARGV = split m/\s+/,
@@ -779,7 +805,7 @@ sub Send {
     # on linux certain mail implementations won't accept the subject
     # as "~s subject" and thus the Subject header will be corrupted
     # so don't use Mail::Send to be safe
-    if ($::HaveSend && !$Is_Linux) {
+    if ($::HaveSend && !$Is_Linux && !$Is_OpenBSD) {
 	$msg = new Mail::Send Subject => $subject, To => $address;
 	$msg->cc($cc) if $cc;
 	$msg->add("Reply-To",$from) if $from;

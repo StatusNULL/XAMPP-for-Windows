@@ -13,13 +13,13 @@ goto endofperl
 #!/usr/bin/perl -w
 #line 15
 
-# $Id: lwp-mirror,v 2.0 2002/01/03 01:42:31 gisle Exp $
+# $Id: lwp-mirror,v 2.2 2003/10/26 14:39:18 gisle Exp $
 #
 # Simple mirror utility using LWP
 
 =head1 NAME
 
-lwp-mirror - Simple mirror utility for WWW
+lwp-mirror - Simple mirror utility
 
 =head1 SYNOPSIS
 
@@ -60,7 +60,7 @@ $progname = $0;
 $progname =~ s,.*/,,;  # use basename only
 $progname =~ s/\.\w*$//; #strip extension if any
 
-$VERSION = sprintf("%d.%02d", q$Revision: 2.0 $ =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q$Revision: 2.2 $ =~ /(\d+)\.(\d+)/);
 
 $opt_h = undef;  # print usage
 $opt_v = undef;  # print version
@@ -100,7 +100,8 @@ $rc = mirror($url, $file);
 
 if ($rc == 304) {
     print STDERR "$progname: $file is up to date\n"
-} elsif (!is_success($rc)) {
+}
+elsif (!is_success($rc)) {
     print STDERR "$progname: $rc ", status_message($rc), "   ($url)\n";
     exit 1;
 }

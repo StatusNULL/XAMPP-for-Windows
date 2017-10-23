@@ -1,12 +1,12 @@
 #
-# $Id: LWP.pm,v 1.123 2003/01/24 16:47:23 gisle Exp $
+# $Id: LWP.pm,v 1.133 2003/10/23 19:20:00 uid39246 Exp $
 
 package LWP;
 
-$VERSION = "5.69";
+$VERSION = "5.75";
 sub Version { $VERSION; }
 
-require 5.004;
+require 5.005;
 require LWP::UserAgent;  # this should load everything you need
 
 1;
@@ -76,6 +76,10 @@ Provides parser for F<robots.txt> files and a framework for constructing robots.
 
 =item *
 
+Supports parsing of HTML forms.
+
+=item *
+
 Implements HTTP content negotiation algorithm that can
 be used both in protocol modules and in server scripts (like CGI
 scripts).
@@ -86,7 +90,7 @@ Supports HTTP cookies.
 
 =item *
 
-A simple command line client application called C<lwp-request>.
+Some simple command line clients, for instance C<lwp-request> and C<lwp-download>.
 
 =back
 
@@ -298,9 +302,9 @@ represented in actual perl code:
   $ua->agent("MyApp/0.1 ");
 
   # Create a request
-  my $req = HTTP::Request->new(POST => 'http://www.perl.com/cgi-bin/BugGlimpse');
+  my $req = HTTP::Request->new(POST => 'http://search.cpan.org/search');
   $req->content_type('application/x-www-form-urlencoded');
-  $req->content('match=www&errors=0');
+  $req->content('query=libwww-perl&mode=dist');
 
   # Pass request to the user agent and get a response back
   my $res = $ua->request($req);
@@ -308,8 +312,9 @@ represented in actual perl code:
   # Check the outcome of the response
   if ($res->is_success) {
       print $res->content;
-  } else {
-      print "Bad luck this time\n";
+  }
+  else {
+      print $res->status_line, "\n";
   }
 
 The $ua is created once when the application starts up.  New request
@@ -346,10 +351,10 @@ internal error response.
 The library automatically adds a "Host" and a "Content-Length" header
 to the HTTP request before it is sent over the network.
 
-For GET request you might want to add a "If-Modified-Since" or
+For a GET request you might want to add a "If-Modified-Since" or
 "If-None-Match" header to make the request conditional.
 
-For POST request you should add the "Content-Type" header.  When you
+For a POST request you should add the "Content-Type" header.  When you
 try to emulate HTML E<lt>FORM> handling you should usually let the value
 of the "Content-Type" header be "application/x-www-form-urlencoded".
 See L<lwpcook> for examples of this.
@@ -578,31 +583,42 @@ You might want to set it to C<URI::URL> for compatiblity with old times.
 
 =back
 
-=head1 BUGS
+=head1 AUTHORS
 
-The library can not handle multiple simultaneous requests yet.  Also,
-check out what's left in the TODO file.
+LWP was made possible by contributions from Adam Newby, Albert
+Dvornik, Alexandre Duret-Lutz, Andreas Gustafsson, Andreas König, Ben
+Coleman, Benjamin Low, Ben Low, Ben Tilly, Blair Zajac, Bob Dalgleish,
+BooK, Brad Hughes, Brian J. Murrell, Brian McCauley, Charles C. Fu,
+Charles Lane, Chris Nandor, Christian Gilmore, Chris W. Unger, Dale
+Couch, Dave Dunkin, Dave W. Smith, David Coppit, David Dick, David
+D. Kilzer, Doug MacEachern, Edward Avis, erik, Gary Shea, Gisle Aas,
+Graham Barr, Gurusamy Sarathy, Hans de Graaff, Harry Bochner, Hugo,
+Ilya Zakharevich, INOUE Yoshinari, Ivan Panchenko, Jack Shirazi, James
+Tillman, Jan Dubois, Jared Rhine, Jim Stern, John Klar, Johnny Lee,
+Josh Kronengold, Joshua Chamas, Kartik Subbarao, Keiichiro Nagano, Ken
+Williams, KONISHI Katsuhiro, Lee T Lindley, Liam Quinn, Marc Hedlund,
+Marc Langheinrich, Mark D. Anderson, Marko Asplund, Mark Stosberg,
+Markus B Krüger, Markus Laker, Martijn Koster, Martin Thurn, Matthew
+Eldridge, Matt Sergeant, Michael A. Chase, Michael Quaranta, Michael
+Thompson, Mike Schilli, Nathan Torkington, Nicolai Langfeldt, Norton
+Allen, Olly Betts, Paul J. Schinder, peterm, Philip GuentherDaniel
+Buenzli, Pon Hwa Lin, Radu Greab, Randal L. Schwartz, Richard Chen,
+Robin Barker, Roy Fielding, Sander van Zoest, Sean M. Burke,
+shildreth, Slaven Rezic, Steve A Fink, Steve Hay, Steve_Kilbane,
+Takanori Ugai, Thomas Lotterer, Tim Bunce, Tom Hughes, Tony Finch,
+Ville Skyttä, William York and Yale Huang.
 
-=head1 ACKNOWLEDGEMENTS
-
-This package owes a lot in motivation, design, and code, to the
-libwww-perl library for Perl 4, maintained by Roy Fielding
-E<lt>fielding@ics.uci.edu>.
-
-That package used work from Alberto Accomazzi, James Casey, Brooks
-Cutter, Martijn Koster, Oscar Nierstrasz, Mel Melchner, Gertjan van
-Oosten, Jared Rhine, Jack Shirazi, Gene Spafford, Marc VanHeyningen,
-Steven E. Brenner, Marion Hakanson, Waldemar Kebsch, Tony Sanders, and
-Larry Wall; see the libwww-perl-0.40 library for details.
-
-The primary architect for this Perl 5 library is Martijn Koster and
-Gisle Aas, with lots of help from Graham Barr, Tim Bunce, Andreas
-Koenig, Jared Rhine, and Jack Shirazi.
-
+LWP owes a lot in motivation, design, and code, to the libwww-perl
+library for Perl4 by Roy Fielding, which included work from Alberto
+Accomazzi, James Casey, Brooks Cutter, Martijn Koster, Oscar
+Nierstrasz, Mel Melchner, Gertjan van Oosten, Jared Rhine, Jack
+Shirazi, Gene Spafford, Marc VanHeyningen, Steven E. Brenner, Marion
+Hakanson, Waldemar Kebsch, Tony Sanders, and Larry Wall; see the
+libwww-perl-0.40 library for details.
 
 =head1 COPYRIGHT
 
-  Copyright 1995-2001, Gisle Aas
+  Copyright 1995-2003, Gisle Aas
   Copyright 1995, Martijn Koster
 
 This library is free software; you can redistribute it and/or

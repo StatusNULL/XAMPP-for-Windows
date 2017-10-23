@@ -1,13 +1,13 @@
 <?php
-/* $Id: read_dump.php,v 1.62 2003/08/05 18:14:37 nijel Exp $ */
+/* $Id: read_dump.php,v 2.3.2.1 2003/12/15 18:13:40 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
  * Gets some core libraries
  */
-require('./libraries/read_dump.lib.php');
-require('./libraries/grab_globals.lib.php');
-require('./libraries/common.lib.php');
+require_once('./libraries/read_dump.lib.php');
+require_once('./libraries/grab_globals.lib.php');
+require_once('./libraries/common.lib.php');
 
 if (!isset($db)) {
     $db = '';
@@ -22,12 +22,12 @@ if (!isset($db)) {
 /**
  * Defines the url to return to in case of error in a sql statement
  */
-if (!isset($goto) || !eregi('^(db_details|tbl_properties)(_[a-z]*)?\.php$', $goto)) {
+if (!isset($goto) || !preg_match('@^(db_details|tbl_properties)(_[a-z]*)?\.php$@i', $goto)) {
     $goto = 'db_details.php';
 }
 $err_url  = $goto
           . '?' . PMA_generate_common_url($db)
-          . (eregi('^tbl_properties(_[a-z]*)?\.php$', $goto) ? '&amp;table=' . urlencode($table) : '');
+          . (preg_match('@^tbl_properties(_[a-z]*)?\.php$@', $goto) ? '&amp;table=' . urlencode($table) : '');
 
 
 /**
@@ -36,27 +36,25 @@ $err_url  = $goto
 $view_bookmark = 0;
 $sql_bookmark  = isset($sql_bookmark) ? $sql_bookmark : '';
 $sql_query     = isset($sql_query)    ? $sql_query    : '';
-if (!empty($sql_localfile) && $cfg['UploadDir'] != '') {
+if (!empty($sql_localfile) && !empty($cfg['UploadDir'])) {
+    if (substr($cfg['UploadDir'], -1) != '/') {
+        $cfg['UploadDir'] .= '/';
+    }
     $sql_file  = $cfg['UploadDir'] . $sql_localfile;
 } else if (empty($sql_file)) {
     $sql_file  = 'none';
 }
 
-
 /**
  * Bookmark Support: get a query back from bookmark if required
  */
 if (!empty($id_bookmark)) {
-    include('./libraries/bookmark.lib.php');
+    require_once('./libraries/bookmark.lib.php');
     switch ($action_bookmark) {
         case 0: // bookmarked query that have to be run
             $sql_query = PMA_queryBookmarks($db, $cfg['Bookmark'], $id_bookmark);
             if (isset($bookmark_variable) && !empty($bookmark_variable)) {
-            	if (PMA_PHP_INT_VERSION >= 40300) {
-                    $sql_query = preg_replace('|/\*(.*)\[VARIABLE\](.*)\*/|imsU', '${1}' . PMA_sqlAddslashes($bookmark_variable) . '${2}', $sql_query);
-                } else {
-                    $sql_query = preg_replace('|/\*(.*)\[VARIABLE\](.*)\*/|imsU', '\1 ' . PMA_sqlAddslashes($bookmark_variable) . '\2', $sql_query);
-                }
+                $sql_query = preg_replace('|/\*(.*)\[VARIABLE\](.*)\*/|imsU', '${1}' . PMA_sqlAddslashes($bookmark_variable) . '${2}', $sql_query);
             }
             break;
         case 1: // bookmarked query that have to be displayed
@@ -80,13 +78,7 @@ if ($sql_file != 'none') {
 //        || file_exists($cfg['UploadDir'] . $sql_localfile)) {
     if (file_exists($sql_file)
         && ((isset($sql_localfile) && $sql_file == $cfg['UploadDir'] . $sql_localfile) || is_uploaded_file($sql_file))) {
-        $open_basedir     = '';
-        if (PMA_PHP_INT_VERSION >= 40000) {
-            $open_basedir = @ini_get('open_basedir');
-        }
-        if (empty($open_basedir)) {
-            $open_basedir = @get_cfg_var('open_basedir');
-        }
+        $open_basedir = @ini_get('open_basedir');
 
         if (!isset($sql_file_compression)) $sql_file_compression = '';
 
@@ -102,24 +94,25 @@ if ($sql_file != 'none') {
             if (!is_writeable($tmp_subdir)) {
                 $sql_query = PMA_readFile($sql_file, $sql_file_compression);
                 if ($sql_query == FALSE) {
-                    echo $strFileCouldNotBeRead;
-                    exit();
+                    $message = $strFileCouldNotBeRead;
                 }
             }
             else {
                 $sql_file_new = $tmp_subdir . basename($sql_file);
-                if (PMA_PHP_INT_VERSION < 40003) {
-                    copy($sql_file, $sql_file_new);
-                } else {
-                    move_uploaded_file($sql_file, $sql_file_new);
-                }
+                move_uploaded_file($sql_file, $sql_file_new);
                 $sql_query = PMA_readFile($sql_file_new, $sql_file_compression);
+                if ($sql_query == FALSE) {
+                    $message = $strFileCouldNotBeRead;
+                }
                 unlink($sql_file_new);
             }
         }
         else {
             // read from the normal upload dir
             $sql_query = PMA_readFile($sql_file, $sql_file_compression);
+            if ($sql_query == FALSE) {
+                $message = $strFileCouldNotBeRead;
+            }
         }
 
         // Convert the file's charset if necessary
@@ -151,17 +144,32 @@ if (!empty($prev_sql_query)) {
 
 // Drop database is not allowed -> ensure the query can be run
 if (!$cfg['AllowUserDropDatabase']
-    && eregi('DROP[[:space:]]+(IF EXISTS[[:space:]]+)?DATABASE ', $sql_query)) {
+    && preg_match('@DROP[[:space:]]+(IF EXISTS[[:space:]]+)?DATABASE @i', $sql_query)) {
     // Checks if the user is a Superuser
     // TODO: set a global variable with this information
     // loic1: optimized query
     $result = @PMA_mysql_query('USE mysql');
     if (PMA_mysql_error()) {
-        include('./header.inc.php');
+        require_once('./header.inc.php');
         PMA_mysqlDie($strNoDropDatabases, '', '', $err_url);
     }
 }
 define('PMA_CHK_DROP', 1);
+
+/**
+ * Store a query as a bookmark before executing it?
+ */
+if (isset($SQLbookmark) && $sql_query != '') {
+    require_once('./libraries/bookmark.lib.php');
+    $bfields = array(
+                 'dbase' => $db,
+                 'user'  => $cfg['Bookmark']['user'],
+                 'query' => urlencode($sql_query),
+                 'label' => $bkm_label
+    );
+
+    PMA_addBookmarks($bfields, $cfg['Bookmark'], (isset($bkm_all_users) && $bkm_all_users == 'true' ? true : false));
+}
 
 /**
  * Executes the query
@@ -173,7 +181,7 @@ if ($sql_query != '') {
     if ($pieces_count > 1) {
         $is_multiple = TRUE;
     }
-    
+
     // Copy of the cleaned sql statement for display purpose only (see near the
     // beginning of "db_details.php" & "tbl_properties.php")
 
@@ -186,20 +194,24 @@ if ($sql_query != '') {
         // Here be the values if the Verbose-Mode (see config.inc.php) is NOT activated
         $max_nofile_length = 500;
         $max_nofile_pieces = 0;
-        $max_file_length   = 0;
+        // Nijel: Here must be some limit, as extended inserts can be really
+        //        huge and parsing them eats megabytes of memory
+        $max_file_length   = 10000;
         $max_file_pieces   = 10;
     } else {
         // Values for verbose-mode
         $max_nofile_length = 0;
         $max_nofile_pieces = 50;
-        $max_file_length   = 0;
+        // Nijel: Here must be some limit, as extended inserts can be really
+        //        huge and parsing them eats megabytes of memory
+        $max_file_length   = 50000;
         $max_file_pieces   = 50;
     }
-    
+
     if ($sql_file != 'none' &&
-          ($max_file_length == 0 && ($pieces_count > $max_file_pieces))
+          (($max_file_pieces != 0 && ($pieces_count > $max_file_pieces))
             ||
-          ($max_file_pieces == 0 && (strlen($sql_query) > $max_file_length))) {
+          ($max_file_length != 0 && (strlen($sql_query) > $max_file_length)))) {
           // Be nice with bandwidth...
         $sql_query_cpy = $sql_query = '';
         $save_bandwidth = TRUE;
@@ -210,8 +222,8 @@ if ($sql_query != '') {
         $sql_query_cpy = implode(";\n", $pieces) . ';';
          // Be nice with bandwidth... for now, an arbitrary limit of 500,
          // could be made configurable but probably not necessary
-        if (($max_nofile_pieces == 0 && (strlen($sql_query_cpy) > $max_nofile_length))
-              || ($max_nofile_length == 0 && $pieces_count > $max_nofile_pieces)) {
+        if (($max_nofile_length != 0 && (strlen($sql_query_cpy) > $max_nofile_length))
+              || ($max_nofile_pieces != 0 && $pieces_count > $max_nofile_pieces)) {
             $sql_query_cpy = $sql_query = '';
             $save_bandwidth = TRUE;
             $save_bandwidth_length = $max_nofile_length;
@@ -224,11 +236,10 @@ if ($sql_query != '') {
         // Only one query to run
         if ($pieces_count == 1 && !empty($pieces[0])) {
             $sql_query = $pieces[0];
-            if (eregi('^(DROP|CREATE)[[:space:]]+(IF EXISTS[[:space:]]+)?(TABLE|DATABASE)[[:space:]]+(.+)', $sql_query)) {
+            if (preg_match('@^(DROP|CREATE)[[:space:]]+(IF EXISTS[[:space:]]+)?(TABLE|DATABASE)[[:space:]]+(.+)@i', $sql_query)) {
                 $reload = 1;
             }
-            include('./sql.php');
-            exit();
+            require('./sql.php');
         }
 
         // Runs multiple queries
@@ -236,15 +247,14 @@ if ($sql_query != '') {
             $mult = TRUE;
             $info_msg = '';
             $info_count = 0;
-            
+
             for ($i = 0; $i < $pieces_count; $i++) {
                 $a_sql_query = $pieces[$i];
-                if ($i == $pieces_count - 1 && eregi('^SELECT', $a_sql_query)) {
+                if ($i == $pieces_count - 1 && preg_match('@^(SELECT|SHOW)@i', $a_sql_query)) {
                     $complete_query = $sql_query;
                     $display_query = $sql_query;
                     $sql_query = $a_sql_query;
-                    include('./sql.php');
-                    exit();
+                    require('./sql.php');
                 }
 
                 $result = PMA_mysql_query($a_sql_query);
@@ -257,12 +267,12 @@ if ($sql_query != '') {
                     } else {
                         $my_die = $a_sql_query;
                     }
-                    
+
                     if ($cfg['VerboseMultiSubmit']) {
                         $info_msg .= $a_sql_query . '; # ' . $strError . "\n";
                         $info_count++;
                     }
-                    
+
                     if (!$cfg['IgnoreMultiSubmitErrors']) {
                         break;
                     }
@@ -279,19 +289,19 @@ if ($sql_query != '') {
                         $a_rows = '';
                         $a_switch = $strEmptyResultSet;
                     }
-                    
+
                     $info_msg .= $a_sql_query . "; # " . $a_switch . $a_rows . "\n";
                     $info_count++;
                 }
 
-                if (!isset($reload) && eregi('^(DROP|CREATE)[[:space:]]+(IF EXISTS[[:space:]]+)?(TABLE|DATABASE)[[:space:]]+(.+)', $a_sql_query)) {
+                if (!isset($reload) && preg_match('@^(DROP|CREATE)[[:space:]]+(IF EXISTS[[:space:]]+)?(TABLE|DATABASE)[[:space:]]+(.+)@i', $a_sql_query)) {
                     $reload = 1;
                 }
             } // end for
-            
+
             if ($cfg['VerboseMultiSubmit'] && strlen($info_msg) > 0 &&
                   ((!isset($save_bandwidth) || $save_bandwidth == FALSE) ||
-                  ($save_bandwidth_pieces == 0 && strlen($sql_query) < $save_bandwidth_length) ||
+                  ($save_bandwidth_pieces == 0 && strlen($info_msg) < $save_bandwidth_length) ||
                   ($save_bandwidth_length == 0 && $info_count < $save_bandwidth_pieces))) {
                 $sql_query = $info_msg;
             }
@@ -308,9 +318,9 @@ if ($sql_query != '') {
  */
 if (isset($my_die)) {
     $js_to_run = 'functions.js';
-    include('./header.inc.php');
+    require_once('./header.inc.php');
     if (is_array($my_die)) {
-        while(list($key, $die_string) = each($my_die)) {
+        foreach($my_die AS $key => $die_string) {
             PMA_mysqlDie('', $die_string, '', $err_url, FALSE);
             echo '<hr />';
         }
@@ -330,6 +340,7 @@ if (isset($table) && $table == '') {
 if (isset($db) && $db == '') {
     unset($db);
 }
+
 $is_db = $is_table = FALSE;
 if ($goto == 'tbl_properties.php') {
     if (!isset($table)) {
@@ -361,7 +372,9 @@ if ($goto == 'db_details.php') {
 if (!empty($id_bookmark) && $action_bookmark == 2) {
     $message   = $strBookmarkDeleted;
 } else if (!isset($sql_query_cpy)) {
-    $message   = $strNoQuery;
+    if (empty($message)) {
+        $message   = $strNoQuery;
+    }
 } else if ($sql_query_cpy == '') {
     $message   = "$strSuccess&nbsp;:<br />$strTheContent ($pieces_count $strInstructions)&nbsp;";
 } else {
@@ -372,7 +385,7 @@ if ($goto == 'db_details.php' || $goto == 'tbl_properties.php') {
     $js_to_run = 'functions.js';
 }
 if ($goto != 'main.php') {
-    include('./header.inc.php');
+    require_once('./header.inc.php');
 }
 $active_page = $goto;
 require('./' . $goto);

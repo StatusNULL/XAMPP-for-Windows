@@ -1,18 +1,16 @@
 <?php
-/* $Id: db_create.php,v 1.20 2003/07/19 10:43:59 lem9 Exp $ */
+/* $Id: db_create.php,v 2.3 2003/11/26 22:52:24 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
 /**
  * Gets some core libraries
  */
-require('./libraries/grab_globals.lib.php');
+require_once('./libraries/grab_globals.lib.php');
 $js_to_run = 'functions.js';
-require('./header.inc.php');
+require_once('./header.inc.php');
+require_once('./libraries/common.lib.php');
 
-if (!defined('PMA_COMMON_LIB_INCLUDED')) {
-    include('./libraries/common.lib.php');
-}
 
 PMA_checkParameters(array('db'));
 
@@ -20,14 +18,6 @@ PMA_checkParameters(array('db'));
  * Defines the url to return to in case of error in a sql statement
  */
 $err_url = 'main.php?' . PMA_generate_common_url();
-
-/**
- * Ensures the db name is valid
- */
-if (PMA_MYSQL_INT_VERSION < 32306) {
-    PMA_checkReservedWords($db, $err_url);
-}
-
 
 /**
  * Executes the db creation sql query
@@ -40,6 +30,6 @@ $result      = PMA_mysql_query('CREATE DATABASE ' . PMA_backquote($db)) or PMA_m
  * Displays the result and calls default page
  */
 $message = $strDatabase . ' ' . htmlspecialchars($db) . ' ' . $strHasBeenCreated;
-require('./' . $cfg['DefaultTabDatabase']);
+require_once('./' . $cfg['DefaultTabDatabase']);
 
 ?>

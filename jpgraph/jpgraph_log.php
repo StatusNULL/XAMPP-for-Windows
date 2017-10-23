@@ -4,7 +4,7 @@
 // Description:	Log scale plot extension for JpGraph
 // Created: 	2001-01-08
 // Author:	Johan Persson (johanp@aditus.nu)
-// Ver:		$Id: jpgraph_log.php,v 1.15 2003/02/07 03:14:22 aditus Exp $
+// Ver:		$Id: jpgraph_log.php,v 1.15.2.4 2003/09/27 00:24:59 aditus Exp $
 //
 // License:	This code is released under QPL
 // Copyright (C) 2001,2002 Johan Persson
@@ -34,7 +34,11 @@ class LogScale extends LinearScale {
 // PUBLIC METHODS	
 
     // Translate between world and screen
-    function	Translate($a) {
+    function Translate($a) {
+	if( !is_numeric($a) ) {
+	    if( $a != '' && $a != '-' ) 
+		JpGraphError::Raise('Your data contains non-numeric values.');
+	}
 	if( $a < 0 ) {
 	    JpGraphError::Raise("Negative data values can not be used in a log scale.");
 	    exit(1);
@@ -74,7 +78,10 @@ class LogScale extends LinearScale {
     // signature as the linear counterpart.
     function AutoScale(&$img,$min,$max,$dummy) {
 	if( $min==0 ) $min=1;
-	assert($max>0);		
+	
+	if( $max <= 0 ) {
+	    JpGraphError::Raise('Scale error for logarithmic scale. You have a problem with your data values. The max value must be greater than 0. It is mathematically impossible to have 0 in a logarithmic scale.');
+	}
 	$smin = floor(log10($min));
 	$smax = ceil(log10($max));
 	$this->Update($img,$smin,$smax);					
@@ -145,7 +152,7 @@ class LogTicks extends Ticks{
 	    else {
 		if( $this->label_formfunc != '' ) {
 		    $f = $this->label_formfunc;
-		    $this->maj_ticks_label[0]=$f($start);	
+		    $this->maj_ticks_label[0]=call_user_func($f,$start);	
 		}
 		elseif( $this->label_logtype == LOGLABELS_PLAIN )
 		    $this->maj_ticks_label[0]=$start;	
@@ -171,7 +178,7 @@ class LogTicks extends Ticks{
 		    
 		    if( $this->label_formfunc != '' ) {
 			$f = $this->label_formfunc;
-			$this->maj_ticks_label[$i]=$f($nextMajor);	
+			$this->maj_ticks_label[$i]=call_user_func($f,$nextMajor);	
 		    }
 		    elseif( $this->label_logtype == 0 )
 			$this->maj_ticks_label[$i]=$nextMajor;	
@@ -200,7 +207,7 @@ class LogTicks extends Ticks{
 	    else {
 		if( $this->label_formfunc != '' ) {
 		    $f = $this->label_formfunc;
-		    $this->maj_ticks_label[0]=$f($start);	
+		    $this->maj_ticks_label[0]=call_user_func($f,$start);	
 		}
 		elseif( $this->label_logtype == 0 )
 		    $this->maj_ticks_label[0]=$start;	
@@ -219,7 +226,7 @@ class LogTicks extends Ticks{
 
 		    if( $this->label_formfunc != '' ) {
 			$f = $this->label_formfunc;
-			$this->maj_ticks_label[$i]=$f($nextMajor);	
+			$this->maj_ticks_label[$i]=call_user_func($f,$nextMajor);	
 		    }
 		    elseif( $this->label_logtype == 0 )
 			$this->maj_ticks_label[$i]=$nextMajor;	

@@ -1,14 +1,14 @@
 <?
 	if($action=="getpdf")
-	{ 
+	{
 		mysql_connect("localhost","root","");
 		mysql_select_db("cdcol");
 
-		include 'class.ezpdf.php';
+		include ('class.ezpdf.php');
 		$pdf =& new Cezpdf();
 		$pdf->selectFont('../pdf/fonts/Helvetica');
 
-		$pdf->ezText('CD Collection v0.2',14);
+		$pdf->ezText('CD Collection',14);
 		$pdf->ezText('© 2002/2003 Kai Seidler, oswald@apachefriends.org, GPL',10);
 		$pdf->ezText('',12);
 
@@ -29,18 +29,18 @@
 ?>
 <html>
 <head>
-<title>apachefriends.org cd collection v0.2</title>
-<link href="xampp2.css" rel="stylesheet" type="text/css">
+<title>apachefriends.org cd collection</title>
+<link href="xampp.css" rel="stylesheet" type="text/css">
 </head>
 
-<body bgcolor=#ffffff>
+<body>
+<? include("lang/".file_get_contents("lang.tmp").".php"); ?>
+
 &nbsp;<p>
-<h1>CD Collection v0.2 (mit PHP+MySQL+PDF Class)</h1>
+<h1><?=$TEXT['cds-head']?></h1>
 
-Eine sehr einfach CD-Verwaltung. Da man Eintäge nicht mehr verbessern kann, wenn
-man sich mal vertippt hat, empfiehlt sich phpMyAdmin (unten links in der Navigation).<p>
-
-<b>Neu seit 0.9.6 (win32 ab 1.0):</b> Ausgabe der CDs als <a href="<?=$PHP_SELF?>?action=getpdf">PDF</a>.
+<?=$TEXT['cds-text1']?><p>
+<?=$TEXT['cds-text2']?><p>
 
 <?
 
@@ -63,28 +63,26 @@ man sich mal vertippt hat, empfiehlt sich phpMyAdmin (unten links in der Navigat
 
 	if(!mysql_connect("localhost","root",""))
 	{
-		echo "<h2>Kann die Datenbank nicht erreichen!<br>Läuft MySQL? Das Passwort geändert?</h2>";
+		echo "<h2>".$TEXT['cds-error']."</h2>";
 		die();
 	}
 	mysql_select_db("cdcol");
 ?>
 
-<h2>Meine CDs</h2>
+<h2><?=$TEXT['cds-head1']?></h2>
 
-<table width=10% border=0 cellpadding=0 cellspacing=0>
-<tr>
-<td class=h><img src=img/blank.gif width=200 height=1><br>&nbsp;<b>Interpret</b></td>
-<td class=h><img src=img/blank.gif width=200 height=1><br><b>Titel</b></td>
-<td class=h><img src=img/blank.gif width=50 height=1><br><b>Jahr</b></td>
-<td></td>
+<table border=0 cellpadding=0 cellspacing=0>
+<tr bgcolor=#f87820>
+<td><img src=img/blank.gif width=10 height=25></td>
+<td class=tabhead><img src=img/blank.gif width=200 height=6><br><b><?=$TEXT['cds-attrib1']?></b></td>
+<td class=tabhead><img src=img/blank.gif width=200 height=6><br><b><?=$TEXT['cds-attrib2']?></b></td>
+<td class=tabhead><img src=img/blank.gif width=50 height=6><br><b><?=$TEXT['cds-attrib3']?></b></td>
+<td class=tabhead><img src=img/blank.gif width=50 height=6><br><b><?=$TEXT['cds-attrib4']?></b></td>
+<td><img src=img/blank.gif width=10 height=25></td>
 </tr>
 
 
 <?
-	echo "<tr><td bgcolor=#acacc9 colspan=3><img src=img/blank.gif width=1 height=2></td>";
-	echo "<td><img src=img/blank.gif width=1 height=1></td>";
-	echo "<td bgcolor=#acacc9><img src=img/blank.gif width=1 height=1></td>";
-	echo "</tr>";
 	if($interpret!="")
 	{
 		if($jahr=="")$jahr="NULL";
@@ -101,50 +99,48 @@ man sich mal vertippt hat, empfiehlt sich phpMyAdmin (unten links in der Navigat
 	$i=0;
 	while( $row=mysql_fetch_array($result) )
 	{
-		echo "<tr valign=top>";
-		echo "<td class=d>&nbsp;<b>".$row['interpret']."</b></td>";
-		echo "<td class=d>".$row['titel']."&nbsp;</td>";
-		echo "<td class=d>".$row['jahr']."&nbsp;</td>";
-		echo "<td><img src=img/blank.gif width=1 height=1></td>";
-                echo "<td bgcolor=#7c7c99><img src=img/blank.gif width=2 height=1></td>";
-		echo "<td><img src=img/blank.gif width=1 height=1></td>";
-                echo "<td bgcolor=#7c7c99><img src=img/blank.gif width=1 height=1></td>";
-		echo "<td><img src=img/blank.gif width=5 height=1></td>";
+		if($i>0)
+		{
+			echo "<tr valign=bottom>";
+			echo "<td bgcolor=#ffffff background='img/strichel.gif' colspan=6><img src=img/blank.gif width=1 height=1></td>";
+			echo "</tr>";
+		}
+		echo "<tr valign=center>";
+		echo "<td class=tabval><img src=img/blank.gif width=10 height=20></td>";
+		echo "<td class=tabval><b>".$row['interpret']."</b></td>";
+		echo "<td class=tabval>".$row['titel']."&nbsp;</td>";
+		echo "<td class=tabval>".$row['jahr']."&nbsp;</td>";
 
-		echo "<td><a onclick=\"return confirm('Wirklich sicher?');\" href=cds.php?action=del&id=".$row['id']."><span class=black><img border=0 src=img/cdloeschen.gif></span></a></td>";
+		echo "<td class=tabval><a onclick=\"return confirm('".$TEXT['cds-sure']."');\" href=cds.php?action=del&id=".$row['id']."><span class=red>[".$TEXT['cds-button1']."]</span></a></td>";
+		echo "<td class=tabval></td>";
 		echo "</tr>";
-		echo "<tr><td bgcolor=#7c7c99 colspan=3><img src=img/blank.gif width=1 height=1></td>";
-		echo "<td><img src=img/blank.gif width=1 height=1></td>";
-                echo "<td bgcolor=#7c7c99><img src=img/blank.gif width=2 height=1></td>";
-		echo "<td><img src=img/blank.gif width=1 height=1></td>";
-		echo "<td bgcolor=#7c7c99><img src=img/blank.gif width=1 height=1></td>";
-		echo "</tr>";
-		echo "<tr><td bgcolor=#acacc9 colspan=3><img src=img/blank.gif width=1 height=1></td>";
-		echo "<td><img src=img/blank.gif width=1 height=1></td>";
-                echo "<td bgcolor=#acacc9><img src=img/blank.gif width=1 height=1></td>";
-		echo "</tr>";
+		$i++;
+
 	}
+
+	echo "<tr valign=bottom>";
+        echo "<td bgcolor=#fb7922 colspan=6><img src=img/blank.gif width=1 height=8></td>";
+        echo "</tr>";
+
 
 ?>
 
 </table>
 
-<h2>CD hinzufügen</h2>
+<h2><?=$TEXT['cds-head2']?></h2>
 
 <form action=cds.php method=get>
 <table border=0 cellpadding=0 cellspacing=0>
-<tr><td>Interpret:</td><td><input type=text size=30 name=interpret></td></tr>
-<tr><td>Titel:</td><td> <input type=text size=30 name=titel></td></tr>
-<tr><td>Jahr:</td><td> <input type=text size=5 name=jahr></td></tr>
-<tr><td></td><td><input type=image src=img/cdhinzufuegen.gif border=0 value="CD hinzufügen"></td></tr>
+<tr><td><?=$TEXT['cds-attrib1']?>:</td><td><input type=text size=30 name=interpret></td></tr>
+<tr><td><?=$TEXT['cds-attrib2']?>:</td><td> <input type=text size=30 name=titel></td></tr>
+<tr><td><?=$TEXT['cds-attrib3']?>:</td><td> <input type=text size=5 name=jahr></td></tr>
+<tr><td></td><td><input type=submit border=0 value="<?=$TEXT['cds-button2']?>"></td></tr>
 </table>
 </form>
-
-&nbsp;
-<p class=small>
-Autor: Kai 'Oswald' Seidler<br>
-Für xampp win32: Kay Vogelgesang<br>
-Letzte Änderung: 01. August 2003 (win32)<br>
-&copy; 2002/2003 apachefriends.org
+<p>
+<? if ($source=="in")
+		{ include("code.php"); $beispiel = $SCRIPT_FILENAME; pagecode($beispiel);} 
+		else
+		{ print("<p><br><br><h2><U><a href=\"$PHP_SELF?source=in\">".$TEXT['srccode-in']."</a></U></h2>");} ?>
 </body>
 </html>

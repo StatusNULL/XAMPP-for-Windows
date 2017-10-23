@@ -3,7 +3,7 @@
 // +------------------------------------------------------------------------+
 // | PEAR :: PHPUnit                                                        |
 // +------------------------------------------------------------------------+
-// | Copyright (c) 2002-2003 Sebastian Bergmann <sb@sebastian-bergmann.de>. |
+// | Copyright (c) 2002-2004 Sebastian Bergmann <sb@sebastian-bergmann.de>. |
 // +------------------------------------------------------------------------+
 // | This source file is subject to version 3.00 of the PHP License,        |
 // | that is available at http://www.php.net/license/3_0.txt.               |
@@ -12,7 +12,7 @@
 // | license@php.net so we can mail you a copy immediately.                 |
 // +------------------------------------------------------------------------+
 //
-// $Id: BaseTestRunner.php,v 1.10 2003/09/01 21:30:27 sebastian Exp $
+// $Id: BaseTestRunner.php,v 1.13 2004/01/01 10:31:42 sebastian Exp $
 //
 
 require_once 'PHPUnit/Framework/AssertionFailedError.php';
@@ -231,53 +231,6 @@ abstract class PHPUnit_Runner_BaseTestRunner implements PHPUnit_Framework_TestLi
     * @access protected
     */
     protected function clearStatus() {
-    }
-
-    // }}}
-    // {{{ public static function getFilteredStack(Exception $e)
-
-    /**
-    * Filters stack frames from PHPUnit classes.
-    *
-    * @param  Exception $e
-    * @return string
-    * @access public
-    * @static
-    */
-    public static function getFilteredStack(Exception $e) {
-        $filter = array(
-          'Assert.php',
-          'TestCase.php',
-          'TestResult.php',
-          'TestRunner.php',
-          'TestSuite.php'
-        );
-
-        $filteredStacktrace = '';
-        $stacktrace         = $e->getTrace();
-
-        foreach ($stacktrace as $frame) {
-            $filtered = false;
-
-            for ($i = 0; $i < sizeof($filter); $i++) {
-                if (!isset($frame['file']) ||
-                    $filter[$i] == substr($frame['file'], 0 - strlen($filter[$i]))) {
-                    $filtered = true;
-                    break;
-                }
-            }
-
-            if (!$filtered) {
-                $filteredStacktrace .= sprintf(
-                  "%s:%s\n",
-
-                  $frame['file'],
-                  isset($frame['line']) ? $frame['line'] : '?'
-                );
-            }
-        }
-
-        return $filteredStacktrace;
     }
 
     // }}}

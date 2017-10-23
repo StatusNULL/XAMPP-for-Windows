@@ -1,5 +1,5 @@
 <?php
-/* $Id: chinese_big5.inc.php,v 1.264.2.2 2003/09/07 20:35:07 lem9 Exp $ */
+/* $Id: chinese_big5.inc.php,v 2.4.2.1 2003/12/17 09:20:44 nijel Exp $ */
 
 /**
  * Last translation by: Siu Sun <siusun@best-view.net>
@@ -7,7 +7,6 @@
  */
 
 $charset = 'big5';
-$allow_recoding = TRUE;
 $text_dir = 'ltr';
 $left_font_family = 'verdana, arial, helvetica, geneva, sans-serif';
 $right_font_family = 'helvetica, sans-serif';
@@ -24,7 +23,6 @@ $datefmt = '%B %d, %Y, %I:%M %p';
 
 $timespanfmt = '%s ¤é, %s ¤p®É, %s ¤ÀÄÁ %s ¬í';
 
-
 $strAPrimaryKey = '¥DÁä¤w¸g·s¼W¨ì %s';
 $strAbortedClients = '¨ú®ø';
 $strAbsolutePathToDocSqlDir = '½Ð¿é¤J docSQL ¥Ø¿ý©óºô­¶¦øªA¾¹ªºµ´¹ï¸ô®|';
@@ -32,6 +30,7 @@ $strAccessDenied = '©Úµ´¦s¨ú';
 $strAccessDeniedExplanation = 'phpMyAdmin ¹Á¸Õ³s½u¨ì MySQL ¦øªA¾¹, ¦ý¦øªA¾¹©Úµ´¤F³s½u. ±zÀ³©ó config.inc.php ¤ºÀË¬d¥D¾÷¦WºÙ, µn¤J¦WºÙ¤Î±K½X¤Î½T«O³o¨Ç¸ê®Æ¬O»P¨t²ÎºÞ²z¤H­û©Ò´£¨Ñªº MySQL ¦øªA¾¹¸ê®Æ¬Û¦P';
 $strAction = '°õ¦æ';
 $strAddAutoIncrement = "·s¼W AUTO_INCREMENT ¼Æ­È";
+$strAddConstraints = '¥[¤J­­¨î';
 $strAddDeleteColumn = '·s¼W/´î¤Ö ¿ï¾ÜÄæ';
 $strAddDeleteRow = '·s¼W/´î¤Ö ¿z¿ï¦C';
 $strAddDropDatabase = '¥[¤J \'§R°£¸ê®Æªí\' »yªk';
@@ -79,12 +78,15 @@ $strBeginCut = '¶}©l °Å¨ú';
 $strBeginRaw = '¶}©l ­ì©l¸ê®Æ';
 $strBinary = '¤G¶i¨î½X';
 $strBinaryDoNotEdit = '¤G¶i¨î½X - ¤£¯à½s¿è';
+$strBookmarkAllUsers = '©Ò¦³¥ÎªÌ¥iÅª¨ú¦¹®ÑÅÒ';
 $strBookmarkDeleted = '®ÑÅÒ¤w¸g§R°£.';
 $strBookmarkLabel = '®ÑÅÒ¦WºÙ';
+$strBookmarkOptions = '®ÑÅÒ¿ï¶µ';
 $strBookmarkQuery = 'SQL »yªk®ÑÅÒ';
 $strBookmarkThis = '±N¦¹ SQL »yªk¥[¤J®ÑÅÒ';
 $strBookmarkView = '¬d¬Ý';
 $strBrowse = 'ÂsÄý';
+$strBrowseForeignValues = 'ÂsÄý¥~¨Ó­È';
 $strBulgarian = '«O¥[§Q¨È¤å';
 $strBzError = 'phpMyAdmin µLªkÀ£ÁY¦]©ó³o­Ó php ª©¥»ªº Bz2 ¼Ò²Õ¿ù»~. ±j¦C­n¨D©ó phpMyAdmin ³]©wÀÉ³]©w <code>$cfg[\'BZipDump\']</code> ¬°<code>FALSE</code>. ¦pªG·Q¨Ï¥Î Bz2 À£ÁY¥\¯à,½Ð§ó·s php ¨ì³Ì·sª©¥». ¸Ô±¡½Ð°Ñ¬Ý php ¿ù»~³ø³ø %s .';
 $strBzip = '"bzipped"';
@@ -95,7 +97,7 @@ $strCantLoad = 'µLªkÅª¨ú %s ¼Ò²Õ,<br />½ÐÀË¬d PHP ³]©w';
 $strCantLoadMySQL = '¤£¯à¸ü¤J MySQL ¼Ò²Õ,<br />½ÐÀË¬d PHP ªº²ÕºA³]©w';
 $strCantLoadRecodeIconv = '¥¼¯àÅª¨ú iconv ©Î­«·s½s½Xµ{¦¡¨Ó§@¤å¦r½s½XÂà´«, ½Ð³]©w php ¨Ó±Ò°Ê³o¨Ç¼Ò²Õ©Î¨ú®ø phpMyAdmin ¨Ï¥Î¤å¦r½s½XÂà´«¥\¯à.';
 $strCantRenameIdxToPrimary = 'µLªk±N¯Á¤Þ§ó¦W¬° PRIMARY!';
-$strCantUseRecodeIconv = '·í¤å½s½X¼Ò²ÕÅª¨ú«á,¥¼¯à¨Ï¥Î iconv ¡B libiconv ©Î recode_string ¥\¯à. ½ÐÀË¬d±zªº php ³]©w.';
+$strCantUseRecodeIconv = '·í¤å½s½X¼Ò²ÕÅª¨ú«á,¥¼¯à¨Ï¥Î iconv, libiconv ©Î recode_string ¥\¯à. ½ÐÀË¬d±zªº php ³]©w.';
 $strCardinality = '²Õ§O';
 $strCarriage = 'Âk¦ì: \\r';
 $strCaseInsensitive = '¤j¤p¼g¤£¬Û²Å';
@@ -116,6 +118,7 @@ $strCharsets = '¦r¤¸¶°';
 $strCharsetsAndCollations = '¦r¤¸¶°¤Î®Õ¹ï';
 $strCheckAll = '¥þ¿ï';
 $strCheckDbPriv = 'ÀË¬d¸ê®Æ®wÅv­­';
+$strCheckOverhead = 'ÀË¬dÃB¥~°O¿ý (overheaded)'; // nor sure yet.
 $strCheckPrivs = '¬d¸ßÅv­­';
 $strCheckPrivsLong = '¬d¸ß¸ê®Æ®w &quot;%s&quot; ¤§Åv­­.';
 $strCheckTable = 'ÀË¬d¸ê®Æªí';
@@ -133,6 +136,8 @@ $strConfigFileError = 'phpMyAdmin ¥¼¯àÅª¨ú±zªº³]©wÀÉ! ³o¥i¯à¬O¦]¬° php §ä¨ì»yªk¤
 $strConfigureTableCoord = '½Ð³]©wªí®æ %s ¤ºªº§¤¼Ð';
 $strConfirm = '±z½T©w­n³o¼Ë°µ¡H';
 $strConnections = '³s½u';
+$strConstraintsForDumped = '³Æ¥÷¸ê®Æªí­­¨î';
+$strConstraintsForTable = '¸ê®Æªí­­¨î';
 $strCookiesRequired = 'Cookies ¥²¶·±Ò°Ê¤~¯àµn¤J.';
 $strCopyTable = '½Æ»s¸ê®Æªí¨ì¡G (®æ¦¡¬° ¸ê®Æ®w¦WºÙ<b>.</b>¸ê®Æªí¦WºÙ):';
 $strCopyTableOK = '¤w¸g±N¸ê®Æªí %s ½Æ»s¬° %s.';
@@ -145,6 +150,7 @@ $strCreateNewDatabase = '«Ø¥ß·s¸ê®Æ®w';
 $strCreateNewTable = '«Ø¥ß·s¸ê®Æªí©ó¸ê®Æ®w %s';
 $strCreatePage = '«Ø¥ß·s¤@­¶';
 $strCreatePdfFeat = '«Ø¥ß PDF';
+$strCreationDates = '«Ø¥ß/§ó·s/ÀË¬d ¤é´Á';
 $strCriteria = '¿z¿ï';
 $strCroatian = '§JÃ¹¦è¨È¤å';
 $strCyrillic = '¦è¨½º¸¤å';
@@ -180,6 +186,7 @@ $strDbSpecific = '«ü©w¸ê®Æ®w';
 $strDefault = '¹w³]­È';
 $strDefaultValueHelp = '¹w³]­È: ½Ð¥u¿é¤J¸Ó¹w³]­È, µL»Ý¥[¤W¥ô¦ó¤Ï±×½u©Î¤Þ¸¹';
 $strDelOld = '¥»­¶ªº°Ñ¦Ò¨ì¸ê®Æªí¤w¤£¦s¦b. ±z§Æ±æ§R°£³o¨Ç°Ñ¦Ò¶Ü?';
+$strDelayedInserts = '¨Ï¥Î©µ¿ð¦¡·s¼W';
 $strDelete = '§R°£';
 $strDeleteAndFlush = '§R°£¨Ï¥ÎªÌ¤Î­«·sÅª¨úÅv­­.';
 $strDeleteAndFlushDescr = '³o¬O¤@­Ó³Ì²M¼äªº°µªk,¦ý­«·sÅª¨úÅv­­»Ý¤@¬q®É¶¡.';
@@ -224,6 +231,7 @@ $strEnglish = '­^¤å';
 $strEnglishPrivileges = 'ª`·N: MySQL Åv­­¦WºÙ·|¥H­^»yÅã¥Ü';
 $strError = '¿ù»~';
 $strEstonian = '·R¨F¥§¨È¤å';
+$strExcelEdition = 'Excel ª©¥»';
 $strExcelOptions = 'Excel ¿ï¶µ';
 $strExecuteBookmarked = '°õ¦æ®ÑÅÒ¬d¸ß';
 $strExplain = '»¡©ú SQL';
@@ -300,6 +308,8 @@ $strInsertTextfiles = '±N¤å¦rÀÉ¸ê®Æ¶×¤J¸ê®Æªí';
 $strInsertedRowId = '·s¼W¸ê®Æ¦C id:';
 $strInsertedRows = '·s¼W¦C¼Æ:';
 $strInstructions = '«ü¥O';
+$strInternalNotNecessary = '* ·í¤º³¡ÃöÁp¦b InnoDB ¤w¦s¦b®É¬OµL»Ý­nªº.';
+$strInternalRelations = '¤º³¡ÃöÁp';
 $strInvalidName = '"%s" ¬O¤@­Ó«O¯d¦r,±z¤£¯à±N«O¯d¦r¨Ï¥Î¬° ¸ê®Æ®w/¸ê®Æªí/Äæ¦ì ¦WºÙ.';
 
 $strJapanese = '¤é¤å';
@@ -315,6 +325,13 @@ $strKorean = 'Áú¤å';
 $strLaTeX = 'LaTeX';  // use eng
 $strLaTeXOptions = 'LaTeX ¿ï¶µ';
 $strLandscape = '¾î¦V';
+$strLatexCaption = '¸ê®Æªí¼ÐÃD';
+$strLatexContent = '¸ê®Æªí __TABLE__ ¤º®e';
+$strLatexContinued = '(³sÄò)';
+$strLatexContinuedCaption = '³sÄò¸ê®Æªí¼ÐÃD';
+$strLatexIncludeCaption = '¥]¬A¸ê®Æªí¼ÐÃD';
+$strLatexLabel = '¼Ð°OÁä¦W';
+$strLatexStructure = '¸ê®Æªí __TABLE__ µ²ºc';
 $strLength = 'ªø«×';
 $strLengthSet = 'ªø«×/¶°¦X*';
 $strLimitNumRows = 'µ§°O¿ý/¨C­¶';
@@ -329,6 +346,7 @@ $strLoadMethod = 'LOAD ¼Ò¦¡';
 $strLocalhost = '¥»¦a';
 $strLocationTextfile = '¤å¦rÀÉ®×ªº¦ì¸m';
 $strLogPassword = '±K½X:';
+$strLogServer = '¦øªA¾¹';
 $strLogUsername = 'µn¤J¦WºÙ:';
 $strLogin = 'µn¤J';
 $strLoginInformation = 'µn¤J¸ê°T';
@@ -438,6 +456,7 @@ $strPrimaryKeyName = '¥DÁäªº¦WºÙ¥²¶·ºÙ¬° PRIMARY!';
 $strPrimaryKeyWarning = '("PRIMARY" <b>¥²¶·</b>¬O¥DÁäªº¦WºÙ¥H¤Î¬O<b>°ß¤@</b>¤@²Õ¥DÁä!)';
 $strPrint = '¦C¦L';
 $strPrintView = '¦C¦LÀËµø';
+$strPrintViewFull = '¦C¦LÀËµø (Åã¥Ü§¹¾ã¤å¦r)';
 $strPrivDescAllPrivileges = '¥]¬A©Ò¦³Åv­­°£¤F±ÂÅv (GRNANT).';
 $strPrivDescAlter = '®e³\­×§ï²{¦³¸ê®Æªíªºµ²ºc.';
 $strPrivDescCreateDb = '®e³\«Ø¥ß·s¸ê®Æ®w¤Î¸ê®Æªí.';
@@ -529,6 +548,7 @@ $strRunning = '¦b %s °õ¦æ';
 $strRussian = '«X¤å'; 
 
 $strSQL = 'SQL'; // should express in english
+$strSQLExportType = '¿é¥X¤è¦¡';
 $strSQLOptions = 'SQL ¿ï¶µ';
 $strSQLParserBugMessage = '³o¥i¯à¬O±z§ä¨ì¤F SQL ¤ÀªRµ{¦¡ªº¤@¨Çµ{¦¡¿ù»~¡A½Ð²Ó¤ß¬d¬Ý±zªº»yªk¡AÀË¬d¤@¤U¤Þ¸¹¬O¥¿½T¤Î¨S¦³¿òº|¡A¨ä¥L¥i¯à¥X¿ùªº­ì¦]¥i¯à¨Ó¦Û±z¤W¸üÀÉ®×®É¦b¤Þ¸¹¥~ªº¦a¤è¨Ï¥Î¤F¤G¶i¨î½X¡C±z¥i¥H¹Á¸Õ¦b MySQL ©R¥O¦C¤¶­±°õ¦æ¸Ó»yªk¡C¦p MySQL ¦øªA¾¹µo¥X¿ù»~«H®§¡A³o¥i¯àÀ°§U±z¥h§ä¥X°ÝÃD©Ò¦b¡C¦p±z¤´µM¥¼¯à¸Ñ¨M°ÝÃD¡A©Î¦b¤ÀªRµ{¦¡¥X²{¿ù»~¡A¦ý¦b©R¥O¦C¼Ò¦¡¯à¥¿±`°õ¦æ¡A½Ð±N¸Ó¥y¥X²{¿ù»~ªº SQL »yªk©â¥X¡A¨Ã±N¥H¤Uªº"°Å¨ú"³¡¥÷¤@¦P´£¥æ¨ì¯ä¦ä°Ï:';
 $strSQLParserUserError = '¥i¯à¬O±zªº SQL »yªk¥X²{¿ù»~¡A¦p MySQL ¦øªA¾¹µo¥X¿ù»~«H®§¡A³o¥i¯àÀ°§U±z¥h§ä¥X°ÝÃD©Ò¦b¡C';
@@ -586,6 +606,7 @@ $strSimplifiedChinese = 'Â²Åé¤¤¤å';
 $strSingly = '(¥u·|±Æ§Ç²{®Éªº°O¿ý)';
 $strSize = '¤j¤p';
 $strSort = '±Æ§Ç';
+$strSortByKey = '¨ÌÁä¦W±Æ§Ç';
 $strSpaceUsage = '¤w¨Ï¥ÎªÅ¶¡';
 $strSplitWordsWithSpace = '¨C²Õ¤å¦r¥HªÅ®æ (" ") ¤À¹j.';
 $strStatCheckTime = '³Ì«áÀË¬d';
@@ -658,11 +679,13 @@ $strUpdatePrivMessage = '±z¤w¸g§ó·s¤F %s ªºÅv­­.';
 $strUpdateProfile = '§ó·s¸ê®Æ:';
 $strUpdateProfileMessage = '¸ê®Æ¤v¸g§ó·s.';
 $strUpdateQuery = '§ó·s»yªk';
+$strUpgrade = '±zÀ³¸Ó§ó·s¨ì %s %s ©Î¤§«á.';
 $strUsage = '¨Ï¥Î';
 $strUseBackquotes = '¦b¸ê®Æªí¤ÎÄæ¦ì¨Ï¥Î¤Þ¸¹';
 $strUseHostTable = '¨Ï¥Î¥D¾÷¸ê®Æªí';
 $strUseTables = '¨Ï¥Î¸ê®Æªí';
 $strUseTextField = '¤å¦r¿é¤J';
+$strUseThisValue = '¨Ï¥Î¦¹­È';
 $strUser = '¨Ï¥ÎªÌ';
 $strUserAlreadyExists = '¨Ï¥ÎªÌ %s ¤v¦s¦b!';
 $strUserEmpty = '½Ð¿é¤J¨Ï¥ÎªÌ¦WºÙ!';
@@ -686,6 +709,7 @@ $strWebServerUploadDirectoryError = '³]©w¤§¤W¸ü¥Ø¿ý¿ù»~¡A¥¼¯à¨Ï¥Î';
 $strWelcome = 'Åwªï¨Ï¥Î %s';
 $strWestEuropean = '¦è¼Ú»y¤å';
 $strWildcard = '¸U¥Î¦r¤¸';
+$strWindowNotFound = '¥Ø¦aªºµøµ¡µLªk§ó·s. ¥i¯à§A¤wÃö³¬¦¹µøµ¡©Î§AªºÂsÄý¾¹©ó¦w¥þ³]©w¤º±Ò°Ê¤FµLªk¸óµøµ¡§ó·s';
 $strWithChecked = '¿ï¾Üªº¸ê®Æªí¡G';
 $strWritingCommentNotPossible = 'µLªkÀx¦sµù¸Ñ¤å¦r';
 $strWritingRelationNotPossible = 'µLªkÀx¦sÃöÁp';
@@ -697,11 +721,5 @@ $strYes = ' ¬O ';
 
 $strZeroRemovesTheLimit = 'µù: ³]©w³o¨Ç¿ï¶µ¬° 0 (¹s) ¥i¸Ñ°£­­¨î.';
 $strZip = '"zipped"';
-
-$strBrowseForeignValues = 'Browse foreign values';  //to translate
-
-$strUseThisValue = 'Use this value';  //to translate
-
-$strWindowNotFound = 'The target browser window could not be updated. Maybe you have closed the parent window or your browser is blocking cross-window updates of your security settings';  //to translate
 
 ?>

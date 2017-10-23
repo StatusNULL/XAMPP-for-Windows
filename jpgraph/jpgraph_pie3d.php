@@ -4,7 +4,7 @@
 // Description: 3D Pie plot extension for JpGraph
 // Created: 	2001-03-24
 // Author:	Johan Persson (johanp@aditus.nu)
-// Ver:		$Id: jpgraph_pie3d.php,v 1.45 2003/02/26 19:25:14 aditus Exp $
+// Ver:		$Id: jpgraph_pie3d.php,v 1.46.2.3 2003/08/15 11:07:07 aditus Exp $
 //
 // License:	This code is released under QPL
 // Copyright (C) 2001,2002 Johan Persson
@@ -43,7 +43,6 @@ class PiePlot3D extends PiePlot {
     }
 
     function SetSliceColors($aColors) {
-	
 	$this->setslicecolors = $aColors;
     }
 
@@ -431,6 +430,10 @@ class PiePlot3D extends PiePlot {
 	// Special optimization
 	if( $sum==0 ) return;
 
+	if( $this->labeltype == 2 ) {
+	    $this->adjusted_data = $this->AdjPercentage($data);
+	}
+
 	// Setup the start
 	$accsum = 0;
 	$a = $startangle;
@@ -635,13 +638,18 @@ class PiePlot3D extends PiePlot {
 		$x = $labeldata[$i][1] + cos($la*M_PI/180)*($d+$margin);
 		$y = $labeldata[$i][2] - sin($la*M_PI/180)*($h+$margin);
 		if( $la > 180 && $la < 360 ) $y += $z;
-		if( $this->labeltype == 0 )
+		if( $this->labeltype == 0 ) {
 		    if( $sum > 0 )
 			$l = 100*$data[$i]/$sum;
 		    else
 			$l = 0;
-		else
+		}
+		elseif( $this->labeltype == 1 ) {
 		    $l = $data[$i];
+		}
+		else {
+		    $l = $this->adjusted_data[$i];
+		}
 		if( isset($this->labels[$i]) && is_string($this->labels[$i]) )
 		    $l=sprintf($this->labels[$i],$l);
 
@@ -747,6 +755,7 @@ class PiePlot3D extends PiePlot {
     }
 
     function Stroke($img,$aaoption=0) {
+	$n = count($this->data);
 
 	// If user hasn't set the colors use the theme array
    	if( $this->setslicecolors==null ) {
@@ -754,13 +763,15 @@ class PiePlot3D extends PiePlot {
 	    sort($colors);	
 	    $idx_a=$this->themearr[$this->theme];	
 	    $ca = array();
-	    $n = count($idx_a);
-	    for($i=0; $i < $n; ++$i)
+	    $m = count($idx_a);
+	    for($i=0; $i < $m; ++$i)
 		$ca[$i] = $colors[$idx_a[$i]];
+	    $ca = array_reverse(array_slice($ca,0,$n));
 	}
    	else {
 	    $ca = $this->setslicecolors;
 	}
+	
 
 	if( $this->posx <= 1 && $this->posx > 0 )
 	    $xc = round($this->posx*$img->width);
@@ -815,7 +826,7 @@ class PiePlot3D extends PiePlot {
 	$thick = floor($thick);
 
 	if( $this->explode_all )
-	    for($i=0;$i<count($this->data);++$i)
+	    for($i=0; $i < $n; ++$i)
 		$this->explode_radius[$i]=$this->explode_r;
 
 	$this->Pie3D($aaoption,$img,$this->data, $ca, $xc, $yc, $width, $this->angle, 
@@ -847,10 +858,10 @@ class PiePlot3D extends PiePlot {
 	// For numeric values the format of the display value
 	// must be taken into account
 	if( is_numeric($label) ) {
-	    if( $label > 0 )
+	    if( $label >= 0 )
 		$w=$img->GetTextWidth(sprintf($this->value->format,$label));
 	    else
-		$w=$img->GetTextWidth(sprintf($this->value->negormat,$label));
+		$w=$img->GetTextWidth(sprintf($this->value->negformat,$label));
 	}
 	else
 	    $w=$img->GetTextWidth($label);

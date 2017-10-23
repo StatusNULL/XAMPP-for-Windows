@@ -12,7 +12,7 @@ goto endofperl
 @rem ';
 #!perl
 #line 15
-    eval 'exec c:\xampp\perl\bin\perl.exe -S $0 ${1+"$@"}'
+    eval 'exec C:\wampp2\perl\bin\perl.exe -S $0 ${1+"$@"}'
 	if $running_under_some_shell;
 #
 #
@@ -142,9 +142,9 @@ declarations at least, but that's quite a bit.
 
 Prior to this point, anyone programming in perl who wanted to interact
 with C programs, like the kernel, was forced to guess the layouts of
-the C strutures, and then hardwire these into his program.  Of course,
+the C structures, and then hardwire these into his program.  Of course,
 when you took your wonderfully crafted program to a system where the
-sgtty structure was laid out differently, you program broke.  Which is
+sgtty structure was laid out differently, your program broke.  Which is
 a shame.
 
 We've had Larry's h2ph translator, which helped, but that only works on
@@ -318,6 +318,8 @@ $perl++ if $0 =~ m#/?c2ph$#;
 
 require 'getopts.pl';
 
+use File::Temp 'tempdir';
+
 eval '$'.$1.'$2;' while $ARGV[0] =~ /^([A-Za-z_]+=)(.*)/ && shift;
 
 &Getopts('aixdpvtnws:') || &usage(0);
@@ -446,9 +448,10 @@ if (@ARGV) {
 	$ARGV[0] =~ s/\.c$/.s/;
     }
     else {
-	$TMP = "/tmp/c2ph.$$.c";
+	$TMPDIR = tempdir(CLEANUP => 1);
+	$TMP = "$TMPDIR/c2ph.$$.c";
 	&system("cat @ARGV > $TMP") && exit 1;
-	&system("cd /tmp; $CC $CFLAGS $DEFINES $TMP") && exit 1;
+	&system("cd $TMPDIR; $CC $CFLAGS $DEFINES $TMP") && exit 1;
 	unlink $TMP;
 	$TMP =~ s/\.c$/.s/;
 	@ARGV = ($TMP);
@@ -1219,7 +1222,8 @@ sub fetch_template {
 }
 
 sub compute_intrinsics {
-    local($TMP) = "/tmp/c2ph-i.$$.c";
+    $TMPDIR ||= tempdir(CLEANUP => 1);
+    local($TMP) = "$TMPDIR/c2ph-i.$$.c";
     open (TMP, ">$TMP") || die "can't open $TMP: $!";
     select(TMP);
 
@@ -1247,7 +1251,7 @@ EOF
     close TMP;
 
     select(STDOUT);
-    open(PIPE, "cd /tmp && $CC $TMP && /tmp/a.out|");
+    open(PIPE, "cd $TMPDIR && $CC $TMP && $TMPDIR/a.out|");
     while (<PIPE>) {
 	chop;
 	split(' ',$_,2);;
@@ -1256,7 +1260,7 @@ EOF
 	$intrinsics{$_[1]} = $template{$_[0]};
     }
     close(PIPE) || die "couldn't read intrinsics!";
-    unlink($TMP, '/tmp/a.out');
+    unlink($TMP, '$TMPDIR/a.out');
     print STDERR "done\n" if $trace;
 }
 

@@ -1,5 +1,5 @@
 <?php
-/* $Id: left.php,v 1.131 2003/07/25 13:59:47 garvinhicking Exp $ */
+/* $Id: left.php,v 2.5 2003/12/09 13:38:16 garvinhicking Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -7,7 +7,7 @@
  * Gets the variables sent to this script, retains the db name that may have
  * been defined as startup option and include a core library
  */
-require('./libraries/grab_globals.lib.php');
+require_once('./libraries/grab_globals.lib.php');
 if (isset($lightm_db) && !empty($lightm_db)) {
 // no longer urlencoded because of html entities in the db name
 //    $db = urldecode($lightm_db);
@@ -22,8 +22,8 @@ if (!empty($db)) {
 /**
  * Gets a core script and starts output buffering work
  */
-require('./libraries/common.lib.php');
-require('./libraries/ob.lib.php');
+require_once('./libraries/common.lib.php');
+require_once('./libraries/ob.lib.php');
 if ($cfg['OBGzip']) {
     $ob_mode = PMA_outBufferModeGet();
     if ($ob_mode) {
@@ -31,10 +31,18 @@ if ($cfg['OBGzip']) {
     }
 }
 
-PMA_checkParameters(array('hash'));
+// This check had been put here to avoid revealing the full path
+// of the phpMyAdmin directory in case this script is called
+// directly. But some users report a "Missing hash" message and
+// I cannot reproduce it, so let's define $hash to a dummy value
+// and hope some other clue will surface, to sort this bug.
+//PMA_checkParameters(array('hash'));
+if (!isset($hash)) {
+    $hash='';
+}
 
-include('./libraries/bookmark.lib.php');
-require('./libraries/relation.lib.php');
+require_once('./libraries/bookmark.lib.php');
+require_once('./libraries/relation.lib.php');
 $cfgRelation = PMA_getRelationsParam();
 
 function PMA_reduceNest($_table) {
@@ -63,13 +71,13 @@ function PMA_indent($spaces) {
     for ($i = 0; $i <= $spaces; $i++) {
         $string .= ' ';
     }
-    
+
     return $string;
 }
 
 function PMA_nestedSetHeaderParent($baseid, $key, $keyhistory, $indent, $indent_level, $val, $childout = true) {
     $name = $key;
-    $id = eregi_replace('[^a-z0-9]*', '', $baseid . $keyhistory . $key) . $indent;
+    $id = preg_replace('@[^a-z0-9]*@i', '', $baseid . $keyhistory . $key) . $indent;
 
     $on_mouse = (($GLOBALS['cfg']['LeftPointerColor'] == '') ? '' : ' onmouseover="if (isDOM || isIE4) {hilightBase(\'el' . $id . '\', \'' . $GLOBALS['cfg']['LeftPointerColor'] . '\')}" onmouseout="if (isDOM || isIE4) {hilightBase(\'el' . $id . '\', \'' . $GLOBALS['cfg']['LeftBgColor'] . '\')}"');
 
@@ -83,7 +91,7 @@ function PMA_nestedSetHeaderParent($baseid, $key, $keyhistory, $indent, $indent_
         }
         $counter = count($countarray);
     }
-    
+
     echo "\n";
     echo PMA_indent($indent * 5) . '<div id="el' . $id . 'Parent" class="parent"' . $on_mouse . '>' . "\n";
     echo PMA_indent($indent * 6) . '<nobr><img src="images/spacer.gif" border="0" width="' . (($indent - 1) * $indent_level) . '" height="9" alt="" /><a class="item" href="' . $GLOBALS['cfg']['DefaultTabDatabase'] . '?' . $GLOBALS['common_url_query'] . '" onclick="if (capable) {expandBase(\'el' . $id . '\', true); return false} else {return true}">';
@@ -102,25 +110,25 @@ function PMA_nestedSetHeader($baseid, $tablestack, $keyhistory, $indent, $indent
         PMA_nestedSetHeaderParent($baseid, $firstGroup, $keyhistory, $indent, $indent_level, $tablestack);
         $indent++;
     }
-    
-    while(list($key, $val) = each($tablestack)) {
+
+    foreach($tablestack AS $key => $val) {
         if ($key != 'pma_name' && $key != 'pma_list_item') {
             if ($headerOut) {
                 PMA_nestedSetHeaderParent($baseid, $key, $keyhistory, $indent, $indent_level, $val);
             }
-    
+
             if (isset($val['pma_name']) && isset($val['pma_list_item']) && count($val) == 2) {
                 PMA_nestedSet($baseid, $val, $key, $keyhistory . $key, false, ($indent + 1));
             } else {
                 PMA_nestedSet($baseid, $val, $key, $keyhistory . $key, true, ($indent + 1));
             }
-    
+
             if ($headerOut) {
                 echo PMA_indent($indent * 5) . '</div><id class="PMA_nestedSetHeader">' . "\n";
             }
         }
     }
-    
+
     if ($firstGroup && $firstGroupClose) {
         echo PMA_indent($indent * 4) . '</div><id class="PMA_nestedSetHeader2">' . "\n";
     } elseif ($firstGroup) {
@@ -133,13 +141,13 @@ function PMA_nestedSet($baseid, $tablestack, $key = '__protected__', $keyhistory
     if ($keyhistory == '' && $key != '__protected__') {
         $keyhistory = $key;
     }
-    
+
     $indent_level = 9;
-    
+
     if (isset($tablestack)
         && isset($tablestack['pma_name'])
         && isset($tablestack['pma_list_item'])) {
-            
+
         if (count($tablestack) > 1 && !empty($key) && isset($tablestack['pma_name']) && isset($tablestack['pma_list_item']) && $indent == 1) {
             PMA_nestedSetHeader($baseid, $tablestack, $keyhistory, ($indent+1), $indent_level, $headerOut, $key, false);
             $divClose = true;
@@ -151,21 +159,21 @@ function PMA_nestedSet($baseid, $tablestack, $key = '__protected__', $keyhistory
         }
 
         $on_mouse = (($GLOBALS['cfg']['LeftPointerColor'] == '') ? '' : ' onmouseover="if (isDOM || isIE4) {hilightBase(\'el' . $keyhistory . $key . '\', \'' . $GLOBALS['cfg']['LeftPointerColor'] . '\')}" onmouseout="if (isDOM || isIE4) {hilightBase(\'el' . $keyhistory . $key . '\', \'' . $GLOBALS['cfg']['LeftBgColor'] . '\')}"');
-        
+
         $loops = 0;
-        while(list($tkey, $tval) = each($tablestack['pma_name'])) {
+        foreach($tablestack['pma_name'] AS $tkey => $tval) {
 
             echo PMA_indent($indent * 5) . '<nobr><img src="images/spacer.gif" border="0" width="' . (($indent+$extra_indent) * $indent_level) . '" height="9" alt="" />';
             $items = explode("\n", $tablestack['pma_list_item'][$tkey]);
-            while(list($ikey, $ival) = each($items)) {
+            foreach($items AS $ikey => $ival) {
                 echo "\n";
                 echo PMA_indent(($indent * 5)) . $ival;
             }
             echo "\n";
-            
+
             $loops++;
         }
-        
+
         if ($divClose) {
             echo PMA_indent($indent * 5) . '</div><id space="putting omitted div" class="PMA_nestedSet2">';
         }
@@ -173,7 +181,7 @@ function PMA_nestedSet($baseid, $tablestack, $key = '__protected__', $keyhistory
     } elseif (is_array($tablestack)) {
         PMA_nestedSetHeader($baseid, $tablestack, $keyhistory, (($key == '__protected__' && $indent == 1 )? ($indent-1) : ($indent + 1)), $indent_level, $headerOut,  (($key == '__protected__' && $indent == 1) || ($indent > 1) ? false : $key));
     }
-    
+
     return true;
 }
 /**
@@ -192,7 +200,7 @@ if ($server > 0) {
 // to a seperate file. It can now be included by header.inc.php,
 // queryframe.php, querywindow.php.
 
-include('./libraries/header_http.inc.php');
+require_once('./libraries/header_http.inc.php');
 
 /**
  * Displays the frame
@@ -215,11 +223,11 @@ PMA_setFontSizes();
 if (isset($lightm_db) && !empty($lightm_db)) {
 ?>
     window.parent.frames['phpmain<?php echo $hash; ?>'].location.replace('./<?php echo $cfg['DefaultTabDatabase'] . '?' . PMA_generate_common_url($db, '', '&');?>');
-<?php 
+<?php
 } elseif (isset($lightm_db)) {
 ?>
     window.parent.frames['phpmain<?php echo $hash; ?>'].location.replace('./main.php?<?php echo PMA_generate_common_url('', '', '&');?>');
-<?php 
+<?php
 }
 ?>
     //-->
@@ -247,11 +255,14 @@ if (($num_dbs > 1 || !empty($cfg['LeftFrameTableSeparator'])) && !$cfg['LeftFram
     // Uggly fix for Opera and Konqueror 2.2 that are half DOM compliant
     if (capable) {
         if (typeof(window.opera) != 'undefined') {
-            capable = 0;
+            var browserName = ' ' + navigator.userAgent.toLowerCase();
+            if ((browserName.indexOf('konqueror 7') == 0)) {
+                capable = 0;
+            }
         }
         else if (typeof(navigator.userAgent) != 'undefined') {
             var browserName = ' ' + navigator.userAgent.toLowerCase();
-            if (browserName.indexOf('konqueror') > 0) {
+            if ((browserName.indexOf('konqueror') > 0) && (browserName.indexOf('konqueror/3') == 0)) {
                 capable = 0;
             }
         } // end if... else if...
@@ -304,8 +315,7 @@ if ($cfg['LeftDisplayServers']) {
             <select name="server" onchange="this.form.submit();">
     <?php
     echo "\n";
-    reset($cfg['Servers']);
-    while (list($key, $val) = each($cfg['Servers'])) {
+    foreach($cfg['Servers'] AS $key => $val) {
         if (!empty($val['host'])) {
             echo '                <option value="' . $key . '"';
             if (!empty($server) && ($server == $key)) {
@@ -477,13 +487,12 @@ if ($num_dbs > 1) {
                 $list_item .= '<bdo dir="' . $text_dir . '">&nbsp;</bdo>' . "\n";
                 $list_item .= '<a class="tblItem" id="tbl_' . md5($table) . '" title="' . $url_title . '" target="phpmain' . $hash . '" href="' . $cfg['DefaultTabTable'] . '?' . $common_url_query . '&amp;table=' . urlencode($table) . '">';
                 $list_item .= ($alias != '' && $cfg['ShowTooltipAliasTB'] ? $alias : htmlspecialchars($table)) . '</a></nobr><br />' . "\n";
-                
+
                 // garvin: Check whether to display nested sets
                 if (!empty($cfg['LeftFrameTableSeparator'])) {
                     $_table = explode($cfg['LeftFrameTableSeparator'],  str_replace('\'', '\\\'',$table));
                     if (is_array($_table)) {
-                        reset($_table);
-                        while(list($key, $val) = each($_table)) {
+                        foreach($_table AS $key => $val) {
                             if ($val == '') {
                                 $_table[$key] = '__protected__';
                             }
@@ -491,20 +500,20 @@ if ($num_dbs > 1) {
 
                         unset($_table[count($_table)-1]);
                         $_table = PMA_reduceNest($_table);
-                        
+
                         $eval_string = '$tablestack[\'' . implode('\'][\'', $_table) . '\'][\'pma_name\'][] = \'' . str_replace('\'', '\\\'', $table) . '\';';
                         $eval_string .= '$tablestack[\'' . implode('\'][\'', $_table) . '\'][\'pma_list_item\'][] = \'' . str_replace('\'', '\\\'', $list_item) . '\';';
                         eval($eval_string);
                     } else {
-                        $tablestack['__protected__']['pma_name'][] = $table;
-                        $tablestack['__protected__']['pma_list_item'][] = $list_item;
+                        $tablestack['']['pma_name'][] = $table;
+                        $tablestack['']['pma_list_item'][] = $list_item;
                     }
                 } else {
-                    $tablestack['__protected__']['pma_name'][] = $table;
-                    $tablestack['__protected__']['pma_list_item'][] = $list_item;
+                    $tablestack['']['pma_name'][] = $table;
+                    $tablestack['']['pma_list_item'][] = $list_item;
                 }
             } // end for $t (tables list)
-            
+
             PMA_nestedSet($j, $tablestack);
             ?>
     </div>
@@ -707,30 +716,30 @@ else if ($num_dbs == 1) {
             $list_item .= '<bdo dir="' . $text_dir . '">&nbsp;</bdo>' . "\n";
             $list_item .= '<a class="tblItem" id="tbl_' . md5($table) . '" title="' . $url_title . '" target="phpmain' . $hash . '" href="' . $cfg['DefaultTabTable'] . '?' . $common_url_query . '&amp;table=' . urlencode($table) . '">';
             $list_item .= ($alias != '' && $cfg['ShowTooltipAliasTB'] ? $alias : htmlspecialchars($table)) . '</a></nobr><br />';
-            
+
             // garvin: Check whether to display nested sets
             if (!empty($cfg['LeftFrameTableSeparator'])) {
-                $_table = explode($cfg['LeftFrameTableSeparator'], $table);
+                $_table = explode($cfg['LeftFrameTableSeparator'],  str_replace('\'', '\\\'',$table));
                 if (is_array($_table)) {
-                    reset($_table);
-                    while(list($key, $val) = each($_table)) {
+                    foreach($_table AS $key => $val) {
                         if ($val == '') {
                             $_table[$key] = '__protected__';
                         }
                     }
+
                     unset($_table[count($_table)-1]);
                     $_table = PMA_reduceNest($_table);
 
-                    $eval_string = '$tablestack[\'' . implode('\'][\'', $_table) . '\'][\'pma_name\'][] = \'' . $table . '\';';
-                    $eval_string .= '$tablestack[\'' . implode('\'][\'', $_table) . '\'][\'pma_list_item\'][] = \'' . $list_item . '\';';
+                    $eval_string = '$tablestack[\'' . implode('\'][\'', $_table) . '\'][\'pma_name\'][] = \'' . str_replace('\'', '\\\'', $table) . '\';';
+                    $eval_string .= '$tablestack[\'' . implode('\'][\'', $_table) . '\'][\'pma_list_item\'][] = \'' . str_replace('\'', '\\\'', $list_item) . '\';';
                     eval($eval_string);
                 } else {
-                    $tablestack['__protected__']['pma_name'][] = $table;
-                    $tablestack['__protected__']['pma_list_item'][] = $list_item;
+                    $tablestack['']['pma_name'][] = $table;
+                    $tablestack['']['pma_list_item'][] = $list_item;
                 }
             } else {
-                $tablestack['__protected__']['pma_name'][] = $table;
-                $tablestack['__protected__']['pma_list_item'][] = $list_item;
+                $tablestack['']['pma_name'][] = $table;
+                $tablestack['']['pma_list_item'][] = $list_item;
             }
         }
     } // end for $j (tables list)
@@ -755,7 +764,7 @@ else if ($num_dbs == 1) {
     } else {
         echo '    </div>';
     }
-    
+
     echo "\n";
 } // end if ($num_dbs == 1)
 
