@@ -33,7 +33,7 @@
 * @author     Sergio Carvalho <sergio.carvalho@portugalmail.com>  
 * @copyright  2004-2006 Sergio Carvalho
 * @license    http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
-* @version    CVS: $Id: Server.php,v 1.12 2006/12/02 18:09:49 sergiosgc Exp $
+* @version    CVS: $Id: Server.php,v 1.13 2008/09/10 19:03:55 sergiosgc Exp $
 * @link       http://pear.php.net/package/XML_RPC2
 */
 
@@ -305,6 +305,27 @@ abstract class XML_RPC2_Server
         print "  </body>\n";
         print "</html>\n";
     }    
+    // }}}
+    // {{{ getContentLength()
+
+    /**
+     * Gets the content legth of a serialized XML-RPC message in bytes
+     *
+     * @param string $content the serialized XML-RPC message.
+     *
+     * @return integer the content length in bytes.
+     */
+    protected function getContentLength($content)
+    {
+        if (extension_loaded('mbstring') && (ini_get('mbstring.func_overload') & 2) == 2) {
+            $length = mb_strlen($content, '8bit');
+        } else {
+            $length = strlen((binary)$content);
+        }
+
+        return $length;
+    }
+
     // }}}
 }
 

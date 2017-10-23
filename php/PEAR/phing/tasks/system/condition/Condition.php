@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: Condition.php 43 2006-03-10 14:31:51Z mrook $
+ *  $Id: Condition.php 325 2007-12-20 15:44:58Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -36,4 +36,3 @@ interface Condition {
      */
     public function evaluate();
 }
-?>

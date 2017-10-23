@@ -33,7 +33,7 @@
 * @author     Sergio Carvalho <sergio.carvalho@portugalmail.com>  
 * @copyright  2004-2005 Sergio Carvalho
 * @license    http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
-* @version    CVS: $Id: Value.php,v 1.6 2006/12/02 18:09:49 sergiosgc Exp $
+* @version    CVS: $Id: Value.php,v 1.7 2007/12/05 16:35:08 sergiosgc Exp $
 * @link       http://pear.php.net/package/XML_RPC2
 */
 
@@ -139,13 +139,15 @@ abstract class XML_RPC2_Backend_Php_Value extends XML_RPC2_Value
                 case 'array':
                     $explicitType = 'array';
                     $keys = array_keys($nativeValue);
-                    if (($keys[0] !== 0) && ($keys[0] !== 1)) $explicitType = 'struct';
-                    $i=0;
-                    do {
-                        $previous = $keys[$i];
-                        $i++;
-                        if (array_key_exists($i, $keys) && ($keys[$i] !== $keys[$i - 1] + 1)) $explicitType = 'struct';
-                    } while (array_key_exists($i, $keys) && $explicitType == 'array');
+                    if (count($keys) > 0) {
+                        if ($keys[0] !== 0 && ($keys[0] !== 1)) $explicitType = 'struct';
+                        $i=0;
+                        do {
+                            $previous = $keys[$i];
+                            $i++;
+                            if (array_key_exists($i, $keys) && ($keys[$i] !== $keys[$i - 1] + 1)) $explicitType = 'struct';
+                        } while (array_key_exists($i, $keys) && $explicitType == 'array');
+                    }
                     break;
                 case 'object':
                     if ((strtolower(get_class($nativeValue)) == 'stdclass') && (isset($nativeValue->xmlrpc_type))) {

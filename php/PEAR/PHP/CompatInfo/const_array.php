@@ -8,10 +8,9 @@
  * @package  PHP_CompatInfo
  * @author   Davey Shafik <davey@php.net>
  * @author   Laurent Laville <pear@laurent-laville.org>
- * @license  http://www.php.net/license/3_01.txt  PHP License 3.01
- * @version  CVS: $Id: const_array.php,v 1.11 2008/02/03 21:32:09 farell Exp $
+ * @license  http://www.opensource.org/licenses/bsd-license.php  BSD
+ * @version  CVS: $Id: const_array.php,v 1.14 2008/07/22 20:26:19 farell Exp $
  * @link     http://pear.php.net/package/PHP_CompatInfo
- * @global   array $GLOBALS['_PHP_COMPATINFO_CONST']
  * @ignore
  */
 
@@ -24,6 +23,7 @@
  *       Using PHP from the command line: CLI specific Constants
  * @link http://www.php.net/features.file-upload.errors
  *       File Upload Error specific Constants
+ * @global   array $GLOBALS['_PHP_COMPATINFO_CONST']
  */
 
 $GLOBALS['_PHP_COMPATINFO_CONST'] = array (
@@ -181,6 +181,11 @@ $GLOBALS['_PHP_COMPATINFO_CONST'] = array (
   array (
     'init' => '5.0.0',
     'name' => 'E_STRICT',
+  ),
+  'E_RECOVERABLE_ERROR' =>
+  array (
+    'init' => '5.2.0',
+    'name' => 'E_RECOVERABLE_ERROR',
   ),
   'PATH_SEPARATOR' =>
   array (

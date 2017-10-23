@@ -1,6 +1,6 @@
 <?php
 /*
- *	$Id: PhpLintTask.php 244 2007-10-07 18:59:52Z mrook $
+ *	$Id: PhpLintTask.php 342 2008-01-21 14:49:48Z mrook $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -36,7 +36,25 @@ class PhpLintTask extends Task {
 	protected $errorProperty;
 	protected $haltOnFailure = false;
 	protected $hasErrors = false;
-    private $badFiles = array();
+	private $badFiles = array();
+	protected $interpreter = ''; // php interpreter to use for linting
+
+    /**
+     * Initialize the interpreter with the Phing property
+     */
+    public function __construct() {
+        $this->setInterpreter(Phing::getProperty('php.interpreter'));
+    }
+
+	/**
+	 * Override default php interpreter
+	 * @todo	Do some sort of checking if the path is correct but would 
+	 *			require traversing the systems executeable path too
+	 * @param	string	$sPhp
+	 */
+	public function setInterpreter($sPhp) {
+		$this->Interpreter = $sPhp;
+	}
 
 	/**
 	 * The haltonfailure property
@@ -105,7 +123,10 @@ class PhpLintTask extends Task {
 	 * @return void
 	 */
 	protected function lint($file) {
-		$command = 'php -l ';
+        $command = $this->Interpreter == ''
+            ? 'php'
+            : $this->Interpreter;
+        $command .= ' -l ';
 		if(file_exists($file)) {
 			if(is_readable($file)) {
 				$messages = array();
@@ -134,4 +155,5 @@ class PhpLintTask extends Task {
 	}
 }
 
-?>
+
+

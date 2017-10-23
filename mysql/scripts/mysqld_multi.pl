@@ -11,8 +11,8 @@ my @defaults_options;   #  Leading --no-defaults, --defaults-file, etc.
 $opt_example       = 0;
 $opt_help          = 0;
 $opt_log           = undef();
-$opt_mysqladmin    = "C:/Program Files/MySql/MySQL Server 5.0/bin/mysqladmin";
-$opt_mysqld        = "C:/Program Files/MySql/MySQL Server 5.0/bin/mysqld";
+$opt_mysqladmin    = "C:/Program Files/MySql/MySQL Server 5.1/bin/mysqladmin";
+$opt_mysqld        = "C:/Program Files/MySql/MySQL Server 5.1/bin/mysqld";
 $opt_no_log        = 0;
 $opt_password      = undef();
 $opt_tcp_ip        = 0;
@@ -193,7 +193,7 @@ sub defaults_for_group
 
 ####
 #### Init log file. Check for appropriate place for log file, in the following
-#### order:  my_print_defaults mysqld datadir, C:/Program Files/MySql/MySQL Server 5.0/share
+#### order:  my_print_defaults mysqld datadir, C:/Program Files/MySql/MySQL Server 5.1/share
 ####
 
 sub init_log
@@ -207,7 +207,7 @@ sub init_log
   }
   if (!defined($logdir))
   {
-    $logdir= "C:/Program Files/MySql/MySQL Server 5.0/share" if (-d "C:/Program Files/MySql/MySQL Server 5.0/share" && -w "C:/Program Files/MySql/MySQL Server 5.0/share");
+    $logdir= "C:/Program Files/MySql/MySQL Server 5.1/share" if (-d "C:/Program Files/MySql/MySQL Server 5.1/share" && -w "C:/Program Files/MySql/MySQL Server 5.1/share");
   }
   if (!defined($logdir))
   {
@@ -444,7 +444,7 @@ sub list_defaults_files
   return grep { defined $_ and not $seen{$_}++ and -f $_ and -r $_ }
               ('/etc/my.cnf',
                '/etc/mysql/my.cnf',
-               'C:/Program Files/MySql/MySQL Server 5.0/my.cnf',
+               'C:/Program Files/MySql/MySQL Server 5.1/my.cnf',
                ($ENV{MYSQL_HOME} ? "$ENV{MYSQL_HOME}/my.cnf" : undef),
                $opt{'extra-file'},
                ($ENV{HOME} ? "$ENV{HOME}/.my.cnf" : undef));
@@ -648,7 +648,7 @@ sub example
 #   (as per Linux/Unix standard). You may even replace the
 #   /etc/init.d/mysql.server script with it.
 #
-#   Before using, you must create a my.cnf file either in C:/Program Files/MySql/MySQL Server 5.0/my.cnf
+#   Before using, you must create a my.cnf file either in C:/Program Files/MySql/MySQL Server 5.1/my.cnf
 #   or /root/.my.cnf and add the [mysqld_multi] and [mysqld#] groups.
 #
 #   The script can be found from support-files/mysqld_multi.server.sh
@@ -656,17 +656,17 @@ sub example
 #
 
 [mysqld_multi]
-mysqld     = C:/Program Files/MySql/MySQL Server 5.0/bin/mysqld_safe
-mysqladmin = C:/Program Files/MySql/MySQL Server 5.0/bin/mysqladmin
+mysqld     = C:/Program Files/MySql/MySQL Server 5.1/bin/mysqld_safe
+mysqladmin = C:/Program Files/MySql/MySQL Server 5.1/bin/mysqladmin
 user       = multi_admin
 password   = my_password
 
 [mysqld2]
 socket     = /tmp/mysql.sock2
 port       = 3307
-pid-file   = C:/Program Files/MySql/MySQL Server 5.0/data2/hostname.pid2
-datadir    = C:/Program Files/MySql/MySQL Server 5.0/data2
-language   = C:/Program Files/MySql/MySQL Server 5.0/share/mysql/english
+pid-file   = C:/Program Files/MySql/MySQL Server 5.1/data2/hostname.pid2
+datadir    = C:/Program Files/MySql/MySQL Server 5.1/data2
+language   = C:/Program Files/MySql/MySQL Server 5.1/share/mysql/english
 user       = unix_user1
 
 [mysqld3]
@@ -675,25 +675,25 @@ ledir      = /path/to/mysqld-binary/
 mysqladmin = /path/to/mysqladmin/mysqladmin
 socket     = /tmp/mysql.sock3
 port       = 3308
-pid-file   = C:/Program Files/MySql/MySQL Server 5.0/data3/hostname.pid3
-datadir    = C:/Program Files/MySql/MySQL Server 5.0/data3
-language   = C:/Program Files/MySql/MySQL Server 5.0/share/mysql/swedish
+pid-file   = C:/Program Files/MySql/MySQL Server 5.1/data3/hostname.pid3
+datadir    = C:/Program Files/MySql/MySQL Server 5.1/data3
+language   = C:/Program Files/MySql/MySQL Server 5.1/share/mysql/swedish
 user       = unix_user2
 
 [mysqld4]
 socket     = /tmp/mysql.sock4
 port       = 3309
-pid-file   = C:/Program Files/MySql/MySQL Server 5.0/data4/hostname.pid4
-datadir    = C:/Program Files/MySql/MySQL Server 5.0/data4
-language   = C:/Program Files/MySql/MySQL Server 5.0/share/mysql/estonia
+pid-file   = C:/Program Files/MySql/MySQL Server 5.1/data4/hostname.pid4
+datadir    = C:/Program Files/MySql/MySQL Server 5.1/data4
+language   = C:/Program Files/MySql/MySQL Server 5.1/share/mysql/estonia
 user       = unix_user3
  
 [mysqld6]
 socket     = /tmp/mysql.sock6
 port       = 3311
-pid-file   = C:/Program Files/MySql/MySQL Server 5.0/data6/hostname.pid6
-datadir    = C:/Program Files/MySql/MySQL Server 5.0/data6
-language   = C:/Program Files/MySql/MySQL Server 5.0/share/mysql/japanese
+pid-file   = C:/Program Files/MySql/MySQL Server 5.1/data6/hostname.pid6
+datadir    = C:/Program Files/MySql/MySQL Server 5.1/data6
+language   = C:/Program Files/MySql/MySQL Server 5.1/share/mysql/japanese
 user       = unix_user4
 EOF
   exit(0);

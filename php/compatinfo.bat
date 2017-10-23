@@ -18,5 +18,5 @@ rem @version    CVS: $Id: compatinfo.bat,v 1.4 2007/02/11 16:20:50 farell Exp $
 rem @link       http://pear.php.net/package/PHP_CompatInfo
 rem @since      File available since Release 1.3.0
 
-"\xampp\php\.\php.exe" -d include_path="\xampp\php\pear" -f "\xampp\php\pear/PHP/CompatInfo/pcicmd.php" -- %*
+"\xampp\php\.\php.exe" -d include_path=".\pear" -f "PHP\CompatInfo\pcicmd.php" -- %*
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: SvnLastRevisionTask.php 81 2006-07-06 13:07:29Z mrook $
+ * $Id: SvnLastRevisionTask.php 325 2007-12-20 15:44:58Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -26,7 +26,7 @@ require_once 'phing/tasks/ext/svn/SvnBaseTask.php';
  * Stores the number of the last revision of a workingcopy in a property
  *
  * @author Michiel Rook <michiel.rook@gmail.com>
- * @version $Id: SvnLastRevisionTask.php 81 2006-07-06 13:07:29Z mrook $
+ * @version $Id: SvnLastRevisionTask.php 325 2007-12-20 15:44:58Z hans $
  * @package phing.tasks.ext.svn
  * @see VersionControl_SVN
  * @since 2.1.0
@@ -72,4 +72,3 @@ class SvnLastRevisionTask extends SvnBaseTask
 		}
 	}
 }
-?>

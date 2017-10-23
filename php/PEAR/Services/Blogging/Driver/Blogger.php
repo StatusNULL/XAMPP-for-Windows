@@ -1,4 +1,18 @@
 <?php
+/**
+* Part of the Services_Blogging package.
+*
+* PHP version 5
+*
+* @category Services
+* @package  Services_Blogging
+* @author   Anant Narayanan <anant@php.net>
+* @author   Christian Weiske <cweiske@php.net>
+* @license  http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
+* @version  CVS: $Id: Blogger.php,v 1.5 2008/11/29 13:15:46 cweiske Exp $
+* @link     http://pear.php.net/package/Services_Blogging
+*/
+
 require_once 'Services/Blogging/Driver.php';
 require_once 'Services/Blogging/Driver/Exception.php';
 require_once 'Services/Blogging/MultipleBlogsInterface.php';
@@ -39,7 +53,7 @@ class Services_Blogging_Driver_Blogger
     * Internal list with user data.
     * @var array
     */
-    protected $userdata         = array();
+    protected $userdata = array();
 
     const ERROR_UNKNOWN_TEMPLATE = 112;
 
@@ -74,7 +88,7 @@ class Services_Blogging_Driver_Blogger
             'path'  => $path,
             'rpc_user'  => new XML_RPC_Value($user, 'string'),
             'rpc_pass'  => new XML_RPC_Value($pass, 'string'),
-            'rpc_blogid'=> new XML_RPC_Value(''   , 'string'),
+            'rpc_blogid'=> new XML_RPC_Value('', 'string'),
             'rpc_key'   => new XML_RPC_Value('0123456789ABCDEF', 'string')
         );
 
@@ -86,6 +100,7 @@ class Services_Blogging_Driver_Blogger
                 $this->userdata['rpc_pass']
             )
         );
+
         $this->rpc_client = new XML_RPC_Client(
             $this->userdata['path'],
             $this->userdata['server']
@@ -118,7 +133,9 @@ class Services_Blogging_Driver_Blogger
                     $this->userdata['rpc_blogid'],
                     $this->userdata['rpc_user'],
                     $this->userdata['rpc_pass'],
-                    new XML_RPC_Value($post->{Services_Blogging_Post::CONTENT}, 'string'),
+                    new XML_RPC_Value(
+                        $post->{Services_Blogging_Post::CONTENT}, 'string'
+                    ),
                     new XML_RPC_Value(true, 'boolean')
                 )
             );
@@ -134,7 +151,9 @@ class Services_Blogging_Driver_Blogger
                     new XML_RPC_Value($post->id, 'string'),
                     $this->userdata['rpc_user'],
                     $this->userdata['rpc_pass'],
-                    new XML_RPC_Value($post->{Services_Blogging_Post::CONTENT}, 'string'),
+                    new XML_RPC_Value(
+                        $post->{Services_Blogging_Post::CONTENT}, 'string'
+                    ),
                     new XML_RPC_Value(true, 'boolean')
                 )
             );
@@ -170,6 +189,7 @@ class Services_Blogging_Driver_Blogger
                 new XML_RPC_Value(true, 'boolean')
             )
         );
+
         $response = Services_Blogging_XmlRpc::sendRequest(
             $request, $this->rpc_client
         );
@@ -184,9 +204,10 @@ class Services_Blogging_Driver_Blogger
     * have.
     *
     * @param string $strPostType Type of post to create.
-    *                            @see getSupportedPostTypes()
     *
     * @return array Array of strings
+    *
+    * @see getSupportedPostTypes()
     */
     public function getSupportedPostProperties($strPostType = 'post')
     {
@@ -201,9 +222,10 @@ class Services_Blogging_Driver_Blogger
     *
     * @param string $strProperty Property name/id to check
     * @param string $strPostType Type of post to create.
-    *                            @see getSupportedPostTypes()
     *
     * @return boolean If the property is supported
+    *
+    * @see getSupportedPostTypes()
     */
     public function isPostPropertySupported($strProperty, $strPostType = 'post')
     {
@@ -255,9 +277,11 @@ class Services_Blogging_Driver_Blogger
                 $this->userdata['rpc_pass']
             )
         );
+
         $blogs = Services_Blogging_XmlRpc::sendRequest(
             $request, $this->rpc_client
         );
+
         $arBlogs = array();
         foreach ($blogs as $blog) {
             $arBlogs[] = new Services_Blogging_Blog(

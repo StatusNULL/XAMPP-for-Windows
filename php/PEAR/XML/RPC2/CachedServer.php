@@ -33,7 +33,7 @@
 * @author     Fabien MARTY <fab@php.net>  
 * @copyright  2005-2006 Fabien MARTY
 * @license    http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
-* @version    CVS: $Id: CachedServer.php,v 1.5 2006/01/23 22:30:48 fab Exp $
+* @version    CVS: $Id: CachedServer.php,v 1.6 2008/09/10 19:03:55 sergiosgc Exp $
 * @link       http://pear.php.net/package/XML_RPC2
 */
 
@@ -220,7 +220,7 @@ class XML_RPC2_CachedServer {
             $encoding = $this->_options['encoding'];
         }
         header('Content-type: text/xml; charset=' . $encoding);
-        header('Content-length: '.strlen($response));
+        header('Content-length: ' . $this->getContentLength($response));
         print $response;
     }
     
@@ -389,6 +389,28 @@ class XML_RPC2_CachedServer {
         $this->_cacheObject->clean($this->_defaultCacheGroup, 'ingroup');
     }
 
+    // }}}
+    // {{{ getContentLength()
+
+    /**
+     * Gets the content legth of a serialized XML-RPC message in bytes
+     *
+     * @param string $content the serialized XML-RPC message.
+     *
+     * @return integer the content length in bytes.
+     */
+    protected function getContentLength($content)
+    {
+        if (extension_loaded('mbstring') && (ini_get('mbstring.func_overload') & 2) == 2) {
+            $length = mb_strlen($content, '8bit');
+        } else {
+            $length = strlen((binary)$content);
+        }
+
+        return $length;
+    }
+
+    // }}}
 }
 
 ?>

@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: PhingTask.php 175 2007-03-14 13:52:03Z hans $  
+ *  $Id: PhingTask.php 303 2007-11-08 20:39:33Z hans $  
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -159,7 +159,6 @@ class PhingTask extends Task {
         $savedDir = $this->dir;
         $savedPhingFile = $this->phingFile;
         $savedTarget = $this->newTarget;
-        $buildFailed = false;
 
         // set no specific target for files in filesets
         // [HL] I'm commenting this out; I don't know why this should not be supported!
@@ -199,7 +198,8 @@ class PhingTask extends Task {
      * @return void
      */
     private function processFile()  {
-            
+
+    	$buildFailed = false;
         $savedDir = $this->dir;
         $savedPhingFile = $this->phingFile;
         $savedTarget = $this->newTarget;

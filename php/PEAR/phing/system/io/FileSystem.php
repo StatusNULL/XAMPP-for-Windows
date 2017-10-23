@@ -1,7 +1,7 @@
 <?php
 
 /* 
- *  $Id: FileSystem.php 258 2007-10-21 00:46:45Z hans $
+ *  $Id: FileSystem.php 362 2008-03-08 10:07:53Z mrook $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -349,7 +349,7 @@ abstract class FileSystem {
         $path = $f->getPath();
         $success = @touch($path, $time);
         if (!$success) {
-            throw new Exception("Could not create directory due to: $php_errormsg");
+            throw new Exception("Could not touch '" . $path . "' due to: $php_errormsg");
         }
     }
 
@@ -408,6 +408,22 @@ abstract class FileSystem {
         }
     }
 
+	/**
+	 * Change the ownership on a file or directory.
+	 *
+	 * @param    string $pathname Path and name of file or directory.
+	 * @param    string $user The user name or number of the file or directory. See http://us.php.net/chown
+	 *
+	 * @return void
+	 * @throws Exception if operation failed.
+	 */
+	function chown($pathname, $user) {
+		if (false === @chown($pathname, $user)) {// FAILED.
+			$msg = "FileSystem::chown() FAILED. Cannot chown $pathname. User $user." . (isset($php_errormsg) ? ' ' . $php_errormsg : "");
+			throw new Exception($msg);
+		}
+    }
+    
     /**
      * Change the permissions on a file or directory.
      *

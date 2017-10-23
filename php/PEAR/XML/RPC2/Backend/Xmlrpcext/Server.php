@@ -33,7 +33,7 @@
 * @author     Sergio Carvalho <sergio.carvalho@portugalmail.com>  
 * @copyright  2004-2006 Sergio Carvalho
 * @license    http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
-* @version    CVS: $Id: Server.php,v 1.10 2006/12/02 18:09:49 sergiosgc Exp $
+* @version    CVS: $Id: Server.php,v 1.11 2008/09/10 19:03:55 sergiosgc Exp $
 * @link       http://pear.php.net/package/XML_RPC2
 */
 
@@ -126,7 +126,7 @@ class XML_RPC2_Backend_Xmlrpcext_Server extends XML_RPC2_Server
         if ((!($this->autoDocument)) or ((isset($GLOBALS['HTTP_RAW_POST_DATA'])) && (strlen($GLOBALS['HTTP_RAW_POST_DATA'])>0))) {
             $response = $this->getResponse();
             header('Content-type: text/xml; charset=' . $this->encoding);
-            header('Content-length: '.strlen($response));
+            header('Content-length: ' . $this->getContentLength($response));
             print $response;
         } else {
             $this->autoDocument();

@@ -1,3 +1,18 @@
+<?php
+	// Requests allowed only from localhosz
+	extract($_POST);
+	extract($_SERVER);
+	$host = "127.0.0.1";
+	$timeout = "1";
+
+	if ($REMOTE_ADDR) {
+		if ($REMOTE_ADDR != $host) {
+			echo "<p><h2> FORBIDDEN FOR CLIENT $REMOTE_ADDR <h2></p>";
+			exit;
+		}
+	}
+?>
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 	"http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -13,7 +28,7 @@
 		&nbsp;<br>
 
 		<h1><?php echo $TEXT['security-head']; ?> <?php include ".secureversion"; ?></h1>
-
+		<i>(Requests allowed from localhost only)</i><br/><br/>
 		<?php echo $TEXT['security-text1']; ?><p>
 
 		<?php

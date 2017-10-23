@@ -1,4 +1,18 @@
 <?php
+/**
+* Part of the Services_Blogging package.
+*
+* PHP version 5
+*
+* @category Services
+* @package  Services_Blogging
+* @author   Christian Weiske <cweiske@php.net>
+* @author   Anant Narayanan <anant@php.net>
+* @license  http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
+* @version  CVS: $Id: Driver.php,v 1.4 2008/11/29 13:15:46 cweiske Exp $
+* @link     http://pear.php.net/package/Services_Blogging
+*/
+
 require_once 'Services/Blogging/Post.php';
 
 /**
@@ -53,9 +67,10 @@ abstract class Services_Blogging_Driver
     * the properties that a post to this blog may have.
     *
     * @param string $strPostType Type of post to create.
-    *                            @see getSupportedPostTypes()
     *
     * @return array Array of strings
+    *
+    * @see getSupportedPostTypes()
     */
     abstract public function getSupportedPostProperties($strPostType = 'post');
 
@@ -67,9 +82,10 @@ abstract class Services_Blogging_Driver
     *
     * @param string $strProperty Property name/id to check
     * @param string $strPostType Type of post to create.
-    *                            @see getSupportedPostTypes()
     *
     * @return boolean If the property is supported
+    *
+    * @see getSupportedPostTypes()
     */
     abstract public function isPostPropertySupported(
         $strProperty, $strPostType = 'post'
@@ -84,12 +100,13 @@ abstract class Services_Blogging_Driver
     * Needs to be overwritten by drivers supporting multiple post types.
     *
     * @param string $strPostType Type of post to create.
-    *                            @see getSupportedPostTypes()
     *
     * @return Services_Blogging_Post New post object
     *
     * @throws Services_Blogging_Driver_Exception When an unsupported post
     *  type is used.
+    *
+    * @see getSupportedPostTypes()
     */
     public function createNewPost($strPostType = 'post')
     {

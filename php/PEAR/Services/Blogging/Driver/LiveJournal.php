@@ -1,4 +1,17 @@
 <?php
+/**
+* Part of the Services_Blogging package.
+*
+* PHP version 5
+*
+* @category Services
+* @package  Services_Blogging
+* @author   Christian Weiske <cweiske@php.net>
+* @license  http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
+* @version  CVS: $Id: LiveJournal.php,v 1.5 2008/11/29 13:15:46 cweiske Exp $
+* @link     http://pear.php.net/package/Services_Blogging
+*/
+
 require_once 'Services/Blogging/ExtendedDriver.php';
 require_once 'Services/Blogging/Driver/Exception.php';
 require_once 'Services/Blogging/XmlRpc.php';
@@ -29,7 +42,7 @@ class Services_Blogging_Driver_LiveJournal
     * Internal list with user data.
     * @var array
     */
-    protected $userdata                  = array();
+    protected $userdata = array();
 
     protected $arSupportedPostProperties = array(
         Services_Blogging_Post::TITLE,
@@ -74,28 +87,40 @@ class Services_Blogging_Driver_LiveJournal
             $this->userdata['server']
         );
 
-        $authdata     = $this->getAuthData();
-        $authenticate = new XML_RPC_Message(
-            'LJ.XMLRPC.login',
+        $authdata = $this->getAuthData();
+
+        $value = new XML_RPC_Value(
             array(
-                new XML_RPC_Value(
-                    array(
-                        'username'       => $this->userdata['rpc_user'],
-                        'auth_method'    => new XML_RPC_Value('challenge', 'string'),
-                        'auth_challenge' => new XML_RPC_Value($authdata['challenge'], 'string'),
-                        'auth_response'  => new XML_RPC_Value($authdata['response'] , 'string'),
-                        'clientversion'  => new XML_RPC_Value('PHP-Services_Blogging/0.0.1')
-                    ),
-                    'struct'
+                'username'       => $this->userdata['rpc_user'],
+                'auth_method'    => new XML_RPC_Value('challenge', 'string'),
+                'auth_challenge' => new XML_RPC_Value(
+                    $authdata['challenge'], 'string'
+                ),
+                'auth_response'  => new XML_RPC_Value(
+                    $authdata['response'] , 'string'
+                ),
+                'clientversion'  => new XML_RPC_Value(
+                    'PHP/Services_Blogging-0.2.3'
                 )
-            )
+            ),
+            'struct'
         );
+
+        $authenticate = new XML_RPC_Message('LJ.XMLRPC.login', array($value));
         Services_Blogging_XmlRpc::sendRequest($authenticate, $this->rpc_client);
     }//public function __construct($userid, $pass, $server = null, $path = null)
 
 
 
-    protected function md5_hex($string)
+    /**
+    * Creates md5 hash of the given string and converts it to hexadecimal
+    * representation.
+    *
+    * @param string $string Some string value
+    *
+    * @return string md5-hashed hecadecimal representation
+    */
+    protected function md5hex($string)
     {
         $md5 = md5($string, true);//raw output
         $hex = '';
@@ -103,10 +128,16 @@ class Services_Blogging_Driver_LiveJournal
             $hex .= str_pad(dechex(ord($md5[$nC])), 2, '0', STR_PAD_LEFT);
         }
         return $hex;
-    }//protected function md5_hex($string)
+    }//protected function md5hex($string)
 
 
 
+    /**
+    * Returns the authentication data used for the challenge-repsonse
+    * mechanism.
+    *
+    * @return array Array with authentican data.
+    */
     protected function getAuthData()
     {
         //get challenge for authentication
@@ -117,8 +148,8 @@ class Services_Blogging_Driver_LiveJournal
 
         return array(
             'challenge' => $response['challenge'],
-            'response'  => $this->md5_hex(
-                $response['challenge'] . $this->md5_hex($this->userdata['pass'])
+            'response'  => $this->md5hex(
+                $response['challenge'] . $this->md5hex($this->userdata['pass'])
             )
         );
     }//protected function getAuthData()
@@ -145,29 +176,35 @@ class Services_Blogging_Driver_LiveJournal
 
         if ($post->id === null) {
             //post is new and has no Id => create new one
-            $request = new XML_RPC_Message('LJ.XMLRPC.postevent',
+            $value = new XML_RPC_Value(
                 array(
-                    new XML_RPC_Value(
-                        array(
-                            'username'       => $this->userdata['rpc_user'],
-                            'auth_method'    => new XML_RPC_Value('challenge', 'string'),
-                            'auth_challenge' => new XML_RPC_Value($authdata['challenge'], 'string'),
-                            'auth_response'  => new XML_RPC_Value($authdata['response'] , 'string'),
+                    'username'       => $this->userdata['rpc_user'],
+                    'auth_method'    => new XML_RPC_Value('challenge', 'string'),
+                    'auth_challenge' => new XML_RPC_Value(
+                        $authdata['challenge'], 'string'
+                    ),
+                    'auth_response'  => new XML_RPC_Value(
+                        $authdata['response'] , 'string'
+                    ),
 
-                            'subject'        => new XML_RPC_Value($post->{Services_Blogging_Post::TITLE}),
-                            'event'          => new XML_RPC_Value($post->{Services_Blogging_Post::CONTENT}),
-                            'lineendings'    => new XML_RPC_Value('pc'),
+                    'subject'        => new XML_RPC_Value(
+                        $post->{Services_Blogging_Post::TITLE}
+                    ),
+                    'event'          => new XML_RPC_Value(
+                        $post->{Services_Blogging_Post::CONTENT}
+                    ),
+                    'lineendings'    => new XML_RPC_Value('pc'),
 
-                            'year'           => new XML_RPC_Value(date('Y', $time), 'int'),
-                            'mon'            => new XML_RPC_Value(date('n', $time), 'int'),
-                            'day'            => new XML_RPC_Value(date('j', $time), 'int'),
-                            'hour'           => new XML_RPC_Value(date('G', $time), 'int'),
-                            'min'            => new XML_RPC_Value(date('i', $time), 'int'),
-                        ),
-                        'struct'
-                    )
-                )
+                    'year'           => new XML_RPC_Value(date('Y', $time), 'int'),
+                    'mon'            => new XML_RPC_Value(date('n', $time), 'int'),
+                    'day'            => new XML_RPC_Value(date('j', $time), 'int'),
+                    'hour'           => new XML_RPC_Value(date('G', $time), 'int'),
+                    'min'            => new XML_RPC_Value(date('i', $time), 'int'),
+                ),
+                'struct'
             );
+
+            $request = new XML_RPC_Message('LJ.XMLRPC.postevent', array($value));
 
             $arData = Services_Blogging_XmlRpc::sendRequest(
                 $request, $this->rpc_client
@@ -176,31 +213,37 @@ class Services_Blogging_Driver_LiveJournal
             $post->{Services_Blogging_Post::URL} = $arData['url'];
         } else {
             //edit the post; it already exists
-            $request = new XML_RPC_Message('LJ.XMLRPC.editevent',
+            $value = new XML_RPC_Value(
                 array(
-                    new XML_RPC_Value(
-                        array(
-                            'username'       => $this->userdata['rpc_user'],
-                            'auth_method'    => new XML_RPC_Value('challenge', 'string'),
-                            'auth_challenge' => new XML_RPC_Value($authdata['challenge'], 'string'),
-                            'auth_response'  => new XML_RPC_Value($authdata['response'] , 'string'),
+                    'username'       => $this->userdata['rpc_user'],
+                    'auth_method'    => new XML_RPC_Value('challenge', 'string'),
+                    'auth_challenge' => new XML_RPC_Value(
+                        $authdata['challenge'], 'string'
+                    ),
+                    'auth_response'  => new XML_RPC_Value(
+                        $authdata['response'] , 'string'
+                    ),
 
-                            'itemid'         => new XML_RPC_Value($post->id, 'int'),
+                    'itemid'         => new XML_RPC_Value($post->id, 'int'),
 
-                            'subject'        => new XML_RPC_Value($post->{Services_Blogging_Post::TITLE}),
-                            'event'          => new XML_RPC_Value($post->{Services_Blogging_Post::CONTENT}),
-                            'lineendings'    => new XML_RPC_Value('pc'),
+                    'subject'        => new XML_RPC_Value(
+                        $post->{Services_Blogging_Post::TITLE}
+                    ),
+                    'event'          => new XML_RPC_Value(
+                        $post->{Services_Blogging_Post::CONTENT}
+                    ),
+                    'lineendings'    => new XML_RPC_Value('pc'),
 
-                            'year'           => new XML_RPC_Value(date('Y', $time), 'int'),
-                            'mon'            => new XML_RPC_Value(date('n', $time), 'int'),
-                            'day'            => new XML_RPC_Value(date('j', $time), 'int'),
-                            'hour'           => new XML_RPC_Value(date('G', $time), 'int'),
-                            'min'            => new XML_RPC_Value(date('i', $time), 'int'),
-                        ),
-                        'struct'
-                    )
-                )
+                    'year'           => new XML_RPC_Value(date('Y', $time), 'int'),
+                    'mon'            => new XML_RPC_Value(date('n', $time), 'int'),
+                    'day'            => new XML_RPC_Value(date('j', $time), 'int'),
+                    'hour'           => new XML_RPC_Value(date('G', $time), 'int'),
+                    'min'            => new XML_RPC_Value(date('i', $time), 'int'),
+                ),
+                'struct'
             );
+
+            $request = new XML_RPC_Message('LJ.XMLRPC.editevent', array($value));
 
             $arData = Services_Blogging_XmlRpc::sendRequest(
                 $request, $this->rpc_client
@@ -253,22 +296,25 @@ class Services_Blogging_Driver_LiveJournal
     public function getPost($id)
     {
         $authdata = $this->getAuthData();
-        $request  = new XML_RPC_Message('LJ.XMLRPC.getevents',
-            array(
-                new XML_RPC_Value(
-                    array(
-                        'username'       => $this->userdata['rpc_user'],
-                        'auth_method'    => new XML_RPC_Value('challenge', 'string'),
-                        'auth_challenge' => new XML_RPC_Value($authdata['challenge'], 'string'),
-                        'auth_response'  => new XML_RPC_Value($authdata['response'] , 'string'),
 
-                        'selecttype'     => new XML_RPC_Value('one', 'string'),
-                        'itemid'         => new XML_RPC_Value($id, 'int')
-                    ),
-                    'struct'
-                )
-            )
+        $value = new XML_RPC_Value(
+            array(
+                'username'       => $this->userdata['rpc_user'],
+                'auth_method'    => new XML_RPC_Value('challenge', 'string'),
+                'auth_challenge' => new XML_RPC_Value(
+                    $authdata['challenge'], 'string'
+                ),
+                'auth_response'  => new XML_RPC_Value(
+                    $authdata['response'] , 'string'
+                ),
+
+                'selecttype'     => new XML_RPC_Value('one', 'string'),
+                'itemid'         => new XML_RPC_Value($id, 'int')
+            ),
+            'struct'
         );
+
+        $request = new XML_RPC_Message('LJ.XMLRPC.getevents', array($value));
 
         $arData = Services_Blogging_XmlRpc::sendRequest(
             $request, $this->rpc_client
@@ -300,26 +346,28 @@ class Services_Blogging_Driver_LiveJournal
         }
 
         $authdata = $this->getAuthData();
-        $request  = new XML_RPC_Message('LJ.XMLRPC.getevents',
+        $value    = new XML_RPC_Value(
             array(
-                new XML_RPC_Value(
-                    array(
-                        'username'       => $this->userdata['rpc_user'],
-                        'auth_method'    => new XML_RPC_Value('challenge', 'string'),
-                        'auth_challenge' => new XML_RPC_Value($authdata['challenge'], 'string'),
-                        'auth_response'  => new XML_RPC_Value($authdata['response'] , 'string'),
+                'username'       => $this->userdata['rpc_user'],
+                'auth_method'    => new XML_RPC_Value('challenge', 'string'),
+                'auth_challenge' => new XML_RPC_Value(
+                    $authdata['challenge'], 'string'
+                ),
+                'auth_response'  => new XML_RPC_Value(
+                    $authdata['response'] , 'string'
+                ),
 
-                        'selecttype'     => new XML_RPC_Value('lastn', 'string'),
-                        'howmany'        => new XML_RPC_Value($number, 'int')
-                    ),
-                    'struct'
-                )
-            )
+                'selecttype'     => new XML_RPC_Value('lastn', 'string'),
+                'howmany'        => new XML_RPC_Value($number, 'int')
+            ),
+            'struct'
         );
+        $request  = new XML_RPC_Message('LJ.XMLRPC.getevents', array($value));
 
         $arData = Services_Blogging_XmlRpc::sendRequest(
             $request, $this->rpc_client
         );
+
         $arPosts = array();
         foreach ($arData['events'] as $event) {
             $post               = $this->convertStructToPost($event);
@@ -348,29 +396,33 @@ class Services_Blogging_Driver_LiveJournal
         }
 
         $authdata = $this->getAuthData();
-        $request  = new XML_RPC_Message('LJ.XMLRPC.getevents',
-            array(
-                new XML_RPC_Value(
-                    array(
-                        'username'       => $this->userdata['rpc_user'],
-                        'auth_method'    => new XML_RPC_Value('challenge', 'string'),
-                        'auth_challenge' => new XML_RPC_Value($authdata['challenge'], 'string'),
-                        'auth_response'  => new XML_RPC_Value($authdata['response'] , 'string'),
 
-                        'selecttype'     => new XML_RPC_Value('lastn', 'string'),
-                        'howmany'        => new XML_RPC_Value($number, 'int'),
-                        'prefersubject'  => new XML_RPC_Value(true, 'boolean'),
-                        'truncate'       => new XML_RPC_Value(50, 'string'),
-                        'noprops'        => new XML_RPC_Value(true, 'boolean')
-                    ),
-                    'struct'
-                )
-            )
+        $value = new XML_RPC_Value(
+            array(
+                'username'       => $this->userdata['rpc_user'],
+                'auth_method'    => new XML_RPC_Value('challenge', 'string'),
+                'auth_challenge' => new XML_RPC_Value(
+                    $authdata['challenge'], 'string'
+                ),
+                'auth_response'  => new XML_RPC_Value(
+                    $authdata['response'] , 'string'
+                ),
+
+                'selecttype'     => new XML_RPC_Value('lastn', 'string'),
+                'howmany'        => new XML_RPC_Value($number, 'int'),
+                'prefersubject'  => new XML_RPC_Value(true, 'boolean'),
+                'truncate'       => new XML_RPC_Value(50, 'string'),
+                'noprops'        => new XML_RPC_Value(true, 'boolean')
+            ),
+            'struct'
         );
+
+        $request = new XML_RPC_Message('LJ.XMLRPC.getevents', array($value));
 
         $arData = Services_Blogging_XmlRpc::sendRequest(
             $request, $this->rpc_client
         );
+
         $arTitles = array();
         foreach ($arData['events'] as $event) {
             $arTitles[$event['itemid']] = $event['event'];
@@ -387,9 +439,10 @@ class Services_Blogging_Driver_LiveJournal
     * have.
     *
     * @param string $strPostType Type of post to create.
-    *                            @see getSupportedPostTypes()
     *
     * @return array Array of strings
+    *
+    * @see getSupportedPostTypes()
     */
     public function getSupportedPostProperties($strPostType = 'post')
     {
@@ -404,9 +457,10 @@ class Services_Blogging_Driver_LiveJournal
     *
     * @param string $strProperty Property name/id to check
     * @param string $strPostType Type of post to create.
-    *                            @see getSupportedPostTypes()
     *
     * @return boolean If the property is supported
+    *
+    * @see getSupportedPostTypes()
     */
     public function isPostPropertySupported($strProperty, $strPostType = 'post')
     {
@@ -439,6 +493,7 @@ class Services_Blogging_Driver_LiveJournal
             substr($arStruct['eventtime'],  8, 2), //day
             substr($arStruct['eventtime'],  0, 4)  //year
         );
+
         $post->{Services_Blogging_Post::URL} = $arStruct['url'];
         $post->setId($arStruct['itemid']);
 

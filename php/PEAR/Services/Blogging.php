@@ -1,4 +1,18 @@
 <?php
+/**
+* Part of the Services_Blogging package.
+*
+* PHP version 5
+*
+* @category Services
+* @package  Services_Blogging
+* @author   Christian Weiske <cweiske@php.net>
+* @author   Anant Narayanan <anant@php.net>
+* @license  http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
+* @version  CVS: $Id: Blogging.php,v 1.5 2008/11/29 13:15:46 cweiske Exp $
+* @link     http://pear.php.net/package/Services_Blogging
+*/
+
 require_once 'Services/Blogging/Exception.php';
 
 /**
@@ -18,7 +32,6 @@ require_once 'Services/Blogging/Exception.php';
 * @author   Christian Weiske <cweiske@php.net>
 * @author   Anant Narayanan <anant@php.net>
 * @license  http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
-* @version  CVS: $Id: Blogging.php,v 1.3 2008/02/07 13:33:31 cweiske Exp $
 * @link     http://pear.php.net/package/Services_Blogging
 *
 * @todo
@@ -31,19 +44,33 @@ require_once 'Services/Blogging/Exception.php';
 */
 class Services_Blogging
 {
+    /**
+    * Exception code for a problem with the driver:
+    * - driver does not exist
+    * - driver does not extend base driver class
+    */
+    const ERROR_DRIVER = 101;
 
     /**
-     * Exception codes and messages that are thrown by the class.
-     */
-    const ERROR_DRIVER                 = 101;
+    * Exception code when the bloggin system does not support autodiscovery
+    */
     const ERROR_BLOGHASNTAUTODISCOVERY = 102;
-    const ERROR_NOSUPPORTEDDRIVER      = 103;
-    const ERROR_NOTSUPPORTED           = 104;
-    
+
+    /**
+    * Exception code when autodiscovery succeeded, but not matching driver
+    * could be found
+    */
+    const ERROR_NOSUPPORTEDDRIVER = 103;
+
+    /**
+    * Exception code when something (method, property) is not supported.
+    */
+    const ERROR_NOTSUPPORTED = 104;
+
     /**
      * USER_AGENT to send along during requests.
      */
-    const USER_AGENT = 'PHP/Services_Blogging @package_version@';
+    const USER_AGENT = 'PHP/Services_Blogging-0.2.3';
 
 
     /**
@@ -51,23 +78,43 @@ class Services_Blogging
     * the object, so that further methods may be executed. This function serves
     * as the single entry point for the class.
     *
-    * @param string $driver   The driver name, currently either "Blogger"
-    *                          or "metaWeblog".
+    * @param string $driver   The driver name, currently either 'Blogger',
+    *                         'MetaWeblog' or 'LiveJournal'.
     * @param string $username The username of the blog account to connect to.
     * @param string $password The password of the blog account to connect to.
-    * @param string $server   The URI of the blog's server.
+    * @param string $server   The URI of the blog's server with protocol.
     * @param string $path     The location of the XML-RPC server script.
     *
     * @return Services_Blogging_Driver Blogging driver instance
+    *
+    * @throws Services_Blogging_Exception If authentication fails
+    * @throws Services_Blogging_Exception If the driver does not exist.
+    * @throws Services_Blogging_Exception If the driver does not extend the
+    *                                     base driver class
+    *                                     Services_Blogging_Driver
     */
     public static function factory($driver, $username, $password, $server, $path)
     {
+        //security measurement
+        $driver = preg_replace('/[^a-z0-9_]/i', '', $driver);
+
         include_once 'Services/Blogging/Driver/' . $driver . '.php';
         $strClass = 'Services_Blogging_Driver_' . $driver;
         if (!class_exists($strClass)) {
             throw new Services_Blogging_Exception(
                 'Invalid driver "' . $driver . '" specified!', self::ERROR_DRIVER
             );
+        }
+        if (!is_subclass_of($strClass, 'Services_Blogging_Driver')) {
+            throw new Services_Blogging_Exception(
+                'Driver class ' . $strClass . ' is not a child class'
+                . ' of Services_Blogging_Driver', self::ERROR_DRIVER
+            );
+        }
+
+        //handle slighly wrong user input: no path but slash in server
+        if ($path == null && substr($server, -1) == '/') {
+            $server = substr($server, 0, -1);
         }
 
         $class = new $strClass($username, $password, $server, $path);

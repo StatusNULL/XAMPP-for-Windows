@@ -42,7 +42,7 @@
  */
 
 /* phpDocumentor version */
-if ('H:\release167\NEU\xampp\php\pear' != '@'.'PEAR-DIR@') {
+if ('C:\php\pear' != '@'.'PEAR-DIR@') {
     /** @ignore */
     define("PHPDOCUMENTOR_VER", "1.4.2");
 } else {

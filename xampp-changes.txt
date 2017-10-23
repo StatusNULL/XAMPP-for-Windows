@@ -1,3 +1,29 @@
+20. Dez 2008 XAMPP 1.7.0
+- Bugfxing (PEAR etc.)
+
+18. Dez 2008 XAMPP 1.7.0 Beta 4
+- Upgrade PHP 5.2.8
+- Upgrade phpMyAdmin 3.1.1
+
+09. Dez 2008 XAMPP 1.7.0 Beta 3
+- Upgrade PHP 5.2.8
+- Upgrade FileZilla FTP Server 0.9.29
+- Upgrade Fake Mail
+
+05. Dez 2008 XAMPP 1.7.0 Beta 2
+- Upgrade PHP 5.2.7
+- Upgrade phpMyAdmin 3.1.0
+- Upgrade eAccelerator
+- Fix PEAR / PECL Setup bug
+- Fix Security Problems 
+
+28. Nov 2008 XAMPP 1.7.0 Beta 1
+- Remove PHP 4
+- Upgrade  MySQL 5.1.30
+- Upgrade Apache 2.2.10
+- Upgrade phpMyAdmin 2.11.9.3
+- Upgrade FileZilla FTP Server 0.9.28
+
 25. Sept 2008 XAMPP 1.6.8
 - Upgrade OpenSSL 0.9.8i
 - Upgrade phpMyAdmin 2.11.9.2

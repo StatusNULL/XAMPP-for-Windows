@@ -9,7 +9,7 @@
  *  - adding tables
  *  - viewing PDF schemas
  *
- * @version $Id: db_operations.php 11195 2008-04-14 14:32:06Z lem9 $
+ * @version $Id: db_operations.php 12011 2008-11-28 12:47:41Z nijel $
  */
 
 /**
@@ -19,31 +19,33 @@ require_once './libraries/common.inc.php';
 require_once './libraries/Table.class.php';
 require_once './libraries/mysql_charsets.lib.php';
 
+// add blobstreaming library functions
+require_once "./libraries/blobstreaming.lib.php";
+
 /**
  * Rename/move or copy database
  */
-if (strlen($db) &&
-    ((isset($db_rename) && $db_rename == 'true') ||
-    (isset($db_copy) && $db_copy == 'true'))) {
+if (strlen($db) && (! empty($db_rename) || ! empty($db_copy))) {
 
-    if (isset($db_rename) && $db_rename == 'true') {
+    if (! empty($db_rename)) {
         $move = true;
     } else {
         $move = false;
     }
 
     if (!isset($newname) || !strlen($newname)) {
-        $message = $strDatabaseEmpty;
+        $message = PMA_Message::error('strDatabaseEmpty');
     } else {
         $sql_query = ''; // in case target db exists
+        $_error = false;
         if ($move ||
-           (isset($create_database_before_copying) && $create_database_before_copying)) {
+         (isset($create_database_before_copying) && $create_database_before_copying)) {
             // lower_case_table_names=1 `DB` becomes `db`
             $lower_case_table_names = PMA_DBI_fetch_value('SHOW VARIABLES LIKE "lower_case_table_names"', 0, 1);
             if ($lower_case_table_names === '1') {
                 $newname = strtolower($newname);
             }
-            
+
             $local_query = 'CREATE DATABASE ' . PMA_backquote($newname);
             if (isset($db_collation)) {
                 $local_query .= ' DEFAULT' . PMA_generateCharsetQueryPart($db_collation);
@@ -51,9 +53,10 @@ if (strlen($db) &&
             $local_query .= ';';
             $sql_query = $local_query;
             PMA_DBI_query($local_query);
+
             // rebuild the database list because PMA_Table::moveCopy
             // checks in this list if the target db exists
-            $GLOBALS['PMA_List_Database']->build();
+            $GLOBALS['pma']->databases->build();
         }
 
         if (isset($GLOBALS['add_constraints'])) {
@@ -81,9 +84,6 @@ if (strlen($db) &&
             // value of $what for this table only
             $this_what = $what;
 
-            if (!isset($tables_full[$each_table]['Engine'])) {
-                $tables_full[$each_table]['Engine'] = $tables_full[$each_table]['Type'];
-            }
             // do not copy the data from a Merge table
             // note: on the calling FORM, 'data' means 'structure and data'
             if ($tables_full[$each_table]['Engine'] == 'MRG_MyISAM') {
@@ -96,27 +96,38 @@ if (strlen($db) &&
             }
 
             if ($this_what != 'nocopy') {
-                PMA_Table::moveCopy($db, $each_table, $newname, $each_table,
-                    isset($this_what) ? $this_what : 'data', $move, 'db_copy');
+                if (! PMA_Table::moveCopy($db, $each_table, $newname, $each_table,
+                    isset($this_what) ? $this_what : 'data', $move, 'db_copy'))
+                {
+                    $_error = true;
+                    // $sql_query is filled by PMA_Table::moveCopy()
+                    $sql_query = $back . $sql_query;
+                    break;
+                }
                 if (isset($GLOBALS['add_constraints'])) {
                     $GLOBALS['sql_constraints_query_full_db'] .= $GLOBALS['sql_constraints_query'];
                     unset($GLOBALS['sql_constraints_query']);
                 }
             }
-
+            // $sql_query is filled by PMA_Table::moveCopy()
             $sql_query = $back . $sql_query;
         } // end (foreach)
         unset($each_table);
 
         // handle the views
-        foreach ($views as $view) {
-            PMA_Table::moveCopy($db, $view, $newname, $view,
-                'structure', $move, 'db_copy');
+        if (! $_error) {
+            foreach ($views as $view) {
+                if (! PMA_Table::moveCopy($db, $view, $newname, $view,
+                 'structure', $move, 'db_copy')) {
+                    $_error = true;
+                    break;
+                }
+            }
         }
         unset($view, $views);
 
         // now that all tables exist, create all the accumulated constraints
-        if (isset($GLOBALS['add_constraints'])) {
+        if (! $_error && isset($GLOBALS['add_constraints'])) {
             /**
              * @todo this works with mysqli but not with mysql, because
              * mysql extension does not accept more than one statement; maybe
@@ -140,7 +151,7 @@ if (strlen($db) &&
             if ($procedure_names) {
                 foreach($procedure_names as $procedure_name) {
                     PMA_DBI_select_db($db);
-                    $tmp_query = PMA_DBI_get_procedure_or_function_def($db, 'PROCEDURE', $procedure_name);
+                    $tmp_query = PMA_DBI_get_definition($db, 'PROCEDURE', $procedure_name);
                     // collect for later display
                     $GLOBALS['sql_query'] .= "\n" . $tmp_query;
                     PMA_DBI_select_db($newname);
@@ -152,7 +163,7 @@ if (strlen($db) &&
             if ($function_names) {
                 foreach($function_names as $function_name) {
                     PMA_DBI_select_db($db);
-                    $tmp_query = PMA_DBI_get_procedure_or_function_def($db, 'FUNCTION', $function_name);
+                    $tmp_query = PMA_DBI_get_definition($db, 'FUNCTION', $function_name);
                     // collect for later display
                     $GLOBALS['sql_query'] .= "\n" . $tmp_query;
                     PMA_DBI_select_db($newname);
@@ -164,7 +175,7 @@ if (strlen($db) &&
         PMA_DBI_select_db($db);
 
         // Duplicate the bookmarks for this db (done once for each db)
-        if ($db != $newname) {
+        if (! $_error && $db != $newname) {
             $get_fields = array('user', 'label', 'query');
             $where_fields = array('dbase' => $db);
             $new_fields = array('dbase' => $newname);
@@ -172,7 +183,7 @@ if (strlen($db) &&
                 $where_fields, $new_fields);
         }
 
-        if ($move) {
+        if (! $_error && $move) {
             // cleanup pmadb stuff for this db
             require_once './libraries/relation_cleanup.lib.php';
             PMA_relationsCleanupDatabase($db);
@@ -182,27 +193,94 @@ if (strlen($db) &&
             $sql_query .= "\n" . $local_query;
             PMA_DBI_query($local_query);
 
-            $message    = sprintf($strRenameDatabaseOK, htmlspecialchars($db),
-                htmlspecialchars($newname));
-        } else {
-            $message    = sprintf($strCopyDatabaseOK, htmlspecialchars($db),
-                htmlspecialchars($newname));
+            $message = PMA_Message::success('strRenameDatabaseOK');
+            $message->addParam($db);
+            $message->addParam($newname);
+        } elseif (! $_error)  {
+            $message = PMA_Message::success('strCopyDatabaseOK');
+            $message->addParam($db);
+            $message->addParam($newname);
         }
         $reload     = true;
 
         /* Change database to be used */
-        if ($move) {
-            $db         = $newname;
-        } else {
+        if (! $_error && $move) {
+            $db = $newname;
+        } elseif (! $_error) {
             if (isset($switch_to_new) && $switch_to_new == 'true') {
                 PMA_setCookie('pma_switch_to_new', 'true');
-                $db         = $newname;
+                $db = $newname;
             } else {
                 PMA_setCookie('pma_switch_to_new', '');
             }
         }
+
+        if ($_error && ! isset($message)) {
+            $message = PMA_Message::error();
+        }
     }
 }
+
+/*
+ * Enable/Disable/Repair BLOB Repository Monitoring for current database
+*/
+if (strlen($db) > 0 && !empty($db_blob_streaming_op))
+{
+    // load PMA_Config
+    $PMA_Config = $_SESSION['PMA_Config'];
+
+    if (!empty($PMA_Config))
+    {
+        if ($PMA_Config->get('PBXT_NAME') !== strtolower($db))
+        {
+            // if Blobstreaming plugins exist, begin checking for Blobstreaming tables
+            if ($PMA_Config->get('BLOBSTREAMING_PLUGINS_EXIST'))
+            {
+                $bs_tables = $PMA_Config->get('BLOBSTREAMABLE_DATABASES');
+                $bs_tables = $bs_tables[$db];
+
+                $oneBSTableExists = FALSE;
+
+                // check if at least one blobstreaming table exists
+                foreach ($bs_tables as $table_key=>$tbl)
+                    if ($bs_tables[$table_key]['Exists'])
+                    {
+                        $oneBSTableExists = TRUE;
+                        break;
+                    }
+
+                switch ($db_blob_streaming_op)
+                {
+                    // enable BLOB repository monitoring
+                    case "enable":
+                        // if blobstreaming tables do not exist, create them
+                        if (!$oneBSTableExists)
+                            PMA_BS_CreateTables($db);
+                    break;
+                    // disable BLOB repository monitoring
+                    case "disable":
+                        // if at least one blobstreaming table exists, execute drop
+                        if ($oneBSTableExists)
+                            PMA_BS_DropTables($db);
+                    break;
+                    // repair BLOB repository
+                    case "repair":
+                        // check if a blobstreaming table is missing
+                        foreach ($bs_tables as $table_key=>$tbl)
+                        if (!$bs_tables[$table_key]['Exists'])
+                        {
+                            PMA_DBI_select_db($db);
+                            PMA_DBI_query(PMA_BS_GetTableStruct($table_key));
+                        }
+                }
+
+                // refresh side menu
+                PMA_sendHeaderLocation($cfg['PmaAbsoluteUri'] . 'db_operations.php?' . PMA_generate_common_url ('','', '&') . (isset($db) ? '&db=' . urlencode($db) : '') . (isset($token) ? '&token=' . urlencode($token) : '') . (isset($goto) ? '&goto=' . urlencode($goto) : '') . 'reload=1&purge=1');
+            }   // end  if ($PMA_Config->get('BLOBSTREAMING_PLUGINS_EXIST'))
+        }   // end if ($PMA_Config->get('PBXT_NAME') !== strtolower($db))
+    }
+}
+
 /**
  * Settings for relations stuff
  */
@@ -214,8 +292,8 @@ $cfgRelation = PMA_getRelationsParam();
  * Check if comments were updated
  * (must be done before displaying the menu tabs)
  */
-if ($cfgRelation['commwork'] && isset($db_comment) && $db_comment == 'true') {
-    PMA_SetComment($db, '', '(db_comment)', $comment);
+if (isset($_REQUEST['comment'])) {
+    PMA_setDbComment($db, $comment);
 }
 
 /**
@@ -230,16 +308,18 @@ if (empty($is_info)) {
     $sub_part = '_structure';
     require './libraries/db_info.inc.php';
     echo "\n";
+
+    if (isset($message)) {
+        PMA_showMessage($message, $sql_query);
+        unset($message);
+    }
 }
 
-if (PMA_MYSQL_INT_VERSION >= 40101) {
-    $db_collation = PMA_getDbCollation($db);
-}
-if (PMA_MYSQL_INT_VERSION < 50002
-  || (PMA_MYSQL_INT_VERSION >= 50002 && $db != 'information_schema')) {
-    $is_information_schema = false;
-} else {
+$db_collation = PMA_getDbCollation($db);
+if ($db == 'information_schema') {
     $is_information_schema = true;
+} else {
+    $is_information_schema = false;
 }
 
 if (!$is_information_schema) {
@@ -253,23 +333,13 @@ if (!$is_information_schema) {
         ?>
     <form method="post" action="db_operations.php">
     <?php echo PMA_generate_common_hidden_inputs($db); ?>
-    <input type="hidden" name="db_comment" value="true" />
     <fieldset>
         <legend>
-        <?php
-        if ($cfg['PropertiesIconic']) {
-            echo '<img class="icon" src="' . $pmaThemeImage . 'b_comment.png"'
-                .' alt="" border="0" width="16" height="16" hspace="2" align="middle" />';
-        }
-        echo $strDBComment;
-        $comment = PMA_getComments($db);
-        ?>
+        <?php echo PMA_getIcon('b_comment.png', $strDBComment, false, true); ?>
         </legend>
         <input type="text" name="comment" class="textfield" size="30"
             value="<?php
-            echo (isset($comment) && is_array($comment)
-                ? htmlspecialchars(implode(' ', $comment))
-                : ''); ?>" />
+            echo htmlspecialchars(PMA_getDBComment($db)); ?>" />
         <input type="submit" value="<?php echo $strGo; ?>" />
     </fieldset>
     </form>
@@ -284,9 +354,9 @@ if (!$is_information_schema) {
         <?php
     if (isset($db_collation)) {
         echo '<input type="hidden" name="db_collation" value="' . $db_collation
-             .'" />' . "\n";
+            .'" />' . "\n";
     }
-         ?>
+        ?>
     <input type="hidden" name="what" value="data" />
     <input type="hidden" name="db_rename" value="true" />
     <?php echo PMA_generate_common_hidden_inputs($db); ?>
@@ -304,7 +374,7 @@ if (!$is_information_schema) {
         <?php
     echo '(' . $strCommand . ': ';
     /**
-     * @todo (see explanations above in a previous todo) 
+     * @todo (see explanations above in a previous todo)
      */
     //if (PMA_MYSQL_INT_VERSION >= XYYZZ) {
     //    echo 'RENAME DATABASE';
@@ -339,24 +409,18 @@ if (!$is_information_schema) {
             .' alt="" width="16" height="16" />';
     }
     echo $strDBCopy . ':';
-    if (PMA_MYSQL_INT_VERSION >= 50000) {
-        $drop_clause = 'DROP TABLE / DROP VIEW';
-    } else {
-        $drop_clause = 'DROP TABLE';
-    }
+    $drop_clause = 'DROP TABLE / DROP VIEW';
     ?>
         </legend>
         <input type="text" name="newname" size="30" class="textfield" value="" /><br />
-        <input type="radio" name="what" value="structure"
-            id="radio_copy_structure" style="vertical-align: middle" />
-        <label for="radio_copy_structure"><?php echo $strStrucOnly; ?></label><br />
-        <input type="radio" name="what" value="data" id="radio_copy_data"
-            checked="checked" style="vertical-align: middle" />
-        <label for="radio_copy_data"><?php echo $strStrucData; ?></label><br />
-        <input type="radio" name="what" value="dataonly"
-            id="radio_copy_dataonly" style="vertical-align: middle" />
-        <label for="radio_copy_dataonly"><?php echo $strDataOnly; ?></label><br />
-
+<?php
+        $choices = array(
+            'structure' => $strStrucOnly,
+            'data'      => $strStrucData, 
+            'dataonly'  => $strDataOnly);
+        PMA_generate_html_radio('what', $choices, 'data', true);
+        unset($choices);
+?>
         <input type="checkbox" name="create_database_before_copying" value="1"
             id="checkbox_create_database_before_copying"
             style="vertical-align: middle" checked="checked" />
@@ -365,7 +429,7 @@ if (!$is_information_schema) {
         <input type="checkbox" name="drop_if_exists" value="true"
             id="checkbox_drop" style="vertical-align: middle" />
         <label for="checkbox_drop"><?php echo sprintf($strAddClause, $drop_clause); ?></label><br />
-        <input type="checkbox" name="sql_auto_increment" value="1"
+        <input type="checkbox" name="sql_auto_increment" value="1" checked="checked"
             id="checkbox_auto_increment" style="vertical-align: middle" />
         <label for="checkbox_auto_increment">
             <?php echo $strAddAutoIncrement; ?></label><br />
@@ -393,40 +457,123 @@ if (!$is_information_schema) {
     </form>
 
     <?php
+    /*
+     * BLOB streaming support
+    */
+
+    // load PMA_Config
+    $PMA_Config = $_SESSION['PMA_Config'];
+
+    // if all blobstreaming plugins exist, begin checking for blobstreaming tables
+    if (!empty($PMA_Config))
+    {
+        if ($PMA_Config->get('PBXT_NAME') !== strtolower($db))
+        {
+            if ($PMA_Config->get('BLOBSTREAMING_PLUGINS_EXIST'))
+            {
+                $bs_tables = $PMA_Config->get('BLOBSTREAMABLE_DATABASES');
+                $bs_tables = $bs_tables[$db];
+
+                $oneBSTableExists = FALSE;
+                $allBSTablesExist = TRUE;
+
+                // first check that all blobstreaming tables do not exist
+                foreach ($bs_tables as $table_key=>$tbl)
+                    if ($bs_tables[$table_key]['Exists'])
+                        $oneBSTableExists = TRUE;
+                    else
+                        $allBSTablesExist = FALSE;
+
+                ?>
+
+                    <form method="post" action="./db_operations.php">
+                    <?php echo PMA_generate_common_hidden_inputs($db); ?>
+                    <fieldset>
+                    <legend>
+                    <?php echo PMA_getIcon('b_edit.png', $strBLOBRepository, false, true); ?>
+                    </legend>
+
+                    <?php echo $strBLOBRepositoryStatus; ?>:
+
+                    <?php
+
+                    // if the blobstreaming tables exist, provide option to disable the BLOB repository
+                    if ($allBSTablesExist)
+                    {
+                        ?>
+                            <?php echo $strBLOBRepositoryEnabled; ?>
+                            </fieldset>
+                            <fieldset class="tblFooters">
+                            <input type="hidden" name="db_blob_streaming_op" value="disable" />
+                            <input type="submit" onclick="return confirmDisableRepository('<?php echo $db; ?>');" value="<?php echo $strBLOBRepositoryDisable; ?>" />
+                            </fieldset>
+                            <?php
+                    }
+                    else
+                    {
+                        // if any of the blobstreaming tables are missing, provide option to repair the BLOB repository
+                        if ($oneBSTableExists && !$allBSTablesExist)
+                        {
+                            ?>
+                                <?php echo $strBLOBRepositoryDamaged; ?>
+                                </fieldset>
+                                <fieldset class="tblFooters">
+                                <input type="hidden" name="db_blob_streaming_op" value="repair" />
+                                <input type="submit" value="<?php echo $strBLOBRepositoryRepair; ?>" />
+                                </fieldset>
+                                <?php
+                        }
+                        // if none of the blobstreaming tables exist, provide option to enable BLOB repository
+                        else
+                        {
+                            ?>
+                                <?php echo $strBLOBRepositoryDisabled; ?>
+                                </fieldset>
+                                <fieldset class="tblFooters">
+                                <input type="hidden" name="db_blob_streaming_op" value="enable" />
+                                <input type="submit" value="<?php echo $strBLOBRepositoryEnable; ?>" />
+                                </fieldset>
+                                <?php
+                        }
+                    }   // end if ($allBSTablesExist)
+
+                ?>
+                    </form>
+                <?php
+            }   // end  if ($PMA_Config->get('BLOBSTREAMING_PLUGINS_EXIST'))
+        }   // end if ($PMA_Config->get('PBXT_NAME') !== strtolower($db))
+    }
+
     /**
      * Change database charset
      */
-    if (PMA_MYSQL_INT_VERSION >= 40101) {
-    // MySQL supports setting default charsets / collations for databases since
-    // version 4.1.1.
-        echo '<form method="post" action="./db_operations.php">' . "\n"
-           . PMA_generate_common_hidden_inputs($db, $table)
-           . '<fieldset>' . "\n"
-           . '    <legend>';
-        if ($cfg['PropertiesIconic']) {
-            echo '<img class="icon" src="' . $pmaThemeImage . 's_asci.png"'
-                .' alt="" width="16" height="16" />';
-        }
-        echo '    <label for="select_db_collation">' . $strCollation . ':</label>' . "\n"
-           . '    </legend>' . "\n"
-           . PMA_generateCharsetDropdownBox(PMA_CSDROPDOWN_COLLATION,
-                'db_collation', 'select_db_collation', $db_collation, false, 3)
-           . '    <input type="submit" name="submitcollation"'
-           . ' value="' . $strGo . '" style="vertical-align: middle" />' . "\n"
-           . '</fieldset>' . "\n"
-           . '</form>' . "\n";
+    echo '<form method="post" action="./db_operations.php">' . "\n"
+       . PMA_generate_common_hidden_inputs($db, $table)
+       . '<fieldset>' . "\n"
+       . '    <legend>';
+    if ($cfg['PropertiesIconic']) {
+        echo '<img class="icon" src="' . $pmaThemeImage . 's_asci.png"'
+            .' alt="" width="16" height="16" />';
     }
+    echo '    <label for="select_db_collation">' . $strCollation . ':</label>' . "\n"
+       . '    </legend>' . "\n"
+       . PMA_generateCharsetDropdownBox(PMA_CSDROPDOWN_COLLATION,
+            'db_collation', 'select_db_collation', $db_collation, false, 3)
+       . '    <input type="submit" name="submitcollation"'
+       . ' value="' . $strGo . '" style="vertical-align: middle" />' . "\n"
+       . '</fieldset>' . "\n"
+       . '</form>' . "\n";
 
     if ($num_tables > 0
       && !$cfgRelation['allworks'] && $cfg['PmaNoRelation_DisableWarning'] == false) {
+        $message = PMA_Message::notice('strRelationNotWorking');
+        $message->addParam('<a href="' . $cfg['PmaAbsoluteUri'] . 'chk_rel.php?' . $url_query . '">', false);
+        $message->addParam('</a>', false);
         /* Show error if user has configured something, notice elsewhere */
         if (!empty($cfg['Servers'][$server]['pmadb'])) {
-            echo '<div class="error"><h1>' . $strError . '</h1>';
-        } else {
-            echo '<div class="notice">';
+            $message->isError(true);
         }
-        printf($strRelationNotWorking, '<a href="' . $cfg['PmaAbsoluteUri'] . 'chk_rel.php?' . $url_query . '">', '</a>');
-        echo '</div>';
+        $message->display();
     } // end if
 } // end if (!$is_information_schema)
 
@@ -483,6 +630,8 @@ if ($cfgRelation['pdfwork'] && $num_tables > 0) { ?>
             </label><br />
         <input type="checkbox" name="with_doc" id="with_doc" checked="checked" />
         <label for="with_doc"><?php echo $strDataDict; ?></label><br />
+		<input type="checkbox" name="show_keys" id="show_keys" />
+        <label for="show_keys"><?php echo $strShowKeys; ?></label><br />
 
         <label for="orientation_opt"><?php echo $strShowDatadictAs; ?></label>
         <select name="orientation" id="orientation_opt">

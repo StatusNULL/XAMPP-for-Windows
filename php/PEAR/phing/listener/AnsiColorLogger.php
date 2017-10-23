@@ -1,6 +1,6 @@
 <?php
 /*
- * $Id: AnsiColorLogger.php 227 2007-08-28 02:17:00Z hans $
+ * $Id: AnsiColorLogger.php 386 2008-09-12 21:01:41Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -42,8 +42,8 @@ include_once 'phing/system/util/Properties.php';
  *
  * The default colors used for differentiating
  * the message levels can be changed by editing the
- * /org/apache/tools/ant/listener/defaults.properties
- * file.
+ * phing/listener/defaults.properties file.
+ *
  * This file contains 5 key/value pairs:
  * AnsiColorLogger.ERROR_COLOR=2;31
  * AnsiColorLogger.WARNING_COLOR=2;35
@@ -95,9 +95,9 @@ include_once 'phing/system/util/Properties.php';
  * @author     Hans Lellelid <hans@xmpl.org> (Phing)
  * @author     Magesh Umasankar (Ant)
  * @package    phing.listener
- * @version    $Revision: 1.13 $
+ * @version    $Revision$
  */
-final class AnsiColorLogger extends DefaultLogger {
+class AnsiColorLogger extends DefaultLogger {
 
     const ATTR_NORMAL = 0;
     const ATTR_BRIGHT = 1;
@@ -177,19 +177,19 @@ final class AnsiColorLogger extends DefaultLogger {
             $verbose = $prop->getProperty("AnsiColorLogger.VERBOSE_COLOR");
             $debug = $prop->getProperty("AnsiColorLogger.DEBUG_COLOR");
             if ($err !== null) {
-                $errColor = self::PREFIX . $err . self::SUFFIX;
+                $this->errColor = self::PREFIX . $err . self::SUFFIX;
             }
             if ($warn !== null) {
-                $warnColor = self::PREFIX . $warn . self::SUFFIX;
+                $this->warnColor = self::PREFIX . $warn . self::SUFFIX;
             }
             if ($info !== null) {
-                $infoColor = self::PREFIX . $info . self::SUFFIX;
+                $this->infoColor = self::PREFIX . $info . self::SUFFIX;
             }
             if ($verbose !== null) {
-                $verboseColor = self::PREFIX . $verbose . self::SUFFIX;
+                $this->verboseColor = self::PREFIX . $verbose . self::SUFFIX;
             }
             if ($debug !== null) {
-                $debugColor = self::PREFIX . $debug . self::SUFFIX;
+                $this->debugColor = self::PREFIX . $debug . self::SUFFIX;
             }
         } catch (IOException $ioe) {
             //Ignore exception - we will use the defaults.

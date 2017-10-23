@@ -1,28 +1,49 @@
 <?php
 /**
- * CLI Script to Check Compatibility of chunk of PHP code
+ * Copyright (c) 2004-2008, Davey Shafik <davey@php.net>
+ *                          Laurent Laville <pear@laurent-laville.org>
+ *
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the authors nor the names of its contributors
+ *       may be used to endorse or promote products derived from this software
+ *       without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  *
  * PHP versions 4 and 5
- *
- * LICENSE: This source file is subject to version 3.01 of the PHP license
- * that is available through the world-wide-web at the following URI:
- * http://www.php.net/license/3_01.txt.  If you did not receive a copy of
- * the PHP License and are unable to obtain it through the web, please
- * send a note to license@php.net so we can mail you a copy immediately.
  *
  * @category PHP
  * @package  PHP_CompatInfo
  * @author   Davey Shafik <davey@php.net>
  * @author   Laurent Laville <pear@laurent-laville.org>
- * @license  http://www.php.net/license/3_01.txt  PHP License 3.01
- * @version  CVS: $Id: Cli.php,v 1.61 2008/04/10 22:19:34 farell Exp $
+ * @license  http://www.opensource.org/licenses/bsd-license.php  BSD
+ * @version  CVS: $Id: Cli.php,v 1.74 2008/07/22 20:26:19 farell Exp $
  * @link     http://pear.php.net/package/PHP_CompatInfo
  * @since    File available since Release 0.8.0
  */
 
 require_once 'PHP/CompatInfo.php';
 require_once 'Console/Getargs.php';
-require_once 'Console/Table.php';
 
 /**
  * CLI Script to Check Compatibility of chunk of PHP code
@@ -30,25 +51,23 @@ require_once 'Console/Table.php';
  * <code>
  * <?php
  *     require_once 'PHP/CompatInfo/Cli.php';
- *     $cli = new PHP_CompatInfo_Cli;
+ *     $cli = new PHP_CompatInfo_Cli();
  *     $cli->run();
  * ?>
  * </code>
- *
- * @example docs/examples/cliCustom.php Example of using PHP_CompatInfo_Cli
  *
  * @category  PHP
  * @package   PHP_CompatInfo
  * @author    Davey Shafik <davey@php.net>
  * @author    Laurent Laville <pear@laurent-laville.org>
  * @copyright 2003 Davey Shafik and Synaptic Media. All Rights Reserved.
- * @license   http://www.php.net/license/3_01.txt  PHP License 3.01
- * @version   Release: 1.7.0
+ * @license   http://www.opensource.org/licenses/bsd-license.php  BSD
+ * @version   Release: 1.8.1
  * @link      http://pear.php.net/package/PHP_CompatInfo
  * @since     Class available since Release 0.8.0
  */
 
-class PHP_CompatInfo_Cli extends PHP_CompatInfo
+class PHP_CompatInfo_Cli
 {
     /**
      * @var    array    Current CLI Flags
@@ -57,34 +76,12 @@ class PHP_CompatInfo_Cli extends PHP_CompatInfo
     var $opts = array();
 
     /**
-     * @var    string   error message
-     * @since  0.8.0
+     * Unified data source reference
+     *
+     * @var    string   Directory, File or String to be processed
+     * @since  1.8.0b3
      */
-    var $error;
-
-    /**
-     * @var    string   String to be Processed
-     * @since  1.6.0
-     */
-    var $string;
-
-    /**
-     * @var    string   File to be Processed
-     * @since  0.8.0
-     */
-    var $file;
-
-    /**
-     * @var    string   Directory to be Processed
-     * @since  0.8.0
-     */
-    var $dir;
-
-    /**
-     * @var    object   Console_Getargs instance
-     * @since  1.4.0
-     */
-    var $args;
+    var $dataSource;
 
     /**
      * @var    array    Current parser options
@@ -92,17 +89,13 @@ class PHP_CompatInfo_Cli extends PHP_CompatInfo
      */
     var $options = array();
 
-    /**
-     * @var    integer  Output level detail
-     * @since  1.7.0b3
-     */
-    var $_output_level;
-
 
     /**
-     * ZE2 Constructor
+     * Command-Line Class constructor
      *
-     * @since  0.8.0
+     * Command-Line Class constructor (ZE2) for PHP5+
+     *
+     * @since  version 0.8.0 (2004-04-22)
      */
     function __construct()
     {
@@ -193,13 +186,23 @@ class PHP_CompatInfo_Cli extends PHP_CompatInfo
                       'min'     => 0 , 'max' => 1),
             'report' =>
                 array('short' => 'r',
-                      'desc' => 'Print either "xml" or "cli" report',
-                      'default' => 'cli',
+                      'desc' => 'Print either "xml" or "csv" report',
+                      'default' => 'text',
                       'min'   => 0 , 'max' => 1),
             'output-level' =>
                 array('short' => 'o',
                       'desc' => 'Print Path/File + Version with additional data',
-                      'default' => 15,
+                      'default' => 31,
+                      'min'   => 0 , 'max' => 1),
+            'tab' =>
+                array('short' => 't',
+                      'desc'  => 'Columns width',
+                      'default' => '29,12,20',
+                      'min'   => 0 , 'max' => 1),
+            'progress' =>
+                array('short' => 'p',
+                      'desc' => 'Show a wait message [text] or a progress bar [bar]',
+                      'default' => 'bar',
                       'min'   => 0 , 'max' => 1),
             'summarize' =>
                 array('short' => 'S',
@@ -214,149 +217,194 @@ class PHP_CompatInfo_Cli extends PHP_CompatInfo
                       'desc'  => 'Show this help',
                       'max'   => 0),
         );
-        $this->args = & Console_Getargs::factory($this->opts);
-        if (PEAR::isError($this->args)) {
-            if ($this->args->getCode() === CONSOLE_GETARGS_HELP) {
-                $this->error = '';
+    }
+
+    /**
+     * Command-Line Class constructor
+     *
+     * Command-Line Class constructor (ZE1) for PHP4
+     *
+     * @since  version 0.8.0 (2004-04-22)
+     */
+    function PHP_CompatInfo_Cli()
+    {
+        $this->__construct();
+    }
+
+    /**
+     * Run the CLI version
+     *
+     * Run the CLI version of PHP_CompatInfo
+     *
+     * @return void
+     * @access public
+     * @since  version 0.8.0 (2004-04-22)
+     */
+    function run()
+    {
+        $args = & Console_Getargs::factory($this->opts);
+        if (PEAR::isError($args)) {
+            if ($args->getCode() === CONSOLE_GETARGS_HELP) {
+                $error = '';
             } else {
-                $this->error = $this->args->getMessage();
+                $error = $args->getMessage();
             }
+            $this->_printUsage($error);
             return;
         }
 
+        // default parser options
+        $this->options = array(
+            'file_ext' => array('php', 'php4', 'inc', 'phtml'),
+            'recurse_dir' => true,
+            'debug' => false,
+            'is_string' => false,
+            'ignore_files' => array(),
+            'ignore_dirs' => array()
+            );
+
         // version
-        $V = $this->args->getValue('V');
+        $V = $args->getValue('V');
         if (isset($V)) {
-            $this->error = 'PHP_CompatInfo (cli) version 1.7.0'
-                         . ' (http://pear.php.net/package/PHP_CompatInfo)';
+            $error = 'PHP_CompatInfo (cli) version 1.8.1'
+                   . ' (http://pear.php.net/package/PHP_CompatInfo)';
+            echo $error;
             return;
         }
 
         // debug
-        $this->options['debug'] = false;
-        if ($this->args->isDefined('v')) {
-            $v = $this->args->getValue('v');
+        if ($args->isDefined('v')) {
+            $v = $args->getValue('v');
             if ($v > 3) {
                 $this->options['debug'] = true;
             }
         }
 
         // no-recurse
-        if ($this->args->isDefined('n')) {
+        if ($args->isDefined('n')) {
             $this->options['recurse_dir'] = false;
         }
 
         // dir
-        if ($this->args->isDefined('d')) {
-            $d = $this->args->getValue('d');
+        if ($args->isDefined('d')) {
+            $d = $args->getValue('d');
             if (file_exists($d)) {
                 if ($d{strlen($d)-1} == '/' || $d{strlen($d)-1} == '\\') {
                     $d = substr($d, 0, -1);
                 }
-                $this->dir = str_replace('\\', '/', realpath($d));
+                $this->dataSource = realpath($d);
             } else {
-                $this->error = 'Failed opening directory "' . $d
-                     . '". Please check your spelling and try again.';
+                $error = 'Failed opening directory "' . $d
+                       . '". Please check your spelling and try again.';
+                $this->_printUsage($error);
                 return;
             }
         }
 
         // file
-        if ($this->args->isDefined('f')) {
-            $f = $this->args->getValue('f');
+        if ($args->isDefined('f')) {
+            $f = $args->getValue('f');
             if (file_exists($f)) {
-                $this->file = $f;
+                $this->dataSource = $f;
             } else {
-                $this->error = 'Failed opening file "' . $f
-                     . '". Please check your spelling and try again.';
+                $error = 'Failed opening file "' . $f
+                       . '". Please check your spelling and try again.';
+                $this->_printUsage($error);
                 return;
             }
         }
 
         // string
-        if ($this->args->isDefined('s')) {
-            $s = $this->args->getValue('s');
+        if ($args->isDefined('s')) {
+            $s = $args->getValue('s');
             if (!empty($s)) {
-                $this->string = sprintf("<?php %s ?>", $s);
+                $this->dataSource           = sprintf("<?php %s ?>", $s);
+                $this->options['is_string'] = true;
             } else {
-                $this->error = 'Failed opening string "' . $s
-                     . '". Please check your spelling and try again.';
+                $error = 'Failed opening string "' . $s
+                       . '". Please check your spelling and try again.';
+                $this->_printUsage($error);
                 return;
             }
         }
 
         // ignore-files
-        $if = $this->args->getValue('if');
+        $if = $args->getValue('if');
         if (isset($if)) {
             if (file_exists($if)) {
                 $options                       = $this->_parseParamFile($if);
                 $this->options['ignore_files'] = $options['std'];
             } else {
-                $this->error = 'Failed opening file "' . $if
-                     . '" (ignore-files option). '
-                     . 'Please check your spelling and try again.';
+                $error = 'Failed opening file "' . $if
+                       . '" (ignore-files option). '
+                       . 'Please check your spelling and try again.';
+                $this->_printUsage($error);
                 return;
             }
         }
 
         // ignore-dirs
-        $id = $this->args->getValue('id');
+        $id = $args->getValue('id');
         if (isset($id)) {
             if (file_exists($id)) {
                 $options                      = $this->_parseParamFile($id);
                 $this->options['ignore_dirs'] = $options['std'];
             } else {
-                $this->error = 'Failed opening file "' . $id
-                     . '" (ignore-dirs option). '
-                     . 'Please check your spelling and try again.';
+                $error = 'Failed opening file "' . $id
+                       . '" (ignore-dirs option). '
+                       . 'Please check your spelling and try again.';
+                $this->_printUsage($error);
                 return;
             }
         }
 
         // ignore-functions
-        $in = $this->args->getValue('in');
+        $in = $args->getValue('in');
         if (isset($in)) {
             if (file_exists($in)) {
                 $options                           = $this->_parseParamFile($in);
                 $this->options['ignore_functions'] = $options['std'];
             } else {
-                $this->error = 'Failed opening file "' . $in
-                     . '" (ignore-functions option). '
-                     . 'Please check your spelling and try again.';
+                $error = 'Failed opening file "' . $in
+                       . '" (ignore-functions option). '
+                       . 'Please check your spelling and try again.';
+                $this->_printUsage($error);
                 return;
             }
         }
 
         // ignore-constants
-        $ic = $this->args->getValue('ic');
+        $ic = $args->getValue('ic');
         if (isset($ic)) {
             if (file_exists($ic)) {
                 $options                           = $this->_parseParamFile($ic);
                 $this->options['ignore_constants'] = $options['std'];
             } else {
-                $this->error = 'Failed opening file "' . $ic
-                     . '" (ignore-constants option). '
-                     . 'Please check your spelling and try again.';
+                $error = 'Failed opening file "' . $ic
+                       . '" (ignore-constants option). '
+                       . 'Please check your spelling and try again.';
+                $this->_printUsage($error);
                 return;
             }
         }
 
         // ignore-extensions
-        $ie = $this->args->getValue('ie');
+        $ie = $args->getValue('ie');
         if (isset($ie)) {
             if (file_exists($ie)) {
                 $options                            = $this->_parseParamFile($ie);
                 $this->options['ignore_extensions'] = $options['std'];
             } else {
-                $this->error = 'Failed opening file "' . $ie
-                     . '" (ignore-extensions option). '
-                     . 'Please check your spelling and try again.';
+                $error = 'Failed opening file "' . $ie
+                       . '" (ignore-extensions option). '
+                       . 'Please check your spelling and try again.';
+                $this->_printUsage($error);
                 return;
             }
         }
 
         // ignore-versions
-        $iv = $this->args->getValue('iv');
+        $iv = $args->getValue('iv');
         if (isset($iv)) {
             if (!is_array($iv)) {
                 $iv = array($iv);
@@ -365,15 +413,16 @@ class PHP_CompatInfo_Cli extends PHP_CompatInfo
         }
 
         // ignore-functions-match
-        $inm = $this->args->getValue('inm');
+        $inm = $args->getValue('inm');
         if (isset($inm)) {
             if (file_exists($inm)) {
                 $patterns = $this->_parseParamFile($inm, true);
                 if (count($patterns['std']) > 0
                     && count($patterns['reg']) > 0) {
-                    $this->error = 'Mixed "function_exists" and '
-                         . '"preg_match" conditions are not allowed. '
-                         . 'Please check your spelling and try again.';
+                    $error = 'Mixed "function_exists" and '
+                           . '"preg_match" conditions are not allowed. '
+                           . 'Please check your spelling and try again.';
+                    $this->_printUsage($error);
                     return;
 
                 } elseif (count($patterns['std']) > 0) {
@@ -384,23 +433,25 @@ class PHP_CompatInfo_Cli extends PHP_CompatInfo
                         = array('preg_match', $patterns['reg']);
                 }
             } else {
-                $this->error = 'Failed opening file "' . $inm
-                     . '" (ignore-functions-match option). '
-                     . 'Please check your spelling and try again.';
+                $error = 'Failed opening file "' . $inm
+                       . '" (ignore-functions-match option). '
+                       . 'Please check your spelling and try again.';
+                $this->_printUsage($error);
                 return;
             }
         }
 
         // ignore-extensions-match
-        $iem = $this->args->getValue('iem');
+        $iem = $args->getValue('iem');
         if (isset($iem)) {
             if (file_exists($iem)) {
                 $patterns = $this->_parseParamFile($iem, true);
                 if (count($patterns['std']) > 0
                     && count($patterns['reg']) > 0) {
-                    $this->error = 'Mixed "extension_loaded" and '
-                         . '"preg_match" conditions are not allowed. '
-                         . 'Please check your spelling and try again.';
+                    $error = 'Mixed "extension_loaded" and '
+                           . '"preg_match" conditions are not allowed. '
+                           . 'Please check your spelling and try again.';
+                    $this->_printUsage($error);
                     return;
 
                 } elseif (count($patterns['std']) > 0) {
@@ -411,23 +462,25 @@ class PHP_CompatInfo_Cli extends PHP_CompatInfo
                         = array('preg_match', $patterns['reg']);
                 }
             } else {
-                $this->error = 'Failed opening file "' . $iem
-                     . '" (ignore-extensions-match option). '
-                     . 'Please check your spelling and try again.';
+                $error = 'Failed opening file "' . $iem
+                       . '" (ignore-extensions-match option). '
+                       . 'Please check your spelling and try again.';
+                $this->_printUsage($error);
                 return;
             }
         }
 
         // ignore-constants-match
-        $icm = $this->args->getValue('icm');
+        $icm = $args->getValue('icm');
         if (isset($icm)) {
             if (file_exists($icm)) {
                 $patterns = $this->_parseParamFile($icm, true);
                 if (count($patterns['std']) > 0
                     && count($patterns['reg']) > 0) {
-                    $this->error = 'Mixed "defined" and '
-                         . '"preg_match" conditions are not allowed. '
-                         . 'Please check your spelling and try again.';
+                    $error = 'Mixed "defined" and '
+                           . '"preg_match" conditions are not allowed. '
+                           . 'Please check your spelling and try again.';
+                    $this->_printUsage($error);
                     return;
 
                 } elseif (count($patterns['std']) > 0) {
@@ -438,76 +491,78 @@ class PHP_CompatInfo_Cli extends PHP_CompatInfo
                         = array('preg_match', $patterns['reg']);
                 }
             } else {
-                $this->error = 'Failed opening file "' . $icm
-                     . '" (ignore-constants-match option). '
-                     . 'Please check your spelling and try again.';
+                $error = 'Failed opening file "' . $icm
+                       . '" (ignore-constants-match option). '
+                       . 'Please check your spelling and try again.';
+                $this->_printUsage($error);
                 return;
             }
         }
 
         // file-ext
-        if ($this->args->isDefined('d') && $this->args->isDefined('fe')) {
-            $fe = $this->args->getValue('fe');
+        if ($args->isDefined('d') && $args->isDefined('fe')) {
+            $fe = $args->getValue('fe');
             if (is_string($fe)) {
                 $this->options['file_ext'] = explode(',', $fe);
             } else {
-                $this->error = 'No valid file extensions provided "'
-                     . '". Please check your spelling and try again.';
+                $error = 'No valid file extensions provided "'
+                       . '". Please check your spelling and try again.';
+                $this->_printUsage($error);
                 return;
             }
         }
 
-        // output-level
-        if ($this->args->isDefined('o')) {
-            $this->_output_level = $this->args->getValue('o');
-        } else {
-            $this->_output_level = 15; // default = full detail
-        }
-
         // file or directory options are minimum required to work
-        if (!$this->args->isDefined('f')
-            && !$this->args->isDefined('d')
-            && !$this->args->isDefined('s')) {
-            $this->error = 'ERROR: You must supply at least '
-                . 'one string, file or directory to process';
+        if (!$args->isDefined('f')
+            && !$args->isDefined('d')
+            && !$args->isDefined('s')) {
+            $error = 'ERROR: You must supply at least '
+                   . 'one string, file or directory to process';
+            $this->_printUsage($error);
+            return;
         }
-    }
 
-    /**
-     * ZE1 PHP4 Compatible Constructor
-     *
-     * @since  0.8.0
-     */
-    function PHP_CompatInfo_Cli()
-    {
-        $this->__construct();
-    }
-
-    /**
-     * Run the CLI Script
-     *
-     * @return void
-     * @access public
-     * @since  0.8.0
-     */
-    function run()
-    {
-        if (isset($this->error)) {
-            if (strpos($this->error, 'PHP_CompatInfo') === false) {
-                $this->_printUsage($this->error);
-            } else {
-                // when Version asked, do not print help usage
-                echo $this->error;
-            }
+        if ($args->isDefined('r')) {
+            $report = $args->getValue('r');
         } else {
-            if (isset($this->dir)) {
-                $this->_parseDir();
-            } elseif (isset($this->file)) {
-                $this->_parseFile();
-            } elseif (isset($this->string)) {
-                $this->_parseString();
+            $report = 'text';
+        }
+
+        if ($args->isDefined('t')) {
+            $defs = array('f' => 29, 'e' => 12, 'c' => 20);
+            $tabs = $args->getValue('t');
+            $tabs = explode(',', $tabs);
+            for ($t = 0; $t < 3; $t++) {
+                if (isset($tabs[$t])) {
+                    if ($t == 0) {
+                        $defs['f'] = (int)$tabs[$t];
+                    } elseif ($t == 1) {
+                        $defs['e'] = (int)$tabs[$t];
+                    } else {
+                        $defs['c'] = (int)$tabs[$t];
+                    }
+                }
+            }
+            $conf = array('colwidth' => $defs);
+        } else {
+            $conf = array();
+        }
+        $conf = array_merge($conf, array('args' => $args->getValues()));
+
+        $compatInfo = new PHP_CompatInfo($report, $conf);
+
+        // dir
+        if ($args->isDefined('d')) {
+            $d     = $args->getValue('d');
+            $files = $compatInfo->parser->getFilelist($d, $this->options);
+            if (count($files) == 0) {
+                $error = 'No valid files into directory "'. $d
+                       . '". Please check your spelling and try again.';
+                $this->_printUsage($error);
+                return;
             }
         }
+        $compatInfo->parseData($this->dataSource, $this->options);
     }
 
     /**
@@ -559,677 +614,13 @@ class PHP_CompatInfo_Cli extends PHP_CompatInfo
     }
 
     /**
-     * Parse Directory Input
-     *
-     * @return void
-     * @access private
-     * @since  0.8.0
-     */
-    function _parseDir()
-    {
-        $info = $this->parseDir($this->dir, $this->options);
-        if ($info === false) {
-            $err = 'No valid files into directory "' . $this->dir
-               . '". Please check your spelling and try again.';
-            $this->_printUsage($err);
-            return;
-        }
-        $o = $this->_output_level;
-        if ($this->args->isDefined('r')) {
-            $r = $this->args->getValue('r');
-            if ($r == 'xml') {
-                $this->_printXMLReport($info);
-                return;
-            }
-        }
-
-        $table = new Console_Table();
-        $hdr   = array('Path', 'Version');
-        $f     = 1;
-        if ($o & 1) {
-            $hdr[] = 'C';
-            $f++;
-        }
-        if ($o & 2) {
-            $hdr[]   = 'Extensions';
-            $filter2 = array(&$this, '_splitExtname');
-            $table->addFilter($f+1, $filter2);
-            $f++;
-        }
-        if ($o & 4) {
-            if ($o & 8) {
-                $hdr[] = 'Constants/Tokens';
-            } else {
-                $hdr[] = 'Constants';
-            }
-            $f++;
-        } else {
-            if ($o & 8) {
-                $hdr[] = 'Tokens';
-                $f++;
-            }
-        }
-        $table->setHeaders($hdr);
-        $filter0 = array(&$this, '_splitFilename');
-        $table->addFilter(0, $filter0);
-        if ($o > 3) {
-            $filter3 = array(&$this, '_splitConstant');
-            $table->addFilter($f, $filter3);
-        }
-
-        $ext   = implode("\r\n", $info['extensions']);
-        $const = implode("\r\n", array_merge($info['constants'], $info['tokens']));
-        $ds    = DIRECTORY_SEPARATOR;
-        $dir   = str_replace(array('\\', '/'), $ds, $this->dir);
-
-        $data = array($dir . $ds . '*');
-        if (empty($info['max_version'])) {
-            $data[] = $info['version'];
-        } else {
-            $data[] = implode("\r\n", array($info['version'], $info['max_version']));
-        }
-
-        if ($o & 1) {
-            $data[] = $info['cond_code'][0];
-        }
-        if ($o & 2) {
-            $data[] = $ext;
-        }
-        if ($o & 4) {
-            if ($o & 8) {
-                $data[] = $const;
-            } else {
-                $data[] = implode("\r\n", $info['constants']);
-            }
-        } else {
-            if ($o & 8) {
-                $data[] = implode("\r\n", $info['tokens']);
-            }
-        }
-
-        $table->addRow($data);
-
-        // summarize : print only summary for directory without files details
-        if ($this->args->isDefined('S') === false) {
-
-            unset($info['max_version']);
-            unset($info['version']);
-            unset($info['extensions']);
-            unset($info['constants']);
-            unset($info['tokens']);
-            unset($info['cond_code']);
-
-            $ignored = $info['ignored_files'];
-
-            unset($info['ignored_files']);
-            unset($info['ignored_functions']);
-            unset($info['ignored_extensions']);
-            unset($info['ignored_constants']);
-
-            foreach ($info as $file => $info) {
-                if ($info === false) {
-                    continue;  // skip this (invalid) file
-                }
-                $ext   = implode("\r\n", $info['extensions']);
-                $const = implode("\r\n", array_merge($info['constants'],
-                                                     $info['tokens']));
-
-                $file = str_replace(array('\\', '/'), $ds, $file);
-                $table->addSeparator();
-
-                $data = array($file);
-                if (empty($info['max_version'])) {
-                    $data[] = $info['version'];
-                } else {
-                    $data[] = implode("\r\n",
-                                      array($info['version'], $info['max_version']));
-                }
-
-                if ($o & 1) {
-                    $data[] = $info['cond_code'][0];
-                }
-                if ($o & 2) {
-                    $data[] = $ext;
-                }
-                if ($o & 4) {
-                    if ($o & 8) {
-                        $data[] = $const;
-                    } else {
-                        $data[] = implode("\r\n", $info['constants']);
-                    }
-                } else {
-                    if ($o & 8) {
-                        $data[] = implode("\r\n", $info['tokens']);
-                    }
-                }
-
-                $table->addRow($data);
-            }
-        }
-        $output = $table->getTable();
-
-        // verbose level
-        $v = $this->args->getValue('v');
-
-        // command line resume
-        if ($v & 1) {
-            $output .= "\nCommand Line resume :\n\n";
-
-            $table = new Console_Table();
-            $table->setHeaders(array('Option', 'Value'));
-
-            $filter0 = array(&$this, '_splitOption');
-            $table->addFilter(0, $filter0);
-            $filter1 = array(&$this, '_splitValue');
-            $table->addFilter(1, $filter1);
-
-            $opts = $this->args->getValues();
-            if (is_array($opts)) {
-                foreach ($opts as $key => $raw) {
-                    if (is_array($raw)) {
-                        $raw = implode(', ', $raw);
-                    }
-                    $contents = array($key, $raw);
-                    $table->addRow($contents);
-                }
-            }
-
-            $output .= $table->getTable();
-        }
-
-        // parser options resume
-        if ($v & 2) {
-            $output .= "\nParser options :\n\n";
-
-            $table = new Console_Table();
-            $table->setHeaders(array('Option', 'Value'));
-
-            $filter0 = array(&$this, '_splitOption');
-            $table->addFilter(0, $filter0);
-            $filter1 = array(&$this, '_splitValue');
-            $table->addFilter(1, $filter1);
-
-            $opts = $this->options;
-            if (is_array($opts)) {
-                foreach ($opts as $key => $raw) {
-                    if ($key == 'debug' || $key == 'recurse_dir') {
-                        $raw = ($raw === true) ? 'TRUE' : 'FALSE';
-                    }
-                    if (substr($key, -6) == '_match') {
-                        $val = array_values($raw[1]);
-                        array_unshift($val, $raw[0]);
-                        $raw = implode("\r\n", $val);
-                    } else {
-                        if (is_array($raw)) {
-                            $raw = implode("\r\n", $raw);
-                        }
-                    }
-                    $contents = array($key, $raw);
-                    $table->addRow($contents);
-                }
-            }
-
-            $output .= $table->getTable();
-        }
-
-        echo $output;
-    }
-
-    /**
-     * Parse File Input
-     *
-     * @return void
-     * @access private
-     * @since  0.8.0
-     */
-    function _parseFile()
-    {
-        $info = $this->parseFile($this->file, $this->options);
-        if ($info === false) {
-            $err = 'Failed opening file "' . $this->file
-               . '". Please check your spelling and try again.';
-            $this->_printUsage($err);
-            return;
-        }
-        $o = $this->_output_level;
-        if ($this->args->isDefined('r')) {
-            $r = $this->args->getValue('r');
-            if ($r == 'xml') {
-                $this->_printXMLReport($info);
-                return;
-            }
-        }
-
-        $table = new Console_Table();
-        $hdr   = array('File', 'Version');
-        $f     = 1;
-        if ($o & 1) {
-            $hdr[] = 'C';
-            $f++;
-        }
-        if ($o & 2) {
-            $hdr[]   = 'Extensions';
-            $filter2 = array(&$this, '_splitExtname');
-            $table->addFilter($f+1, $filter2);
-            $f++;
-        }
-        if ($o & 4) {
-            if ($o & 8) {
-                $hdr[] = 'Constants/Tokens';
-            } else {
-                $hdr[] = 'Constants';
-            }
-            $f++;
-        } else {
-            if ($o & 8) {
-                $hdr[] = 'Tokens';
-                $f++;
-            }
-        }
-        $table->setHeaders($hdr);
-        $filter0 = array(&$this, '_splitFilename');
-        $table->addFilter(0, $filter0);
-        if ($o > 3) {
-            $filter3 = array(&$this, '_splitConstant');
-            $table->addFilter($f, $filter3);
-        }
-
-        $ext   = implode("\r\n", $info['extensions']);
-        $const = implode("\r\n", array_merge($info['constants'], $info['tokens']));
-        $data  = array($this->file);
-        if (empty($info['max_version'])) {
-            $data[] = $info['version'];
-        } else {
-            $data[] = implode("\r\n", array($info['version'], $info['max_version']));
-        }
-
-        if ($o & 1) {
-            $data[] = $info['cond_code'][0];
-        }
-        if ($o & 2) {
-            $data[] = $ext;
-        }
-        if ($o & 4) {
-            if ($o & 8) {
-                $data[] = $const;
-            } else {
-                $data[] = implode("\r\n", $info['constants']);
-            }
-        } else {
-            if ($o & 8) {
-                $data[] = implode("\r\n", $info['tokens']);
-            }
-        }
-
-        $table->addRow($data);
-
-        $output = $table->getTable();
-
-        // verbose level
-        $v = $this->args->getValue('v');
-
-        // command line resume
-        if ($v & 1) {
-            $output .= "\nCommand Line resume :\n\n";
-
-            $table = new Console_Table();
-            $table->setHeaders(array('Option', 'Value'));
-
-            $filter0 = array(&$this, '_splitOption');
-            $table->addFilter(0, $filter0);
-            $filter1 = array(&$this, '_splitValue');
-            $table->addFilter(1, $filter1);
-
-            $opts = $this->args->getValues();
-            if (is_array($opts)) {
-                foreach ($opts as $key => $raw) {
-                    if (is_array($raw)) {
-                        $raw = implode(', ', $raw);
-                    }
-                    $contents = array($key, $raw);
-                    $table->addRow($contents);
-                }
-            }
-
-            $output .= $table->getTable();
-        }
-
-        // parser options resume
-        if ($v & 2) {
-            $output .= "\nParser options :\n\n";
-
-            $table = new Console_Table();
-            $table->setHeaders(array('Option', 'Value'));
-
-            $filter0 = array(&$this, '_splitOption');
-            $table->addFilter(0, $filter0);
-            $filter1 = array(&$this, '_splitValue');
-            $table->addFilter(1, $filter1);
-
-            $opts = $this->options;
-            if (is_array($opts)) {
-                foreach ($opts as $key => $raw) {
-                    if ($key == 'debug' || $key == 'recurse_dir') {
-                        $raw = ($raw === true) ? 'TRUE' : 'FALSE';
-                    }
-                    if (substr($key, -6) == '_match') {
-                        $val = array_values($raw[1]);
-                        array_unshift($val, $raw[0]);
-                        $raw = implode("\r\n", $val);
-                    } else {
-                        if (is_array($raw)) {
-                            $raw = implode("\r\n", $raw);
-                        }
-                    }
-                    $contents = array($key, $raw);
-                    $table->addRow($contents);
-                }
-            }
-
-            $output .= $table->getTable();
-        }
-
-        // extra information
-        if ($v & 4) {
-            $output .= "\nDebug:\n\n";
-
-            $table = new Console_Table();
-            $table->setHeaders(array('Version', 'Function', 'Extension', 'PECL'));
-
-            unset($info['max_version']);
-            unset($info['version']);
-            unset($info['extensions']);
-            unset($info['constants']);
-            unset($info['tokens']);
-            unset($info['cond_code']);
-            unset($info['ignored_functions']);
-            unset($info['ignored_extensions']);
-            unset($info['ignored_constants']);
-
-            foreach ($info as $version => $functions) {
-                foreach ($functions as $func) {
-                    $table->addRow(array($version,
-                        $func['function'], $func['extension'],
-                        (isset($func['pecl']) ?
-                        (($func['pecl'] === true) ? 'yes' : 'no') : '')));
-                }
-            }
-
-            $output .= $table->getTable();
-        }
-
-        echo $output;
-    }
-
-    /**
-     * Parse String Input
-     *
-     * @return void
-     * @access private
-     * @since  1.6.0
-     */
-    function _parseString()
-    {
-        $info = $this->parseString($this->string, $this->options);
-        if ($info === false) {
-            $err = 'Failed opening string "' . $this->string
-               . '". Please check your spelling and try again.';
-            $this->_printUsage($err);
-            return;
-        }
-        $table = new Console_Table();
-        $table->setHeaders(array('Version', 'Extensions', 'Constants/Tokens'));
-
-        $ext   = implode("\r\n", $info['extensions']);
-        $const = implode("\r\n", $info['constants']);
-        $data  = array();
-        if (empty($info['max_version'])) {
-            $data[] = $info['version'];
-        } else {
-            $data[] = implode("\r\n", array($info['version'], $info['max_version']));
-        }
-        $data[] = $ext;
-        $data[] = $const;
-
-        $table->addRow($data);
-
-        $output = $table->getTable();
-
-        // verbose level
-        $v = $this->args->getValue('v');
-
-        // command line resume
-        if ($v & 1) {
-            $output .= "\nCommand Line resume :\n\n";
-
-            $table = new Console_Table();
-            $table->setHeaders(array('Option', 'Value'));
-
-            $filter0 = array(&$this, '_splitOption');
-            $table->addFilter(0, $filter0);
-            $filter1 = array(&$this, '_splitValue');
-            $table->addFilter(1, $filter1);
-
-            $opts = $this->args->getValues();
-            if (is_array($opts)) {
-                foreach ($opts as $key => $raw) {
-                    if (is_array($raw)) {
-                        $raw = implode(', ', $raw);
-                    }
-                    $contents = array($key, $raw);
-                    $table->addRow($contents);
-                }
-            }
-
-            $output .= $table->getTable();
-        }
-
-        // parser options resume
-        if ($v & 2) {
-            $output .= "\nParser options :\n\n";
-
-            $table = new Console_Table();
-            $table->setHeaders(array('Option', 'Value'));
-
-            $filter0 = array(&$this, '_splitOption');
-            $table->addFilter(0, $filter0);
-            $filter1 = array(&$this, '_splitValue');
-            $table->addFilter(1, $filter1);
-
-            $opts = $this->options;
-            if (is_array($opts)) {
-                foreach ($opts as $key => $raw) {
-                    if ($key == 'debug') {
-                        $raw = ($raw === true) ? 'TRUE' : 'FALSE';
-                    }
-                    if (substr($key, -6) == '_match') {
-                        $val = array_values($raw[1]);
-                        array_unshift($val, $raw[0]);
-                        $raw = implode("\r\n", $val);
-                    } else {
-                        if (is_array($raw)) {
-                            $raw = implode("\r\n", $raw);
-                        }
-                    }
-                    $contents = array($key, $raw);
-                    $table->addRow($contents);
-                }
-            }
-
-            $output .= $table->getTable();
-        }
-
-        // extra information
-        if ($v & 4) {
-            $output .= "\nDebug:\n\n";
-
-            $table = new Console_Table();
-            $table->setHeaders(array('Version', 'Function', 'Extension', 'PECL'));
-
-            unset($info['max_version']);
-            unset($info['version']);
-            unset($info['extensions']);
-            unset($info['constants']);
-            unset($info['tokens']);
-            unset($info['cond_code']);
-            unset($info['ignored_functions']);
-            unset($info['ignored_extensions']);
-            unset($info['ignored_constants']);
-
-            foreach ($info as $version => $functions) {
-                foreach ($functions as $func) {
-                    $table->addRow(array($version,
-                        $func['function'], $func['extension'],
-                        (isset($func['pecl']) ?
-                        (($func['pecl'] === true) ? 'yes' : 'no') : '')));
-                }
-            }
-
-            $output .= $table->getTable();
-        }
-
-        echo $output;
-    }
-
-    /**
-     * The Console_Table filter callback limits table output to 80 columns,
-     * and Path column to 29 characters
-     * (27 + 1 blank margin left + 1 blank margin right).
-     *
-     * @param string $data Content of filename column (0)
-     *
-     * @return string
-     * @access private
-     * @since  1.3.0
-     */
-    function _splitFilename($data)
-    {
-        if (strlen($data) <= 27) {
-            $str = str_pad($data, 27);
-        } else {
-            $str = '...' . substr($data, (strlen($data) - 24));
-        }
-        return $str;
-    }
-
-    /**
-     * The Console_Table filter callback limits table output to 80 columns,
-     * and Extensions column to 12 characters
-     * (10 + 1 blank margin left + 1 blank margin right).
-     *
-     * @param string $data Content of extensions column
-     *
-     * @return string
-     * @access private
-     * @since  1.7.0
-     */
-    function _splitExtname($data)
-    {
-        $szlim = ($this->_output_level & 12) ? 10 : 35;
-        if ($this->_output_level & 1) {
-            $szlim = $szlim - 4;
-        }
-        $extArr = explode("\r\n", $data);
-        $str    = '';
-        foreach ($extArr as $ext) {
-            if (strlen($ext) <= $szlim) {
-                $str .= str_pad($ext, $szlim);
-            } else {
-                $str .= '...' . substr($ext, (strlen($ext) - ($szlim - 3)));
-            }
-            $str .= "\r\n";
-        }
-        $str = rtrim($str, "\r\n");
-        return $str;
-    }
-
-    /**
-     * The Console_Table filter callback limits table output to 80 columns,
-     * and Constants/Tokens column to 20 characters
-     * (18 + 1 blank margin left + 1 blank margin right)
-     *
-     * @param string $data Content of constants/tokens column
-     *
-     * @return string
-     * @access private
-     * @since  1.7.0
-     */
-    function _splitConstant($data)
-    {
-        $szlim = ($this->_output_level & 2) ? 22 : 35;
-        if ($this->_output_level & 1) {
-            $szlim = $szlim - 4;
-        }
-        $cstArr = explode("\r\n", $data);
-        $str    = '';
-        foreach ($cstArr as $cst) {
-            if (strlen($cst) <= $szlim) {
-                $str .= str_pad($cst, $szlim);
-            } else {
-                $str .= '...' . substr($cst, (strlen($cst) - ($szlim - 3)));
-            }
-            $str .= "\r\n";
-        }
-        $str = rtrim($str, "\r\n");
-        return $str;
-    }
-
-    /**
-     * The Console_Table filter callback limits table output to 80 columns,
-     * and Command line Option column to 25 characters
-     * (23 + 1 blank margin left + 1 blank margin right).
-     *
-     * @param string $data Content of option column (0)
-     *
-     * @return string
-     * @access private
-     * @since  1.7.0
-     */
-    function _splitOption($data)
-    {
-        if (strlen($data) <= 23) {
-            $str = str_pad($data, 23);
-        } else {
-            $str = '...' . substr($data, (strlen($data) - 20));
-        }
-        return $str;
-    }
-
-    /**
-     * The Console_Table filter callback limits table output to 80 columns,
-     * and Command line Value column to 51 characters
-     * (49 + 1 blank margin left + 1 blank margin right)
-     *
-     * @param string $data Content of value column (1)
-     *
-     * @return string
-     * @access private
-     * @since  1.7.0
-     */
-    function _splitValue($data)
-    {
-        $cstArr = explode("\r\n", $data);
-        $str    = '';
-        foreach ($cstArr as $cst) {
-            if (strlen($cst) <= 49) {
-                $str .= str_pad($cst, 49);
-            } else {
-                $str .= '...' . substr($cst, (strlen($cst) - 46));
-            }
-            $str .= "\r\n";
-        }
-        $str = rtrim($str, "\r\n");
-        return $str;
-    }
-
-    /**
      * Show full help information
      *
      * @param string $footer (optional) page footer content
      *
      * @return void
      * @access private
-     * @since  0.8.0
+     * @since  version 0.8.0 (2004-04-22)
      */
     function _printUsage($footer = '')
     {
@@ -1237,292 +628,6 @@ class PHP_CompatInfo_Cli extends PHP_CompatInfo
             . basename($_SERVER['SCRIPT_NAME']) . " [options]\n\n";
         echo Console_Getargs::getHelp($this->opts, $header,
             "\n$footer\n", 78, 2)."\n";
-    }
-
-    /**
-     * Print XML report
-     *
-     * @param array $info File or directory parsing data
-     *
-     * @return void
-     * @access private
-     * @since  1.6.0
-     */
-    function _printXMLReport($info)
-    {
-        include_once 'XML/Util.php';
-
-        ob_start();
-
-        echo XML_Util::getXMLDeclaration("1.0", "UTF-8");
-        echo PHP_EOL;
-        echo XML_Util::createStartElement('pci',
-                                          array('version' => '1.7.0'));
-        echo PHP_EOL;
-        $o = $this->_output_level;
-
-        if (isset($this->dir)) {
-            // parsing a directory
-
-            // print <dir> tag
-            $tag = array('qname' => 'dir',
-                         'content' => $this->dir);
-            echo XML_Util::createTagFromArray($tag);
-            echo PHP_EOL;
-
-            // print global <version> tag
-            if (empty($info['max_version'])) {
-                $attr = array();
-            } else {
-                $attr = array('max' => $info['max_version']);
-            }
-            $tag = array('qname' => 'version',
-                         'attributes' => $attr,
-                         'content' => $info['version']);
-            echo XML_Util::createTagFromArray($tag);
-            echo PHP_EOL;
-
-            // print global <conditions> tag group
-            if ($o & 1) {
-                $this->_printTagList($info['cond_code'], 'condition');
-            }
-            // print global <extensions> tag group
-            if ($o & 2) {
-                $this->_printTagList($info['extensions'], 'extension');
-            }
-            // print global <constants> tag group
-            if ($o & 4) {
-                $this->_printTagList($info['constants'], 'constant');
-            }
-            // print global <tokens> tag group
-            if ($o & 8) {
-                $this->_printTagList($info['tokens'], 'token');
-            }
-
-            // print global <ignored> tag group
-            echo XML_Util::createStartElement('ignored');
-            echo PHP_EOL;
-            // with children groups <files>, <functions>, <extensions>, <constants>
-            $ignored = array('file' => $info['ignored_files'],
-                             'function' => $info['ignored_functions'],
-                             'extension' => $info['ignored_extensions'],
-                             'constant' => $info['ignored_constants']);
-            foreach ($ignored as $tag => $data) {
-                $this->_printTagList($data, $tag);
-            }
-            echo XML_Util::createEndElement('ignored');
-            echo PHP_EOL;
-
-            // remove summary data
-            unset($info['ignored_files']);
-            unset($info['ignored_functions']);
-            unset($info['ignored_extensions']);
-            unset($info['ignored_constants']);
-            unset($info['max_version']);
-            unset($info['version']);
-            unset($info['extensions']);
-            unset($info['constants']);
-            unset($info['tokens']);
-            unset($info['cond_code']);
-
-            $files = $info;
-        } else {
-            // parsing a single file
-            $files = array($this->file => $info);
-        }
-
-        // print <files> tag group
-        echo XML_Util::createStartElement('files', array('count' => count($files)));
-        echo PHP_EOL;
-
-        foreach ($files as $file => $info) {
-            // print local <file> tag
-            echo XML_Util::createStartElement('file', array('name' => $file));
-            echo PHP_EOL;
-
-            // print local <version> tag
-            if (empty($info['max_version'])) {
-                $attr = array();
-            } else {
-                $attr = array('max' => $info['max_version']);
-            }
-            $tag = array('qname' => 'version',
-                         'attributes' => $attr,
-                         'content' => $info['version']);
-            echo XML_Util::createTagFromArray($tag);
-            echo PHP_EOL;
-
-            // print local <conditions> tag group
-            if ($o & 1) {
-                $this->_printTagList($info['cond_code'], 'condition');
-            }
-            // print local <extensions> tag group
-            if ($o & 2) {
-                $this->_printTagList($info['extensions'], 'extension');
-            }
-            // print local <constants> tag group
-            if ($o & 4) {
-                $this->_printTagList($info['constants'], 'constant');
-            }
-            // print local <tokens> tag group
-            if ($o & 8) {
-                $this->_printTagList($info['tokens'], 'token');
-            }
-
-            // print local <ignored> tag group
-            echo XML_Util::createStartElement('ignored');
-            echo PHP_EOL;
-            // with children groups <functions>, <extensions>, <constants>
-            $ignored = array('function' => $info['ignored_functions'],
-                             'extension' => $info['ignored_extensions'],
-                             'constant' => $info['ignored_constants']);
-            foreach ($ignored as $tag => $data) {
-                $this->_printTagList($data, $tag);
-            }
-            echo XML_Util::createEndElement('ignored');
-            echo PHP_EOL;
-
-            // verbose level
-            $v = $this->args->getValue('v');
-
-            // extra information only if verbose mode >= 4
-            if ($v & 4) {
-                unset($info['ignored_files']);
-                unset($info['ignored_functions']);
-                unset($info['ignored_extensions']);
-                unset($info['ignored_constants']);
-                unset($info['max_version']);
-                unset($info['version']);
-                unset($info['constants']);
-                unset($info['tokens']);
-                unset($info['extensions']);
-                unset($info['cond_code']);
-
-                // print local <functions> tag group
-                $this->_printTagList($info, 'function');
-            }
-
-            echo XML_Util::createEndElement('file');
-            echo PHP_EOL;
-        }
-        echo XML_Util::createEndElement('files');
-        echo PHP_EOL;
-        echo XML_Util::createEndElement('pci');
-        echo PHP_EOL;
-
-        $result = ob_get_clean();
-
-        // try to see if we can improve XML render
-        $beautifier = 'XML/Beautifier.php';
-        if (PHP_CompatInfo_Cli::isIncludable($beautifier)) {
-            include_once $beautifier;
-            $options = array('indent' => ' ');
-            $fmt     = new XML_Beautifier($options);
-            $result  = $fmt->formatString($result);
-        }
-        echo $result;
-    }
-
-    /**
-     * Print a group of same tag in the XML report.
-     *
-     * Groups list are : extension(s), constant(s), token(s)
-     *
-     * @param array  $dataSrc Data source
-     * @param string $tagName Name of the XML tag
-     *
-     * @return void
-     * @access private
-     * @since  version 1.7.0b4 (2008-04-03)
-     */
-    function _printTagList($dataSrc, $tagName)
-    {
-        if ($tagName == 'function') {
-            $c = 0;
-            foreach ($dataSrc as $version => $functions) {
-                $c += count($functions);
-            }
-            $attributes = array('count' => $c);
-        } elseif ($tagName == 'condition') {
-            if ($this->options['debug'] === true) {
-                $c = 0;
-                foreach ($dataSrc[1] as $cond => $elements) {
-                    $c += count($elements);
-                }
-                $attributes = array('count' => $c, 'level' => $dataSrc[0]);
-            } else {
-                $attributes = array('level' => $dataSrc[0]);
-            }
-        } else {
-            $attributes = array('count' => count($dataSrc));
-        }
-
-        echo XML_Util::createStartElement($tagName.'s', $attributes);
-        echo PHP_EOL;
-
-        if ($tagName == 'function') {
-            foreach ($dataSrc as $version => $functions) {
-                foreach ($functions as $data) {
-                    $attr = array('version' => $version);
-                    if (!empty($data['extension'])) {
-                        $attr['extension'] = $data['extension'];
-                        $attr['pecl']      = $data['pecl'] === true ?
-                                                'true' : 'false';
-                    }
-                    $tag = array('qname' => $tagName,
-                                 'attributes' => $attr,
-                                 'content' => $data['function']);
-                    echo XML_Util::createTagFromArray($tag);
-                    echo PHP_EOL;
-                }
-            }
-        } elseif ($tagName == 'condition') {
-            if ($this->options['debug'] == true) {
-                foreach ($dataSrc[1] as $cond => $elements) {
-                    $cond = ($cond == 0) ? 1 : ($cond * 2);
-                    foreach ($elements as $data) {
-                        $tag = array('qname' => $tagName,
-                                     'attributes' => array('level' => $cond),
-                                     'content' => $data);
-                        echo XML_Util::createTagFromArray($tag);
-                        echo PHP_EOL;
-                    }
-                }
-            }
-        } else {
-            foreach ($dataSrc as $data) {
-                $tag = array('qname' => $tagName,
-                             'attributes' => array(),
-                             'content' => $data);
-                echo XML_Util::createTagFromArray($tag);
-                echo PHP_EOL;
-            }
-        }
-
-        echo XML_Util::createEndElement($tagName.'s');
-        echo PHP_EOL;
-    }
-
-    /**
-     * Returns whether or not a file is in the include path.
-     *
-     * @param string $file Path to filename to check if includable
-     *
-     * @static
-     * @access public
-     * @return boolean TRUE if the file is in the include path, FALSE otherwise
-     * @since  version 1.7.0b4 (2008-04-03)
-     */
-    function isIncludable($file)
-    {
-        foreach (explode(PATH_SEPARATOR, get_include_path()) as $ip) {
-            if (file_exists($ip . DIRECTORY_SEPARATOR . $file)
-                && is_readable($ip . DIRECTORY_SEPARATOR . $file)
-                ) {
-                return true;
-            }
-        }
-        return false;
     }
 }
 ?>

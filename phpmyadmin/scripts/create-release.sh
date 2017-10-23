@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: create-release.sh 11315 2008-06-10 17:25:15Z lem9 $
+# $Id: create-release.sh 12091 2008-12-06 19:23:55Z lem9 $
 # vim: expandtab sw=4 ts=4 sts=4:
 #
 # 2005-09-13, lem9@users.sourceforge.net
@@ -68,7 +68,7 @@
 # - added release todo list
 #
 
-KITS="all-languages-utf-8-only all-languages english"
+KITS="all-languages english"
 COMPRESSIONS="zip-7z tbz tgz 7z"
 
 if [ $# = 0 ]
@@ -106,10 +106,7 @@ Please ensure you have:
           " <h1>phpMyAdmin $1 Documentation</h1> "
      - in translators.html
      - in README
-  2. synchronized the language files:
-       cd lang
-       ./sync_lang.sh
-     and checked all language files are valid (use
+  2. checked that all language files are valid (use
      the "./scripts/check_lang.php" script to do it).
 
 Continue (y/n)?
@@ -133,7 +130,7 @@ if [ "$mode" = "snapshot" -a "$2" = "sf" ] ; then
 fi
 
 # Do SVNcheckout
-mkdir -p ./svn 
+mkdir -p ./svn
 cd svn
 
 echo "Exporting repository from subversion"
@@ -222,16 +219,10 @@ echo
 echo "MD5 sums:"
 echo "--------"
 
-md5sum *.{gz,zip,bz2,7z} | sed "s/\([^ ]*\)[ ]*\([^ ]*\)/\$md5sum['\2'] = '\1';/"
+md5sum *.{gz,zip,bz2,7z} | sed "s/\([^ ]*\)[ ]*\([^ ]*\)/md5sum['\2'] = '\1'/"
 
 echo
-echo "Sizes:"
-echo "------"
-
-ls -l --block-size=k *.{gz,zip,bz2,7z} | sed -r "s/[a-z-]+[[:space:]]+[0-9]+[[:space:]]+[^[:space:]]+[[:space:]]+[^[:space:]]+[[:space:]]+([0-9]*)K.*[[:space:]]([^[:space:]]+)\$/\$size['\2'] = \1;/"
-
-echo
-echo "Add these to /home/groups/p/ph/phpmyadmin/htdocs/home_page/files.inc.php on sf"
+echo "Add these to website/data/md5sums.py in SVN"
 
 cat <<END
 
@@ -247,8 +238,7 @@ Todo now:
  3. add files to SF files page (cut and paste changelog since last release)
  4. add SF news item to phpMyAdmin project
  5. update web page:
-        - add MD5s and file sizes to /home/groups/p/ph/phpmyadmin/htdocs/home_page/includes/list_files.inc.php
-        - add release to /home/groups/p/ph/phpmyadmin/htdocs/home_page/includes/list_release.inc.php
+        - add MD5s to website/data/md5sums.py in SVN
  6. announce release on freshmeat (http://freshmeat.net/projects/phpmyadmin/)
  7. send a short mail (with list of major changes) to
         phpmyadmin-devel@lists.sourceforge.net

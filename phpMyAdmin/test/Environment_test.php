@@ -1,9 +1,9 @@
 <?php
-/* vim: expandtab sw=4 ts=4 sts=4: */
+/* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
  * tests for environment like OS, PHP, modules, ...
  *
- * @version $Id: Environment_test.php 10140 2007-03-20 08:32:55Z cybot_tm $
+ * @version $Id: Environment_test.php 11677 2008-10-25 13:37:54Z lem9 $
  * @package phpMyAdmin-test
  */
 
@@ -16,8 +16,8 @@ class Environment_test extends PHPUnit_Framework_TestCase
 {
     public function testPhpVersion()
     {
-        $this->assertTrue(version_compare('4.1', phpversion(), '<='),
-            'phpMyAdmin requires PHP 4.1 or above');
+        $this->assertTrue(version_compare('5.2', phpversion(), '<='),
+            'phpMyAdmin requires PHP 5.2 or above');
     }
 
     public function testMySQL()

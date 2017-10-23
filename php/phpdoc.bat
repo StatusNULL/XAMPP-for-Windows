@@ -69,7 +69,7 @@ ECHO Select Ini-File [default is phpDocumentor.ini]
 ECHO ------------------------------------------------------------------------------
 ECHO # 0: phpDocumentor.ini
 SET count=0
-FOR /R "C:\php5\pear\data\PhpDocumentor\user" %%I IN (*.ini) DO (
+FOR /R "\xampp\php\pear\data\PhpDocumentor\user" %%I IN (*.ini) DO (
   SET /a count+=1
   CALL :exec ECHO # %%count%%: %%~nI%%~xI
 )
@@ -95,7 +95,7 @@ IF %iniNr%==0 (
 :: Check selected
 SET count=0
 SET found=
-FOR /R "C:\php5\pear\data\PhpDocumentor\user" %%I IN (*.ini) DO (
+FOR /R "\xampp\php\pear\data\PhpDocumentor\user" %%I IN (*.ini) DO (
   SET /a count+=1
   SET iniFile=%%~nI%%~xI
   CALL :exec IF '%%iniNr%%'=='%%count%%' GOTO :run 
@@ -138,7 +138,7 @@ GOTO :PAUSE_END
 SET found=1
 ECHO Starting: "%phpCli%" "\xampp\php\phpdoc" -c "%iniFile%"
 ECHO.
-"%phpCli%"  -d include_path="\xampp\php\pear" "\xampp\php\phpdoc" -c "%iniFile%"
+"%phpCli%"  -d include_path="\xampp\php\pear" "phpdoc" -c "%iniFile%"
 GOTO :EOF
 
 :PAUSE_END

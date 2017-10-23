@@ -33,7 +33,7 @@
 * @author     Sergio Carvalho <sergio.carvalho@portugalmail.com>  
 * @copyright  2004-2006 Sergio Carvalho
 * @license    http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
-* @version    CVS: $Id: Client.php,v 1.13 2007/07/30 08:47:11 sergiosgc Exp $
+* @version    CVS: $Id: Client.php,v 1.14 2008/09/10 18:50:31 sergiosgc Exp $
 * @link       http://pear.php.net/package/XML_RPC2
 */
 
@@ -71,7 +71,7 @@ require_once 'XML/RPC2/Backend.php';
  */
 abstract class XML_RPC2_Client 
 {
-
+    const VERSION = '1.0.4';
     // {{{ properties
     
     /**

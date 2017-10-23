@@ -32,7 +32,7 @@
  * @author    Lorenzo Alberton <l.alberton@quipo.it>
  * @copyright 2004-2008 Lorenzo Alberton
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   CVS: $Id: Translation2.php,v 1.40 2008/02/02 18:02:26 quipo Exp $
+ * @version   CVS: $Id: Translation2.php,v 1.42 2008/11/14 16:18:50 quipo Exp $
  * @link      http://pear.php.net/package/Translation2
  */
 
@@ -296,7 +296,7 @@ class Translation2
      *
      * @param string $langID language code (for instance, 'en' or 'it')
      *
-     * @return void|PEAR_Error
+     * @return true|PEAR_Error
      */
     function setLang($langID)
     {
@@ -305,6 +305,7 @@ class Translation2
             return $res;
         }
         $this->lang = $res;
+        return true;
     }
 
     // }}}
@@ -318,11 +319,12 @@ class Translation2
      *
      * @param string $pageID ID of the default page
      *
-     * @return void
+     * @return self
      */
     function setPageID($pageID = null)
     {
         $this->currentPageID = $pageID;
+        return $this;
     }
 
     // }}}
@@ -373,7 +375,7 @@ class Translation2
      *
      * @param string $format ['ids', 'names', 'array']
      *
-     * @return array
+     * @return array|PEAR_Error
      */
     function getLangs($format = 'name')
     {
@@ -391,7 +393,7 @@ class Translation2
      *
      * @param array $params array of replacement parameters
      *
-     * @return void
+     * @return self
      */
     function setParams($params = null)
     {
@@ -402,6 +404,7 @@ class Translation2
         } else {
             $this->params = array($params);
         }
+        return $this;
     }
 
     // }}}

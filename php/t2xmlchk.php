@@ -1,4 +1,4 @@
-#!/usr/bin/php -q
+#!\xampp\php\.\php.exe -q
 <?php
 /**
  * Check XML files intended to be used with Translation2

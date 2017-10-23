@@ -1,4 +1,18 @@
 <?php
+/**
+* Part of the Services_Blogging package.
+*
+* PHP version 5
+*
+* @category Services
+* @package  Services_Blogging
+* @author   Anant Narayanan <anant@php.net>
+* @author   Christian Weiske <cweiske@php.net>
+* @license  http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
+* @version  CVS: $Id: MetaWeblog.php,v 1.6 2008/11/29 13:15:46 cweiske Exp $
+* @link     http://pear.php.net/package/Services_Blogging
+*/
+
 require_once 'Services/Blogging/Driver/Exception.php';
 require_once 'Services/Blogging/ExtendedDriver.php';
 require_once 'Services/Blogging/Post.php';
@@ -133,6 +147,7 @@ class Services_Blogging_Driver_MetaWeblog extends Services_Blogging_ExtendedDriv
                 $this->userdata['rpc_pass'],
             )
         );
+
         $arData = Services_Blogging_XmlRpc::sendRequest(
             $request, $this->rpc_client
         );
@@ -193,9 +208,11 @@ class Services_Blogging_Driver_MetaWeblog extends Services_Blogging_ExtendedDriv
                 new XML_RPC_Value($number, 'int')
             )
         );
+
         $arData = Services_Blogging_XmlRpc::sendRequest(
             $request, $this->rpc_client
         );
+
         $arPosts = array();
         foreach ($arData as $data) {
             $post               = $this->convertStructToPost($data);
@@ -239,9 +256,10 @@ class Services_Blogging_Driver_MetaWeblog extends Services_Blogging_ExtendedDriv
     * have.
     *
     * @param string $strPostType Type of post to create.
-    *                            @see getSupportedPostTypes()
     *
     * @return array Array of strings
+    *
+    * @see getSupportedPostTypes()
     */
     public function getSupportedPostProperties($strPostType = 'post')
     {
@@ -256,9 +274,10 @@ class Services_Blogging_Driver_MetaWeblog extends Services_Blogging_ExtendedDriv
     *
     * @param string $strProperty Property name/id to check
     * @param string $strPostType Type of post to create.
-    *                            @see getSupportedPostTypes()
     *
     * @return boolean If the property is supported
+    *
+    * @see getSupportedPostTypes()
     */
     public function isPostPropertySupported($strProperty, $strPostType = 'post')
     {
@@ -291,7 +310,9 @@ class Services_Blogging_Driver_MetaWeblog extends Services_Blogging_ExtendedDriv
             substr($arStruct['dateCreated'],  6, 2), //day
             substr($arStruct['dateCreated'],  0, 4)  //year
         );
+
         $post->{Services_Blogging_Post::URL} = $arStruct['link'];
+
         if (!isset($arStruct['categories'])) {
             $arStruct['categories'] = array();
         }
@@ -331,9 +352,15 @@ class Services_Blogging_Driver_MetaWeblog extends Services_Blogging_ExtendedDriv
         return new XML_RPC_Value(
             array(
                 'categories'  => new XML_RPC_Value($categories, 'array'),
-                'dateCreated' => new XML_RPC_Value(date('Ymd\\TH:i:s', $time), 'dateTime.iso8601'),
-                'description' => new XML_RPC_Value($post->{Services_Blogging_Post::CONTENT}, 'string'),
-                'title'       => new XML_RPC_Value($post->{Services_Blogging_Post::TITLE}, 'string')
+                'dateCreated' => new XML_RPC_Value(
+                    date('Ymd\\TH:i:s', $time), 'dateTime.iso8601'
+                ),
+                'description' => new XML_RPC_Value(
+                    $post->{Services_Blogging_Post::CONTENT}, 'string'
+                ),
+                'title'       => new XML_RPC_Value(
+                    $post->{Services_Blogging_Post::TITLE}, 'string'
+                )
             ),
             'struct'
         );

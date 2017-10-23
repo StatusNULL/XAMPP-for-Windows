@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: Win32FileSystem.php 267 2007-10-25 01:49:31Z hans $
+ *  $Id: Win32FileSystem.php 325 2007-12-20 15:44:58Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -474,4 +474,4 @@ class Win32FileSystem extends FileSystem {
     
 }
 
-?>
+

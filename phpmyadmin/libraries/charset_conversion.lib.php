@@ -3,7 +3,7 @@
 /**
  * Charset conversion functions.
  *
- * @version $Id: charset_conversion.lib.php 11335 2008-06-21 14:01:54Z lem9 $
+ * @version $Id: charset_conversion.lib.php 11626 2008-10-01 20:48:40Z lem9 $
  */
 if (! defined('PHPMYADMIN')) {
     exit;
@@ -13,25 +13,18 @@ if (! defined('PHPMYADMIN')) {
  * Loads the recode or iconv extensions if any of it is not loaded yet
  */
 if (isset($cfg['AllowAnywhereRecoding'])
-    && $cfg['AllowAnywhereRecoding']
-    && $allow_recoding) {
+    && $cfg['AllowAnywhereRecoding']) {
 
     if ($cfg['RecodingEngine'] == 'recode') {
         if (!@extension_loaded('recode')) {
-            PMA_dl('recode');
-            if (!@extension_loaded('recode')) {
-                echo $strCantLoadRecodeIconv;
-                exit;
-            }
+            echo $strCantLoadRecodeIconv;
+            exit;
         }
         $PMA_recoding_engine             = 'recode';
     } elseif ($cfg['RecodingEngine'] == 'iconv') {
         if (!@extension_loaded('iconv')) {
-            PMA_dl('iconv');
-            if (!@extension_loaded('iconv')) {
-                echo $strCantLoadRecodeIconv;
-                exit;
-            }
+            echo $strCantLoadRecodeIconv;
+            exit;
         }
         $PMA_recoding_engine             = 'iconv';
     } else {
@@ -40,18 +33,8 @@ if (isset($cfg['AllowAnywhereRecoding'])
         } elseif (@extension_loaded('recode')) {
             $PMA_recoding_engine         = 'recode';
         } else {
-            PMA_dl('iconv');
-            if (!@extension_loaded('iconv')) {
-                PMA_dl('recode');
-                if (!@extension_loaded('recode')) {
-                    echo $strCantLoadRecodeIconv;
-                    exit;
-                } else {
-                    $PMA_recoding_engine = 'recode';
-                }
-            } else {
-                $PMA_recoding_engine     = 'iconv';
-            }
+            echo $strCantLoadRecodeIconv;
+            exit;
         }
     }
 } // end load recode/iconv extension
@@ -66,10 +49,9 @@ if (!isset($cfg['IconvExtraParams'])) {
     $cfg['IconvExtraParams'] = '';
 }
 
-// Finally detects which function will we use:
+// Finally detect which function we will use:
 if (isset($cfg['AllowAnywhereRecoding'])
-    && $cfg['AllowAnywhereRecoding']
-    && $allow_recoding) {
+    && $cfg['AllowAnywhereRecoding']) {
 
     if (!isset($PMA_recoding_engine)) {
         $PMA_recoding_engine = $cfg['RecodingEngine'];
@@ -134,77 +116,6 @@ if ($PMA_recoding_engine == PMA_CHARSET_ICONV_AIX) {
 }
 
 /**
- * Converts encoding according to current settings.
- *
- * @param   mixed    what to convert (string or array of strings or object returned by mysql_fetch_field)
- *
- * @return  string   converted string or array of strings
- *
- * @global  array    the configuration array
- * @global  boolean  whether recoding is allowed or not
- * @global  string   the current charset
- * @global  array    the charset to convert to
- *
- * @access  public
- *
- * @author  nijel
- */
-function PMA_convert_display_charset($what) {
-    global $cfg, $allow_recoding, $charset, $convcharset;
-
-    if (!(isset($cfg['AllowAnywhereRecoding']) && $cfg['AllowAnywhereRecoding'] && $allow_recoding)
-        || $convcharset == $charset // rabus: if input and output charset are the same, we don't have to do anything...
-        // this constant is not defined before the login:
-        || (defined('PMA_MYSQL_INT_VERSION') && PMA_MYSQL_INT_VERSION >= 40100)) {  // lem9: even if AllowAnywhereRecoding is TRUE, do not recode for MySQL >= 4.1.x since MySQL does the job
-        return $what;
-    } elseif (is_array($what)) {
-        $result = array();
-        foreach ($what AS $key => $val) {
-            if (is_string($val) || is_array($val)) {
-                if (is_string($key)) {
-                    $result[PMA_convert_display_charset($key)] = PMA_convert_display_charset($val);
-                } else {
-                    $result[$key] = PMA_convert_display_charset($val);
-                }
-            } else {
-                $result[$key]     = $val;
-            }
-        } // end while
-        return $result;
-    } elseif (is_string($what)) {
-
-        switch ($GLOBALS['PMA_recoding_engine']) {
-            case PMA_CHARSET_RECODE:
-                return recode_string($convcharset . '..'  . $charset, $what);
-            case PMA_CHARSET_ICONV:
-                return iconv($convcharset, $charset . $cfg['IconvExtraParams'], $what);
-            case PMA_CHARSET_ICONV_AIX:
-                return PMA_aix_iconv_wrapper($convcharset, $charset . $cfg['IconvExtraParams'], $what);
-            case PMA_CHARSET_LIBICONV:
-                return libiconv($convcharset, $charset . $GLOBALS['cfg']['IconvExtraParams'], $what);
-            default:
-                return $what;
-        }
-    } elseif (is_object($what)) {
-        // isn't it object returned from mysql_fetch_field ?
-        if (@is_string($what->name)) {
-            $what->name = PMA_convert_display_charset($what->name);
-        }
-        if (@is_string($what->table)) {
-            $what->table = PMA_convert_display_charset($what->table);
-        }
-        if (@is_string($what->Database)) {
-            $what->Database = PMA_convert_display_charset($what->Database);
-        }
-        return $what;
-    } else {
-        // when we don't know what it is we don't touch it...
-        return $what;
-    }
-} //  end of the "PMA_convert_display_charset()" function
-
-
-/**
  * Converts encoding of text according to current settings.
  *
  * @param   string   what to convert
@@ -221,9 +132,9 @@ function PMA_convert_display_charset($what) {
  * @author  nijel
  */
 function PMA_convert_charset($what) {
-    global $cfg, $allow_recoding, $charset, $convcharset;
+    global $cfg, $charset, $convcharset;
 
-    if (!(isset($cfg['AllowAnywhereRecoding']) && $cfg['AllowAnywhereRecoding'] && $allow_recoding)
+    if (!(isset($cfg['AllowAnywhereRecoding']) && $cfg['AllowAnywhereRecoding'] )
         || $convcharset == $charset) { // rabus: if input and output charset are the same, we don't have to do anything...
         return $what;
     } else {

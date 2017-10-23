@@ -15,7 +15,7 @@
 // | Authors: Christian Stocker <chregu@phant.ch>                         |
 // +----------------------------------------------------------------------+
 //
-// $Id: dbx.php,v 1.4 2003/01/04 11:54:46 mj Exp $
+// $Id: dbx.php,v 1.6 2004/12/15 09:09:29 dufuz Exp $
 
 
 require_once 'Cache/Container.php';
@@ -37,23 +37,24 @@ require_once 'Cache/Container.php';
 * For _MySQL_ you need this DB table:
 *
 * CREATE TABLE cache (
-*   id          CHAR(32) NOT NULL DEFAULT '',
-*   cachegroup  VARCHAR(127) NOT NULL DEFAULT '',
-*   cachedata   BLOB NOT NULL DEFAULT '',
-*   userdata    VARCHAR(255) NOT NULL DEFAULT '',
-*   expires     INT(9) NOT NULL DEFAULT 0,
+*   id          CHAR(32) NOT null DEFAULT '',
+*   cachegroup  VARCHAR(127) NOT null DEFAULT '',
+*   cachedata   BLOB NOT null DEFAULT '',
+*   userdata    VARCHAR(255) NOT null DEFAULT '',
+*   expires     INT(9) NOT null DEFAULT 0,
 *  
-*   changed     TIMESTAMP(14) NOT NULL,
+*   changed     TIMESTAMP(14) NOT null,
 *  
 *   INDEX (expires),
 *   PRIMARY KEY (id, cachegroup)
 * )
 *
 * @author   Christian Stocker <chregu@phant.ch>
-* @version  $Id: dbx.php,v 1.4 2003/01/04 11:54:46 mj Exp $
+* @version  $Id: dbx.php,v 1.6 2004/12/15 09:09:29 dufuz Exp $
 * @package  Cache
 */
-class Cache_Container_dbx extends Cache_Container {
+class Cache_Container_dbx extends Cache_Container
+{
 
     /**
     * Name of the DB table to store caching data
@@ -145,16 +146,16 @@ class Cache_Container_dbx extends Cache_Container {
                         );
 
         $res = dbx_query($this->db, $query);
-        if (dbx_error($this->db))
+        if (dbx_error($this->db)) {
             return new Cache_Error('DBx query failed: ' . dbx_error($this->db), __FILE__, __LINE__);
-
+        }
         $row = $res->data[0];
 
-        if (is_array($row))
+        if (is_array($row)) {
             $data = array($row['expires'], $this->decode($row['cachedata']), $row['userdata']);
-        else 
-            $data = array(NULL, NULL, NULL);
-
+        } else {
+            $data = array(null, null, null);
+        }
         // last used required by the garbage collection   
         // WARNING: might be MySQL specific         
         $query = sprintf("UPDATE %s SET changed = (NOW() + 0) WHERE id = '%s' AND cachegroup = '%s'",
@@ -164,9 +165,9 @@ class Cache_Container_dbx extends Cache_Container {
                           );
         
         $res = dbx_query($this->db, $query);
-        if (dbx_error($this->db))
+        if (dbx_error($this->db)) {
             return new Cache_Error('DBx query failed: ' . dbx_error($this->db), __FILE__, __LINE__);                             
-            
+        }
         return $data;            
     }
 
@@ -209,8 +210,9 @@ class Cache_Container_dbx extends Cache_Container {
 
         $res = dbx_query($this->db, $query);
 
-        if (dbx_error($this->db))
+        if (dbx_error($this->db)) {
             return new Cache_Error('DBx query failed: ' . dbx_error($this->db), __FILE__, __LINE__);
+        }
     }
 
     function flush($group = '')
@@ -225,8 +227,9 @@ class Cache_Container_dbx extends Cache_Container {
 
         $res = dbx_query($this->db,$query);
 
-        if (dbx_error($this->db))
+        if (dbx_error($this->db)) {
             return new Cache_Error('DBx query failed: ' . dbx_error($this->db), __FILE__, __LINE__);
+        }
     }
 
     function idExists($id, $group)
@@ -239,17 +242,16 @@ class Cache_Container_dbx extends Cache_Container {
 
         $res = dbx_query($this->db, $query);
 
-        if (dbx_error($this->db))
+        if (dbx_error($this->db)) {
             return new Cache_Error('DBx query failed: ' . dbx_error($this->db), __FILE__, __LINE__);
-
+        }
 
         $row = $res[0];
 
         if (is_array($row)) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     function garbageCollection($maxlifetime)
@@ -265,31 +267,28 @@ class Cache_Container_dbx extends Cache_Container {
 
         $res = dbx_query($this->db, $query);
 
-        if (dbx_error($this->db))
+        if (dbx_error($this->db)) {
             return new Cache_Error('DBx query failed: ' . dbx_error($this->db), __FILE__, __LINE__);
-
+        }
         $query = sprintf('select sum(length(cachedata)) as CacheSize from %s',
                          $this->cache_table
                        );
 
         $res = dbx_query($this->db, $query);
         //if cache is to big.
-        if ($res->data[0][CacheSize] > $this->highwater)
-        {
+        if ($res->data[0][CacheSize] > $this->highwater) {
             //find the lowwater mark.
             $query = sprintf('select length(cachedata) as size, changed from %s order by changed DESC',
                                      $this->cache_table
                        );
 
             $res = dbx_query($this->db, $query);
-            $keep_size=0;
-            $i=0;
-            while ($keep_size < $this->lowwater && $i < $res->rows )
-            {
-
+            $keep_size = 0;
+            $i = 0;
+            while ($keep_size < $this->lowwater && $i < $res->rows ) {
                 $keep_size += $res->data[$i][size];
                 $i++;
-    }
+            }
     
             //delete all entries, which were changed before the "lowwwater mark"
             $query = sprintf('delete from %s where changed <= %s',

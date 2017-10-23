@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: MoveTask.php 217 2007-08-14 15:39:59Z mrook $
+ *  $Id: MoveTask.php 325 2007-12-20 15:44:58Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -244,4 +244,4 @@ class MoveTask extends CopyTask {
         return $renamed;
     }
 }
-?>
+

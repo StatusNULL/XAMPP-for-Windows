@@ -101,16 +101,16 @@ class DbDeployTask extends Task {
     	ksort($files);
     	foreach($files as $fileChangeNumber=>$fileName){
     		if($fileChangeNumber > $lastChangeAppliedInDb && $fileChangeNumber <= $this->lastChangeToApply){
-    			$sqlToPerformDeploy .= '--------------- Fragment begins: ' . $fileChangeNumber . ' ---------------' . "\n";
+    			$sqlToPerformDeploy .= '-- Fragment begins: ' . $fileChangeNumber . ' --' . "\n";
     			$sqlToPerformDeploy .= 'INSERT INTO ' . DbDeployTask::$TABLE_NAME . ' (change_number, delta_set, start_dt, applied_by, description)'.
 					' VALUES ('. $fileChangeNumber .', \''. $this->deltaSet .'\', '. $this->dbmsSyntax->generateTimestamp() .', \'dbdeploy\', \''. $fileName .'\');' . "\n";
 				$fullFileName = $this->dir . '/' . $fileName;
     			$fh = fopen($fullFileName, 'r');
     			$contents = fread($fh, 	filesize($fullFileName));
-    			$deploySQLFromFile = substr($contents,0,strpos($contents, '--//@UNDO'));    			
+    			$deploySQLFromFile = substr($contents,0,strpos($contents, '-- //@UNDO'));
     			$sqlToPerformDeploy .= $deploySQLFromFile;
     			$sqlToPerformDeploy .= 'UPDATE ' . DbDeployTask::$TABLE_NAME . ' SET complete_dt = ' . $this->dbmsSyntax->generateTimestamp() . ' WHERE change_number = ' . $fileChangeNumber . ' AND delta_set = \'' . $this->deltaSet . '\';' . "\n";
-    			$sqlToPerformDeploy .= '--------------- Fragment ends: ' . $fileChangeNumber . ' ---------------' . "\n";
+    			$sqlToPerformDeploy .= '-- Fragment ends: ' . $fileChangeNumber . ' --' . "\n";
     		}
     	}
 		return $sqlToPerformDeploy;
@@ -126,10 +126,10 @@ class DbDeployTask extends Task {
 				$fullFileName = $this->dir . '/' . $fileName;
     			$fh = fopen($fullFileName, 'r');
     			$contents = fread($fh, 	filesize($fullFileName));
-    			$undoSQLFromFile = substr($contents,strpos($contents, '--//@UNDO')+9);    			
+    			$undoSQLFromFile = substr($contents,strpos($contents, '-- //@UNDO')+10);
     			$sqlToPerformUndo .= $undoSQLFromFile;
     			$sqlToPerformUndo .= 'DELETE FROM ' . DbDeployTask::$TABLE_NAME . ' WHERE change_number = ' . $fileChangeNumber . ' AND delta_set = \'' . $this->deltaSet . '\';' . "\n";
-    			$sqlToPerformUndo .= '--------------- Fragment ends: ' . $fileChangeNumber . ' ---------------' . "\n";
+    			$sqlToPerformUndo .= '-- Fragment ends: ' . $fileChangeNumber . ' --' . "\n";
     		}
     	}
 		return $sqlToPerformUndo;
@@ -190,4 +190,3 @@ class DbDeployTask extends Task {
     }
 }
 
-?>

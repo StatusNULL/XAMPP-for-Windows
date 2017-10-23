@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: TokenSource.php 144 2007-02-05 15:19:00Z hans $
+ *  $Id: TokenSource.php 325 2007-12-20 15:44:58Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -154,4 +154,4 @@ class TokenSource extends DataType {
 }
 
 
-?>
+

@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: CoverageReportTask.php 216 2007-08-14 14:17:15Z mrook $
+ * $Id: CoverageReportTask.php 426 2008-10-28 19:29:49Z mrook $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -30,7 +30,7 @@ require_once 'phing/tasks/ext/coverage/CoverageReportTransformer.php';
  * Transforms information in a code coverage database to XML
  *
  * @author Michiel Rook <michiel.rook@gmail.com>
- * @version $Id: CoverageReportTask.php 216 2007-08-14 14:17:15Z mrook $
+ * @version $Id: CoverageReportTask.php 426 2008-10-28 19:29:49Z mrook $
  * @package phing.tasks.ext.coverage
  * @since 2.1.0
  */
@@ -242,11 +242,7 @@ class CoverageReportTask extends Task
 	}
 
 	protected function transformCoverageInformation($filename, $coverageInformation)
-	{
-		// Strip last line of coverage information
-		end($coverageInformation);
-		unset($coverageInformation[key($coverageInformation)]);
-		
+	{	
 		$classes = PHPUnitUtil::getDefinedClasses($filename, $this->classpath);
 		
 		if (is_array($classes))
@@ -401,7 +397,7 @@ class CoverageReportTask extends Task
 		foreach ($props->keys() as $filename)
 		{
 			$file = unserialize($props->getProperty($filename));
-
+			
 			$this->transformCoverageInformation($file['fullname'], $file['coverage']);
 		}
 		
@@ -416,4 +412,3 @@ class CoverageReportTask extends Task
 		}
 	}
 }
-?>

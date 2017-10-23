@@ -41,7 +41,6 @@ ALTER TABLE user MODIFY ssl_type enum('','ANY','X509', 'SPECIFIED') NOT NULL;
 #
 # tables_priv
 #
-
 ALTER TABLE tables_priv
   ADD KEY Grantor (Grantor);
 
@@ -66,8 +65,9 @@ ALTER TABLE tables_priv
 #
 # columns_priv
 #
-
+#
 # Name change of Type -> Column_priv from MySQL 3.22.12
+#
 ALTER TABLE columns_priv
   CHANGE Type Column_priv set('Select','Insert','Update','References')
     COLLATE utf8_general_ci DEFAULT '' NOT NULL;
@@ -131,8 +131,8 @@ ALTER TABLE db
 ADD Create_tmp_table_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,
 ADD Lock_tables_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL;
 ALTER TABLE host
-ADD Create_tmp_table_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,
-ADD Lock_tables_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL;
+ADD Create_tmp_table_priv enum('N','Y') DEFAULT 'N' NOT NULL,
+ADD Lock_tables_priv enum('N','Y') DEFAULT 'N' NOT NULL;
 
 alter table user change max_questions max_questions int(11) unsigned DEFAULT 0  NOT NULL;
 
@@ -343,7 +343,8 @@ ALTER TABLE proc MODIFY name char(64) DEFAULT '' NOT NULL,
                              'READS_SQL_DATA',
                              'MODIFIES_SQL_DATA'
                             ) DEFAULT 'CONTAINS_SQL' NOT NULL,
-                 MODIFY body longblob DEFAULT '' NOT NULL,
+                 MODIFY body longblob NOT NULL,
+                 MODIFY returns longblob NOT NULL,
                  MODIFY sql_mode
                         set('REAL_AS_FLOAT',
                             'PIPES_AS_CONCAT',
@@ -374,7 +375,9 @@ ALTER TABLE proc MODIFY name char(64) DEFAULT '' NOT NULL,
                             'ERROR_FOR_DIVISION_BY_ZERO',
                             'TRADITIONAL',
                             'NO_AUTO_CREATE_USER',
-                            'HIGH_NOT_PRECEDENCE'
+                            'HIGH_NOT_PRECEDENCE',
+                            'NO_ENGINE_SUBSTITUTION',
+                            'PAD_CHAR_TO_FULL_LENGTH'
                             ) DEFAULT '' NOT NULL,
                  DEFAULT CHARACTER SET utf8;
 
@@ -387,6 +390,135 @@ ALTER TABLE proc  MODIFY db
                          char(77) collate utf8_bin DEFAULT '' NOT NULL,
                   MODIFY comment
                          char(64) collate utf8_bin DEFAULT '' NOT NULL;
+
+ALTER TABLE proc ADD character_set_client
+                     char(32) collate utf8_bin DEFAULT NULL
+                     AFTER comment;
+ALTER TABLE proc MODIFY character_set_client
+                        char(32) collate utf8_bin DEFAULT NULL;
+
+ALTER TABLE proc ADD collation_connection
+                     char(32) collate utf8_bin DEFAULT NULL
+                     AFTER character_set_client;
+ALTER TABLE proc MODIFY collation_connection
+                        char(32) collate utf8_bin DEFAULT NULL;
+
+ALTER TABLE proc ADD db_collation
+                     char(32) collate utf8_bin DEFAULT NULL
+                     AFTER collation_connection;
+ALTER TABLE proc MODIFY db_collation
+                        char(32) collate utf8_bin DEFAULT NULL;
+
+ALTER TABLE proc ADD body_utf8 longblob DEFAULT NULL
+                     AFTER db_collation;
+ALTER TABLE proc MODIFY body_utf8 longblob DEFAULT NULL;
+
+
+#
+# EVENT privilege
+#
+SET @hadEventPriv := 0;
+SELECT @hadEventPriv :=1 FROM user WHERE Event_priv LIKE '%';
+
+ALTER TABLE user add Event_priv enum('N','Y') character set utf8 DEFAULT 'N' NOT NULL AFTER Create_user_priv;
+ALTER TABLE user MODIFY Event_priv enum('N','Y') character set utf8 DEFAULT 'N' NOT NULL AFTER Create_user_priv;
+
+UPDATE user SET Event_priv=Super_priv WHERE @hadEventPriv = 0;
+
+ALTER TABLE db add Event_priv enum('N','Y') character set utf8 DEFAULT 'N' NOT NULL;
+ALTER TABLE db MODIFY Event_priv enum('N','Y') character set utf8 DEFAULT 'N' NOT NULL;
+
+#
+# EVENT table
+#
+ALTER TABLE event DROP PRIMARY KEY;
+ALTER TABLE event ADD PRIMARY KEY(db, name);
+# Add sql_mode column just in case.
+ALTER TABLE event ADD sql_mode set ('NOT_USED') AFTER on_completion;
+# Update list of sql_mode values.
+ALTER TABLE event MODIFY sql_mode
+                        set('REAL_AS_FLOAT',
+                            'PIPES_AS_CONCAT',
+                            'ANSI_QUOTES',
+                            'IGNORE_SPACE',
+                            'NOT_USED',
+                            'ONLY_FULL_GROUP_BY',
+                            'NO_UNSIGNED_SUBTRACTION',
+                            'NO_DIR_IN_CREATE',
+                            'POSTGRESQL',
+                            'ORACLE',
+                            'MSSQL',
+                            'DB2',
+                            'MAXDB',
+                            'NO_KEY_OPTIONS',
+                            'NO_TABLE_OPTIONS',
+                            'NO_FIELD_OPTIONS',
+                            'MYSQL323',
+                            'MYSQL40',
+                            'ANSI',
+                            'NO_AUTO_VALUE_ON_ZERO',
+                            'NO_BACKSLASH_ESCAPES',
+                            'STRICT_TRANS_TABLES',
+                            'STRICT_ALL_TABLES',
+                            'NO_ZERO_IN_DATE',
+                            'NO_ZERO_DATE',
+                            'INVALID_DATES',
+                            'ERROR_FOR_DIVISION_BY_ZERO',
+                            'TRADITIONAL',
+                            'NO_AUTO_CREATE_USER',
+                            'HIGH_NOT_PRECEDENCE',
+                            'NO_ENGINE_SUBSTITUTION',
+                            'PAD_CHAR_TO_FULL_LENGTH'
+                            ) DEFAULT '' NOT NULL AFTER on_completion;
+ALTER TABLE event MODIFY name char(64) CHARACTER SET utf8 NOT NULL default '';
+ALTER TABLE event ADD COLUMN originator INT(10) NOT NULL AFTER comment;
+ALTER TABLE event MODIFY COLUMN status ENUM('ENABLED','DISABLED','SLAVESIDE_DISABLED') NOT NULL default 'ENABLED';
+
+ALTER TABLE event ADD COLUMN time_zone char(64) CHARACTER SET latin1
+        NOT NULL DEFAULT 'SYSTEM' AFTER originator;
+
+ALTER TABLE event ADD character_set_client
+                      char(32) collate utf8_bin DEFAULT NULL
+                      AFTER time_zone;
+ALTER TABLE event MODIFY character_set_client
+                         char(32) collate utf8_bin DEFAULT NULL;
+
+ALTER TABLE event ADD collation_connection
+                      char(32) collate utf8_bin DEFAULT NULL
+                      AFTER character_set_client;
+ALTER TABLE event MODIFY collation_connection
+                         char(32) collate utf8_bin DEFAULT NULL;
+
+ALTER TABLE event ADD db_collation
+                      char(32) collate utf8_bin DEFAULT NULL
+                      AFTER collation_connection;
+ALTER TABLE event MODIFY db_collation
+                         char(32) collate utf8_bin DEFAULT NULL;
+
+ALTER TABLE event ADD body_utf8 longblob DEFAULT NULL
+                      AFTER db_collation;
+ALTER TABLE event MODIFY body_utf8 longblob DEFAULT NULL;
+
+
+#
+# TRIGGER privilege
+#
+
+SET @hadTriggerPriv := 0;
+SELECT @hadTriggerPriv :=1 FROM user WHERE Trigger_priv LIKE '%';
+
+ALTER TABLE user ADD Trigger_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL AFTER Event_priv;
+ALTER TABLE user MODIFY Trigger_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL AFTER Event_priv;
+
+ALTER TABLE host ADD Trigger_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL;
+ALTER TABLE host MODIFY Trigger_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL;
+
+ALTER TABLE db ADD Trigger_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL;
+ALTER TABLE db MODIFY Trigger_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL;
+
+ALTER TABLE tables_priv MODIFY Table_priv set('Select','Insert','Update','Delete','Create','Drop','Grant','References','Index','Alter','Create View','Show view','Trigger') COLLATE utf8_general_ci DEFAULT '' NOT NULL;
+
+UPDATE user SET Trigger_priv=Super_priv WHERE @hadTriggerPriv = 0;
 
 # Activate the new, possible modified privilege tables
 # This should not be needed, but gives us some extra testing that the above

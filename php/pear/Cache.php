@@ -16,7 +16,7 @@
 // |          Sebastian Bergmann <sb@sebastian-bergmann.de>               |
 // +----------------------------------------------------------------------+
 //
-// $Id: Cache.php,v 1.5 2003/01/04 11:54:45 mj Exp $
+// $Id: Cache.php,v 1.9 2008/10/07 08:58:46 dufuz Exp $
 
 require_once 'PEAR.php';
 require_once 'Cache/Error.php';
@@ -24,16 +24,16 @@ require_once 'Cache/Error.php';
 /**
 * Cache is a base class for cache implementations.
 *
-* The pear cache module is a generic data cache which can be used to 
+* The pear cache module is a generic data cache which can be used to
 * cache script runs. The idea behind the cache is quite simple. If you have
 * the same input parameters for whatever tasks/algorithm you use you'll
 * usually get the same output. So why not caching templates, functions calls,
 * graphic generation etc. Caching certain actions e.g. XSLT tranformations
-* saves you lots of time. 
+* saves you lots of time.
 *
-* The design of the cache reminds of PHPLibs session implementation. A 
-* (PHPLib: session) controller uses storage container (PHPLib: ct_*.inc) to save 
-* certain data (PHPLib: session data). In contrast to the session stuff it's up to 
+* The design of the cache reminds of PHPLibs session implementation. A
+* (PHPLib: session) controller uses storage container (PHPLib: ct_*.inc) to save
+* certain data (PHPLib: session data). In contrast to the session stuff it's up to
 * you to generate an ID for the data to cache. If you're using the output cache
 * you might use the script name as a seed for cache::generateID(), if your using the
 * function cache you'd use an array with all function parameters.
@@ -59,11 +59,12 @@ require_once 'Cache/Error.php';
 *          bad circumstances  (especially with the file container)
 *
 * @author   Ulf Wendel <ulf.wendel@phpdoc.de>
-* @version  $Id: Cache.php,v 1.5 2003/01/04 11:54:45 mj Exp $
+* @version  $Id: Cache.php,v 1.9 2008/10/07 08:58:46 dufuz Exp $
 * @package  Cache
 * @access   public
 */
-class Cache extends PEAR {
+class Cache extends PEAR
+{
 
     /**
     * Enables / disables caching.
@@ -98,7 +99,7 @@ class Cache extends PEAR {
     * @access   public
     */
     var $gc_probability = 1;
-    
+
     /**
     * Garbage collection: delete all entries not use for n seconds.
     *
@@ -150,7 +151,7 @@ class Cache extends PEAR {
      */
     function getCaching()
     {
-        return ($this->caching);
+        return $this->caching;
     }
 
     /**
@@ -169,17 +170,19 @@ class Cache extends PEAR {
     *
     * @param    string  dataset ID
     * @param    string  cache group
-    * @return   mixed   cached data or NULL on failure
+    * @return   mixed   cached data or null on failure
     * @access   public
     */
-    function get($id, $group = 'default') {
-        if (!$this->caching)
+    function get($id, $group = 'default')
+    {
+        if (!$this->caching) {
             return '';
+        }
 
-        if ($this->isCached($id, $group) && !$this->isExpired($id, $group))
+        if ($this->isCached($id, $group) && !$this->isExpired($id, $group)) {
             return $this->load($id, $group);
-
-        return NULL;
+        }
+        return null;
     } // end func get
 
     /**
@@ -192,10 +195,11 @@ class Cache extends PEAR {
     * @return   boolean
     * @access   public
     */
-    function save($id, $data, $expires = 0, $group = 'default') {
-        if (!$this->caching)
+    function save($id, $data, $expires = 0, $group = 'default')
+    {
+        if (!$this->caching) {
             return true;
-
+        }
         return $this->extSave($id, $data, '',$expires, $group);
     } // end func save
 
@@ -212,10 +216,11 @@ class Cache extends PEAR {
     * @access   public
     * @see      getUserdata()
     */
-    function extSave($id, $cachedata, $userdata, $expires = 0, $group = 'default') {
-        if (!$this->caching)
+    function extSave($id, $cachedata, $userdata, $expires = 0, $group = 'default')
+    {
+        if (!$this->caching) {
             return true;
-
+        }
         return $this->container->save($id, $cachedata, $expires, $group, $userdata);
     } // end func extSave
 
@@ -224,13 +229,14 @@ class Cache extends PEAR {
     *
     * @param    string  dataset ID
     * @param    string  cache group
-    * @return   mixed   cached data or NULL on failure
+    * @return   mixed   cached data or null on failure
     * @access   public
     */
-    function load($id, $group = 'default') {
-        if (!$this->caching)
+    function load($id, $group = 'default')
+    {
+        if (!$this->caching) {
             return '';
-
+        }
         return $this->container->load($id, $group);
     } // end func load
 
@@ -243,10 +249,11 @@ class Cache extends PEAR {
     * @access   public
     * @see      extSave()
     */
-    function getUserdata($id, $group = 'default') {
-        if (!$this->caching)
+    function getUserdata($id, $group = 'default')
+    {
+        if (!$this->caching) {
             return '';
-
+        }
         return $this->container->getUserdata($id, $group);
     } // end func getUserdata
 
@@ -258,10 +265,11 @@ class Cache extends PEAR {
     * @return   boolean
     * @access   public
     */
-    function remove($id, $group = 'default') {
-        if (!$this->caching)
+    function remove($id, $group = 'default')
+    {
+        if (!$this->caching) {
             return true;
-
+        }
         return $this->container->remove($id, $group);
     } // end func remove
 
@@ -271,10 +279,11 @@ class Cache extends PEAR {
     * @param    string  cache group, if empty all groups will be flashed
     * @return   integer number of removed datasets
     */
-    function flush($group = 'default') {
-        if (!$this->caching)
+    function flush($group = 'default')
+    {
+        if (!$this->caching) {
             return true;
-
+        }
         return $this->container->flush($group);
     } // end func flush
 
@@ -288,10 +297,11 @@ class Cache extends PEAR {
     * @return   boolean
     * @access   public
     */
-    function isCached($id, $group = 'default') {
-        if (!$this->caching)
+    function isCached($id, $group = 'default')
+    {
+        if (!$this->caching) {
             return false;
-
+        }
         return $this->container->isCached($id, $group);
     } // end func isCached
 
@@ -309,10 +319,11 @@ class Cache extends PEAR {
     * @return   boolean
     * @access   public
     */
-    function isExpired($id, $group = 'default', $max_age = 0) {
-        if (!$this->caching)
+    function isExpired($id, $group = 'default', $max_age = 0)
+    {
+        if (!$this->caching) {
             return true;
-
+        }
         return $this->container->isExpired($id, $group, $max_age);
     } // end func isExpired
 
@@ -326,7 +337,8 @@ class Cache extends PEAR {
     * @return   string  "unique" ID
     * @access   public
     */
-    function generateID($variable) {
+    function generateID($variable)
+    {
         // WARNING: ID clashes are possible although unlikely
         return md5(serialize($variable));
     }
@@ -337,13 +349,13 @@ class Cache extends PEAR {
     * @param    boolean Force a garbage collection run?
     * @see  $gc_probability, $gc_time
     */
-    function garbageCollection($force = false) {
+    function garbageCollection($force = false)
+    {
         static $last_run = 0;
 
-        if (!$this->caching)
+        if (!$this->caching) {
             return;
-
-        srand((double) microtime() * 1000000);
+        }
 
         // time and probability based
         if (($force) || ($last_run && $last_run < time() + $this->gc_time) || (rand(1, 100) < $this->gc_probability)) {

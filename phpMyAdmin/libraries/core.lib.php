@@ -2,8 +2,10 @@
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
  * Core functions used all over the scripts.
+ * This script is distinct from libraries/common.inc.php because this
+ * script is called from /test.
  *
- * @version $Id: core.lib.php 10420 2007-06-03 23:30:40Z lem9 $
+ * @version $Id: core.lib.php 11499 2008-08-21 16:45:14Z lem9 $
  */
 
 /**
@@ -196,6 +198,8 @@ function PMA_securePath($path)
  * displays the given error message on phpMyAdmin error page in foreign language,
  * ends script execution and closes session
  *
+ * loads language file if not loaded already
+ *
  * @todo    use detected argument separator (PMA_Config)
  * @uses    $GLOBALS['session_name']
  * @uses    $GLOBALS['text_dir']
@@ -207,24 +211,40 @@ function PMA_securePath($path)
  * @uses    $_COOKIE
  * @uses    substr()
  * @uses    header()
- * @uses    urlencode()
- * @param string    $error_message the error message or named error message
+ * @uses    http_build_query()
+ * @uses    is_string()
+ * @uses    sprintf()
+ * @uses    vsprintf()
+ * @uses    strtr()
+ * @uses    defined()
+ * @param   string $error_message the error message or named error message
+ * @param   string|array $message_args arguments applied to $error_message
+ * @return  exit
  */
 function PMA_fatalError($error_message, $message_args = null)
 {
+    // it could happen PMA_fatalError() is called before language file is loaded
     if (! isset($GLOBALS['available_languages'])) {
-        $GLOBALS['cfg'] = array('DefaultLang'           => 'en-iso-8859-1',
-                     'AllowAnywhereRecoding' => false);
+        $GLOBALS['cfg'] = array(
+            'DefaultLang'           => 'en-utf-8',
+            'AllowAnywhereRecoding' => false);
+
         // Loads the language file
         require_once './libraries/select_lang.lib.php';
+
         if (isset($strError)) {
             $GLOBALS['strError'] = $strError;
+        } else {
+            $GLOBALS['strError'] = 'Error';
         }
+
+        // $text_dir is set in lang/language-utf-8.inc.php
         if (isset($text_dir)) {
             $GLOBALS['text_dir'] = $text_dir;
         }
     }
 
+    // $error_message could be a language string identifier: strString
     if (substr($error_message, 0, 3) === 'str') {
         if (isset($$error_message)) {
             $error_message = $$error_message;
@@ -242,11 +262,14 @@ function PMA_fatalError($error_message, $message_args = null)
 
     // Displays the error message
     // (do not use &amp; for parameters sent by header)
-    header('Location: ' . (defined('PMA_SETUP') ? '../' : '') . 'error.php'
-            . '?lang='  . urlencode($GLOBALS['available_languages'][$GLOBALS['lang']][2])
-            . '&dir='   . urlencode($GLOBALS['text_dir'])
-            . '&type='  . urlencode($GLOBALS['strError'])
-            . '&error=' . urlencode($error_message));
+    $query_params = array(
+        'lang'  => $GLOBALS['available_languages'][$GLOBALS['lang']][2],
+        'dir'   => $GLOBALS['text_dir'],
+        'type'  => $GLOBALS['strError'],
+        'error' => $error_message,
+    );
+    header('Location: ' . (defined('PMA_SETUP') ? '../' : '') . 'error.php?'
+            . http_build_query($query_params, null, '&'));
 
     // on fatal errors it cannot hurt to always delete the current session
     if (isset($GLOBALS['session_name']) && isset($_COOKIE[$GLOBALS['session_name']])) {
@@ -274,6 +297,33 @@ function PMA_getTableCount($db)
         null, PMA_DBI_QUERY_STORE);
     if ($tables) {
         $num_tables = PMA_DBI_num_rows($tables);
+
+        // for blobstreaming - get blobstreaming tables
+        // for use in determining if a table here is a blobstreaming table - rajk
+
+        // load PMA configuration
+        $PMA_Config = $_SESSION['PMA_Config'];
+
+        // if PMA configuration exists
+        if (!empty($PMA_Config))
+        {
+            // load BS tables
+            $session_bs_tables = $_SESSION['PMA_Config']->get('BLOBSTREAMING_TABLES');
+
+            // if BS tables exist 
+            if (isset ($session_bs_tables))
+                while ($data = PMA_DBI_fetch_assoc($tables))
+                    foreach ($session_bs_tables as $table_key=>$table_val)
+                        // if the table is a blobstreaming table, reduce the table count
+                        if ($data['Tables_in_' . $db] == $table_key)
+                        {
+                            if ($num_tables > 0)
+                                $num_tables--;
+
+                            break;
+                        }
+        } // end if PMA configuration exists
+
         PMA_DBI_free_result($tables);
     } else {
         $num_tables = 0;
@@ -317,71 +367,6 @@ function PMA_get_real_size($size = 0)
 
     return $size;
 } // end function PMA_get_real_size()
-
-/**
- * loads php module
- *
- * @uses    PHP_OS
- * @uses    extension_loaded()
- * @uses    ini_get()
- * @uses    function_exists()
- * @uses    ob_start()
- * @uses    phpinfo()
- * @uses    strip_tags()
- * @uses    ob_get_contents()
- * @uses    ob_end_clean()
- * @uses    preg_match()
- * @uses    strtoupper()
- * @uses    substr()
- * @uses    dl()
- * @param   string  $module name if module to load
- * @return  boolean success loading module
- */
-function PMA_dl($module)
-{
-    static $dl_allowed = null;
-
-    if (extension_loaded($module)) {
-        return true;
-    }
-
-    if (null === $dl_allowed) {
-        if (!@ini_get('safe_mode')
-          && @ini_get('enable_dl')
-          && @function_exists('dl')) {
-            ob_start();
-            phpinfo(INFO_GENERAL); /* Only general info */
-            $a = strip_tags(ob_get_contents());
-            ob_end_clean();
-            if (preg_match('@Thread Safety[[:space:]]*enabled@', $a)) {
-                if (preg_match('@Server API[[:space:]]*\(CGI\|CLI\)@', $a)) {
-                    $dl_allowed = true;
-                } else {
-                    $dl_allowed = false;
-                }
-            } else {
-                $dl_allowed = true;
-            }
-        } else {
-            $dl_allowed = false;
-        }
-    }
-
-    if (!$dl_allowed) {
-        return false;
-    }
-
-    /* Once we require PHP >= 4.3, we might use PHP_SHLIB_SUFFIX here */
-    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-        $module_file = 'php_' . $module . '.dll';
-    } elseif (PHP_OS=='HP-UX') {
-        $module_file = $module . '.sl';
-    } else {
-        $module_file = $module . '.so';
-    }
-
-    return @dl($module_file);
-}
 
 /**
  * merges array recursive like array_merge_recursive() but keyed-values are
@@ -599,14 +584,8 @@ function PMA_setCookie($cookie, $value, $default = null, $validity = null, $http
         } else {
             $v = time() + $validity;
         }
-        /* Use native support for httponly cookies if available */
-        if (version_compare(PHP_VERSION, '5.2.0', 'ge')) {
-            return setcookie($cookie, $value, $v,
-                PMA_Config::getCookiePath(), '', PMA_Config::isHttps(), $httponly);
-        } else {
-            return setcookie($cookie, $value, $v,
-                PMA_Config::getCookiePath() . ($httponly ? '; HttpOnly' : ''), '', PMA_Config::isHttps());
-        }
+        return setcookie($cookie, $value, $v,
+            PMA_Config::getCookiePath(), '', PMA_Config::isHttps(), $httponly);
     }
 
     // cookie has already $value as value

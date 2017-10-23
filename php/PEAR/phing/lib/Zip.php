@@ -16,7 +16,7 @@
 // | Author: Vincent Blavet <vincent@blavet.net>                          |
 // +----------------------------------------------------------------------+
 //
-// $Id: Zip.php 227 2007-08-28 02:17:00Z hans $
+// $Id: Zip.php 325 2007-12-20 15:44:58Z hans $
 
   // ----- Constants
   define( 'ARCHIVE_ZIP_READ_BLOCK_SIZE', 2048 );
@@ -3587,4 +3587,4 @@ class Archive_Zip
   }
   // End of class
 
-?>
+

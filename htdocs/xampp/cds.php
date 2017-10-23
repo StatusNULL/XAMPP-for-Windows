@@ -1,4 +1,17 @@
 <?
+	// Requests allowed only from localhosz
+	extract($_POST);
+	extract($_SERVER);
+	$host = "127.0.0.1";
+	$timeout = "1";
+
+	if ($REMOTE_ADDR) {
+		if ($REMOTE_ADDR != $host) {
+			echo "<p><h2> FORBIDDEN FOR CLIENT $REMOTE_ADDR <h2></p>";
+			exit;
+		}
+}
+	
 	if($_REQUEST['action']=="getpdf")
 	{
 		mysql_connect("localhost","root","");
@@ -38,7 +51,7 @@
 
 &nbsp;<p>
 <h1><?=$TEXT['cds-head']?></h1>
-
+<i>(Requests allowed from localhost only)</i><br/><br/>
 <?=$TEXT['cds-text1']?><p>
 <?=$TEXT['cds-text2']?><p>
 

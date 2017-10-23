@@ -1,7 +1,7 @@
 This snapshot was automatically generated on
-Thu, 08 Nov 2007 23:23:48 -0500
+Mon, 08 Dec 2008 19:32:59 +0000
 
-Version: 5.2.5
+Version: 5.2.8
 Branch: HEAD
 Build: Release_TS
 
@@ -44,6 +44,10 @@ Module: php5apache2_2.dll
 ===========================
 	libapr-1.dll
 	libaprutil-1.dll
+
+Module: php5pi3web.dll
+===========================
+	pi2api.dll
 
 Module: php_curl.dll
 ===========================
@@ -96,6 +100,10 @@ Module: php_openssl.dll
 	ssleay32.dll
 	libeay32.dll
 
+Module: php_pgsql.dll
+===========================
+	libpq.dll
+
 Module: php_pspell.dll
 ===========================
 	aspell-15.dll
@@ -111,6 +119,10 @@ Module: php_pdo_firebird.dll
 Module: php_pdo_mysql.dll
 ===========================
 	libmysql.dll
+
+Module: php_pdo_pgsql.dll
+===========================
+	libpq.dll
 
 Module: php_pdo_sqlite_external.dll
 ===========================

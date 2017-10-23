@@ -16,7 +16,7 @@
 // |          Sebastian Bergmann <sb@sebastian-bergmann.de>               |
 // +----------------------------------------------------------------------+
 //
-// $Id: phplib.php,v 1.3 2003/01/04 11:54:46 mj Exp $
+// $Id: phplib.php,v 1.5 2004/12/15 09:09:30 dufuz Exp $
 
 require_once 'Cache/Container.php';
 
@@ -36,13 +36,13 @@ require_once 'Cache/Container.php';
 * For _MySQL_ you need this DB table:
 *
 * CREATE TABLE cache (
-*   id          CHAR(32) NOT NULL DEFAULT '',
-*   cachegroup  VARCHAR(127) NOT NULL DEFAULT '',
-*   cachedata   BLOB NOT NULL DEFAULT '',
-*   userdata    VARCHAR(255) NOT NULL DEFAUL '',
-*   expires     INT(9) NOT NULL DEFAULT 0,
+*   id          CHAR(32) NOT null DEFAULT '',
+*   cachegroup  VARCHAR(127) NOT null DEFAULT '',
+*   cachedata   BLOB NOT null DEFAULT '',
+*   userdata    VARCHAR(255) NOT null DEFAUL '',
+*   expires     INT(9) NOT null DEFAULT 0,
 *  
-*   changed     TIMESTAMP(14) NOT NULL,
+*   changed     TIMESTAMP(14) NOT null,
 *  
 *   INDEX (expires),
 *   PRIMARY KEY (id, cachegroup)
@@ -50,12 +50,12 @@ require_once 'Cache/Container.php';
 *
 * 
 * @author   Ulf Wendel  <ulf.wendel@phpdoc.de>, Sebastian Bergmann <sb@sebastian-bergmann.de>
-* @version  $Id: phplib.php,v 1.3 2003/01/04 11:54:46 mj Exp $
+* @version  $Id: phplib.php,v 1.5 2004/12/15 09:09:30 dufuz Exp $
 * @package  Cache
 * @see      save()
 */
-class Cache_Container_phplib extends Cache_Container {
-  
+class Cache_Container_phplib extends Cache_Container
+{
     /**
     * Name of the DB table to store caching data
     * 
@@ -116,34 +116,36 @@ class Cache_Container_phplib extends Cache_Container {
     *                   see $local_path for some hints.s
     * @see  $local_path
     */
-    function Cache_Container_phplib($options = '') {
-        if (is_array($options))
+    function Cache_Container_phplib($options = '')
+    {
+        if (is_array($options)) {
             $this->setOptions($options,  array_merge($this->allowed_options, array('db_class', 'db_file', 'db_path', 'local_file', 'local_path')));
-
-        if (!$this->db_class)
+        }
+        if (!$this->db_class) {
             return new Cache_Error('No database class specified.', __FILE__, __LINE__);
-
+        }
         // include the required files
-        if ($this->db_file)
-            include_once($this->db_path . $this->db_file);
-
-        if ($this->local_file)
-            include_once($this->local_path . $this->local_file);
-
+        if ($this->db_file) {
+            include_once $this->db_path . $this->db_file;
+        }
+        if ($this->local_file) {
+            include_once $this->local_path . $this->local_file;
+        }
         // create a db object 
         $this->db = new $this->db_class;
     } // end constructor
 
-    function fetch($id, $group) {
+    function fetch($id, $group)
+    {
         $query = sprintf("SELECT expires, cachedata, userdata FROM %s WHERE id = '%s' AND cachegroup = '%s'",
                             $this->cache_table, 
                             $id,
                             $group
                          );
         $this->db->query($query);
-        if (!$this->db->Next_Record())
-            return array(NULL, NULL, NULL);
-
+        if (!$this->db->Next_Record()) {
+            return array(null, null, null);
+        }
         // last used required by the garbage collection   
         // WARNING: might be MySQL specific         
         $query = sprintf("UPDATE %s SET changed = (NOW() + 0) WHERE id = '%s' AND cachegroup = '%s'",
@@ -162,7 +164,8 @@ class Cache_Container_phplib extends Cache_Container {
     * MySQL specific. As MySQL is very popular the method should
     * work fine for 95% of you.
     */
-    function save($id, $data, $expires, $group) {
+    function save($id, $data, $expires, $group)
+    {
         $this->flushPreload($id, $group);
 
         $query = sprintf("REPLACE INTO %s (cachedata, expires, id, cachegroup) VALUES ('%s', %d, '%s', '%s')",
@@ -177,7 +180,8 @@ class Cache_Container_phplib extends Cache_Container {
         return (boolean)$this->db->affected_rows(); 
     } // end func save
 
-    function remove($id, $group) {
+    function remove($id, $group)
+    {
         $this->flushPreload($id, $group);
         $this->db->query(
                         sprintf("DELETE FROM %s WHERE id = '%s' AND cachegroup = '%s'",
@@ -190,7 +194,8 @@ class Cache_Container_phplib extends Cache_Container {
         return (boolean)$this->db->affected_rows();
     } // end func remove
 
-    function flush($group) {
+    function flush($group)
+    {
         $this->flushPreload();
 
         if ($group) {
@@ -202,7 +207,8 @@ class Cache_Container_phplib extends Cache_Container {
         return $this->db->affected_rows();
     } // end func flush
 
-    function idExists($id, $group) {
+    function idExists($id, $group)
+    {
         $this->db->query(
                         sprintf("SELECT id FROM %s WHERE ID = '%s' AND cachegroup = '%s'", 
                             $this->cache_table,
@@ -214,7 +220,8 @@ class Cache_Container_phplib extends Cache_Container {
         return (boolean)$this->db->nf();                         
     } // end func isExists
 
-    function garbageCollection($maxlifetime) {
+    function garbageCollection($maxlifetime)
+    {
         $this->flushPreload();
 
         $this->db->query( 
@@ -234,8 +241,7 @@ class Cache_Container_phplib extends Cache_Container {
         $this->db->Next_Record();
         $cachesize = $this->db->f('CacheSize');
         //if cache is to big.
-        if ($cachesize > $this->highwater)
-        {
+        if ($cachesize > $this->highwater) {
             //find the lowwater mark.
             $query = sprintf('select length(cachedata) as size, changed from %s order by changed DESC',
                                      $this->cache_table
@@ -243,8 +249,7 @@ class Cache_Container_phplib extends Cache_Container {
             $this->db->query($query);
 
             $keep_size=0;
-            while ($keep_size < $this->lowwater && $this->db->Next_Record() )
-            {
+            while ($keep_size < $this->lowwater && $this->db->Next_Record()) {
                 $keep_size += $this->db->f('size');
             }
             //delete all entries, which were changed before the "lowwwater mark"

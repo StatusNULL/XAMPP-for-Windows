@@ -17,7 +17,7 @@
 // |          Vinai Kopp <kopp@netzarbeiter.de>                           |
 // +----------------------------------------------------------------------+
 //
-// $Id: Output.php,v 1.6 2003/01/04 11:54:45 mj Exp $
+// $Id: Output.php,v 1.8 2005/01/26 09:47:28 dufuz Exp $
 
 require_once 'Cache.php';
 
@@ -94,7 +94,8 @@ require_once 'Cache.php';
 * @package  Cache
 * @access   public
 */
-class Cache_Output extends Cache {
+class Cache_Output extends Cache
+{
 
     /**
     * ID passed to start()
@@ -118,7 +119,7 @@ class Cache_Output extends Cache {
     */
     function _Cache_Output()
     {
-                $this->_Cache();
+        $this->_Cache();
     }
 
     /**
@@ -129,15 +130,16 @@ class Cache_Output extends Cache {
     * @return   string
     * @access   public
     */
-    function start($id, $group = 'default') {
-        if (!$this->caching)
+    function start($id, $group = 'default')
+    {
+        if (!$this->caching) {
             return '';
-
+        }
         // this is already cached return it from the cache so that the user
         // can use the cache content and stop script execution
-        if ($content = $this->get($id, $group))
+        if ($content = $this->get($id, $group)) {
             return $content;
-
+        }
         // remember some data to be able to fill the cache on calling end()
         $this->output_id = $id;
         $this->output_group = $group;
@@ -158,14 +160,15 @@ class Cache_Output extends Cache {
     * @access   public
     * @see      endPrint(), endGet(), Container::getExpiresAbsolute()
     */
-    function end($expire = 0, $userdata = '') {
+    function end($expire = 0, $userdata = '')
+    {
         $content = ob_get_contents();
         ob_end_clean();
 
         // store in the cache
-        if ($this->caching)
+        if ($this->caching) {
             $this->container->save($this->output_id, $content, $expire, $this->output_group, $userdata);
-
+        }
         return $content;
     } // end func end()
 
@@ -174,7 +177,8 @@ class Cache_Output extends Cache {
     *
     * @brother  end()
     */
-    function endPrint($expire = 0, $userdata = '') {
+    function endPrint($expire = 0, $userdata = '')
+    {
         $this->printContent($this->end($expire, $userdata));
     } // end func endPrint
 
@@ -185,10 +189,11 @@ class Cache_Output extends Cache {
     * @param    string
     * @access   public
     */    
-    function printContent($content = '') {
-        if ('' == $content)
+    function printContent($content = '')
+    {
+        if ($content == '') {
             $content = &$this->container->cachedata;
-            
+        }
         print $content;
     }
     /**
@@ -202,7 +207,8 @@ class Cache_Output extends Cache {
     * @access   public
     * @see      endPrint(), end()
     */
-    function endGet() {
+    function endGet()
+    {
         $content = ob_get_contents();
         ob_end_clean();
 

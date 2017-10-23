@@ -33,7 +33,7 @@
 * @author     Sergio Carvalho <sergio.carvalho@portugalmail.com>  
 * @copyright  2004-2006 Sergio Carvalho
 * @license    http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
-* @version    CVS: $Id: Client.php,v 1.14 2007/07/30 08:47:11 sergiosgc Exp $
+* @version    CVS: $Id: Client.php,v 1.16 2007/12/05 17:00:30 sergiosgc Exp $
 * @link       http://pear.php.net/package/XML_RPC2
 */
 
@@ -110,12 +110,14 @@ class XML_RPC2_Backend_Xmlrpcext_Client extends XML_RPC2_Client
             $this->displayDebugInformations___($request, $body);
         }
         $result = xmlrpc_decode($body, $this->encoding);
-        if ($result === false) {
+        /* Commented due to change in behaviour from xmlrpc_decode. It does not return faults now
+        if ($result === false || is_null($result)) {
             if ($this->debug) {
                 print "XML_RPC2_Exception : unable to decode response !";
             }
             throw new XML_RPC2_Exception('Unable to decode response');
         }
+        */
         if (xmlrpc_is_fault($result)) {
             if ($this->debug) {
                 print "XML_RPC2_FaultException(${result['faultString']}, ${result['faultCode']})";

@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: ZendCodeAnalyzerTask.php 162 2007-02-16 07:14:02Z knut $
+ *  $Id: ZendCodeAnalyzerTask.php 325 2007-12-20 15:44:58Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -26,7 +26,7 @@ require_once 'phing/Task.php';
  * 
  * Available warnings:
  * <b>zend-error</b> - %s(line %d): %s
- * <b>oneline-comment</b> - One-line comment ends with ?> tag.
+ * <b>oneline-comment</b> - One-line comment ends with  tag.
  * <b>bool-assign</b> - Assignment seen where boolean expression is expected. Did you mean '==' instead of '='?
  * <b>bool-print</b> - Print statement used when boolean expression is expected.
  * <b>bool-array</b> - Array used when boolean expression is expected.
@@ -180,4 +180,3 @@ class ZendCodeAnalyzerTask extends Task {
   }
 }
 
-?>

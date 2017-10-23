@@ -15,7 +15,7 @@
 // | Authors: Ulf Wendel <ulf.wendel@phpdoc.de>                           |
 // +----------------------------------------------------------------------+
 //
-// $Id: msession.php,v 1.4 2003/01/04 11:54:46 mj Exp $
+// $Id: msession.php,v 1.8 2005/01/26 09:47:28 dufuz Exp $
 
 require_once 'Cache/Container.php';
 
@@ -25,11 +25,10 @@ require_once 'Cache/Container.php';
 * WARNING: experimental, untested
 *
 * @author   Ulf Wendel  <ulf.wendel@phpdoc.de>
-* @version  $Id: msession.php,v 1.4 2003/01/04 11:54:46 mj Exp $
+* @version  $Id: msession.php,v 1.8 2005/01/26 09:47:28 dufuz Exp $
 */
-class Cache_Container_msession extends Cache_Container {
-
-
+class Cache_Container_msession extends Cache_Container
+{
     /**
     * Length of the Cache-Identifier
     *
@@ -63,7 +62,7 @@ class Cache_Container_msession extends Cache_Container {
     *
     * @var  string
     */  
-    var $host = NULL;
+    var $host = null;
     
    
     /**
@@ -71,7 +70,7 @@ class Cache_Container_msession extends Cache_Container {
     *
     * @var  string
     */
-    var $port = NULL;
+    var $port = null;
     
     
     /**
@@ -79,33 +78,36 @@ class Cache_Container_msession extends Cache_Container {
     *
     * @var  resource msession
     */
-    var $ms = NULL;
+    var $ms = null;
 
     
-    function Cache_Container_msession($options = '') {
-        if (is_array($options))
-            $this->setOptions($options, array_merge($this->allowed_options, array('id_lenght', 'uniq', 'host', 'port', 'connect')));
-
+    function Cache_Container_msession($options = '')
+    {
+        if (is_array($options)) {
+            $this->setOptions($options, array_merge($this->allowed_options, array('id_length', 'uniq', 'host', 'port', 'connect')));
+        }
         if ($connect) {            
-            if (NULL == $this->host)
+            if ($this->host == null) {
                 new Cache_Error('No host specified.', __FILE__, __LINE__);
-            if (NULL == $this->port)
+            }
+            if ($this->port == null) {
                 new Cache_Error('No port specified.', __FILE__, __LINE__);
-        
-            if (!($this->ms = msession_connect($this->host, $this->port)))
+            }
+            if (!($this->ms = msession_connect($this->host, $this->port))) {
                 new Cache_Error('Can not connect to the sever using host "' . $this->host . '" on port "' . $this->port . '"', __FILE__, __LINE__);
+            }
         }
         
     } // end func contructor
 
-    function fetch($id, $group) {
-    
+    function fetch($id, $group)
+    {
         $id = strtoupper(md5($group)) . $id;
-        $group = msession_get($id, '_pear_cache_data', NULL);
+        $group = msession_get($id, '_pear_cache_data', null);
         
-        if (NULL == $data)
-            return array(NULL, NULL, NULL);
-        
+        if ($data == null) {
+            return array(null, null, null);
+        }
         return array($data['expires'], $data['cachedata'], $data['userdata']);
     } // end func fetch
 
@@ -115,7 +117,8 @@ class Cache_Container_msession extends Cache_Container {
     * WARNING: If you supply userdata it must not contain any linebreaks,
     * otherwise it will break the filestructure.
     */
-    function save($id, $cachedata, $expires, $group, $userdata) {
+    function save($id, $cachedata, $expires, $group, $userdata)
+    {
         $this->flushPreload($id, $group);
         
         $cachedata      = $this->encode($cachedata);
@@ -157,36 +160,38 @@ class Cache_Container_msession extends Cache_Container {
         // note that msession works different from the PEAR Cache.
         // msession deletes an entry if it has not been used for n-seconds.
         // PEAR Cache deletes after n-seconds.
-        if (0 != $expires)
+        if ($expires != 0) {
             msession_timeout($id, $expires);
-            
+        }
         msession_unlock($id);
 
         return true;
     } // end func save
 
-    function remove($id, $group) {
+    function remove($id, $group)
+    {
         $this->flushPreload($id, $group);
-    
         return msession_destroy(strtoupper(md5($group)) . $id);
     } // end func remove
 
-    function flush($group) {
+    function flush($group)
+    {
         $this->flushPreload();
       
         $sessions = msession_find('_pear_cache_group', $group);
-        if (empty($sessions))
+        if (empty($sessions)) {
             return 0;
-        
+        }
+
         foreach ($sessions as $k => $id)
             messsion_destroy($id);
 
         return count($sessions);
     } // end func flush
 
-    function idExists($id, $group) {
-        
-        return (NULL == msession_get(strtoupper(md5($group)) . $id, '_pear_cache_group', NULL)) ? false : true;
+    function idExists($id, $group)
+    {
+        return (msession_get(strtoupper(md5($group)) . $id, '_pear_cache_group', null) == null) ? false : true;
     } // end func idExists
 
     /**
@@ -197,7 +202,8 @@ class Cache_Container_msession extends Cache_Container {
     * @param    integer Maximum lifetime in seconds of an no longer used/touched entry
     * @throws   Cache_Error
     */
-    function garbageCollection($maxlifetime) {
+    function garbageCollection($maxlifetime)
+    {
         $this->flushPreload();
         
         $sessions = msession_find('_pear_cache', true);
@@ -208,16 +214,17 @@ class Cache_Container_msession extends Cache_Container {
         $entries = array();
         
         foreach ($sessions as $k => $id) {
-            $data = msession_get($id, '_pear_cache_data', NULL);
-            if (NULL == $data)
+            $data = msession_get($id, '_pear_cache_data', null);
+            if (null == $data) {
                 continue;
-                
+            }
+
             if ($data['expires'] <= time()) {
                 msession_destroy($id);
                 continue;
             }
             
-            $size = msession_get($id, '_pear_cache_size', NULL);
+            $size = msession_get($id, '_pear_cache_size', null);
             $total += $size;
             $entries[$data['expires']] = array($id, $size);
         }

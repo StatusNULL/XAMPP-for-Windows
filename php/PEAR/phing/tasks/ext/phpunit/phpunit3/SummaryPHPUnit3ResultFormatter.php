@@ -31,16 +31,17 @@ require_once 'phing/tasks/ext/phpunit/phpunit3/PHPUnit3ResultFormatter.php';
  */	
 class SummaryPHPUnit3ResultFormatter extends PHPUnit3ResultFormatter
 {
-	function endTestRun()
+	function endTestSuite(PHPUnit_Framework_TestSuite $suite)
 	{
-		$sb = "Tests run: " . $this->getRunCount();
+		$sb = "Test: " . $suite->getName();
+		$sb.= ", Run: " . $this->getRunCount();
 		$sb.= ", Failures: " . $this->getFailureCount();
 		$sb.= ", Errors: " . $this->getErrorCount();
 		$sb.= ", Incomplete: " . $this->getIncompleteCount();
 		$sb.= ", Skipped: " . $this->getSkippedCount();
 		$sb.= ", Time elapsed: " . sprintf('%0.5f', $this->getElapsedTime()) . " s\n";
 		
-		parent::endTestRun($suite);
+		parent::endTestSuite($suite);
 		
 		if ($this->out != NULL)
 		{
@@ -54,4 +55,4 @@ class SummaryPHPUnit3ResultFormatter extends PHPUnit3ResultFormatter
 		return NULL;
 	}
 }
-?>
+

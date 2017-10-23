@@ -3,7 +3,7 @@
 /**
  * Contributed by Maxime Delorme and merged by lem9
  *
- * @version $Id: pdf_schema.php 10239 2007-04-01 09:51:41Z cybot_tm $
+ * @version $Id: pdf_schema.php 11625 2008-09-29 17:13:53Z lem9 $
  */
 
 /**
@@ -16,6 +16,7 @@ require_once './libraries/common.inc.php';
  */
 require_once './libraries/relation.lib.php';
 require_once './libraries/transformations.lib.php';
+require_once './libraries/Index.class.php';
 
 $cfgRelation = PMA_getRelationsParam();
 
@@ -56,35 +57,32 @@ class PMA_PDF extends TCPDF {
     var $l_marg = 10;
     var $t_marg = 10;
     var $scale;
-    var $title;
     var $PMA_links;
     var $Outlines = array();
     var $def_outlines;
-    var $Alias ;
+    var $Alias = array();
     var $widths;
 
-    /**
-     * The PMA_PDF constructor
-     *
-     * This function just refers to the "FPDF" constructor: with PHP3 a class
-     * must have a constructor
-     *
-     * @param string $ The page orientation (p, portrait, l or landscape)
-     * @param string $ The unit for sizes (pt, mm, cm or in)
-     * @param mixed $ The page format (A3, A4, A5, letter, legal or an array
-     *                  with page sizes)
-     * @access public
-     * @see FPDF::FPDF()
-     */
-    function PMA_PDF($orientation = 'L', $unit = 'mm', $format = 'A4')
+    public function getFh()
     {
-        $this->Alias = array() ;
-        $this->TCPDF($orientation, $unit, $format);
-    } // end of the "PMA_PDF()" method
+        return $this->fh;
+    }
+
+    public function getFw()
+    {
+        return $this->fw;
+    }
+
+    public function setCMargin($c_margin)
+    {
+        $this->cMargin = $c_margin;
+    }
+
     function SetAlias($name, $value)
     {
         $this->Alias[$name] = $value ;
     }
+
     function _putpages()
     {
         if (count($this->Alias) > 0) {
@@ -125,7 +123,7 @@ class PMA_PDF extends TCPDF {
      * @param double $ The cell width
      * @param double $ The cell height
      * @param string $ The text to output
-     * @param mixed $ Wether to add borders or not
+     * @param mixed $ Whether to add borders or not
      * @param integer $ Where to put the cursor once the output is done
      * @param string $ Align mode
      * @param integer $ Whether to fill the cell with a color or not
@@ -230,7 +228,7 @@ class PMA_PDF extends TCPDF {
 
         require_once './libraries/header.inc.php';
 
-        echo '<p><b>PDF - ' . $GLOBALS['strError'] . '</b></p>' . "\n";
+        echo '<p><strong>PDF - ' . $GLOBALS['strError'] . '</strong></p>' . "\n";
         if (!empty($error_message)) {
             $error_message = htmlspecialchars($error_message);
         }
@@ -490,6 +488,8 @@ class PMA_PDF extends TCPDF {
         return $nl;
     }
 } // end of the "PMA_PDF" class
+
+
 /**
  * Draws tables schema
  *
@@ -617,7 +617,7 @@ class PMA_RT_Table {
      * @see PMA_PDF, PMA_RT_Table::PMA_RT_Table_setWidth,
           PMA_RT_Table::PMA_RT_Table_setHeight
      */
-    function PMA_RT_Table($table_name, $ff, &$same_wide_width)
+    function __construct($table_name, $ff, &$same_wide_width, $show_keys)
     {
         global $pdf, $pdf_page_number, $cfgRelation, $db;
 
@@ -628,9 +628,19 @@ class PMA_RT_Table {
             $pdf->PMA_PDF_die(sprintf($GLOBALS['strPdfInvalidTblName'], $table_name));
         }
         // load fields
-        while ($row = PMA_DBI_fetch_row($result)) {
-            $this->fields[] = $row[0];
-        }
+        //check to see if it will load all fields or only the foreign keys
+		if ($show_keys) {
+			$indexes = PMA_Index::getFromTable($this->table_name, $db);
+			$all_columns = array();
+			foreach ($indexes as $index) {
+			   $all_columns = array_merge($all_columns, array_flip(array_keys($index->getColumns())));
+			}
+			$this->fields = array_keys($all_columns);
+		} else {
+	        while ($row = PMA_DBI_fetch_row($result)) {
+	            $this->fields[] = $row[0];
+	        }
+		}
         // height and width
         $this->PMA_RT_Table_setWidth($ff);
         $this->PMA_RT_Table_setHeight();
@@ -750,7 +760,7 @@ class PMA_RT_Relation {
      * @access private
      * @see PMA_RT_Relation::PMA_RT_Relation_getXy
      */
-    function PMA_RT_Relation($master_table, $master_field, $foreign_table, $foreign_field)
+    function __construct($master_table, $master_field, $foreign_table, $foreign_field)
     {
         $src_pos = $this->PMA_RT_Relation_getXy($master_table, $master_field);
         $dest_pos = $this->PMA_RT_Relation_getXy($foreign_table, $foreign_field);
@@ -953,30 +963,29 @@ class PMA_RT {
      *                    everywhere, due to some problems printing with color
      * @param boolean $ Whether to draw grids or not
      * @param boolean $ Whether all tables should have the same width or not
+     * @param boolean $ Wheter to show all field or only the keys
      * @global object   The current PDF document
      * @global string   The current db name
      * @global array    The relations settings
      * @access private
      * @see PMA_PDF
      */
-    function PMA_RT($which_rel, $show_info = 0, $change_color = 0, $show_grid = 0, $all_tab_same_wide = 0, $orientation = 'L', $paper = 'A4')
+    function __construct($which_rel, $show_info = 0, $change_color = 0, $show_grid = 0, $all_tab_same_wide = 0, $orientation = 'L', $paper = 'A4', $show_keys = 0)
     {
         global $pdf, $db, $cfgRelation, $with_doc;
 
         $this->same_wide = $all_tab_same_wide;
         // Initializes a new document
         $pdf = new PMA_PDF('L', 'mm', $paper);
-        $pdf->title = sprintf($GLOBALS['strPdfDbSchema'], $GLOBALS['db'], $which_rel);
-        $pdf->cMargin = 0;
+        $pdf->SetTitle(sprintf($GLOBALS['strPdfDbSchema'], $GLOBALS['db'], $which_rel));
+        $pdf->setCMargin(0);
         $pdf->Open();
-        $pdf->SetTitle($pdf->title);
         $pdf->SetAuthor('phpMyAdmin ' . PMA_VERSION);
         $pdf->AliasNbPages();
-
         $pdf->AddFont('DejaVuSans', '', 'dejavusans.php');
-        $pdf->AddFont('DejaVuSans', 'B', 'dejavusans-bold.php');
+        $pdf->AddFont('DejaVuSans', 'B', 'dejavusansb.php');
         $pdf->AddFont('DejaVuSerif', '', 'dejavuserif.php');
-        $pdf->AddFont('DejaVuSerif', 'B', 'dejavuserif-bold.php');
+        $pdf->AddFont('DejaVuSerif', 'B', 'dejavuserifb.php');
         $this->ff = PMA_PDF_FONT;
         $pdf->SetFont($this->ff, '', 14);
         $pdf->SetAutoPageBreak('auto');
@@ -995,10 +1004,10 @@ class PMA_RT {
         // make doc                    //
         if ($with_doc) {
             $pdf->SetAutoPageBreak('auto', 15);
-            $pdf->cMargin = 1;
+            $pdf->setCMargin(1);
             PMA_RT_DOC($alltables);
             $pdf->SetAutoPageBreak('auto');
-            $pdf->cMargin = 0;
+            $pdf->setCMargin(0);
         }
 
         $pdf->Addpage();
@@ -1015,7 +1024,7 @@ class PMA_RT {
 
         foreach ($alltables AS $table) {
             if (!isset($this->tables[$table])) {
-                $this->tables[$table] = new PMA_RT_Table($table, $this->ff, $this->tablewidth);
+                $this->tables[$table] = new PMA_RT_Table($table, $this->ff, $this->tablewidth, $show_keys);
             }
 
             if ($this->same_wide) {
@@ -1024,7 +1033,12 @@ class PMA_RT {
             $this->PMA_RT_setMinMax($this->tables[$table]);
         }
         // Defines the scale factor
-        $this->scale = ceil(max(($this->x_max - $this->x_min) / ($pdf->fh - $this->r_marg - $this->l_marg), ($this->y_max - $this->y_min) / ($pdf->fw - $this->t_marg - $this->b_marg)) * 100) / 100;
+        $this->scale = ceil(
+            max(
+                ($this->x_max - $this->x_min) / ($pdf->getFh() - $this->r_marg - $this->l_marg),
+                ($this->y_max - $this->y_min) / ($pdf->getFw() - $this->t_marg - $this->b_marg))
+             * 100) / 100;
+
         $pdf->PMA_PDF_setScale($this->scale, $this->x_min, $this->y_min, $this->l_marg, $this->t_marg);
         // Builds and save the PDF document
         $pdf->PMA_PDF_setLineWidthScale(0.1);
@@ -1125,9 +1139,7 @@ function PMA_RT_DOC($alltables)
         $pdf->ln();
 
         $cfgRelation = PMA_getRelationsParam();
-        if ($cfgRelation['commwork'] || PMA_MYSQL_INT_VERSION >= 40100) {
-            $comments = PMA_getComments($db, $table);
-        }
+        $comments = PMA_getComments($db, $table);
         if ($cfgRelation['mimework']) {
             $mime_map = PMA_getMIME($db, $table, true);
         }
@@ -1376,8 +1388,9 @@ $all_tab_same_wide      = (isset($all_tab_same_wide) && $all_tab_same_wide == 'o
 $with_doc               = (isset($with_doc) && $with_doc == 'on') ? 1 : 0;
 $orientation            = (isset($orientation) && $orientation == 'P') ? 'P' : 'L';
 $paper                  = isset($paper) ? $paper : 'A4';
+$show_keys              = (isset($show_keys) && $show_keys == 'on') ? 1 : 0;
 PMA_DBI_select_db($db);
 
-$rt = new PMA_RT($pdf_page_number, $show_table_dimension, $show_color, $show_grid, $all_tab_same_wide, $orientation, $paper);
+$rt = new PMA_RT($pdf_page_number, $show_table_dimension, $show_color, $show_grid, $all_tab_same_wide, $orientation, $paper, $show_keys);
 
 ?>

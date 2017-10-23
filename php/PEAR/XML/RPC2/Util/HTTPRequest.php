@@ -33,7 +33,7 @@
 * @author     Sergio Carvalho <sergio.carvalho@portugalmail.com>  
 * @copyright  2004-2006 Sergio Carvalho
 * @license    http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
-* @version    CVS: $Id: HTTPRequest.php,v 1.7 2007/07/30 08:47:11 sergiosgc Exp $
+* @version    CVS: $Id: HTTPRequest.php,v 1.8 2008/09/10 18:50:31 sergiosgc Exp $
 * @link       http://pear.php.net/package/XML_RPC2
 */
 
@@ -41,6 +41,7 @@
 
 // dependencies {{{
 require_once 'XML/RPC2/Exception.php';
+require_once 'XML/RPC2/Client.php';
 // }}}
 
 /**
@@ -194,7 +195,7 @@ class XML_RPC2_Util_HTTPRequest
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE) &&
                 curl_setopt($ch, CURLOPT_POST, 1) &&
                 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->_sslverify) &&
-                curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: text/xml; charset='.$this->_encoding, 'User-Agent: PEAR_XML_RCP2/0.0.x')) &&
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: text/xml; charset='.$this->_encoding, 'User-Agent: PEAR_XML_RCP2/' . XML_RPC2_Client::VERSION)) &&
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $this->_postData)
             ) {
                 $result = curl_exec($ch);

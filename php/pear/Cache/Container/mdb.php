@@ -18,7 +18,7 @@
 // | Author: Lorenzo Alberton <l.alberton at quipo.it>                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: mdb.php,v 1.3 2003/01/04 11:54:46 mj Exp $
+// $Id: mdb.php,v 1.5 2004/12/15 09:09:30 dufuz Exp $
 
 require_once 'MDB.php';
 require_once 'Cache/Container.php';
@@ -61,10 +61,11 @@ require_once 'Cache/Container.php';
 * ------------------------------------------
 *
 * @author   Lorenzo Alberton <l.alberton at quipo.it>
-* @version  $Id: mdb.php,v 1.3 2003/01/04 11:54:46 mj Exp $
+* @version  $Id: mdb.php,v 1.5 2004/12/15 09:09:30 dufuz Exp $
 * @package  Cache
 */
-class Cache_Container_mdb extends Cache_Container {
+class Cache_Container_mdb extends Cache_Container
+{
 
     /**
      * Name of the MDB table to store caching data
@@ -88,7 +89,7 @@ class Cache_Container_mdb extends Cache_Container {
     function Cache_Container_mdb($options)
     {
         $this->db = &MDB::Connect($options);
-        if(MDB::isError($this->db)) {
+        if (MDB::isError($this->db)) {
            return new Cache_Error('MDB::connect failed: '
                     . $this->db->getMessage(), __FILE__, __LINE__);
         } else {
@@ -103,7 +104,7 @@ class Cache_Container_mdb extends Cache_Container {
      *
      * @param    string  dataset ID
      * @param    string  cache group
-     * @return   mixed   dataset value or NULL/Cache_Error on failure
+     * @return   mixed   dataset value or null/Cache_Error on failure
      * @access   public
      */
     function fetch($id, $group)
@@ -111,16 +112,16 @@ class Cache_Container_mdb extends Cache_Container {
         $query = 'SELECT cachedata FROM ' . $this->cache_table
                 .' WHERE id='       . $this->db->getTextValue($id)
                 .' AND cachegroup=' . $this->db->getTextValue($group);
-        if($res = $this->db->query($query)) {
-            if($this->db->endOfResult($res)) {
+        if ($res = $this->db->query($query)) {
+            if ($this->db->endOfResult($res)) {
                 //no rows returned
-                $data = array(NULL, NULL, NULL);
+                $data = array(null, null, null);
             } else {
                 $clob = $this->db->fetchClob($res,0,'cachedata');
-                if(!MDB::isError($clob)) {
+                if (!MDB::isError($clob)) {
                     $cached_data = '';
                     while(!$this->db->endOfLOB($clob)) {
-                        if(MDB::isError($error =
+                        if (MDB::isError($error =
                                     $this->db->readLob($clob,$data,8000)<0)) {
                             return new Cache_Error('MDB::query failed: '
                                     . $error->getMessage(), __FILE__, __LINE__);
@@ -135,7 +136,7 @@ class Cache_Container_mdb extends Cache_Container {
                     $query = 'SELECT userdata, expires FROM ' . $this->cache_table
                             .' WHERE id='       . $this->db->getTextValue($id)
                             .' AND cachegroup=' . $this->db->getTextValue($group);
-                    if($res = $this->db->query($query)) {
+                    if ($res = $this->db->query($query)) {
                         $row = $this->db->fetchInto($res);
                         if (is_array($row)) {
                             $data = array(
@@ -144,10 +145,10 @@ class Cache_Container_mdb extends Cache_Container {
                                         $row['userdata']
                                     );
                         } else {
-                            $data = array(NULL, NULL, NULL);
+                            $data = array(null, null, null);
                         }
                     } else {
-                        $data = array(NULL, NULL, NULL);
+                        $data = array(null, null, null);
                     }
                 } else {
                     return new Cache_Error('MDB::query failed: '
@@ -158,7 +159,7 @@ class Cache_Container_mdb extends Cache_Container {
         } else {
             //return new Cache_Error('MDB::query failed: '
             //          . $result->getMessage(), __FILE__, __LINE__);
-            $data = array(NULL, NULL, NULL);
+            $data = array(null, null, null);
         }
 
         // last used required by the garbage collection
@@ -202,7 +203,7 @@ class Cache_Container_mdb extends Cache_Container {
             'userdata'  => array(
                             'Type'   => 'integer',
                             'Value'  => $userdata,
-                            'Null'   => ($userdata ? false : true)
+                            'null'   => ($userdata ? false : true)
                         ),
             'expires'   => array(
                             'Type'   => 'integer',
@@ -216,7 +217,7 @@ class Cache_Container_mdb extends Cache_Container {
 
         $result = $this->db->replace($this->cache_table, $fields);
 
-        if(MDB::isError($result)) {
+        if (MDB::isError($result)) {
             //Var_Dump::display($result);
             return new Cache_Error('MDB::query failed: '
                     . $this->db->errorMessage($result), __FILE__, __LINE__);
@@ -226,13 +227,13 @@ class Cache_Container_mdb extends Cache_Container {
                  .' SET cachedata=?'
                  .' WHERE id='. $this->db->getTextValue($id);
 
-        if(($prepared_query = $this->db->prepareQuery($query2))) {
+        if (($prepared_query = $this->db->prepareQuery($query2))) {
             $char_lob = array(
                             'Error' => '',
                             'Type' => 'data',
                             'Data' => $this->encode($data)
                         );
-            if(!MDB::isError($clob = $this->db->createLob($char_lob))) {
+            if (!MDB::isError($clob = $this->db->createLob($char_lob))) {
                 $this->db->setParamClob($prepared_query,1,$clob,'cachedata');
                 if(MDB::isError($error=$this->db->executeQuery($prepared_query))) {
                     return new Cache_Error('MDB::query failed: '
@@ -319,9 +320,8 @@ class Cache_Container_mdb extends Cache_Container {
 
         if (is_array($row)) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
@@ -347,8 +347,7 @@ class Cache_Container_mdb extends Cache_Container {
                    . $this->db->errorMessage($cachesize), __FILE__, __LINE__);
         }
         //if cache is to big.
-        if ($cachesize > $this->highwater)
-        {
+        if ($cachesize > $this->highwater) {
             //find the lowwater mark.
             $query = 'SELECT length(cachedata) as size, changed FROM '
                     . $this->cache_table .' ORDER BY changed DESC';

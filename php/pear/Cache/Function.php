@@ -15,7 +15,7 @@
 // | Authors: Sebastian Bergmann <sb@sebastian-bergmann.de>               |
 // +----------------------------------------------------------------------+
 //
-// $Id: Function.php,v 1.6 2003/01/04 11:54:45 mj Exp $
+// $Id: Function.php,v 1.8 2004/12/15 09:09:33 dufuz Exp $
 
 require_once 'Cache.php';
 
@@ -65,10 +65,11 @@ require_once 'Cache.php';
 * @module       Function_Cache
 * @modulegroup  Function_Cache
 * @package      Cache
-* @version      $Revision: 1.6 $
+* @version      $Revision: 1.8 $
 * @access       public
 */
-class Cache_Function extends Cache {
+class Cache_Function extends Cache
+{
     var $expires;
 
     /**
@@ -93,7 +94,8 @@ class Cache_Function extends Cache {
     * PEAR-Deconstructor
     * Call deconstructor of parent
     */
-    function _Cache_Function() {
+    function _Cache_Function()
+    {
         $this->_Cache();
     }
 
@@ -103,7 +105,8 @@ class Cache_Function extends Cache {
     * @return mixed $result
     * @access public
     */
-    function call() {
+    function call()
+    {
         // get arguments
         $arguments = func_get_args();
 
@@ -113,7 +116,7 @@ class Cache_Function extends Cache {
         // query cache
         $cached_object = $this->get($id, 'function_cache');
 
-        if ($cached_object != NULL) {
+        if ($cached_object != null) {
             // cache hit: return cached output and result
 
             $output = $cached_object[0];
@@ -130,18 +133,14 @@ class Cache_Function extends Cache {
                 list($class, $method) = explode('::', $target);
 
                 $result = call_user_func_array(array($class, $method), $arguments);
-            }
-
-            // object->method
-            elseif (strstr($target, '->')) {
+            } elseif (strstr($target, '->')) {
+                // object->method
                 list($object, $method) = explode('->', $target);
                 global $$object;
 
                 $result = call_user_func_array(array($$object, $method), $arguments);
-            }
-
-            // function
-            else {
+            } else {
+                // function
                 $result = call_user_func_array($target, $arguments);
             }
 

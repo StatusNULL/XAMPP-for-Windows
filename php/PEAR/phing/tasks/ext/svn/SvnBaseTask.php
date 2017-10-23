@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: SvnBaseTask.php 281 2007-11-02 09:17:51Z hans $
+ *  $Id: SvnBaseTask.php 329 2007-12-22 17:12:59Z mrook $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -26,7 +26,7 @@ include_once 'phing/Task.php';
  *
  * @author Michiel Rook <michiel.rook@gmail.com>
  * @author Andrew Eddie <andrew.eddie@jamboworks.com> 
- * @version $Id: SvnBaseTask.php 281 2007-11-02 09:17:51Z hans $
+ * @version $Id: SvnBaseTask.php 329 2007-12-22 17:12:59Z mrook $
  * @package phing.tasks.ext.svn
  * @see VersionControl_SVN
  * @since 2.2.0
@@ -143,7 +143,7 @@ abstract class SvnBaseTask extends Task
 	}
 
 	/**
-	 * Returns the forec switch
+	 * Returns the force switch
 	 */
 	function getForce()
 	{
@@ -183,7 +183,7 @@ abstract class SvnBaseTask extends Task
 	}
 
 	/**
-	 * Sets the password of the user to export
+	 * Sets the no-auth-cache switch
 	 */
 	function setNoCache($value)
 	{
@@ -191,7 +191,7 @@ abstract class SvnBaseTask extends Task
 	}
 
 	/**
-	 * Returns the password
+	 * Returns the no-auth-cache switch
 	 */
 	function getNoCache()
 	{
@@ -199,7 +199,7 @@ abstract class SvnBaseTask extends Task
 	}
 	
 	/**
-	 * Toggles recursive behavior
+	 * Sets the non-recursive switch
 	 */
 	function setRecursive($value)
 	{
@@ -207,11 +207,27 @@ abstract class SvnBaseTask extends Task
 	}
 	
 	/**
-	 * Returns status of recursive behavior
+	 * Returns the non-recursive switch
 	 */
 	function getRecursive()
 	{
 		return isset( $this->svnSwitches['non-recursive'] ) ? $this->svnSwitches['non-recursive'] : '';
+	}
+
+	/**
+	 * Sets the ignore-externals switch
+	 */
+	function setIgnoreExternals($value)
+	{
+		$this->svnSwitches['ignore-externals'] = $value;
+	}
+	
+	/**
+	 * Returns the ignore-externals switch
+	 */
+	function getIgnoreExternals()
+	{
+		return isset( $this->svnSwitches['ignore-externals'] ) ? $this->svnSwitches['ignore-externals'] : '';
 	}
 	
 	/**
@@ -302,4 +318,4 @@ abstract class SvnBaseTask extends Task
 		}
 	}
 }
-?>
+

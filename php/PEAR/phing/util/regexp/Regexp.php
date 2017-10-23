@@ -1,6 +1,6 @@
 <?php
 /* 
- *  $Id: Regexp.php 123 2006-09-14 20:19:08Z mrook $
+ *  $Id: Regexp.php 325 2007-12-20 15:44:58Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -165,4 +165,3 @@ class Regexp {
     }
 } 
 
-?>

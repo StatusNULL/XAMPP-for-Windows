@@ -8,8 +8,8 @@
  * @package  PHP_CompatInfo
  * @author   Davey Shafik <davey@php.net>
  * @author   Laurent Laville <pear@laurent-laville.org>
- * @license  http://www.php.net/license/3_01.txt  PHP License 3.01
- * @version  CVS: $Id: func_array.php,v 1.12 2008/02/02 15:06:18 farell Exp $
+ * @license  http://www.opensource.org/licenses/bsd-license.php  BSD
+ * @version  CVS: $Id: func_array.php,v 1.14 2008/09/27 13:40:18 farell Exp $
  * @link     http://pear.php.net/package/PHP_CompatInfo
  * @ignore
  */
@@ -13797,7 +13797,7 @@ $GLOBALS['_PHP_COMPATINFO_FUNCS'] = array (
   'getallheaders' =>
   array (
     'init' => '4.0.0',
-    'ext' => 'sapi_aolserver',
+    'ext' => 'sapi_apache',
     'pecl' => false,
   ),
   'getcwd' =>
@@ -51496,12 +51496,6 @@ $GLOBALS['_PHP_COMPATINFO_FUNCS'] = array (
     'pecl' => false,
     'init' => '5-dev',
   ),
-  'stat' =>
-  array (
-    'ext' => 'ext_standard',
-    'pecl' => false,
-    'init' => '5-dev',
-  ),
   'str_getcsv' =>
   array (
     'ext' => 'ext_standard',
@@ -51967,6 +51961,12 @@ $GLOBALS['_PHP_COMPATINFO_FUNCS'] = array (
   'zlib_encode' =>
   array (
     'ext' => 'ext_zlib',
+    'pecl' => false,
+    'init' => '5-dev',
+  ),
+  'stat' =>
+  array (
+    'ext' => 'ext_standard',
     'pecl' => false,
     'init' => '5-dev',
   ),

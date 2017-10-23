@@ -11,7 +11,7 @@
 // | Authors: Sandy McArthur Jr. <Leknor@Leknor.com>                      |
 // +----------------------------------------------------------------------+
 //
-// $Id: Id.php,v 1.11 2005/10/04 10:58:20 alexmerz Exp $
+// $Id: Id.php,v 1.12 2005/11/28 11:24:28 alexmerz Exp $
 //
 
 // Uncomment the folling define if you want the class to automatically
@@ -79,7 +79,7 @@ define('PEAR_MP3_ID_NOMP3', 4);
  *
  * @package MP3_Id
  * @author Sandy McArthur Jr. <Leknor@Leknor.com>
- * @version $Version$
+ * @version $Id: Id.php,v 1.12 2005/11/28 11:24:28 alexmerz Exp $
  */
 class MP3_Id {
 

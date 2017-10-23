@@ -5,9 +5,9 @@
 	*/
 
 	echo "\r\n  ########################################################################\n";
-	echo "  # ApacheFriends XAMPP setup win32 Version 1.6                          #\r\n";
+	echo "  # ApacheFriends XAMPP setup win32 Version 1.7                          #\r\n";
 	echo "  #----------------------------------------------------------------------#\r\n";
-	echo "  # Copyright (c) 2002-2005 Apachefriends                                #\r\n";
+	echo "  # Copyright (c) 2002-2008 Apachefriends                                #\r\n";
 	echo "  #----------------------------------------------------------------------#\r\n";
 	echo "  # Authors: Kay Vogelgesang <kvo@apachefriends.org>                     #\r\n";
 	echo "  #          Carsten Wiedmann <webmaster@wiedmann-online.de>             #\r\n";

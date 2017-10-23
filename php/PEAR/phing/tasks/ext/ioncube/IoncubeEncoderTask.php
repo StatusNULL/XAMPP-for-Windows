@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: IoncubeEncoderTask.php 119 2006-09-14 20:02:22Z mrook $
+ * $Id: IoncubeEncoderTask.php 325 2007-12-20 15:44:58Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -27,7 +27,7 @@ require_once 'phing/tasks/ext/ioncube/IoncubeComment.php';
  *
  * @author Michiel Rook <michiel.rook@gmail.com>
  * @author Andrew Eddie <andrew.eddie@jamboworks.com> 
- * @version $Id: IoncubeEncoderTask.php 119 2006-09-14 20:02:22Z mrook $
+ * @version $Id: IoncubeEncoderTask.php 325 2007-12-20 15:44:58Z hans $
  * @package phing.tasks.ext.ioncube
  * @since 2.2.0
  */
@@ -485,4 +485,3 @@ class IoncubeEncoderTask extends Task
 		return $arguments;
 	}
 }
-?>

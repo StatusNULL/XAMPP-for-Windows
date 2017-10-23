@@ -1,5 +1,19 @@
 <?php
 /**
+* Part of the Services_Blogging package.
+*
+* PHP version 5
+*
+* @category Services
+* @package  Services_Blogging
+* @author   Christian Weiske <cweiske@php.net>
+* @author   Anant Narayanan <anant@php.net>
+* @license  http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
+* @version  CVS: $Id: Blog.php,v 1.3 2008/11/29 13:15:46 cweiske Exp $
+* @link     http://pear.php.net/package/Services_Blogging
+*/
+
+/**
 * Blog object. Used when multiple blogs are supported by
 * one account.
 *
@@ -13,8 +27,16 @@
 */
 class Services_Blogging_Blog
 {
+    /**
+    * Exception code when the property is not supported.
+    */
     const ERROR_INVALID_PROPERTY = 181;
 
+    /**
+    * Values/properties supported by the blogging system.
+    *
+    * @var array
+    */
     protected $values = array(
         'id'    => null,
         'name'  => null,
@@ -23,6 +45,13 @@ class Services_Blogging_Blog
 
 
 
+    /**
+    * Creates a new blog instance.
+    *
+    * @param string $id   ID of the blog
+    * @param string $name Name of the blog
+    * @param string $url  URL of the blog
+    */
     public function __construct($id = null, $name = null, $url = null)
     {
         $this->id   = $id;
@@ -32,6 +61,14 @@ class Services_Blogging_Blog
 
 
 
+    /**
+    * Set a property value.
+    *
+    * @param string $strProperty Property name
+    * @param mixed  $value       Value of property
+    *
+    * @return void
+    */
     public function __set($strProperty, $value)
     {
         /*
@@ -50,6 +87,13 @@ class Services_Blogging_Blog
 
 
 
+    /**
+    * Returns value of a property
+    *
+    * @param string $strProperty Property name
+    *
+    * @return mixed Property value
+    */
     public function __get($strProperty)
     {
         /*

@@ -1,4 +1,4 @@
-#!H:\release167\NEU\xampp\php\.\php.exe -Cq
+#!C:\php\.\php.exe -Cq
 <?php
     /**
     * Console script to use PHP_Beautifier from the command line

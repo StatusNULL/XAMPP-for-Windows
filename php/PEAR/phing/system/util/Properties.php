@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: Properties.php 229 2007-08-30 12:45:08Z hans $
+ *  $Id: Properties.php 325 2007-12-20 15:44:58Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -214,7 +214,10 @@ class Properties {
      * @return mixed Old property value or NULL if none was set.
      */
     function setProperty($key, $value) {
-        $oldValue = @$this->properties[$key];       
+    	$oldValue = null;
+    	if (isset($this->properties[$key])) {
+    		$oldValue = $this->properties[$key];
+    	}
         $this->properties[$key] = $value;
         return $oldValue;
     }
@@ -266,4 +269,4 @@ class Properties {
     }
 
 }
-?>
+

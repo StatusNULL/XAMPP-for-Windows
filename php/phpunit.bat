@@ -36,4 +36,4 @@ REM
 REM $Id: pear-phpunit.bat,v 1.3.2.2 2005/12/17 16:04:56 sebastian Exp $
 REM
 
-"\xampp\php\.\php.exe" "\xampp\php\pear/PHPUnit2/TextUI/TestRunner.php" %*
+"\xampp\php\.\php.exe" ".\pear\PHPUnit2\TextUI\TestRunner.php" %*

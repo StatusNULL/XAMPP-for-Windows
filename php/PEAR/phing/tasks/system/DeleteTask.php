@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: DeleteTask.php 144 2007-02-05 15:19:00Z hans $
+ *  $Id: DeleteTask.php 321 2007-12-14 18:00:25Z hans $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -260,7 +260,7 @@ class DeleteTask extends Task {
                         $dir->delete();
                         $dirCount++;
                     } catch (Exception $e) {
-                        $message="Unable to delete directory " + $dir;
+                        $message="Unable to delete directory " . $dir->__toString();
                         if($this->failonerror) {
                             throw new BuildException($message);
                         } else {

@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: Project.php 175 2007-03-14 13:52:03Z hans $
+ *  $Id: Project.php 345 2008-01-30 19:46:32Z mrook $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -18,13 +18,6 @@
  * and is licensed under the LGPL. For more information please see
  * <http://phing.info>.
  */
-
-// DEPRECATED logging constants
-define('PROJECT_MSG_DEBUG', Project::MSG_DEBUG);
-define('PROJECT_MSG_VERBOSE', Project::MSG_VERBOSE);
-define('PROJECT_MSG_INFO', Project::MSG_INFO);
-define('PROJECT_MSG_WARN', Project::MSG_WARN);
-define('PROJECT_MSG_ERR', Project::MSG_ERR);
 
 include_once 'phing/system/io/PhingFile.php';
 include_once 'phing/util/FileUtils.php';

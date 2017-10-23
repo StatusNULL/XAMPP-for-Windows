@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: PHPUnitTask.php 275 2007-10-31 08:01:03Z mrook $
+ * $Id: PHPUnitTask.php 427 2008-10-28 19:34:15Z mrook $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -28,7 +28,7 @@ require_once 'phing/util/LogWriter.php';
  * Runs PHPUnit2/3 tests.
  *
  * @author Michiel Rook <michiel.rook@gmail.com>
- * @version $Id: PHPUnitTask.php 275 2007-10-31 08:01:03Z mrook $
+ * @version $Id: PHPUnitTask.php 427 2008-10-28 19:34:15Z mrook $
  * @package phing.tasks.ext.phpunit
  * @see BatchTest
  * @since 2.1.0
@@ -39,8 +39,12 @@ class PHPUnitTask extends Task
 	private $formatters = array();
 	private $haltonerror = false;
 	private $haltonfailure = false;
-	private $failureproperty;
+	private $haltonincomplete = false;
+	private $haltonskipped = false;
 	private $errorproperty;
+	private $failureproperty;
+	private $incompleteproperty;
+	private $skippedproperty;
 	private $printsummary = false;
 	private $testfailed = false;
 	private $codecoverage = false;
@@ -100,33 +104,42 @@ class PHPUnitTask extends Task
 		/**
 		 * Add some defaults to the PHPUnit filter
 		 */
+		$pwd = dirname(__FILE__);
+
 		if (PHPUnitUtil::$installedVersion == 3)
 		{
+			require_once 'PHPUnit/Framework.php';
 			require_once 'PHPUnit/Util/Filter.php';
 			
 			// point PHPUnit_MAIN_METHOD define to non-existing method
-			define('PHPUnit_MAIN_METHOD', 'PHPUnitTask::undefined');
+			if (!defined('PHPUnit_MAIN_METHOD')) {
+				define('PHPUnit_MAIN_METHOD', 'PHPUnitTask::undefined');
+			}
 			
-			PHPUnit_Util_Filter::addFileToFilter('PHPUnitTask.php', 'PHING');
-			PHPUnit_Util_Filter::addFileToFilter('PHPUnitTestRunner.php', 'PHING');
-			PHPUnit_Util_Filter::addFileToFilter('phing/Task.php', 'PHING');
-			PHPUnit_Util_Filter::addFileToFilter('phing/Target.php', 'PHING');
-			PHPUnit_Util_Filter::addFileToFilter('phing/Project.php', 'PHING');
-			PHPUnit_Util_Filter::addFileToFilter('phing/Phing.php', 'PHING');
-			PHPUnit_Util_Filter::addFileToFilter('phing.php', 'PHING');
+			PHPUnit_Util_Filter::addFileToFilter($pwd . '/PHPUnitTask.php', 'PHING');
+			PHPUnit_Util_Filter::addFileToFilter($pwd . '/PHPUnitTestRunner.php', 'PHING');
+			PHPUnit_Util_Filter::addFileToFilter($pwd . '/../../../Task.php', 'PHING');
+			PHPUnit_Util_Filter::addFileToFilter($pwd . '/../../../Target.php', 'PHING');
+			PHPUnit_Util_Filter::addFileToFilter($pwd . '/../../../Project.php', 'PHING');
+			PHPUnit_Util_Filter::addFileToFilter($pwd . '/../../../Phing.php', 'PHING');
 		}
 		else
 		{
+			require_once 'PHPUnit2/Framework.php';
 			require_once 'PHPUnit2/Util/Filter.php';
 			
-			PHPUnit2_Util_Filter::addFileToFilter('PHPUnitTask.php');
-			PHPUnit2_Util_Filter::addFileToFilter('PHPUnitTestRunner.php');
-			PHPUnit2_Util_Filter::addFileToFilter('phing/Task.php');
-			PHPUnit2_Util_Filter::addFileToFilter('phing/Target.php');
-			PHPUnit2_Util_Filter::addFileToFilter('phing/Project.php');
-			PHPUnit2_Util_Filter::addFileToFilter('phing/Phing.php');
-			PHPUnit2_Util_Filter::addFileToFilter('phing.php');
+			PHPUnit2_Util_Filter::addFileToFilter($pwd . '/PHPUnitTask.php');
+			PHPUnit2_Util_Filter::addFileToFilter($pwd . '/PHPUnitTestRunner.php');
+			PHPUnit2_Util_Filter::addFileToFilter($pwd . '/../../../Task.php');
+			PHPUnit2_Util_Filter::addFileToFilter($pwd . '/../../../Target.php');
+			PHPUnit2_Util_Filter::addFileToFilter($pwd . '/../../../Project.php');
+			PHPUnit2_Util_Filter::addFileToFilter($pwd . '/../../../Phing.php');
 		}
+	}
+	
+	function setErrorproperty($value)
+	{
+		$this->errorproperty = $value;
 	}
 	
 	function setFailureproperty($value)
@@ -134,9 +147,14 @@ class PHPUnitTask extends Task
 		$this->failureproperty = $value;
 	}
 	
-	function setErrorproperty($value)
+	function setIncompleteproperty($value)
 	{
-		$this->errorproperty = $value;
+		$this->incompleteproperty = $value;
+	}
+	
+	function setSkippedproperty($value)
+	{
+		$this->skippedproperty = $value;
 	}
 	
 	function setHaltonerror($value)
@@ -147,6 +165,16 @@ class PHPUnitTask extends Task
 	function setHaltonfailure($value)
 	{
 		$this->haltonfailure = $value;
+	}
+
+	function setHaltonincomplete($value)
+	{
+		$this->haltonincomplete = $value;
+	}
+
+	function setHaltonskipped($value)
+	{
+		$this->haltonskipped = $value;
 	}
 
 	function setPrintsummary($printsummary)
@@ -246,7 +274,7 @@ class PHPUnitTask extends Task
 		{
 			$suite = NULL;
 			
-			if (is_subclass_of($test, 'PHPUnit_Framework_TestSuite') || is_subclass_of($test, 'PHPUnit2_Framework_TestSuite'))
+			if ((PHPUnitUtil::$installedVersion == 3 && is_subclass_of($test, 'PHPUnit_Framework_TestSuite')) || (PHPUnitUtil::$installedVersion == 2 && is_subclass_of($test, 'PHPUnit2_Framework_TestSuite')))
 			{
 				if (is_object($test))
 				{
@@ -321,8 +349,23 @@ class PHPUnitTask extends Task
 			if ($this->haltonfailure) {
 				$this->testfailed = true;
 			}
+		} elseif ($retcode == PHPUnitTestRunner::INCOMPLETES) {
+			if ($this->incompleteproperty) {
+				$this->project->setNewProperty($this->incompleteproperty, true);
+			}
+			
+			if ($this->haltonincomplete) {
+				$this->testfailed = true;
+			}
+		} elseif ($retcode == PHPUnitTestRunner::SKIPPED) {
+			if ($this->skippedproperty) {
+				$this->project->setNewProperty($this->skippedproperty, true);
+			}
+			
+			if ($this->haltonskipped) {
+				$this->testfailed = true;
+			}
 		}
-		
 	}
 
 	private function getDefaultOutput()
@@ -344,4 +387,4 @@ class PHPUnitTask extends Task
 		return $batchtest;
 	}
 }
-?>
+
