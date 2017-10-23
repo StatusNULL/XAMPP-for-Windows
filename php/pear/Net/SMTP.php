@@ -18,7 +18,7 @@
 // |          Damian Alejandro Fernandez Sosa <damlists@cnba.uba.ar>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: SMTP.php,v 1.64 2008/12/20 23:03:49 jon Exp $
+// $Id: SMTP.php 284052 2009-07-14 05:34:26Z jon $
 
 require_once 'PEAR.php';
 require_once 'Net/Socket.php';
@@ -92,6 +92,13 @@ class Net_SMTP
     var $_debug = false;
 
     /**
+     * Debug output handler.
+     * @var callback
+     * @access private
+     */
+    var $_debug_handler = null;
+
+    /**
      * The socket resource being used to connect to the SMTP server.
      * @var resource
      * @access private
@@ -111,6 +118,13 @@ class Net_SMTP
      * @access private
      */
     var $_arguments = array();
+
+    /**
+     * Stores the SMTP server's greeting string.
+     * @var string
+     * @access private
+     */
+    var $_greeting = null;
 
     /**
      * Stores detected features of the SMTP server.
@@ -172,9 +186,30 @@ class Net_SMTP
      * @access  public
      * @since   1.1.0
      */
-    function setDebug($debug)
+    function setDebug($debug, $handler = null)
     {
         $this->_debug = $debug;
+        $this->_debug_handler = $handler;
+    }
+
+    /**
+     * Write the given debug text to the current debug output handler.
+     *
+     * @param   string  $message    Debug mesage text.
+     *
+     * @access  private
+     * @since   1.3.3
+     */
+    function _debug($message)
+    {
+        if ($this->_debug) {
+            if ($this->_debug_handler) {
+                call_user_func_array($this->_debug_handler,
+                                     array(&$this, $message));
+            } else {
+                echo "DEBUG: $message\n";
+            }
+        }
     }
 
     /**
@@ -189,9 +224,7 @@ class Net_SMTP
      */
     function _send($data)
     {
-        if ($this->_debug) {
-            echo "DEBUG: Send: $data\n";
-        }
+        $this->_debug("Send: $data");
 
         if (PEAR::isError($error = $this->_socket->write($data))) {
             return PEAR::raiseError('Failed to write to socket: ' .
@@ -262,9 +295,7 @@ class Net_SMTP
 
         for ($i = 0; $i <= $this->_pipelined_commands; $i++) {
             while ($line = $this->_socket->readLine()) {
-                if ($this->_debug) {
-                    echo "DEBUG: Recv: $line\n";
-                }
+                $this->_debug("Recv: $line");
 
                 /* If we receive an empty line, the connection has been closed. */
                 if (empty($line)) {
@@ -320,6 +351,20 @@ class Net_SMTP
     }
 
     /**
+     * Return the SMTP server's greeting string.
+     *
+     * @return  string  A string containing the greeting string, or null if a 
+     *                  greeting has not been received.
+     *
+     * @access  public
+     * @since   1.3.3
+     */
+    function getGreeting()
+    {
+        return $this->_greeting;
+    }
+
+    /**
      * Attempt to connect to the SMTP server.
      *
      * @param   int     $timeout    The timeout value (in seconds) for the
@@ -334,6 +379,7 @@ class Net_SMTP
      */
     function connect($timeout = null, $persistent = false)
     {
+        $this->_greeting = null;
         $result = $this->_socket->connect($this->host, $this->port,
                                           $persistent, $timeout);
         if (PEAR::isError($result)) {
@@ -344,6 +390,10 @@ class Net_SMTP
         if (PEAR::isError($error = $this->_parseResponse(220))) {
             return $error;
         }
+
+        /* Extract and store a copy of the server's greeting string. */
+        list(, $this->_greeting) = $this->getResponse();
+
         if (PEAR::isError($error = $this->_negotiate())) {
             return $error;
         }
@@ -460,7 +510,14 @@ class Net_SMTP
      */
     function auth($uid, $pwd , $method = '')
     {
-        if (version_compare(PHP_VERSION, '5.1.0', '>=') && isset($this->_esmtp['STARTTLS'])) {
+        /* We can only attempt a TLS connection if we're running PHP 5.1.0 or 
+         * later, have access to the OpenSSL extension, are connected to an 
+         * SMTP server which supports the STARTTLS extension, and aren't 
+         * already connected over a secure (SSL) socket connection. */
+        $tls = version_compare(PHP_VERSION, '5.1.0', '>=') && extension_loaded('openssl') &&
+               isset($this->_esmtp['STARTTLS']) && strncasecmp($this->host, 'ssl://', 6) != 0;
+
+        if ($tls) {
             if (PEAR::isError($result = $this->_put('STARTTLS'))) {
                 return $result;
             }

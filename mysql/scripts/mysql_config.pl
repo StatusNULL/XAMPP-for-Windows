@@ -53,8 +53,8 @@ my @exclude_libs = qw/lmtmalloc static-libcxa i-static static-intel/;
 my $cwd = cwd();
 my $basedir;
 
-my $socket  = '/tmp/mysql.sock';
-my $version = '5.1.33';
+my $socket  = 'MySQL';
+my $version = '5.1.36';
 
 sub which
 {

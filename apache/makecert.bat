@@ -1,24 +1,45 @@
-@echo off
-set OPENSSL_CONF=./bin/openssl.cnf
+:: Make a selfsigend certificate with OpenSSL
+::
+:: author     Carsten Wiedmann <carsten_sttgt@gmx.de>
+:: copyright  2009 Carsten Wiedmann
+:: license    http://www.freebsd.org/copyright/freebsd-license.html FreeBSD License
+:: version    1.0
+@ECHO OFF & SETLOCAL
+PUSHD %~dp0
+CD ..
 
-if not exist .\conf\ssl.crt mkdir .\conf\ssl.crt
-if not exist .\conf\ssl.key mkdir .\conf\ssl.key
+SET "OPENSSL_CONF=%CD%\apache\bin\openssl.cnf"
+SET "OPENSSL_CONF=%OPENSSL_CONF:\=/%"
 
-bin\openssl req -new -out server.csr
-bin\openssl rsa -in privkey.pem -out server.key
-bin\openssl x509 -in server.csr -out server.crt -req -signkey server.key -days 3650
+IF NOT EXIST apache\conf\ssl.crt (
+    MKDIR apache\conf\ssl.crt
+)
+IF NOT EXIST apache\conf\ssl.csr (
+    MKDIR apache\conf\ssl.csr
+)
+IF NOT EXIST apache\conf\ssl.key (
+    MKDIR apache\conf\ssl.key
+)
 
-set OPENSSL_CONF=
-del .rnd
-del privkey.pem
-del server.csr
+apache\bin\openssl req -new -out server.csr
+apache\bin\openssl rsa -in privkey.pem -out server.key
+apache\bin\openssl x509 -in server.csr -out server.crt -req -signkey server.key -days 3650
 
-move /y server.crt .\conf\ssl.crt
-move /y server.key .\conf\ssl.key
+DEL .rnd >nul 2>&1
+DEL tmp\.rnd >nul 2>&1
+DEL .oid >nul 2>&1
+DEL tmp\.oid >nul 2>&1
+DEL privkey.pem >nul 2>&1
 
-echo.
-echo -----
-echo Das Zertifikat wurde erstellt.
-echo The certificate was provided.
-echo.
-pause
+MOVE /Y server.crt apache\conf\ssl.crt\
+MOVE /Y server.csr apache\conf\ssl.csr\
+MOVE /y server.key apache\conf\ssl.key\
+
+ECHO.
+ECHO -----
+ECHO Das Zertifikat wurde erstellt.
+ECHO The certificate was provided.
+ECHO.
+
+POPD
+PAUSE

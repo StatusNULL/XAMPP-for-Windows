@@ -1,0 +1,1 @@
+mod_perl.lib libapr-1.lib libaprutil-1.lib libhttpd.lib oldnames.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib netapi32.lib uuid.lib ws2_32.lib mpr.lib winmm.lib version.lib odbc32.lib odbccp32.lib msvcrt.lib

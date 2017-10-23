@@ -5,11 +5,11 @@
 
 # This definition stops the following lines choking if HOME isn't
 # defined.
-HOME			= .
-RANDFILE		= $ENV::HOME/.rnd
+HOME			= "/xampp"
+RANDFILE		= $HOME/tmp/.rnd
 
 # Extra OBJECT IDENTIFIER info:
-#oid_file		= $ENV::HOME/.oid
+#oid_file		= $HOME/tmp/.oid
 oid_section		= new_oids
 
 # To use this configuration file with the "-extfile" option of the
@@ -34,7 +34,7 @@ default_ca	= CA_default		# The default ca section
 ####################################################################
 [ CA_default ]
 
-dir		= ./demoCA		# Where everything is kept
+dir		= "/xampp/demoCA"		# Where everything is kept
 certs		= $dir/certs		# Where the issued certs are kept
 crl_dir		= $dir/crl		# Where the issued crl are kept
 database	= $dir/index.txt	# database index file.

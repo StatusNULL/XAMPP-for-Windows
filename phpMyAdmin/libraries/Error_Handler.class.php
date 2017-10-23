@@ -3,7 +3,8 @@
 /**
  * Holds class PMA_Error_Handler
  *
- * @version $Id: Error_Handler.class.php 12202 2009-01-20 18:04:20Z lem9 $
+ * @version $Id: Error_Handler.class.php 12298 2009-03-22 12:25:17Z lem9 $
+ * @package phpMyAdmin
  */
 
 /**
@@ -14,6 +15,7 @@ require_once './libraries/Error.class.php';
 /**
  * handling errors
  *
+ * @package phpMyAdmin
  */
 class PMA_Error_Handler
 {
@@ -57,7 +59,7 @@ class PMA_Error_Handler
             } else {
                 // remember only not displayed errors
                 foreach ($this->_errors as $key => $error) {
-                    if (! $error->isDisplayed()) {
+                    if (($error instanceof PMA_Error) && ! $error->isDisplayed()) {
                         $_SESSION['errors'][$key] = $error;
                     }
                 }

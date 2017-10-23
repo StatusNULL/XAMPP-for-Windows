@@ -68,7 +68,7 @@ class ADODB_db2 extends ADOConnection {
 		global $php_errormsg;
 		
 		if (!function_exists('db2_connect')) {
-			ADOConnection::outp("Warning: The old ODBC based DB2 driver has been renamed 'odbc_db2'. This ADOdb driver calls PHP's native db2 extension.");
+			ADOConnection::outp("Warning: The old ODBC based DB2 driver has been renamed 'odbc_db2'. This ADOdb driver calls PHP's native db2 extension which is not installed.");
 			return null;
 		}
 		// This needs to be set before the connect().
@@ -249,9 +249,9 @@ class ADODB_db2 extends ADOConnection {
 	{	
 		// if you have to modify the parameter below, your database is overloaded,
 		// or you need to implement generation of id's yourself!
-		$num = $this->GetOne("VALUES NEXTVAL FOR $seq");
+				$num = $this->GetOne("VALUES NEXTVAL FOR $seq");
 				return $num;
-			}
+	}
 
 
 	function ErrorMsg()
@@ -495,7 +495,7 @@ See http://msdn.microsoft.com/library/default.asp?url=/library/en-us/db2/htm/db2
 		}
 	}
 	
-	function MetaColumns($table)
+	function MetaColumns($table, $normalize=true)
 	{
 	global $ADODB_FETCH_MODE;
 	

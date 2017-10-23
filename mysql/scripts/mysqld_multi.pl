@@ -293,12 +293,7 @@ sub start_mysqlds()
   @groups = &find_groups($groupids);
   for ($i = 0; defined($groups[$i]); $i++)
   {
-    # Defaults are made explicit parameters to server execution...
     @options = defaults_for_group($groups[$i]);
-    # ...so server MUST NOT try to read again from some config file, especially
-    # as the "right" file may be unknown to the server if we are using
-    # --defaults-file=... params in here.
-    unshift(@options,"--no-defaults");  
 
     $mysqld_found= 1; # The default
     $mysqld_found= 0 if (!length($mysqld));
@@ -321,11 +316,11 @@ sub start_mysqlds()
 	$tmp.= " $options[$j]";
       }
     }
-    if ($opt_verbose && $com =~ m/\/safe_mysqld$/ && !$info_sent)
+    if ($opt_verbose && $com =~ m/\/(safe_mysqld|mysqld_safe)$/ && !$info_sent)
     {
-      print "WARNING: safe_mysqld is being used to start mysqld. In this case you ";
+      print "WARNING: $1 is being used to start mysqld. In this case you ";
       print "may need to pass\n\"ledir=...\" under groups [mysqldN] to ";
-      print "safe_mysqld in order to find the actual mysqld binary.\n";
+      print "$1 in order to find the actual mysqld binary.\n";
       print "ledir (library executable directory) should be the path to the ";
       print "wanted mysqld binary.\n\n";
       $info_sent= 1;
@@ -675,9 +670,9 @@ language   = C:/Program Files/MySql/MySQL Server 5.1/share/mysql/english
 user       = unix_user1
 
 [mysqld3]
-mysqld     = /path/to/safe_mysqld/safe_mysqld
+mysqld     = /path/to/mysqld_safe
 ledir      = /path/to/mysqld-binary/
-mysqladmin = /path/to/mysqladmin/mysqladmin
+mysqladmin = /path/to/mysqladmin
 socket     = /tmp/mysql.sock3
 port       = 3308
 pid-file   = C:/Program Files/MySql/MySQL Server 5.1/data3/hostname.pid3

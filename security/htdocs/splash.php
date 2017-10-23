@@ -1,10 +1,15 @@
+<?php
+    header("Content-Type: text/html; charset=iso-8859-1");
+?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 	"http://www.w3.org/TR/html4/loose.dtd">
 <html>
 	<head>
 		<meta name="author" content="Kai Oswald Seidler, Kay Vogelgesang, Carsten Wiedmann">
 		<link href="xampp.css" rel="stylesheet" type="text/css">
-		<title>XAMPP 1.5 WIN32</title>
+        <link href="img/xampp.ico" rel="shortcut icon" type="image/x-icon">
+            <?php echo trim(@file_get_contents('../../install/xampp_modell.txt')); ?>
+            <?php echo trim(@file_get_contents('../../install/xampp_version.txt')); ?>
 	</head>
 
 	<body class="white" bgcolor="#ffffff">

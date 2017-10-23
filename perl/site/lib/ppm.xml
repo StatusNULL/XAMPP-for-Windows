@@ -1,0 +1,31 @@
+
+<PPMCONFIG>
+    
+<PPMVER>2,1,9,0</PPMVER>
+    
+<PLATFORM CPU="x86" OSVALUE="MSWin32" OSVERSION="4,0,0,0" />
+    
+<OPTIONS BUILDDIR="\xampp\perl\bin\.ppm" CLEAN="1" CONFIRM="1" DOWNLOADSTATUS="16384" FORCEINSTALL="1" IGNORECASE="1" MORE="24" ROOT="" TRACE="0" TRACEFILE="PPM.LOG" VERBOSE="1" />
+    
+<REPOSITORY LOCATION="http://trouchelle.com/ppm10/" NAME="trouchelle.com" />
+<PPMPRECIOUS />
+<PACKAGE NAME="PPM">
+<LOCATION>http://trouchelle.com/ppm10/</LOCATION>
+<INSTPACKLIST>\xampp\perl\site\lib/auto/PPM/.packlist</INSTPACKLIST>
+<INSTROOT>\xampp\perl</INSTROOT>
+<INSTDATE>Fri Oct  2 16:14:32 1998</INSTDATE>
+<INSTPPD>
+<SOFTPKG NAME="PPM" VERSION="2,1,9,0">
+<TITLE>PPM</TITLE>
+<ABSTRACT>Perl Package Manager: locate, install, upgrade software packages.</ABSTRACT>
+<AUTHOR>Murray Nesbitt &lt;murray@cpan.org&gt;</AUTHOR>
+<IMPLEMENTATION>
+<CODEBASE HREF="MSWin32-x86-multi-thread-5.10/PPM-2.1.6.zip"/>
+<INSTALL />
+<UNINSTALL />
+</IMPLEMENTATION>
+</SOFTPKG>
+</INSTPPD>
+</PACKAGE>
+
+</PPMCONFIG>

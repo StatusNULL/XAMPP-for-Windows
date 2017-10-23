@@ -1,0 +1,14 @@
+\xampp\perl\bin\perldoc
+\xampp\perl\bin\perldoc.bat
+\xampp\perl\lib\Pod\xampp\perldoc.pm
+\xampp\perl\lib\Pod\xampp\perldoc\BaseTo.pm
+\xampp\perl\lib\Pod\xampp\perldoc\GetOptsOO.pm
+\xampp\perl\lib\Pod\xampp\perldoc\ToChecker.pm
+\xampp\perl\lib\Pod\xampp\perldoc\ToMan.pm
+\xampp\perl\lib\Pod\xampp\perldoc\ToNroff.pm
+\xampp\perl\lib\Pod\xampp\perldoc\ToPod.pm
+\xampp\perl\lib\Pod\xampp\perldoc\ToRtf.pm
+\xampp\perl\lib\Pod\xampp\perldoc\ToText.pm
+\xampp\perl\lib\Pod\xampp\perldoc\ToTk.pm
+\xampp\perl\lib\Pod\xampp\perldoc\ToXml.pm
+\xampp\perl\lib\xampp\perldoc.pod

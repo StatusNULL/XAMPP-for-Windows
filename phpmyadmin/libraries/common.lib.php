@@ -3,7 +3,8 @@
 /**
  * Misc functions used all over the scripts.
  *
- * @version $Id: common.lib.php 12239 2009-02-16 10:56:11Z lem9 $
+ * @version $Id: common.lib.php 12608 2009-06-30 10:48:08Z lem9 $
+ * @package phpMyAdmin
  */
 
 /**
@@ -46,7 +47,8 @@ function PMA_pow($base, $exp, $use_function = false)
 
     switch ($use_function) {
         case 'bcpow' :
-            //bcscale(10);
+            // bcscale() needed for testing PMA_pow() with base values < 1
+            bcscale(10);
             $pow = bcpow($base, $exp);
             break;
         case 'gmp_pow' :
@@ -140,7 +142,9 @@ function PMA_getIcon($icon, $alternate = '', $container = false, $force_text = f
  */
 function PMA_displayMaximumUploadSize($max_upload_size)
 {
-    list($max_size, $max_unit) = PMA_formatByteDown($max_upload_size);
+    // I have to reduce the second parameter (sensitiveness) from 6 to 4
+    // to avoid weird results like 512 kKib
+    list($max_size, $max_unit) = PMA_formatByteDown($max_upload_size, 4);
     return '(' . sprintf($GLOBALS['strMaximumSize'], $max_size, $max_unit) . ')';
 }
 
@@ -301,7 +305,7 @@ function PMA_formatSql($parsed_sql, $unparsed_sql = '')
     // well, not quite
     // first check for the SQL parser having hit an error
     if (PMA_SQP_isError()) {
-        return $parsed_sql;
+        return htmlspecialchars($parsed_sql['raw']);
     }
     // then check for an array
     if (!is_array($parsed_sql)) {
@@ -452,6 +456,9 @@ function PMA_showHint($message, $bbcode = false, $type = 'notice')
     }
 
     if (! isset($GLOBALS['footnotes'][$key])) {
+        if (empty($GLOBALS['footnotes']) || ! is_array($GLOBALS['footnotes'])) {
+            $GLOBALS['footnotes'] = array();
+        }
         $nr = count($GLOBALS['footnotes']) + 1;
         // this is the first instance of this message
         $instance = 1;
@@ -808,7 +815,8 @@ function PMA_getTableList($db, $tables = null, $limit_offset = 0, $limit_count =
             $group =& $table_groups;
             $i = 0;
             $group_name_full = '';
-            while ($i < count($parts) - 1
+            $parts_cnt = count($parts) - 1;
+            while ($i < $parts_cnt
               && $i < $GLOBALS['cfg']['LeftFrameTableLevel']) {
                 $group_name = $parts[$i] . $sep;
                 $group_name_full .= $group_name;
@@ -1600,7 +1608,7 @@ function PMA_getTab($tab, $url_params = array())
  * @uses    PMA_getTab()
  * @uses    htmlentities()
  * @param   array   $tabs   one element per tab
- * @param   array   $url_params
+ * @param   string  $url_params
  * @return  string  html-code for tab-navigation
  */
 function PMA_getTabs($tabs, $url_params)
@@ -1793,7 +1801,7 @@ function PMA_flipstring($string, $Separator = "<br />\n")
     $format_string = '';
     $charbuff = false;
 
-    for ($i = 0; $i < strlen($string); $i++) {
+    for ($i = 0, $str_len = strlen($string); $i < $str_len; $i++) {
         $char = $string{$i};
         $append = false;
 
@@ -1812,13 +1820,14 @@ function PMA_flipstring($string, $Separator = "<br />\n")
         }
 
         // do not add separator after the last character
-        if ($append && ($i != strlen($string)-1)) {
+        if ($append && ($i != $str_len - 1)) {
             $format_string .= $Separator;
         }
     }
 
     return $format_string;
 }
+
 
 /**
  * Function added to avoid path disclosures.
@@ -1940,10 +1949,10 @@ function PMA_getUniqueCondition($handle, $fields_cnt, $fields_meta, $row, $force
         //
         // But orgtable is present only with mysqli extension so the
         // fix is only for mysqli.
-        // Also, do not use the original table name if we are dealing with 
+        // Also, do not use the original table name if we are dealing with
         // a view because this view might be updatable.
         // (The isView() verification should not be costly in most cases
-        // because there is some caching in the function). 
+        // because there is some caching in the function).
         if (isset($meta->orgtable) && $meta->table != $meta->orgtable && ! PMA_Table::isView($GLOBALS['db'], $meta->table)) {
             $meta->table = $meta->orgtable;
         }
@@ -2005,7 +2014,7 @@ function PMA_getUniqueCondition($handle, $fields_cnt, $fields_meta, $row, $force
         $preferred_condition = $nonprimary_condition;
     }
 
-    return preg_replace('|\s?AND$|', '', $preferred_condition);
+    return trim(preg_replace('|\s?AND$|', '', $preferred_condition));
 } // end function
 
 /**
@@ -2395,6 +2404,10 @@ function PMA_generate_html_dropdown($select_name, $choices, $active_choice)
  */
 function PMA_generate_slider_effect($id, $message)
 {
+    if ($GLOBALS['cfg']['InitialSlidersState'] == 'disabled') {
+        echo '<div id="' . $id . '">';
+        return;
+    }
     ?>
 <script type="text/javascript">
 // <![CDATA[
@@ -2441,7 +2454,7 @@ window.addEvent('domready', function(){
     //]]>
     </script>
     <noscript>
-    <div id="<?php echo $id; ?>">
+    <div id="<?php echo $id; ?>" />
     </noscript>
     <?php
 }
@@ -2449,10 +2462,9 @@ window.addEvent('domready', function(){
 /**
  * Verifies if something is cached in the session
  *
- * @param unknown_type $var
- * @param unknown_type $val
- * @param unknown_type $server
- * @return mixed
+ * @param string $var
+ * @param scalar $server
+ * @return boolean
  */
 function PMA_cacheExists($var, $server = 0)
 {
@@ -2465,9 +2477,8 @@ function PMA_cacheExists($var, $server = 0)
 /**
  * Gets cached information from the session
  *
- * @param unknown_type $var
- * @param unknown_type $val
- * @param unknown_type $server
+ * @param string $var
+ * @param scalar $server
  * @return mixed
  */
 function PMA_cacheGet($var, $server = 0)
@@ -2485,9 +2496,9 @@ function PMA_cacheGet($var, $server = 0)
 /**
  * Caches information in the session
  *
- * @param unknown_type $var
- * @param unknown_type $val
- * @param unknown_type $server
+ * @param string $var
+ * @param mixed $val
+ * @param integer $server
  * @return mixed
  */
 function PMA_cacheSet($var, $val = null, $server = 0)
@@ -2501,9 +2512,8 @@ function PMA_cacheSet($var, $val = null, $server = 0)
 /**
  * Removes cached information from the session
  *
- * @param unknown_type $var
- * @param unknown_type $server
- * @return mixed
+ * @param string $var
+ * @param scalar $server
  */
 function PMA_cacheUnset($var, $server = 0)
 {
@@ -2529,7 +2539,7 @@ function PMA_cacheUnset($var, $server = 0)
  */
 function PMA_printable_bit_value($value, $length) {
     $printable = '';
-    for ($i = 0; $i < ceil($length / 8); $i++) {
+    for ($i = 0, $len_ceiled = ceil($length / 8); $i < $len_ceiled; $i++) {
         $printable .= sprintf('%08d', decbin(ord(substr($value, $i, 1))));
     }
     $printable = substr($printable, -$length);
@@ -2551,7 +2561,7 @@ function PMA_printable_bit_value($value, $length) {
 function PMA_extractFieldSpec($fieldspec) {
     $first_bracket_pos = strpos($fieldspec, '(');
     if ($first_bracket_pos) {
-        $spec_in_brackets = chop(substr($fieldspec, $first_bracket_pos + 1, (strpos($fieldspec, ')') - $first_bracket_pos - 1)));
+        $spec_in_brackets = chop(substr($fieldspec, $first_bracket_pos + 1, (strrpos($fieldspec, ')') - $first_bracket_pos - 1)));
         // convert to lowercase just to be sure
         $type = strtolower(chop(substr($fieldspec, 0, $first_bracket_pos)));
     } else {
@@ -2651,49 +2661,30 @@ function PMA_replace_binary_contents($content) {
 
 /**
  *
- * If the first character given is \n (CR) we will add an extra \n
+ * If the string starts with a \r\n pair (0x0d0a) add an extra \n
  *
  * @uses    strpos()
  * @return  string with the chars replaced
  */
 
 function PMA_duplicateFirstNewline($string){
-	$first_occurence = strpos($string, "\n");
-	if($first_occurence == 1){
-		$string = "\n".$string;
-	}
-	return $string;
+    $first_occurence = strpos($string, "\r\n");
+    if ($first_occurence === 0){
+        $string = "\n".$string;
+    }
+    return $string;
 }
 
 /**
  * get the action word corresponding to a script name
  * in order to display it as a title in navigation panel
  *
- * @uses    switch()
  * @uses    $GLOBALS
  * @param   string  a valid value for $cfg['LeftDefaultTabTable']
  *                  or $cfg['DefaultTabTable']
+ *                  or $cfg['DefaultTabDatabase']
  */
 function PMA_getTitleForTarget($target) {
-    switch ($target) {
-        case 'tbl_structure.php':
-            $message = 'strStructure';
-            break;
-        case 'tbl_sql.php':
-            $message = 'strSQL';
-            break;
-        case 'tbl_select.php':
-            $message = 'strSearch';
-            break;
-        case 'tbl_change.php':
-            $message = 'strInsert';
-            break;
-        case 'sql.php':
-            $message = 'strBrowse';
-            break;
-        default:
-            $message = '';
-    }
-    return $GLOBALS[$message];
+    return $GLOBALS[$GLOBALS['cfg']['DefaultTabTranslationMapping'][$target]];
 }
 ?>

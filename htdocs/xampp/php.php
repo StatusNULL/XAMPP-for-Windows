@@ -1,5 +1,5 @@
 <?php
-	echo "OK";
-	exit;
+    echo "OK";
+    exit;
 ?>
 NOK

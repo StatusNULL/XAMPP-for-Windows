@@ -3,7 +3,8 @@
 /**
  * @todo    we must handle the case if sql.php is called directly with a query
  *          that returns 0 rows - to prevent cyclic redirects or includes
- * @version $Id: sql.php 12211 2009-01-24 16:43:56Z lem9 $
+ * @version $Id: sql.php 12608 2009-06-30 10:48:08Z lem9 $
+ * @package phpMyAdmin
  */
 
 /**
@@ -310,9 +311,15 @@ if (isset($GLOBALS['show_as_php']) || !empty($GLOBALS['validatequery'])) {
                 $table = '';
             }
             $active_page = $goto;
-            $message = PMA_Message::rawError($error);
+            $message = htmlspecialchars(PMA_Message::rawError($error));
+            /**
+             * Go to target path.
+             */
             require './' . PMA_securePath($goto);
         } else {
+            /**
+             * HTML header.
+             */
             require_once './libraries/header.inc.php';
             $full_err_url = (preg_match('@^(db|tbl)_@', $err_url))
                           ? $err_url . '&amp;show_query=1&amp;sql_query=' . urlencode($sql_query)
@@ -446,6 +453,9 @@ if (isset($GLOBALS['show_as_php']) || !empty($GLOBALS['validatequery'])) {
 
     // garvin: if a table or database gets dropped, check column comments.
     if (isset($purge) && $purge == '1') {
+        /**
+         * Cleanup relations.
+         */
         require_once './libraries/relation_cleanup.lib.php';
 
         if (strlen($table) && strlen($db)) {
@@ -504,7 +514,7 @@ if (0 == $num_rows || $is_affected) {
         // the form should not have priority over
         // errors like $strEmptyResultSet
     } elseif (!empty($zero_rows) && !$is_select) {
-        $message = PMA_Message::rawSuccess($zero_rows);
+        $message = PMA_Message::rawSuccess(htmlspecialchars($zero_rows));
     } elseif (!empty($GLOBALS['show_as_php'])) {
         $message = PMA_Message::success('strShowingPhp');
     } elseif (isset($GLOBALS['show_as_php'])) {

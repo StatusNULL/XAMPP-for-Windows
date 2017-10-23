@@ -2,7 +2,8 @@
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
  *
- * @version $Id: main.php 12304 2009-03-24 12:56:58Z nijel $
+ * @version $Id: main.php 12323 2009-03-25 08:32:33Z nijel $
+ * @package phpMyAdmin
  */
 
 /**
@@ -286,11 +287,45 @@ if (! @extension_loaded('mbstring')) {
 }
 
 /**
+ * Check whether session.gc_maxlifetime limits session validity.
+ */
+$gc_time = (int)@ini_get('session.gc_maxlifetime');
+if ($gc_time < $GLOBALS['cfg']['LoginCookieValidity'] ) {
+    trigger_error(PMA_Message::decodeBB($strSessionGCWarning), E_USER_WARNING);
+}
+
+/**
  * Check if user does not have defined blowfish secret and it is being used.
  */
 if (!empty($_SESSION['auto_blowfish_secret']) &&
         empty($GLOBALS['cfg']['blowfish_secret'])) {
     trigger_error($strSecretRequired, E_USER_WARNING);
+}
+
+/**
+ * Check for existence of config directory which should not exist in
+ * production environment.
+ */
+if (file_exists('./config')) {
+    trigger_error($strConfigDirectoryWarning, E_USER_WARNING);
+}
+
+/**
+ * Check whether relations are supported.
+ */
+if ($server > 0) {
+    require_once './libraries/relation.lib.php';
+    $cfgRelation = PMA_getRelationsParam();
+    if(!$cfgRelation['allworks'] && $cfg['PmaNoRelation_DisableWarning'] == false) {
+        $message = PMA_Message::notice('strRelationNotWorking');
+        $message->addParam('<a href="' . $cfg['PmaAbsoluteUri'] . 'chk_rel.php?' . $common_url_query . '">', false);
+        $message->addParam('</a>', false);
+        /* Show error if user has configured something, notice elsewhere */
+        if (!empty($cfg['Servers'][$server]['pmadb'])) {
+            $message->isError(true);
+        }
+        $message->display();
+    } // end if
 }
 
 /**
@@ -300,10 +335,7 @@ if (!empty($_SESSION['auto_blowfish_secret']) &&
  * of strpos().
  * If no default server is set, PMA_DBI_get_client_info() is not defined yet.
  */
- /**
- * Only XAMPP: libmysql from MySQL 5.1.30 do not function with PHP 5.2.8, so no warning for older clients
- */
-/* if (function_exists('PMA_DBI_get_client_info')) {
+if (function_exists('PMA_DBI_get_client_info')) {
     $_client_info = PMA_DBI_get_client_info();
     if ($server > 0 && strpos($_client_info, 'mysqlnd') === false && substr(PMA_MYSQL_CLIENT_API, 0, 3) != substr(PMA_MYSQL_INT_VERSION, 0, 3)) {
         trigger_error(PMA_sanitize(sprintf($strMysqlLibDiffersServerVersion,
@@ -312,7 +344,7 @@ if (!empty($_SESSION['auto_blowfish_secret']) &&
             E_USER_NOTICE);
     }
     unset($_client_info);
-} */
+}
 
 /**
  * Warning about Suhosin
