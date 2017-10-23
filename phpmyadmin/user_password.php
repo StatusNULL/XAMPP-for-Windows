@@ -1,5 +1,5 @@
 <?php
-/* $Id: user_password.php,v 2.5 2004/04/21 19:12:54 lem9 Exp $ */
+/* $Id: user_password.php,v 2.8 2004/11/24 02:44:49 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -47,16 +47,18 @@ if (isset($nopass)) {
         $common_url_query = PMA_generate_common_url();
 
         $err_url          = 'user_password.php?' . $common_url_query;
+	$hashing_function = (PMA_MYSQL_INT_VERSION >= 40102 && !empty($pw_hash) && $pw_hash == 'old' ? 'OLD_' : '')
+	                  . 'PASSWORD';
 
-        $sql_query        = 'SET password = ' . (($pma_pw == '') ? '\'\'' : 'PASSWORD(\'' . preg_replace('@.@s', '*', $pma_pw) . '\')');
-        $local_query      = 'SET password = ' . (($pma_pw == '') ? '\'\'' : 'PASSWORD(\'' . PMA_sqlAddslashes($pma_pw) . '\')');
+        $sql_query        = 'SET password = ' . (($pma_pw == '') ? '\'\'' : $hashing_function . '(\'' . preg_replace('@.@s', '*', $pma_pw) . '\')');
+        $local_query      = 'SET password = ' . (($pma_pw == '') ? '\'\'' : $hashing_function . '(\'' . PMA_sqlAddslashes($pma_pw) . '\')');
         $result           = @PMA_DBI_try_query($local_query) or PMA_mysqlDie(PMA_DBI_getError(), $sql_query, FALSE, $err_url);
 
         // Changes password cookie if required
         // Duration = till the browser is closed for password (we don't want this to be saved)
         if ($cfg['Server']['auth_type'] == 'cookie') {
 
-            setcookie('pma_cookie_password',
+            setcookie('pma_cookie_password-' . $server,
                PMA_blowfish_encrypt($pma_pw,
                $GLOBALS['cfg']['blowfish_secret'] . $GLOBALS['current_time']),
                0,
@@ -95,7 +97,7 @@ echo '<h1>' . $strChangePassword . '</h1>' . "\n\n";
 
 // Displays an error message if required
 if (!empty($error_msg)) {
-    echo '<p><b>' . $strError . '&nbsp;:&nbsp;' . $error_msg . '</b></p>' . "\n";
+    echo '<p><b>' . $strError . ':&nbsp;' . $error_msg . '</b></p>' . "\n";
 }
 
 // loic1: autocomplete feature of IE kills the "onchange" event handler and it
@@ -118,15 +120,43 @@ $chg_evt_handler = (PMA_USR_BROWSER_AGENT == 'IE' && PMA_USR_BROWSER_VER >= 5)
     <tr>
         <td>
             <input type="radio" name="nopass" value="0" checked="checked " />
-            <?php echo $GLOBALS['strPassword']; ?>&nbsp;:&nbsp;
+            <?php echo $GLOBALS['strPassword']; ?>:&nbsp;
         </td>
         <td>
             <input type="password" name="pma_pw" size="10" class="textfield" <?php echo $chg_evt_handler; ?>="nopass[1].checked = true" />
             &nbsp;&nbsp;
-            <?php echo $GLOBALS['strReType']; ?>&nbsp;:&nbsp;
+            <?php echo $GLOBALS['strReType']; ?>:&nbsp;
             <input type="password" name="pma_pw2" size="10" class="textfield" <?php echo $chg_evt_handler; ?>="nopass[1].checked = true" />
         </td>
     </tr>
+    <?php
+
+if (PMA_MYSQL_INT_VERSION >= 40102) {
+    ?>
+    <tr>
+        <td>
+	    <?php echo $strPasswordHashing; ?>:
+	</td>
+	<td>
+	    <input type="radio" name="pw_hash" id="radio_pw_hash_new" value="new" checked="checked" />
+	    <label for="radio_pw_hash_new">
+	        MySQL&nbsp;4.1
+	    </label>
+	</td>
+    </tr>
+    <tr>
+        <td>&nbsp;</td>
+	<td>
+	    <input type="radio" name="pw_hash" id="radio_pw_hash_old" value="old" />
+	    <label for="radio_pw_hash_old">
+	        <?php echo $strCompatibleHashing; ?>
+	    </label>
+	</td>
+    </tr>
+    <?php
+}
+
+    ?>
     <tr>
         <td colspan="2">&nbsp;</td>
     </tr>

@@ -48,7 +48,9 @@ $TEXT['navi-english']="English";
 $TEXT['navi-german']="Deutsch";
 $TEXT['navi-french']="Francais";
 $TEXT['navi-dutch']="Nederlands";
-$TEXT['navi-spanish']="Spanish";
+$TEXT['navi-polish']="Polski";
+$TEXT['navi-spanish']="Español";
+$TEXT['navi-chinese']="&#20013;&#25991;";
 
 // ---------------------------------------------------------------------
 // STATUS
@@ -180,7 +182,7 @@ $TEXT['start-subhead']="Congratulations:<br>You successfully installed XAMPP on 
 
 $TEXT['start-text1']="Now you can start using Apache and Co. Firstly you should try »Status« on the left navigation to make sure everything works fine.";
 
-$TEXT['start-text2']="<B>Thank you to Carsten Wiedmann for his refined compilation of PHP 4.3.10 with MySQL 1.4.8 Support and his \"patched\" version of the Webalizer for win32! :-)</B>";
+$TEXT['start-text2']="<B>Thank you to Carsten Wiedmann for his refined compilations  :-)</B>";
 
 $TEXT['start-text3']="";
 

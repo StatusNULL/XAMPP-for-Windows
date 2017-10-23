@@ -1,5 +1,5 @@
 <?php
-/* $Id: display_tbl_links.lib.php,v 2.9 2004/05/16 17:32:15 rabus Exp $ */
+/* $Id: display_tbl_links.lib.php,v 2.10 2004/11/03 13:56:52 garvinhicking Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 // modified 2004-05-08 by Michael Keck <mail_at_michaelkeck_dot_de>
@@ -44,7 +44,7 @@ if ( $doWriteModifyAt == 'left' ){
         echo '    <td width="16" align="center" valign="top" bgcolor="' . $bgcolor . '">' . "\n"
            . '        <input type="checkbox" id="id_rows_to_delete' . $row_no . 'r" name="rows_to_delete[' . $uva_condition . ']"'
            . ' onclick="copyCheckboxesRange(\'rowsDeleteForm\', \'id_rows_to_delete' . $row_no . '\',\'r\');"'
-											. ' value="' . $del_query . '" ' . (isset($GLOBALS['checkall']) ? 'checked="checked"' : '') . ' />' . "\n"
+           . ' value="' . $del_query . '" ' . (isset($GLOBALS['checkall']) ? 'checked="checked"' : '') . ' />' . "\n"
            . '    </td>' . "\n";
     }
 }

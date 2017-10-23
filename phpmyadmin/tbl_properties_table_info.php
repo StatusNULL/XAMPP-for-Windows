@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_properties_table_info.php,v 2.8 2004/06/02 13:31:04 rabus Exp $ */
+/* $Id: tbl_properties_table_info.php,v 2.9 2004/10/21 10:18:12 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 // this should be recoded as functions, to avoid messing with global
@@ -36,26 +36,4 @@ for ($i = 0; $i < $tmp_cnt; $i++) {
 } // end for
 unset($tmp1, $tmp);
 PMA_DBI_free_result($table_info_result);
-
-
-/**
- * Displays top menu links
- */
-echo '<!-- top menu -->' . "\n";
-require('./tbl_properties_links.php');
-
-
-/**
- * Displays table comment
- */
-if (!empty($show_comment) && !isset($avoid_show_comment)) {
-    ?>
-<!-- Table comment -->
-<p><i>
-    <?php echo htmlspecialchars($show_comment) . "\n"; ?>
-</i></p>
-    <?php
-} // end if
-
-echo "\n\n";
 ?>

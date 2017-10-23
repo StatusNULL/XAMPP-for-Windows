@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_details_links.php,v 2.9 2004/08/12 15:13:18 nijel Exp $ */
+/* $Id: db_details_links.php,v 2.12 2004/10/21 10:18:12 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -63,7 +63,7 @@ else {
 if ($cfg['LightTabs']) {
     echo '&nbsp;';
 } else {
-    echo '<table border="0" cellspacing="0" cellpadding="0" width="100%">' . "\n"
+    echo '<table border="0" cellspacing="0" cellpadding="0" width="100%" id="topmenu">' . "\n"
        . '    <tr>' . "\n"
        . '        <td class="nav" align="left" nowrap="nowrap" valign="bottom">'
        . '            <table border="0" cellpadding="0" cellspacing="0"><tr>'
@@ -76,6 +76,7 @@ echo PMA_printTab(($GLOBALS['cfg']['MainPageIconic'] ? '<img src="' . $GLOBALS['
 echo PMA_printTab(($GLOBALS['cfg']['MainPageIconic'] ? '<img src="' . $GLOBALS['pmaThemeImage'] . 'b_export.png" width="16" height="16" border="0" hspace="2" align="middle" alt="'.$strExport.'" />' : '') . $strExport, $lnk3, $arg3);
 echo PMA_printTab(($GLOBALS['cfg']['MainPageIconic'] ? '<img src="' . $GLOBALS['pmaThemeImage'] . 'b_search.png" width="16" height="16" border="0" hspace="2" align="middle" alt="'.$strSearch.'" />' : '') . $strSearch, $lnk4, $arg4);
 echo PMA_printTab(($GLOBALS['cfg']['MainPageIconic'] ? '<img src="' . $GLOBALS['pmaThemeImage'] . 's_db.png" width="16" height="16" border="0" hspace="2" align="middle" alt="'.$strQBE.'" />' : '') . $strQBE, ($num_tables > 0) ? 'db_details_qbe.php' : '', $url_query);
+echo PMA_printTab(($GLOBALS['cfg']['MainPageIconic'] ? '<img src="' . $GLOBALS['pmaThemeImage'] . 'b_tblops.png" width="16" height="16" border="0" hspace="2" align="middle" alt="'.$strOperations.'" />' : '') . $strOperations,'db_operations.php', $url_query);
 
 // Displays drop link
 if ($lnk5) {
@@ -91,6 +92,14 @@ if (!$cfg['LightTabs']) {
        . '</table>';
 } else {
     echo '<br />';
+}
+
+/**
+ * Displays a message
+ */
+if (!empty($message)) {
+    PMA_showMessage($message);
+    unset($message);
 }
 ?>
 <br />

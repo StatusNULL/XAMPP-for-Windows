@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_details_qbe.php,v 2.11 2004/07/08 14:41:07 lem9 Exp $ */
+/* $Id: db_details_qbe.php,v 2.13 2004/10/20 12:35:33 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -395,7 +395,7 @@ for ($y = 0; $y <= $row; $y++) {
                     <input type="checkbox" name="InsRow[<?php echo $w; ?>]" />
                 </td>
                 <td align="<?php echo $cell_align_right; ?>">
-                    <b><?php echo $strAnd; ?>&nbsp;:</b>
+                    <b><?php echo $strAnd; ?>:</b>
                 </td>
                 <td>
                     <input type="radio" name="AndOrRow[<?php echo $w; ?>]" value="and"<?php echo $chk['and']; ?> />
@@ -629,7 +629,7 @@ for ($x = 0; $x < $col; $x++) {
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
-                </select>           
+                </select>
         </td>
         <td width="10">&nbsp;</td>
         <td nowrap="nowrap"><?php echo $strAddDeleteColumn; ?>:
@@ -952,12 +952,12 @@ if (isset($Field) && count($Field) > 0) {
             if ($run > 5) {
 
                 foreach ($tab_left AS $tab) {
-                    $emerg    .= ', ' . $tab;
+                    $emerg    .= ', ' . PMA_backquote($tab);
                     $tab_left = PMA_arrayShort($tab_left, $tab);
                 }
             }
         } // end while
-        $qry_from = $master . $emerg . $fromclause;
+        $qry_from = PMA_backquote($master) . $emerg . $fromclause;
     } // end if ($cfgRelation['relwork'] && count($tab_all) > 0)
 
 } // end count($Field) > 0
@@ -1061,7 +1061,7 @@ if (!empty($qry_orderby)) {
         <!-- Execute a query -->
         <td align="right" class="tblHeaders"><input type="submit" name="submit_sql" value="<?php echo $strRunQuery; ?>" /></td>
     </tr>
-</table>   
+</table>
 </form>
 <?php
 /**

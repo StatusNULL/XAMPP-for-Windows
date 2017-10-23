@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_select.php,v 2.21.2.1 2004/10/13 11:37:24 rabus Exp $ */
+/* $Id: tbl_select.php,v 2.25 2004/11/03 13:56:52 garvinhicking Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -38,7 +38,16 @@ if (!isset($param) || $param[0] == '') {
     require('./tbl_properties_common.php');
     //$err_url   = 'tbl_select.php' . $err_url;
     $url_query .= '&amp;goto=tbl_select.php&amp;back=tbl_select.php';
+
+    /**
+     * Gets tables informations
+     */
     require('./tbl_properties_table_info.php');
+
+    /**
+     * Displays top menu links
+     */
+    require('./tbl_properties_links.php');
 
     if (!isset($goto)) {
         $goto = $cfg['DefaultTabTable'];
@@ -128,7 +137,7 @@ function PMA_tbl_select_operator(f, index, multiple) {
                             </select>
                         </td>
                         <td valign="bottom" bgcolor="<?php echo $cfg['BgcolorOne']; ?>">
-                            <input type="checkbox" name="distinct" value="DISTINCT" id="oDistinct" /> <label for="oDistinct">DISTINCT</label>
+                            <input type="checkbox" name="distinct" value="DISTINCT" id="oDistinct" /><label for="oDistinct">DISTINCT</label>
                         </td>
                     </tr>
                 </table>
@@ -166,10 +175,8 @@ function PMA_tbl_select_operator(f, index, multiple) {
     } // end for
     ?>
                             </select><br />
-                            <input type="radio" name="order" value="ASC" checked="checked" id="sortASC" />
-                            <label for="sortASC"><?php echo $strAscending; ?></label><br />
-                            <input type="radio" name="order" value="DESC" id="sortDESC" />
-                            <label for="sortDESC"><?php echo $strDescending; ?></label>
+                            <input type="radio" name="order" value="ASC" checked="checked" id="sortASC" /><label for="sortASC"><?php echo $strAscending; ?></label><br />
+                            <input type="radio" name="order" value="DESC" id="sortDESC" /><label for="sortDESC"><?php echo $strDescending; ?></label>
                         </td>
                     </tr>
                 </table>
@@ -296,7 +303,7 @@ function PMA_tbl_select_operator(f, index, multiple) {
         ?>
                     <input type="hidden" name="names[<?php echo $i; ?>]" value="<?php echo htmlspecialchars($fields_list[$i]); ?>" />
                     <input type="hidden" name="types[<?php echo $i; ?>]" value="<?php echo $fields_type[$i]; ?>" />
-		    <input type="hidden" name="collations[<?php echo $i; ?>]" value="<?php echo $fields_collation[$i]; ?>" />
+                    <input type="hidden" name="collations[<?php echo $i; ?>]" value="<?php echo $fields_collation[$i]; ?>" />
                 </td>
             </tr>
         <?php
@@ -352,9 +359,9 @@ else {
         $cnt_func = count($func);
         reset($func);
         while (list($i, $func_type) = each($func)) {
-	    if (PMA_MYSQL_INT_VERSION >= 40100) {
-	        list($charsets[$i]) = explode('_', $collations[$i]);
-	    }
+            if (PMA_MYSQL_INT_VERSION >= 40100) {
+                list($charsets[$i]) = explode('_', $collations[$i]);
+            }
             if (@$GLOBALS['cfg']['UnaryOperators'][$func_type] == 1) {
                 $fields[$i] = '';
                 $w[] = PMA_backquote(urldecode($names[$i])) . ' ' . $func_type;

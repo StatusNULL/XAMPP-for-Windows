@@ -71,26 +71,27 @@ me=`get_full_path $0`
 
 basedir=`echo $me | sed -e 's;/bin/mysql_config;;'`
 
-ldata='/usr/local/mysql/var'
-execdir='/usr/local/mysql/libexec'
-bindir='/usr/local/mysql/bin'
-pkglibdir='/usr/local/mysql/lib/mysql'
+ldata='/usr/local/var'
+execdir='/usr/local/libexec'
+bindir='/usr/local/bin'
+pkglibdir='/usr/local/lib/mysql'
 fix_path pkglibdir lib/mysql lib
-pkgincludedir='/usr/local/mysql/include/mysql'
+pkgincludedir='/usr/local/include/mysql'
 fix_path pkgincludedir include/mysql include
-version='4.1.8'
+version='4.1.10'
 socket='/tmp/mysql.sock'
 port='3306'
 ldflags=''
-client_libs='-lcrypt -lnsl -lm  -lz -L/usr/lib -lssl -lcrypto '
 
 # Create options
 
-libs="$ldflags -L$pkglibdir -lmysqlclient $client_libs"
+libs="$ldflags -L$pkglibdir -lmysqlclient -lz -lcrypt -lnsl -lm "
+libs="$libs  "
 libs=`echo "$libs" | sed -e 's;  \+; ;g' | sed -e 's;^ *;;' | sed -e 's; *\$;;'`
-libs_r="$ldflags -L$pkglibdir -lmysqlclient_r -lpthread -lcrypt -lnsl -lm  -lpthread  -L/usr/lib -lssl -lcrypto"
+
+libs_r="$ldflags -L$pkglibdir -lmysqlclient_r -lz -lpthread -lcrypt -lnsl -lm  -lpthread  "
 libs_r=`echo "$libs_r" | sed -e 's;  \+; ;g' | sed -e 's;^ *;;' | sed -e 's; *\$;;'`
-cflags="-I$pkgincludedir -Wimplicit -Wreturn-type -Wswitch -Wtrigraphs -Wcomment -W -Wchar-subscripts -Wformat -Wparentheses -Wsign-compare -Wwrite-strings -Wunused -mcpu=pentiumpro -O3 -fno-omit-frame-pointer -g " #note: end space!
+cflags="-I$pkgincludedir  " #note: end space!
 include="-I$pkgincludedir"
 embedded_libs="$ldflags -L$pkglibdir -lmysqld -lpthread -lcrypt -lnsl -lm  -lpthread   -lrt $client_libs"
 embedded_libs=`echo "$embedded_libs" | sed -e 's;  \+; ;g' | sed -e 's;^ *;;' | sed -e 's; *\$;;'`
@@ -100,7 +101,9 @@ for remove in DDBUG_OFF DSAFEMALLOC USAFEMALLOC DSAFE_MUTEX \
               DPEDANTIC_SAFEMALLOC DUNIV_MUST_NOT_INLINE DFORCE_INIT_OF_VARS \
               DEXTRA_DEBUG DHAVE_purify 'O[0-9]' 'W[-A-Za-z]*'
 do
-  cflags=`echo "$cflags"|sed -e "s/-$remove  *//g"` 
+  # The first option we might strip will always have a space before it because
+  # we set -I$pkgincludedir as the first option
+  cflags=`echo "$cflags"|sed -e "s/ -$remove  */ /g"` 
 done
 cflags=`echo "$cflags"|sed -e 's/ *\$//'` 
 

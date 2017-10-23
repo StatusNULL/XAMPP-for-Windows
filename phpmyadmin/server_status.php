@@ -1,5 +1,5 @@
 <?php
-/* $Id: server_status.php,v 2.10 2004/08/12 15:13:19 nijel Exp $ */
+/* $Id: server_status.php,v 2.11 2004/10/19 14:25:57 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -268,7 +268,7 @@ if (!empty($serverStatus)) {
     </li>
 <?php
 }
-$res = PMA_DBI_query('SHOW VARIABLES LIKE "have_innodb";');
+$res = PMA_DBI_query('SHOW VARIABLES LIKE \'have_innodb\';');
 if ($res) {
     $row = PMA_DBI_fetch_row($res);
     if (!empty($row[1]) && $row[1] == 'YES') {

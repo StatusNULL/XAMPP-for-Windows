@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_properties_export.php,v 2.8 2004/07/15 15:17:16 nijel Exp $ */
+/* $Id: tbl_properties_export.php,v 2.9 2004/10/21 10:18:12 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -96,9 +96,13 @@ if (isset($sql_query)) {
             }
         }
     }
-    // TODO: can we avoid reparsing the query here?
-    PMA_showMessage($GLOBALS['strSQLQuery']);
+    $message = $GLOBALS['strSuccess'];
 }
+
+/**
+ * Displays top menu links
+ */
+require('./tbl_properties_links.php');
 
 $export_type = 'table';
 require_once('./libraries/display_export.lib.php');

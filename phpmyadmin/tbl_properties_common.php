@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_properties_common.php,v 2.2 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: tbl_properties_common.php,v 2.3 2004/10/21 10:18:12 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -29,13 +29,8 @@ require_once('./libraries/db_table_exists.lib.php');
 /**
  * Displays headers
  */
-if (!isset($message)) {
-    $js_to_run = 'functions.js';
-    require_once('./header.inc.php');
-} else {
-    PMA_showMessage($message);
-    unset($message);
-}
+$js_to_run = 'functions.js';
+require_once('./header.inc.php');
 
 
 /**

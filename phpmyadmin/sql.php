@@ -1,5 +1,5 @@
 <?php
-/* $Id: sql.php,v 2.32.2.2 2004/11/10 00:41:46 lem9 Exp $ */
+/* $Id: sql.php,v 2.44 2005/01/01 21:36:48 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -7,7 +7,7 @@
  */
 require_once('./libraries/grab_globals.lib.php');
 require_once('./libraries/common.lib.php');
-
+require_once('./libraries/tbl_indexes.lib.php');
 
 /**
  * Defines the url to return to in case of error in a sql statement
@@ -139,13 +139,17 @@ if ($is_select) {
     else {
         $db = $prev_db;
     }
-    $reload  = ($db == $prev_db) ? 0 : 1;
+    // Nijel don't change reload, if we already decided to reload in read_dump
+    if (!isset($reload) || $reload == 0) {
+        $reload  = ($db == $prev_db) ? 0 : 1;
+    }
 }
 
 /**
  * Sets or modifies the $goto variable if required
  */
 if ($goto == 'sql.php') {
+    $is_gotofile = FALSE;
     $goto = 'sql.php?'
           . PMA_generate_common_url($db, $table)
           . '&amp;pos=' . $pos
@@ -207,7 +211,7 @@ if ($do_confirm) {
         if($cfg['ErrorIconic']){
             echo '        <img src="' .$pmaThemeImage .'s_warn.png" border="0" hspace="2" vspace="2" align="left" />';
         }
-        echo $strDropDatabaseStrongWarning . '&nbsp;<br />' . "\n"; 
+        echo $strDropDatabaseStrongWarning . '&nbsp;<br />' . "\n";
     } else {
         echo '    <tr>' . "\n"
            . '        <td class="tblHeadError">' . "\n";
@@ -312,6 +316,7 @@ else {
         && (!$cfg['ShowAll'] || $session_max_rows != 'all')
         && !($is_count || $is_export || $is_func || $is_analyse)
         && isset($analyzed_sql[0]['queryflags']['select_from'])
+        && !isset($analyzed_sql[0]['queryflags']['offset'])
         && !preg_match('@[[:space:]]LIMIT[[:space:]0-9,-]+$@i', $sql_query)) {
         $sql_limit_to_append = " LIMIT $pos, ".$cfg['MaxRows'];
         if (preg_match('@(.*)([[:space:]](PROCEDURE[[:space:]](.*)|FOR[[:space:]]+UPDATE|LOCK[[:space:]]+IN[[:space:]]+SHARE[[:space:]]+MODE))$@i', $sql_query, $regs)) {
@@ -390,7 +395,7 @@ else {
 
         // Checks if the current database has changed
         // This could happen if the user sends a query like "USE `database`;"
-        $res = PMA_DBI_query('SELECT DATABASE() AS "db";');
+        $res = PMA_DBI_query('SELECT DATABASE() AS \'db\';');
         $row = PMA_DBI_fetch_row($res);
         if (is_array($row) && isset($row[0]) && (strcasecmp($db,$row[0]) != 0)) {
             $db     = $row[0];
@@ -436,13 +441,20 @@ else {
                 } else { // n o t   " j u s t   b r o w s i n g "
 
                     if (PMA_MYSQL_INT_VERSION < 40000) {
-                        // TODO: detect DISTINCT in the parser
-                        if (stristr($sql_query, 'DISTINCT')) {
-                            $count_what = 'DISTINCT ' . $analyzed_sql[0]['select_expr_clause'];
-                        } else {
-                            $count_what = '*';
-                        }
 
+                        // detect this case:
+                        // SELECT DISTINCT x AS foo, y AS bar FROM sometable
+
+                        if (isset($analyzed_sql[0]['queryflags']['distinct'])) {
+                            $count_what = 'DISTINCT ';
+                            $first_expr = TRUE;
+                            foreach($analyzed_sql[0]['select_expr'] as $part) {
+                                $count_what .= (!$first_expr ? ', ' : '') . $part['expr'];
+                                $first_expr = FALSE;
+                            }
+                         } else {
+                             $count_what = '*';
+                         }
                         $count_query = 'SELECT COUNT(' . $count_what . ') AS count';
                     }
 
@@ -466,7 +478,6 @@ else {
                             // (SELECT
                             $count_query = PMA_SQP_formatHtml($parsed_sql, 'query_only', 0, $analyzed_sql[0]['position_of_first_select'] + 1);
                             $count_query .= ' SQL_CALC_FOUND_ROWS ';
-
                             // add everything that was after the first SELECT
                             $count_query .= PMA_SQP_formatHtml($parsed_sql, 'query_only', $analyzed_sql[0]['position_of_first_select']+1);
                     } else { // PMA_MYSQL_INT_VERSION < 40000
@@ -520,14 +531,14 @@ else {
                     } else {
                         PMA_DBI_try_query($count_query);
                         // if (mysql_error()) {
-                        // void. 
+                        // void.
                         // I tried the case
                         // (SELECT `User`, `Host`, `Db`, `Select_priv` FROM `db`)
                         // UNION (SELECT `User`, `Host`, "%" AS "Db",
                         // `Select_priv`
                         // FROM `user`) ORDER BY `User`, `Host`, `Db`;
                         // and although the generated count_query is wrong
-                        // the SELECT FOUND_ROWS() work! (maybe it gets the 
+                        // the SELECT FOUND_ROWS() work! (maybe it gets the
                         // count from the latest query that worked)
                         //
                         // another case where the count_query is wrong:
@@ -660,6 +671,7 @@ else {
                 require('./tbl_properties_common.php');
                 $url_query .= '&amp;goto=tbl_properties.php&amp;back=tbl_properties.php';
                 require('./tbl_properties_table_info.php');
+                require('./tbl_properties_links.php');
             }
             else {
                 require('./db_details_common.php');
@@ -697,6 +709,29 @@ else {
 
         PMA_displayTable($result, $disp_mode, $analyzed_sql);
         PMA_DBI_free_result($result);
+
+        // BEGIN INDEX CHECK See if indexes should be checked.
+        if (isset($query_type) && $query_type == 'check_tbl' && isset($selected) && is_array($selected)) {
+            foreach($selected AS $idx => $tbl_name) {
+                $indexes        = $indexes_info = $indexes_data = array();
+                $tbl_ret_keys   = PMA_get_indexes(urldecode($tbl_name), $err_url_0);
+
+                PMA_extract_indexes($tbl_ret_keys, $indexes, $indexes_info, $indexes_data);
+
+                $idx_collection = PMA_show_indexes(urldecode($tbl_name), $indexes, $indexes_info, $indexes_data, false);
+                $check          = PMA_check_indexes($idx_collection);
+                if (!empty($check)) {
+                ?>
+<table border="0" cellpadding="2" cellspacing="0">
+    <tr>
+        <td class="tblHeaders" colspan="7"><?php printf($strIndexWarningTable, urldecode($tbl_name)); ?></td>
+    </tr>
+    <?php echo $check; ?>
+</table>
+                <?php
+                }
+            }
+        } // End INDEX CHECK
 
         if ($disp_mode[6] == '1' || $disp_mode[9] == '1') {
             echo "\n";
@@ -743,7 +778,7 @@ else {
                 echo '    <!-- Print view -->' . "\n"
                    . '    <a href="sql.php' . $url_query
                    . ((isset($dontlimitchars) && $dontlimitchars == '1') ? '&amp;dontlimitchars=1' : '')
-                   . '" target="print_view">' 
+                   . '" target="print_view">'
                    . ($cfg['PropertiesIconic'] ? '<img src="' . $pmaThemeImage . 'b_print.png" border="0" height="16" width="16" align="middle" hspace="2" alt="' . $strPrintView . '"/>' : '')
                    . $strPrintView . '</a>' . "\n";
                 if (!$dontlimitchars) {
@@ -763,7 +798,7 @@ else {
         // (the url_query has extra parameters that won't be used to export)
         // (the single_table parameter is used in display_export.lib.php
         //  to hide the SQL and the structure export dialogs)
-        if ($analyzed_sql[0]['querytype'] == 'SELECT' && !isset($printview)) {
+        if (isset($analyzed_sql[0]) && $analyzed_sql[0]['querytype'] == 'SELECT' && !isset($printview)) {
             if (isset($analyzed_sql[0]['table_ref'][0]['table_true_name']) && !isset($analyzed_sql[0]['table_ref'][1]['table_true_name'])) {
                 $single_table   = '&amp;single_table=true';
             } else {
@@ -773,7 +808,7 @@ else {
                    . '    &nbsp;&nbsp;<a href="tbl_properties_export.php' . $url_query
                    . '&amp;unlim_num_rows=' . $unlim_num_rows
                    . $single_table
-                   . '">' 
+                   . '">'
                    . ($cfg['PropertiesIconic'] ? '<img src="' . $pmaThemeImage . 'b_tblexport.png" border="0" height="16" width="16" align="middle" hspace="2" alt="' . $strExport . '" />' : '')
                    . $strExport . '</a>' . "\n";
         }

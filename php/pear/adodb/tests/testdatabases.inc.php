@@ -1,7 +1,7 @@
 <?php
   
 /*
-V4.54 5 Nov 2004  (c) 2000-2004 John Lim (jlim@natsoft.com.my). All rights reserved.
+V4.60 24 Jan 2005  (c) 2000-2005 John Lim (jlim@natsoft.com.my). All rights reserved.
   Released under both BSD license and Lesser GPL library license. 
   Whenever there is any discrepancy between the two licenses, 
   the BSD license will take precedence.
@@ -156,10 +156,10 @@ if (!empty($testvfp)) { // ODBC
 if (!empty($testmysql)) { // MYSQL
 
 
-	if (PHP_VERSION >= 5 || $HTTP_SERVER_VARS['HTTP_HOST'] == 'localhost') $server = 'localhost';
+	if (PHP_VERSION >= 5 || $_SERVER['HTTP_HOST'] == 'localhost') $server = 'localhost';
 	else $server = "mangrove";
 	$user = 'root'; $password = ''; $database = 'northwind';
-	$db = &ADONewConnection("mysql://$user:$password@$server/$database?persist");
+	$db = &ADONewConnection("mysqlt://$user:$password@$server/$database?persist");
 	print "<h1>Connecting $db->databaseType...</h1>";
 	
 	if (true || $db->PConnect($server, "root", "", "northwind")) {

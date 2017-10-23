@@ -8,6 +8,9 @@ Note: The Reverse DNS feature may be enabled or disabled at compile
       time.  It is enabled by using the -DUSE_DNS compiler switch, or
       by specifing '--enable-dns' when "configure' is run.  DNS lookups
       are disabled by default.
+      
+Another Note: DNS lookups will not work under Windows yet, see the
+      README.WIN file for more information.
 
 
 How it works

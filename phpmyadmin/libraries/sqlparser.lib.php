@@ -1,5 +1,5 @@
 <?php
-/* $Id: sqlparser.lib.php,v 2.23.2.1 2004/11/10 00:40:48 lem9 Exp $ */
+/* $Id: sqlparser.lib.php,v 2.27 2004/11/05 00:41:55 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /** SQL Parser Functions for phpMyAdmin
@@ -149,7 +149,7 @@ if ($is_minimum_common == FALSE) {
     {
         global $SQP_errorString;
         $debugstr = 'ERROR: ' . $message . "\n";
-        $debugstr .= 'CVS: $Id: sqlparser.lib.php,v 2.23.2.1 2004/11/10 00:40:48 lem9 Exp $' . "\n";
+        $debugstr .= 'CVS: $Id: sqlparser.lib.php,v 2.27 2004/11/05 00:41:55 lem9 Exp $' . "\n";
         $debugstr .= 'MySQL: '.PMA_MYSQL_STR_VERSION . "\n";
         $debugstr .= 'USR OS, AGENT, VER: ' . PMA_USR_OS . ' ' . PMA_USR_BROWSER_AGENT . ' ' . PMA_USR_BROWSER_VER . "\n";
         $debugstr .= 'PMA: ' . PMA_VERSION . "\n";
@@ -698,6 +698,7 @@ if ($is_minimum_common == FALSE) {
             'having_clause'  => '',
             'where_clause'   => '',
             'where_clause_identifiers'   => array(),
+            'unsorted_query' => '',
             'queryflags'     => array(),
             'select_expr'    => array(),
             'table_ref'      => array(),
@@ -750,9 +751,11 @@ if ($is_minimum_common == FALSE) {
  * Currently, those are generated:
  *
  * ['queryflags']['need_confirm'] = 1; if the query needs confirmation
- * ['queryflags']['select_from'] = 1; if this is a real SELECT...FROM
- * ['queryflags']['distinct'] = 1;    for a DISTINCT
- * ['queryflags']['union'] = 1;       for a UNION
+ * ['queryflags']['select_from'] = 1;  if this is a real SELECT...FROM
+ * ['queryflags']['distinct'] = 1;     for a DISTINCT
+ * ['queryflags']['union'] = 1;        for a UNION
+ * ['queryflags']['join'] = 1;         for a JOIN
+ * ['queryflags']['offset'] = 1;       for the presence of OFFSET 
  *
  * lem9:  query clauses
  *        -------------
@@ -765,8 +768,11 @@ if ($is_minimum_common == FALSE) {
  * ['having_clause']
  * ['where_clause']
  *
- * and the identifiers of the where clause are put into the array
+ * The identifiers of the WHERE clause are put into the array
  * ['where_clause_identifier']
+ *
+ * For a SELECT, the whole query without the ORDER BY clause is put into
+ * ['unsorted_query']
  *
  * lem9:   foreign keys
  *         ------------
@@ -781,6 +787,8 @@ if ($is_minimum_common == FALSE) {
  *
  * The array index of the first SELECT we find. Will be used to
  * insert a SQL_CALC_FOUND_ROWS.
+ *
+ * End of description of analyzer results
  */
 
         // must be sorted
@@ -1199,7 +1207,7 @@ if ($is_minimum_common == FALSE) {
         // -------------------------------------------------------
         // This is a big hunk of debugging code by Marc for this.
         // -------------------------------------------------------
-        /* 
+        /*
           if (isset($current_select_expr)) {
            for ($trace=0; $trace<=$current_select_expr; $trace++) {
                echo "<br />";
@@ -1219,7 +1227,7 @@ if ($is_minimum_common == FALSE) {
                echo "table ref $trace $key => $val<br />\n";
                }
           }
-        */ 
+        */
         // -------------------------------------------------------
 
 
@@ -1235,13 +1243,14 @@ if ($is_minimum_common == FALSE) {
         $seen_reserved_word = FALSE;
         $seen_group = FALSE;
         $seen_order = FALSE;
-        $in_group_by = FALSE; // true when we are into the GROUP BY clause
-        $in_order_by = FALSE; // true when we are into the ORDER BY clause
-        $in_having = FALSE; // true when we are into the HAVING clause
-        $in_select_expr = FALSE; // true when we are into the select expr clause
-        $in_where = FALSE; // true when we are into the WHERE clause
+        $in_group_by = FALSE; // true when we are inside the GROUP BY clause
+        $in_order_by = FALSE; // true when we are inside the ORDER BY clause
+        $in_having = FALSE; // true when we are inside the HAVING clause
+        $in_select_expr = FALSE; // true when we are inside the select expr clause
+        $in_where = FALSE; // true when we are inside the WHERE clause
         $in_from = FALSE;
         $in_group_concat = FALSE;
+        $unsorted_query = '';
 
         for ($i = 0; $i < $size; $i++) {
 //DEBUG echo "trace loop2 <b>"  . $arr[$i]['data'] . "</b> (" . $arr[$i]['type'] . ")<br />";
@@ -1295,6 +1304,14 @@ if ($is_minimum_common == FALSE) {
 
                if ($upper_data == 'UNION') {
                       $subresult['queryflags']['union'] = 1;
+               }
+
+               if ($upper_data == 'JOIN') {
+                      $subresult['queryflags']['join'] = 1;
+               }
+
+               if ($upper_data == 'OFFSET') {
+                      $subresult['queryflags']['offset'] = 1;
                }
 
                // if this is a real SELECT...FROM
@@ -1380,7 +1397,7 @@ if ($is_minimum_common == FALSE) {
 
 
            // do not add a blank after a function name
-           // TODO: can we combine loop 2 and loop 1? 
+           // TODO: can we combine loop 2 and loop 1?
            // some code is repeated here...
 
            $sep=' ';
@@ -1429,6 +1446,13 @@ if ($is_minimum_common == FALSE) {
                 || ($arr[$i]['type'] == 'alpha_identifier')) {
                    $where_clause_identifiers[] = $arr[$i]['data'];
                }
+           }
+
+           // FIXME: is it correct to always add $sep ?
+           if (isset($subresult['queryflags']['select_from'])
+             && $subresult['queryflags']['select_from'] == 1
+             && !$seen_order) {
+               $unsorted_query .= $arr[$i]['data'] . $sep;
            }
 
            // clear $upper_data for next iteration
@@ -1549,14 +1573,14 @@ if ($is_minimum_common == FALSE) {
                         $foreign[$foreign_key_number]['ref_index_list'][] = $identifier;
                     } else {
                         // for MySQL 4.0.18, identifier is
-                        // `table` or `db`.`table` 
+                        // `table` or `db`.`table`
                         // first pass will pick the db name
                         // next pass will execute the else and pick the
                         // db name in $db_table[0]
                         if ($arr[$i+1]['type'] == 'punct_qualifier') {
                                 $foreign[$foreign_key_number]['ref_db_name'] = $identifier;
                         } else {
-                        // for MySQL 4.0.16, identifier is 
+                        // for MySQL 4.0.16, identifier is
                         // `table` or `db.table`
                             $db_table = explode('.',$identifier);
                             if (isset($db_table[1])) {
@@ -1565,7 +1589,7 @@ if ($is_minimum_common == FALSE) {
                             } else {
                                 $foreign[$foreign_key_number]['ref_table_name'] = $db_table[0];
                             }
-                        }    
+                        }
                     }
                 }
             }
@@ -1593,6 +1617,9 @@ if ($is_minimum_common == FALSE) {
         }
         if (isset($where_clause)) {
             $subresult['where_clause'] = $where_clause;
+        }
+        if (isset($unsorted_query) && !empty($unsorted_query)) {
+            $subresult['unsorted_query'] = $unsorted_query;
         }
         if (isset($where_clause_identifiers)) {
             $subresult['where_clause_identifiers'] = $where_clause_identifiers;
@@ -1653,13 +1680,13 @@ if ($is_minimum_common == FALSE) {
     function PMA_SQP_formatHtml($arr, $mode='color', $start_token=0,
         $number_of_tokens=-1)
     {
-        // first check for the SQL parser having hit an error
-        if (PMA_SQP_isError()) {
-            return $arr;
-        }
         // then check for an array
         if (!is_array($arr)) {
-            return $arr;
+            return htmlspecialchars($arr);
+        }
+        // first check for the SQL parser having hit an error
+        if (PMA_SQP_isError()) {
+            return htmlspecialchars($arr['raw']);
         }
         // else do it properly
         switch ($mode) {
@@ -1898,12 +1925,12 @@ if ($is_minimum_common == FALSE) {
                             // GRANT SELECT ON mydb.mytable TO myuser@localhost
                             // (else, we get mydb.mytableTO )
                             //
-                            // the quote_single exception is there to 
+                            // the quote_single exception is there to
                             // catch cases like
                             // GRANT ... TO 'marc'@'domain.com' IDENTIFIED...
                             //
                             // TODO: fix all cases and find why this happens
- 
+
                             if (!$in_priv_list || $typearr[1] == 'alpha_identifier' || $typearr[1] == 'quote_single' || $typearr[1] == 'white_newline') {
                                 $before    .= $space_alpha_reserved_word;
                             }

@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_query_box.php,v 2.24 2004/09/22 21:36:35 lem9 Exp $ */
+/* $Id: tbl_query_box.php,v 2.29.2.1 2005/01/24 00:23:19 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 // Check parameters
@@ -9,7 +9,10 @@ require_once('./libraries/bookmark.lib.php');
 
 $upload_dir_error='';
 
-if (!($cfg['QueryFrame'] && $cfg['QueryFrameJS'] && isset($is_inside_querywindow) && $is_inside_querywindow == TRUE && isset($querydisplay_tab) && ($querydisplay_tab == 'sql' || $querydisplay_tab == 'full'))) {
+// I don't see the purpose of the first 2 conditions
+//if (!($cfg['QueryFrame'] && $cfg['QueryFrameJS'] && isset($is_inside_querywindow) && $is_inside_querywindow == TRUE && isset($querydisplay_tab) && ($querydisplay_tab == 'sql' || $querydisplay_tab == 'full'))) {
+
+if (!(isset($is_inside_querywindow) && $is_inside_querywindow == TRUE && isset($querydisplay_tab) && ($querydisplay_tab == 'sql' || $querydisplay_tab == 'full'))) {
     PMA_checkParameters(array('db','table','url_query'));
 }
 
@@ -50,8 +53,6 @@ if (isset($db) && isset($table) && $table != '' && $db != '') {
 /**
  * Work on the table
  */
-// loic1: defines whether file upload is available or not
-// ($is_upload now defined in common.lib.php)
 
 if ($cfg['QueryFrame'] && $cfg['QueryFrameJS'] && isset($is_inside_querywindow) && $is_inside_querywindow == TRUE && isset($querydisplay_tab) && ($querydisplay_tab == 'sql' || $querydisplay_tab == 'full')) {
     $locking   = 'onkeypress="document.sqlform.elements[\'LockFromUpdate\'].checked = true;"';
@@ -103,6 +104,8 @@ if ($cfg['QueryFrame'] && (!$cfg['QueryFrameJS'] && !$db || ($cfg['QueryFrameJS'
     }
 }
 $form_items = 0;
+// ($is_upload defined in common.lib.php)
+
 if ($cfg['QueryFrame'] && $cfg['QueryFrameJS'] && isset($is_inside_querywindow) && $is_inside_querywindow) {
 ?>
         <script type="text/javascript">
@@ -116,7 +119,7 @@ if ($cfg['QueryFrame'] && $cfg['QueryFrameJS'] && isset($is_inside_querywindow) 
        . '            action="read_dump.php"' . ($is_upload ? ' enctype="multipart/form-data"' : '' ) . ' name="sqlform">' . "\n"
        . '        </noscript>';
 } else {
-?>    
+?>
         <form method="post" action="read_dump.php"<?php if ($is_upload) echo ' enctype="multipart/form-data"'; ?> onsubmit="return checkSqlQuery(this)" name="sqlform">
 <?php
 }
@@ -157,8 +160,12 @@ if (!isset($is_inside_querywindow) ||
                     <textarea name="sql_query" rows="<?php echo $cfg['TextareaRows']; ?>" cols="<?php echo ((isset($is_inside_querywindow) && $is_inside_querywindow == TRUE && $queryframe_tdcolspan != '') ? ceil($cfg['TextareaCols'] * 1.25) : $cfg['TextareaCols'] * 2); ?>" dir="<?php echo $text_dir; ?>"<?php echo $auto_sel; ?>><?php
     if (!empty($query_to_display)) {
         echo htmlspecialchars($query_to_display);
-    } elseif (isset($table)) {
-        echo htmlspecialchars(str_replace('%d', PMA_backquote($db), str_replace('%t', PMA_backquote($table), $cfg['DefaultQueryTable'])));
+    } elseif (isset($table) && !empty($table) && isset($fields_list)) {
+        echo htmlspecialchars(
+            str_replace('%d', PMA_backquote($db),
+                str_replace('%t', PMA_backquote($table),
+                    str_replace('%f', implode(', ', PMA_backquote($fields_list)),
+                        $cfg['DefaultQueryTable']))));
     } else {
         echo htmlspecialchars(str_replace('%d', PMA_backquote($db), $cfg['DefaultQueryDatabase']));
     }
@@ -175,8 +182,8 @@ if (!isset($is_inside_querywindow) ||
             echo '<input type="button" name="insert" value="' . $strInsert . '" onclick="insertValueQuery()" />';
         }
                 ?>
-                </td>   
-                <td valign="top">   
+                </td>
+                <td valign="top">
                     <select name="dummy" size="<?php echo $cfg['TextareaRows']; ?>" multiple="multiple" class="textfield">
 <?php
         echo "\n";
@@ -185,7 +192,7 @@ if (!isset($is_inside_querywindow) ||
                . '<option value="' . PMA_backquote(htmlspecialchars($fields_list[$i])) . '">' . htmlspecialchars($fields_list[$i]) . '</option>' . "\n";
         }
 ?>
-                    </select>        
+                    </select>
                 </td>
 <?php
     }
@@ -193,15 +200,13 @@ if (!isset($is_inside_querywindow) ||
             </tr>
             <tr bgcolor="<?php echo $cfg['BgcolorOne']; ?>">
                 <td<?php if ($queryframe_tdcolspan != '') { echo ' colspan="2"'; } //echo $queryframe_tdcolspan; ?>>
-                    <input type="checkbox" name="show_query" value="1" id="checkbox_show_query" checked="checked" />
-                    <label for="checkbox_show_query"><?php echo $strShowThisQuery; ?></label>
+                    <input type="checkbox" name="show_query" value="1" id="checkbox_show_query" checked="checked" /><label for="checkbox_show_query"><?php echo $strShowThisQuery; ?></label>
 <?php
             if (isset($is_inside_querywindow) && $is_inside_querywindow == TRUE) {
             ?>
             <br />
             <script type="text/javascript">
-                document.writeln('<input type="checkbox" name="LockFromUpdate" value="1" id="checkbox_lock" />&nbsp;');
-                document.writeln('    <label for="checkbox_lock"><?php echo $strQueryWindowLock; ?></label><br />');
+                document.writeln('<input type="checkbox" name="LockFromUpdate" value="1" id="checkbox_lock" /><label for="checkbox_lock"><?php echo $strQueryWindowLock; ?></label><br />');
             </script>
             <?php
             }
@@ -228,8 +233,8 @@ if ($is_upload && (!isset($is_inside_querywindow) ||
             <tr>
                 <td class="tblHeaders"<?php echo $queryframe_thcolspan; ?>>
 <?php
-    echo '            ' 
-       . ((isset($is_inside_querywindow) && $is_inside_querywindow == TRUE && isset($querydisplay_tab) && $querydisplay_tab == 'full') || !isset($is_inside_querywindow) ? '<i>' . $strOr . '</i>' : '') 
+    echo '            '
+       . ((isset($is_inside_querywindow) && $is_inside_querywindow == TRUE && isset($querydisplay_tab) && $querydisplay_tab == 'full') || !isset($is_inside_querywindow) ? '<i>' . $strOr . '</i>' : '')
        . ' ' . $strLocationTextfile . ':&nbsp;' . "\n";
 ?>
                 </td>
@@ -267,7 +272,7 @@ if ($is_upload && (!isset($is_inside_querywindow) ||
                . '<label for="radio_sql_file_compression_gzip">' . $strGzip . '</label>&nbsp;&nbsp;' . "\n";
         }
         if ($is_bzip) {
-            echo '                    <input type="radio" id="radio_sql_file_compression_bzip" name="sql_file_compression" value="application/x-bzip" />' 
+            echo '                    <input type="radio" id="radio_sql_file_compression_bzip" name="sql_file_compression" value="application/x-bzip" />'
                . '<label for="radio_sql_file_compression_bzip">' . $strBzip . '</label>&nbsp;&nbsp;' . "\n";
         }
     } else {
@@ -407,7 +412,7 @@ if (($is_upload || $is_upload_dir) &&
     }
     echo '    <tr bgcolor="' . $cfg['BgcolorTwo'] . '">' . "\n"
        . '        <td align="right"' . $queryframe_thcolspan . '><input type="submit" name="SQL" value="' . $strGo . '" /></td>' . "\n"
-       . '    </tr>' . "\n\n";  
+       . '    </tr>' . "\n\n";
 }
 
 // Bookmark Support
@@ -432,7 +437,7 @@ if (!isset($is_inside_querywindow) ||
                 echo '                <option value="' . $value . '">' . htmlspecialchars($key) . '</option>' . "\n";
             }
             echo '            </select>' . "&nbsp;&nbsp;&nbsp;\n";
-            echo '            ' . $strVar; 
+            echo '            ' . $strVar;
             echo '            ' . $cfg['ReplaceHelpImg'] ? '<a href="./Documentation.html#faqbookmark" target="documentation"><img src="' . $pmaThemeImage . 'b_help.png" width="11" height="11" align="middle" alt="' . $strDocu . '" hspace="2" border="0" /></a>' : '(<a href="./Documentation.html#faqbookmark" target="documentation">' . $strDocu . '</a>)';
             echo ': <input type="text" name="bookmark_variable" class="textfield" size="10" style="vertical-align: middle" /><br />' . "\n";
             echo '            <input type="radio" name="action_bookmark" value="0" id="radio_bookmark0" checked="checked" style="vertical-align: middle" /><label for="radio_bookmark0">' . $strSubmit . '</label>' . "\n";
@@ -474,7 +479,7 @@ if (!isset($is_inside_querywindow) || (isset($is_inside_querywindow) && $is_insi
                 </tr>
                 <tr bgcolor="<?php echo $cfg['BgcolorOne']; ?>">
                     <td align="right"<?php echo $queryframe_thcolspan; ?>>
-                        <input type="submit" name="SQLbookmark" value="<?php echo $strGo . ' &amp; ' . $strBookmarkThis; ?>" onclick="if(document.forms['sqlform'].elements['bkm_label'].value==''){ alert('Please insert a Bookmark-Titel     ');forms['sqlform'].elements['bkm_label'].focus();return false; }"/>
+                        <input type="submit" name="SQLbookmark" value="<?php echo $strGo . ' &amp; ' . $strBookmarkThis; ?>" onclick="if(document.forms['sqlform'].elements['bkm_label'].value==''){ alert('<?php echo addslashes($strInsertBookmarkTitle); ?>');forms['sqlform'].elements['bkm_label'].focus();return false; }"/>
                     </td>
                 </tr>
 <?php
@@ -496,7 +501,7 @@ if ($upload_dir_error!='') {
 ?>
             </table>
         </form>
-        
+
 <?php
 //if (!isset($is_inside_querywindow) || !$is_inside_querywindow) echo "</li>\n";
 if (!isset($is_inside_querywindow) ||
@@ -541,7 +546,7 @@ if (!isset($is_inside_querywindow) ||
 
             <noscript>
                <a href="<?php echo $ldi_target; ?>"><?php
-                  echo $imgInsertTextfiles . $strInsertTextfiles; 
+                  echo $imgInsertTextfiles . $strInsertTextfiles;
                ?></a>
             </noscript>
         <?php

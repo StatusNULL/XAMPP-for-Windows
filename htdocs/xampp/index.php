@@ -15,7 +15,7 @@
 <frameset rows="68,*" marginwidth="0" marginheight="0" frameborder="0" border="0" borderwidth="0">
     <frame name="head" src="head.php" scrolling=no>
 <frameset cols="170,*" marginwidth="0" marginheight="0" frameborder="0" border="0" borderwidth="0">
-    <frame name="navi" src="navi.php" scrolling=no>
+    <frame name="navi" src="navi.php" scrolling=auto>
     <frame name="content" src="start.php" marginwidth=20>
 </frameset>
 </frameset>

@@ -1,5 +1,5 @@
 <?php
-/* $Id: server_links.inc.php,v 2.7 2004/08/12 15:13:19 nijel Exp $ */
+/* $Id: server_links.inc.php,v 2.10 2004/10/21 10:18:12 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 // Check parameters
@@ -31,20 +31,12 @@ if ($is_superuser) {
 
 
 /**
- * Displays a message
- */
-if (!empty($message)) {
-    PMA_showMessage($message);
-}
-
-
-/**
  * Displays tab links
  */
 if ($cfg['LightTabs']) {
     echo '&nbsp;';
 } else {
-    echo '<table border="0" cellspacing="0" cellpadding="0" width="100%">' . "\n"
+    echo '<table border="0" cellspacing="0" cellpadding="0" width="100%" id="topmenu">' . "\n"
        . '    <tr>' . "\n"
        . '        <td class="nav" align="left" nowrap="nowrap" valign="bottom">'
        . '            <table border="0" cellpadding="0" cellspacing="0"><tr>'
@@ -64,6 +56,9 @@ if (PMA_MYSQL_INT_VERSION >= 40100) {
 if ($is_superuser) {
     echo PMA_printTab(($GLOBALS['cfg']['MainPageIconic'] ? '<img src="' . $GLOBALS['pmaThemeImage'] . 's_rights.png" width="16" height="16" border="0" hspace="2" align="middle" alt="'.$strPrivileges.'" />' : '') . $strPrivileges, 'server_privileges.php', $url_query);
 }
+if ($has_binlogs) {
+    echo PMA_printTab(($GLOBALS['cfg']['MainPageIconic'] ? '<img src="' . $GLOBALS['pmaThemeImage'] . 's_tbl.png" width="16" height="16" border="0" hspace="2" align="middle" alt="'.$strBinaryLog.'" />' : '') . $strBinaryLog, 'server_binlog.php', $url_query);
+}
 echo PMA_printTab(($GLOBALS['cfg']['MainPageIconic'] ? '<img src="' . $GLOBALS['pmaThemeImage'] . 's_process.png" width="16" height="16" border="0" hspace="2" align="middle" alt="'.$strServerTabProcesslist.'" />' : '') . $strServerTabProcesslist, 'server_processlist.php', $url_query);
 echo PMA_printTab(($GLOBALS['cfg']['MainPageIconic'] ? '<img src="' . $GLOBALS['pmaThemeImage'] . 'b_export.png" width="16" height="16" border="0" hspace="2" align="middle" alt="'.$strExport.'" />' : '') . $strExport, 'server_export.php', $url_query);
 if (!$cfg['LightTabs']) {
@@ -74,6 +69,14 @@ if (!$cfg['LightTabs']) {
        . '</table>';
 } else {
     echo '<br />';
+}
+
+/**
+ * Displays a message
+ */
+if (!empty($message)) {
+    PMA_showMessage($message);
+    unset($message);
 }
 
 ?>

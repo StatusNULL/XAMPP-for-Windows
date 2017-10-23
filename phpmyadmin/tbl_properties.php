@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_properties.php,v 2.3 2004/06/13 21:32:17 lem9 Exp $ */
+/* $Id: tbl_properties.php,v 2.4 2004/10/21 10:18:12 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -11,9 +11,14 @@ $err_url   = 'tbl_properties.php' . $err_url;
 $url_query .= '&amp;goto=tbl_properties.php&amp;back=tbl_properties.php';
 
 /**
- * Top menu
+ * Get table information
  */
 require('./tbl_properties_table_info.php');
+
+/**
+ * Displays top menu links
+ */
+require('./tbl_properties_links.php');
 
 ?>
 <!-- TABLE WORK -->

@@ -62,11 +62,12 @@
 <a target=_parent class=n href="lang.php?de"><?=$TEXT['navi-german']?></a><br>
 <a target=_parent class=n href="lang.php?fr"><?=$TEXT['navi-french']?></a><br>
 <a target=_parent class=n href="lang.php?nl"><?=$TEXT['navi-dutch']?></a><br>
-<a target=_parent class=n href="lang.php?es"><?=$TEXT['navi-spanish']?></a><p>
-<!-- <a target=_parent class=n href="lang.php?pl"><?=$TEXT['navi-polish']?></a><p> -->
+<a target=_parent class=n href="lang.php?pl"><?=$TEXT['navi-polish']?></a><br>
+<a target=_parent class=n href="lang.php?es"><?=$TEXT['navi-spanish']?></a><br>
+<a target=_parent class=n href="lang.php?zh"><?=$TEXT['navi-chinese']?></a><p>
 
 
-<p class=navi>&copy;2002/2004<br>
+<p class=navi>&copy;2002/2005<br>
 <? if(file_get_contents("lang.tmp")=="de") { ?>
 <a target="_new" href="http://www.apachefriends.org/index.html"><img border=0 src="img/apachefriends.gif"></a><p>
 <? } else { ?>

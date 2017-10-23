@@ -1,5 +1,5 @@
 <?php
-/* $Id: common.lib.php,v 2.87.2.2 2004/11/10 00:40:48 lem9 Exp $ */
+/* $Id: common.lib.php,v 2.111.2.1 2005/01/16 14:37:30 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -142,7 +142,7 @@ if (isset($cfg['FileRevision'])) {
 } else {
     $cfg['FileRevision'] = array(1, 1);
 }
-if ($cfg['FileRevision'][0] < 2 || ($cfg['FileRevision'][0] == 2 && $cfg['FileRevision'][1] < 38)) {
+if ($cfg['FileRevision'][0] < 2 || ($cfg['FileRevision'][0] == 2 && $cfg['FileRevision'][1] < 48)) {
     require_once('./libraries/config_import.lib.php');
 }
 
@@ -299,7 +299,7 @@ if (strtolower($cfg['OBGzip']) == 'auto') {
  *            If not, it will use default images
 */
 // Theme Manager
-if (!isset($_COOKIE['pma_theme']) || empty($_COOKIE['pma_theme'])){
+if (!$cfg['ThemeManager'] || !isset($_COOKIE['pma_theme']) || empty($_COOKIE['pma_theme'])){
     $GLOBALS['theme'] = $cfg['ThemeDefault'];
     $ThemeDefaultOk = FALSE;
     if ($cfg['ThemePath']!='' && $cfg['ThemePath'] != FALSE) {
@@ -548,9 +548,21 @@ if ($is_minimum_common == FALSE) {
                  // end of the 'PMA_showDocu()' function
 
     /**
+     * Displays a hint icon, on mouse over show the hint
+     *
+     * @param   string   the error message
+     *
+     * @access  public
+     */
+     function PMA_showHint($hint_message)
+     {
+         return '<img src="' . $GLOBALS['pmaThemeImage'] . 'b_tipp.png" width="16" height="16" border="0" alt="' . $hint_message . '" title="' . $hint_message . '" align="middle" />';
+     }
+
+    /**
      * Displays a MySQL error message in the right frame.
      *
-     * @param   string   the error mesage
+     * @param   string   the error message
      * @param   string   the sql query that failed
      * @param   boolean  whether to show a "modify" link or not
      * @param   string   the "back" link url (full path is not required)
@@ -629,7 +641,10 @@ if ($is_minimum_common == FALSE) {
                     . '    ' . $formatted_sql . "\n"
                     . '</p></div>' . "\n";
         } // end if
+
+        $tmp_mysql_error = ''; // for saving the original $error_message
         if (!empty($error_message)) {
+            $tmp_mysql_error = strtolower($error_message); // save the original $error_message
             $error_message = htmlspecialchars($error_message);
             $error_message = preg_replace("@((\015\012)|(\015)|(\012)){3,}@", "\n\n", $error_message);
         }
@@ -652,7 +667,30 @@ if ($is_minimum_common == FALSE) {
 
         echo '<code>' . "\n"
             . $error_message . "\n"
-            . '</code><br /><br />' . "\n";
+            . '</code><br />' . "\n";
+
+        // feature request #1036254:
+        // Add a link by MySQL-Error #1062 - Duplicate entry
+        // 2004-10-20 by mk.keck
+        if (substr($error_message, 1, 4) == '1062') {
+        // TODO: do not assume that the error message is in English
+        // and do not use mysql_result()
+
+            // explode the entry and the column
+            $arr_mysql_val_key = explode('entry \'',$tmp_mysql_error);
+            $arr_mysql_val_key = explode('\' for key',$arr_mysql_val_key[1]);
+            // get the duplicate value
+            $string_duplicate_val = trim(strtolower($arr_mysql_val_key[0]));
+            // get the field name ...
+            $string_duplicate_key = mysql_result(mysql_query("SHOW FIELDS FROM " . $table), ($arr_mysql_val_key[1]-1), 0);
+            $duplicate_sql_query = "SELECT * FROM " . $table . " WHERE " . $string_duplicate_key . " LIKE '" . $string_duplicate_val . "'";
+            echo '        <form method="post" action="read_dump.php" style="padding: 0px; margin: 0px">' ."\n"
+                    . '            <input type="hidden" name="sql_query" value="' . $duplicate_sql_query . '" />' . "\n"
+                    . '            ' . PMA_generate_common_hidden_inputs($db, $table) . "\n"
+                    . '            <input type="submit" name="submit" value="' . $GLOBALS['strBrowse'] . '" />' . "\n"
+                    . '        </form>' . "\n";
+        } // end of show duplicate entry
+
         echo '</div>';
 
         if (!empty($back_url) && $exit) {
@@ -1070,16 +1108,7 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
         // If URI doesn't start with http:// or https://, we will add
         // this.
         if (substr($cfg['PmaAbsoluteUri'], 0, 7) != 'http://' && substr($cfg['PmaAbsoluteUri'], 0, 8) != 'https://') {
-            if (!empty($_SERVER)) {
-                $SERVER_ARRAY = '_SERVER';
-            } else {
-                $SERVER_ARRAY = 'GLOBALS';
-            } // end if
-            if (isset(${$SERVER_ARRAY}['HTTPS'])) {
-                $HTTPS = ${$SERVER_ARRAY}['HTTPS'];
-            }
-
-            $cfg['PmaAbsoluteUri']          = ((!empty($HTTPS) && strtolower($HTTPS) != 'off') ? 'https' : 'http') . ':'
+            $cfg['PmaAbsoluteUri']          = ((!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) != 'off') ? 'https' : 'http') . ':'
                                             . (substr($cfg['PmaAbsoluteUri'], 0, 2) == '//' ? '' : '//')
                                             . $cfg['PmaAbsoluteUri'];
         }
@@ -1188,6 +1217,13 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
             }
             unset($allowDeny_forbidden); //Clean up after you!
         } // end if
+
+        // is root allowed?
+        if (!$cfg['Server']['AllowRoot'] && $cfg['Server']['user'] == 'root') {
+            $allowDeny_forbidden = TRUE;
+            PMA_auth_fails();
+            unset($allowDeny_forbidden); //Clean up after you!
+        }
 
         // The user can work with only some databases
         if (isset($cfg['Server']['only_db']) && $cfg['Server']['only_db'] != '') {
@@ -1401,8 +1437,9 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
      */
     function PMA_backquote($a_name, $do_it = TRUE)
     {
+        // '0' is also empty for php :-(
         if ($do_it
-            && !empty($a_name) && $a_name != '*') {
+            && (!empty($a_name) || $a_name == '0') && $a_name != '*') {
 
             if (is_array($a_name)) {
                  $result = array();
@@ -1514,12 +1551,41 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
     } // end of the 'PMA_countRecords()' function
 
     /**
+     * Reloads navigation if needed.
+     *
+     * @global  mixed   configuration
+     * @global  bool    whether to reload
+     *
+     * @access  public
+     */
+    function PMA_reloadNavigation() {
+        global $cfg;
+
+        // Reloads the navigation frame via JavaScript if required
+        if (isset($GLOBALS['reload']) && $GLOBALS['reload']) {
+            echo "\n";
+            $reload_url = './left.php?' . PMA_generate_common_url((isset($GLOBALS['db']) ? $GLOBALS['db'] : ''), '', '&');
+            ?>
+<script type="text/javascript" language="javascript1.2">
+<!--
+if (typeof(window.parent) != 'undefined'
+    && typeof(window.parent.frames['nav']) != 'undefined') {
+    window.parent.frames['nav'].goTo('<?php echo $reload_url; ?>&hash=' + <?php echo (($cfg['QueryFrame'] && $cfg['QueryFrameJS']) ? 'window.parent.frames[\'queryframe\'].document.hashform.hash.value' : "'" . md5($cfg['PmaAbsoluteUri']) . "'"); ?>);
+}
+//-->
+</script>
+            <?php
+            unset($GLOBALS['reload']);
+        }
+    }
+
+    /**
      * Sanitizes $message, taking into account our special codes
      * for formatting
      *
-     * @param   string   the message 
+     * @param   string   the message
      *
-     * @return  string   the sanitized message 
+     * @return  string   the sanitized message
      *
      * @access  public
      */
@@ -1534,7 +1600,7 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
             '[br]'  => '<br />',
             '[/b]'  => '</b>',
         );
-        return strtr($message, $replace_pairs); 
+        return strtr($message, $replace_pairs);
     }
 
     /**
@@ -1553,27 +1619,8 @@ h1    {font-family: sans-serif; font-size: large; font-weight: bold}
         // Sanitizes $message
         $message = PMA_sanitize($message);
 
-        require_once('./header.inc.php');
-
-        // Reloads the navigation frame via JavaScript if required
-        if (isset($GLOBALS['reload']) && $GLOBALS['reload']) {
-            echo "\n";
-            $reload_url = './left.php?' . PMA_generate_common_url((isset($GLOBALS['db']) ? $GLOBALS['db'] : ''), '', '&')
-            ?>
-<script type="text/javascript" language="javascript1.2">
-<!--
-if (typeof(window.parent) != 'undefined'
-    && typeof(window.parent.frames['nav']) != 'undefined') {
-    window.parent.frames['nav'].goTo('<?php echo $reload_url; ?>&hash=' + <?php echo (($cfg['QueryFrame'] && $cfg['QueryFrameJS']) ? 'window.parent.frames[\'queryframe\'].document.hashform.hash.value' : "'" . md5($cfg['PmaAbsoluteUri']) . "'"); ?>);
-}
-//-->
-</script>
-            <?php
-            unset($GLOBALS['reload']);
-        }
-
         // Corrects the tooltip text via JS if required
-        else if (!empty($GLOBALS['table']) && $cfg['ShowTooltip']) {
+        if (!empty($GLOBALS['table']) && $cfg['ShowTooltip']) {
             $result = PMA_DBI_try_query('SHOW TABLE STATUS FROM ' . PMA_backquote($GLOBALS['db']) . ' LIKE \'' . PMA_sqlAddslashes($GLOBALS['table'], TRUE) . '\'');
             if ($result) {
                 $tbl_status = PMA_DBI_fetch_assoc($result);
@@ -1619,6 +1666,7 @@ if (typeof(document.getElementById) != 'undefined'
 
         echo "\n";
         ?>
+<br />
 <div align="<?php echo $GLOBALS['cell_align_left']; ?>">
     <table border="<?php echo $cfg['Border']; ?>" cellpadding="5" cellspacing="1">
     <tr>
@@ -1659,9 +1707,9 @@ if (typeof(document.getElementById) != 'undefined'
             // enable its display. Adding it higher in the code
             // to $local_query would create a problem when
             // using the Refresh or Edit links.
-            
+
             // Only append it on SELECTs.
-            
+
             // FIXME: what would be the best to do when someone
             // hits Refresh: use the current LIMITs ?
 
@@ -1677,7 +1725,12 @@ if (typeof(document.getElementById) != 'undefined'
             } else if (!empty($GLOBALS['validatequery'])) {
                 $query_base = PMA_validateSQL($query_base);
             } else {
-                $parsed_sql = PMA_SQP_parse($query_base);
+                // avoid reparsing query:
+                if (isset($GLOBALS['parsed_sql']) && $query_base == $GLOBALS['parsed_sql']['raw']) {
+                    $parsed_sql = $GLOBALS['parsed_sql'];
+                } else {
+                    $parsed_sql = PMA_SQP_parse($query_base);
+                }
                 $query_base = PMA_formatSql($parsed_sql, $query_base);
             }
 
@@ -2283,7 +2336,10 @@ if (typeof(document.getElementById) != 'undefined'
             if (!isset($row[$i]) || is_null($row[$i])) {
                 $condition .= 'IS NULL AND';
             } else {
-                if ($meta->type == 'blob'
+                // timestamp is numeric on some MySQL 4.1
+                if ($meta->numeric && $meta->type != 'timestamp') {
+                    $condition .= '= ' . $row[$i] . ' AND';
+                } elseif ($meta->type == 'blob'
                     // hexify only if this is a true not empty BLOB
                      && stristr($field_flags, 'BINARY')
                      && !empty($row[$i])) {
@@ -2319,6 +2375,120 @@ if (typeof(document.getElementById) != 'undefined'
 
         return preg_replace('|\s?AND$|', '', $uva_condition);
     } // end function
+
+    /**
+     * Function to generate unique condition for specified row.
+     *
+     * @param   string      name of button element
+     * @param   string      class of button element
+     * @param   string      name of image element
+     * @param   string      text to display
+     * @param   string      image to display
+     *
+     * @access  public
+     * @author  Michal Cihar (michal@cihar.com)
+     */
+    function PMA_buttonOrImage($button_name, $button_class, $image_name, $text, $image) {
+        global $pmaThemeImage, $propicon;
+
+        /* Opera has trouble with <input type="image"> */
+        /* IE has trouble with <button> */
+        if (PMA_USR_BROWSER_AGENT != 'IE') {
+            echo '<button class="' . $button_class . '" type="submit" name="' . $button_name . '" value="' . $text . '" title="' . $text . '">' . "\n"
+               . '<img src="' . $pmaThemeImage . $image . '" title="' . $text . '" alt="' . $text . '" width="16" height="16" />' . (($propicon == 'both') ? '&nbsp;' . $text : '') . "\n"
+               . '</button>' . "\n";
+        } else {
+            echo '<input type="image" name="' . $image_name . '" value="' .$text . '" title="' . $text . '" src="' . $pmaThemeImage . $image . '" />'  . (($propicon == 'both') ? '&nbsp;' . $text : '') . "\n";
+        }
+    } // end function
+
+    /**
+     * Generate a pagination selector for browsing resultsets
+     *
+     * @param   string      URL for the JavaScript
+     * @param   string      Number of rows in the pagination set
+     * @param   string      current page number
+     * @param   string      number of total pages
+     * @param   string      If the number of pages is lower than this
+     *                      variable, no pages will be ommitted in
+     *                      pagination
+     * @param   string      How many rows at the beginning should always
+     *                      be shown?
+     * @param   string      How many rows at the end should always
+     *                      be shown?
+     * @param   string      Percentage of calculation page offsets to
+     *                      hop to a next page
+     * @param   string      Near the current page, how many pages should
+     *                      be considered "nearby" and displayed as
+     *                      well?
+     *
+     * @access  public
+     * @author  Garvin Hicking (pma@supergarv.de)
+     */
+    function PMA_pageselector($url, $rows, $pageNow = 1, $nbTotalPage = 1, $showAll = 200, $sliceStart = 5, $sliceEnd = 5, $percent = 20, $range = 10) {
+        $gotopage = '<br />' . $GLOBALS['strPageNumber']
+                  . '<select name="goToPage" onchange="goToUrl(this, \'' . $url . '\');">' . "\n";
+        if ($nbTotalPage < $showAll) {
+            $pages = range(1, $nbTotalPage);
+        } else {
+            $pages = array();
+
+            // Always show first X pages
+            for ($i = 1; $i <= $sliceStart; $i++) {
+                $pages[] = $i;
+            }
+
+            // Always show last X pages
+            for ($i = $nbTotalPage - $sliceEnd; $i <= $nbTotalPage; $i++) {
+                $pages[] = $i;
+            }
+
+            // garvin: Based on the number of results we add the specified $percent percentate to each page number,
+            // so that we have a representing page number every now and then to immideately jump to specific pages.
+            // As soon as we get near our currently chosen page ($pageNow - $range), every page number will be
+            // shown.
+            $i = $sliceStart;
+            $x = $nbTotalPage - $sliceEnd;
+            $met_boundary = false;
+            while($i <= $x) {
+                if ($i >= ($pageNow - $range) && $i <= ($pageNow + $range)) {
+                    // If our pageselector comes near the current page, we use 1 counter increments
+                    $i++;
+                    $met_boundary = true;
+                } else {
+                    // We add the percentate increment to our current page to hop to the next one in range
+                    $i = $i + floor($nbTotalPage / $percent);
+
+                    // Make sure that we do not cross our boundaries.
+                    if ($i > ($pageNow - $range) && !$met_boundary) {
+                        $i = $pageNow - $range;
+                    }
+                }
+
+                if ($i > 0 && $i <= $x) {
+                    $pages[] = $i;
+                }
+            }
+
+            // Since because of ellipsing of the current page some numbers may be double,
+            // we unify our array:
+            sort($pages);
+            $pages = array_unique($pages);
+        }
+
+        foreach($pages AS $i) {
+            if ($i == $pageNow) {
+                $selected = 'selected="selected" style="font-weight: bold"';
+            } else {
+                $selected = '';
+            }
+            $gotopage .= '                <option ' . $selected . ' value="' . (($i - 1) * $rows) . '">' . $i . '</option>' . "\n";
+        }
+
+        $gotopage .= ' </select>';
+
+        return $gotopage;
+    }
 
 } // end if: minimal common.lib needed?
 

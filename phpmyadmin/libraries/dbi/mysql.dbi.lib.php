@@ -1,5 +1,5 @@
 <?php
-/* $Id: mysql.dbi.lib.php,v 2.32.2.1 2004/09/28 19:44:22 lem9 Exp $ */
+/* $Id: mysql.dbi.lib.php,v 2.33 2004/09/28 10:41:49 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**

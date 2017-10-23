@@ -1,17 +1,17 @@
 <?php
 /*
  * Code for displaying server selection written by nijel
- * $Id: select_server.lib.php,v 2.2 2004/06/15 13:10:20 nijel Exp $
+ * $Id: select_server.lib.php,v 2.4 2004/12/26 21:46:45 lem9 Exp $
  */
 
 if (count($cfg['Servers']) > 1) {
-    if (!$cfg['DisplayServersList']) { 
+    if (!$cfg['DisplayServersList']) {
     ?>
     <form method="post" action="index.php" target="_parent" style="margin: 0px; padding: 0px;">
     <?php
-    } 
+    }
     if ($show_server_left) {
-        echo '<div class="heada">' . $strServer . ':</div>'; 
+        echo '<div class="heada">' . $strServer . ':</div>';
     } else {
     ?>
 <!-- MySQL servers choice form -->
@@ -23,12 +23,12 @@ if (count($cfg['Servers']) > 1) {
         <td>
     <?php
     }
-    if (!$cfg['DisplayServersList']) { 
+    if (!$cfg['DisplayServersList']) {
     ?>
     <form method="post" action="index.php" target="_parent" style="margin: 0px; padding: 0px;">
         <select name="server" onchange="this.form.submit();">
     <?php
-    } 
+    }
     foreach ($cfg['Servers'] AS $key => $val) {
         if (!empty($val['host'])) {
              $selected = 0;
@@ -54,7 +54,7 @@ if (count($cfg['Servers']) > 1) {
             }
 
             if ($cfg['DisplayServersList']){
-                if ($selected) {
+                if ($selected && !$show_server_left) {
                     echo '&raquo; <b>' . $label . '</b><br />';
                 }else{
                     echo '&raquo; <a class="item" href="index.php?server=' . $key . '&amp;lang=' . $lang . '&amp;convcharset=' . $convcharset . '" target="_top">' . $label . '</a><br />';
@@ -71,7 +71,7 @@ if (count($cfg['Servers']) > 1) {
         </select>
         <input type="hidden" name="lang" value="<?php echo $lang; ?>" />
         <input type="hidden" name="convcharset" value="<?php echo $convcharset; ?>" />
-        <noscript><input type="submit" value="<?php echo $strGo; ?>" /></noscript>
+        <input type="submit" value="<?php echo $strGo; ?>" />
     </form>
 <?php
     }

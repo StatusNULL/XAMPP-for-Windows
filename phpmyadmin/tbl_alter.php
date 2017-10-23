@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_alter.php,v 2.8 2004/05/20 16:14:08 nijel Exp $ */
+/* $Id: tbl_alter.php,v 2.12 2005/01/01 19:34:05 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -14,6 +14,19 @@ require_once('./header.inc.php');
 PMA_checkParameters(array('db', 'table'));
 
 /**
+ * Gets tables informations
+ */
+require('./tbl_properties_common.php');
+require('./tbl_properties_table_info.php');
+/**
+ * Displays top menu links
+ */
+$active_page = 'tbl_properties_structure.php';
+// I don't see the need to display the links here, they will be displayed later
+//require('./tbl_properties_links.php');
+
+
+/**
  * Defines the url to return to in case of error in a sql statement
  */
 $err_url = 'tbl_properties_structure.php?' . PMA_generate_common_url($db, $table);
@@ -23,7 +36,7 @@ $err_url = 'tbl_properties_structure.php?' . PMA_generate_common_url($db, $table
  * Modifications have been submitted -> updates the table
  */
 $abort = false;
-if (isset($submit)) {
+if (isset($do_save_data)) {
     $field_cnt = count($field_orig);
     for ($i = 0; $i < $field_cnt; $i++) {
         // to "&quot;" in tbl_properties.php
@@ -52,7 +65,7 @@ if (isset($submit)) {
         }
         if ($field_attribute[$i] != '') {
             $query .= ' ' . $field_attribute[$i];
-        } else if (PMA_MYSQL_INT_VERSION >= 40100 && $field_collation[$i] != '') {
+        } else if (PMA_MYSQL_INT_VERSION >= 40100 && $field_collation[$i] != '' && preg_match('@^(TINYTEXT|TEXT|MEDIUMTEXT|LONGTEXT|VARCHAR|CHAR)$@i', $field_type[$i])) {
             $query .= PMA_generateCharsetQueryPart($field_collation[$i]);
         }
         if ($field_default[$i] != '') {

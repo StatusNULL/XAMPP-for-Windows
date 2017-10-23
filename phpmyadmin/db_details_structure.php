@@ -1,80 +1,11 @@
 <?php
-/* $Id: db_details_structure.php,v 2.36 2004/08/12 15:13:18 nijel Exp $ */
+/* $Id: db_details_structure.php,v 2.42 2004/12/01 11:33:20 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 require_once('./libraries/grab_globals.lib.php');
 require_once('./libraries/common.lib.php');
 require_once('./libraries/mysql_charsets.lib.php');
 
-/**
- * Rename database
- */
-if (isset($db) && isset($db_rename) && $db_rename == 'true') {
-    if (!isset($newname) || empty($newname)) {
-        $message = $strDatabaseEmpty;
-    } else {
-        $local_query = 'CREATE DATABASE ' . PMA_backquote($newname) . ';';
-        $sql_query = $local_query;
-        PMA_DBI_query($local_query);
-        $tables = PMA_DBI_get_tables($db);
-        foreach ($tables as $table) {
-            $local_query = 'RENAME TABLE '
-                . PMA_backquote($db) . '.' . PMA_backquote($table)
-                . ' TO '
-                . PMA_backquote($newname) . '.' . PMA_backquote($table)
-                . ';';
-            $sql_query .= "\n" . $local_query;
-            PMA_DBI_query($local_query);
-        }
-        $local_query = 'DROP DATABASE ' . PMA_backquote($db) . ';';
-        $sql_query .= "\n" . $local_query;
-        PMA_DBI_query($local_query);
-        $reload     = TRUE;
-        $message    = sprintf($strRenameDatabaseOK, htmlspecialchars($db), htmlspecialchars($newname));
-
-        /* Update relations */
-        require_once('./libraries/relation.lib.php');
-        $cfgRelation = PMA_getRelationsParam();
-
-        if ($cfgRelation['commwork']) {
-            PMA_query_as_cu('UPDATE ' . PMA_backquote($cfgRelation['column_info'])
-                          . ' SET db_name    = \'' . PMA_sqlAddslashes($newname) . '\''
-                          . ' WHERE db_name  = \'' . PMA_sqlAddslashes($db) . '\'');
-        }
-        if ($cfgRelation['bookmarkwork']) {
-            PMA_query_as_cu('UPDATE ' . PMA_backquote($cfgRelation['bookmark'])
-                          . ' SET dbase    = \'' . PMA_sqlAddslashes($newname) . '\''
-                          . ' WHERE dbase  = \'' . PMA_sqlAddslashes($db) . '\'');
-        }
-        if ($cfgRelation['displaywork']) {
-            PMA_query_as_cu('UPDATE ' . PMA_backquote($cfgRelation['table_info'])
-                          . ' SET db_name    = \'' . PMA_sqlAddslashes($newname) . '\''
-                          . ' WHERE db_name  = \'' . PMA_sqlAddslashes($db) . '\'');
-        }
-
-        if ($cfgRelation['relwork']) {
-            PMA_query_as_cu('UPDATE ' . PMA_backquote($cfgRelation['relation'])
-                          . ' SET foreign_db    = \'' . PMA_sqlAddslashes($newname) . '\''
-                          . ' WHERE foreign_db  = \'' . PMA_sqlAddslashes($db) . '\'');
-            PMA_query_as_cu('UPDATE ' . PMA_backquote($cfgRelation['relation'])
-                          . ' SET master_db    = \'' . PMA_sqlAddslashes($newname) . '\''
-                          . ' WHERE master_db  = \'' . PMA_sqlAddslashes($db) . '\'');
-        }
-        if ($cfgRelation['historywork']) {
-            PMA_query_as_cu('UPDATE ' . PMA_backquote($cfgRelation['history'])
-                          . ' SET db    = \'' . PMA_sqlAddslashes($newname) . '\''
-                          . ' WHERE db  = \'' . PMA_sqlAddslashes($db) . '\'');
-        }
-        if ($cfgRelation['pdfwork']) {
-            PMA_query_as_cu('UPDATE ' . PMA_backquote($cfgRelation['table_info'])
-                          . ' SET db_name    = \'' . PMA_sqlAddslashes($newname) . '\''
-                          . ' WHERE db_name  = \'' . PMA_sqlAddslashes($db) . '\'');
-        }
-
-        /* Change database to be used */
-        $db         = $newname;
-    }
-}
 /**
  * Prepares the tables list if the user where not redirected to this script
  * because there is no table in the database ($is_info is TRUE)
@@ -86,6 +17,7 @@ if (empty($is_info)) {
         $action = 'db_details_structure.php';
         $err_url = 'db_details_structure.php?'. PMA_generate_common_url($db);
         require('./mult_submits.inc.php');
+        $message = $strSuccess;
     }
     require('./db_details_common.php');
     $url_query .= '&amp;goto=db_details_structure.php';
@@ -94,14 +26,6 @@ if (empty($is_info)) {
     $sub_part = '_structure';
     require('./db_details_db_info.php');
     echo "\n";
-
-    /**
-     * Show result of multi submit operation
-     */
-    if ((!empty($submit_mult) && isset($selected_tbl))
-       || isset($mult_btn)) {
-        PMA_showMessage($strSuccess);
-    }
 }
 
 if (PMA_MYSQL_INT_VERSION >= 40101) {
@@ -121,7 +45,7 @@ function pma_TableHeader($alternate = FALSE) {
        . '                    &nbsp;' . $GLOBALS['strAction'] . '&nbsp;' . "\n"
        . '                </th>' . "\n"
        . '                <th>' . "\n"
-       . '                    &nbsp;' .  $GLOBALS['strRecords'] . '&nbsp;' . "\n"
+       . '                    &nbsp;' .  $GLOBALS['strRecords'] . PMA_showHint($GLOBALS['strApproximateCount']) . '&nbsp;' . "\n"
        . '                </th>' . "\n";
     if (!$alternate) {
         if (!($GLOBALS['cfg']['PropertiesNumColumns'] > 1)) {
@@ -155,13 +79,6 @@ require_once('./libraries/relation.lib.php');
 $cfgRelation = PMA_getRelationsParam();
 
 /**
- * Check if comments were updated
- */
-if ($cfgRelation['commwork'] && isset($db_comment) && $db_comment == 'true') {
-    PMA_SetComment($db, '', '(db_comment)', $comment);
-}
-
-/**
  * Displays the tables list
  */
 ?>
@@ -185,7 +102,7 @@ if ($cfg['PropertiesIconic'] == true) {
     $titles['NoBrowse']   = $iconic_spacer . '<img hspace="2" width="16" height="16" src="' .$pmaThemeImage . 'bd_browse.png" alt="' . $strBrowse . '" title="' . $strBrowse . '" border="0" />';
     $titles['NoSearch']   = $iconic_spacer . '<img hspace="2" width="16" height="16" src="' .$pmaThemeImage . 'bd_select.png" alt="' . $strSearch . '" title="' . $strSearch . '" border="0" />';
     $titles['Insert']     = $iconic_spacer . '<img hspace="2" width="16" height="16" src="' .$pmaThemeImage . 'b_insrow.png" alt="' . $strInsert . '" title="' . $strInsert . '" border="0" />';
-    $titles['Properties'] = $iconic_spacer . '<img hspace="2" width="16" height="16" src="' .$pmaThemeImage . 'b_props.png" alt="' . $strProperties . '" title="' . $strProperties . '" border="0" />';
+    $titles['Structure']  = $iconic_spacer . '<img hspace="2" width="16" height="16" src="' .$pmaThemeImage . 'b_props.png" alt="' . $strStructure . '" title="' . $strStructure . '" border="0" />';
     $titles['Drop']       = $iconic_spacer . '<img hspace="2" width="16" height="16" src="' .$pmaThemeImage . 'b_drop.png" alt="' . $strDrop . '" title="' . $strDrop . '" border="0" />';
     $titles['Empty']      = $iconic_spacer . '<img hspace="2" width="16" height="16" src="' .$pmaThemeImage . 'b_empty.png" alt="' . $strEmpty . '" title="' . $strEmpty . '" border="0" />';
     $titles['NoEmpty']    = $iconic_spacer . '<img hspace="2" width="16" height="16" src="' .$pmaThemeImage . 'bd_empty.png" alt="' . $strEmpty . '" title="' . $strEmpty . '" border="0" />';
@@ -196,7 +113,7 @@ if ($cfg['PropertiesIconic'] == true) {
         $titles['NoBrowse']   .= '&nbsp;' . $strBrowse . '</div>';
         $titles['NoSearch']   .= '&nbsp;' . $strSearch . '</div>';
         $titles['Insert']     .= '&nbsp;' . $strInsert . '</div>';
-        $titles['Properties'] .= '&nbsp;' . $strProperties . '</div>';
+        $titles['Structure']  .= '&nbsp;' . $strStructure . '</div>';
         $titles['Drop']       .= '&nbsp;' . $strDrop . '</div>';
         $titles['Empty']      .= '&nbsp;' . $strEmpty . '</div>';
         $titles['NoEmpty']    .= '&nbsp;' . $strEmpty . '</div>';
@@ -207,7 +124,7 @@ if ($cfg['PropertiesIconic'] == true) {
     $titles['NoBrowse']   = $strBrowse;
     $titles['NoSearch']   = $strSearch;
     $titles['Insert']     = $strInsert;
-    $titles['Properties'] = $strProperties;
+    $titles['Structure']  = $strStructure;
     $titles['Drop']       = $strDrop;
     $titles['Empty']      = $strEmpty;
     $titles['NoEmpty']    = $strEmpty;
@@ -352,7 +269,7 @@ else {
                             </td>
                             <td align="center" bgcolor="<?php echo $bgcolor; ?>">
                     <a href="tbl_properties_structure.php?<?php echo $tbl_url_query; ?>">
-                        <?php echo $titles['Properties']; ?></a>
+                        <?php echo $titles['Structure']; ?></a>
                             </td>
                 <td align="center" bgcolor="<?php echo $bgcolor; ?>">
         <?php
@@ -522,7 +439,7 @@ else {
         echo '                <th align="center">' . "\n"
            . '                    <b>--</b>' . "\n"
            . '                </th>' . "\n";
-        if (PMA_MYSQL_INT_VERSION >= 40100) {
+        if (PMA_MYSQL_INT_VERSION >= 40101) {
             echo '                <th align="center">' . "\n"
                . '                    &nbsp;<b><dfn title="' . PMA_getCollationDescr($db_collation) . '">' . $db_collation . '</dfn></b>&nbsp;' . "\n"
                . '                </th>' . "\n";
@@ -686,225 +603,8 @@ echo '             ' . '<input type="text" name="num_fields" size="2" class="tex
 echo '     </td>';
 echo '     <td align="right">';
 echo '             ' . '&nbsp;<input type="submit" value="' . $strGo . '" />' . "\n";
-?>
-     </td> </tr>
-        </form>
-
-
-
-<?php
-if ($cfgRelation['commwork']) {
-?>
-    <!-- Alter/Enter db-comment -->
-        <tr><td colspan="3"><img src="<?php echo $GLOBALS['pmaThemeImage'] . 'spacer.png'; ?>" width="1" height="1" border="0" alt="" /></td></tr>
-
-        <tr>
-        <td colspan="3" class="tblHeaders"><?php
-    if ($cfg['PropertiesIconic']) {
-        echo '<img src="' . $pmaThemeImage . 'b_comment.png" border="0" width="16" height="16" hspace="2" align="middle" />';
-    }
-    echo $strDBComment;
-        ?></td></tr>
-                                <form method="post" action="db_details_structure.php">
-        <tr bgcolor="<?php echo $cfg['BgcolorOne']; ?>">
-                                  <td colspan="2" nowrap="nowrap">
-            <input type="hidden" name="db_comment" value="true" />
-            <?php echo PMA_generate_common_hidden_inputs($db); ?>
-            <input type="text" name="comment" class="textfield" size="30" value="<?php echo (isset($comment) && is_array($comment) ? htmlspecialchars(implode(' ', $comment)) : ''); ?>" /></td><td align="right">
-            <input type="submit" value="<?php echo $strGo; ?>" />
-         </td></tr>
-        </form>
-<?php
-}
-?>
-    <!-- Rename database -->
-        <tr><td colspan="3"><img src="<?php echo $GLOBALS['pmaThemeImage'] . 'spacer.png'; ?>" width="1" height="1" border="0" alt="" /></td></tr>
-        <tr><td colspan="3" class="tblHeaders"><?php
-          if ($cfg['PropertiesIconic']) {
-              echo '<img src="' . $pmaThemeImage . 'b_edit.png" border="0" width="16" height="16" hspace="2" align="middle" />';
-          }
-          echo $strDBRename.':&nbsp;';
-          ?></td></tr>
-        <form method="post" action="db_details_structure.php"
-            onsubmit="return emptyFormElements(this, 'newname')">
-                                        <tr bgcolor="<?php echo $cfg['BgcolorOne']; ?>"><td colspan="2"><?php
-          echo '<input type="hidden" name="db_rename" value="true" />'
-             . PMA_generate_common_hidden_inputs($db);
-          ?><input type="text" name="newname" size="30" class="textfield" value="" /></td>
-            <td align="right"><input type="submit" value="<?php echo $strGo; ?>" /></td>
-        </form></tr>
-
-<?php
-
-if (PMA_MYSQL_INT_VERSION >= 40101) {
-    // MySQL supports setting default charsets / collations for databases since
-    // version 4.1.1.
-    echo '    <!-- Change database charset -->' . "\n"
-       . '    <tr><td colspan="3"><img src="' . $GLOBALS['pmaThemeImage'] . 'spacer.png' . '" width="1" height="1" border="0" alt="" /></td></tr>' . "\n"
-       . '    <tr><td colspan="3" class="tblHeaders">';
-    if ($cfg['PropertiesIconic']) {
-        echo '<img src="' . $pmaThemeImage . 's_asci.png" border="0" width="16" height="16" hspace="2" align="middle" />';
-    }
-    echo '      <label for="select_db_collation">' . $strCollation . '</label>:&nbsp;' . "\n"
-       . '    </td></tr>' . "\n"
-       . '        <form method="post" action="./db_details_structure.php">' . "\n"
-       . '    <tr bgcolor="' . $cfg['BgcolorOne'] . '"><td colspan="2" nowrap="nowrap">'
-       . PMA_generate_common_hidden_inputs($db, $table, 3)
-       . PMA_generateCharsetDropdownBox(PMA_CSDROPDOWN_COLLATION, 'db_collation', 'select_db_collation', $db_collation, FALSE, 3)
-       . '    </td><td align="right">'
-       . '            <input type="submit" name="submitcollation" value="' . $strGo . '" style="vertical-align: middle" />' . "\n"
-       . '    </td></tr>' . "\n"
-       . '        </form>' . "\n"
-       . '         ' . "\n\n";
-}
-
-if ($num_tables > 0
-    && !$cfgRelation['allworks'] && $cfg['PmaNoRelation_DisableWarning'] == FALSE) {
-    echo '<tr><td colspan="3"><img src="' . $GLOBALS['pmaThemeImage'] . 'spacer.png' . '" width="1" height="1" border="0" alt="" /></td></tr>'
-        . '<tr><th colspan="3" class="tblHeadError"><div class="errorhead">' . $strError . '</div></th></tr>'
-        . '<tr><td colspan="3" class="tblError">'
-        . sprintf(wordwrap($strRelationNotWorking,65,'<br />'), '<a href="' . $cfg['PmaAbsoluteUri'] . 'chk_rel.php?' . $url_query . '">',  '</a>')
-        . '</td></tr>';
-} // end if
-?>
-</table>
-<?php
-// is this OK to check for 'class' support?
-if ($num_tables > 0) {
-    $takeaway = $url_query . '&amp;table=' . urlencode($table);
-}
-if (($cfgRelation['pdfwork'] && $num_tables > 0) ||
-($num_tables > 0
-    && $cfgRelation['relwork'] && $cfgRelation['commwork']
-    && isset($cfg['docSQLDir']) && !empty($cfg['docSQLDir'])
-    )
-) { ?><hr /><table border="0" cellpadding="2" cellspacing="0"><?php }
-
-if ($cfgRelation['pdfwork'] && $num_tables > 0) {
-    ?>
-    <!-- Work on PDF Pages -->
-      <tr><td colspan="3" class="tblHeaders">
-      <?php
-    if ($cfg['PropertiesIconic']) {
-        echo '<img src="' . $pmaThemeImage . 'b_pdfdoc.png" border="0" width="16" height="16" hspace="2" align="middle" />';
-    }
-?>PDF</td></tr><tr bgcolor="<?php echo $cfg['BgcolorOne']; ?>">
-        <td colspan="3"><?php
-    echo '<a href="pdf_pages.php?' . $takeaway . '">';
-    if ($cfg['PropertiesIconic']) {
-        echo '<img src="' . $pmaThemeImage . 'b_edit.png" border="0" width="16" height="16" hspace="2" align="middle" />';
-    }
-    echo ''. $strEditPDFPages . '</a>';
-     ?></td></tr>
-
-    <!-- PDF schema -->
-    <?php
-    // We only show this if we find something in the new pdf_pages table
-
-    $test_query = 'SELECT * FROM ' . PMA_backquote($cfgRelation['pdf_pages'])
-                . ' WHERE db_name = \'' . PMA_sqlAddslashes($db) . '\'';
-    $test_rs    = PMA_query_as_cu($test_query, NULL, PMA_DBI_QUERY_STORE);
-    if ($test_rs && PMA_DBI_num_rows($test_rs) > 0) {
-        echo "\n";
-        ?>
-        <form method="post" action="pdf_schema.php">
-         <tr bgcolor="<?php echo $cfg['BgcolorTwo']; ?>"><td colspan="3">
-<?php
-         echo PMA_generate_common_hidden_inputs($db);
-         if ($cfg['PropertiesIconic']) {
-             echo '<img src="' . $pmaThemeImage . 'b_view.png" border="0" width="16" height="16" hspace="2" align="middle" />';
-         }
-         echo $strDisplayPDF;
-?>:&nbsp;</td></tr>
-            <tr bgcolor="<?php echo $cfg['BgcolorTwo']; ?>"><td width="20">&nbsp;</td><td colspan="2">
-            <?php echo $strPageNumber; ?>&nbsp;
-            <select name="pdf_page_number">
-        <?php
-        while ($pages = @PMA_DBI_fetch_assoc($test_rs)) {
-            echo "\n" . '                '
-                 . '<option value="' . $pages['page_nr'] . '">' . $pages['page_nr'] . ': ' . $pages['page_descr'] . '</option>';
-        } // end while
-        PMA_DBI_free_result($test_rs);
-        unset($test_rs);
-        echo "\n";
-        ?>
-            </select></td></tr>
-            <tr bgcolor="<?php echo $cfg['BgcolorTwo']; ?>">
-                                                  <td width="20">&nbsp;</td><td width="20" valign="top">
-            <input type="checkbox" name="show_grid" id="show_grid_opt" /></td><td>
-            <label for="show_grid_opt"><?php echo $strShowGrid; ?></label></td></tr>
-            <tr bgcolor="<?php echo $cfg['BgcolorTwo']; ?>">
-                                                  <td width="20">&nbsp;</td><td width="20" valign="top">
-            <input type="checkbox" name="show_color" id="show_color_opt" checked="checked" /></td><td>
-            <label for="show_color_opt"><?php echo $strShowColor; ?></label></td></tr>
-            <tr bgcolor="<?php echo $cfg['BgcolorTwo']; ?>">
-                                                  <td width="20">&nbsp;</td><td width="20" valign="top">
-            <input type="checkbox" name="show_table_dimension" id="show_table_dim_opt" /></td><td>
-            <label for="show_table_dim_opt"><?php echo $strShowTableDimension; ?></label></td></tr>
-            <tr bgcolor="<?php echo $cfg['BgcolorTwo']; ?>">
-                                                  <td width="20">&nbsp;</td><td width="20" valign="top">
-            <input type="checkbox" name="all_tab_same_wide" id="all_tab_same_wide" /></td><td>
-            <label for="all_tab_same_wide"><?php echo wordwrap($strAllTableSameWidth,55,'<br />'); ?></label></td></tr>
-            <tr bgcolor="<?php echo $cfg['BgcolorTwo']; ?>">
-                                                  <td width="20">&nbsp;</td><td width="20" valign="top">
-            <input type="checkbox" name="with_doc" id="with_doc" checked="checked" /></td><td>
-            <label for="with_doc"><?php echo $strDataDict; ?></label></td></tr>
-            <tr bgcolor="<?php echo $cfg['BgcolorTwo']; ?>">
-                                                  <td width="20">&nbsp;</td><td colspan="2">
-            <?php echo $strShowDatadictAs; ?>
-            <select name="orientation">
-                <option value="L"><?php echo $strLandscape;?></option>
-                <option value="P"><?php echo $strPortrait;?></option>
-            </select></td></tr>
-            <tr bgcolor="<?php echo $cfg['BgcolorTwo']; ?>">
-                                                  <td width="20">&nbsp;</td><td colspan="2">
-            <?php echo $strPaperSize; ?>
-            <select name="paper">
-            <?php
-                foreach ($cfg['PDFPageSizes'] AS $key => $val) {
-                    echo '<option value="' . $val . '"';
-                    if ($val == $cfg['PDFDefaultPageSize']) {
-                        echo ' selected="selected"';
-                    }
-                    echo ' >' . $val . '</option>' . "\n";
-                }
-            ?>
-                </select></td></tr>
-            <tr bgcolor="<?php echo $cfg['BgcolorTwo']; ?>">
-                                                  <td width="20">&nbsp;</td><td colspan="3" align="right">
-                &nbsp;&nbsp;<input type="submit" value="<?php echo $strGo; ?>" /></td>
-            </form></tr>
-            <tr><td colspan="3"><img src="<?php echo $GLOBALS['pmaThemeImage'] . 'spacer.png'; ?>" width="1" height="1" border="0" alt="" /></td></tr>
-        <?php
-    }   // end if
-?>
-
-<?php
-} // end if
-
-if ($num_tables > 0
-    && $cfgRelation['relwork'] && $cfgRelation['commwork']
-    && isset($cfg['docSQLDir']) && !empty($cfg['docSQLDir'])
-    ) {
-?>
-    <!-- import docSQL files -->
-    <tr bgcolor="<?php echo $cfg['BgcolorOne']; ?>"><td colspan="3"><?php
-    echo '<a href="db_details_importdocsql.php?' . $takeaway . '">';
-    if ($cfg['PropertiesIconic']) {
-        echo '<img src="' . $pmaThemeImage . 'b_docsql.png" border="0" width="16" height="16" hspace="2" align="middle" />';
-    }
-    echo $strImportDocSQL . '</a>';
-    ?>
-    </td></tr>
-    <?php
-}
-echo "\n";
-if (($cfgRelation['pdfwork'] && $num_tables > 0) ||
-($num_tables > 0
-    && $cfgRelation['relwork'] && $cfgRelation['commwork']
-    && isset($cfg['docSQLDir']) && !empty($cfg['docSQLDir'])
-    )
-) { ?></table><?php }
+echo '     </td> </tr>';
+echo '        </form>';
 
 /**
  * Displays the footer

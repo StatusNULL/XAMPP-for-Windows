@@ -1,5 +1,5 @@
 <?php
-/* $Id: queryframe.php,v 2.17 2004/09/16 23:36:54 lem9 Exp $ */
+/* $Id: queryframe.php,v 2.20 2004/11/06 19:44:42 mkkeck Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -119,9 +119,20 @@ function resizeRowsLeft() {
     }
 }
 
+//-->
+</script>
+<?php
+    // setup the onload handler for resizing frames
+    $js_frame_onload=' onload="resizeRowsLeft();"';
+}
+if ($cfg['QueryFrame']) {
+?>
+<script type="text/javascript" language="javascript">
+<!--
 // added 2004-09-16 by Michael Keck (mkkeck)
 //                  bug: #1027321
 //                       drop-down databases list keep focus on database change
+// modified 2004-11-06: bug #1046434 (Light mode does not work)
 var focus_removed = false;
 function remove_focus_select() {
     focus_removed = false;
@@ -139,13 +150,11 @@ function set_focus_to_nav() {
 //-->
 </script>
 <?php
-    // setup the onload handler for resizing frames
-    $js_frame_onload=' onload="resizeRowsLeft();"';
 }
 ?>
 </head>
 
-<body bgcolor="<?php echo $cfg['LeftBgColor']; ?>"<?php echo ((isset($js_frame_onload) && $js_frame_onload!='') ? $js_frame_onload : ''); ?>>
+<body id="body_queryFrame" bgcolor="<?php echo $cfg['LeftBgColor']; ?>"<?php echo ((isset($js_frame_onload) && $js_frame_onload!='') ? $js_frame_onload : ''); ?>>
     <div id="qfcontainer">
 <?php
 if ($cfg['LeftDisplayLogo']) {
@@ -154,7 +163,7 @@ if ($cfg['LeftDisplayLogo']) {
     <?php
     if (@file_exists($pmaThemeImage . 'logo_left.png')) {
     ?>
-    
+
     <div align="center">
         <a href="http://www.phpmyadmin.net" target="_blank"><img src="<?php echo '' . $pmaThemeImage . 'logo_left.png'; ?>" alt="phpMyAdmin" vspace="3" border="0" /></a>
     </div>
@@ -165,7 +174,7 @@ if ($cfg['LeftDisplayLogo']) {
            . '<img src="' . $GLOBALS['pmaThemeImage'] . 'pma_logo2.png'  .'" alt="phpMyAdmin" border="0" />'
            . '</a></div>' . "\n";
     }
-    echo '<hr />';
+    echo '<hr id="hr_first" />';
 } // end of display logo
 
 if ($cfg['MainPageIconic']) {
@@ -183,34 +192,36 @@ if ($cfg['MainPageIconic']) {
                     .' onmouseover="this.style.backgroundColor=\'#ffffff\';" onmouseout="this.style.backgroundColor=\'\';" align="middle" />'
             : '<b>' . $strHome . '</b>')
         . '</a>';
-    // Logout for advanced authentication
-    if ($cfg['Server']['auth_type'] != 'config') {
-        echo $str_spacer_links;
-        echo '<a class="item" href="index.php?' . PMA_generate_common_url() . '&amp;old_usr=' . urlencode($PHP_AUTH_USER) . '" target="_parent">'
-           . ($cfg['MainPageIconic']
-                ? '<img src="' . $pmaThemeImage . 's_loggoff.png" width="16" height="16" border="0" hspace="2" alt="' . $strLogout . '" title="' . $strLogout . '"'
-                        .' onmouseover="this.style.backgroundColor=\'#ffffff\';" onmouseout="this.style.backgroundColor=\'\';" align="middle" />'
-                : '<b>' . $strLogout . '</b>')
-           . '</a>';
-    } // end if
+    // if we have chosen server
+    if ($server != 0) {
+        // Logout for advanced authentication
+        if ($cfg['Server']['auth_type'] != 'config') {
+            echo $str_spacer_links;
+            echo '<a class="item" href="index.php?' . PMA_generate_common_url() . '&amp;old_usr=' . urlencode($PHP_AUTH_USER) . '" target="_parent">'
+               . ($cfg['MainPageIconic']
+                    ? '<img src="' . $pmaThemeImage . 's_loggoff.png" width="16" height="16" border="0" hspace="2" alt="' . $strLogout . '" title="' . $strLogout . '"'
+                            .' onmouseover="this.style.backgroundColor=\'#ffffff\';" onmouseout="this.style.backgroundColor=\'\';" align="middle" />'
+                    : '<b>' . $strLogout . '</b>')
+               . '</a>';
+        } // end if
 
-$anchor = 'querywindow.php?' . PMA_generate_common_url('', '');
-if ($cfg['QueryFrameJS']) {
-    $href = $anchor;
-    $target = '';
-    $onclick = 'onclick="javascript:open_querywindow(this.href); return false;"';
-} else {
-    $href = $anchor;
-    $target = 'target="phpmain' . $hash . '"';
-    $onclick = '';
-}
-if ($cfg['MainPageIconic']) {
-    $query_frame_link_text = '<img src="' . $pmaThemeImage . 'b_selboard.png" border="0" hspace="1" width="16" height="16" alt="' . $strQueryFrame . '" title="' . $strQueryFrame . '"'
-                           .' onmouseover="this.style.backgroundColor=\'#ffffff\';" onmouseout="this.style.backgroundColor=\'\';" align="middle" />';
-} else {
-    echo ($str_spacer_links != '' ? '<br />' : '');
-    $query_frame_link_text = '<b>' . $strQueryFrame . '</b>';
-}
+        $anchor = 'querywindow.php?' . PMA_generate_common_url('', '');
+        if ($cfg['QueryFrameJS']) {
+            $href = $anchor;
+            $target = '';
+            $onclick = 'onclick="javascript:open_querywindow(this.href); return false;"';
+        } else {
+            $href = $anchor;
+            $target = 'target="phpmain' . $hash . '"';
+            $onclick = '';
+        }
+        if ($cfg['MainPageIconic']) {
+            $query_frame_link_text = '<img src="' . $pmaThemeImage . 'b_selboard.png" border="0" hspace="1" width="16" height="16" alt="' . $strQueryFrame . '" title="' . $strQueryFrame . '"'
+                                   .' onmouseover="this.style.backgroundColor=\'#ffffff\';" onmouseout="this.style.backgroundColor=\'\';" align="middle" />';
+        } else {
+            echo ($str_spacer_links != '' ? '<br />' : '');
+            $query_frame_link_text = '<b>' . $strQueryFrame . '</b>';
+        }
     ?>
     <script type="text/javascript">
     <!--
@@ -221,6 +232,7 @@ if ($cfg['MainPageIconic']) {
         <a href="<?php echo $href; ?>&amp;no_js=true" <?php echo $target . ' ' . $onclick; ?> target="phpmain<?php echo $hash; ?>" class="item"><?php echo $query_frame_link_text; ?></a>
     </noscript>
     <?php
+    }
 
 if ($cfg['MainPageIconic']) {
     echo '<img src="' .$GLOBALS['pmaThemeImage'] . 'spacer.png'  .'" width="2" height="1" border="0" alt="" />'
@@ -237,7 +249,7 @@ if ($cfg['MainPageIconic']) {
 
     ?>
     </div>
-    <hr />
+    <hr id="hr_second" />
 
     <?php
 if ($cfg['LeftDisplayServers']){
@@ -371,7 +383,7 @@ if ($num_dbs > 1) {
 
             if (!empty($num_tables)) {
                 echo '            '
-                   . '<option value="' . htmlspecialchars($db) . '"' . $selected . '>' 
+                   . '<option value="' . htmlspecialchars($db) . '"' . $selected . '>'
                    . ($db_tooltip != '' && $cfg['ShowTooltipAliasDB'] ? htmlspecialchars($db_tooltip) : htmlspecialchars($db)) . ' (' . $num_tables . ')</option>' . "\n";
             } else {
                 echo '            '
@@ -387,7 +399,7 @@ if ($num_dbs > 1) {
             </td>
         </tr>
     </table>
-    <hr />
+    <hr id="hr_third" />
     <?php
     } // end if LeftFrameLight
 } // end if num_db > 1

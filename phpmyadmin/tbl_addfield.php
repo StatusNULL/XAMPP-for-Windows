@@ -1,7 +1,6 @@
 <?php
-/* $Id: tbl_addfield.php,v 2.7 2004/08/12 15:13:19 nijel Exp $ */
+/* $Id: tbl_addfield.php,v 2.11 2005/01/07 14:33:20 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
-
 
 /**
  * Get some core libraries
@@ -19,7 +18,6 @@ PMA_checkParameters(array('db', 'table'));
  */
 $err_url = 'tbl_properties.php?' . PMA_generate_common_url($db, $table);
 
-
 /**
  * The form used to define the field to add has been submitted
  */
@@ -31,8 +29,9 @@ if (isset($submit_num_fields)) {
     if (isset($orig_field_where)) {
         $field_where = $orig_field_where;
     }
+    $num_fields = $orig_num_fields + $added_fields;
     $regenerate = TRUE;
-} else if (isset($submit)) {
+} else if (isset($do_save_data)) {
     $query = '';
 
     // Transforms the radio button field_key into 3 arrays
@@ -63,7 +62,7 @@ if (isset($submit_num_fields)) {
         }
         if ($field_attribute[$i] != '') {
             $query .= ' ' . $field_attribute[$i];
-        } else if (PMA_MYSQL_INT_VERSION >= 40100 && $field_charset[$i] != '') {
+        } else if (PMA_MYSQL_INT_VERSION >= 40100 && isset($field_charset[$i]) && $field_charset[$i] != '') {
             $query .= ' CHARACTER SET ' . $field_charset[$i];
         }
         if ($field_default[$i] != '') {
@@ -235,6 +234,19 @@ if (isset($submit_num_fields)) {
  * Displays the form used to define the new field
  */
 if ($abort == FALSE) {
+    /**
+     * Gets tables informations
+     */
+    require('./tbl_properties_common.php');
+    require('./tbl_properties_table_info.php');
+    /**
+     * Displays top menu links
+     */
+    $active_page = 'tbl_properties_structure.php';
+    require('./tbl_properties_links.php');
+    /**
+     * Display the form
+     */
     $action = 'tbl_addfield.php';
     require('./tbl_properties.inc.php');
 

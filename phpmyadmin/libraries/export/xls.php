@@ -1,5 +1,5 @@
 <?php
-/* $Id: xls.php,v 1.2 2004/07/06 17:53:28 lem9 Exp $ */
+/* $Id: xls.php,v 2.0 2004/10/13 09:59:56 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 require_once('Spreadsheet/Excel/Writer.php');

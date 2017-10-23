@@ -27,8 +27,8 @@ GOTO WinNT
 
 :MainNT 
 echo Installing MySQL as an Service 
-copy %cd%\bin\my.cnf /-y %windir%\my.ini
-bin\mysqld-nt --install mysql --defaults-file=%cd%\bin\my.cnf
+copy "%cd%\bin\my.cnf" /-y %windir%\my.ini
+bin\mysqld-nt --install mysql --defaults-file="%cd%\bin\my.cnf"
 echo Try to start the MySQL deamon as service ... 
 net start MySQL 
 

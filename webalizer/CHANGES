@@ -3,15 +3,6 @@
 --------------------------------------------------------------------
 
 Fixes:
- o Fix posible obscure buffer overflow bug in DNS resolver code
-
- o Added additional extended character fixes
-
- o Let code accept partial content response codes along with 200's
-
- o Added code to catch blank hostnames (yes, they have been found!)
-   Will convert them into 'Unknown'
-
  o Security fix for cross-site scripting vulnerability found by
    Flavio Veloso (www.magnux.com).
 

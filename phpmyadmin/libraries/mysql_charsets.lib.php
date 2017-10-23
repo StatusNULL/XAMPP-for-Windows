@@ -1,5 +1,5 @@
 <?php
-/* $Id: mysql_charsets.lib.php,v 2.23 2004/09/21 11:00:43 rabus Exp $ */
+/* $Id: mysql_charsets.lib.php,v 2.24 2004/11/19 14:04:02 garvinhicking Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 if (PMA_MYSQL_INT_VERSION >= 40100){
@@ -45,6 +45,14 @@ if (PMA_MYSQL_INT_VERSION >= 40100){
     unset($res, $row);
 
     function PMA_getCollationDescr($collation) {
+        static $collation_cache;
+
+        if (!is_array($collation_cache)) {
+            $collation_cache = array();
+        } elseif (isset($collation_cache[$collation])) {
+            return $collation_cache[$collation];
+        }
+
         if ($collation == 'binary') {
             return $GLOBALS['strBinary'];
         }
@@ -254,6 +262,8 @@ if (PMA_MYSQL_INT_VERSION >= 40100){
                 $descr .= ', ' . $GLOBALS['strCaseSensitive'];
             }
         }
+
+        $collation_cache[$collation] = $descr;
         return $descr;
     }
 
@@ -286,7 +296,7 @@ if (PMA_MYSQL_INT_VERSION >= 40100){
 
     define('PMA_CSDROPDOWN_COLLATION', 0);
     define('PMA_CSDROPDOWN_CHARSET',   1);
-    
+
     function PMA_generateCharsetDropdownBox($type = PMA_CSDROPDOWN_COLLATION, $name = NULL, $id = NULL, $default = NULL, $label = TRUE, $indent = 0, $submitOnChange = FALSE) {
         global $mysql_charsets, $mysql_charsets_descriptions, $mysql_collations;
 

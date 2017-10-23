@@ -1,5 +1,5 @@
 <?php
-/* $Id: norwegian-utf-8.inc.php,v 2.44 2004/09/25 11:51:44 lem9 Exp $ */
+/* $Id: norwegian-utf-8.inc.php,v 2.63 2004/12/30 20:42:34 lem9 Exp $ */
 
 /**
  * Translated by Sven-Erik Andersen <sven-erik.andersen at pkf107.no>
@@ -33,6 +33,7 @@ $strAddConstraints = 'Legg til begrensninger';
 $strAddDeleteColumn = 'Legg til/Slett kolonne';
 $strAddDeleteRow = 'Legg til/Slett kriterierad';
 $strAddDropDatabase = 'Legg til DROP DATABASE';
+$strAddFields = 'Legg til %s felt(er)';
 $strAddHeaderComment = 'Legg til egen kommentar i hodet (\\n lager linjeskift)';
 $strAddIfNotExists = 'Legg til IF NOT EXISTS';
 $strAddIntoComments = 'Legg til i kommentarer';
@@ -60,6 +61,7 @@ $strAnd = 'og';
 $strAny = 'Alle';
 $strAnyHost = 'Alle verter';
 $strAnyUser = 'Alle brukere';
+$strApproximateCount = 'Kan være unøyaktig. Se FAQ 3.11';
 $strArabic = 'arabisk';
 $strArmenian = 'armensk';
 $strAscending = 'Stigende';
@@ -73,8 +75,15 @@ $strBack = 'Tilbake';
 $strBaltic = 'baltisk';
 $strBeginCut = 'START KUTT';
 $strBeginRaw = 'START UFORMATERT';
+$strBinLogEventType = 'Hendelsestype';
+$strBinLogInfo = 'Informasjon';
+$strBinLogName = 'Loggnavn';
+$strBinLogOriginalPosition = 'Original posisjon';
+$strBinLogPosition = 'Posisjon';
+$strBinLogServerId = 'Tjener ID';
 $strBinary = ' Binær ';
 $strBinaryDoNotEdit = ' Binær - må ikke redigeres ';
+$strBinaryLog = 'Binærlogg';
 $strBookmarkAllUsers = 'La alle brukere ha adgang til dette bokmerket';
 $strBookmarkDeleted = 'Bokmerket har blitt slettet.';
 $strBookmarkLabel = 'Navn';
@@ -126,6 +135,7 @@ $strColumnPrivileges = 'Kolonne-spesifikke privilegier';
 $strCommand = 'Kommando';
 $strComments = 'Kommentarer';
 $strCommentsForTable = 'TABELLKOMMENTARER';
+$strCompatibleHashing = 'MySQL&nbsp;4.0 kompatibel';
 $strCompleteInserts = 'Komplette innlegg';
 $strCompression = 'Kompresjon';
 $strConfigFileError = 'phpMyAdmin kunne ikke lese din konfigurasjonsfil!<br />Dette kan skje hvis PHP finner en syntaksfeil eller ikke kan finne filen.<br />Vennligst kall opp konfigurasjonsfilen direkte via linken under og les PHP feilmeldingen(e) som du vil få. I de fleste tilfeller så mangler det et anførselstegn eller et semikolon et sted.<br />Hvis du får en blank side så er alt ok.';
@@ -135,6 +145,7 @@ $strConnections = 'tilkoblinger';
 $strConstraintsForDumped = 'Begrensninger for dumpede tabeller';
 $strConstraintsForTable = 'Begrensninger for tabell';
 $strCookiesRequired = 'Cookies må være slått på forbi dette punkt.';
+$strCopyDatabaseOK = 'Databasen %s har blitt kopiert til %s';
 $strCopyTable = 'Kopier tabell til (database<b>.</b>tabell):';
 $strCopyTableOK = 'Tabellen %s er kopiert til %s.';
 $strCopyTableSameNames = 'Kan ikke kopiere tabellen til samme navn!';
@@ -154,6 +165,7 @@ $strCzech = 'tjekkisk';
 $strCzechSlovak = 'Tjekkoslovakisk';
 
 $strDBComment = 'Database kommentar: ';
+$strDBCopy = 'Kopier databasen til';
 $strDBGContext = 'Sammenheng';
 $strDBGContextID = 'Sammenhengs-ID';
 $strDBGHits = 'Treff';
@@ -241,7 +253,7 @@ $strFieldHasBeenDropped = 'Feltet %s har blitt slettet';
 $strFields = 'Felter';
 $strFieldsEmpty = ' Antall felter er tommt! ';
 $strFieldsEnclosedBy = 'Felter omsluttet av';
-$strFieldsEscapedBy = 'Felter "escaped" med';
+$strFieldsEscapedBy = 'Felter beskyttet med';
 $strFieldsTerminatedBy = 'Felter avsluttet med';
 $strFileAlreadyExists = 'Fila %s eksisterer alt på serveren, endre navnet eller merk av for overskriving av fil.';
 $strFileCouldNotBeRead = 'Fila kunne ikke leses';
@@ -295,11 +307,16 @@ $strIndex = 'Indeks';
 $strIndexHasBeenDropped = 'Indeksen %s har blitt slettet';
 $strIndexName = 'Indeksnavn&nbsp;:';
 $strIndexType = 'Indekstype&nbsp;:';
+$strIndexWarningMultiple = 'Mer enn en %s nøkkel ble opprettet for kolonne `%s`';
+$strIndexWarningPrimary = 'Både PRIMARY og INDEX nøkler bør ikke settes for kolonne `%s`';
+$strIndexWarningTable = 'Problemer med indeksene i tabellen `%s`';
+$strIndexWarningUnique = 'Både UNIQUE og INDEX nøkler bør ikke settes for kolonne `%s`';
 $strIndexes = 'Indekser';
 $strInnodbStat = 'InnoDB status';
 $strInsecureMySQL = 'Din konfigurasjonsfil inneholder innstillinger (root uten passord) som korrensponderer med MySQLs standard priviligerte brukerkonto. Din MySQL-tjener kjører med denne standardinnstillingen, er åpen for misbruk, og du burde fikse dette sikkerhetshullet snarest.';
 $strInsert = 'Sett inn';
 $strInsertAsNewRow = 'Sett inn som ny rad';
+$strInsertBookmarkTitle = 'Skriv inn bokmerketittel';
 $strInsertNewRow = 'Sett inn ny rad';
 $strInsertTextfiles = 'Les tekstfil inn i tabell';
 $strInsertedRowId = 'Satt inn rad id:';
@@ -381,6 +398,7 @@ $strName = 'Navn';
 $strNeedPrimaryKey = 'Du burde definere en primærnøkkel for denne tabellen.';
 $strNext = 'Neste';
 $strNo = 'Nei';
+$strNoActivity = 'Ingen aktivitet på %s sekunder eller mer, du må logge inn på nytt';
 $strNoDatabases = 'Ingen databaser';
 $strNoDatabasesSelected = 'Ingen databaser er valgt.';
 $strNoDescription = 'ingen beskrivelse';
@@ -400,6 +418,7 @@ $strNoRights = 'Du har ikke nok rettigheter til å være her nå!';
 $strNoRowsSelected = 'Ingen rader valgt';
 $strNoSpace = 'Ikke nok plass til å lagre fila %s.';
 $strNoTablesFound = 'Ingen tabeller i databasen.';
+$strNoThemeSupport = 'Ikke støtte for maler, kontroller konfigureringen og/eller dine maler i katalogen %s.';
 $strNoUsersFound = 'Ingen bruker(e) funnet.';
 $strNoValidateSQL = 'Ikke teste SQL';
 $strNone = 'Ingen';
@@ -431,6 +450,7 @@ $strPartialText = 'Delvis tekst';
 $strPassword = 'Passord';
 $strPasswordChanged = 'Passordet til %s er endret.';
 $strPasswordEmpty = 'Passordet er blankt!';
+$strPasswordHashing = 'Passordnøkling';
 $strPasswordNotSame = 'Passordene er ikke like!';
 $strPdfDbSchema = 'Skjema for "%s"-databasen - Side %s';
 $strPdfInvalidTblName = 'Tabellen "%s" eksisterer ikke!';
@@ -486,7 +506,6 @@ $strPrivDescUsage = 'Ingen privilegier.';
 $strPrivileges = 'Privilegier';
 $strPrivilegesReloaded = 'Oppfriskingen av privilegiene lyktes.';
 $strProcesslist = 'Prosess liste';
-$strProperties = 'Egenskaper';
 $strPutColNames = 'Sett inn feltnavn i første rad';
 
 $strQBE = 'Spørring ved eksempel (Query by Example)';
@@ -568,6 +587,7 @@ $strSearchType = 'Finn:';
 $strSecretRequired = 'Konfigurasjonsfila trenger nå et hemmelig passordfrase (blowfish_secret).';
 $strSelectADb = 'Vennligst velg en database';
 $strSelectAll = 'Velg alle';
+$strSelectBinaryLog = 'Velg binærlogg for visning';
 $strSelectFields = 'Velg felt (minst ett):';
 $strSelectNumRows = 'i spørring';
 $strSelectTables = 'Velg tabeller';
@@ -623,6 +643,7 @@ $strSubmit = 'Send';
 $strSuccess = 'Kommandoen/spørringen er utført';
 $strSum = 'Sum';
 $strSwedish = 'svensk';
+$strSwitchToDatabase = 'Bytt til kopiert database';
 $strSwitchToTable = 'Bytt til kopiert tabell';
 
 $strTable = 'Tabell';
@@ -684,6 +705,7 @@ $strUpgrade = 'Du burde oppgradere til %s %s eller nyere.';
 $strUsage = 'Bruk';
 $strUseBackquotes = 'Bruk venstre anførselstegn med tabell og feltnavn';
 $strUseHostTable = 'Vis vert tabell';
+$strUseTabKey = 'Bruk TAB tasten for å flytte fra verdi til verdi, eller CTRL+piltastene for å bevege deg hvor som helst';
 $strUseTables = 'Bruk tabeller';
 $strUseTextField = 'Bruk tekstfelt';
 $strUseThisValue = 'Bruk denne verdien';
@@ -722,5 +744,14 @@ $strYes = 'Ja';
 $strZeroRemovesTheLimit = 'Merk: Ved å sette disse til 0 (null) fjernes begrensningen.';
 $strZip = 'Komprimert (zip)';
 
+// To translate:
+$strAfterInsertNext = 'Edit next row';  //to translate
+
+$strEscapeWildcards = 'Jokertegnene _ og % må beskyttes med en \ for å bruke dem direkte';  //to translate
+
+$strMbExtensionMissing = 'The mbstring PHP extension was not found and you seem to be using multibyte charset. Without mbstring extension phpMyAdmin is unable to split strings correctly and it may result in unexpected results.';  //to translate
+$strMbOverloadWarning = 'You have enabled mbstring.func_overload in your PHP configuration. This option is incompatible with phpMyAdmin and might cause breaking of some data!';  //to translate
+
+$strSQLExportCompatibility = 'SQL export compatibility';  //to translate
 
 ?>

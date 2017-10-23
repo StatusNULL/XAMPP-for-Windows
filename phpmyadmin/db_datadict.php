@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_datadict.php,v 2.14 2004/09/24 20:49:44 lem9 Exp $ */
+/* $Id: db_datadict.php,v 2.15 2004/10/08 11:14:06 garvinhicking Exp $ */
 
 
 /**
@@ -153,7 +153,7 @@ while ($row = PMA_DBI_fetch_assoc($rowset)) {
      * Displays the comments of the table if MySQL >= 3.23
      */
     if (!empty($show_comment)) {
-        echo $strTableComments . '&nbsp;:&nbsp;' . $show_comment . '<br /><br />';
+        echo $strTableComments . ':&nbsp;' . $show_comment . '<br /><br />';
     }
 
     /**

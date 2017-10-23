@@ -1,5 +1,5 @@
 <?php
-/* $Id: config_import.lib.php,v 2.35 2004/09/23 10:10:37 rabus Exp $ */
+/* $Id: config_import.lib.php,v 2.40 2004/12/28 12:48:34 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -185,6 +185,10 @@ if (isset($cfg['Servers'])) {
 
         if (!isset($cfg['Servers'][$i]['verbose_check'])) {
             $cfg['Servers'][$i]['verbose_check'] = TRUE;
+        }
+
+        if (!isset($cfg['Servers'][$i]['AllowRoot'])) {
+            $cfg['Servers'][$i]['AllowRoot'] = TRUE;
         }
 
         if (!isset($cfg['Servers'][$i]['AllowDeny'])) {
@@ -939,9 +943,10 @@ if ($cfg['ShowFunctionFields']) {
                'LCASE',
                'UCASE',
                'NOW',
+               'OLD_PASSWORD',
                'PASSWORD',
                'MD5',
-                'SHA1',
+               'SHA1',
                'ENCRYPT',
                'RAND',
                'LAST_INSERT_ID',
@@ -999,6 +1004,7 @@ if ($cfg['ShowFunctionFields']) {
                 'SOUNDEX',
                 'LCASE',
                 'UCASE',
+                'OLD_PASSWORD',
                 'PASSWORD',
                 'MD5',
                 'SHA1',
@@ -1029,6 +1035,7 @@ if ($cfg['ShowFunctionFields']) {
                 'ENCRYPT',
                 'RAND',
                 'LAST_INSERT_ID',
+                'UNIX_TIMESTAMP',
                 'COUNT',
                 'AVG',
                 'SUM'
@@ -1216,6 +1223,9 @@ if (!isset($cfg['Export']['sql_structure'])) {
 }
 if (!isset($cfg['Export']['sql_data'])) {
     $cfg['Export']['sql_data'] = TRUE;
+}
+if (!isset($cfg['Export']['sql_compat'])) {
+    $cfg['Export']['sql_compat'] = 'NONE';
 }
 if (!isset($cfg['Export']['sql_backquotes'])) {
     $cfg['Export']['sql_backquotes'] = TRUE;

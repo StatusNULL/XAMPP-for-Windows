@@ -45,11 +45,13 @@ $TEXT['navi-specialguest']="Current Guest";
 $TEXT['navi-guest1']="FCKeditor";
                                                                                                                  
 $TEXT['navi-languages']="Sprachen";
-$TEXT['navi-english']="Englisch";
+$TEXT['navi-english']="English";
 $TEXT['navi-german']="Deutsch";
-$TEXT['navi-french']="Französisch";
-$TEXT['navi-dutch']="Holländisch";
-$TEXT['navi-spanish']="Spanisch";
+$TEXT['navi-french']="Francais";
+$TEXT['navi-dutch']="Nederlands";
+$TEXT['navi-polish']="Polski";
+$TEXT['navi-spanish']="Español";
+$TEXT['navi-chinese']="&#20013;&#25991;";
 
 // ---------------------------------------------------------------------
 // STATUS
@@ -179,7 +181,7 @@ $TEXT['start-subhead']="Herzlichen Glückwunsch:<br>XAMPP wurde erfolgreich auf d
 
 $TEXT['start-text1']="Nun kann es losgehen. :) Als erstes bitte einmal auf der linken Seite auf »Status« klicken. Damit bekommt man einen Überblick was alles schon funktioniert. Ein paar Funktionen werden ausgeschaltet sein. Das ist Absicht so. Es sind Funktionen, die nicht überall funktionieren oder evtl. Probleme bereiten könnten.";
 
-$TEXT['start-text-newest']="<B>Vielen Dank an Carsten Wiedmann, der Apachefriends seine raffinierte Kompilation  von PHP 4.3.10 u.a. mit MySQL 1.4.8 Support und eine \"gepatchte\" Version vom Webalizer für win32 zur Verfügung stellte! :-)</B>";
+$TEXT['start-text-newest']="<B>Vielen Dank an Carsten Wiedmann  für seine raffinierten Kompilationen. :-)</B>";
 
 $TEXT['start-text3']="";
 
@@ -285,9 +287,19 @@ $TEXT['iart-ok']="OK";
 // FLASH ART DEMO
 // ---------------------------------------------------------------------
 
+// $TEXT['flash-head']="Flash Art (Beispiel für PHP+MING)";
+// $TEXT['flash-text1']="Das MING Projekt für Windows wurde leider nicht weiterverfolgt und ist deshalb unvollständig.<br>Vgl. bitte <a class=blue target=extern href=\"http://ming.sourceforge.net/install.html/\">Ming - an SWF output library and PHP module</a>";
+// $TEXT['flash-ok']="OK";
+
+
+// ---------------------------------------------------------------------
+// FLASH ART DEMO
+// ---------------------------------------------------------------------
+
 $TEXT['flash-head']="Flash Art (Beispiel für PHP+MING)";
-$TEXT['flash-text1']="Das MING Projekt für Windows wurde leider nicht weiterverfolgt und ist deshalb unvollständig.<br>Vgl. bitte <a class=blue target=extern href=\"http://ming.sourceforge.net/install.html/\">Ming - an SWF output library and PHP module</a>";
+$TEXT['flash-text2']="Font »AnkeCalligraph« von <a class=blue target=extern href=\"http://www.anke-art.de/\">Anke Arnold</a>";
 $TEXT['flash-ok']="OK";
+$TEXT['flash-text1']="Das MING Projekt für Windows wurde leider nicht weiterverfolgt und ist deshalb unvollständig.<br>Vgl. bitte <a class=blue target=extern href=\"http://ming.sourceforge.net/install.html/\">Ming - an SWF output library and PHP module</a>";
 
 // ---------------------------------------------------------------------
 // PHONE BOOK DEMO

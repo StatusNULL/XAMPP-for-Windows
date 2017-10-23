@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_row_delete.php,v 2.13 2004/05/20 16:14:09 nijel Exp $ */
+/* $Id: tbl_row_delete.php,v 2.15 2004/12/28 13:54:36 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 require_once('./libraries/grab_globals.lib.php');
 require_once('./libraries/common.lib.php');
@@ -20,9 +20,9 @@ if ((!isset($rows_to_delete) || !is_array($rows_to_delete)) && !isset($mult_btn)
  */
 
 // workaround for IE problem:
-if (isset($submit_mult_x)) {
+if (isset($submit_mult_delete_x)) {
     $submit_mult = 'row_delete';
-} elseif (isset($submit_mult_edit_x)) {
+} elseif (isset($submit_mult_change_x)) {
     $submit_mult = 'row_edit';
 } elseif (isset($submit_mult_export_x)) {
     $submit_mult = 'row_export';
@@ -119,7 +119,7 @@ if (!empty($submit_mult)) {
             }
 
             if (isset($original_sql_query)) {
-                $sql_query = urldecode($original_sql_query);
+                $sql_query = $original_sql_query;
             }
 
             if (isset($original_url_query)) {

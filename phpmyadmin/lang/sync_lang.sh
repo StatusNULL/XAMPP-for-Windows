@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: sync_lang.sh,v 2.10 2004/09/22 12:53:52 nijel Exp $
+# $Id: sync_lang.sh,v 2.12 2004/10/13 08:59:36 nijel Exp $
 ##
 # Shell script that synchronises all translations in phpMyAdmin
 ##
@@ -97,7 +97,7 @@ estonian-iso-8859-1
 finnish-iso-8859-1
 french-iso-8859-1
 galician-iso-8859-1
-german-iso-8859-1
+german-utf-8
 greek-iso-8859-7
 hebrew-iso-8859-8-i
 hungarian-iso-8859-2
@@ -184,7 +184,12 @@ for base in $BASE_TRANSLATIONS ; do
     fi
     echo "$base [charset $src_charset]"
 
-    is_utf=no
+    # do we already have utf-8 translation?
+    if [ $src_charset = 'utf-8' ] ; then
+        is_utf=yes
+    else
+        is_utf=no
+    fi
 
     # at first update existing translations
     for file in $create_files ; do
@@ -196,11 +201,12 @@ for base in $BASE_TRANSLATIONS ; do
             charset=$(echo $file | sed -e 's/^[^-]*-//' -e 's/\.inc\.php\?$//')
         fi
 
+        if [ $charset = 'utf-8' ] ; then
+            is_utf=yes
+        fi
+
         # check whether we need to update translation
         if [ ! "$base.inc.php" -nt "$file" -a "$FORCE" -eq 0 -a -s "$file" ] ; then
-            if [ $charset = 'utf-8' ] ; then
-                is_utf=yes
-            fi
             echo " $file is not needed to update"
             continue
         fi

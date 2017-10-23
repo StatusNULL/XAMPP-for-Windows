@@ -1,5 +1,5 @@
 <?php
-/* $Id: russian-utf-8.inc.php,v 2.40 2004/09/22 12:53:52 nijel Exp $ */
+/* $Id: russian-utf-8.inc.php,v 2.56 2004/12/28 16:34:49 nijel Exp $ */
 
 /**
  * Translated by Gosha Sakovich <gt2 at users.sourceforge.net>
@@ -489,7 +489,6 @@ $strPrivDescUsage = 'Нет привилегий.';
 $strPrivileges = 'Привилегии';
 $strPrivilegesReloaded = 'Привилегии были успешно перезагружены.';
 $strProcesslist = 'Список процессов';
-$strProperties = 'Свойства';
 $strPutColNames = 'Укажите наименования полей в первой строке';
 
 $strQBE = 'Запрос&nbsp;по&nbsp;примеру';
@@ -726,4 +725,32 @@ $strZeroRemovesTheLimit = 'Замечание: Установка этих оп�
 $strZip = 'архивировать в zip';
 
 $strPersian = 'Persian';  //to translate
+$strAddFields = 'Add %s field(s)';  //to translate
+$strInsertBookmarkTitle = 'Please insert bookmark title';  //to translate
+$strNoThemeSupport = 'No themes support, please check your configuration and/or your themes in directory %s.';  //to translate
+$strUseTabKey = 'Use TAB key to move from value to value, or CTRL+arrows to move anywhere';  //to translate
+$strEscapeWildcards = 'Wildcards _ and % should be escaped with a \ to use them literally';  //to translate
+$strBinLogName = 'Log name';  //to translate
+$strBinLogPosition = 'Position';  //to translate
+$strBinLogEventType = 'Event type';  //to translate
+$strBinLogServerId = 'Server ID';  //to translate
+$strBinLogOriginalPosition = 'Original position';  //to translate
+$strBinLogInfo = 'Information';  //to translate
+$strBinaryLog = 'Binary log';  //to translate
+$strSelectBinaryLog = 'Select binary log to view';  //to translate
+$strDBCopy = 'Copy database to';  //to translate
+$strCopyDatabaseOK = 'Database %s has been copied to %s';  //to translate
+$strSwitchToDatabase = 'Switch to copied database';  //to translate
+$strPasswordHashing = 'Password Hashing';  //to translate
+$strCompatibleHashing = 'MySQL&nbsp;4.0 compatible';  //to translate
+$strIndexWarningPrimary = 'PRIMARY and INDEX keys should not both be set for column `%s`';//to translate
+$strIndexWarningUnique = 'UNIQUE and INDEX keys should not both be set for column `%s`';//to translate
+$strIndexWarningMultiple = 'More than one %s key was created for column `%s`';//to translate
+$strIndexWarningTable = 'Problems with indexes of table `%s`';//to translate
+$strNoActivity = 'No activity since %s seconds or more, please login again';  //to translate
+$strApproximateCount = 'May be approximate. See FAQ 3.11';  //to translate
+$strSQLExportCompatibility = 'SQL export compatibility';  //to translate
+$strMbOverloadWarning = 'You have enabled mbstring.func_overload in your PHP configuration. This option is incompatible with phpMyAdmin and might cause breaking of some data!';  //to translate
+$strMbExtensionMissing = 'The mbstring PHP extension was not found and you seem to be using multibyte charset. Without mbstring extension phpMyAdmin is unable to split strings correctly and it may result in unexpected results.';  //to translate
+$strAfterInsertNext = 'Edit next row';  //to translate
 ?>

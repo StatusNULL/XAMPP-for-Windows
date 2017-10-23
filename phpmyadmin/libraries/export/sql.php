@@ -1,5 +1,5 @@
 <?php
-/* $Id: sql.php,v 2.33 2004/09/24 15:41:50 nijel Exp $ */
+/* $Id: sql.php,v 2.40 2004/12/29 09:36:25 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 error_reporting(E_ALL);
 /**
@@ -9,7 +9,7 @@ error_reporting(E_ALL);
 /**
  * Marker for comments, -- is needed for ANSI SQL.
  */
-$comment_marker = '-- ';
+$GLOBALS['comment_marker'] = '-- ';
 
 /**
  * Outputs comment
@@ -55,6 +55,11 @@ function PMA_exportFooter() {
 function PMA_exportHeader() {
     global $crlf;
     global $cfg;
+
+    if (PMA_MYSQL_INT_VERSION >= 40100 && isset($GLOBALS['sql_compat']) && $GLOBALS['sql_compat'] != 'NONE') {
+        $result = PMA_DBI_query('SET @@SQL_MODE="' . $GLOBALS['sql_compat'] . '"');
+        PMA_DBI_free_result($result);
+    }
 
     $head  =  $GLOBALS['comment_marker'] . 'phpMyAdmin SQL Dump' . $crlf
            .  $GLOBALS['comment_marker'] . 'version ' . PMA_VERSION . $crlf
@@ -143,8 +148,12 @@ function PMA_exportDBHeader($db) {
  * @access  public
  */
 function PMA_exportDBFooter($db) {
-    if (isset($GLOBALS['sql_constraints'])) return PMA_exportOutputHandler($GLOBALS['sql_constraints']);
-    return TRUE;
+    $result = TRUE;
+    if (isset($GLOBALS['sql_constraints'])) {
+        $result = PMA_exportOutputHandler($GLOBALS['sql_constraints']);
+        unset($GLOBALS['sql_constraints']);
+    }
+    return $result;
 }
 
 /**
@@ -221,6 +230,15 @@ function PMA_getTableDef($db, $table, $crlf, $error_url, $show_dates = false)
         $create_query = $row[1];
         unset($row);
 
+        // Convert end of line chars to one that we want (note that MySQL doesn't return query it will accept in all cases)
+        if (strpos($create_query, "(\r\n ")) {
+            $create_query = str_replace("\r\n", $crlf, $create_query);
+        } elseif (strpos($create_query, "(\n ")) {
+            $create_query = str_replace("\n", $crlf, $create_query);
+        } elseif (strpos($create_query, "(\r ")) {
+            $create_query = str_replace("\r", $crlf, $create_query);
+        }
+
         // Should we use IF NOT EXISTS?
         if (isset($GLOBALS['if_not_exists'])) {
             $create_query     = preg_replace('/^CREATE TABLE/', 'CREATE TABLE IF NOT EXISTS', $create_query);
@@ -229,12 +247,8 @@ function PMA_getTableDef($db, $table, $crlf, $error_url, $show_dates = false)
         // are there any constraints to cut out?
         if (preg_match('@CONSTRAINT|FOREIGN[\s]+KEY@', $create_query)) {
 
-            // split the query into lines, so we can easilly handle it
-            if (strpos(",\r\n ", $create_query) === FALSE) {
-                $sql_lines = preg_split('@\r|\n@', $create_query);
-            } else {
-                $sql_lines = preg_split('@\r\n@', $create_query);
-            }
+            // Split the query into lines, so we can easily handle it. We know lines are separated by $crlf (done few lines above).
+            $sql_lines = explode($crlf, $create_query);
             $sql_count = count($sql_lines);
 
             // lets find first line with constraints
@@ -528,8 +542,14 @@ function PMA_exportData($db, $table, $crlf, $error_url, $sql_query)
                     $values[] = $row[$j];
                 // a binary field
                 // Note: with mysqli, under MySQL 4.1.3, we get the flag
-                // "binary" for a datetime (I don't know why)
-                } else if (stristr($field_flags[$j], 'BINARY') && isset($GLOBALS['hexforbinary']) && $fields_meta[$j]->type != 'datetime') {
+                // "binary" for those field types (I don't know why)
+                } else if (stristr($field_flags[$j], 'BINARY')
+                        && isset($GLOBALS['hexforbinary'])
+                        && $fields_meta[$j]->type != 'datetime'
+                        && $fields_meta[$j]->type != 'date'
+                        && $fields_meta[$j]->type != 'time'
+                        && $fields_meta[$j]->type != 'timestamp'
+                       ) {
                     // empty blobs need to be different, but '0' is also empty :-(
                     if (empty($row[$j]) && $row[$j] != '0') {
                         $values[] = '\'\'';

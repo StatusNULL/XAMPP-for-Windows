@@ -16,12 +16,12 @@ Content-language: de
 Content-type: text/html; charset=ISO-8859-1
 Body:----------de--
 <!--#set var="CONTENT_LANGUAGE" value="de"
---><!--#set var="TITLE" value="Vorbedingung negativ!"
+--><!--#set var="TITLE" value="Vorbedingung verfehlt!"
 --><!--#include virtual="include/top.html" -->
 
-    Die Vorbedingung unter dem angeforderten URL wurde
-    negativ ausgewertet.
-    
+    Die f&uuml;r den Abruf der angeforderten URL notwendige
+    Vorbedingung wurde nicht erf&uuml;llt.
+
 <!--#include virtual="include/bottom.html" -->
 ----------de--
 
@@ -74,6 +74,19 @@ Body:----------it--
 
 <!--#include virtual="include/bottom.html" -->
 ----------it--
+
+Content-language: ja
+Content-type: text/html; charset=ISO-2022-JP
+Body:----------ja--
+<!--#set var="CONTENT_LANGUAGE" value="ja"
+--><!--#set var="CHARACTER_ENCODING" value="iso-2022-jp"
+--><!--#set var="TITLE" value="Precondition failed!"
+--><!--#include virtual="include/top.html" -->
+
+    指定された URL へのリクエストにおける事前条件が満たされませんでした。
+  
+<!--#include virtual="include/bottom.html" --> 
+----------ja--
 
 Content-language: ko
 Content-type: text/html; charset=EUC-KR

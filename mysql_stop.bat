@@ -1,3 +1,3 @@
 @echo off
 echo Mysql shutdowm ...
-mysql\bin\mysqladmin shutdown
+mysql\bin\mysqladmin --user=pma --password= shutdown

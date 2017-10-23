@@ -1,5 +1,5 @@
 <?php
-/* $Id: server_processlist.php,v 2.9 2004/08/12 15:13:19 nijel Exp $ */
+/* $Id: server_processlist.php,v 2.11 2004/10/21 10:18:12 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -40,13 +40,16 @@ echo '<h2>' . "\n"
  * Sends the query and buffers the result
  */
 $serverProcesses = array();
-$res = PMA_DBI_query('SHOW' . (empty($full) ? '' : ' FULL') . ' PROCESSLIST;');
+$sql_query = 'SHOW' . (empty($full) ? '' : ' FULL') . ' PROCESSLIST';
+$res = PMA_DBI_query($sql_query);
 while ($row = PMA_DBI_fetch_assoc($res)) {
     $serverProcesses[] = $row;
 }
 @PMA_DBI_free_result($res);
 unset($res);
 unset($row);
+
+PMA_showMessage($GLOBALS['strSuccess']);
 
 
 /**

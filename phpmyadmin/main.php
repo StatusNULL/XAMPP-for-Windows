@@ -1,5 +1,5 @@
 <?php
-/* $Id: main.php,v 2.56 2004/09/07 16:54:15 lem9 Exp $ */
+/* $Id: main.php,v 2.65 2004/12/28 15:12:08 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -52,20 +52,6 @@ if (isset($table)) {
 }
 $show_query = '1';
 require_once('./header.inc.php');
-if (isset($message)) {
-    PMA_showMessage($message);
-}
-else if (isset($reload) && $reload) {
-    // Reloads the navigation frame via JavaScript if required
-    echo "\n";
-    ?>
-<script type="text/javascript" language="javascript1.2">
-<!--
-window.parent.frames['nav'].location.replace('./left.php?<?php echo PMA_generate_common_url('', '', '&');?>&hash=' + <?php echo (($cfg['QueryFrame'] && $cfg['QueryFrameJS']) ? 'window.parent.frames[\'queryframe\'].document.hashform.hash.value' : "'" . md5($cfg['PmaAbsoluteUri']) . "'"); ?>);
-//-->
-</script>
-    <?php
-}
 echo "\n";
 
 
@@ -81,10 +67,11 @@ echo "\n";
         <td valign="top">
         <h1>
         <?php
-        echo sprintf($strWelcome, ' phpMyAdmin ' . PMA_VERSION . ''); 
+        echo sprintf($strWelcome, ' phpMyAdmin ' . PMA_VERSION . '');
         ?>
         </h1>
 <?php
+
 // Don't display server info if $server == 0 (no server selected)
 // loic1: modified in order to have a valid words order whatever is the
 //        language used
@@ -116,6 +103,13 @@ if ($server > 0) {
     echo '<p><b>' . $full_string . '</b></p>' . "\n";
 } // end if
 
+
+// Any message to display?
+
+if (isset($message)) {
+    PMA_showMessage($message);
+    unset($message);
+}
 
 /**
  * Reload mysql (flush privileges)
@@ -153,10 +147,12 @@ if (($server > 0) && isset($mode) && ($mode == 'reload')) {
 /**
  * Displays the MySQL servers choice form
  */
-$show_server_left = FALSE;
-include('./libraries/select_server.lib.php');
+if (!$cfg['LeftDisplayServers']) {
+    $show_server_left = FALSE;
+    include('./libraries/select_server.lib.php');
+}
 
-// neted table needed
+// nested table needed
 ?>
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
@@ -176,92 +172,116 @@ if ($server > 0) {
     $is_create_priv  = FALSE;
     $is_process_priv = TRUE;
     $is_reload_priv  = FALSE;
+    $db_to_create    = '';
 
-// We were checking privileges with 'USE mysql' but users with the global
-// priv CREATE TEMPORARY TABLES or LOCK TABLES can do a 'USE mysql'
-// (even if they cannot see the tables)
+// We were trying to find if user if superuser with 'USE mysql'
+// but users with the global priv CREATE TEMPORARY TABLES or LOCK TABLES
+// can do a 'USE mysql' (even if they cannot see the tables)
     $is_superuser    = PMA_DBI_try_query('SELECT COUNT(*) FROM mysql.user', $userlink, PMA_DBI_QUERY_STORE);
-    if ($dbh) {
-        $local_query = 'SELECT Create_priv, Reload_priv FROM mysql.user WHERE ' . PMA_convert_using('User') . ' = ' . PMA_convert_using(PMA_sqlAddslashes($mysql_cur_user), 'quoted') . ' OR ' . PMA_convert_using('User') . ' = ' . PMA_convert_using('', 'quoted') . ';';
-        $rs_usr      = PMA_DBI_try_query($local_query, $dbh); // Debug: or PMA_mysqlDie('', $local_query, FALSE);
-        if ($rs_usr) {
-            while ($result_usr = PMA_DBI_fetch_assoc($rs_usr)) {
-                if (!$is_create_priv) {
-                    $is_create_priv  = ($result_usr['Create_priv'] == 'Y');
-                }
-                if (!$is_reload_priv) {
-                    $is_reload_priv  = ($result_usr['Reload_priv'] == 'Y');
-                }
-            } // end while
-            PMA_DBI_free_result($rs_usr);
-            unset($rs_usr, $result_usr);
+
+function PMA_analyseShowGrant($rs_usr, &$is_create_priv, &$db_to_create) {
+
+    $re0 = '(^|(\\\\\\\\)+|[^\])'; // non-escaped wildcards
+    $re1 = '(^|[^\])(\\\)+'; // escaped wildcards
+    while ($row = PMA_DBI_fetch_row($rs_usr)) {
+        $show_grants_dbname = substr($row[0], strpos($row[0], ' ON ') + 4,(strpos($row[0], '.', strpos($row[0], ' ON ')) - strpos($row[0], ' ON ') - 4));
+        $show_grants_dbname = ereg_replace('^`(.*)`','\\1',  $show_grants_dbname);
+        $show_grants_str    = substr($row[0],6,(strpos($row[0],' ON ')-6));
+        if (($show_grants_str == 'ALL') || ($show_grants_str == 'ALL PRIVILEGES') || ($show_grants_str == 'CREATE') || strpos($show_grants_str, 'CREATE')) {
+            if ($show_grants_dbname == '*') {
+                $is_create_priv = TRUE;
+                $db_to_create   = '';
+                break;
+            } // end if
+            else if ( (ereg($re0 . '%|_', $show_grants_dbname)
+                    && !ereg('\\\\%|\\\\_', $show_grants_dbname))
+                    || (!PMA_DBI_try_query('USE ' . ereg_replace($re1 .'(%|_)', '\\1\\3', $show_grants_dbname)) && substr(PMA_DBI_getError(), 1, 4) != 1044)
+                    ) {
+                     $db_to_create = ereg_replace($re0 . '%', '\\1...', ereg_replace($re0 . '_', '\\1?', $show_grants_dbname));
+                     $db_to_create = ereg_replace($re1 . '(%|_)', '\\1\\3', $db_to_create);
+                     $is_create_priv     = TRUE;
+                     break;
+            } // end elseif
         } // end if
-    } // end if
-    // If the user has Create priv on a inexistant db, show him in the dialog
-    // the first inexistant db name that we find, in most cases it's probably
-    // the one he just dropped :)
-    if (!$is_create_priv) {
-        $local_query = 'SELECT DISTINCT Db FROM mysql.db WHERE ' . PMA_convert_using('Create_priv') . ' = ' . PMA_convert_using('Y', 'quoted') . ' AND (' . PMA_convert_using('User') . ' = ' .PMA_convert_using(PMA_sqlAddslashes($mysql_cur_user), 'quoted') . ' OR ' . PMA_convert_using('User') . ' = ' . PMA_convert_using('', 'quoted') . ');';
-        $rs_usr      = PMA_DBI_try_query($local_query, $dbh, PMA_DBI_QUERY_STORE);
+    } // end while
+} // end function
+
+// Detection for some CREATE privilege.
+
+// Since MySQL 4.1.2, we can easily detect current user's grants
+// using $userlink (no control user needed)
+// and we don't have to try any other method for detection
+
+    if (PMA_MYSQL_INT_VERSION >= 40102) {
+        $rs_usr = PMA_DBI_try_query('SHOW GRANTS', $userlink, PMA_DBI_QUERY_STORE);
         if ($rs_usr) {
-            $re0     = '(^|(\\\\\\\\)+|[^\])'; // non-escaped wildcards
-            $re1     = '(^|[^\])(\\\)+';       // escaped wildcards
-            while ($row = PMA_DBI_fetch_assoc($rs_usr)) {
-                if (ereg($re0 . '(%|_)', $row['Db'])
-                    || (!PMA_DBI_try_query('USE ' . ereg_replace($re1 . '(%|_)', '\\1\\3', $row['Db'])) && substr(PMA_DBI_getError(), 1, 4) != 1044)) {
-                    $db_to_create   = ereg_replace($re0 . '%', '\\1...', ereg_replace($re0 . '_', '\\1?', $row['Db']));
-                    $db_to_create   = ereg_replace($re1 . '(%|_)', '\\1\\3', $db_to_create);
-                    $is_create_priv = TRUE;
-                    break;
-                } // end if
-            } // end while
+            PMA_analyseShowGrant($rs_usr,$is_create_priv, $db_to_create);
             PMA_DBI_free_result($rs_usr);
-            unset($rs_usr, $row, $re0, $re1);
-        } // end if
-        else {
-            // Finally, let's try to get the user's privileges by using SHOW
-            // GRANTS...
-            // Maybe we'll find a little CREATE priv there :)
-            $rs_usr      = PMA_DBI_try_query('SHOW GRANTS FOR ' . $mysql_cur_user_and_host . ';', $dbh, PMA_DBI_QUERY_STORE);
-            if (!$rs_usr) {
-                // OK, now we'd have to guess the user's hostname, but we
-                // only try out the 'username'@'%' case.
-                $rs_usr      = PMA_DBI_try_query('SHOW GRANTS FOR ' . $mysql_cur_user . ';', $dbh, PMA_DBI_QUERY_STORE);
-            }
-            unset($local_query);
+            unset($rs_usr);
+        }
+    } else {
+
+// Before MySQL 4.1.2, we first try to find a priv in mysql.user. Hopefuly
+// the controluser is correctly defined; but here, $dbh could contain
+// $userlink so maybe the SELECT will fail
+
+        if (!$is_create_priv) {
+            $local_query = 'SELECT Create_priv, Reload_priv FROM mysql.user WHERE ' . PMA_convert_using('User') . ' = ' . PMA_convert_using(PMA_sqlAddslashes($mysql_cur_user), 'quoted') . ' OR ' . PMA_convert_using('User') . ' = ' . PMA_convert_using('', 'quoted') . ';';
+            $rs_usr      = PMA_DBI_try_query($local_query, $dbh); // Debug: or PMA_mysqlDie('', $local_query, FALSE);
             if ($rs_usr) {
-                $re0 = '(^|(\\\\\\\\)+|[^\])'; // non-escaped wildcards
-                $re1 = '(^|[^\])(\\\)+'; // escaped wildcards
-                while ($row = PMA_DBI_fetch_row($rs_usr)) {
-                    $show_grants_dbname = substr($row[0], strpos($row[0], ' ON ') + 4,(strpos($row[0], '.', strpos($row[0], ' ON ')) - strpos($row[0], ' ON ') - 4));
-                    $show_grants_dbname = ereg_replace('^`(.*)`','\\1',  $show_grants_dbname);
-                    $show_grants_str    = substr($row[0],6,(strpos($row[0],' ON ')-6));
-                    if (($show_grants_str == 'ALL') || ($show_grants_str == 'ALL PRIVILEGES') || ($show_grants_str == 'CREATE') || strpos($show_grants_str, 'CREATE')) {
-                        if ($show_grants_dbname == '*') {
-                            $is_create_priv = TRUE;
-                            $db_to_create   = '';
-                            break;
-                        } // end if
-                        else if ( (ereg($re0 . '%|_', $show_grants_dbname)
-                                  && !ereg('\\\\%|\\\\_', $show_grants_dbname))
-                                || (!PMA_DBI_try_query('USE ' . ereg_replace($re1 .'(%|_)', '\\1\\3', $show_grants_dbname)) && substr(PMA_DBI_getError(), 1, 4) != 1044)
-                            ) {
-                            $db_to_create = ereg_replace($re0 . '%', '\\1...', ereg_replace($re0 . '_', '\\1?', $show_grants_dbname));
-                            $db_to_create = ereg_replace($re1 . '(%|_)', '\\1\\3', $db_to_create);
-                            $is_create_priv     = TRUE;
-                            break;
-                        } // end elseif
+                while ($result_usr = PMA_DBI_fetch_assoc($rs_usr)) {
+                    if (!$is_create_priv) {
+                        $is_create_priv  = ($result_usr['Create_priv'] == 'Y');
+                    }
+                    if (!$is_reload_priv) {
+                        $is_reload_priv  = ($result_usr['Reload_priv'] == 'Y');
+                    }
+                } // end while
+                PMA_DBI_free_result($rs_usr);
+                unset($rs_usr, $result_usr);
+            } // end if
+        } // end if
+
+        // If the user has Create priv on a inexistant db, show him in the dialog
+        // the first inexistant db name that we find, in most cases it's probably
+        // the one he just dropped :)
+        if (!$is_create_priv) {
+            $local_query = 'SELECT DISTINCT Db FROM mysql.db WHERE ' . PMA_convert_using('Create_priv') . ' = ' . PMA_convert_using('Y', 'quoted') . ' AND (' . PMA_convert_using('User') . ' = ' .PMA_convert_using(PMA_sqlAddslashes($mysql_cur_user), 'quoted') . ' OR ' . PMA_convert_using('User') . ' = ' . PMA_convert_using('', 'quoted') . ');';
+            $rs_usr      = PMA_DBI_try_query($local_query, $dbh, PMA_DBI_QUERY_STORE);
+            if ($rs_usr) {
+                $re0     = '(^|(\\\\\\\\)+|[^\])'; // non-escaped wildcards
+                $re1     = '(^|[^\])(\\\)+';       // escaped wildcards
+                while ($row = PMA_DBI_fetch_assoc($rs_usr)) {
+                    if (ereg($re0 . '(%|_)', $row['Db'])
+                        || (!PMA_DBI_try_query('USE ' . ereg_replace($re1 . '(%|_)', '\\1\\3', $row['Db'])) && substr(PMA_DBI_getError(), 1, 4) != 1044)) {
+                        $db_to_create   = ereg_replace($re0 . '%', '\\1...', ereg_replace($re0 . '_', '\\1?', $row['Db']));
+                        $db_to_create   = ereg_replace($re1 . '(%|_)', '\\1\\3', $db_to_create);
+                        $is_create_priv = TRUE;
+                        break;
                     } // end if
                 } // end while
-                unset($show_grants_dbname, $show_grants_str, $re0, $re1);
                 PMA_DBI_free_result($rs_usr);
-                unset($rs_usr);
+                unset($rs_usr, $row, $re0, $re1);
             } // end if
-        } // end elseif
-    } // end if
-    else {
-        $db_to_create = '';
-    } // end else
+            else {
+                // Finally, let's try to get the user's privileges by using SHOW
+                // GRANTS...
+                // Maybe we'll find a little CREATE priv there :)
+                $rs_usr      = PMA_DBI_try_query('SHOW GRANTS FOR ' . $mysql_cur_user_and_host . ';', $dbh, PMA_DBI_QUERY_STORE);
+                if (!$rs_usr) {
+                    // OK, now we'd have to guess the user's hostname, but we
+                    // only try out the 'username'@'%' case.
+                    $rs_usr      = PMA_DBI_try_query('SHOW GRANTS FOR ' . $mysql_cur_user . ';', $dbh, PMA_DBI_QUERY_STORE);
+                }
+                unset($local_query);
+                if ($rs_usr) {
+                    PMA_analyseShowGrant($rs_usr,$is_create_priv, $db_to_create);
+                    PMA_DBI_free_result($rs_usr);
+                    unset($rs_usr);
+                } // end if
+            } // end elseif
+        } // end if
+    } // end else (MySQL < 4.1.2)
 
     if (!$cfg['SuggestDBName']) {
         $db_to_create = '';
@@ -290,7 +310,7 @@ if ($server > 0) {
         <th class="tblHeaders"<?php echo $str_iconic_colspan; ?>>&nbsp;&nbsp;MySQL</th>
     </tr>
     <tr><?php
-        echo '        ' . ($str_iconic_list != '' ? sprintf($str_iconic_list,'','b_newdb.png',$strCreateNewDatabase,'') : $str_normal_list); 
+        echo '        ' . ($str_iconic_list != '' ? sprintf($str_iconic_list,'','b_newdb.png',$strCreateNewDatabase,'') : $str_normal_list);
 ?>
     <!-- db creation form -->
         <td valign="top" align="<?php echo $cell_align_left; ?>" nowrap="nowrap">
@@ -316,8 +336,8 @@ if ($server > 0) {
             ?>
             <!-- db creation no privileges message -->
                 <b><?php echo $strCreateNewDatabase . ':&nbsp;' . PMA_showMySQLDocu('Reference', 'CREATE_DATABASE'); ?></b><br />
-                <?php 
-                      echo '<span class="noPrivileges">' 
+                <?php
+                      echo '<span class="noPrivileges">'
                          . ($cfg['ErrorIconic'] ? '<img src="' . $pmaThemeImage . 's_error2.png" width="11" height="11" hspace="2" border="0" align="middle" />' : '')
                          . '' . $strNoPrivileges .'</span>';
         } // end create db form or message
@@ -371,7 +391,7 @@ if ($server > 0) {
             echo "\n";
             ?>
     <tr><?php
-            echo '        ' . ($str_iconic_list != '' ? sprintf($str_iconic_list,'<a href="./server_collations.php?'.$common_url_query.'">','s_asci.png',$strCharsetsAndCollations,'</a>') : $str_normal_list); 
+            echo '        ' . ($str_iconic_list != '' ? sprintf($str_iconic_list,'<a href="./server_collations.php?'.$common_url_query.'">','s_asci.png',$strCharsetsAndCollations,'</a>') : $str_normal_list);
 ?>
         <td>
                 <a href="./server_collations.php?<?php echo $common_url_query; ?>">
@@ -385,7 +405,7 @@ if ($server > 0) {
             echo "\n";
             ?>
     <tr><?php
-            echo '        ' . ($str_iconic_list!='' ? sprintf($str_iconic_list,'<a href="main.php?'.$common_url_query.'&amp;mode=reload">','s_reload.png',$strReloadMySQL,'</a>') : $str_normal_list);  
+            echo '        ' . ($str_iconic_list!='' ? sprintf($str_iconic_list,'<a href="main.php?'.$common_url_query.'&amp;mode=reload">','s_reload.png',$strReloadMySQL,'</a>') : $str_normal_list);
 ?>
         <td>
                 <a href="main.php?<?php echo $common_url_query; ?>&amp;mode=reload">
@@ -400,7 +420,7 @@ if ($server > 0) {
             echo "\n";
             ?>
     <tr><?php
-            echo '        ' . ($str_iconic_list != '' ? sprintf($str_iconic_list,'<a href="server_privileges.php?'.$common_url_query.'">','s_rights.png',$strPrivileges,'</a>') : $str_normal_list);   
+            echo '        ' . ($str_iconic_list != '' ? sprintf($str_iconic_list,'<a href="server_privileges.php?'.$common_url_query.'">','s_rights.png',$strPrivileges,'</a>') : $str_normal_list);
 ?>
         <td>
                 <a href="server_privileges.php?<?php echo $common_url_query; ?>">
@@ -409,9 +429,27 @@ if ($server > 0) {
     </tr>
             <?php
         }
+
+        $binlogs = PMA_DBI_try_query('SHOW MASTER LOGS', NULL, PMA_DBI_QUERY_STORE);
+        if ($binlogs) {
+            if (PMA_DBI_num_rows($binlogs) > 0) {
+                ?>
+    <tr><?php
+            echo '        ' . ($str_iconic_list != '' ? sprintf($str_iconic_list,'<a href="server_binlog.php?'.$common_url_query.'">','s_tbl.png',$strBinaryLog,'</a>') : $str_normal_list);
+?>
+        <td>
+                <a href="server_binlog.php?<?php echo $common_url_query; ?>">
+                    <?php echo $strBinaryLog; ?></a>&nbsp;
+        </td>
+    </tr>
+                <?php
+            }
+            PMA_DBI_free_result($binlogs);
+        }
+        unset($binlogs);
         ?>
     <tr><?php
-            echo '        ' . ($str_iconic_list != '' ? sprintf($str_iconic_list,'<a href="server_databases.php?'.$common_url_query.'">','s_db.png',$strDatabases,'</a>') : $str_normal_list);  
+            echo '        ' . ($str_iconic_list != '' ? sprintf($str_iconic_list,'<a href="server_databases.php?'.$common_url_query.'">','s_db.png',$strDatabases,'</a>') : $str_normal_list);
 ?>
         <td>
                 <a href="./server_databases.php?<?php echo $common_url_query; ?>">
@@ -448,7 +486,7 @@ if ($server > 0) {
         // Logout for advanced authentication
         if ($cfg['Server']['auth_type'] != 'config') {
             $http_logout = ($cfg['Server']['auth_type'] == 'http')
-                         ? "\n" 
+                         ? "\n"
 . '                <a href="./Documentation.html#login_bug" target="documentation">'
                          . ($cfg['ReplaceHelpImg'] ? '<img src="' . $pmaThemeImage . 'b_info.png" width="11" height="11" border="0" alt="Info" align="middle" />' : '(*)') . '</a>'
                          : '';
@@ -487,7 +525,7 @@ if (empty($cfg['Lang'])) {
     ?>
     <!-- Language Selection -->
     <tr><?php
-        echo '        ' . ($str_iconic_list !='' ? sprintf($str_iconic_list,'<a href="./translators.html" target="documentation">','s_lang.png','Language','</a>') : $str_normal_list); 
+        echo '        ' . ($str_iconic_list !='' ? sprintf($str_iconic_list,'<a href="./translators.html" target="documentation">','s_lang.png','Language','</a>') : $str_normal_list);
 ?>
         <td nowrap="nowrap">
             <form method="post" action="index.php" target="_parent">
@@ -518,7 +556,7 @@ if (empty($cfg['Lang'])) {
 
     uasort($available_languages, 'PMA_cmp');
     foreach ($available_languages AS $id => $tmplang) {
-        $lang_name = ucfirst(substr(strstr($tmplang[0], '|'), 1));
+        $lang_name = ucfirst(substr(strrchr($tmplang[0], '|'), 1));
         if ($lang == $id) {
             $selected = ' selected="selected"';
         } else {
@@ -533,12 +571,12 @@ if (empty($cfg['Lang'])) {
             </form>
         </td>
     </tr>
-       
+
     <?php
 }
 
 if (isset($cfg['AllowAnywhereRecoding']) && $cfg['AllowAnywhereRecoding']
-    && $allow_recoding && PMA_MYSQL_INT_VERSION < 40100) {
+    && $server != 0 && $allow_recoding && PMA_MYSQL_INT_VERSION < 40100) {
     echo "\n";
 ?>
     <!-- Charset Selection -->
@@ -569,10 +607,10 @@ if (isset($cfg['AllowAnywhereRecoding']) && $cfg['AllowAnywhereRecoding']
         </td>
     </tr>
     <?php
-} elseif (PMA_MYSQL_INT_VERSION >= 40100) {
+} elseif ($server != 0 && PMA_MYSQL_INT_VERSION >= 40100) {
     echo '    <!-- Charset Info -->' . "\n"
        . '    <tr>' .  "\n"
-       .'        ' . ($str_iconic_list != '' ? sprintf($str_iconic_list,'','s_asci.png',$strMySQLCharset,'') : $str_normal_list) . "\n" 
+       .'        ' . ($str_iconic_list != '' ? sprintf($str_iconic_list,'','s_asci.png',$strMySQLCharset,'') : $str_normal_list) . "\n"
        . '        <td>' . "\n"
        . '            ' . $strMySQLCharset . ': '
        . '            <b>'
@@ -583,7 +621,7 @@ if (isset($cfg['AllowAnywhereRecoding']) && $cfg['AllowAnywhereRecoding']
        . '    </tr>' . "\n"
        . '    <!-- MySQL Connection Collation -->' . "\n"
        . '    <tr>' .  "\n"
-       .'        ' . ($str_iconic_list != '' ? sprintf($str_iconic_list,'','s_asci.png',$strMySQLCharset,'') : $str_normal_list) . "\n" 
+       .'        ' . ($str_iconic_list != '' ? sprintf($str_iconic_list,'','s_asci.png',$strMySQLCharset,'') : $str_normal_list) . "\n"
        . '        <td>' . "\n"
        . '            <form method="post" action="index.php" target="_parent">' . "\n"
        . PMA_generate_common_hidden_inputs(NULL, NULL, 4, 'collation_connection')
@@ -617,12 +655,12 @@ if (isset($available_themes_choices) && $available_themes_choices > 1) {
 ?>
         <td>
             <form name="setTheme" method="post" action="index.php" target="_parent">
-                <?php 
+                <?php
                 echo PMA_generate_common_hidden_inputs('', '', 5);
                 echo $theme_preview_href
                    . (isset($strTheme) ? $strTheme : 'Theme (Style)')
                    . '</a>:' . "\n";
-                ?> 
+                ?>
                 <select name="set_theme" dir="ltr" onchange="this.form.submit();" style="vertical-align: middle">
                 <?php
                     foreach ($available_themes_choices AS $cur_theme) {
@@ -643,7 +681,7 @@ if (isset($available_themes_choices) && $available_themes_choices > 1) {
 ?>
     <!-- Documentation -->
     <tr><?php
-        echo '        ' . ($str_iconic_list != '' ? sprintf($str_iconic_list,'<a href="Documentation.html" target="documentation">','b_docs.png',$strPmaDocumentation,'</a>') : $str_normal_list); 
+        echo '        ' . ($str_iconic_list != '' ? sprintf($str_iconic_list,'<a href="Documentation.html" target="documentation">','b_docs.png',$strPmaDocumentation,'</a>') : $str_normal_list);
 ?>
         <td nowrap="nowrap">
             <a href="Documentation.html" target="documentation"><b><?php echo $strPmaDocumentation; ?></b></a>
@@ -655,7 +693,7 @@ if ($is_superuser || $cfg['ShowPhpInfo']) {
     ?>
     <!-- PHP Information -->
     <tr><?php
-        echo '        ' . ($str_iconic_list != '' ? sprintf($str_iconic_list,'<a href="phpinfo.php?' . PMA_generate_common_url() . '" target="_blank">','php_sym.png',$strShowPHPInfo,'</a>') : $str_normal_list);  
+        echo '        ' . ($str_iconic_list != '' ? sprintf($str_iconic_list,'<a href="phpinfo.php?' . PMA_generate_common_url() . '" target="_blank">','php_sym.png',$strShowPHPInfo,'</a>') : $str_normal_list);
 ?>
         <td nowrap="nowrap">
             <a href="phpinfo.php?<?php echo PMA_generate_common_url(); ?>" target="_blank"><?php echo $strShowPHPInfo; ?></a>
@@ -668,15 +706,15 @@ echo "\n";
 
         <!-- phpMyAdmin related urls -->
     <tr><?php
-        echo '        ' . ($str_iconic_list != '' ? sprintf($str_iconic_list,'<a href="http://www.phpMyAdmin.net/" target="_blank">','b_home.png',$strHomepageOfficial,'</a>') : $str_normal_list);  
+        echo '        ' . ($str_iconic_list != '' ? sprintf($str_iconic_list,'<a href="http://www.phpMyAdmin.net/" target="_blank">','b_home.png',$strHomepageOfficial,'</a>') : $str_normal_list);
 ?>
         <td nowrap="nowrap">
             <a href="http://www.phpMyAdmin.net/" target="_blank"><?php echo $strHomepageOfficial; ?></a>
        </td>
-    </tr> 
+    </tr>
     <tr>
 <?php
-        echo '<td><img src="' .$GLOBALS['pmaThemeImage'] . 'spacer.png'  . '" width="1" height="1" border="0" /></td>'; 
+        echo '<td><img src="' .$GLOBALS['pmaThemeImage'] . 'spacer.png'  . '" width="1" height="1" border="0" /></td>';
 ?>
        <td nowrap="nowrap">
             [<a href="changelog.php" target="_blank">ChangeLog</a>]
@@ -719,6 +757,23 @@ if ($server != 0
 
 if (PMA_PHP_INT_VERSION == 40203 && @extension_loaded('mbstring')) {
     echo '<div class="warning">' . $strPHP40203 . '</div>' . "\n";
+}
+
+/**
+ * Nijel: As we try to hadle charsets by ourself, mbstring overloads just
+ * break it, see bug 1063821.
+ */
+
+if (@extension_loaded('mbstring') && @ini_get('mbstring.func_overload') > 1) {
+    echo '<div class="warning">' . $strMbOverloadWarning . '</div>' . "\n";
+}
+
+/**
+ * Nijel: mbstring is used for handling multibyte inside parser, so it is good
+ * to tell user something might be broken without it, see bug #1063149.
+ */
+if ($GLOBALS['using_mb_charset'] && !@extension_loaded('mbstring')) {
+    echo '<div class="warning">' . $strMbExtensionMissing . '</div>' . "\n";
 }
 
 /**

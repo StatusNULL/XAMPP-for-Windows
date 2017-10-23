@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_properties_links.php,v 2.8 2004/08/12 15:13:19 nijel Exp $ */
+/* $Id: tbl_properties_links.php,v 2.10 2004/10/21 10:18:12 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -14,7 +14,9 @@
 
 require_once('./libraries/common.lib.php');
 
-PMA_checkParameters(array('db'));
+PMA_checkParameters(array('db', 'table'));
+
+echo '<!-- top menu -->' . "\n";
 
 /**
  * Count amount of navigation tabs
@@ -68,7 +70,7 @@ $class7 = 'Drop';
 if ($cfg['LightTabs']) {
     echo '&nbsp;';
 } else {
-    echo '<table border="0" cellspacing="0" cellpadding="0" width="100%">' . "\n"
+    echo '<table border="0" cellspacing="0" cellpadding="0" width="100%" id="topmenu">' . "\n"
        . '    <tr>' . "\n"
        . '        <td class="nav" align="left" nowrap="nowrap" valign="bottom">'
        . '            <table border="0" cellpadding="0" cellspacing="0"><tr>'
@@ -95,6 +97,28 @@ if (!$cfg['LightTabs']) {
        . '</table>';
 } else {
     echo '<br />';
+}
+
+/**
+ * Displays table comment
+ */
+if (!empty($show_comment) && !isset($avoid_show_comment)) {
+    ?>
+<!-- Table comment -->
+<p><i>
+    <?php echo htmlspecialchars($show_comment) . "\n"; ?>
+</i></p>
+    <?php
+} // end if
+
+echo "\n\n";
+
+/**
+ * Displays a message
+ */
+if (!empty($message)) {
+    PMA_showMessage($message);
+    unset($message);
 }
 
 ?><br />

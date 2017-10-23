@@ -1,5 +1,5 @@
 <?php
-/* $Id: export.php,v 2.15 2004/06/24 20:45:12 lem9 Exp $ */
+/* $Id: export.php,v 2.18.2.1 2005/01/23 23:23:57 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -101,7 +101,7 @@ function PMA_exportOutputHandler($line)
         }
     } else {
         if ($GLOBALS['asfile']) {
-            if ($GLOBALS['save_on_server']) {
+            if ($GLOBALS['save_on_server'] && strlen($line) > 0) {
                 $write_result = @fwrite($GLOBALS['file_handle'], $line);
                 if (!$write_result || ($write_result != strlen($line))) {
                     $GLOBALS['message'] = sprintf($GLOBALS['strNoSpace'], htmlspecialchars($save_filename));
@@ -143,15 +143,19 @@ if (empty($asfile)) {
     $asfile = TRUE;
 }
 
-// Defines the default <CR><LF> format
-$crlf = PMA_whichCrlf();
+// Defines the default <CR><LF> format. For SQL always use \n as MySQL wants this on all platforms.
+if ($what == 'sql') {
+    $crlf = "\n";
+} else {
+    $crlf = PMA_whichCrlf();
+}
 
 $output_kanji_conversion = function_exists('PMA_kanji_str_conv') && $type != 'xls';
 
 // Do we need to convert charset?
 $output_charset_conversion = $asfile &&
     $cfg['AllowAnywhereRecoding'] && $allow_recoding
-    && isset($charset_of_file) && $charset_of_file != $charset 
+    && isset($charset_of_file) && $charset_of_file != $charset
     && $type != 'xls';
 
 // Set whether we will need buffering
@@ -214,10 +218,10 @@ if ($asfile) {
     // Generate basic dump extension
     if ($type == 'csv') {
         $filename  .= '.csv';
-        $mime_type = 'text/x-csv';
+        $mime_type = 'text/x-comma-separated-values';
     } else if ($type == 'xls') {
         $filename  .= '.xls';
-        $mime_type = 'application/excel';
+        $mime_type = 'application/vnd.ms-excel';
     } else if ($type == 'xml') {
         $filename  .= '.xml';
         $mime_type = 'text/xml';
@@ -226,24 +230,25 @@ if ($asfile) {
         $mime_type = 'application/x-tex';
     } else {
         $filename  .= '.sql';
-        // loic1: 'application/octet-stream' is the registered IANA type but
-        //        MSIE and Opera seems to prefer 'application/octetstream'
-        $mime_type = (PMA_USR_BROWSER_AGENT == 'IE' || PMA_USR_BROWSER_AGENT == 'OPERA')
-                   ? 'application/octetstream'
-                   : 'application/octet-stream';
+        $mime_type = 'text/x-sql';
     }
 
-    // If dump is going to be compressed, set correct mime_type and add
+    // If dump is going to be compressed, set correct encoding or mime_type and add
     // compression to extension
+    $content_encoding = '';
     if (isset($compression) && $compression == 'bzip') {
         $filename  .= '.bz2';
-        $mime_type = 'application/x-bzip';
+        // browsers don't like this:
+        //$content_encoding = 'x-bzip2';
+        $mime_type = 'application/x-bzip2';
     } else if (isset($compression) && $compression == 'gzip') {
         $filename  .= '.gz';
+        // needed to avoid recompression by server modules like mod_gzip:
+        $content_encoding = 'x-gzip';
         $mime_type = 'application/x-gzip';
     } else if (isset($compression) && $compression == 'zip') {
         $filename  .= '.zip';
-        $mime_type = 'application/x-zip';
+        $mime_type = 'application/zip';
     }
 }
 
@@ -289,6 +294,9 @@ if ($save_on_server) {
 if (!$save_on_server) {
     if ($asfile ) {
         // Download
+        if (!empty($content_encoding)) {
+            header('Content-Encoding: ' . $content_encoding);
+        }
         header('Content-Type: ' . $mime_type);
         header('Expires: ' . gmdate('D, d M Y H:i:s') . ' GMT');
         // lem9 & loic1: IE need specific headers
@@ -381,9 +389,9 @@ if ($export_type == 'server') {
     foreach ($dblist AS $current_db) {
         if ((isset($tmp_select) && strpos(' ' . $tmp_select, '|' . $current_db . '|'))
             || !isset($tmp_select)) {
-            if (!PMA_exportDBHeader($current_db)) 
+            if (!PMA_exportDBHeader($current_db))
                 break 2;
-            if (!PMA_exportDBCreate($current_db)) 
+            if (!PMA_exportDBCreate($current_db))
                 break 2;
             $tables = PMA_DBI_get_tables($current_db);
             foreach ($tables as $table) {
@@ -397,7 +405,7 @@ if ($export_type == 'server') {
                         break 3;
                 }
             }
-            if (!PMA_exportDBFooter($current_db)) 
+            if (!PMA_exportDBFooter($current_db))
                 break 2;
         }
     }
@@ -425,10 +433,10 @@ if ($export_type == 'server') {
             }
         }
     }
-    if (!PMA_exportDBFooter($db)) 
+    if (!PMA_exportDBFooter($db))
         break;
 } else {
-    if (!PMA_exportDBHeader($db)) 
+    if (!PMA_exportDBHeader($db))
         break;
     // We export just one table
 

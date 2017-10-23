@@ -8,15 +8,9 @@
 -- If you are running one MySQL 4.1.0 or 4.1.1, please create the tables using
 -- create_tables.sql, then use this script.
 --                                                 
--- This script expects the user pma to already be existing. If we would put a
--- line here to create him too many users might just use this script and end
--- up with having the same password for the controluser.
---                                                     
--- This user "pma" must be defined in config.inc.php (controluser/controlpass)                         
---                                                  
 -- Please don't forget to set up the tablenames in config.inc.php                                 
 -- 
--- $Id: upgrade_tables_mysql_4_1_2+.sql,v 1.1 2004/08/09 00:26:38 lem9 Exp $
+-- $Id: upgrade_tables_mysql_4_1_2+.sql,v 2.1 2004/12/26 22:29:36 lem9 Exp $
 
 -- --------------------------------------------------------
 

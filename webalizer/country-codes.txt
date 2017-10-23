@@ -7,7 +7,6 @@ AL   Albania
 AM   Armenia
 AN   Netherlands Antilles
 AO   Angola
-AP   Asia/Pacific Region
 AQ   Antarctica
 AR   Argentina
 AS   American Samoa
@@ -36,7 +35,6 @@ BY   Belarus
 BZ   Belize
 CA   Canada
 CC   Cocos (Keeling) Islands
-CD   Congo
 CF   Central African Republic
 CG   Congo
 CH   Switzerland
@@ -66,7 +64,6 @@ EH   Western Sahara
 ER   Eritrea
 ES   Spain
 ET   Ethiopia
-EU   Europe
 FI   Finland
 FJ   Fiji
 FK   Falkland Islands (Malvinas)
@@ -177,7 +174,6 @@ PL   Poland
 PM   St. Pierre and Miquelon
 PN   Pitcairn
 PR   Puerto Rico
-PS   Palestinian Territory
 PT   Portugal
 PW   Palau
 PY   Paraguay
@@ -187,7 +183,7 @@ RO   Romania
 RU   Russian Federation
 RW   Rwanda
 SA   Saudi Arabia
-SB   Solomon Islands
+Sb   Solomon Islands
 SC   Seychelles
 SD   Sudan
 SE   Sweden
@@ -234,7 +230,7 @@ VC   Saint Vincent and the Grenadines
 VE   Venezuela
 VG   Virgin Islands (British)
 VI   Virgin Islands (U.S.)
-VN   Vietnam
+VN   Viet Nam
 VU   Vanuatu
 WF   Wallis and Futuna Islands
 WS   Samoa
@@ -245,14 +241,12 @@ ZA   South Africa
 ZM   Zambia
 ZR   Zaire
 ZW   Zimbabwe
-COM  US Commercial
-EDU  US Educational
-GOV  US Government
-INT  International (int)
-MIL  US Military
-NET  Network
-ORG  Non-Profit Organization
-ARPA Old style Arpanet (arpa)
-NATO Nato field (nato)
-A1   Anonymous Proxy
-A2   Satellite Provider
+COM   US Commercial
+EDU   US Educational
+GOV   US Government
+INT   International
+MIL   US Military
+NET   Network
+ORG   Non-Profit Organization
+ARPA   Old style Arpanet
+NATO   Nato field

@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_properties_structure.php,v 2.25 2004/08/28 14:12:59 lem9 Exp $ */
+/* $Id: tbl_properties_structure.php,v 2.31 2004/10/25 13:28:19 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 require_once('./libraries/grab_globals.lib.php');
@@ -13,9 +13,16 @@ require_once('./libraries/mysql_charsets.lib.php');
 // workaround for IE problem:
 if (isset($submit_mult_change_x)) {
     $submit_mult = $strChange;
-}
-if (isset($submit_mult_drop_x)) {
+} elseif (isset($submit_mult_drop_x)) {
     $submit_mult = $strDrop;
+} elseif (isset($submit_mult_primary_x)) {
+    $submit_mult = $strPrimary;
+} elseif (isset($submit_mult_index_x)) {
+    $submit_mult = $strIndex;
+} elseif (isset($submit_mult_unique_x)) {
+    $submit_mult = $strUnique;
+} elseif (isset($submit_mult_fulltext_x)) {
+    $submit_mult = $strIdxFulltext;
 }
 
 if ((!empty($submit_mult) && isset($selected_fld))
@@ -34,7 +41,10 @@ $url_query .= '&amp;goto=tbl_properties_structure.php&amp;back=tbl_properties_st
 /**
  * Prepares the table structure display
  */
-// 1. Get table information/display tabs;
+
+/**
+ * Gets tables informations
+ */
 require('./tbl_properties_table_info.php');
 
 /**
@@ -42,8 +52,13 @@ require('./tbl_properties_table_info.php');
  */
 if ((!empty($submit_mult) && isset($selected_fld))
     || isset($mult_btn)) {
-    PMA_showMessage($strSuccess);
+    $message = $strSuccess;
 }
+
+/**
+ * Displays top menu links
+ */
+require('./tbl_properties_links.php');
 
 // 2. Gets table keys and retains them
 $result      = PMA_DBI_query('SHOW KEYS FROM ' . PMA_backquote($table) . ';');
@@ -404,31 +419,33 @@ $checkall_url = 'tbl_properties_structure.php?' . PMA_generate_common_url($db,$t
                     <?php
 
 if ($cfg['PropertiesIconic']) {
-    /* Opera has trouble with <input type="image"> */
-    /* IE has trouble with <button> */
-    if (PMA_USR_BROWSER_AGENT != 'IE') {
-        echo '<button class="mult_submit" type="submit" name="submit_mult" value="' . $strChange . '" title="' . $strChange . '">' . "\n"
-           . '<img src="' . $pmaThemeImage . 'b_edit.png" title="' . $strChange . '" alt="' . $strChange . '" width="16" height="16" />' . (($propicon == 'both') ? '&nbsp;' . $strChange : '') . "\n"
-           . '</button>' . "\n";
-    } else {
-        echo '                    <input type="image" name="submit_mult_change" value="' .$strChange . '" title="' . $strChange . '" src="' . $pmaThemeImage . 'b_edit.png" />'  . (($propicon == 'both') ? '&nbsp;' . $strChange : '') . "\n";
-    }
+    PMA_buttonOrImage('submit_mult', 'mult_submit', 'submit_mult_change', $strChange, 'b_edit.png');
     // Drop button if there is at least two fields
     if ($fields_cnt > 1) {
-        if (PMA_USR_BROWSER_AGENT != 'IE') {
-            echo '                    <button class="mult_submit" type="submit" name="submit_mult" value="' . $strDrop . '" title="' . $strDrop . '">' . "\n"
-               . '<img src="' . $pmaThemeImage . 'b_drop.png" title="' . $strDrop . '" alt="' . $strDrop . '" width="16" height="16" />' . (($propicon == 'both') ? '&nbsp;' . $strDrop : '') . "\n"
-               . '</button>' . "\n";
-        } else {
-            echo '                    <input type="image" name="submit_mult_drop" value="' .$strDrop . '" title="' . $strDrop . '" src="' . $pmaThemeImage . 'b_drop.png" />' . (($propicon == 'both') ? '&nbsp;' . $strDrop : '') . "\n";
-        }
+        PMA_buttonOrImage('submit_mult', 'mult_submit', 'submit_mult_drop', $strDrop, 'b_drop.png');
+    }
+    PMA_buttonOrImage('submit_mult', 'mult_submit', 'submit_mult_primary', $strPrimary, 'b_primary.png');
+    PMA_buttonOrImage('submit_mult', 'mult_submit', 'submit_mult_index', $strIndex, 'b_index.png');
+    PMA_buttonOrImage('submit_mult', 'mult_submit', 'submit_mult_unique', $strUnique, 'b_unique.png');
+    if ((!empty($tbl_type) && $tbl_type == 'MYISAM')) {
+        PMA_buttonOrImage('submit_mult', 'mult_submit', 'submit_mult_fulltext', $strIdxFulltext, 'b_ftext.png');
     }
 } else {
-    echo '                    <input type="submit" name="submit_mult" value="' . $strChange . '" title="' . $strChange . '" />' . "\n";
+    echo '<input type="submit" name="submit_mult" value="' . $strChange . '" title="' . $strChange . '" />' . "\n";
     // Drop button if there is at least two fields
     if ($fields_cnt > 1) {
-        echo '                    &nbsp;<i>' . $strOr . '</i>&nbsp;' . "\n"
-           . '                    <input type="submit" name="submit_mult" value="' . $strDrop . '" title="' . $strDrop . '" />' . "\n";
+        echo '&nbsp;<i>' . $strOr . '</i>&nbsp;' . "\n"
+           . '<input type="submit" name="submit_mult" value="' . $strDrop . '" title="' . $strDrop . '" />' . "\n";
+    }
+    echo '&nbsp;<i>' . $strOr . '</i>&nbsp;' . "\n"
+       . '<input type="submit" name="submit_mult" value="' . $strPrimary . '" title="' . $strPrimary . '" />' . "\n";
+    echo '&nbsp;<i>' . $strOr . '</i>&nbsp;' . "\n"
+       . '<input type="submit" name="submit_mult" value="' . $strIndex . '" title="' . $strIndex . '" />' . "\n";
+    echo '&nbsp;<i>' . $strOr . '</i>&nbsp;' . "\n"
+       . '<input type="submit" name="submit_mult" value="' . $strUnique . '" title="' . $strUnique . '" />' . "\n";
+    if ((!empty($tbl_type) && $tbl_type == 'MYISAM')) {
+        echo '&nbsp;<i>' . $strOr . '</i>&nbsp;' . "\n"
+           . '<input type="submit" name="submit_mult" value="' . $strIdxFulltext . '" title="' . $strIdxFulltext . '" />' . "\n";
     }
 }
 
@@ -455,9 +472,9 @@ if ($cfg['PropertiesIconic']) {
     if ($cfg['PropertiesIconic']) {
         echo '<img src="' . $pmaThemeImage . 'b_print.png" border="0" hspace="2" align="middle" width="16" height="16" alt="' . $strPrintView . '"/>';
     }
-    echo $strPrintView; 
+    echo $strPrintView;
     ?></a>&nbsp;&nbsp;&nbsp;
-                
+
 <?php
 // if internal relations are available, or the table type is INNODB
 // ($tbl_type comes from tbl_properties_table_info.php)
@@ -480,35 +497,29 @@ if ($cfg['Server']['relation'] || $tbl_type=="INNODB") {
         echo '<img src="' . $pmaThemeImage . 'b_tblanalyse.png" border="0" hspace="2" align="middle" width="16" height="16" alt="' . $strStructPropose . '" />';
     }
     echo $strStructPropose;
-?></a><?php 
+?></a><?php
     echo PMA_showMySQLDocu('Extending_MySQL', 'procedure_analyse') . "\n";
 ?><br />
 <!-- Add some new fields -->
 <form method="post" action="tbl_addfield.php"
     onsubmit="return checkFormElementInRange(this, 'num_fields', 1)">
-    <?php 
+    <?php
         echo PMA_generate_common_hidden_inputs($db, $table);
         if ($cfg['PropertiesIconic']) {
             echo '<img src="' . $pmaThemeImage . 'b_insrow.png" width="16" height="16" border="0" hspace="2" align="middle" alt="' . $strAddNewField . '"/>';
         }
-        echo $strAddNewField . ':&nbsp;';
+        echo sprintf($strAddFields, '<input type="text" name="num_fields" size="2" maxlength="2" value="1" style="vertical-align: middle" onfocus="this.select()" />');
     ?>
-    <input type="text" name="num_fields" size="2" maxlength="2" value="1" style="vertical-align: middle" onfocus="this.select()" />
-    <input type="radio" name="field_where" id="radio_field_where_last" value="last" checked="checked" />
-    <label for="radio_field_where_last"><?php echo $strAtEndOfTable; ?></label>
-    <input type="radio" name="field_where" id="radio_field_where_first" value="first" />
-    <label for="radio_field_where_first"><?php echo $strAtBeginningOfTable; ?></label>
-    <input type="radio" name="field_where" id="radio_field_where_after" value="after" />
-<?php
-$fieldOptions = '</label><select name="after_field" style="vertical-align: middle" onclick="this.form.field_where[2].checked=true" onchange="this.form.field_where[2].checked=true">';
-foreach ($aryFields AS $fieldname) {
-$fieldOptions .= '<option value="' . htmlspecialchars($fieldname) . '">' . htmlspecialchars($fieldname) . '</option>' . "\n";
-}
-unset($aryFields);
-$fieldOptions .= '</select><label for="radio_field_where_after">';
-?>
-        <?php 
-        echo str_replace('<label for="radio_field_where_after"></label>', '', '<label for="radio_field_where_after">' . sprintf($strAfter, $fieldOptions) . '</label>') . "\n"; 
+    <input type="radio" name="field_where" id="radio_field_where_last" value="last" checked="checked" /><label for="radio_field_where_last"><?php echo $strAtEndOfTable; ?></label>
+    <input type="radio" name="field_where" id="radio_field_where_first" value="first" /><label for="radio_field_where_first"><?php echo $strAtBeginningOfTable; ?></label>
+    <input type="radio" name="field_where" id="radio_field_where_after" value="after" /><?php
+        $fieldOptions = '</label><select name="after_field" style="vertical-align: middle" onclick="this.form.field_where[2].checked=true" onchange="this.form.field_where[2].checked=true">';
+        foreach ($aryFields AS $fieldname) {
+            $fieldOptions .= '<option value="' . htmlspecialchars($fieldname) . '">' . htmlspecialchars($fieldname) . '</option>' . "\n";
+        }
+        unset($aryFields);
+        $fieldOptions .= '</select><label for="radio_field_where_after">';
+        echo str_replace('<label for="radio_field_where_after"></label>', '', '<label for="radio_field_where_after">' . sprintf($strAfter, $fieldOptions) . '</label>') . "\n";
         ?>
     <input type="submit" value="<?php echo $strGo; ?>" style="vertical-align: middle" />
 </form>
@@ -639,7 +650,7 @@ if ($cfg['ShowStats']) {
             ?>
         <tr>
             <td colspan="3" align="center" bgcolor="<?php echo $cfg['BgcolorTwo']; ?>">
-                <a href="sql.php?<?php echo $url_query; ?>&pos=0&amp;sql_query=<?php echo urlencode('OPTIMIZE TABLE ' . PMA_backquote($table)); ?>"><?php 
+                <a href="sql.php?<?php echo $url_query; ?>&pos=0&amp;sql_query=<?php echo urlencode('OPTIMIZE TABLE ' . PMA_backquote($table)); ?>"><?php
                     if ($cfg['PropertiesIconic']) {
                        echo '<img src="' . $pmaThemeImage . 'b_tbloptimize.png" width="16" height="16" border="0" hspace="2" align="middle" alt="' . $strOptimizeTable. '" />';
                     }

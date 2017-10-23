@@ -1,5 +1,5 @@
 <?php
-/* $Id: sqlparser.data.php,v 2.12 2004/09/07 04:09:26 rabus Exp $ */
+/* $Id: sqlparser.data.php,v 2.15.2.1 2005/01/23 21:05:14 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -115,6 +115,7 @@ $PMA_SQPdata_function_name = array (
     'NULLIF',
     'OCT',
     'OCTET_LENGTH',
+    'OLD_PASSWORD',
     'ORD',
     'PASSWORD',
     'PERIOD_ADD',
@@ -169,7 +170,7 @@ $PMA_SQPdata_function_name = array (
     'YEARWEEK'
 );
 //$PMA_SQPdata_function_name_cnt = count($PMA_SQPdata_function_name);
-$PMA_SQPdata_function_name_cnt = 152;
+$PMA_SQPdata_function_name_cnt = 153;
 
 $PMA_SQPdata_column_attrib = array (
     'AUTO_INCREMENT',
@@ -180,16 +181,21 @@ $PMA_SQPdata_column_attrib = array (
     'INNOBASE',
     'INNODB',
     'ISAM',
+    'MERGE',
+    'MRG_ISAM',
     'MRG_MYISAM',
     'MYISAM',
     'NATIONAL',
+    'NDB',
+    'NDBCLUSTER',
     'PRECISION',
+    'UNDEFINED',
     'UNSIGNED',
     'VARYING',
     'ZEROFILL'
 );
 //$PMA_SQPdata_column_attrib_cnt = count($PMA_SQPdata_column_attrib);
-$PMA_SQPdata_column_attrib_cnt = 15;
+$PMA_SQPdata_column_attrib_cnt = 20;
 
 $PMA_SQPdata_reserved_word = array (
     'ACTION',
@@ -197,6 +203,7 @@ $PMA_SQPdata_reserved_word = array (
     'AFTER',
     'AGAINST',
     'AGGREGATE',
+    'ALGORITHM',
     'ALL',
     'ALTER',
     'ANALYSE',
@@ -346,11 +353,13 @@ $PMA_SQPdata_reserved_word = array (
     'MONTH',
     'MRG_MYISAM',
     'MYISAM',
+    'NAMES',
     'NATURAL',
     // 'NO' is not allowed in SQL-99 but is allowed in MySQL
     //'NO',
     'NOT',
     'NULL',
+    'OFFSET',
     'ON',
     'OPEN',
     'OPTIMIZE',
@@ -397,6 +406,7 @@ $PMA_SQPdata_reserved_word = array (
     'ROWS',
     'SECOND',
     'SELECT',
+    'SEPARATOR',
     'SERIALIZABLE',
     'SESSION',
     'SHARE',
@@ -452,6 +462,7 @@ $PMA_SQPdata_reserved_word = array (
     'USING',
     'VALUES',
     'VARIABLES',
+    'VIEW',
     'WHEN',
     'WHERE',
     'WITH',
@@ -461,7 +472,7 @@ $PMA_SQPdata_reserved_word = array (
     'YEAR_MONTH'
 );
 //$PMA_SQPdata_reserved_word_cnt = count($PMA_SQPdata_reserved_word);
-$PMA_SQPdata_reserved_word_cnt = 265;
+$PMA_SQPdata_reserved_word_cnt = 270;
 
 $PMA_SQPdata_column_type = array (
     'BIGINT',

@@ -1,5 +1,5 @@
 <?php
-/* $Id: server_databases.php,v 2.12 2004/08/12 15:13:19 nijel Exp $ */
+/* $Id: server_databases.php,v 2.14 2004/12/29 12:31:43 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -46,10 +46,15 @@ function reload_window(db) {
 function PMA_dbCmp($a, $b)
 {
     global $sort_by, $sort_order;
+    if ($GLOBALS['cfg']['NaturalOrder']) {
+        $sorter = 'strnatcmp';
+    } else {
+        $sorter = 'strcasecmp';
+    }
     if ($sort_by == 'db_name') {
-        return ($sort_order == 'asc' ? 1 : -1) * strcasecmp($a['db_name'], $b['db_name']);
+        return ($sort_order == 'asc' ? 1 : -1) * $sorter($a['db_name'], $b['db_name']);
     } else if ($a[$sort_by] == $b[$sort_by]) {
-        return strcasecmp($a['db_name'], $b['db_name']);
+        return $sorter($a['db_name'], $b['db_name']);
     } else {
         return ($sort_order == 'asc' ? 1 : -1) * ((int)$a[$sort_by] > (int)$b[$sort_by] ? 1 : -1);
     }
@@ -162,20 +167,13 @@ if (count($statistics) > 0) {
        . '        <tr>' . "\n"
        . ($is_superuser || $cfg['AllowUserDropDatabase'] ? '            <th>&nbsp;</th>' . "\n" : '')
        . '            <th>' . "\n"
-       . '                &nbsp;';
-    if (empty($dbstats)) {
-        echo $strDatabase . "\n"
-           . '                <img src="' . $pmaThemeImage . 's_asc.png" border="0" width="11" height="9"  alt="' . $strAscending . '" />' . "\n"
-           . '                &nbsp;' . "\n"
-           . '            </th>' . "\n";
-    } else {
-        echo "\n"
-           . '                <a href="./server_databases.php?' . $url_query . '&amp;dbstats=1&amp;sort_by=db_name&amp;sort_order=' . (($sort_by == 'db_name' && $sort_order == 'asc') ? 'desc' : 'asc') . '">' . "\n"
-           . '                    ' . $strDatabase . "\n"
-           . ($sort_by == 'db_name' ? '                    <img src="' . $pmaThemeImage . 's_' . $sort_order . '.png" border="0" width="11" height="9"  alt="' . ($sort_order == 'asc' ? $strAscending : $strDescending) . '" />' . "\n" : '')
-           . '                </a>' . "\n"
-           . '                &nbsp;' . "\n"
-           . '            </th>' . "\n";
+       . '                <a href="./server_databases.php?' . $url_query . (!empty($dbstats) ? '&amp;dbstats=1' : '') . '&amp;sort_by=db_name&amp;sort_order=' . (($sort_by == 'db_name' && $sort_order == 'asc') ? 'desc' : 'asc') . '">' . "\n"
+       . '                    ' . $strDatabase . "\n"
+       . ($sort_by == 'db_name' ? '                    <img src="' . $pmaThemeImage . 's_' . $sort_order . '.png" border="0" width="11" height="9"  alt="' . ($sort_order == 'asc' ? $strAscending : $strDescending) . '" />' . "\n" : '')
+       . '                </a>' . "\n"
+       . '                &nbsp;' . "\n"
+       . '            </th>' . "\n";
+    if (!empty($dbstats)) {
         if (PMA_MYSQL_INT_VERSION >= 40101) {
             echo '            <th>' . "\n"
                . '                &nbsp;' . $strCollation . '&nbsp;' . "\n"
@@ -391,6 +389,26 @@ if (count($statistics) > 0) {
     echo $strNoDatabases . "\n";
 }
 
+/**
+ * Create new database.
+ */
+?>
+
+<form method="post" action="db_create.php"><b>
+    <?php echo $strCreateNewDatabase . '&nbsp;' . PMA_showMySQLDocu('Reference', 'CREATE_DATABASE'); ?></b><br />
+    <?php echo PMA_generate_common_hidden_inputs('', '', 5); ?>
+    <input type="hidden" name="reload" value="1" />
+    <input type="text" name="db" value="" maxlength="64" class="textfield" />
+    <?php
+if (PMA_MYSQL_INT_VERSION >= 40101) {
+    require_once('./libraries/mysql_charsets.lib.php');
+    echo PMA_generateCharsetDropdownBox(PMA_CSDROPDOWN_COLLATION, 'db_collation', NULL, NULL, TRUE, 5);
+}
+    ?>
+    <input type="submit" value="<?php echo $strCreate; ?>" id="buttonGo" />
+</form>
+
+<?php
 
 /**
  * Sends the footer

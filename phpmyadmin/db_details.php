@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_details.php,v 2.15 2004/09/21 10:35:57 rabus Exp $ */
+/* $Id: db_details.php,v 2.16 2004/10/08 11:14:06 garvinhicking Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -88,8 +88,7 @@ if (!empty($query_to_display)) {
 </td></tr>
 <tr bgcolor="<?php echo $cfg['BgcolorOne']; ?>">
     <td>
-        <input type="checkbox" name="show_query" value="1" id="checkbox_show_query" checked="checked" />
-        <label for="checkbox_show_query"><?php echo $strShowThisQuery; ?></label>
+        <input type="checkbox" name="show_query" value="1" id="checkbox_show_query" checked="checked" /><label for="checkbox_show_query"><?php echo $strShowThisQuery; ?></label>
     </td>
     <td align="right"><input type="submit" name="SQL" value="<?php echo $strGo; ?>" /></td>
 </tr>

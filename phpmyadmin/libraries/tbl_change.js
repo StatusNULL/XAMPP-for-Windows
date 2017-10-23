@@ -1,4 +1,4 @@
-/* $Id: tbl_change.js,v 2.14 2004/08/10 12:52:10 nijel Exp $ */
+/* $Id: tbl_change.js,v 2.17 2005/01/07 11:48:45 nijel Exp $ */
 
 
 /**
@@ -61,60 +61,13 @@ function unNullify(urlField, multi_edit)
     if (typeof(rowForm.elements['fields_null[multi_edit][' + multi_edit + '][' + urlField + ']']) != 'undefined') {
         rowForm.elements['fields_null[multi_edit][' + multi_edit + '][' + urlField + ']'].checked = false
     } // end if
-    
+
     if (typeof(rowForm.elements['insert_ignore_' + multi_edit]) != 'undefined') {
         rowForm.elements['insert_ignore_' + multi_edit].checked = false
     } // end if
 
     return true;
 } // end of the 'unNullify()' function
-
-/**
-  * Allows moving around inputs/select by Ctrl+arrows
-  *
-  * @param   object   event data
-  */
-function onKeyDownArrowsHandler(e) {
-    e = e||window.event;
-    var o = (e.srcElement||e.target);
-    if (!o) return;
-    if (o.tagName != "TEXTAREA" && o.tagName != "INPUT" && o.tagName != "SELECT") return;
-    if (!e.ctrlKey) return;
-    if (!o.id) return;
-
-    var pos = o.id.split("_");
-    if (pos[0] != "field" || typeof pos[2] == "undefined") return;
-
-    var x = pos[2], y=pos[1];
-
-    // skip non existent fields
-    for (i=0; i<10; i++)
-    {
-        switch(e.keyCode) {
-            case 38: y--; break; // up
-            case 40: y++; break; // down
-            case 37: x--; break; // left
-            case 39: x++; break; // right
-            default: return;
-        }
-
-        var id = "field_" + y + "_" + x;
-        var nO = document.getElementById(id);
-        if (!nO) {
-            var id = "field_" + y + "_" + x + "_0";
-            var nO = document.getElementById(id);
-        }
-        if (nO) break;
-    }
-
-    if (!nO) return;
-    nO.focus();
-    if (nO.tagName != 'SELECT') {
-        nO.select();
-    }
-    e.returnValue = false;
-}
-
 
 var day;
 var month;
@@ -248,13 +201,29 @@ function initCalendar() {
 
     //heading table
     str += '<table class="calendar"><tr><th width="50%">';
+    str += '<form method="NONE" onsubmit="return 0">';
     str += '<a href="javascript:month--; initCalendar();">&laquo;</a> ';
-    str += month_names[month];
+    str += '<select id="select_month" name="monthsel" onchange="month = parseInt(document.getElementById(\'select_month\').value); initCalendar();">';
+    for (i =0; i < 12; i++) {
+        if (i == month) selected = ' selected="selected"';
+        else selected = '';
+        str += '<option value="' + i + '" ' + selected + '>' + month_names[i] + '</option>';
+    }
+    str += '</select>';
     str += ' <a href="javascript:month++; initCalendar();">&raquo;</a>';
+    str += '</form>';
     str += '</th><th width="50%">';
+    str += '<form method="NONE" onsubmit="return 0">';
     str += '<a href="javascript:year--; initCalendar();">&laquo;</a> ';
-    str += year;
+    str += '<select id="select_year" name="yearsel" onchange="year = parseInt(document.getElementById(\'select_year\').value); initCalendar();">';
+    for (i = year - 25; i < year + 25; i++) {
+        if (i == year) selected = ' selected="selected"';
+        else selected = '';
+        str += '<option value="' + i + '" ' + selected + '>' + i + '</option>';
+    }
+    str += '</select>';
     str += ' <a href="javascript:year++; initCalendar();">&raquo;</a>';
+    str += '</form>';
     str += '</th></tr></table>';
 
     str += '<table class="calendar"><tr>';

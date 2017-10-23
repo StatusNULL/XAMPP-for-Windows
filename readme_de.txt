@@ -1,17 +1,18 @@
-  ApacheFriends XAMPP (basic package) version 1.4.11
+  ApacheFriends XAMPP (basic package) version 1.4.12
 
-  + Apache 2.0.52
-  + MySQL 4.1.8
+  + Apache 2.0.53
+  + MySQL 4.1.9
   + PHP 5.0.3 + PHP 4.3.10 + PEAR
+  + eAccelerator 0.9.2a
   + PHP-Switch win32 1.0 (von Apachefriends, man nehme die "php-switch.bat") 
+  + XAMPP Control Version 1.0 from www.nat32.com	
   + XAMPP Security 1.0	
-  + MiniPerl 5.8.3
   + SQLite 2.8.15
   + OpenSSL 0.9.7e
-  + PHPMyAdmin 2.6.0 pl3
-  + ADODB 4.54
+  + PHPMyAdmin 2.6.1
+  + ADODB 4.60
   + Mercury Mail Transport System for Win32 and NetWare Systems v4.01a
-  + FileZilla FTP Server 0.9.4d
+  + FileZilla FTP Server 0.9.4e
   + Webalizer 2.01-10
   + Zend Optimizer 2.5.7
 

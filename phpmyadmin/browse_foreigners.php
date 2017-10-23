@@ -1,5 +1,5 @@
 <?php
-/* $Id: browse_foreigners.php,v 2.17 2004/09/16 10:01:12 garvinhicking Exp $ */
+/* $Id: browse_foreigners.php,v 2.19 2004/11/09 15:40:03 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -112,25 +112,16 @@ $pageNow = @floor($pos / $session_max_rows) + 1;
 $nbTotalPage = @ceil($the_total / $session_max_rows);
 
 if ($the_total > $per_page) {
-    $gotopage = '<br />' . $GLOBALS['strPageNumber']
-              . '<select name="goToPage" onchange="goToUrl(this, \'browse_foreigners.php?field=' . urlencode($field) . '&amp;' . PMA_generate_common_url($db, $table) . $pk_uri . '&amp;fieldkey=' . (isset($fieldkey) ? $fieldkey : '') . '&amp;\');">';
-    if ($nbTotalPage < 200) {
-        $firstPage = 1;
-        $lastPage  = $nbTotalPage;
-    } else {
-        $range = 20;
-        $firstPage = ($pageNow - $range < 1 ? 1 : $pageNow - $range);
-        $lastPage  = ($pageNow + $range > $nbTotalPage ? $nbTotalPage : $pageNow + $range);
-    }
-
-    for ($i=$firstPage; $i<=$lastPage; $i++){
-        if ($i == $pageNow) {
-            $selected = 'selected="selected"';
-        } else {
-            $selected = '';
-        }
-        $gotopage .= '                <option ' . $selected . ' value="' . (($i - 1) * $session_max_rows) . '">' . $i . '</option>' . "\n";
-    }
+    $gotopage = PMA_pageselector(
+                  'browse_foreigners.php?field='    . urlencode($field) .
+                                   '&amp;'          . PMA_generate_common_url($db, $table)
+                                                    . $pk_uri .
+                                   '&amp;fieldkey=' . (isset($fieldkey) ? $fieldkey : '') .
+                                   '&amp;',
+                  $session_max_rows,
+                  $pageNow,
+                  $nbTotalPage
+                );
 } else {
     $gotopage = '';
 }
@@ -191,7 +182,7 @@ if (isset($disp_row) && is_array($disp_row)) {
         $val   = key($mysql_val_relrow[$i]);
         $key   = $mysql_val_relrow[$i][$val];
 
-        if (strlen($val) <= $cfg['LimitChars']) {
+        if (PMA_strlen($val) <= $cfg['LimitChars']) {
             $value  = htmlspecialchars($val);
             $vtitle = '';
         } else {
@@ -208,12 +199,12 @@ if (isset($disp_row) && is_array($disp_row)) {
 <?php
         $key   = key($mysql_key_relrow[$i]);
         $val   = $mysql_key_relrow[$i][$key];
-        if (strlen($val) <= $cfg['LimitChars']) {
+        if (PMA_strlen($val) <= $cfg['LimitChars']) {
             $value  = htmlspecialchars($val);
             $vtitle = '';
         } else {
             $vtitle = htmlspecialchars($val);
-            $value  = htmlspecialchars(substr($val, 0, $cfg['LimitChars']) . '...');
+            $value  = htmlspecialchars(PMA_substr($val, 0, $cfg['LimitChars']) . '...');
         }
 
         $key_equals_data = isset($data) && $key == $data;

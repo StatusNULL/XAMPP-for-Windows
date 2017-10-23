@@ -5,8 +5,8 @@
 # chmod +x ./scripts/setsomevars
 
 machine=i686
-system=pc-linux
-version=4.1.8
+system=pc-linux-gnu
+version=4.1.10
 export machine system version
 SOURCE=`pwd` 
 CP="cp -p"

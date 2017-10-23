@@ -1,5 +1,5 @@
 <?php
-/* $Id: info.inc.php,v 1.2 2004/09/14 14:21:31 nijel Exp $ */
+/* $Id: info.inc.php,v 2.0 2004/10/13 10:02:44 rabus Exp $ */
 /* Theme information */
 $theme_name = 'Darkblue/orange';
 $theme_version = 1;

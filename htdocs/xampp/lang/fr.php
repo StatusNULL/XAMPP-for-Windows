@@ -3,7 +3,7 @@
 // GLOBAL
 // ---------------------------------------------------------------------
 
-$TEXT['global-xampp']="XAMPP pour Linux";
+$TEXT['global-xampp']="XAMPP pour Windows";
 
 // ---------------------------------------------------------------------
 // NAVIGATION
@@ -50,7 +50,9 @@ $TEXT['navi-english']="English";
 $TEXT['navi-german']="Deutsch";
 $TEXT['navi-french']="Francais";
 $TEXT['navi-dutch']="Nederlands";
-$TEXT['navi-spanish']="Spanish";
+$TEXT['navi-polish']="Polski";
+$TEXT['navi-spanish']="Español";
+$TEXT['navi-chinese']="&#20013;&#25991;";
 
 // ---------------------------------------------------------------------
 // STATUS

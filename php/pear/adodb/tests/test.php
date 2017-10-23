@@ -1,6 +1,6 @@
 <?php
 /* 
-V4.54 5 Nov 2004  (c) 2000-2004 John Lim (jlim@natsoft.com.my). All rights reserved.
+V4.60 24 Jan 2005  (c) 2000-2005 John Lim (jlim@natsoft.com.my). All rights reserved.
   Released under both BSD license and Lesser GPL library license. 
   Whenever there is any discrepancy between the two licenses, 
   the BSD license will take precedence. 
@@ -182,11 +182,11 @@ FROM `nuke_stories` `t1`, `nuke_authors` `t2`, `nuke_stories_cat` `t3`, `nuke_to
 	print "<p>Test select on empty table, FetchField when EOF, and GetInsertSQL</p>";
 	$rs = &$db->Execute("select id,firstname from ADOXYZ where id=9999");
 	if ($rs && !$rs->EOF) print "<b>Error: </b>RecordSet returned by Execute(select...') on empty table should show EOF</p>";
-	if ($rs->EOF && ($o = $rs->FetchField(0) && !empty($o->name))) {
+	if ($rs->EOF && (($ox = $rs->FetchField(0)) && !empty($ox->name))) {
 		$record['id'] = 99;
 		$record['firstname'] = 'John';
 		$sql =  $db->GetInsertSQL($rs, $record);
-		if ($sql != "INSERT INTO ADOXYZ ( id, firstname ) VALUES ( 99, 'John' )") Err("GetInsertSQL does not work on empty table");
+		if (strtoupper($sql) != strtoupper("INSERT INTO ADOXYZ ( id, firstname ) VALUES ( 99, 'John' )")) Err("GetInsertSQL does not work on empty table: $sql");
 	} else {
 		Err("FetchField does not work on empty recordset, meaning GetInsertSQL will fail...");
 	}
@@ -420,8 +420,15 @@ GO
 		break;
 	case 'oci8': 
 	case 'oci8po':
+		
+		# cleanup
+		$db->Execute("delete from photos where id=99 or id=1");
+		$db->Execute("insert into photos (id) values(1)");
+		$db->Execute("update photos set photo=null,descclob=null where id=1");
+		
 		$saved = $db->debug;
 		$db->debug=true;
+		
 		
 
 		/*
@@ -440,7 +447,25 @@ GO
 			$s .= '1234567890';
 		}
 		
+		$sql = "INSERT INTO photos ( ID, photo) ".
+			"VALUES ( :id, empty_blob() )".
+			" RETURNING photo INTO :xx";
+
 		
+		$blob_data = $s;
+		$id = 99;
+		
+ 		$stmt = $db->PrepareSP($sql);
+		$db->InParameter($stmt, $id, 'id');
+		$blob = $db->InParameter($stmt, $s, 'xx',-1, OCI_B_BLOB);
+		$db->StartTrans();
+		$result = $db->Execute($stmt);
+		$db->CompleteTrans();
+		
+		$s2= $db->GetOne("select photo from photos where id=99");
+		echo "<br>---$s2";
+		if ($s !== $s2) Err("insert blob does not match");
+
 		print "<h4>Testing Blob: size=".strlen($s)."</h4>";
 		$ok = $db->Updateblob('photos','photo',$s,'id=1');
 		if (!$ok) Err("Blob failed 1");
@@ -464,7 +489,6 @@ GO
 		$arr = $db->MetaForeignKeys('emp');
 		print_r($arr);
 		if (!$arr) Err("Bad MetaForeignKeys");
-		print "<h4>Testing Cursor Variables</h4>";
 /*
 -- TEST PACKAGE
 -- "Set scan off" turns off substitution variables. 
@@ -512,6 +536,8 @@ END Adodb;
 /
 
 */
+
+		print "<h4>Testing Cursor Variables</h4>";
 		$rs = $db->ExecuteCursor("BEGIN adodb.open_tab(:zz,'A%'); END;",'zz');
 	
 		if ($rs && !$rs->EOF) {
@@ -521,6 +547,7 @@ END Adodb;
 		} else {
 			print "<b>Error in using Cursor Variables 1</b><p>";
 		}
+		$rs->Close();
 		
 		print "<h4>Testing Stored Procedures for oci8</h4>";
 		
@@ -600,7 +627,8 @@ END Adodb;
 		$arr = array(0=>'Caroline',1=>'Miranda');
 		$sql = "insert into ADOXYZ (id,firstname,lastname,created) values ($i*10+0,?,?,$time)";
 		break;
-		
+	case 'mysqli':
+	case 'mysqlt':
 	case 'mysql':
 		$sqlt = "CREATE TABLE `mytable` (
   `row1` int(11) NOT NULL auto_increment,
@@ -756,6 +784,7 @@ END Adodb;
 		}
 		if ($rs->fields['id'] != 1)  {Err("Error"); print_r($rs->fields);};
 		if (trim($rs->fields['firstname']) != 'Caroline')  {print Err("Error 2"); print_r($rs->fields);};
+		
 		$rs->MoveNext();
 		if ($rs->fields['id'] != 2)  {Err("Error 3"); print_r($rs->fields);};
 		$rs->MoveNext();
@@ -1287,13 +1316,13 @@ END Adodb;
 	
 	print "<h3>rs2rs Test</h3>";
 	
-	$rs = $db->Execute('select * from adoxyz order by id');
+	$rs = $db->Execute('select * from adoxyz where id>= 1 order by id');
 	$rs = $db->_rs2rs($rs);
 	$rs->valueX = 'X';
 	$rs->MoveNext();
 	$rs = $db->_rs2rs($rs);
 	if (!isset($rs->valueX)) err("rs2rs does not preserve array recordsets");
-	if (reset($rs->fields) != 1) err("rs2rs does not move to first row");
+	if (reset($rs->fields) != 1) err("rs2rs does not move to first row: id=".reset($rs->fields));
 
 	/////////////////////////////////////////////////////////////
 	include_once('../pivottable.inc.php');
@@ -1597,6 +1626,6 @@ include_once('../adodb-time.inc.php');
 if (isset($_GET['time'])) adodb_date_test();
 
 ?>
-<p><i>ADODB Database Library  (c) 2000-2004 John Lim. All rights reserved. Released under BSD and LGPL.</i></p>
+<p><i>ADODB Database Library  (c) 2000-2005 John Lim. All rights reserved. Released under BSD and LGPL.</i></p>
 </body>
 </html>

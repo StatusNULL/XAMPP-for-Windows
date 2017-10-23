@@ -1,5 +1,5 @@
 <?php
-/* $Id: zip.lib.php,v 2.2 2004/04/27 12:36:11 nijel Exp $ */
+/* $Id: zip.lib.php,v 2.4 2004/11/03 13:56:52 garvinhicking Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -67,12 +67,12 @@ class zipfile
         $timearray = ($unixtime == 0) ? getdate() : getdate($unixtime);
 
         if ($timearray['year'] < 1980) {
-        	$timearray['year']    = 1980;
-        	$timearray['mon']     = 1;
-        	$timearray['mday']    = 1;
-        	$timearray['hours']   = 0;
-        	$timearray['minutes'] = 0;
-        	$timearray['seconds'] = 0;
+            $timearray['year']    = 1980;
+            $timearray['mon']     = 1;
+            $timearray['mday']    = 1;
+            $timearray['hours']   = 0;
+            $timearray['minutes'] = 0;
+            $timearray['seconds'] = 0;
         } // end if
 
         return (($timearray['year'] - 1980) << 25) | ($timearray['mon'] << 21) | ($timearray['mday'] << 16) |
@@ -124,9 +124,11 @@ class zipfile
 
         // "data descriptor" segment (optional but necessary if archive is not
         // served as file)
-        $fr .= pack('V', $crc);                 // crc32
-        $fr .= pack('V', $c_len);               // compressed filesize
-        $fr .= pack('V', $unc_len);             // uncompressed filesize
+        // nijel(2004-10-19): this seems not to be needed at all and causes
+        // problems in some cases (bug #1037737)
+        //$fr .= pack('V', $crc);                 // crc32
+        //$fr .= pack('V', $c_len);               // compressed filesize
+        //$fr .= pack('V', $unc_len);             // uncompressed filesize
 
         // add this entry to array
         $this -> datasec[] = $fr;

@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_create.php,v 2.8 2004/09/05 14:51:49 rabus Exp $ */
+/* $Id: tbl_create.php,v 2.12 2004/12/26 22:47:40 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -34,7 +34,8 @@ PMA_DBI_select_db($db);
 $abort = FALSE;
 if (isset($submit_num_fields)) {
     $regenerate = TRUE;
-} else if (isset($submit)) {
+    $num_fields = $orig_num_fields + $added_fields;
+} else if (isset($do_save_data)) {
     $sql_query = $query_cpy = '';
 
     // Transforms the radio button field_key into 3 arrays
@@ -54,11 +55,13 @@ if (isset($submit_num_fields)) {
     } // end for
     // Builds the fields creation statements
     for ($i = 0; $i < $field_cnt; $i++) {
-        if (empty($field_name[$i])) {
+        // '0' is also empty for php :-(
+        if (empty($field_name[$i]) && $field_name[$i] != '0') {
             continue;
         }
         $query = PMA_backquote($field_name[$i]) . ' ' . $field_type[$i];
-        if ($field_length[$i] != '') {
+        if ($field_length[$i] != ''
+            && !preg_match('@^(DATE|DATETIME|TIME|TINYBLOB|TINYTEXT|BLOB|TEXT|MEDIUMBLOB|MEDIUMTEXT|LONGBLOB|LONGTEXT)$@i', $field_type[$i])) {
             $query .= '(' . $field_length[$i] . ')';
         }
         if ($field_attribute[$i] != '') {

@@ -1,5 +1,5 @@
 <?php
-/* $Id: config.inc.php,v 2.41 2004/09/23 10:10:37 rabus Exp $ */
+/* $Id: config.inc.php,v 2.48 2004/12/28 12:48:27 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -117,6 +117,7 @@ $cfg['Servers'][$i]['history']       = '';          // table to store SQL histor
 $cfg['Servers'][$i]['verbose_check'] = TRUE;        // set to FALSE if you know that your pma_* tables
                                                     // are up to date. This prevents compatibility
                                                     // checks and thereby increases performance.
+$cfg['Servers'][$i]['AllowRoot']     = TRUE;        // whether to allow root login
 $cfg['Servers'][$i]['AllowDeny']['order']           // Host authentication order, leave blank to not use
                                      = '';
 $cfg['Servers'][$i]['AllowDeny']['rules']           // Host authentication rules, leave blank for defaults
@@ -146,6 +147,7 @@ $cfg['Servers'][$i]['pdf_pages']       = ''; // 'pma_pdf_pages'
 $cfg['Servers'][$i]['column_info']     = ''; // 'pma_column_info'
 $cfg['Servers'][$i]['history']         = ''; // 'pma_history'
 $cfg['Servers'][$i]['verbose_check']   = TRUE;
+$cfg['Servers'][$i]['AllowRoot']       = TRUE;
 $cfg['Servers'][$i]['AllowDeny']['order']
                                        = '';
 $cfg['Servers'][$i]['AllowDeny']['rules']
@@ -174,6 +176,8 @@ $cfg['Servers'][$i]['pdf_pages']       = ''; // 'pma_pdf_pages'
 $cfg['Servers'][$i]['column_info']     = ''; // 'pma_column_info'
 $cfg['Servers'][$i]['history']         = ''; // 'pma_history'
 $cfg['Servers'][$i]['verbose_check']   = TRUE;
+$cfg['Servers'][$i]['AllowRoot']       = TRUE;
+
 $cfg['Servers'][$i]['AllowDeny']['order']
                                        = '';
 $cfg['Servers'][$i]['AllowDeny']['rules']
@@ -292,6 +296,7 @@ $cfg['DefaultTabDatabase']    = 'db_details_structure.php';
                                    // 'db_details_structure.php' = tables list
                                    // 'db_details.php' = sql form
                                    // 'db_search.php' = search query
+                                   // 'db_operations.php' = operations on database
 $cfg['DefaultTabTable']       = 'tbl_properties_structure.php';
                                    // Possible values:
                                    // 'tbl_properties_structure.php' = fields list
@@ -337,6 +342,7 @@ $cfg['Export']['latex_structure_label']     = 'tab:__TABLE__-structure';
 
 $cfg['Export']['sql_structure']             = TRUE;
 $cfg['Export']['sql_data']                  = TRUE;
+$cfg['Export']['sql_compat']                = 'NONE';
 $cfg['Export']['sql_disable_fk']            = FALSE;
 $cfg['Export']['sql_use_transaction']       = FALSE;
 $cfg['Export']['sql_drop_database']         = FALSE;
@@ -531,7 +537,7 @@ $cfg['SetHttpHostTitle']    = '';              // if ShowHttpHostTitle=true, ple
                                              // or an other string, wich should be shown in browsers window title.
                                              // If not set (or empty), the PMA will get your real Host-Adress.
 
-$cfg['ErrorIconic']          = TRUE;    // show some icons for warnings, errors and informations (true|false)?
+$cfg['ErrorIconic']          = TRUE;    // show some icons for warning, error and information messages (true|false)?
 $cfg['MainPageIconic']       = TRUE;    // show icons in list on main page, on right panel top menu (server db table)  and on menu tabs (true|false)?
 $cfg['ReplaceHelpImg']       = TRUE;    // show help button instead of strDocumentation (true|false)?
 
@@ -760,6 +766,7 @@ if ($cfg['ShowFunctionFields']) {
             'ENCRYPT',
             'RAND',
             'LAST_INSERT_ID',
+            'UNIX_TIMESTAMP',
             'COUNT',
             'AVG',
             'SUM'
@@ -822,5 +829,5 @@ set_magic_quotes_runtime(0);
 /**
  * File Revision - do not change either!
  */
-$cfg['FileRevision'] = '$Revision: 2.41 $';
+$cfg['FileRevision'] = '$Revision: 2.48 $';
 ?>

@@ -1,5 +1,5 @@
 <?php
-/* $Id: header.inc.php,v 2.19 2004/07/05 14:01:49 lem9 Exp $ */
+/* $Id: header.inc.php,v 2.22 2004/10/30 00:32:56 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 if (empty($GLOBALS['is_header_sent'])) {
@@ -41,7 +41,7 @@ if (empty($GLOBALS['is_header_sent'])) {
      */
     $title     = '';
     if ($cfg['ShowHttpHostTitle']) {
-        $title .= (empty($GLOBALS['cfg']['SetHttpHostTitle']) ? $_SERVER['HTTP_HOST'] : $GLOBALS['cfg']['SetHttpHostTitle']) . ' >> ';
+        $title .= (empty($GLOBALS['cfg']['SetHttpHostTitle']) && isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $GLOBALS['cfg']['SetHttpHostTitle']) . ' >> ';
     }
     if (!empty($GLOBALS['cfg']['Server']) && isset($GLOBALS['cfg']['Server']['host'])) {
         $title.=str_replace('\'', '\\\'', $GLOBALS['cfg']['Server']['host']);
@@ -127,6 +127,9 @@ if (empty($GLOBALS['is_header_sent'])) {
         <?php
     }
     echo "\n";
+
+    // Reloads the navigation frame via JavaScript if required
+    PMA_reloadNavigation();
     ?>
         <meta name="OBGZip" content="<?php echo ($cfg['OBGzip'] ? 'true' : 'false'); ?>" />
     </head>
@@ -152,7 +155,7 @@ if (empty($GLOBALS['is_header_sent'])) {
      */
 
     if (PMA_DISPLAY_HEADING) {
-        echo '<table border="0" cellpadding="0" cellspacing="0">' . "\n"
+        echo '<table border="0" cellpadding="0" cellspacing="0" id="serverinfo">' . "\n"
            . '    <tr>' . "\n";
         $header_url_qry = '?' . PMA_generate_common_url();
         $server_info = (!empty($cfg['Server']['verbose'])

@@ -1,5 +1,5 @@
 <?php
-/* $Id: database_interface.lib.php,v 2.11.2.1 2004/10/13 11:37:24 rabus Exp $ */
+/* $Id: database_interface.lib.php,v 2.15 2004/12/26 21:32:40 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -40,7 +40,11 @@ function PMA_DBI_get_dblist($link = NULL) {
 
        // Before MySQL 4.0.2, SHOW DATABASES could send the
        // whole list, so check if we really have access:
-       if (PMA_MYSQL_CLIENT_API < 40002) {
+       //if (PMA_MYSQL_CLIENT_API < 40002) {
+       // Better check the server version, in case the client API
+       // is more recent than the server version
+
+       if (PMA_MYSQL_INT_VERSION < 40002) {
            $dblink = @PMA_DBI_select_db($row[0], $link);
            if (!$dblink) {
                continue;
@@ -159,7 +163,7 @@ function PMA_DBI_postConnect($link) {
         }
 
         $mysql_charset = $GLOBALS['mysql_charset_map'][$GLOBALS['charset']];
-        if (empty($collation_connection) || (strpos('_', $collation_connection) ? substr($collation_connection, 0, strpos('_', $collation_connection)) : $collation_connection) == $mysql_charset) {
+        if (empty($collation_connection) || (strpos($collation_connection, '_') ? substr($collation_connection, 0, strpos($collation_connection, '_')) : $collation_connection) == $mysql_charset) {
             PMA_DBI_query('SET NAMES ' . $mysql_charset . ';', $link, PMA_DBI_QUERY_STORE);
         } else {
             PMA_DBI_query('SET CHARACTER SET ' . $mysql_charset . ';', $link, PMA_DBI_QUERY_STORE);
@@ -168,7 +172,7 @@ function PMA_DBI_postConnect($link) {
             PMA_DBI_query('SET collation_connection = \'' . $collation_connection . '\';', $link, PMA_DBI_QUERY_STORE);
         }
         $collation_connection = PMA_DBI_get_variable('collation_connection',     PMA_DBI_GETVAR_SESSION, $link);
-	$charset_connection   = PMA_DBI_get_variable('character_set_connection', PMA_DBI_GETVAR_SESSION, $link);
+        $charset_connection   = PMA_DBI_get_variable('character_set_connection', PMA_DBI_GETVAR_SESSION, $link);
 
         // Add some field types to the list
         // (we pass twice here; feel free to code something better :)

@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_properties_operations.php,v 2.21 2004/08/06 17:24:04 lem9 Exp $ */
+/* $Id: tbl_properties_operations.php,v 2.26 2005/01/05 13:01:23 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -21,6 +21,10 @@ $cfgRelation = PMA_getRelationsParam();
  * Gets available MySQL charsets
  */
 require_once('./libraries/mysql_charsets.lib.php');
+
+// reselect current db (needed in some cases probably due to
+// the calling of relation.lib.php)
+PMA_DBI_select_db($db);
 
 /**
  * Updates table comment, type and options if required
@@ -48,17 +52,10 @@ if (isset($submitoptions)) {
                    . (isset($pack_keys) ? ' pack_keys=1': ' pack_keys=0')
                    . (isset($checksum) ? ' checksum=1': ' checksum=0')
                    . (isset($delay_key_write) ? ' delay_key_write=1': ' delay_key_write=0')
-                   . (isset($auto_increment) ? ' auto_increment=' . PMA_sqlAddslashes($auto_increment) : '');
+                   . (!empty($auto_increment) ? ' auto_increment=' . PMA_sqlAddslashes($auto_increment) : '');
     $result        = PMA_DBI_query($sql_query);
     $message       = $strSuccess;
 }
-
-// Displays a message if a query had been submitted
-if (isset($message)) {
-    PMA_showMessage($message);
-}
-
-
 
 /**
  * Reordering the table has been requested by the user
@@ -70,15 +67,18 @@ if (isset($submitorderby) && !empty($order_field)) {
         $sql_query .= ' DESC';
     }
     $result      = PMA_DBI_query($sql_query);
-    PMA_showMessage($result ? $strSuccess : $strFailed);
+    $message     = $result ? $strSuccess : $strFailed;
 } // end if
 
-
 /**
- * Gets tables informations and displays top links
+ * Gets tables informations
  */
 require('./tbl_properties_table_info.php');
 
+/**
+ * Displays top menu links
+ */
+require('./tbl_properties_links.php');
 
 /**
  * Get columns names
@@ -102,7 +102,7 @@ unset($result);
 if (PMA_MYSQL_INT_VERSION >= 32334) {
     ?>
     <!-- Order the table -->
-    
+
     <form method="post" action="tbl_properties_operations.php">
         <?php echo PMA_generate_common_hidden_inputs($db, $table); ?>
         <tr>
@@ -214,32 +214,25 @@ for ($i = 0; $i < $num_dbs; $i++) {
         </tr>
         <tr>
             <td nowrap="nowrap" bgcolor="<?php echo $cfg['BgcolorOne']; ?>">
-                <input type="radio" name="what" value="structure" id="radio_copy_structure" style="vertical-align: middle" />
-                <label for="radio_copy_structure"><?php echo $strStrucOnly; ?></label>&nbsp;&nbsp;<br />
-                <input type="radio" name="what" value="data" id="radio_copy_data" checked="checked" style="vertical-align: middle" />
-                <label for="radio_copy_data"><?php echo $strStrucData; ?></label>&nbsp;&nbsp;<br />
-                <input type="radio" name="what" value="dataonly" id="radio_copy_dataonly" style="vertical-align: middle" />
-                <label for="radio_copy_dataonly"><?php echo $strDataOnly; ?></label>&nbsp;&nbsp;<br />
-                    
-                <input type="checkbox" name="drop_if_exists" value="true" id="checkbox_drop" style="vertical-align: middle" />
-                <label for="checkbox_drop"><?php echo $strStrucDrop; ?></label>&nbsp;&nbsp;<br />
-                <input type="checkbox" name="auto_increment" value="1" id="checkbox_auto_increment" style="vertical-align: middle" />
-                <label for="checkbox_auto_increment"><?php echo $strAddAutoIncrement; ?></label><br />
+                <input type="radio" name="what" value="structure" id="radio_copy_structure" style="vertical-align: middle" /><label for="radio_copy_structure"><?php echo $strStrucOnly; ?></label>&nbsp;&nbsp;<br />
+                <input type="radio" name="what" value="data" id="radio_copy_data" checked="checked" style="vertical-align: middle" /><label for="radio_copy_data"><?php echo $strStrucData; ?></label>&nbsp;&nbsp;<br />
+                <input type="radio" name="what" value="dataonly" id="radio_copy_dataonly" style="vertical-align: middle" /><label for="radio_copy_dataonly"><?php echo $strDataOnly; ?></label>&nbsp;&nbsp;<br />
+
+                <input type="checkbox" name="drop_if_exists" value="true" id="checkbox_drop" style="vertical-align: middle" /><label for="checkbox_drop"><?php echo $strStrucDrop; ?></label>&nbsp;&nbsp;<br />
+                <input type="checkbox" name="auto_increment" value="1" id="checkbox_auto_increment" style="vertical-align: middle" /><label for="checkbox_auto_increment"><?php echo $strAddAutoIncrement; ?></label><br />
                 <?php
                     // display "Add constraints" choice only if there are
                     // foreign keys
                     if (PMA_getForeigners($db, $table, '', 'innodb')) {
                 ?>
-                <input type="checkbox" name="constraints" value="1" id="checkbox_constraints" style="vertical-align: middle" />
-                <label for="checkbox_constraints"><?php echo $strAddConstraints; ?></label><br />
+                <input type="checkbox" name="constraints" value="1" id="checkbox_constraints" style="vertical-align: middle" /><label for="checkbox_constraints"><?php echo $strAddConstraints; ?></label><br />
                 <?php
                     } // endif
                     if (isset($_COOKIE) && isset($_COOKIE['pma_switch_to_new']) && $_COOKIE['pma_switch_to_new'] == 'true') {
                         $pma_switch_to_new = 'true';
                     }
                 ?>
-                <input type="checkbox" name="switch_to_new" value="true" id="checkbox_switch"<?php echo ((isset($pma_switch_to_new) && $pma_switch_to_new == 'true') ? ' checked="checked"' : ''); ?> style="vertical-align: middle" />
-                <label for="checkbox_switch"><?php echo $strSwitchToTable; ?></label>&nbsp;&nbsp;
+                <input type="checkbox" name="switch_to_new" value="true" id="checkbox_switch"<?php echo ((isset($pma_switch_to_new) && $pma_switch_to_new == 'true') ? ' checked="checked"' : ''); ?> style="vertical-align: middle" /><label for="checkbox_switch"><?php echo $strSwitchToTable; ?></label>&nbsp;&nbsp;
             </td>
             <td align="<?php echo $cell_align_right; ?>" valign="bottom" bgcolor="<?php echo $cfg['BgcolorOne']; ?>">
                 <input type="submit" name="submit_copy" value="<?php echo $strGo; ?>" />
@@ -257,9 +250,22 @@ for ($i = 0; $i < $num_dbs; $i++) {
     <form method="post" action="tbl_properties_operations.php">
         <tr>
             <th colspan="2" class="tblHeaders" align="left">
-                <?php echo PMA_generate_common_hidden_inputs($db, $table); ?>
-                <?php echo $strTableComments; ?>&nbsp;:&nbsp;
-                <?php $comment = ereg_replace('; InnoDB free:.*$' , '', ereg_replace('^InnoDB free:.*$', '', $show_comment)); ?>
+                <?php
+                echo PMA_generate_common_hidden_inputs($db, $table);
+                echo $strTableComments . '&nbsp;';
+                if (strstr($show_comment, '; InnoDB free') === FALSE) {
+                    if (strstr($show_comment, 'InnoDB free') === FALSE) {
+                        // only user entered comment
+                        $comment = $show_comment;
+                    } else {
+                        // here we have just InnoDB generated part
+                        $comment = '';
+                    }
+                } else {
+                    // remove InnoDB comment from end, just the minimal part (*? is non greedy)
+                    $comment = preg_replace('@; InnoDB free:.*?$@' , '', $show_comment);
+                }
+                ?>
                 <input type="hidden" name="prev_comment" value="<?php echo urlencode($comment); ?>" />&nbsp;
             </th>
         <tr>
@@ -394,22 +400,18 @@ for ($i = 0; $i < $num_dbs; $i++) {
         <tr>
             <td bgcolor="<?php echo $cfg['BgcolorOne']; ?>">
                 <input type="checkbox" name="pack_keys" id="pack_keys_opt"
-                <?php echo (isset($pack_keys) && $pack_keys == 1) ? ' checked="checked"' : ''; ?> style="vertical-align: middle" />
-                <label for="pack_keys_opt">pack_keys</label><br />
+                <?php echo (isset($pack_keys) && $pack_keys == 1) ? ' checked="checked"' : ''; ?> style="vertical-align: middle" /><label for="pack_keys_opt">pack_keys</label><br />
         <?php
         if ($tbl_type == 'MYISAM') {
         ?>
                 <input type="checkbox" name="checksum" id="checksum_opt"
-                <?php echo (isset($checksum) && $checksum == 1) ? ' checked="checked"' : ''; ?> style="vertical-align: middle" />
-                <label for="checksum_opt">checksum</label><br />
+                <?php echo (isset($checksum) && $checksum == 1) ? ' checked="checked"' : ''; ?> style="vertical-align: middle" /><label for="checksum_opt">checksum</label><br />
 
                 <input type="checkbox" name="delay_key_write" id="delay_key_write_opt"
-                <?php echo (isset($delay_key_write) && $delay_key_write == 1) ? ' checked="checked"' : ''; ?> style="vertical-align: middle" />
-                <label for="delay_key_write_opt">delay_key_write</label><br />
+                <?php echo (isset($delay_key_write) && $delay_key_write == 1) ? ' checked="checked"' : ''; ?> style="vertical-align: middle" /><label for="delay_key_write_opt">delay_key_write</label><br />
 
                 <input type="text" name="auto_increment" id="auto_increment_opt" class="textfield"
-                <?php echo (isset($auto_increment) && !empty($auto_increment) ? ' value="' . $auto_increment . '"' : ''); ?> style="width: 30px; vertical-align: middle" />&nbsp;
-                <label for="auto_increment_opt">auto_increment</label>
+                <?php echo (isset($auto_increment) && !empty($auto_increment) ? ' value="' . $auto_increment . '"' : ''); ?> style="width: 30px; vertical-align: middle" />&nbsp;<label for="auto_increment_opt">auto_increment</label>
             </td>
         <?php
         } // end if (MYISAM)

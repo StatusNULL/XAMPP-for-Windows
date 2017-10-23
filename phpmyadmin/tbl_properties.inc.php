@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_properties.inc.php,v 2.16 2004/09/05 15:02:52 rabus Exp $ */
+/* $Id: tbl_properties.inc.php,v 2.18 2005/01/07 11:48:44 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 // Check parameters
@@ -13,8 +13,10 @@ require_once('./libraries/mysql_charsets.lib.php');
 ?>
 <?php if ($cfg['CtrlArrowsMoving']) { ?>
 <!-- Set on key handler for moving using by Ctrl+arrows -->
+<script src="libraries/keyhandler.js" type="text/javascript" language="javascript"></script>
 <script type="text/javascript" language="javascript">
 <!--
+var switch_movement = <?php echo $cfg['DefaultPropDisplay'] == 'horizontal' ? '0' : '1'; ?>;
 document.onkeydown = onKeyDownArrowsHandler;
 // -->
 </script>
@@ -625,14 +627,17 @@ echo "\n";
 // END - Table Type - 2 May 2001 - Robbat2
 ?>
 
-<input type="submit" name="submit" value="<?php echo $strSave; ?>" />
 <?php
 if ($action == 'tbl_create.php' || $action == 'tbl_addfield.php') {
-    echo '        &nbsp;&nbsp;<em>' . $strOr . '</em>&nbsp;&nbsp;' . $strFields . ':' . "\n";
-    echo '        ' . '<input type="text" name="num_fields" size="2" class="textfield" value="' . $num_fields . '" />' . "\n";
-    echo '        ' . '&nbsp;<input type="submit" name="submit_num_fields" value="' . $strGo . '" />' . "\n";
+    echo '    ' . sprintf($strAddFields,  '<input type="text" name="added_fields" size="2" value="1" onfocus="this.select()" style="vertical-align: middle;" />') . "\n";
+    echo '    &nbsp;<input type="submit" name="submit_num_fields" value="' . $strGo . '" onclick="return checkFormElementInRange(this.form, \'added_fields\', 1)" style="vertical-align: middle;" />' . "\n<br />\n<br />\n";
 }
 ?>
+
+<div class="tblFooters" style="width: 80%; text-align: center; padding: 3px;">
+    <input type="submit" name="do_save_data" value="<?php echo $strSave; ?>" />
+</div>
+
 </form>
 
 <table>

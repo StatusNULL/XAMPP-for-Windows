@@ -1,5 +1,5 @@
 <?php
-/* $Id: transformations.lib.php,v 2.8 2004/08/21 13:05:42 lem9 Exp $ */
+/* $Id: transformations.lib.php,v 2.9 2004/10/12 12:08:18 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -17,7 +17,12 @@ function PMA_transformation_getOptions($string) {
         }
     }
 
-    return $transform_options;
+    // strip possible slashes to behave like documentation says
+    $result = array();
+    foreach($transform_options as $val) {
+        $result[] = stripslashes($val);
+    }
+    return $result;
 }
 
 /**

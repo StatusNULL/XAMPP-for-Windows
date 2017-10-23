@@ -1,5 +1,5 @@
 <?php
-/* $Id: string.lib.php,v 2.8 2004/09/03 10:08:37 nijel Exp $ */
+/* $Id: string.lib.php,v 2.9 2004/12/28 15:12:16 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /** Specialized String Functions for phpMyAdmin
@@ -13,12 +13,24 @@
  *
  * The SQL Parser code relies heavily on these functions.
  */
- 
- /* windows-* and tis-620 are not supported and are not multibyte, so there is
-  * no need to handle them. */
-$GLOBALS['PMA_allow_mbstr'] = @function_exists('mb_strlen') 
-    && substr($GLOBALS['charset'], 0, 8) != 'windows-' 
-    && $GLOBALS['charset'] != 'tis-620';
+
+/* Try to load mbstring, unless we're using buggy php version */
+if (PMA_PHP_INT_VERSION != 40203) {
+    if (!@extension_loaded('mbstring')) {
+        //PMA_dl('mbstring');
+    }
+}
+
+/* windows-* and tis-620 are not supported and are not multibyte,
+ * others can be ignored as they're not multibyte */
+$GLOBALS['using_mb_charset'] = 
+    substr($GLOBALS['charset'], 0, 8) != 'windows-' &&
+    substr($GLOBALS['charset'], 0, 9) != 'iso-8859-' && 
+    substr($GLOBALS['charset'], 0, 3) != 'cp-' && 
+    $GLOBALS['charset'] != 'koi8-r' && 
+    $GLOBALS['charset'] != 'tis-620';
+
+$GLOBALS['PMA_allow_mbstr'] = @function_exists('mb_strlen') && $GLOBALS['using_mb_charset'];
 
 if ($GLOBALS['PMA_allow_mbstr']) {
     // the hebrew lang file uses iso-8859-8-i, encoded RTL,

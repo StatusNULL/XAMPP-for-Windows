@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_search.php,v 2.9.2.1 2004/10/13 11:37:23 rabus Exp $ */
+/* $Id: db_search.php,v 2.11 2004/10/12 21:08:49 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 /**
  * Credits for this script goes to Thomas Chaumeny <chaume92 at aol.com>
@@ -296,14 +296,10 @@ if (empty($search_option)) {
             <?php echo $strSearchType; ?>&nbsp;
         </td>
         <td bgcolor="<?php echo $cfg['BgcolorOne']; ?>">
-            <input type="radio" id="search_option_1" name="search_option" value="1"<?php if ($search_option == 1) echo ' checked="checked"'; ?> />
-            <label for="search_option_1"><?php echo $strSearchOption1; ?></label>&nbsp;*<br />
-            <input type="radio" id="search_option_2" name="search_option" value="2"<?php if ($search_option == 2) echo ' checked="checked"'; ?> />
-            <label for="search_option_2"><?php echo $strSearchOption2; ?></label>&nbsp;*<br />
-            <input type="radio" id="search_option_3" name="search_option" value="3"<?php if ($search_option == 3) echo ' checked="checked"'; ?> />
-            <label for="search_option_3"><?php echo $strSearchOption3; ?></label><br />
-            <input type="radio" id="search_option_4" name="search_option" value="4"<?php if ($search_option == 4) echo ' checked="checked"'; ?> />
-            <label for="search_option_4"><?php echo $strSearchOption4; ?></label><?php echo PMA_showMySQLDocu('Regexp', 'Regexp'); ?><br />
+            <input type="radio" id="search_option_1" name="search_option" value="1"<?php if ($search_option == 1) echo ' checked="checked"'; ?> /><label for="search_option_1"><?php echo $strSearchOption1; ?></label>&nbsp;*<br />
+            <input type="radio" id="search_option_2" name="search_option" value="2"<?php if ($search_option == 2) echo ' checked="checked"'; ?> /><label for="search_option_2"><?php echo $strSearchOption2; ?></label>&nbsp;*<br />
+            <input type="radio" id="search_option_3" name="search_option" value="3"<?php if ($search_option == 3) echo ' checked="checked"'; ?> /><label for="search_option_3"><?php echo $strSearchOption3; ?></label><br />
+            <input type="radio" id="search_option_4" name="search_option" value="4"<?php if ($search_option == 4) echo ' checked="checked"'; ?> /><label for="search_option_4"><?php echo $strSearchOption4; ?></label><?php echo PMA_showMySQLDocu('Regexp', 'Regexp'); ?><br />
             <br />
             *&nbsp;<?php echo $strSplitWordsWithSpace . "\n"; ?>
         </td>

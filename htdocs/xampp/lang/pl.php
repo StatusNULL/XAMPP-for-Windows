@@ -49,6 +49,9 @@ $TEXT['navi-german']="Niemiecki";
 $TEXT['navi-french']="Francais";
 $TEXT['navi-dutch']="Nederlands";
 $TEXT['navi-spanish']="Spanish";
+$TEXT['navi-polish']="Polski";
+$TEXT['navi-spanish']="Español";
+$TEXT['navi-chinese']="&#20013;&#25991;";
 
 // ---------------------------------------------------------------------
 // STATUS

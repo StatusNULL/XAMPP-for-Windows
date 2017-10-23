@@ -1,5 +1,5 @@
 <?php
-/* $Id: mysqli.dbi.lib.php,v 2.29 2004/08/02 00:46:22 lem9 Exp $ */
+/* $Id: mysqli.dbi.lib.php,v 2.30.2.1 2005/01/11 11:53:51 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -57,16 +57,18 @@ function PMA_DBI_connect($user, $password) {
         $cfg['Server']['socket'] = '';
     }
 
+    // NULL enables connection to the default socket
     $server_socket = (empty($cfg['Server']['socket']))
-                   ? FALSE
+                   ? NULL 
                    : $cfg['Server']['socket'];
 
-    if ($server_socket) {
-        $link = @mysqli_connect($cfg['Server']['host'], $user, $password, FALSE, $server_port, $server_socket);
-    } else {
-        // Omit the last parameter to enable connection to the default socket
-        $link = @mysqli_connect($cfg['Server']['host'], $user, $password, FALSE, $server_port);
-    }
+    $link = mysqli_init();
+
+    mysqli_options($link, MYSQLI_OPT_LOCAL_INFILE, TRUE);
+
+    $client_flags = $cfg['Server']['compress'] && defined('MYSQLI_CLIENT_COMPRESS') ? MYSQLI_CLIENT_COMPRESS : 0;
+
+    @mysqli_real_connect($link, $cfg['Server']['host'], $user, $password, FALSE, $server_port, $server_socket, $client_flags);
 
     if (empty($link)) {
         PMA_auth_fails();
@@ -187,7 +189,7 @@ function PMA_DBI_getError($link = NULL) {
     if (mysqli_connect_errno()) {
         $error = mysqli_connect_errno();
         $error_message = mysqli_connect_error();
-    } elseif (mysqli_errno($link)) {
+    } elseif ( !empty($link) && mysqli_errno($link)) {
         $error = mysqli_errno($link);
         $error_message = mysqli_error($link);
     } 

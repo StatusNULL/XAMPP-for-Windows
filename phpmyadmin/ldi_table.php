@@ -1,5 +1,5 @@
 <?php
-/* $Id: ldi_table.php,v 2.8 2004/09/06 00:28:21 lem9 Exp $ */
+/* $Id: ldi_table.php,v 2.10 2004/10/21 10:18:12 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -21,6 +21,7 @@ require('./tbl_properties_common.php');
 $err_url   = 'ldi_table.php' . $err_url;
 $url_query .= '&amp;goto=ldi_table.php&amp;back=ldi_table.php';
 require('./tbl_properties_table_info.php');
+require('./tbl_properties_links.php');
 
 /**
  * Displays the form
@@ -47,7 +48,7 @@ if (!empty($cfg['UploadDir'])) {
                 if ($is_first == 0) {
                     $is_upload_dir = true;
                     echo "<br />\n";
-                    echo '    <i>' . $strOr . '</i> ' . $strWebServerUploadDirectory . '&nbsp;: ' . "\n";
+                    echo '    <i>' . $strOr . '</i> ' . $strWebServerUploadDirectory . ': ' . "\n";
                     echo '    <div style="margin-bottom: 5px">' . "\n";
                     echo '        <select size="1" name="local_textfile">' . "\n";
                     echo '            <option value="" selected="selected"></option>' . "\n";
@@ -112,8 +113,7 @@ echo "\n";
         <td><?php echo $strFieldsEnclosedBy; ?></td>
         <td>
             <input type="text" name="enclosed" size="1" maxlength="1" value="&quot;" />
-            <input type="checkbox" name="enclose_option" value="OPTIONALLY" id="checkbox_enclose_option" />
-            <label for="checkbox_enclose_option"><?php echo $strOptionally; ?></label>
+            <input type="checkbox" name="enclose_option" value="OPTIONALLY" id="checkbox_enclose_option" /><label for="checkbox_enclose_option"><?php echo $strOptionally; ?></label>
         </td>
         <td><?php echo $strOftenQuotation; ?></td>
     </tr>

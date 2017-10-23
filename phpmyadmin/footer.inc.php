@@ -1,5 +1,5 @@
 <?php
-/* $Id: footer.inc.php,v 2.11 2004/07/05 13:18:08 lem9 Exp $ */
+/* $Id: footer.inc.php,v 2.12 2004/11/03 13:56:51 garvinhicking Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -39,7 +39,7 @@ if ($cfg['QueryFrame'] && $cfg['QueryFrameJS']) {
             } else {
                 setTimeout("dbBoxSetup();",500);
             }
-        }		
+        }
     }
     if (parent.frames.queryframe && parent.frames.queryframe.document && parent.frames.queryframe.document.queryframeform) {
         parent.frames.queryframe.document.queryframeform.db.value = "<?php echo (isset($db) ? addslashes($db) : ''); ?>";

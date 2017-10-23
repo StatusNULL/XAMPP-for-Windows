@@ -6,7 +6,7 @@
    Transformations  -  FAQ  -  Developers  -  Credits  -  Translators
    ______________________________________________________________________
 
-                      phpMyAdmin 2.6.0-pl3 Documentation
+                        phpMyAdmin 2.6.1 Documentation
 
      * SourceForge phpMyAdmin project page   [ http://www.phpmyadmin.net/
        ] 
@@ -14,15 +14,22 @@
           + Version history: ChangeLog
           + General notes: README
           + License: LICENSE
-     * Documentation    version:   $Id:   Documentation.html,v   2.86.2.3
-       2004/10/13 11:37:23 rabus Exp $
+     * Documentation   version:   $Id:   Documentation.html,v   2.103.2.1
+       2005/01/24 01:10:22 lem9 Exp $
 
 Requirements
 
-     * php 4.1.0 or later (*)
-       If  you  want  to  display  inline  thumbnails  of  JPEGs with the
-       original aspect ratio, you also need GD2 support in PHP.
+     * PHP
+          + You need PHP 4.1.0 or newer (*)
+          + If  you  want  to display inline thumbnails of JPEGs with the
+            original aspect ratio, you also need GD2 support in PHP
+          + Starting  with  phpMyAdmin  2.6.1, MIME-based transformations
+            that use an external program need PHP 4.3.0 or newer
      * MySQL 3.23.32 or newer (details);
+     * Not really a requirement but a strong suggestion: if you are using
+       the   "cookie"   authentication  method,  having  the  mcrypt  PHP
+       extension  on your web server accelerates not only the login phase
+       but every other action that you do in phpMyAdmin.
      * a web-browser (doh!).
 
 Introduction
@@ -89,7 +96,10 @@ Installation
        the values for host, user, password and authentication mode to fit
        your environment. Here, "host" means the MySQL server. Also insert
        the  correct  value  for  $cfg['PmaAbsoluteUri'].  Have  a look at
-       Configuration section for an explanation of all values.
+       Configuration  section  for  an  explanation of all values. Please
+       also   read   the  remaining  of  this  Installation  section  for
+       information  about  authentication  modes  and  the  linked-tables
+       infrastructure.
     4. It  is  recommended  that  you  protect the directory in which you
        installed  phpMyAdmin  (unless  it's  on a closed intranet, or you
        wish  to  use  HTTP  or  cookie  authentication), for example with
@@ -146,14 +156,16 @@ Installation
        cookie  mode  so  that your user/password pair are not in clear in
        the configuration file.
      * HTTP  and  cookie  authentication modes are more secure: the MySQL
-       password  does  not need to be set in the phpMyAdmin configuration
-       file   (except   for  the  "controluser"  -see  the  Configuration
-       section).
+       login  information  does  not  need  to  be  set in the phpMyAdmin
+       configuration file (except possibly for the controluser).
        However,  keep  in  mind  that the password travels in plain text,
        unless you are using the HTTPS protocol.
        In  cookie  mode,  the  password  is  stored,  encrypted  with the
        blowfish algorithm, in a temporary cookie.
-     * For 'HTTP' and 'cookie' modes, phpMyAdmin needs a controluser that
+     * Note:  starting with phpMyAdmin 2.6.1, configuring the controluser
+       to  enable  HTTP  and  cookie authentication applies only to MySQL
+       servers older than 4.1.2.
+       For 'HTTP' and 'cookie' modes, phpMyAdmin needs a controluser that
        has  only  the  SELECT  privilege  on  the mysql.user (all columns
        except   "Password"),  mysql.db  (all  columns),  mysql.host  (all
        columns)  and  mysql.tables_priv  (all  columns except "Grantor" &
@@ -231,6 +243,8 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON <pma_db>.* TO 'pma'@'localhost';
        back with the same username.
      * If    you    want    to    login    to    arbitrary   server   see
        $cfg['AllowArbitraryServer'] directive.
+     * See  also  the  requirements  section  for  a  way  to improve the
+       interface speed while using this mode.
 
     'config' authentication mode
 
@@ -348,10 +362,14 @@ Configuration
 
    $cfg['Servers'][$i]['controluser'] string
           $cfg['Servers'][$i]['controlpass'] string
+          Note:   starting   with   phpMyAdmin   2.6.1,  configuring  the
+          controluser  to  enable  HTTP and cookie authentication applies
+          only to MySQL servers older than 4.1.2.
           This  special  account is used for 2 distinct purposes: to make
-          possible    a   multi-user   installation   (http   or   cookie
-          authentication  mode) and also for all relational features (see
-          $cfg['Servers'][$i]['pmadb']).
+          possible all relational features (see
+          $cfg['Servers'][$i]['pmadb'])  and,  for  a  MySQL server older
+          than 4.1.2, to enable a multi-user installation (http or cookie
+          authentication mode).
           When  using  HTTP  or  cookie authentication modes (or 'config'
           authentication mode since phpMyAdmin 2.2.1), you need to supply
           the details of a MySQL account that has SELECT privilege on the
@@ -365,7 +383,8 @@ Configuration
           "controluser",  you  could get some errors, depending the exact
           privileges  you  gave to the "controluser". phpMyAdmin does not
           support a direct login with the "controluser".
-          In versions before 2.2.5, those were called "stduser/stdpass".
+          In   phpMyAdmin   versions  before  2.2.5,  those  were  called
+          "stduser/stdpass".
 
    $cfg['Servers'][$i]['auth_type'] string ['http'|'cookie'|'config']
           Whether  config or cookie or http authentication should be used
@@ -557,7 +576,7 @@ Configuration
           + set up pmadb and the linked-tables infrastructure
           + put the table name in $cfg['Servers'][$i]['history']
 
-   $cfg['Servers'][$i]['verbose_check'] string
+   $cfg['Servers'][$i]['verbose_check'] boolean
           Because  release  2.5.0  introduced the new MIME-transformation
           support,  the  column_info  table  got  enhanced with three new
           fields.  If  the  above  variable  is  set  to  TRUE  (default)
@@ -567,6 +586,10 @@ Configuration
           to false, which should offer a performance increase.
           Recommended  to  set  to  FALSE,  when you are sure, your table
           structure is up to date.
+
+   $cfg['Servers'][$i]['AllowRoot'] boolean
+          Whether  to  allow  root access, This is just simplification of
+          rules below.
 
    $cfg['Servers'][$i]['AllowDeny']['order'] string
           If  your  rule  order  is  empty,  then  IP  authentication  is
@@ -998,7 +1021,8 @@ Configuration
           on click.
 
    $cfg['CtrlArrowsMoving'] boolean
-          Enable Ctrl+Arrows moving between fields when editing?
+          Enable  Ctrl+Arrows  (Option+Arrows  in  Safari) moving between
+          fields when editing?
 
    $cfg['LimitChars'] integer
           Maximal  number  of  Chars  showed  in any non-numeric field on
@@ -1141,7 +1165,8 @@ Configuration
           Determines for how large tables phpMyAdmin should get exact row
           count by SELECT COUNT. If approximate row count is smaller than
           this  value,  SELECT  COUNT  will be used, otherwise only value
-          returned by SHOW TABLE STATUS.
+          returned  by  SHOW  TABLE  STATUS. This has currently an impact
+          only on InnoDB tables.
 
    $cfg['WYSIWYG-PDF'] boolean
           Utilizes  a WYSIWYG editing control to easily place elements of
@@ -1699,7 +1724,7 @@ FAQ - Frequently Asked Questions
    1.17a).
    MySQL 5.1 is not yet supported.
 
-    [1.17a] I cannot connect to the MySQL server. It alaways returns the error
+    [1.17a] I cannot connect to the MySQL server. It always returns the error
     message, "Client does not support authentication protocol requested by
     server; consider upgrading MySQL client"
 
@@ -1937,8 +1962,8 @@ FAQ - Frequently Asked Questions
    verbose  name,  theme generation and theme version. These versions and
    generations  are  enumerated  from  1  and  do  not  have  any  direct
    dependance on phpMyAdmin version. Themes within same generation should
-   be bacward compatible - theme with version 2 should work in phpMyAdmin
-   requiring   version   1.   Themes   with   different   generation  are
+   be  backwards  compatible  -  theme  with  version  2  should  work in
+   phpMyAdmin  requiring  version 1. Themes with different generation are
    incompatible.
 
    If  you  do  not  want to use your own symbols and buttons, remove the
@@ -2045,6 +2070,13 @@ FAQ - Frequently Asked Questions
 
    Please make sure that your table has a primary key, so that phpMyAdmin
    can use it for the Edit and Delete links.
+
+    [3.11] The number of records for InnoDB tables is not correct.
+
+   phpMyAdmin  uses  a quick method to get the row count, and this method
+   only  returns  an  approximate count in the case of InnoDB tables. See
+   $cfg['MaxExactCount']  for  a  way  to  modify those results, but this
+   could have a serious impact on performance.
 
   [4. ISPs, multi-user installations ]
 
@@ -2447,11 +2479,12 @@ FAQ - Frequently Asked Questions
 
     [6.16] How can I simply move in page with plenty editing fields?
 
-   You  can  use Ctrl+arrows for moving on most pages with plenty editing
-   fields  (table  structure changes, row editing, etc.) (must be enabled
-   in configuration - see. $cfg['CtrlArrowsMoving']). You can also have a
-   look  at the directive $cfg['DefaultPropDisplay'] ('vertical') and see
-   if this eases up editing for you.
+   You  can  use Ctrl+arrows (Option+Arrows in Safari) for moving on most
+   pages  with many editing fields (table structure changes, row editing,
+   etc.)     (must     be     enabled    in    configuration    -    see.
+   $cfg['CtrlArrowsMoving']).  You  can also have a look at the directive
+   $cfg['DefaultPropDisplay']  ('vertical')  and  see  if  this  eases up
+   editing for you.
 
     [6.17] Transformations: I can't enter my own mimetype! WTF is this feature
     then useful for?
@@ -2550,11 +2583,13 @@ FAQ - Frequently Asked Questions
     enable that?
 
    You can either export as CSV suitable for MS Excel, which works out of
-   the  box  or  you  can  try native experimental MS Excel exporter. For
-   enabling  this  you  need  to  set  $cfg['TempDir'] to place where web
-   server  user  can  write (for example './tmp') and install PEAR module
-   Spreadsheet_Excel_Writer  into  php include path. The installation can
-   be done by following command:
+   the  box  or  you  can try native experimental MS Excel exporter. This
+   export  has  several  problems,  most important are limitation of cell
+   content  to  255 chars and no support for charsets, so think carefully
+   whether  you  want  to enable this.. For enabling this you need to set
+   $cfg['TempDir']  to place where web server user can write (for example
+   './tmp')  and  install  PEAR  module Spreadsheet_Excel_Writer into php
+   include path. The installation can be done by following command:
     pear -d preferred_state=beta install -a Spreadsheet_Excel_Writer
 
    First  part  of  switches  set we want to install beta version of that
@@ -2823,7 +2858,8 @@ CREDITS, in chronological order
 
 - Maxime Delorme <delorme.maxime_at_free.fr>
     * PDF schema output, thanks also to Olivier Plathey for the
-      "FPDF" library (see http://www.fpdf.org/).
+      "FPDF" library (see http://www.fpdf.org/) and Steven Wittens
+      for the "UFPDF" library (see http://www.acko.net/node/56).
 
 - Olof Edlund <olof.edlund_at_upright.se>
     * SQL validator server
@@ -2841,6 +2877,9 @@ CREDITS, in chronological order
 - Michael Keck <mkkeck_at_users.sourceforge.net>
     * redesign for 2.6.0
     * phpMyAdmin sailboat logo (June 2004)
+
+- Mathias Landh‰uﬂer
+    * Representation at conferences
 
 And also to the following people who have contributed minor changes,
 enhancements, bugfixes or support for a new language since version 2.1.0:

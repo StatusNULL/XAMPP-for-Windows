@@ -77,7 +77,7 @@ parse_arguments() {
 # [mysql_install_db], and then merge with the command line arguments
 
 print_defaults=my_print_defaults
-for dir in ./bin /usr/local/mysql/bin /usr/local/mysql/bin extra $print_defaults_bindir/../bin $print_defaults_bindir/../extra
+for dir in ./bin /usr/local/bin /usr/local/bin extra $print_defaults_bindir/../bin $print_defaults_bindir/../extra
 do
   if test -x $dir/my_print_defaults
   then
@@ -91,13 +91,13 @@ parse_arguments PICK-ARGS-FROM-ARGV "$@"
 
 if test -z "$basedir"
 then
-  basedir=/usr/local/mysql
+  basedir=/usr/local
   if test -z "$bindir"
   then
-     bindir=/usr/local/mysql/bin
+     bindir=/usr/local/bin
   fi
-  execdir=/usr/local/mysql/libexec 
-  pkgdatadir=/usr/local/mysql/share/mysql
+  execdir=/usr/local/libexec 
+  pkgdatadir=/usr/local/share/mysql
 else
   if test -z "$bindir"
   then
@@ -106,9 +106,9 @@ else
   if test -x "$basedir/libexec/mysqld"
   then
     execdir="$basedir/libexec"
-  elif test -x "/usr/local/mysql/libexec/mysqld"
+  elif test -x "/usr/local/libexec/mysqld"
   then
-    execdir="/usr/local/mysql/libexec"
+    execdir="/usr/local/libexec"
   else
     execdir="$basedir/bin"
   fi
@@ -138,7 +138,7 @@ fi
 
 # Find where first mysql_fix_privilege_tables.sql is located
 for i in $basedir/support-files $basedir/share $basedir/share/mysql \
-        $basedir/scripts /usr/local/mysql/share/mysql . ./scripts
+        $basedir/scripts /usr/local/share/mysql . ./scripts
 do
   if test -f $i/$file
   then

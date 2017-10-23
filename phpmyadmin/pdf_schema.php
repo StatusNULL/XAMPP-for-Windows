@@ -1,5 +1,5 @@
 <?php
-/* $Id: pdf_schema.php,v 2.9 2004/08/08 19:20:09 lem9 Exp $ */
+/* $Id: pdf_schema.php,v 2.12 2004/12/29 14:13:40 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -39,10 +39,20 @@ if (!$cfgRelation['pdfwork']) {
 
 
 /**
- * Gets the "fpdf" libraries and defines the pdf font path
+ * Gets the "fpdf" libraries and defines the pdf font path, use unicode version for unicode.
  */
-require_once('./libraries/fpdf/fpdf.php');
-$FPDF_font_path = './libraries/fpdf/font/';
+define('FPDF_FONTPATH','./libraries/fpdf/font/');
+if ($charset == 'utf-8') {
+    define('PMA_PDF_FONT', 'FreeSans');
+    require_once('./libraries/fpdf/ufpdf.php');
+    class PMA_FPDF extends UFPDF {
+    };
+} else {
+    define('PMA_PDF_FONT', 'Arial');
+    require_once('./libraries/fpdf/fpdf.php');
+    class PMA_FPDF extends FPDF {
+    };
+}
 
 
 /**
@@ -52,7 +62,7 @@ $FPDF_font_path = './libraries/fpdf/font/';
  *
  * @see     FPDF
  */
-class PMA_PDF extends FPDF
+class PMA_PDF extends PMA_FPDF
 {
     /**
      * Defines private properties
@@ -100,7 +110,7 @@ class PMA_PDF extends FPDF
             $nb=$this->page;
             foreach ($this->Alias AS $alias => $value) {
                 for ($n=1;$n<=$nb;$n++)
-                $this->pages[$n]=str_replace($alias,$value,$this->pages[$n]);
+                $this->pages[$n]=$this->_strreplace($alias,$value,$this->pages[$n]);
             }
         }
         parent::_putpages();
@@ -512,7 +522,7 @@ function NbLines($w,$txt)
       }
       if ($c==' ')
          $sep=$i;
-      $l+=$cw[$c];
+      $l+=isset($cw[ord($c)])?$cw[ord($c)]:0 ;
       if ($l>$wmax)
       {
          if ($sep==-1)
@@ -889,7 +899,7 @@ class PMA_RT
      */
     var $tables    = array();
     var $relations = array();
-    var $ff        = 'Arial';
+    var $ff        = PMA_PDF_FONT;
     var $x_max     = 0;
     var $y_max     = 0;
     var $scale;
@@ -1048,8 +1058,8 @@ class PMA_RT
         if (empty($filename)) {
             $filename = $pdf_page_number . '.pdf';
         }
-        $pdf->Output($db . '_' . $filename, TRUE);
-        //$pdf->Output('', TRUE);
+        //$pdf->Output($db . '_' . $filename, TRUE);
+        $pdf->Output($db . '_' . $filename, 'I'); // destination: Inline
     } // end of the "PMA_RT_showRt()" method
 
 
@@ -1080,6 +1090,7 @@ class PMA_RT
 
         // Font face depends on the current language
         $this->ff        = str_replace('"', '', substr($GLOBALS['right_font_family'], 0, strpos($GLOBALS['right_font_family'], ',')));
+
         $this->same_wide = $all_tab_same_wide;
 
         // Initializes a new document
@@ -1091,13 +1102,20 @@ class PMA_RT
         $pdf->SetAuthor('phpMyAdmin ' . PMA_VERSION);
         $pdf->AliasNbPages();
 
-         // fonts added to phpMyAdmin and considered non-standard by fpdf
-         // (Note: those tahoma fonts are iso-8859-2 based)
-         if ($this->ff == 'tahoma') {
-             $pdf->AddFont('tahoma','','tahoma.php');
-             $pdf->AddFont('tahoma','B','tahomab.php');
-         }
-
+        if ($GLOBALS['charset'] == 'utf-8') {
+            // Force FreeSans for utf-8
+            $this->ff = 'FreeSans';
+            $pdf->AddFont('FreeSans','','FreeSans.php');
+            $pdf->AddFont('FreeSans','B','FreeSansBold.php');
+            $pdf->SetFont('FreeSans', '', 14);
+        } else { 
+            // fonts added to phpMyAdmin and considered non-standard by fpdf
+            // (Note: those tahoma fonts are iso-8859-2 based)
+            if ($this->ff == 'tahoma') {
+                $pdf->AddFont('tahoma','','tahoma.php');
+                $pdf->AddFont('tahoma','B','tahomab.php');
+            }
+        }
         $pdf->SetFont($this->ff, '', 14);
         $pdf->SetAutoPageBreak('auto');
 

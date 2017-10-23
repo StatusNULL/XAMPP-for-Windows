@@ -1,16 +1,15 @@
 <?php
-/* $Id: latvian-windows-1257.inc.php,v 2.39 2004/09/21 11:00:41 rabus Exp $ */
+/* $Id: latvian-windows-1257.inc.php,v 2.57 2004/12/30 20:46:58 lem9 Exp $ */
 
 /**
  * Latvian language file by Sandis Jçrics <sandisj at parks.lv>
  */
 
 $charset = 'windows-1257';
-$allow_recoding = TRUE;
 $text_dir = 'ltr'; // ('ltr' for left to right, 'rtl' for right to left)
 $left_font_family = 'verdana, arial, helvetica, geneva, sans-serif';
 $right_font_family = 'arial, helvetica, geneva, sans-serif';
-$number_thousands_separator = ',';
+$number_thousands_separator = ' ';
 $number_decimal_separator = '.';
 // shortcuts for Byte, Kilo, Mega, Giga, Tera, Peta, Exa
 $byteUnits = array('baiti', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB');
@@ -34,6 +33,7 @@ $strAddConstraints = 'Pievienot ierobeþojumus';
 $strAddDeleteColumn = 'Pievienot/Dzçst laukus (kolonnas)';
 $strAddDeleteRow = 'Pievienot/Dzçst ierakstu';
 $strAddDropDatabase = 'Pievienot DROP DATABASE';
+$strAddFields = 'Pievienot %s lauku(s)';
 $strAddHeaderComment = 'Ievietot virsrakstâ komentâru (\\n atdala rindas)';
 $strAddIfNotExists = 'Pievienot IF NOT EXISTS';
 $strAddIntoComments = 'Pievienot komentâros';
@@ -61,6 +61,7 @@ $strAnd = 'Un';
 $strAny = 'Jebkurð';
 $strAnyHost = 'Jebkurð hosts';
 $strAnyUser = 'Jebkurð lietotâjs';
+$strApproximateCount = 'Var bût aptuvens skaits. Skatît FAQ 3.11';
 $strArabic = 'Arâbu';
 $strArmenian = 'Armçòu';
 $strAscending = 'Augoðâ secîbâ';
@@ -74,8 +75,15 @@ $strBack = 'Atpakaï';
 $strBaltic = 'Baltijas';
 $strBeginCut = 'IZGRIEZT NO ÐÎS VIETAS';
 $strBeginRaw = 'RINDAS SÂKUMS';
+$strBinLogEventType = 'Notikuma tips';
+$strBinLogInfo = 'Informâcija';
+$strBinLogName = 'Log-faila nosaukums';
+$strBinLogOriginalPosition = 'Oriìinâlâ pozîcija';
+$strBinLogPosition = 'Pozîcija';
+$strBinLogServerId = 'Servera ID';
 $strBinary = 'Binârais';
 $strBinaryDoNotEdit = 'Binârais - netiek labots';
+$strBinaryLog = 'Binârais log-fails';
 $strBookmarkAllUsers = 'Dot ikvienam lietotâjam pieeju ðai grâmatzîmei';
 $strBookmarkDeleted = 'Ieraksts tika dzçsts.';
 $strBookmarkLabel = 'Nosaukums';
@@ -115,7 +123,7 @@ $strCharsetOfFile = 'Tabulas kodçjums:';
 $strCharsets = 'Rakstzîmju kodçjumi';
 $strCharsetsAndCollations = 'Rakstzîmju kodçjumi un izkârtojumi';
 $strCheckAll = 'Iezîmçt visu';
-$strCheckOverhead = 'Pârbaudît pârpildîtos';
+$strCheckOverhead = 'Iezîmçt tabulas ar pârtçriòu';
 $strCheckPrivs = 'Pârbaudît privilçìijas';
 $strCheckPrivsLong = 'Pârbaudît privilçìijas uz datubâzi &quot;%s&quot;.';
 $strCheckTable = 'Pârbaudît tabulu';
@@ -127,6 +135,7 @@ $strColumnPrivileges = 'Kolonnu specifiskâs privilçìijas';
 $strCommand = 'Komanda';
 $strComments = 'Komentâri';
 $strCommentsForTable = 'KOMENTÂRI TABULAI';
+$strCompatibleHashing = 'MySQL&nbsp;4.0 savietojams';
 $strCompleteInserts = 'Pilnas INSERT izteiksmes';
 $strCompression = 'Kompresija';
 $strConfigFileError = 'phpMyAdmin nevar nolasît konfigurâcijas failu!<br />Tas var notikt, ja PHP atrod tajâ kïûdu, vai arî nevar atrast so failu.<br />Mçginiet izsaukt konfigurâcijas failu tieði, klikðkinot linku zemâk un lasiet PHP pazinojumu par kïûdâm. Vairâkumâ gadîjumu kaut kur pietrukst pçdiòa vai semikols.<br />Ja redzat tukðu lapu, viss ir kârtîbâ.';
@@ -136,6 +145,7 @@ $strConnections = 'Konekcijas';
 $strConstraintsForDumped = 'Ierobeþojumi izmestâm tabulâm';
 $strConstraintsForTable = 'Ierobeþojumi tabulai';
 $strCookiesRequired = '"Cookies" ir jâbût atïautiem aiz ðî punkta.';
+$strCopyDatabaseOK = 'Datubâze %s tika pârkopçta uz %s';
 $strCopyTable = 'Kopçt tabulu uz (datubâze<b>.</b>tabula):';
 $strCopyTableOK = 'Tabula %s tika pârkopçta uz %s.';
 $strCopyTableSameNames = 'Nevar nokopçt tabulu uz viòu paðu!';
@@ -155,6 +165,7 @@ $strCzech = 'Èehu';
 $strCzechSlovak = 'Èehu-Slovâku';
 
 $strDBComment = 'Datubâzes komentârs: ';
+$strDBCopy = 'Kopçt datubâzi uz';
 $strDBGContext = 'Konteksts';
 $strDBGContextID = 'Konteksta ID';
 $strDBGHits = 'Apmeklçjumi';
@@ -227,6 +238,7 @@ $strEndRaw = 'RINDAS BEIGAS';
 $strEnglish = 'Angïu';
 $strEnglishPrivileges = ' Piezîme: MySQL privilçìiju apzîmçjumi tiek rakstîti angïu valodâ ';
 $strError = 'Kïûda';
+$strEscapeWildcards = 'Aizstâjçjzîmes _ un % jâaizsargâ ar \ priekðâ, lai izmantotu tâs burtiski';
 $strEstonian = 'Igauòu';
 $strExcelEdition = 'Excel redakcija';
 $strExcelOptions = 'Excel opcijas';
@@ -296,11 +308,16 @@ $strIndex = 'Indekss';
 $strIndexHasBeenDropped = 'Indekss %s tika izdzçsts';
 $strIndexName = 'Indeksa nosaukums&nbsp;:';
 $strIndexType = 'Indeksa tips&nbsp;:';
+$strIndexWarningMultiple = 'Vairâk kâ viena %s atslçga tika izveidota kolonnai `%s`';
+$strIndexWarningPrimary = 'PRIMARY un INDEX atslçgas nevar abas reizç tikt uzliktas kolonnai `%s`';
+$strIndexWarningTable = 'Problçmas ar indeksiem tabulâ `%s`';
+$strIndexWarningUnique = 'UNIQUE un INDEX atslçgas nevar abas reizç tikt uzliktas kolonnai `%s`';
 $strIndexes = 'Indeksi';
 $strInnodbStat = 'InnoDB statuss';
 $strInsecureMySQL = 'Jûsu konfigurâcijas fails satur iestâdîjumus (lietotâjs "root" bez paroles), kas atbilst noklusçtajam MySQL priviliìçtajam lietotâjam. Jûsu MySQL serveris strâdâ ar ðo noklusçto variantu, ir atvçrts uzbrukumiem, un Jums tieðâm jâaiztaisa ðis droðîbas caurums.';
 $strInsert = 'Pievienot';
 $strInsertAsNewRow = 'Ievietot kâ jaunu rindu';
+$strInsertBookmarkTitle = 'Lûdzu ierakstiet grâmatzîmes virsrakstu';
 $strInsertNewRow = 'Pievienot jaunu rindu';
 $strInsertTextfiles = 'Ievietot tabulâ datus no teksta faila';
 $strInsertedRowId = 'Ievietotâs rindas id:';
@@ -382,6 +399,7 @@ $strName = 'Nosaukums';
 $strNeedPrimaryKey = 'Nodefinçjiet primâro atslçgu ðai tabulai.';
 $strNext = 'Nâkamie';
 $strNo = 'Nç';
+$strNoActivity = 'Nebija aktivitâtes vairâk kâ %s sekunþu laikâ, lûdzu autorizçjieties vçlreiz';
 $strNoDatabases = 'Nav datubâzu';
 $strNoDatabasesSelected = 'Datubâze nav izvçlçta.';
 $strNoDescription = 'Bez apraksta';
@@ -401,6 +419,7 @@ $strNoRights = 'Jums nav pietiekoði tiesîbu, lai atrastos ðeit tagad!';
 $strNoRowsSelected = 'Rindas nav iezîmçtas';
 $strNoSpace = 'Nepietiek vietas, lai saglabâtu failu %s.';
 $strNoTablesFound = 'Tabulas nav atrastas ðajâ datubâzç.';
+$strNoThemeSupport = 'Nav tçmu atbalsta, lûdzu pârbaudiet jûsu konfigurâciju un/vai Jûsu tçmas direktorijâ %s.';
 $strNoUsersFound = 'Lietotâji netika atrasti.';
 $strNoValidateSQL = 'Nepârbaudît SQL';
 $strNone = 'Nav';
@@ -432,6 +451,7 @@ $strPartialText = 'Daïçji teksti';
 $strPassword = 'Parole';
 $strPasswordChanged = 'Lietotâja %s parole tika veiksmîgi mainîta.';
 $strPasswordEmpty = 'Parole nav norâdîta!';
+$strPasswordHashing = 'Paroles jaukðana';
 $strPasswordNotSame = 'Paroles nesakrît!';
 $strPdfDbSchema = 'Datubâzes "%s" shçma, %s. lapa';
 $strPdfInvalidTblName = 'Tabula "%s" neeksistç!';
@@ -439,6 +459,7 @@ $strPdfNoTables = 'Nav tabulu';
 $strPerHour = 'stundâ';
 $strPerMinute = 'minûtç';
 $strPerSecond = 'sekundç';
+$strPersian = 'Persieðu';
 $strPhoneBook = 'telefonu grâmata';
 $strPhp = 'Izveidot PHP kodu';
 $strPmaDocumentation = 'phpMyAdmin dokumentâcija';
@@ -504,7 +525,7 @@ $strReType = 'Atkârtojiet';
 $strReceived = 'Saòemts';
 $strRecords = 'Ieraksti';
 $strReferentialIntegrity = 'Pârbaudît referenciâlo integritâti:';
-$strRefresh = 'Atkaunot';
+$strRefresh = 'Atjaunot';
 $strRelationNotWorking = 'Papildiespçjas darbam ar saistîtâm tabulâm tika izslçgtas. Lai uzzinâtu kâpçc, klikðkiniet %sðeit%s.';
 $strRelationView = 'Relâciju pârskats';
 $strRelationalSchema = 'Relâciju shçma';
@@ -568,6 +589,7 @@ $strSearchType = 'Atrast:';
 $strSecretRequired = 'Konfigurâcijas fails tagad prasa slepeno paroli (blowfish_secret).';
 $strSelectADb = 'Lûdzu izvçlieties datubâzi';
 $strSelectAll = 'Iezîmçt visu';
+$strSelectBinaryLog = 'Izvçlieties binâro log-failu apskatei';
 $strSelectFields = 'Izvçlieties laukus (kaut vienu):';
 $strSelectNumRows = 'vaicâjumâ';
 $strSelectTables = 'Izvçlieties tabulas';
@@ -623,6 +645,7 @@ $strSubmit = 'Nosûtît';
 $strSuccess = 'Jûsu SQL vaicâjums tika veiksmîgi izpildîts';
 $strSum = 'Kopumâ';
 $strSwedish = 'Zviedru';
+$strSwitchToDatabase = 'Pârslçgties uz nokopçto datubâzi';
 $strSwitchToTable = 'Pârslçgties uz nokopçto tabulu';
 
 $strTable = 'Tabula';
@@ -684,6 +707,7 @@ $strUpgrade = 'Jums ir jâuzliek %s %s vai jaunâks.';
 $strUsage = 'Aizòem';
 $strUseBackquotes = 'Lietot apostrofa simbolu [`] tabulu un lauku nosaukumiem';
 $strUseHostTable = 'Lietot hostu tabulu';
+$strUseTabKey = 'Lietojiet TAB taustiòu, lai pârvietotos no vçrtîbas lîdz vçrtîbai, vai CTRL+bultiòas, lai pârvietotos jebkurâ vietâ';
 $strUseTables = 'Lietot tabulas';
 $strUseTextField = 'Lietot teksta lauku';
 $strUseThisValue = 'Lietot ðo vçrtîbu';
@@ -722,5 +746,12 @@ $strYes = 'Jâ';
 $strZeroRemovesTheLimit = 'Piezîme: Ðo opciju uzstâdîðana uz 0 (nulli) atceï ierobeþojumus.';
 $strZip = 'Arhivçts ar zip';
 
-$strPersian = 'Persian';  //to translate
+// To translate:
+$strAfterInsertNext = 'Edit next row';  //to translate
+
+$strMbExtensionMissing = 'The mbstring PHP extension was not found and you seem to be using multibyte charset. Without mbstring extension phpMyAdmin is unable to split strings correctly and it may result in unexpected results.';  //to translate
+$strMbOverloadWarning = 'You have enabled mbstring.func_overload in your PHP configuration. This option is incompatible with phpMyAdmin and might cause breaking of some data!';  //to translate
+
+$strSQLExportCompatibility = 'SQL export compatibility';  //to translate
+
 ?>

@@ -1,5 +1,5 @@
 <?php
-/* $Id: profiling.php,v 2.5 2004/05/20 16:14:11 nijel Exp $ */
+/* $Id: profiling.php,v 2.6 2004/11/19 14:26:55 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 if (isset($GLOBALS['DBG']) && $GLOBALS['DBG']
@@ -18,7 +18,7 @@ if (isset($GLOBALS['DBG']) && $GLOBALS['DBG']
          * AUTHOR: Dmitri Dmitrienko <dd@cron.ru>
          */
 
-        dbg_get_profiler_results(&$dbg_prof_results);
+        dbg_get_profiler_results($dbg_prof_results);
 
         echo '<br /><table width="1000" cellspacing="0" cellpadding="2" style="font:8pt courier">' . "\n" .
             '<thead>' . "\n" .
@@ -36,7 +36,7 @@ if (isset($GLOBALS['DBG']) && $GLOBALS['DBG']
             '<tbody style="vertical-align: top">' . "\n";
         foreach ($dbg_prof_results['line_no'] AS $idx => $line_no) {
             $mod_no = $dbg_prof_results['mod_no'][$idx];
-            dbg_get_module_name($mod_no, &$mod_name);
+            dbg_get_module_name($mod_no, $mod_name);
 
             //if (strpos("!".$mod_name, 'dbg.php') > 0) continue;
 
@@ -52,10 +52,10 @@ if (isset($GLOBALS['DBG']) && $GLOBALS['DBG']
             $time_min = sprintf('%.3f', $time_min);
             $time_max = sprintf('%.3f', $time_max);
 
-            dbg_get_source_context($mod_no, $line_no, &$ctx_id);
+            dbg_get_source_context($mod_no, $line_no, $ctx_id);
 
             //use a default context name if needed
-            if (dbg_get_context_name($ctx_id, &$ctx_name)
+            if (dbg_get_context_name($ctx_id, $ctx_name)
                     && strcmp($ctx_name,'') == 0) {
                 $ctx_name = "::main";
             }

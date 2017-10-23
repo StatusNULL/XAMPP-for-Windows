@@ -17,8 +17,9 @@
 <a href="/xampp/lang.php?de">Deutsch</a> /
 <a href="/xampp/lang.php?fr">Francais</a> /
 <a href="/xampp/lang.php?nl">Nederlands</a> / 
-<a href="/xampp/lang.php?es">Spanish</a>
-<!-- <a href="/xampp/lang.php?pl">Polish</a> -->
+<a href="/xampp/lang.php?es">Spanish</a> /
+<a href="/xampp/lang.php?pl">Polish</a> / 
+<a href="/xampp/lang.php?zh">Chinese</a>
 </center>
 </body>
 </html>
