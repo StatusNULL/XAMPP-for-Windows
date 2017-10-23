@@ -1,8 +1,8 @@
-###### ApacheFriends XAMPP (Basispaket) version 1.6.6 ######
+###### ApacheFriends XAMPP (Basispaket) version 1.6.6a ######
 
   + Apache 2.2.8
-  + MySQL 5.0.51
-  + PHP 5.2.5 + PHP 4.4.8 rc2 dev + PEAR
+  + MySQL 5.0.51a
+  + PHP 5.2.5 + PHP 4.4.8 + PEAR
   + PHP-Switch win32 1.0 (von Apachefriends, man nehme die "php-switch.bat") 
   + XAMPP Control Version 2.5 from www.nat32.com	
   + XAMPP Security 1.0	
