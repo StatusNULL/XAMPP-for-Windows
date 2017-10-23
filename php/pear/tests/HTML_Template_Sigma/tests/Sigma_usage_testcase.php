@@ -5,7 +5,7 @@
  * 
  * @author Alexey Borzov <avb@php.net>
  * 
- * $Id: Sigma_usage_testcase.php,v 1.2 2003/04/22 19:01:04 avb Exp $
+ * $Id: Sigma_usage_testcase.php,v 1.3 2004/04/10 10:28:45 avb Exp $
  */
 
 class Sigma_Usage_TestCase extends PHPUnit_TestCase
@@ -39,7 +39,7 @@ class Sigma_Usage_TestCase extends PHPUnit_TestCase
 
     function _methodExists($name) 
     {
-        if (in_array(strtolower($name), get_class_methods($this->tpl))) {
+        if (in_array(strtolower($name), array_map('strtolower', get_class_methods($this->tpl)))) {
             return true;
         }
         $this->assertTrue(false, 'method '. $name . ' not implemented in ' . get_class($this->tpl));

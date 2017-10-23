@@ -1,5 +1,5 @@
 <?php
-/* $Id: profiling.php,v 2.3 2003/11/26 22:52:25 rabus Exp $ */
+/* $Id: profiling.php,v 2.5 2004/05/20 16:14:11 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 if (isset($GLOBALS['DBG']) && $GLOBALS['DBG']
@@ -20,7 +20,7 @@ if (isset($GLOBALS['DBG']) && $GLOBALS['DBG']
 
         dbg_get_profiler_results(&$dbg_prof_results);
 
-        echo '<br><table width="1000" cellspacing="0" cellpadding="2" style="font:8pt courier">' . "\n" .
+        echo '<br /><table width="1000" cellspacing="0" cellpadding="2" style="font:8pt courier">' . "\n" .
             '<thead>' . "\n" .
             '<tr style="background:#808080; color:#FFFFFF">' . "\n" .
             '<td>' . $GLOBALS['strDBGModule'] . '</td>' . "\n" .
@@ -34,7 +34,7 @@ if (isset($GLOBALS['DBG']) && $GLOBALS['DBG']
             '<td>' . $GLOBALS['strDBGContext'] . '</td>' . "\n" .
             '</tr></thead>' . "\n" .
             '<tbody style="vertical-align: top">' . "\n";
-        foreach($dbg_prof_results['line_no'] AS $idx => $line_no) {
+        foreach ($dbg_prof_results['line_no'] AS $idx => $line_no) {
             $mod_no = $dbg_prof_results['mod_no'][$idx];
             dbg_get_module_name($mod_no, &$mod_name);
 
@@ -64,7 +64,7 @@ if (isset($GLOBALS['DBG']) && $GLOBALS['DBG']
             if (($idx & 1) == 0)
                 $bk = "#e0e0e0";
 
-            if($time_avg_hit > $GLOBALS['cfg']['DBG']['profile']['threshold'] ) {
+            if ($time_avg_hit > $GLOBALS['cfg']['DBG']['profile']['threshold'] ) {
                 echo '<tr style="background:' . $bk . '">' .
                     '<td>' . $mod_name . '</td>' .
                     '<td>' . $line_no . '</td>' .

@@ -1,5 +1,5 @@
 <?php
-/* $Id: user_password.php,v 2.3 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: user_password.php,v 2.5 2004/04/21 19:12:54 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -14,7 +14,7 @@ require_once('./libraries/common.lib.php');
  * script
  */
 if (!$cfg['ShowChgPassword']) {
-    $cfg['ShowChgPassword'] = @PMA_mysql_query('USE mysql', $userlink);
+    $cfg['ShowChgPassword'] = PMA_DBI_select_db('mysql');
 }
 if ($cfg['Server']['auth_type'] == 'config' || !$cfg['ShowChgPassword']) {
     require_once('./header.inc.php');
@@ -50,11 +50,19 @@ if (isset($nopass)) {
 
         $sql_query        = 'SET password = ' . (($pma_pw == '') ? '\'\'' : 'PASSWORD(\'' . preg_replace('@.@s', '*', $pma_pw) . '\')');
         $local_query      = 'SET password = ' . (($pma_pw == '') ? '\'\'' : 'PASSWORD(\'' . PMA_sqlAddslashes($pma_pw) . '\')');
-        $result           = @PMA_mysql_query($local_query) or PMA_mysqlDie('', '', FALSE, $err_url);
+        $result           = @PMA_DBI_try_query($local_query) or PMA_mysqlDie(PMA_DBI_getError(), $sql_query, FALSE, $err_url);
 
         // Changes password cookie if required
+        // Duration = till the browser is closed for password (we don't want this to be saved)
         if ($cfg['Server']['auth_type'] == 'cookie') {
-            setcookie('pma_cookie_password', base64_encode(PMA_blowfish_encrypt($pma_pw,$GLOBALS['cfg']['blowfish_secret'])), 0, $cookie_path, '', $is_https);
+
+            setcookie('pma_cookie_password',
+               PMA_blowfish_encrypt($pma_pw,
+               $GLOBALS['cfg']['blowfish_secret'] . $GLOBALS['current_time']),
+               0,
+               $GLOBALS['cookie_path'], '',
+               $GLOBALS['is_https']);
+
         } // end if
         // For http auth. mode, the "back" link will also enforce new
         // authentication

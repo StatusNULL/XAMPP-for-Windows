@@ -29,17 +29,19 @@
 // | OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  |
 // |                                                                       |
 // +-----------------------------------------------------------------------+
-// | Author: Richard Heyes <richard@phpguru.org>                           |
+// | Author: Richard Heyes <richard at php net>                            |
 // +-----------------------------------------------------------------------+
-// $Id: example.php,v 1.8 2004/01/17 15:52:50 pajoye Exp $
+// $Id: example.php,v 1.9 2004/05/08 17:48:08 richard Exp $
 /**
 * This example will decode the url given and display its
 * constituent parts.
 */
 
+//	include('../URL.php');
 	include('Net/URL.php');
 
-	$url = &new Net_URL('http://www.example.com/foo/bar/index.php?foo=bar');
+	//$url = &new Net_URL('https://www.example.com/foo/bar/index.php?foo=bar');
+	$url = new Net_URL('https://example.com/pls/portal30/PORTAL30.wwpob_page.changetabs?p_back_url=http%3A%2F%2Fexample.com%2Fservlet%2Fpage%3F_pageid%3D360%2C366%2C368%2C382%26_dad%3Dportal30%26_schema%3DPORTAL30&foo=bar');
 ?>
 <html>
 <body>
@@ -57,7 +59,7 @@ Port.......: <?=$url->port?>
 
 File/path..: <?=$url->path?>
 
-Querystring: <?=$url->getQueryString()?>
+Querystring: <?print_r($url->querystring)?>
 
 Anchor.....: <?=$url->anchor?>
 

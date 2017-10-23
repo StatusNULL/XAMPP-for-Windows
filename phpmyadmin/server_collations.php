@@ -1,5 +1,5 @@
 <?php
-/* $Id: server_collations.php,v 2.5 2003/12/11 11:37:25 rabus Exp $ */
+/* $Id: server_collations.php,v 2.7 2004/08/12 15:13:19 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -19,7 +19,8 @@ require('./server_links.inc.php');
  * Displays the sub-page heading
  */
 echo '<h2>' . "\n"
-   . '    ' . $strCharsetsAndCollations . "\n"
+   . '    ' . ($GLOBALS['cfg']['MainPageIconic'] ? '<img src="'. $GLOBALS['pmaThemeImage'] . 's_asci.png" border="0" hspace="2" align="middle" />' : '') 
+   . '' . $strCharsetsAndCollations . "\n"
    . '</h2>' . "\n";
 
 
@@ -44,7 +45,7 @@ require_once('./libraries/mysql_charsets.lib.php');
 echo '<table border="0">' . "\n"
    . '    <tr>' . "\n"
    . '        <td valign="top">' . "\n"
-   . '            <table border="0">' . "\n"
+   . '            <table border="0" cellpadding="2" cellspacing="1">' . "\n"
    . '                <tr>' . "\n"
    . '                <th>' . "\n"
    . '                    ' . $strCollation . "\n"
@@ -63,7 +64,7 @@ foreach ($mysql_charsets as $current_charset) {
         echo '            </table>' . "\n"
            . '        </td>' . "\n"
            . '        <td valign="top">' . "\n"
-           . '            <table border="0">' . "\n"
+           . '            <table border="0" cellpadding="2" cellspacing="1">' . "\n"
            . '                <tr>' . "\n"
            . '                <th>' . "\n"
            . '                    ' . $strCollation . "\n"

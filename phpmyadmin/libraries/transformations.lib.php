@@ -1,5 +1,5 @@
 <?php
-/* $Id: transformations.lib.php,v 2.3 2003/11/26 22:52:23 rabus Exp $ */
+/* $Id: transformations.lib.php,v 2.8 2004/08/21 13:05:42 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -43,7 +43,7 @@ function PMA_getAvailableMIMEtypes() {
 
     if (is_array($filestack)) {
         @ksort($filestack);
-        foreach($filestack AS $key => $file) {
+        foreach ($filestack AS $key => $file) {
 
             if (preg_match('|^.*__.*\.inc\.php(3?)$|', trim($file), $match)) {
                 // File contains transformation functions.
@@ -96,12 +96,14 @@ function PMA_getMIME($db, $table, $strict = false) {
               . ' AND (mimetype != \'\'' . (!$strict ? ' OR transformation != \'\' OR transformation_options != \'\'' : '') . ')';
     $com_rs   = PMA_query_as_cu($com_qry);
 
-    while ($row = @PMA_mysql_fetch_array($com_rs)) {
+    while ($row = @PMA_DBI_fetch_assoc($com_rs)) {
         $col                                    = $row['column_name'];
         $mime[$col]['mimetype']                 = $row['mimetype'];
         $mime[$col]['transformation']           = $row['transformation'];
         $mime[$col]['transformation_options']   = $row['transformation_options'];
     } // end while
+    PMA_DBI_free_result($com_rs);
+    unset($com_rs);
 
     if (isset($mime) && is_array($mime)) {
         return $mime;
@@ -134,10 +136,12 @@ function PMA_setMIME($db, $table, $key, $mimetype, $transformation, $transformat
                 . ' WHERE db_name = \'' . PMA_sqlAddslashes($db) . '\''
                 . ' AND table_name = \'' . PMA_sqlAddslashes($table) . '\''
                 . ' AND column_name = \'' . PMA_sqlAddslashes($key) . '\'';
-    $test_rs   = PMA_query_as_cu($test_qry);
+    $test_rs   = PMA_query_as_cu($test_qry, TRUE, PMA_DBI_QUERY_STORE);
 
-    if ($test_rs && mysql_num_rows($test_rs) > 0) {
-        $row = @PMA_mysql_fetch_array($test_rs);
+    if ($test_rs && PMA_DBI_num_rows($test_rs) > 0) {
+        $row = @PMA_DBI_fetch_assoc($test_rs);
+        PMA_DBI_free_result($test_rs);
+        unset($test_rs);
 
         if (!$forcedelete && (strlen($mimetype) > 0 || strlen($transformation) > 0 || strlen($transformation_options) > 0 || strlen($row['comment']) > 0)) {
             $upd_query = 'UPDATE ' . PMA_backquote($cfgRelation['column_info'])
@@ -167,7 +171,8 @@ function PMA_setMIME($db, $table, $key, $mimetype, $transformation, $transformat
 
     if (isset($upd_query)){
         $upd_rs    = PMA_query_as_cu($upd_query);
-        unset($upd_query);
+        PMA_DBI_free_result($upd_rs);
+        unset($upd_rs);
         return true;
     } else {
         return false;
@@ -186,7 +191,7 @@ function PMA_setMIME($db, $table, $key, $mimetype, $transformation, $transformat
 function PMA_sanitizeTransformationFile(&$filename) {
     // garvin: for security, never allow to break out from transformations directory
 
-    $include_file = preg_replace('@\.\.*@', '.', $filename);
+    $include_file = PMA_securePath($filename);
 
     // This value can also contain a 'php3' value, in which case we map this filename to our new 'php' variant
     $testfile = preg_replace('@\.inc\.php3$@', '.inc.php', $include_file);

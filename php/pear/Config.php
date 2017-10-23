@@ -15,7 +15,7 @@
 // | Author: Bertrand Mansion <bmansion@mamasam.com>                      |
 // +----------------------------------------------------------------------+
 //
-// $Id: Config.php,v 1.18 2003/08/10 14:57:30 mansion Exp $
+// $Id: Config.php,v 1.20 2004/06/04 09:40:16 mansion Exp $
 
 require_once('PEAR.php');
 require_once('Config/Container.php');
@@ -158,9 +158,13 @@ class Config {
     */
     function setRoot(&$rootContainer)
     {
-        if (is_object($rootContainer) && get_class($rootContainer) == 'config_container') {
-            $this->container =& new Config_Container('section', 'root');
-            $this->container->addItem($rootContainer);
+        if (is_object($rootContainer) && strtolower(get_class($rootContainer)) === 'config_container') {
+        	if ($rootContainer->getName() === 'root' && $rootContainer->getType() === 'section') {
+        		$this->container =& $rootContainer;
+        	} else {
+	            $this->container =& new Config_Container('section', 'root');
+    	        $this->container->addItem($rootContainer);
+    	    }
             return true;
         } else {
             return PEAR::raiseError("Config::setRoot only accepts object of Config_Container type.", null, PEAR_ERROR_RETURN);

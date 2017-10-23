@@ -11,7 +11,7 @@
 // | Copyright (c) 2003-2004 Michael Wallner <mike@iworks.at>             |
 // +----------------------------------------------------------------------+
 //
-// $Id: Cvs.php,v 1.11 2004/03/14 14:28:12 mike Exp $
+// $Id: Cvs.php,v 1.12 2004/06/07 19:19:47 mike Exp $
 
 /**
 * Manipulate CVS pserver passwd files.
@@ -54,7 +54,7 @@ require_once 'File/Passwd/Common.php';
 * 
 * @author   Michael Wallner <mike@php.net>
 * @package  File_Passwd
-* @version  $Revision: 1.11 $
+* @version  $Revision: 1.12 $
 * @access   public
 */
 class File_Passwd_Cvs extends File_Passwd_Common
@@ -66,7 +66,7 @@ class File_Passwd_Cvs extends File_Passwd_Common
     */
     function File_Passwd_Cvs($file = 'passwd')
     {
-        $this->__construct($file);
+        parent::__construct($file);
     }
     
     /**
@@ -93,7 +93,7 @@ class File_Passwd_Cvs extends File_Passwd_Common
             return $line;
         }
         @list(,$real)   = explode(':', $line);
-        return (File_Passwd_Cvs::_genPass($pass, $real) === $real);
+        return (File_Passwd_Cvs::generatePassword($pass, $real) === $real);
     }
     
     /**
@@ -195,7 +195,7 @@ class File_Passwd_Cvs extends File_Passwd_Common
                 FILE_PASSWD_E_INVALID_CHARS
             );
         }
-        $this->_users[$user]['passwd'] = $this->_genPass($pass);
+        $this->_users[$user]['passwd'] = $this->generatePassword($pass);
         $this->_users[$user]['system'] = $system_user;
         return true;
     }
@@ -220,7 +220,7 @@ class File_Passwd_Cvs extends File_Passwd_Common
             );
         }
         $real = $this->_users[$user]['passwd'];
-        return ($real === $this->_genPass($pass, $real));
+        return ($real === $this->generatePassword($pass, $real));
     }
     
     /**
@@ -240,7 +240,7 @@ class File_Passwd_Cvs extends File_Passwd_Common
                 FILE_PASSWD_E_EXISTS_NOT
             );
         }
-        $this->_users[$user]['passwd'] = $this->_genPass($pass);
+        $this->_users[$user]['passwd'] = $this->generatePassword($pass);
         return true;
     }
     
@@ -280,13 +280,13 @@ class File_Passwd_Cvs extends File_Passwd_Common
     /**
     * Generate crypted password
     *
-    * @throws PEAR_Error
+    * @static
     * @access public
     * @return string    the crypted password
     * @param  string    $pass   new plaintext password
     * @param  string    $salt   new crypted password from which to gain the salt
     */
-    function _genPass($pass, $salt = null)
+    function generatePassword($pass, $salt = null)
     {
         return File_Passwd::crypt_des($pass, $salt);
     }

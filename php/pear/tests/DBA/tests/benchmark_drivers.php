@@ -1,7 +1,7 @@
 <?php
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 // +----------------------------------------------------------------------+
-// | Copyright (c) 2002 Brent Cook                                        |
+// | Copyright (c) 2002-2003 Brent Cook                                        |
 // +----------------------------------------------------------------------+
 // | This library is free software; you can redistribute it and/or        |
 // | modify it under the terms of the GNU Lesser General Public           |
@@ -20,7 +20,7 @@
 // | Author: Brent Cook <busterb@mail.utexas.edu>                         |
 // +----------------------------------------------------------------------+
 //
-// $Id: benchmark_drivers.php,v 1.6 2002/09/25 17:37:49 busterb Exp $
+// $Id: benchmark_drivers.php,v 1.7 2003/01/04 11:54:51 mj Exp $
 //
 
 ini_set('include_path',ini_get('include_path').':../../');

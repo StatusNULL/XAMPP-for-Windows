@@ -1,5 +1,7 @@
 --TEST--
 DB_driver::query
+--INI--
+error_reporting = 2047
 --SKIPIF--
 <?php
 
@@ -9,7 +11,7 @@ DB_driver::query
  * @see      DB_common::query()
  * 
  * @package  DB
- * @version  $Id: 17query.phpt,v 1.7 2004/02/12 06:50:51 danielc Exp $
+ * @version  $Id: 17query.phpt,v 1.9 2004/09/22 22:16:47 danielc Exp $
  * @category Database
  * @author   Daniel Convissor <danielc@analysisandsolutions.com>
  * @internal
@@ -22,7 +24,7 @@ require_once './skipif.inc';
 --FILE--
 <?php
 
-// $Id: 17query.phpt,v 1.7 2004/02/12 06:50:51 danielc Exp $
+// $Id: 17query.phpt,v 1.9 2004/09/22 22:16:47 danielc Exp $
 
 /**
  * Connect to the database and make the phptest table.
@@ -56,13 +58,13 @@ $dbh->setFetchMode(DB_FETCHMODE_ASSOC);
 
 
 $res =& $dbh->query('DELETE FROM phptest WHERE a = 17');
-print 'delete: ' . ($res == DB_OK ? 'okay' : 'error') . "\n";
+print 'delete: ' . ($res === DB_OK ? 'okay' : 'error') . "\n";
 
 $res =& $dbh->query("INSERT INTO phptest (a, b, c) VALUES (17, 'one', 'One')");
-print 'insert: ' . ($res == DB_OK ? 'okay' : 'error') . "\n";
+print 'insert: ' . ($res === DB_OK ? 'okay' : 'error') . "\n";
 
 $res =& $dbh->query('INSERT INTO phptest (a, b, c) VALUES (?, ?, ?)', array(17, 'two', 'Two'));
-print 'insert: ' . ($res == DB_OK ? 'okay' : 'error') . "\n";
+print 'insert: ' . ($res === DB_OK ? 'okay' : 'error') . "\n";
 
 
 $res =& $dbh->query('SELECT a, b FROM phptest WHERE a = 17');
@@ -80,7 +82,7 @@ $array = array(
     'baz' => null,
 );
 $res =& $dbh->query('INSERT INTO phptest (a, b, d) VALUES (?, ?, ?)', $array);
-print 'insert: ' . ($res == DB_OK ? 'okay' : 'error') . "\n";
+print 'insert: ' . ($res === DB_OK ? 'okay' : 'error') . "\n";
 
 $res =& $dbh->query('SELECT a, b, d FROM phptest WHERE a = ?', 11);
 $row = $res->fetchRow();
@@ -95,7 +97,7 @@ if ($type == 'NULL' || $row['d'] == '') {
 
 
 $res =& $dbh->query('DELETE FROM phptest WHERE a = ?', array(17));
-print 'delete: ' . ($res == DB_OK ? 'okay' : 'error') . "\n";
+print 'delete: ' . ($res === DB_OK ? 'okay' : 'error') . "\n";
 
 
 $dbh->setErrorHandling(PEAR_ERROR_RETURN);

@@ -1,7 +1,6 @@
 <?php
-/* $Id: string.lib.php,v 2.2 2003/11/26 22:52:23 rabus Exp $ */
+/* $Id: string.lib.php,v 2.8 2004/09/03 10:08:37 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
-
 
 /** Specialized String Functions for phpMyAdmin
  *
@@ -14,19 +13,73 @@
  *
  * The SQL Parser code relies heavily on these functions.
  */
+ 
+ /* windows-* and tis-620 are not supported and are not multibyte, so there is
+  * no need to handle them. */
+$GLOBALS['PMA_allow_mbstr'] = @function_exists('mb_strlen') 
+    && substr($GLOBALS['charset'], 0, 8) != 'windows-' 
+    && $GLOBALS['charset'] != 'tis-620';
 
+if ($GLOBALS['PMA_allow_mbstr']) {
+    // the hebrew lang file uses iso-8859-8-i, encoded RTL,
+    // but mb_internal_encoding only supports iso-8859-8
+    if ($GLOBALS['charset'] == 'iso-8859-8-i'){
+        mb_internal_encoding('iso-8859-8');
+    } else {
+        mb_internal_encoding($GLOBALS['charset']);
+    }
+}
 
 // This is for handling input better
-if (defined('PMA_MULTIBYTE_ENCODING')) {
-    $GLOBALS['PMA_strlen']  = 'mb_strlen';
+if (defined('PMA_MULTIBYTE_ENCODING') || $GLOBALS['PMA_allow_mbstr']) {
     $GLOBALS['PMA_strpos']  = 'mb_strpos';
     $GLOBALS['PMA_strrpos'] = 'mb_strrpos';
-    $GLOBALS['PMA_substr']  = 'mb_substr';
 } else {
-    $GLOBALS['PMA_strlen']  = 'strlen';
     $GLOBALS['PMA_strpos']  = 'strpos';
     $GLOBALS['PMA_strrpos'] = 'strrpos';
-    $GLOBALS['PMA_substr']  = 'substr';
+}
+
+/**
+ * Returns length of string depending on current charset.
+ *
+ * @param   string   string to count
+ *
+ * @return  int      string length
+ *
+ * @access  public
+ *
+ * @author  nijel
+ */
+function PMA_strlen($string)
+{
+    // windows-* charsets are not multibyte and not supported by mb_*
+    if (defined('PMA_MULTIBYTE_ENCODING') || $GLOBALS['PMA_allow_mbstr']) {
+        return mb_strlen($string);
+    } else {
+        return strlen($string);
+    }
+}
+
+/**
+ * Returns substring from string, works depending on current charset.
+ *
+ * @param   string   string to count
+ * @param   int      start of substring
+ * @param   int      length of substring
+ *
+ * @return  int      substring
+ *
+ * @access  public
+ *
+ * @author  nijel
+ */
+function PMA_substr($string, $start, $length = 2147483647)
+{
+    if (defined('PMA_MULTIBYTE_ENCODING') || $GLOBALS['PMA_allow_mbstr']) {
+        return mb_substr($string, $start, $length);
+    } else {
+        return substr($string, $start, $length);
+    }
 }
 
 
@@ -59,7 +112,7 @@ function PMA_STR_strInStr($needle, $haystack)
  */
 function PMA_STR_charIsEscaped($string, $pos, $start = 0)
 {
-    $len = $GLOBALS['PMA_strlen']($string);
+    $len = PMA_strlen($string);
     // Base case:
     // Check for string length or invalid input or special case of input
     // (pos == $start)

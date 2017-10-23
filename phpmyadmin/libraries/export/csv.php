@@ -1,5 +1,5 @@
 <?php
-/* $Id: csv.php,v 2.1 2003/11/20 16:31:51 garvinhicking Exp $ */
+/* $Id: csv.php,v 2.7 2004/04/14 13:48:41 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -14,6 +14,17 @@
  * @return  bool        Whether it suceeded
  */
 function PMA_exportComment($text) {
+    return TRUE;
+}
+
+/**
+ * Outputs export footer
+ *
+ * @return  bool        Whether it suceeded
+ *
+ * @access  public
+ */
+function PMA_exportFooter() {
     return TRUE;
 }
 
@@ -113,18 +124,18 @@ function PMA_exportData($db, $table, $crlf, $error_url, $sql_query) {
     global $escaped;
 
     // Gets the data from the database
-    $result      = PMA_mysql_query($sql_query) or PMA_mysqlDie('', $sql_query, '', $error_url);
-    $fields_cnt  = mysql_num_fields($result);
+    $result      = PMA_DBI_query($sql_query, NULL, PMA_DBI_QUERY_UNBUFFERED);
+    $fields_cnt  = PMA_DBI_num_fields($result);
 
     // If required, get fields name at the first line
     if (isset($GLOBALS['showcsvnames']) && $GLOBALS['showcsvnames'] == 'yes') {
         $schema_insert = '';
         for ($i = 0; $i < $fields_cnt; $i++) {
             if ($enclosed == '') {
-                $schema_insert .= stripslashes(mysql_field_name($result, $i));
+                $schema_insert .= stripslashes(PMA_DBI_field_name($result, $i));
             } else {
                 $schema_insert .= $enclosed
-                               . str_replace($enclosed, $escaped . $enclosed, stripslashes(mysql_field_name($result, $i)))
+                               . str_replace($enclosed, $escaped . $enclosed, stripslashes(PMA_DBI_field_name($result, $i)))
                                . $enclosed;
             }
             $schema_insert     .= $separator;
@@ -134,14 +145,13 @@ function PMA_exportData($db, $table, $crlf, $error_url, $sql_query) {
     } // end if
 
     // Format the data
-    while ($row = PMA_mysql_fetch_row($result)) {
+    while ($row = PMA_DBI_fetch_row($result)) {
         $schema_insert = '';
         for ($j = 0; $j < $fields_cnt; $j++) {
-            if (!isset($row[$j])) {
+            if (!isset($row[$j]) || is_null($row[$j])) {
                 $schema_insert .= $GLOBALS[$what . '_replace_null'];
             }
             else if ($row[$j] == '0' || $row[$j] != '') {
-                $row[$j] = stripslashes($row[$j]);
                 // loic1 : always enclose fields
                 if ($what == 'excel') {
                     $row[$j]       = ereg_replace("\015(\012)?", "\012", $row[$j]);
@@ -163,7 +173,7 @@ function PMA_exportData($db, $table, $crlf, $error_url, $sql_query) {
         } // end for
         if (!PMA_exportOutputHandler($schema_insert . $add_character)) return FALSE;
     } // end while
-    mysql_free_result($result);
+    PMA_DBI_free_result($result);
 
     return TRUE;
 } // end of the 'PMA_getTableCsv()' function

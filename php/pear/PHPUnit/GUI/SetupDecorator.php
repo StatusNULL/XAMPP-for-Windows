@@ -12,32 +12,44 @@
 // | license@php.net so we can mail you a copy immediately.                 |
 // +------------------------------------------------------------------------+
 //
-// $Id: SetupDecorator.php,v 1.3 2003/06/09 17:22:33 quipo Exp $
+// $Id: SetupDecorator.php,v 1.7 2004/09/28 06:52:48 sebastian Exp $
 //
 
 /**
-*   This decorator actually just adds the functionality to read the
-*   test-suite classes from a given directory and instanciate them
-*   automatically, use it as given in the example below.
-*
-*   usage example
-*   <code>
-*   $gui = new PHPUnit_GUI_SetupDecorator(new PHPUnit_GUI_HTML());
-*   $gui->getSuitesFromDir('/path/to/dir/tests','.*\.php$',array('index.php','sql.php'));
-*   $gui->show();
-*   </code>
-*   The example calls this class and tells it to:
-*       find all file under the directory /path/to/dir/tests
-*       for files, which end with '.php' (this is a piece of a regexp, that's why the . is escaped)
-*       and to exclude the files 'index.php' and 'sql.php'
-*   and include all the files that are left in the tests.
-*   Given that the path (the first parameter) ends with 'tests' it will be assumed
-*   that the classes are named tests_* where * is the directory plus the filename,
-*   according to PEAR standards.
-*   So that:
-*       'testMe.php' in the dir 'tests' bill be assumed to contain a class tests_testMe
-*       '/moretests/aTest.php' should contain a class 'tests_moretests_aTest'
-*/
+ * This decorator actually just adds the functionality to read the
+ * test-suite classes from a given directory and instanciate them
+ * automatically, use it as given in the example below.
+ *
+ * <code>
+ * <?php
+ * $gui = new PHPUnit_GUI_SetupDecorator(new PHPUnit_GUI_HTML());
+ * $gui->getSuitesFromDir('/path/to/dir/tests','.*\.php$',array('index.php','sql.php'));
+ * $gui->show();
+ * ?>
+ * </code>
+ *
+ * The example calls this class and tells it to:
+ *
+ *   - find all file under the directory /path/to/dir/tests
+ *   - for files, which end with '.php' (this is a piece of a regexp, that's why the . is escaped)
+ *   - and to exclude the files 'index.php' and 'sql.php'
+ *   - and include all the files that are left in the tests.
+ *
+ * Given that the path (the first parameter) ends with 'tests' it will be assumed
+ * that the classes are named tests_* where * is the directory plus the filename,
+ * according to PEAR standards.
+ *
+ * So that:
+ *
+ *   - 'testMe.php' in the dir 'tests' bill be assumed to contain a class tests_testMe
+ *   - '/moretests/aTest.php' should contain a class 'tests_moretests_aTest'
+ *
+ * @author      Wolfram Kriesing <wolfram@kriesing.de>
+ * @license     http://www.php.net/license/3_0.txt The PHP License, Version 3.0
+ * @category    PHP
+ * @package     PHPUnit
+ * @subpackage  GUI
+ */
 class PHPUnit_GUI_SetupDecorator
 {
     /**
@@ -53,7 +65,7 @@ class PHPUnit_GUI_SetupDecorator
     *   just forwarding the action to the decorated class.
     *
     */
-    function show($showPassed=true)
+    function show($showPassed=TRUE)
     {
         $this->_gui->show($showPassed);
     }
@@ -106,16 +118,16 @@ class PHPUnit_GUI_SetupDecorator
     {
         $files = array();
         if ($dp=opendir($dir)) {
-            while (false!==($file=readdir($dp))) {
+            while (FALSE!==($file=readdir($dp))) {
                 $filename = $dir.DIRECTORY_SEPARATOR.$file;
-                $match = true;
+                $match = TRUE;
                 if ($filenamePattern && !preg_match("~$filenamePattern~",$file)) {
-                    $match = false;
+                    $match = FALSE;
                 }
                 if (sizeof($exclude)) {
                     foreach ($exclude as $aExclude) {
-                        if (strpos($file,$aExclude)!==false) {
-                            $match = false;
+                        if (strpos($file,$aExclude)!==FALSE) {
+                            $match = FALSE;
                             break;
                         }
                     }

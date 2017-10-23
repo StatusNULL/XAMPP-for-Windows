@@ -1,5 +1,5 @@
 <?php
-/* $Id: sqlparser.lib.php,v 2.6.2.4 2004/03/05 18:52:54 lem9 Exp $ */
+/* $Id: sqlparser.lib.php,v 2.23 2004/08/09 01:22:59 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /** SQL Parser Functions for phpMyAdmin
@@ -149,7 +149,7 @@ if ($is_minimum_common == FALSE) {
     {
         global $SQP_errorString;
         $debugstr = 'ERROR: ' . $message . "\n";
-        $debugstr .= 'CVS: $Id: sqlparser.lib.php,v 2.6.2.4 2004/03/05 18:52:54 lem9 Exp $' . "\n";
+        $debugstr .= 'CVS: $Id: sqlparser.lib.php,v 2.23 2004/08/09 01:22:59 lem9 Exp $' . "\n";
         $debugstr .= 'MySQL: '.PMA_MYSQL_STR_VERSION . "\n";
         $debugstr .= 'USR OS, AGENT, VER: ' . PMA_USR_OS . ' ' . PMA_USR_BROWSER_AGENT . ' ' . PMA_USR_BROWSER_VER . "\n";
         $debugstr .= 'PMA: ' . PMA_VERSION . "\n";
@@ -211,7 +211,7 @@ if ($is_minimum_common == FALSE) {
         $sql = str_replace("\r\n", "\n", $sql);
         $sql = str_replace("\r", "\n", $sql);
 
-        $len = $GLOBALS['PMA_strlen']($sql);
+        $len = PMA_strlen($sql);
         if ($len == 0) {
             return array();
         }
@@ -246,7 +246,7 @@ if ($is_minimum_common == FALSE) {
         $arraysize               = 0;
 
         while ($count2 < $len) {
-            $c      = $sql[$count2];
+            $c      = PMA_substr($sql, $count2, 1);
             $count1 = $count2;
 
             if (($c == "\n")) {
@@ -266,9 +266,9 @@ if ($is_minimum_common == FALSE) {
             // C style /* */
             // ANSI style --
             if (($c == '#')
-                || (($count2 + 1 < $len) && ($c == '/') && ($sql[$count2 + 1] == '*'))
-                || (($count2 + 2 == $len) && ($c == '-') && ($sql[$count2 + 1] == '-'))
-                || (($count2 + 2 < $len) && ($c == '-') && ($sql[$count2 + 1] == '-') && (($sql[$count2 + 2] == ' ') || ($sql[$count2 + 2] == "\n")))) {
+                || (($count2 + 1 < $len) && ($c == '/') && (PMA_substr($sql, $count2 + 1, 1) == '*'))
+                || (($count2 + 2 == $len) && ($c == '-') && (PMA_substr($sql, $count2 + 1, 1) == '-'))
+                || (($count2 + 2 < $len) && ($c == '-') && (PMA_substr($sql, $count2 + 1, 1) == '-') && ((PMA_substr($sql, $count2 + 2, 1) <= ' ')))) {
                 $count2++;
                 $pos  = 0;
                 $type = 'bad';
@@ -288,7 +288,7 @@ if ($is_minimum_common == FALSE) {
                         break;
                 } // end switch
                 $count2 = ($pos < $count2) ? $len : $pos;
-                $str    = $GLOBALS['PMA_substr']($sql, $count1, $count2 - $count1);
+                $str    = PMA_substr($sql, $count1, $count2 - $count1);
                 PMA_SQP_arrayAdd($sql_array, 'comment_' . $type, $str, $arraysize);
                 continue;
             } // end if
@@ -324,7 +324,7 @@ if ($is_minimum_common == FALSE) {
                     if (($pos < $len) && PMA_STR_charIsEscaped($sql, $pos)) {
                         $pos ++;
                         continue;
-                    } else if (($pos + 1 < $len) && ($sql[$pos] == $quotetype) && ($sql[$pos + 1] == $quotetype)) {
+                    } else if (($pos + 1 < $len) && (PMA_substr($sql, $pos, 1) == $quotetype) && (PMA_substr($sql, $pos + 1, 1) == $quotetype)) {
                         $pos = $pos + 2;
                         continue;
                     } else {
@@ -348,7 +348,7 @@ if ($is_minimum_common == FALSE) {
                     default:
                         break;
                 } // end switch
-                $data = $GLOBALS['PMA_substr']($sql, $count1, $count2 - $count1);
+                $data = PMA_substr($sql, $count1, $count2 - $count1);
                 PMA_SQP_arrayAdd($sql_array, $type, $data, $arraysize);
                 continue;
             }
@@ -380,14 +380,14 @@ if ($is_minimum_common == FALSE) {
 
             // Checks for punct
             if (PMA_STR_strInStr($c, $allpunct_list)) {
-                while (($count2 < $len) && PMA_STR_strInStr($sql[$count2], $allpunct_list)) {
+                while (($count2 < $len) && PMA_STR_strInStr(PMA_substr($sql, $count2, 1), $allpunct_list)) {
                     $count2++;
                 }
                 $l = $count2 - $count1;
                 if ($l == 1) {
                     $punct_data = $c;
                 } else {
-                    $punct_data = $GLOBALS['PMA_substr']($sql, $count1, $l);
+                    $punct_data = PMA_substr($sql, $count1, $l);
                 }
 
                 // Special case, sometimes, althought two characters are
@@ -422,12 +422,12 @@ if ($is_minimum_common == FALSE) {
                     if (($first == ',') || ($first == ';') || ($first == '.') || ($first == '*')) {
                         $count2     = $count1 + 1;
                         $punct_data = $first;
-                    } else if (($last2 == '/*') || ($last2 == '--')) {
+                    } else if (($last2 == '/*') || (($last2 == '--') && ($count2 == $len || PMA_substr($sql, $count2, 1) <= ' ') )) {
                         $count2     -= 2;
-                        $punct_data = $GLOBALS['PMA_substr']($sql, $count1, $count2 - $count1);
+                        $punct_data = PMA_substr($sql, $count1, $count2 - $count1);
                     } else if (($last == '-') || ($last == '+') || ($last == '!')) {
                         $count2--;
-                        $punct_data = $GLOBALS['PMA_substr']($sql, $count1, $count2 - $count1);
+                        $punct_data = PMA_substr($sql, $count1, $count2 - $count1);
                     // TODO: for negation operator, split in 2 tokens ?
                     // "select x&~1 from t"
                     // becomes "select x & ~ 1 from t" ?
@@ -450,11 +450,12 @@ if ($is_minimum_common == FALSE) {
 
                 //TODO: a @ can also be present in expressions like
                 // FROM 'user'@'%'
+                // or  TO 'user'@'%'
                 // in this case, the @ is wrongly marked as alpha_variable
 
                 $is_sql_variable         = ($c == '@');
                 $is_digit                = (!$is_sql_variable) && PMA_STR_isDigit($c);
-                $is_hex_digit            = ($is_digit) && ($c == '0') && ($count2 < $len) && ($sql[$count2] == 'x');
+                $is_hex_digit            = ($is_digit) && ($c == '0') && ($count2 < $len) && (PMA_substr($sql, $count2, 1) == 'x');
                 $is_float_digit          = FALSE;
                 $is_float_digit_exponent = FALSE;
 
@@ -462,8 +463,8 @@ if ($is_minimum_common == FALSE) {
                     $count2++;
                 }
 
-                while (($count2 < $len) && PMA_STR_isSqlIdentifier($sql[$count2], ($is_sql_variable || $is_digit))) {
-                    $c2 = $sql[$count2];
+                while (($count2 < $len) && PMA_STR_isSqlIdentifier(PMA_substr($sql, $count2, 1), ($is_sql_variable || $is_digit))) {
+                    $c2 = PMA_substr($sql, $count2, 1);
                     if ($is_sql_variable && ($c2 == '.')) {
                         $count2++;
                         continue;
@@ -475,7 +476,7 @@ if ($is_minimum_common == FALSE) {
                             continue;
                         } else {
                             $debugstr = $GLOBALS['strSQPBugInvalidIdentifer'] . ' @ ' . ($count1+1) . "\n"
-                                      . 'STR: ' . $GLOBALS['PMA_substr']($sql, $count1, $count2 - $count1);
+                                      . 'STR: ' . PMA_substr($sql, $count1, $count2 - $count1);
                             PMA_SQP_throwError($debugstr, $sql);
                             return $sql;
                         }
@@ -503,7 +504,7 @@ if ($is_minimum_common == FALSE) {
                 } // end while
 
                 $l    = $count2 - $count1;
-                $str  = $GLOBALS['PMA_substr']($sql, $count1, $l);
+                $str  = PMA_substr($sql, $count1, $l);
 
                 $type = '';
                 if ($is_digit) {
@@ -532,7 +533,7 @@ if ($is_minimum_common == FALSE) {
             $count2++;
 
             $debugstr = 'C1 C2 LEN: ' . $count1 . ' ' . $count2 . ' ' . $len .  "\n"
-                      . 'STR: ' . $GLOBALS['PMA_substr']($sql, $count1, $count2 - $count1) . "\n";
+                      . 'STR: ' . PMA_substr($sql, $count1, $count2 - $count1) . "\n";
             PMA_SQP_bug($debugstr, $sql);
             return $sql;
 
@@ -574,7 +575,7 @@ if ($is_minimum_common == FALSE) {
             $d_next_upper = '';
           }
 
-          //DEBUG echo "[prev: <b>".$d_prev."</b> ".$t_prev."][cur: <b>".$d_cur."</b> ".$t_cur."][next: <b>".$d_next."</b> ".$t_next."]<br>";
+          //DEBUG echo "[prev: <b>".$d_prev."</b> ".$t_prev."][cur: <b>".$d_cur."</b> ".$t_cur."][next: <b>".$d_next."</b> ".$t_next."]<br />";
 
           if ($t_cur == 'alpha') {
             $t_suffix     = '_identifier';
@@ -662,12 +663,10 @@ if ($is_minimum_common == FALSE) {
     function PMA_SQP_typeCheck($toCheck, $whatWeWant)
     {
         $typeSeperator = '_';
-        if(strcmp($whatWeWant, $toCheck) == 0) {
+        if (strcmp($whatWeWant, $toCheck) == 0) {
             return TRUE;
         } else {
-            //if(strpos($whatWeWant, $typeSeperator) === FALSE) {
-            // PHP3 compatible (works unless there is a real ff character)
-            if(!strpos("\xff" . $whatWeWant, $typeSeperator)) {
+            if (strpos($whatWeWant, $typeSeperator) === FALSE) {
                 return strncmp($whatWeWant, $toCheck , strpos($toCheck, $typeSeperator)) == 0;
             } else {
                 return FALSE;
@@ -712,6 +711,9 @@ if ($is_minimum_common == FALSE) {
         // we must not use CURDATE as a table_ref
         // so we track wether we are in the EXTRACT()
         $in_extract          = FALSE;
+
+        // for GROUP_CONCAT( ... )
+        $in_group_concat     = FALSE;
 
 /* Description of analyzer results
  *
@@ -844,7 +846,7 @@ if ($is_minimum_common == FALSE) {
         // loop #1 for each token: select_expr, table_ref for SELECT
 
         for ($i = 0; $i < $size; $i++) {
-//echo "trace <b>"  . $arr[$i]['data'] . "</b> (" . $arr[$i]['type'] . ")<br>";
+//DEBUG echo "trace loop1 <b>"  . $arr[$i]['data'] . "</b> (" . $arr[$i]['type'] . ")<br />";
 
             // High speed seek for locating the end of the current query
             if ($seek_queryend == TRUE) {
@@ -868,6 +870,9 @@ if ($is_minimum_common == FALSE) {
                 if ($in_extract) {
                     $number_of_brackets_in_extract++;
                 }
+                if ($in_group_concat) {
+                    $number_of_brackets_in_group_concat++;
+                }
             }
 // ==============================================================
             if ($arr[$i]['type'] == 'punct_bracket_close_round') {
@@ -877,6 +882,12 @@ if ($is_minimum_common == FALSE) {
                        $in_extract = FALSE;
                     }
                 }
+                if ($in_group_concat) {
+                    $number_of_brackets_in_group_concat--;
+                    if ($number_of_brackets_in_group_concat == 0) {
+                       $in_group_concat = FALSE;
+                    }
+                }
             }
 // ==============================================================
             if ($arr[$i]['type'] == 'alpha_functionName') {
@@ -884,6 +895,10 @@ if ($is_minimum_common == FALSE) {
                 if ($upper_data =='EXTRACT') {
                     $in_extract = TRUE;
                     $number_of_brackets_in_extract = 0;
+                }
+                if ($upper_data =='GROUP_CONCAT') {
+                    $in_group_concat = TRUE;
+                    $number_of_brackets_in_group_concat = 0;
                 }
             }
 
@@ -947,7 +962,7 @@ if ($is_minimum_common == FALSE) {
                         break;
                 } // end switch
 
-                if ($subresult['querytype'] == 'SELECT') {
+                if ($subresult['querytype'] == 'SELECT' && !$in_group_concat) {
                     if (!$seen_from) {
                         if ($previous_was_identifier && isset($chain)) {
                             // found alias for this select_expr, save it
@@ -1154,11 +1169,17 @@ if ($is_minimum_common == FALSE) {
                // if this is the last token, it implies that we have
                // seen the end of table references
                // Check for the end of table references
+               //
+               // Note: if we are analyzing a GROUP_CONCAT clause,
+               // we might find a word that seems to indicate that
+               // we have found the end of table refs (like ORDER)
+               // but it's a modifier of the GROUP_CONCAT so
+               // it's not the real end of table refs
                if (($i == $size-1)
                || ($arr[$i]['type'] == 'alpha_reservedWord'
+                  && !$in_group_concat
                   && PMA_STR_binarySearchInArr($upper_data, $words_ending_table_ref, $words_ending_table_ref_cnt))) {
                    $seen_end_of_table_ref = TRUE;
-
                    // to be able to save the last table ref, but do not
                    // set it true if we found a word like "ON" that has
                    // already set it to false
@@ -1178,27 +1199,27 @@ if ($is_minimum_common == FALSE) {
         // -------------------------------------------------------
         // This is a big hunk of debugging code by Marc for this.
         // -------------------------------------------------------
-        /*
+        /* 
           if (isset($current_select_expr)) {
            for ($trace=0; $trace<=$current_select_expr; $trace++) {
-
-           echo "<br>";
-           reset ($subresult['select_expr'][$trace]);
-           while (list ($key, $val) = each ($subresult['select_expr'][$trace]))
-           echo "sel expr $trace $key => $val<br />\n";
-           }
+               echo "<br />";
+               reset ($subresult['select_expr'][$trace]);
+               while (list ($key, $val) = each ($subresult['select_expr'][$trace]))
+                   echo "sel expr $trace $key => $val<br />\n";
+               }
           }
 
           if (isset($current_table_ref)) {
+           echo "current_table_ref = " . $current_table_ref . "<br>";
            for ($trace=0; $trace<=$current_table_ref; $trace++) {
 
-           echo "<br>";
-           reset ($subresult['table_ref'][$trace]);
-           while (list ($key, $val) = each ($subresult['table_ref'][$trace]))
-           echo "table ref $trace $key => $val<br />\n";
-           }
+               echo "<br />";
+               reset ($subresult['table_ref'][$trace]);
+               while (list ($key, $val) = each ($subresult['table_ref'][$trace]))
+               echo "table ref $trace $key => $val<br />\n";
+               }
           }
-        */
+        */ 
         // -------------------------------------------------------
 
 
@@ -1220,9 +1241,10 @@ if ($is_minimum_common == FALSE) {
         $in_select_expr = FALSE; // true when we are into the select expr clause
         $in_where = FALSE; // true when we are into the WHERE clause
         $in_from = FALSE;
+        $in_group_concat = FALSE;
 
         for ($i = 0; $i < $size; $i++) {
-//DEBUG echo "trace loop2 <b>"  . $arr[$i]['data'] . "</b> (" . $arr[$i]['type'] . ")<br>";
+//DEBUG echo "trace loop2 <b>"  . $arr[$i]['data'] . "</b> (" . $arr[$i]['type'] . ")<br />";
 
            // need_confirm
            //
@@ -1267,7 +1289,7 @@ if ($is_minimum_common == FALSE) {
                    $in_select_expr = TRUE;
                    $select_expr_clause = '';
                }
-               if ($upper_data == 'DISTINCT') {
+               if ($upper_data == 'DISTINCT' && !$in_group_concat) {
                       $subresult['queryflags']['distinct'] = 1;
                }
 
@@ -1298,7 +1320,7 @@ if ($is_minimum_common == FALSE) {
                    $in_select_expr = FALSE;
                    $in_from = FALSE;
                }
-               if ($upper_data == 'ORDER') {
+               if ($upper_data == 'ORDER' && !$in_group_concat) {
                    $seen_order = TRUE;
                    $seen_group = FALSE;
                    $in_having = FALSE;
@@ -1358,10 +1380,31 @@ if ($is_minimum_common == FALSE) {
 
 
            // do not add a blank after a function name
+           // TODO: can we combine loop 2 and loop 1? 
+           // some code is repeated here...
 
            $sep=' ';
            if ($arr[$i]['type'] == 'alpha_functionName') {
                $sep='';
+               $upper_data = strtoupper($arr[$i]['data']);
+               if ($upper_data =='GROUP_CONCAT') {
+                   $in_group_concat = TRUE;
+                   $number_of_brackets_in_group_concat = 0;
+               }
+           }
+
+           if ($arr[$i]['type'] == 'punct_bracket_open_round') {
+               if ($in_group_concat) {
+                  $number_of_brackets_in_group_concat++;
+               }
+           }
+           if ($arr[$i]['type'] == 'punct_bracket_close_round') {
+               if ($in_group_concat) {
+                  $number_of_brackets_in_group_concat--;
+                  if ($number_of_brackets_in_group_concat == 0) {
+                     $in_group_concat = FALSE;
+                  }
+               }
            }
 
            if ($in_select_expr && $upper_data != 'SELECT' && $upper_data != 'DISTINCT') {
@@ -1405,7 +1448,7 @@ if ($is_minimum_common == FALSE) {
         $foreign_key_number = -1;
 
         for ($i = 0; $i < $size; $i++) {
-        // DEBUG echo "<b>" . $arr[$i]['data'] . "</b> " . $arr[$i]['type'] . "<br>";
+        // DEBUG echo "<b>" . $arr[$i]['data'] . "</b> " . $arr[$i]['type'] . "<br />";
             if ($arr[$i]['type'] == 'alpha_reservedWord') {
                $upper_data = strtoupper($arr[$i]['data']);
 
@@ -1462,8 +1505,14 @@ if ($is_minimum_common == FALSE) {
                               if ($arr[$i+3]['type'] == 'alpha_reservedWord') {
                                   $value = $third_upper_data . '_' . strtoupper($arr[$i+3]['data']);
                               }
+                          } else {
+                          // for example: ON UPDATE CURRENT_TIMESTAMP
+                          // which is not for a foreign key
+                              $value = '';
                           }
-                          $foreign[$foreign_key_number][$clause] = $value;
+                          if (!empty($value)) {
+                              $foreign[$foreign_key_number][$clause] = $value;
+                          }
                        }
                    }
                }
@@ -1499,14 +1548,24 @@ if ($is_minimum_common == FALSE) {
                     if ($in_bracket) {
                         $foreign[$foreign_key_number]['ref_index_list'][] = $identifier;
                     } else {
-                        // identifier can be table or db.table
-                        $db_table = explode('.',$identifier);
-                        if (isset($db_table[1])) {
-                            $foreign[$foreign_key_number]['ref_db_name'] = $db_table[0];
-                            $foreign[$foreign_key_number]['ref_table_name'] = $db_table[1];
+                        // for MySQL 4.0.18, identifier is
+                        // `table` or `db`.`table` 
+                        // first pass will pick the db name
+                        // next pass will execute the else and pick the
+                        // db name in $db_table[0]
+                        if ($arr[$i+1]['type'] == 'punct_qualifier') {
+                                $foreign[$foreign_key_number]['ref_db_name'] = $identifier;
                         } else {
-                            $foreign[$foreign_key_number]['ref_table_name'] = $db_table[0];
-                        }
+                        // for MySQL 4.0.16, identifier is 
+                        // `table` or `db.table`
+                            $db_table = explode('.',$identifier);
+                            if (isset($db_table[1])) {
+                                $foreign[$foreign_key_number]['ref_db_name'] = $db_table[0];
+                                $foreign[$foreign_key_number]['ref_table_name'] = $db_table[1];
+                            } else {
+                                $foreign[$foreign_key_number]['ref_table_name'] = $db_table[0];
+                            }
+                        }    
                     }
                 }
             }
@@ -1543,7 +1602,6 @@ if ($is_minimum_common == FALSE) {
             $subresult['position_of_first_select'] = $position_of_first_select;
         }
 
-
         // They are naughty and didn't have a trailing semi-colon,
         // then still handle it properly
         if ($subresult['querytype'] != '') {
@@ -1567,7 +1625,7 @@ if ($is_minimum_common == FALSE) {
         $i         = $GLOBALS['PMA_strpos']($arr['type'], '_');
         $class     = '';
         if ($i > 0) {
-            $class = 'syntax_' . $GLOBALS['PMA_substr']($arr['type'], 0, $i) . ' ';
+            $class = 'syntax_' . PMA_substr($arr['type'], 0, $i) . ' ';
         }
 
         $class     .= 'syntax_' . $arr['type'];
@@ -1651,7 +1709,6 @@ if ($is_minimum_common == FALSE) {
 
         // These reserved words do NOT get a newline placed near them.
         $keywords_no_newline               = array(
-            'AND',
             'AS',
             'ASC',
             'DESC',
@@ -1659,10 +1716,11 @@ if ($is_minimum_common == FALSE) {
             'HOUR',
             'INTERVAL',
             'IS',
+            'LIKE',
             'NOT',
             'NULL',
             'ON',
-            'OR'
+            'REGEXP'
         );
         $keywords_no_newline_cnt           = 12;
 
@@ -1714,7 +1772,6 @@ if ($is_minimum_common == FALSE) {
 
             switch ($typearr[2]) {
                 case 'white_newline':
-//                    $after      = '<br />';
                     $before     = '';
                     break;
                 case 'punct_bracket_open_round':
@@ -1806,7 +1863,8 @@ if ($is_minimum_common == FALSE) {
                 case 'alpha_columnAttrib':
 
                     // ALTER TABLE tbl_name AUTO_INCREMENT = 1
-                    if ($typearr[1] == 'alpha_identifier') {
+                    // COLLATE LATIN1_GENERAL_CI DEFAULT
+                    if ($typearr[1] == 'alpha_identifier' || $typearr[1] == 'alpha_charset') {
                         $before .= ' ';
                     }
                     if (($typearr[3] == 'alpha_columnAttrib') || ($typearr[3] == 'quote_single') || ($typearr[3] == 'digit_integer')) {
@@ -1835,12 +1893,18 @@ if ($is_minimum_common == FALSE) {
                         //
                         // also we must not be inside a privilege list
                         if ($i > 0) {
-
-                            // the alpha_identifier condition is there to 
+                            // the alpha_identifier exception is there to
                             // catch cases like
                             // GRANT SELECT ON mydb.mytable TO myuser@localhost
                             // (else, we get mydb.mytableTO )
-                            if (!$in_priv_list || $typearr[1] == 'alpha_identifier') {
+                            //
+                            // the quote_single exception is there to 
+                            // catch cases like
+                            // GRANT ... TO 'marc'@'domain.com' IDENTIFIED...
+                            //
+                            // TODO: fix all cases and find why this happens
+ 
+                            if (!$in_priv_list || $typearr[1] == 'alpha_identifier' || $typearr[1] == 'quote_single' || $typearr[1] == 'white_newline') {
                                 $before    .= $space_alpha_reserved_word;
                             }
                         } else {
@@ -1913,7 +1977,11 @@ if ($is_minimum_common == FALSE) {
                     }
                     break;
                 case 'alpha_variable':
-                    $after      = ' ';
+                    // other workaround for a problem similar to the one
+                    // explained below for quote_single
+                    if (!$in_priv_list) {
+                        $after      = ' ';
+                    }
                     break;
                 case 'quote_double':
                 case 'quote_single':
@@ -1922,7 +1990,7 @@ if ($is_minimum_common == FALSE) {
                     // the @ is incorrectly marked as alpha_variable
                     // in the parser, and here, the '%' gets a blank before,
                     // which is a syntax error
-                    if ($typearr[1]!='alpha_variable') {
+                    if ($typearr[1] !='alpha_variable') {
                         $before        .= ' ';
                     }
                     if ($infunction && $typearr[3] == 'punct_bracket_close_round') {
@@ -1998,7 +2066,7 @@ function PMA_SQP_buildCssData()
     global $cfg;
 
     $css_string     = '';
-    foreach($cfg['SQP']['fmtColor'] AS $key => $col) {
+    foreach ($cfg['SQP']['fmtColor'] AS $key => $col) {
         $css_string .= PMA_SQP_buildCssRule('syntax_' . $key, 'color', $col);
     }
 

@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_datadict.php,v 2.5 2003/12/22 19:35:28 lem9 Exp $ */
+/* $Id: db_datadict.php,v 2.14 2004/09/24 20:49:44 lem9 Exp $ */
 
 
 /**
@@ -52,15 +52,11 @@ if ($cfgRelation['commwork']) {
 /**
  * Selects the database and gets tables names
  */
-PMA_mysql_select_db($db);
-$sql    = 'SHOW TABLES FROM ' . PMA_backquote($db);
-$rowset = @PMA_mysql_query($sql);
+PMA_DBI_select_db($db);
+$rowset = PMA_DBI_query('SHOW TABLES FROM ' . PMA_backquote($db) . ';', NULL, PMA_DBI_QUERY_STORE);
 
-if (!$rowset) {
-    exit();
-}
 $count  = 0;
-while ($row = mysql_fetch_array($rowset)) {
+while ($row = PMA_DBI_fetch_assoc($rowset)) {
     $myfieldname = 'Tables_in_' . htmlspecialchars($db);
     $table        = $row[$myfieldname];
     if ($cfgRelation['commwork']) {
@@ -68,29 +64,30 @@ while ($row = mysql_fetch_array($rowset)) {
     }
 
     if ($count != 0) {
-        echo '<div style="page-break-before: always">' . "\n";
+        echo '<div style="page-break-before: always;">' . "\n";
+    } else {
+        echo '<div>' . "\n";
     }
-    echo '<h1>' . $table . '</h1>' . "\n";
+
+    echo '<h2>' . $table . '</h2>' . "\n";
 
     /**
      * Gets table informations
      */
     // The 'show table' statement works correct since 3.23.03
-    $local_query  = 'SHOW TABLE STATUS LIKE \'' . PMA_sqlAddslashes($table, TRUE) . '\'';
-    $result       = PMA_mysql_query($local_query) or PMA_mysqlDie('', $local_query, '', $err_url);
-    $showtable    = PMA_mysql_fetch_array($result);
+    $result       = PMA_DBI_query('SHOW TABLE STATUS LIKE \'' . PMA_sqlAddslashes($table, TRUE) . '\'', NULL, PMA_DBI_QUERY_STORE);
+    $showtable    = PMA_DBI_fetch_assoc($result);
     $num_rows     = (isset($showtable['Rows']) ? $showtable['Rows'] : 0);
     $show_comment = (isset($showtable['Comment']) ? $showtable['Comment'] : '');
-    if ($result) {
-         mysql_free_result($result);
-    }
+    PMA_DBI_free_result($result);
 
 
     /**
      * Gets table keys and retains them
      */
-    $local_query  = 'SHOW KEYS FROM ' . PMA_backquote($table);
-    $result       = PMA_mysql_query($local_query) or PMA_mysqlDie('', $local_query, '', $err_url);
+
+    PMA_DBI_select_db($db);
+    $result       = PMA_DBI_query('SHOW KEYS FROM ' . PMA_backquote($table) . ';');
     $primary      = '';
     $indexes      = array();
     $lastIndex    = '';
@@ -98,7 +95,7 @@ while ($row = mysql_fetch_array($rowset)) {
     $indexes_data = array();
     $pk_array     = array(); // will be use to emphasis prim. keys in the table
                              // view
-    while ($row = PMA_mysql_fetch_array($result)) {
+    while ($row = PMA_DBI_fetch_assoc($result)) {
         // Backups the list of primary keys
         if ($row['Key_name'] == 'PRIMARY') {
             $primary   .= $row['Column_name'] . ', ';
@@ -126,17 +123,15 @@ while ($row = mysql_fetch_array($rowset)) {
 
     } // end while
     if ($result) {
-        mysql_free_result($result);
+        PMA_DBI_free_result($result);
     }
 
 
     /**
      * Gets fields properties
      */
-    $local_query = 'SHOW FIELDS FROM ' . PMA_backquote($table);
-    $result      = PMA_mysql_query($local_query) or PMA_mysqlDie('', $local_query, '', $err_url);
-    $fields_cnt  = mysql_num_rows($result);
-
+    $result      = PMA_DBI_query('SHOW FIELDS FROM ' . PMA_backquote($table) . ';', NULL, PMA_DBI_QUERY_STORE);
+    $fields_cnt  = PMA_DBI_num_rows($result);
     // Check if we can use Relations (Mike Beck)
     if (!empty($cfgRelation['relation'])) {
         // Find which tables are related with the current one and write it in
@@ -167,7 +162,7 @@ while ($row = mysql_fetch_array($rowset)) {
     ?>
 
 <!-- TABLE INFORMATIONS -->
-<table width="100%" bordercolorlight="black" border="border" style="border-collapse: collapse;background-color: white">
+<table width="100%" style="border: 1px solid black; border-collapse: collapse; background-color: white;">
 <tr>
     <th width="50"><?php echo $strField; ?></th>
     <th width="80"><?php echo $strType; ?></th>
@@ -191,7 +186,7 @@ while ($row = mysql_fetch_array($rowset)) {
 
     <?php
     $i = 0;
-    while ($row = PMA_mysql_fetch_array($result)) {
+    while ($row = PMA_DBI_fetch_assoc($result)) {
         $bgcolor = ($i % 2) ?$cfg['BgcolorOne'] : $cfg['BgcolorTwo'];
         $i++;
 
@@ -283,7 +278,7 @@ while ($row = mysql_fetch_array($rowset)) {
 </tr>
         <?php
     } // end while
-    mysql_free_result($result);
+    PMA_DBI_free_result($result);
 
     echo "\n";
     ?>
@@ -315,7 +310,7 @@ function printPage()
 //-->
 </script>
 <?php
-echo '<br /><br />&nbsp;<input type="button" style="visibility: ; width: 100px; height: 25px" id="print" value="' . $strPrint . '" onclick="printPage()">' . "\n";
+echo '<br /><br />&nbsp;<input type="button" style="width: 100px; height: 25px;" id="print" value="' . $strPrint . '" onclick="printPage()">' . "\n";
 
 require_once('./footer.inc.php');
 ?>

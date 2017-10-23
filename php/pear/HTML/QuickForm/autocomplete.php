@@ -23,7 +23,7 @@
 // |      http://www.sitepoint.com/article/1220                           |
 // +----------------------------------------------------------------------+
 //
-// $Id: autocomplete.php,v 1.2 2003/11/12 10:48:42 avb Exp $
+// $Id: autocomplete.php,v 1.4 2004/06/15 10:51:42 mansion Exp $
 
 
 require_once("HTML/QuickForm/text.php");
@@ -112,11 +112,11 @@ class HTML_QuickForm_autocomplete extends HTML_QuickForm_text
         if ($this->_flagFrozen) {
             $js = '';
         } else {
-            $js = "<script type=\"text/javascript\">\n<!--\n";
+            $js = "<script type=\"text/javascript\">\n//<![CDATA[\n";
             if (!defined('HTML_QUICKFORM_AUTOCOMPLETE_EXISTS')) {
                 $js .= <<<EOS
 
-/* --- begin javascript for autocomplete --- */
+/* begin javascript for autocomplete */
 function setSelectionRange(input, selectionStart, selectionEnd) {
     if (input.setSelectionRange) {
         input.setSelectionRange(selectionStart, selectionEnd);
@@ -212,7 +212,7 @@ function autocomplete(textbox, event, values) {
         return true;
     }
 }
-/* --- end javascript for autocomplete --- */
+/* end javascript for autocomplete */
 
 EOS;
                 define('HTML_QUICKFORM_AUTOCOMPLETE_EXISTS', true);
@@ -230,7 +230,7 @@ EOS;
             for ($i = 0; $i < count($this->_options); $i++) {
                 $js .= $arrayName . '[' . $i . "] = '" . strtr($this->_options[$i], $jsEscape) . "';\n";
             }
-            $js .= "//-->\n</script>\n";
+            $js .= "//]]>\n</script>\n";
         }
         return $js . parent::toHtml();
     }// end func toHtml

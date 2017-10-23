@@ -1,5 +1,5 @@
 <?php
-/* $Id: config_import.lib.php,v 2.5.2.1 2004/02/15 01:18:53 rabus Exp $ */
+/* $Id: config_import.lib.php,v 2.35 2004/09/23 10:10:37 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -92,6 +92,10 @@ if (isset($cfg['Servers'])) {
 
         if (!isset($cfg['Servers'][$i]['connect_type'])) {
             $cfg['Servers'][$i]['connect_type'] = 'tcp';
+        }
+
+        if (!isset($cfg['Servers'][$i]['extension'])) {
+            $cfg['Servers'][$i]['extension'] = 'mysql';
         }
 
         if (!isset($cfg['Servers'][$i]['controluser']) && isset($cfg['Servers'][$i]['stduser'])) {
@@ -271,6 +275,10 @@ if (!isset($cfg['LoginCookieRecall'])) {
     }
 }
 
+if (!isset($cfg['LoginCookieValidity'])) {
+    $cfg['LoginCookieValidity'] = 1800;
+}
+
 if (!isset($cfg['UseDbSearch'])) {
     $cfg['UseDbSearch'] = TRUE;
 }
@@ -330,6 +338,14 @@ if (!isset($cfg['LeftDisplayLogo'])) {
 
 if (!isset($cfg['LeftDisplayServers'])) {
     $cfg['LeftDisplayServers'] = FALSE;
+}
+
+if (!isset($cfg['DisplayServersList'])) {
+    if (isset($cfg['LeftisplayServersList'])) {
+        $cfg['DisplayServersList'] = $cfg['LeftDisplayServersList'];
+    } else {
+        $cfg['DisplayServersList'] = FALSE;
+    }
 }
 
 if (!isset($cfg['ShowStats'])) {
@@ -454,6 +470,10 @@ if (!isset($cfg['CharEditing'])) {
     $cfg['CharEditing'] = 'input';
 }
 
+if (!isset($cfg['InsertRows'])) {
+    $cfg['InsertRows'] = 2;
+}
+
 if (!isset($cfg['ZipDump'])) {
     if (isset($cfgZipDump)) {
         $cfg['ZipDump'] = $cfgZipDump;
@@ -510,7 +530,7 @@ if (!isset($cfg['MySQLManualBase'])) {
         $cfg['MySQLManualType'] = 'old';
         unset($cfg['ManualBaseShort']);
     } else {
-        $cfg['MySQLManualBase'] = 'http://www.mysql.com/doc/en';
+        $cfg['MySQLManualBase'] = 'http://dev.mysql.com/doc/mysql/en';
         $cfg['MySQLManualType'] = 'searchable';
     }
 }
@@ -549,108 +569,17 @@ if (!isset($cfg['Lang']) &&isset($cfgLang)) {
     unset($cfgLang);
 }
 
-if (!isset($cfg['LeftWidth'])) {
-    if (isset($cfgLeftWidth)) {
-        $cfg['LeftWidth'] = $cfgLeftWidth;
-        unset($cfgLeftWidth);
-    } else {
-        $cfg['LeftWidth'] = 150;
-    }
+if (!isset($cfg['LeftPointerEnable'])) {
+    $cfg['LeftPointerEnable'] = TRUE;
 }
 
-if (!isset($cfg['LeftBgColor'])) {
-    if (isset($cfgLeftBgColor)) {
-        $cfg['LeftBgColor'] = $cfgLeftBgColor;
-        unset($cfgLeftBgColor);
-    } else {
-        $cfg['LeftBgColor'] = '#D0DCE0';
-    }
+if (!isset($cfg['BrowsePointerEnable'])) {
+    $cfg['BrowsePointerEnable'] = TRUE;
 }
 
-if (!isset($cfg['LeftPointerColor'])) {
-    if (isset($cfgLeftPointerColor)) {
-        $cfg['LeftPointerColor'] = $cfgLeftPointerColor;
-        unset($cfgLeftPointerColor);
-    } else {
-        $cfg['LeftPointerColor'] = '#CCFFCC';
-    }
-}
 
-if (!isset($cfg['RightBgColor'])) {
-    if (isset($cfgRightBgColor)) {
-        $cfg['RightBgColor'] = $cfgRightBgColor;
-        unset($cfgRightBgColor);
-    } else {
-        $cfg['RightBgColor'] = '#F5F5F5';
-    }
-}
-
-if (!isset($cfg['RightBgImage'])) {
-    $cfg['RightBgImage'] = '';
-}
-
-if (!isset($cfg['Border'])) {
-    if (isset($cfgBorder)) {
-        $cfg['Border'] = $cfgBorder;
-        unset($cfgBorder);
-    } else {
-        $cfg['Border'] = 0;
-    }
-}
-
-if (!isset($cfg['ThBgcolor'])) {
-    if (isset($cfgThBgcolor)) {
-        $cfg['ThBgcolor'] = $cfgThBgcolor;
-        unset($cfgThBgcolor);
-    } else {
-        $cfg['ThBgcolor'] = '#D3DCE3';
-    }
-}
-
-if (!isset($cfg['BgcolorOne'])) {
-    if (isset($cfgBgcolorOne)) {
-        $cfg['BgcolorOne'] = $cfgBgcolorOne;
-        unset($cfgBgcolorOne);
-    } else {
-        $cfg['BgcolorOne'] = '#CCCCCC';
-    }
-}
-
-if (!isset($cfg['BgcolorTwo'])) {
-    if (isset($cfgBgcolorTwo)) {
-        $cfg['BgcolorTwo'] = $cfgBgcolorTwo;
-        unset($cfgBgcolorTwo);
-    } else {
-        $cfg['BgcolorTwo'] = '#DDDDDD';
-    }
-}
-
-if (!isset($cfg['BrowsePointerColor'])) {
-    if (isset($cfgBrowsePointerColor)) {
-        $cfg['BrowsePointerColor'] = $cfgBrowsePointerColor;
-        unset($cfgBrowsePointerColor);
-    } else {
-        $cfg['BrowsePointerColor'] = '#CCFFCC';
-    }
-}
-
-if (!isset($cfg['BrowseMarkerColor'])) {
-    if (isset($cfgBrowseMarkerColor)) {
-        $cfg['BrowseMarkerColor'] = $cfgBrowseMarkerColor;
-        unset($cfgBrowseMarkerColor);
-    } else if (isset($cfg['BrowseMarkRow'])) {
-        $cfg['BrowseMarkerColor']   = (!empty($cfg['BrowsePointerColor']) && !empty($cfg['BrowseMarkRow']))
-                                      ? '#FFCC99'
-                                      : '';
-        unset($cfg['BrowseMarkRow']);
-    } else if (isset($cfgBrowseMarkRow)) {
-        $cfg['BrowseMarkerColor']   = (!empty($cfg['BrowsePointerColor']) && !empty($cfgBrowseMarkRow))
-                                      ? '#FFCC99'
-                                      : '';
-        unset($cfgBrowseMarkRow);
-    } else {
-        $cfg['BrowseMarkerColor'] = '#FFCC99';
-    }
+if (!isset($cfg['BrowseMarkerEnable'])) {
+    $cfg['BrowseMarkerEnable'] = TRUE;
 }
 
 if (!isset($cfg['TextareaCols'])) {
@@ -755,10 +684,6 @@ if (!isset($cfg['QueryFrameJS'])) {
     $cfg['QueryFrameJS'] = TRUE;
 }
 
-if (!isset($cfg['QueryFrameDebug'])) {
-    $cfg['QueryFrameDebug'] = FALSE;
-}
-
 if (!isset($cfg['QueryWindowWidth'])) {
     $cfg['QueryWindowWidth'] = 550;
 }
@@ -789,6 +714,43 @@ if (!isset($cfg['MaxExactCount'])) {
 
 if (!isset($cfg['WYSIWYG-PDF'])) {
     $cfg['WYSIWYG-PDF'] = TRUE;
+}
+
+if (!isset($cfg['NaturalOrder'])) {
+    $cfg['NaturalOrder'] = TRUE;
+}
+
+if (!isset($cfg['ShowHttpHostTitle'])) {
+    $cfg['ShowHttpHostTitle'] = FALSE;
+}
+
+if (!isset($cfg['SetHttpHostTitle'])) {
+    $cfg['SetHttpHostTitle'] = '';
+}
+
+if (!isset($cfg['ErrorIconic'])) {
+    $cfg['ErrorIconic'] = TRUE;
+}
+
+if (!isset($cfg['MainPageIconic'])) {
+    $cfg['MainPageIconic'] = TRUE;
+}
+
+if (!isset($cfg['ReplaceHelpImg'])) {
+    $cfg['ReplaceHelpImg'] = TRUE;
+}
+
+if (!isset($cfg['ThemePath'])) {
+    $cfg['ThemePath'] = './themes';
+    $cfg['ThemeDefault'] = 'original';
+    $cfg['ThemeManager'] = TRUE;
+} else {
+    if (!isset($cfg['ThemeDefault'])){
+        $cfg['ThemeDefault'] = 'original';
+    }
+    if (!isset($cfg['ThemeManager'])){
+        $cfg['ThemeManager'] = TRUE;
+    }
 }
 
 if (!isset($cfg['DefaultQueryTable'])) {
@@ -823,6 +785,10 @@ if (!isset($cfg['SQLQuery']['Validate'])) {
     $cfg['SQLQuery']['Validate'] = FALSE;
 }
 
+if (!isset($cfg['SQLQuery']['Refresh'])) {
+    $cfg['SQLQuery']['Refresh'] = TRUE;
+}
+
 if (!isset($cfg['UploadDir'])) {
     $cfg['UploadDir'] = '';
 }
@@ -834,6 +800,11 @@ if (!isset($cfg['SaveDir'])) {
 if (!isset($cfg['docSQLDir'])) {
     $cfg['docSQLDir'] = '';
 }
+
+if (!isset($cfg['TempDir'])) {
+    $cfg['TempDir'] = '';
+}
+
 
 if (!isset($cfg['SQLValidator']['use'])) {
     $cfg['SQLValidator']['use'] = FALSE;
@@ -871,78 +842,6 @@ if (!isset($cfg['SQP']['fmtIndUnit'])) {
     $cfg['SQP']['fmtIndUnit'] = 'em';
 }
 
-if (!isset($cfg['SQP']['fmtColor']['comment'])) {
-    $cfg['SQP']['fmtColor']['comment'] = '#808000';
-}
-
-if (!isset($cfg['SQP']['fmtColor']['digit'])) {
-    $cfg['SQP']['fmtColor']['digit'] = '';
-}
-
-if (!isset($cfg['SQP']['fmtColor']['digit_hex'])) {
-    $cfg['SQP']['fmtColor']['digit_hex'] = 'teal';
-}
-
-if (!isset($cfg['SQP']['fmtColor']['digit_integer'])) {
-    $cfg['SQP']['fmtColor']['digit_integer'] = 'teal';
-}
-
-if (!isset($cfg['SQP']['fmtColor']['digit_float'])) {
-    $cfg['SQP']['fmtColor']['digit_float'] = 'aqua';
-}
-
-if (!isset($cfg['SQP']['fmtColor']['punct'])) {
-    $cfg['SQP']['fmtColor']['punct'] = 'fuchsia';
-}
-
-if (!isset($cfg['SQP']['fmtColor']['alpha'])) {
-    $cfg['SQP']['fmtColor']['alpha'] = '';
-}
-
-if (!isset($cfg['SQP']['fmtColor']['alpha_columnType'])) {
-    $cfg['SQP']['fmtColor']['alpha_columnType'] = '#FF9900';
-}
-
-if (!isset($cfg['SQP']['fmtColor']['alpha_columnAttrib'])) {
-    $cfg['SQP']['fmtColor']['alpha_columnAttrib'] = '#0000FF';
-}
-
-if (!isset($cfg['SQP']['fmtColor']['alpha_reservedWord'])) {
-    $cfg['SQP']['fmtColor']['alpha_reservedWord'] = '#990099';
-}
-
-if (!isset($cfg['SQP']['fmtColor']['alpha_functionName'])) {
-    $cfg['SQP']['fmtColor']['alpha_functionName'] = '#FF0000';
-}
-
-if (!isset($cfg['SQP']['fmtColor']['alpha_identifier'])) {
-    $cfg['SQP']['fmtColor']['alpha_identifier'] = 'black';
-}
-
-if (!isset($cfg['SQP']['fmtColor']['alpha_charset'])) {
-    $cfg['SQP']['fmtColor']['alpha_charset'] = '#6495ed';
-}
-
-if (!isset($cfg['SQP']['fmtColor']['alpha_variable'])) {
-    $cfg['SQP']['fmtColor']['alpha_variable'] = '#800000';
-}
-
-if (!isset($cfg['SQP']['fmtColor']['quote'])) {
-    $cfg['SQP']['fmtColor']['quote'] = '#008000';
-}
-
-if (!isset($cfg['SQP']['fmtColor']['quote_double'])) {
-    $cfg['SQP']['fmtColor']['quote_double'] = '';
-}
-
-if (!isset($cfg['SQP']['fmtColor']['quote_single'])) {
-    $cfg['SQP']['fmtColor']['quote_single'] = '';
-}
-
-if (!isset($cfg['SQP']['fmtColor']['quote_backtick'])) {
-    $cfg['SQP']['fmtColor']['quote_backtick'] = '';
-}
-
 if (!isset($cfg['AvailableCharsets'])) {
     $cfg['AvailableCharsets'] = array(
         'iso-8859-1',
@@ -968,6 +867,7 @@ if (!isset($cfg['AvailableCharsets'])) {
         'koi8-r',
         'big5',
         'gb2312',
+        'gbk',
         'utf-8',
         'utf-7',
         'x-user-defined',
@@ -1041,6 +941,7 @@ if ($cfg['ShowFunctionFields']) {
                'NOW',
                'PASSWORD',
                'MD5',
+                'SHA1',
                'ENCRYPT',
                'RAND',
                'LAST_INSERT_ID',
@@ -1100,6 +1001,7 @@ if ($cfg['ShowFunctionFields']) {
                 'UCASE',
                 'PASSWORD',
                 'MD5',
+                'SHA1',
                 'ENCRYPT',
                 'LAST_INSERT_ID',
                 'USER',
@@ -1123,6 +1025,7 @@ if ($cfg['ShowFunctionFields']) {
                 'ASCII',
                 'CHAR',
                 'MD5',
+                'SHA1',
                 'ENCRYPT',
                 'RAND',
                 'LAST_INSERT_ID',
@@ -1143,6 +1046,52 @@ if ($cfg['ShowFunctionFields']) {
     }
 }
 
+if (!isset($cfg['NumOperators'])) {
+    $cfg['NumOperators'] = array(
+       '=',
+       '>',
+       '>=',
+       '<',
+       '<=',
+       '!=',
+       'LIKE',
+       'NOT LIKE'
+    );
+}
+
+if (!isset($cfg['TextOperators'])) {
+    $cfg['TextOperators'] = array(
+       'LIKE',
+       'LIKE %...%',
+       'NOT LIKE',
+       '=',
+       '!=',
+       'REGEXP',
+       'NOT REGEXP'
+    );
+}
+
+if (!isset($cfg['EnumOperators'])) {
+    $cfg['EnumOperators'] = array(
+       '=',
+       '!='
+    );
+}
+
+if (!isset($cfg['NullOperators'])) {
+    $cfg['NullOperators'] = array(
+       'IS NULL',
+       'IS NOT NULL'
+    );
+}
+
+if (!isset($cfg['UnaryOperators'])) {
+    $cfg['UnaryOperators'] = array(
+       'IS NULL'     => 1,
+       'IS NOT NULL' => 1
+    );
+}
+
 if (!isset($cfg['GD2Available'])) {
     $cfg['GD2Available'] = 'auto';
 }
@@ -1156,9 +1105,13 @@ if (!isset($cfg['CtrlArrowsMoving'])) {
     $cfg['CtrlArrowsMoving'] = TRUE;
 }
 
+if (!isset($cfg['Export'])) {
+    $cfg['Export'] = array();
+}
+
 if (!isset($cfg['Export']['format'])) {
     $cfg['Export']['format'] = 'sql';
-} // sql/latex/excel/csv/xml
+} // sql/latex/excel/csv/xml/xls
 if (!isset($cfg['Export']['compression'])) {
     $cfg['Export']['compression'] = 'none';
 } // none/zip/gzip/bzip2
@@ -1180,6 +1133,12 @@ if (!isset($cfg['Export']['csv_null'])) {
 }
 if (!isset($cfg['Export']['csv_columns'])) {
     $cfg['Export']['csv_columns'] = FALSE;
+}
+if (!isset($cfg['Export']['xls_null'])) {
+    $cfg['Export']['xls_null']                = 'NULL';
+}
+if (!isset($cfg['Export']['xls_columns'])) {
+    $cfg['Export']['xls_columns'] = FALSE;
 }
 if (!isset($cfg['Export']['excel_null'])) {
     $cfg['Export']['excel_null']                = 'NULL';
@@ -1237,8 +1196,17 @@ if (!isset($cfg['Export']['latex_structure_label'])) {
 if (!isset($cfg['Export']['sql_drop_database'])) {
     $cfg['Export']['sql_drop_database'] = FALSE;
 }
+if (!isset($cfg['Export']['sql_disable_fk'])) {
+    $cfg['Export']['sql_disable_fk'] = FALSE;
+}
+if (!isset($cfg['Export']['sql_use_transaction'])) {
+    $cfg['Export']['sql_use_transaction'] = FALSE;
+}
 if (!isset($cfg['Export']['sql_drop_table'])) {
     $cfg['Export']['sql_drop_table'] = FALSE;
+}
+if (!isset($cfg['Export']['sql_if_not_exists'])) {
+    $cfg['Export']['sql_if_not_exists'] = FALSE;
 }
 if (!isset($cfg['Export']['sql_auto_increment'])) {
     $cfg['Export']['sql_auto_increment'] = TRUE;
@@ -1264,6 +1232,12 @@ if (!isset($cfg['Export']['sql_columns'])) {
 if (!isset($cfg['Export']['sql_delayed'])) {
     $cfg['Export']['sql_delayed'] = FALSE;
 }
+if (!isset($cfg['Export']['sql_ignore'])) {
+    $cfg['Export']['sql_ignore'] = FALSE;
+}
+if (!isset($cfg['Export']['sql_hex_for_binary'])) {
+    $cfg['Export']['sql_hex_for_binary'] = TRUE;
+}
 if (!isset($cfg['Export']['sql_type'])) {
     $cfg['Export']['sql_type'] = 'insert';
 }
@@ -1275,6 +1249,9 @@ if (!isset($cfg['Export']['sql_comments'])) {
 }
 if (!isset($cfg['Export']['sql_mime'])) {
     $cfg['Export']['sql_mime'] = FALSE;
+}
+if (!isset($cfg['Export']['sql_header_comment'])) {
+    $cfg['Export']['sql_header_comment'] = '';
 }
 
 ?>

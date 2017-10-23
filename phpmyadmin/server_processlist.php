@@ -1,5 +1,5 @@
 <?php
-/* $Id: server_processlist.php,v 2.3 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: server_processlist.php,v 2.9 2004/08/12 15:13:19 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -13,8 +13,7 @@ require_once('./server_common.inc.php');
  * Kills a selected process
  */
 if (!empty($kill)) {
-    $sql_query = 'KILL ' . $kill . ';';
-    if (@PMA_mysql_query($sql_query, $userlink)) {
+    if (PMA_DBI_try_query('KILL ' . $kill . ';')) {
         $message = sprintf($strThreadSuccessfullyKilled, $kill);
     } else {
         $message = sprintf($strCouldNotKill, $kill);
@@ -32,6 +31,7 @@ require('./server_links.inc.php');
  * Displays the sub-page heading
  */
 echo '<h2>' . "\n"
+   . ($cfg['MainPageIconic'] ? '<img src="' . $pmaThemeImage . 's_process.png" width="16" height="16" border="0" hspace="2" align="middle" />' : '' )
    . '    ' . $strProcesslist . "\n"
    . '</h2>' . "\n";
 
@@ -40,12 +40,11 @@ echo '<h2>' . "\n"
  * Sends the query and buffers the result
  */
 $serverProcesses = array();
-$sql_query = 'SHOW' . (empty($full) ? '' : ' FULL') . ' PROCESSLIST;';
-$res = @PMA_mysql_query($sql_query, $userlink) or PMA_mysqlDie(PMA_mysql_error($userlink), $sql_query);
-while ($row = PMA_mysql_fetch_array($res, MYSQL_ASSOC)) {
+$res = PMA_DBI_query('SHOW' . (empty($full) ? '' : ' FULL') . ' PROCESSLIST;');
+while ($row = PMA_DBI_fetch_assoc($res)) {
     $serverProcesses[] = $row;
 }
-@mysql_free_result($res);
+@PMA_DBI_free_result($res);
 unset($res);
 unset($row);
 
@@ -54,9 +53,9 @@ unset($row);
  * Displays the page
  */
 ?>
-<table border="0">
+<table border="0" cellpadding="2" cellspacing="1">
     <tr>
-        <th><a href="./server_processlist.php?<?php echo $url_query . (empty($full) ? '&amp;full=1' : ''); ?>" title="<?php echo empty($full) ? $strShowFullQueries : $strTruncateQueries; ?>"><img src="./images/<?php echo empty($full) ? 'full' : 'partial'; ?>text.png" width="50" height="20" border="0" alt="<?php echo empty($full) ? $strShowFullQueries : $strTruncateQueries; ?>" /></a></th>
+        <td><a href="./server_processlist.php?<?php echo $url_query . (empty($full) ? '&amp;full=1' : ''); ?>" title="<?php echo empty($full) ? $strShowFullQueries : $strTruncateQueries; ?>"><img src="<?php echo $pmaThemeImage . 's_' . (empty($full) ? 'full' : 'partial'); ?>text.png" width="50" height="20" border="0" alt="<?php echo empty($full) ? $strShowFullQueries : $strTruncateQueries; ?>" /></a></td>
         <th>&nbsp;<?php echo $strId; ?>&nbsp;</th>
         <th>&nbsp;<?php echo $strUser; ?>&nbsp;</th>
         <th>&nbsp;<?php echo $strHost; ?>&nbsp;</th>
@@ -68,7 +67,7 @@ unset($row);
     </tr>
 <?php
 $useBgcolorOne = TRUE;
-foreach($serverProcesses AS $name => $value) {
+foreach ($serverProcesses AS $name => $value) {
 ?>
     <tr>
         <td bgcolor="<?php echo $useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']; ?>">&nbsp;<a href="./server_processlist.php?<?php echo $url_query . '&amp;kill=' . $value['Id']; ?>"><?php echo $strKill; ?></a>&nbsp;</td>
@@ -80,11 +79,11 @@ foreach($serverProcesses AS $name => $value) {
         <td bgcolor="<?php echo $useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']; ?>" align="right">&nbsp;<?php echo $value['Time']; ?>&nbsp;</td>
         <td bgcolor="<?php echo $useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']; ?>">&nbsp;<?php echo (empty($value['State']) ? '---' : $value['State']); ?>&nbsp;</td>
         <td bgcolor="<?php echo $useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']; ?>">&nbsp;<?php echo (empty($value['Info']) ? '---' : PMA_SQP_formatHtml(PMA_SQP_parse($value['Info']))); ?>&nbsp;</td>
+    </tr>
 <?php
     $useBgcolorOne = !$useBgcolorOne;
 }
 ?>
-    </tr>
 <?php
 ?>
 </table>

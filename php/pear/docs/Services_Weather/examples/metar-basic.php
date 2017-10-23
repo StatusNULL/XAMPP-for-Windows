@@ -16,7 +16,7 @@
 // | Authors: Alexander Wirtz <alex@pc4p.net>                             |
 // +----------------------------------------------------------------------+
 //
-// $Id: metar-basic.php,v 1.8 2003/12/31 23:31:22 eru Exp $
+// $Id: metar-basic.php,v 1.10 2004/05/07 14:41:36 eru Exp $
 
 require_once "Services/Weather.php";
 
@@ -34,18 +34,19 @@ if (Services_Weather::isError($metar)) {
 }
 
 /* Erase comments to enable caching
-$metar->setCache("file", array("cache_dir" => "/tmp/cache/"));
-if (Services_Weather::isError($metar)) {
-    echo "Error: ".$metar->getMessage()."\n";
+$status = $metar->setCache("file", array("cache_dir" => "/tmp/cache/"));
+if (Services_Weather::isError($status)) {
+    echo "Error: ".$status->getMessage()."\n";
 }
 */
 
 $metar->setUnitsFormat("custom", array(
-    "wind" => "kt",
-    "vis" => "km",
-    "temp" => "c",
-    "pres" => "hpa",
-    "rain" => "in"));
+    "wind"   => "kt",
+    "vis"    => "km",
+    "height" => "ft",
+    "temp"   => "c",
+    "pres"   => "hpa",
+    "rain"   => "in"));
 $metar->setDateTimeFormat("d.m.Y", "H:i");
 
 // First get code for location

@@ -1,5 +1,5 @@
 <?php
-/* $Id: ldi_table.php,v 2.3 2003/12/13 13:20:06 lem9 Exp $ */
+/* $Id: ldi_table.php,v 2.8 2004/09/06 00:28:21 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -100,12 +100,12 @@ echo "\n";
 ?>
     <tr>
         <td><?php echo $strReplaceTable; ?></td>
-        <td><input type="checkbox" name="replace" value="REPLACE" id="checkbox_replace" /><?php echo $strReplace; ?></td>
-        <td><label for="checkbox_replace"><?php echo $strTheContents; ?></label></td>
+        <td><input type="checkbox" name="replace" value="REPLACE" id="checkbox_replace" /><label for="checkbox_replace"><?php echo $strReplace; ?></label></td>
+        <td><?php echo $strTheContents; ?></td>
     </tr>
     <tr>
         <td><?php echo $strFieldsTerminatedBy; ?></td>
-        <td><input type="text" name="field_terminater" size="2" maxlength="2" value=";" /></td>
+        <td><input type="text" name="field_terminater" size="4" maxlength="4" value=";" /></td>
         <td><?php echo $strTheTerminator; ?></td>
     </tr>
     <tr>
@@ -152,15 +152,15 @@ if (PMA_MYSQL_INT_VERSION < 32349) {
 }
 
 if (PMA_MYSQL_INT_VERSION > 40003) {
-    $tmp_query  = "SHOW VARIABLES LIKE 'local\\_infile'";
-    $result = PMA_mysql_query($tmp_query);
-    if ($result != FALSE && mysql_num_rows($result) > 0) {
-        $tmp = PMA_mysql_fetch_row($result);
+    $result = PMA_DBI_try_query('SHOW VARIABLES LIKE \'local\\_infile\';');
+    if ($result != FALSE && PMA_DBI_num_rows($result) > 0) {
+        $tmp = PMA_DBI_fetch_row($result);
         if ($tmp[1] == 'ON') {
             $local_option_selected = TRUE;
         }
     }
-    mysql_free_result($result);
+    PMA_DBI_free_result($result);
+    unset($result);
 }
 
 ?>

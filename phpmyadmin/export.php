@@ -1,5 +1,5 @@
 <?php
-/* $Id: export.php,v 2.3.2.4 2004/06/07 11:57:38 nijel Exp $ */
+/* $Id: export.php,v 2.15 2004/06/24 20:45:12 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -19,7 +19,7 @@ if ($what == 'excel') {
 }
 
 // Get the functions specific to the export type
-require('./libraries/export/' . preg_replace('@\.\.*@','.',$type) . '.php');
+require('./libraries/export/' . PMA_securePath($type) . '.php');
 
 // Generate error url
 if ($export_type == 'server') {
@@ -54,8 +54,9 @@ $time_start = time();
 function PMA_exportOutputHandler($line)
 {
     global $time_start, $dump_buffer, $dump_buffer_len, $save_filename;
+
     // Kanji encoding convert feature
-    if (function_exists('PMA_kanji_str_conv')) {
+    if ($GLOBALS['output_kanji_conversion']) {
         $line = PMA_kanji_str_conv($line, $GLOBALS['knjenc'], isset($GLOBALS['xkana']) ? $GLOBALS['xkana'] : '');
     }
     // If we have to buffer data, we will perform everything at once at the end
@@ -63,13 +64,14 @@ function PMA_exportOutputHandler($line)
 
         $dump_buffer .= $line;
         if ($GLOBALS['onfly_compression']) {
+
             $dump_buffer_len += strlen($line);
 
             if ($dump_buffer_len > $GLOBALS['memory_limit']) {
-                // as bzipped
                 if ($GLOBALS['output_charset_conversion']) {
                     $dump_buffer = PMA_convert_string($GLOBALS['charset'], $GLOBALS['charset_of_file'], $dump_buffer);
                 }
+                // as bzipped
                 if ($GLOBALS['compression'] == 'bzip'  && @function_exists('bzcompress')) {
                     $dump_buffer = bzcompress($dump_buffer);
                 }
@@ -144,10 +146,13 @@ if (empty($asfile)) {
 // Defines the default <CR><LF> format
 $crlf = PMA_whichCrlf();
 
+$output_kanji_conversion = function_exists('PMA_kanji_str_conv') && $type != 'xls';
+
 // Do we need to convert charset?
 $output_charset_conversion = $asfile &&
     $cfg['AllowAnywhereRecoding'] && $allow_recoding
-    && isset($charset_of_file) && $charset_of_file != $charset;
+    && isset($charset_of_file) && $charset_of_file != $charset 
+    && $type != 'xls';
 
 // Set whether we will need buffering
 $buffer_needed = isset($compression) && ($compression == 'zip' | $compression == 'gzip' | $compression == 'bzip');
@@ -210,6 +215,9 @@ if ($asfile) {
     if ($type == 'csv') {
         $filename  .= '.csv';
         $mime_type = 'text/x-csv';
+    } else if ($type == 'xls') {
+        $filename  .= '.xls';
+        $mime_type = 'application/excel';
     } else if ($type == 'xml') {
         $filename  .= '.xml';
         $mime_type = 'text/xml';
@@ -298,15 +306,21 @@ if (!$save_on_server) {
         require_once('./header.inc.php');
         $cfg['Server'] = $backup_cfgServer;
         unset($backup_cfgServer);
-        echo '<div align="' . $cell_align_left . '">' . "\n";
-        echo '    <pre>' . "\n";
+        echo "\n" . '<div align="' . $cell_align_left . '">' . "\n";
+        //echo '    <pre>' . "\n";
+        echo '    <form name="nofunction">' . "\n"
+           // remove auto-select for now: there is no way to select
+           // only a part of the text; anyway, it should obey
+           // $cfg['TextareaAutoSelect']
+           //. '        <textarea name="sqldump" cols="50" rows="30" onclick="this.select();" id="textSQLDUMP" wrap="OFF">' . "\n";
+           . '        <textarea name="sqldump" cols="50" rows="30" id="textSQLDUMP" wrap="OFF">' . "\n";
     } // end download
 }
 
 // Check if we have something to export
 if ($export_type == 'database') {
-    $tables     = PMA_mysql_list_tables($db);
-    $num_tables = ($tables) ? @mysql_numrows($tables) : 0;
+    $tables     = PMA_DBI_get_tables($db);
+    $num_tables = count($tables);
     if ($num_tables == 0) {
         $message = $strNoTablesFound;
         $js_to_run = 'functions.js';
@@ -364,26 +378,24 @@ if ($export_type == 'server') {
         $tmp_select = '|' . $tmp_select . '|';
     }
     // Walk over databases
-    foreach($dblist AS $current_db) {
+    foreach ($dblist AS $current_db) {
         if ((isset($tmp_select) && strpos(' ' . $tmp_select, '|' . $current_db . '|'))
             || !isset($tmp_select)) {
             if (!PMA_exportDBHeader($current_db)) 
                 break 2;
             if (!PMA_exportDBCreate($current_db)) 
                 break 2;
-            $tables     = PMA_mysql_list_tables($current_db);
-            $num_tables = ($tables) ? @mysql_numrows($tables) : 0;
-            $i = 0;
-            while ($i < $num_tables) {
-                $table = PMA_mysql_tablename($tables, $i);
+            $tables = PMA_DBI_get_tables($current_db);
+            foreach ($tables as $table) {
                 $local_query  = 'SELECT * FROM ' . PMA_backquote($current_db) . '.' . PMA_backquote($table);
-                if (isset($GLOBALS[$what . '_structure']))
+                if (isset($GLOBALS[$what . '_structure'])) {
                     if (!PMA_exportStructure($current_db, $table, $crlf, $err_url, $do_relation, $do_comments, $do_mime, $do_dates))
                         break 3;
-                if (isset($GLOBALS[$what . '_data'])) 
+                }
+                if (isset($GLOBALS[$what . '_data'])) {
                     if (!PMA_exportData($current_db, $table, $crlf, $err_url, $local_query))
                         break 3;
-                $i++;
+                }
             }
             if (!PMA_exportDBFooter($current_db)) 
                 break 2;
@@ -398,20 +410,20 @@ if ($export_type == 'server') {
         $tmp_select = '|' . $tmp_select . '|';
     }
     $i = 0;
-    while ($i < $num_tables) {
-        $table = PMA_mysql_tablename($tables, $i);
+    foreach ($tables as $table) {
         $local_query  = 'SELECT * FROM ' . PMA_backquote($db) . '.' . PMA_backquote($table);
         if ((isset($tmp_select) && strpos(' ' . $tmp_select, '|' . $table . '|'))
             || !isset($tmp_select)) {
 
-            if (isset($GLOBALS[$what . '_structure'])) 
+            if (isset($GLOBALS[$what . '_structure'])) {
                 if (!PMA_exportStructure($db, $table, $crlf, $err_url, $do_relation, $do_comments, $do_mime, $do_dates))
                     break 2;
-            if (isset($GLOBALS[$what . '_data'])) 
+            }
+            if (isset($GLOBALS[$what . '_data'])) {
                 if (!PMA_exportData($db, $table, $crlf, $err_url, $local_query))
                     break 2;
+            }
         }
-        $i++;
     }
     if (!PMA_exportDBFooter($db)) 
         break;
@@ -430,7 +442,7 @@ if ($export_type == 'server') {
 
     if (!empty($sql_query)) {
         $local_query = $sql_query . $add_query;
-        PMA_mysql_select_db($db);
+        PMA_DBI_select_db($db);
     } else {
         $local_query  = 'SELECT * FROM ' . PMA_backquote($db) . '.' . PMA_backquote($table) . $add_query;
     }
@@ -446,6 +458,7 @@ if ($export_type == 'server') {
     if (!PMA_exportDBFooter($db))
         break;
 }
+if (!PMA_exportFooter()) break;
 
 } while (FALSE);
 // End of fake loop
@@ -479,15 +492,8 @@ if (!empty($asfile)) {
     // 1. as a gzipped file
     if (isset($compression) && $compression == 'zip') {
         if (@function_exists('gzcompress')) {
-            if ($type == 'csv' ) {
-                $extbis = '.csv';
-            } else if ($type == 'xml') {
-                $extbis = '.xml';
-            } else {
-                $extbis = '.sql';
-            }
             $zipfile = new zipfile();
-            $zipfile -> addFile($dump_buffer, $filename . $extbis);
+            $zipfile -> addFile($dump_buffer, substr($filename, 0, -4));
             $dump_buffer = $zipfile -> file();
         }
     }
@@ -544,9 +550,32 @@ else {
     /**
      * Close the html tags and add the footers in dump is displayed on screen
      */
-    echo '    </pre>' . "\n";
+    //echo '    </pre>' . "\n";
+    echo '        </textarea>' . "\n"
+       . '    </form>' . "\n";
     echo '</div>' . "\n";
     echo "\n";
+?><script language="JavaScript" type="text/javascript">
+<!--
+    var bodyWidth=null; var bodyHeight=null;
+    if (document.getElementById('textSQLDUMP')) {
+        bodyWidth  = self.innerWidth;
+        bodyHeight = self.innerHeight;
+        if(!bodyWidth && !bodyHeight){
+            if (document.compatMode && document.compatMode == "BackCompat") {
+                bodyWidth  = document.body.clientWidth;
+                bodyHeight = document.body.clientHeight;
+            } else if (document.compatMode && document.compatMode == "CSS1Compat") {
+                bodyWidth  = document.documentElement.clientWidth;
+                bodyHeight = document.documentElement.clientHeight;
+            }
+        }
+        document.getElementById('textSQLDUMP').style.width=(bodyWidth-50) + 'px';
+        document.getElementById('textSQLDUMP').style.height=(bodyHeight-100) + 'px';
+    }
+//-->
+</script>
+<?php
     require_once('./footer.inc.php');
 } // end if
 ?>

@@ -1,5 +1,30 @@
-/* $Id: functions.js,v 2.2 2004/01/05 16:10:15 garvinhicking Exp $ */
+/* $Id: functions.js,v 2.10 2004/09/16 10:01:09 garvinhicking Exp $ */
 
+
+/**
+ * Displays an confirmation box before to submit a "DROP DATABASE" query.
+ * This function is called while clicking links
+ *
+ * @param   object   the link
+ * @param   object   the sql query to submit
+ *
+ * @return  boolean  whether to run the query or not
+ */
+function confirmLinkDropDB(theLink, theSqlQuery)
+{
+    // Confirmation is not required in the configuration file
+    // or browser is Opera (crappy js implementation)
+    if (confirmMsg == '' || typeof(window.opera) != 'undefined') {
+        return true;
+    }
+
+    var is_confirmed = confirm(confirmMsgDropDB + '\n' + confirmMsg + ' :\n' + theSqlQuery);
+    if (is_confirmed) {
+        theLink.href += '&is_js_confirmed=1';
+    }
+
+    return is_confirmed;
+} // end of the 'confirmLink()' function
 
 /**
  * Displays an confirmation box beforme to submit a "DROP/DELETE/ALTER" query.
@@ -350,7 +375,7 @@ var marked_row = new Array;
  * Sets/unsets the pointer and marker in browse mode
  *
  * @param   object    the table row
- * @param   interger  the row number
+ * @param   integer  the row number
  * @param   string    the action calling this script (over, out or click)
  * @param   string    the default background color
  * @param   string    the color to use for mouseover
@@ -399,7 +424,7 @@ function setPointer(theRow, theRowNum, theAction, theDefaultColor, thePointerCol
     } // end 3
 
     // 3.3 ... Opera changes colors set via HTML to rgb(r,g,b) format so fix it
-    if (currentColor.indexOf("rgb") >= 0) 
+    if (currentColor.indexOf("rgb") >= 0)
     {
         var rgbStr = currentColor.slice(currentColor.indexOf('(') + 1,
                                      currentColor.indexOf(')'));
@@ -479,7 +504,7 @@ function setPointer(theRow, theRowNum, theAction, theDefaultColor, thePointerCol
  * Sets/unsets the pointer and marker in vertical browse mode
  *
  * @param   object    the table row
- * @param   interger  the row number
+ * @param   integer   the column number
  * @param   string    the action calling this script (over, out or click)
  * @param   string    the default background color
  * @param   string    the color to use for mouseover
@@ -489,8 +514,9 @@ function setPointer(theRow, theRowNum, theAction, theDefaultColor, thePointerCol
  *
  * @author Garvin Hicking <me@supergarv.de> (rewrite of setPointer.)
  */
-function setVerticalPointer(theRow, theRowNum, theAction, theDefaultColor1, theDefaultColor2, thePointerColor, theMarkColor) {
+function setVerticalPointer(theRow, theColNum, theAction, theDefaultColor1, theDefaultColor2, thePointerColor, theMarkColor) {
     var theCells = null;
+    var tagSwitch = null;
 
     // 1. Pointer and mark feature are disabled or the browser can't get the
     //    row -> exits
@@ -499,61 +525,61 @@ function setVerticalPointer(theRow, theRowNum, theAction, theDefaultColor1, theD
         return false;
     }
 
-    // 2. Gets the current row and exits if the browser can't get it
     if (typeof(document.getElementsByTagName) != 'undefined') {
-        theCells = theRow.getElementsByTagName('td');
-    }
-    else if (typeof(theRow.cells) != 'undefined') {
-        theCells = theRow.cells;
-    }
-    else {
+        tagSwitch = 'tag';
+    } else if (typeof(document.getElementById('table_results')) != 'undefined') {
+        tagSwitch = 'cells';
+    } else {
         return false;
     }
 
+    // 2. Gets the current row and exits if the browser can't get it
+    if (tagSwitch == 'tag') {
+        theRows     = document.getElementById('table_results').getElementsByTagName('tr');
+        theCells    = theRows[1].getElementsByTagName('td');
+    } else if (tagSwitch == 'cells') {
+        theRows     = document.getElementById('table_results').rows;
+        theCells    = theRows[1].cells;
+    }
+
     // 3. Gets the current color...
-    var rowCellsCnt  = theCells.length;
-    var domDetect    = null;
-    var currentColor = null;
-    var newColor     = null;
+    var rowCnt         = theRows.length;
+    var domDetect      = null;
+    var currentColor   = null;
+    var newColor       = null;
 
     // 3.1 ... with DOM compatible browsers except Opera that does not return
     //         valid values with "getAttribute"
     if (typeof(window.opera) == 'undefined'
-        && typeof(theCells[0].getAttribute) != 'undefined') {
-        currentColor = theCells[0].getAttribute('bgcolor');
+        && typeof(theCells[theColNum].getAttribute) != 'undefined') {
+        currentColor = theCells[theColNum].getAttribute('bgcolor');
         domDetect    = true;
     }
     // 3.2 ... with other browsers
     else {
         domDetect    = false;
+        currentColor = theCells[theColNum].style.backgroundColor;
     } // end 3
 
     var c = null;
-    // 5.1 ... with DOM compatible browsers except Opera
-    for (c = 0; c < rowCellsCnt; c++) {
-        if (domDetect) {
-            currentColor = theCells[c].getAttribute('bgcolor');
-        } else {
-            currentColor = theCells[c].style.backgroundColor;
-        }
 
-        // 4. Defines the new color
-        // 4.1 Current color is the default one
-        if (currentColor == ''
-            || currentColor.toLowerCase() == theDefaultColor1.toLowerCase()
-            || currentColor.toLowerCase() == theDefaultColor2.toLowerCase()) {
-            if (theAction == 'over' && thePointerColor != '') {
-                newColor              = thePointerColor;
-            } else if (theAction == 'click' && theMarkColor != '') {
-                newColor              = theMarkColor;
-                marked_row[theRowNum] = true;
-            }
+    // 4. Defines the new color
+    // 4.1 Current color is the default one
+    if (currentColor == ''
+        || currentColor.toLowerCase() == theDefaultColor1.toLowerCase()
+        || currentColor.toLowerCase() == theDefaultColor2.toLowerCase()) {
+        if (theAction == 'over' && thePointerColor != '') {
+            newColor              = thePointerColor;
+        } else if (theAction == 'click' && theMarkColor != '') {
+            newColor              = theMarkColor;
+            marked_row[theColNum] = true;
         }
-        // 4.1.2 Current color is the pointer one
-        else if (currentColor.toLowerCase() == thePointerColor.toLowerCase()
-                 && (typeof(marked_row[theRowNum]) == 'undefined' || !marked_row[theRowNum])) {
+    }
+    // 4.1.2 Current color is the pointer one
+    else if (currentColor.toLowerCase() == thePointerColor.toLowerCase() &&
+             (typeof(marked_row[theColNum]) == 'undefined' || !marked_row[theColNum]) || marked_row[theColNum] == false) {
             if (theAction == 'out') {
-                if (c % 2) {
+                if (theColNum % 2) {
                     newColor              = theDefaultColor1;
                 } else {
                     newColor              = theDefaultColor2;
@@ -561,29 +587,36 @@ function setVerticalPointer(theRow, theRowNum, theAction, theDefaultColor1, theD
             }
             else if (theAction == 'click' && theMarkColor != '') {
                 newColor              = theMarkColor;
-                marked_row[theRowNum] = true;
+                marked_row[theColNum] = true;
             }
+    }
+    // 4.1.3 Current color is the marker one
+    else if (currentColor.toLowerCase() == theMarkColor.toLowerCase()) {
+        if (theAction == 'click') {
+            newColor              = (thePointerColor != '')
+                                  ? thePointerColor
+                                  : ((theColNum % 2) ? theDefaultColor1 : theDefaultColor2);
+            marked_row[theColNum] = false;
         }
-        // 4.1.3 Current color is the marker one
-        else if (currentColor.toLowerCase() == theMarkColor.toLowerCase()) {
-            if (theAction == 'click') {
-                newColor              = (thePointerColor != '')
-                                      ? thePointerColor
-                                      : ((c % 2) ? theDefaultColor1 : theDefaultColor2);
-                marked_row[theRowNum] = (typeof(marked_row[theRowNum]) == 'undefined' || !marked_row[theRowNum])
-                                      ? true
-                                      : null;
-            }
-        } // end 4
+    } // end 4
 
-        // 5. Sets the new color...
+    // 5 ... with DOM compatible browsers except Opera
+
+    for (c = 0; c < rowCnt; c++) {
+        if (tagSwitch == 'tag') {
+            Cells = theRows[c].getElementsByTagName('td');
+        } else if (tagSwitch == 'cells') {
+            Cells = theRows[c].cells;
+        }
+
+        Cell  = Cells[theColNum];
+
+        // 5.1 Sets the new color...
         if (newColor) {
             if (domDetect) {
-                theCells[c].setAttribute('bgcolor', newColor, 0);
-            }
-            // 5.2 ... with other browsers
-            else {
-                theCells[c].style.backgroundColor = newColor;
+                Cell.setAttribute('bgcolor', newColor, 0);
+            } else {
+                Cell.style.backgroundColor = newColor;
             }
         } // end 5
     } // end for
@@ -620,6 +653,75 @@ function setCheckboxes(the_form, do_check)
 
     return true;
 } // end of the 'setCheckboxes()' function
+
+/**
+ * Checks/unchecks all rows
+ *
+ * @param   string   the form name
+ * @param   boolean  whether to check or to uncheck the element
+ * @param   string   basename of the element
+ * @param   integer  min element count
+ * @param   integer  max element count
+ *
+ * @return  boolean  always true
+ */
+// modified 2004-05-08 by Michael Keck <mail_at_michaelkeck_dot_de>
+// - set the other checkboxes (if available) too
+function setCheckboxesRange(the_form, do_check, basename, min, max)
+{
+    for (var i = min; i < max; i++) {
+        if (typeof(document.forms[the_form].elements[basename + i]) != 'undefined') {
+            document.forms[the_form].elements[basename + i].checked = do_check;
+        }
+        if (typeof(document.forms[the_form].elements[basename + i + 'r']) != 'undefined') {
+            document.forms[the_form].elements[basename + i + 'r'].checked = do_check;
+        }
+    }
+
+    return true;
+} // end of the 'setCheckboxesRange()' function
+
+// added 2004-05-08 by Michael Keck <mail_at_michaelkeck_dot_de>
+//   copy the checked from left to right or from right to left
+//   so it's easier for users to see, if $cfg['ModifyAtRight']=true, what they've checked ;)
+function copyCheckboxesRange(the_form, the_name, the_clicked)
+{
+    if (typeof(document.forms[the_form].elements[the_name]) != 'undefined' && typeof(document.forms[the_form].elements[the_name + 'r']) != 'undefined') {
+        if (the_clicked !== 'r') {
+            if (document.forms[the_form].elements[the_name].checked == true) {
+                document.forms[the_form].elements[the_name + 'r'].checked = true;
+            }else {
+                document.forms[the_form].elements[the_name + 'r'].checked = false;
+            }
+        } else if (the_clicked == 'r') {
+            if (document.forms[the_form].elements[the_name + 'r'].checked == true) {
+                document.forms[the_form].elements[the_name].checked = true;
+            }else {
+                document.forms[the_form].elements[the_name].checked = false;
+            }
+       }
+    }
+}
+
+
+// added 2004-05-08 by Michael Keck <mail_at_michaelkeck_dot_de>
+//  - this was directly written to each td, so why not a function ;)
+//  setCheckboxColumn(\'id_rows_to_delete' . $row_no . ''\');
+function setCheckboxColumn(theCheckbox){
+    if (document.getElementById(theCheckbox)) {
+        document.getElementById(theCheckbox).checked = (document.getElementById(theCheckbox).checked ? false : true);
+        if (document.getElementById(theCheckbox + 'r')) {
+            document.getElementById(theCheckbox + 'r').checked = document.getElementById(theCheckbox).checked;
+        }
+    } else {
+        if (document.getElementById(theCheckbox + 'r')) {
+            document.getElementById(theCheckbox + 'r').checked = (document.getElementById(theCheckbox +'r').checked ? false : true);
+            if (document.getElementById(theCheckbox)) {
+                document.getElementById(theCheckbox).checked = document.getElementById(theCheckbox + 'r').checked;
+            }
+        }
+    }
+}
 
 
 /**
@@ -728,7 +830,7 @@ function insertValueQuery() {
 /**
   * listbox redirection
   */
-function goToUrl(selObj, goToLocation){
+function goToUrl(selObj, goToLocation) {
     eval("document.location.href = '" + goToLocation + "pos=" + selObj.options[selObj.selectedIndex].value + "'");
 }
 

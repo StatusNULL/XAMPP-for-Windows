@@ -3,7 +3,7 @@
 // Pear DB LDAP - Database independent query interface definition
 // for PHP's LDAP extension.
 //
-// Copyright (C) 2002 Ludovico Magnocavallo <ludo@sumatrasolutions.com>
+// Copyright (c) 2002-2003 Ludovico Magnocavallo <ludo@sumatrasolutions.com>
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -20,13 +20,16 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 // Contributors
-// - Piotr Roszatycki <Piotr_Roszatycki@netia.net.pl>
+// - Piotr Roszatycki <dexter@debian.org>
 //   DB_ldap::base() method, support for LDAP sequences, various fixes
+// - Aaron Spencer Hawley <aaron dot hawley at uvm dot edu>
+//   fix to use port number if present in DB_ldap->connect()
 //
-// $Id: ldap.php,v 1.9 2002/02/11 12:59:37 mj Exp $
+// $Id: ldap.php,v 1.21 2004/05/20 21:52:05 ludoo Exp $
 //
 
 require_once 'DB/common.php';
+
 define("DB_ERROR_BIND_FAILED",     -26);
 define("DB_ERROR_UNKNOWN_LDAP_ACTION",     -27);
 
@@ -45,7 +48,7 @@ class LDAP_result extends DB_result
 {
 
     // {{{ properties
-    
+
     /**
      * data returned from ldap_entries()
      * @access private
@@ -61,7 +64,7 @@ class LDAP_result extends DB_result
      * @access private
      */
     var $_record    = null;
-    
+
     // }}}
     // {{{ constructor
 
@@ -138,8 +141,8 @@ class LDAP_result extends DB_result
         }
         return DB_OK;
     }
-    
-    
+
+
     /**
      * Fetch and return a row of data (it uses driver->fetchInto for that)
      * @param int $fetchmode  format of fetched row
@@ -170,7 +173,7 @@ class LDAP_result extends DB_result
      * @return  mixed  DB_OK on success, NULL on no more rows or
      *                 a DB_Error object on error
      *
-     * @access public     
+     * @access public
      */
 
     function fetchInto(&$ar, $fetchmode = DB_FETCHMODE_DEFAULT, $rownum = null)
@@ -184,7 +187,7 @@ class LDAP_result extends DB_result
         }
         return DB_OK;
     }
-    
+
     /**
      * return all records
      *
@@ -196,7 +199,7 @@ class LDAP_result extends DB_result
      * @return  mixed  DB_OK on success, NULL on no more rows or
      *                 a DB_Error object on error
      *
-     * @access public     
+     * @access public
      */
     function fetchAll($fetchmode = DB_FETCHMODE_DEFAULT, $rownum = null)
     {
@@ -221,13 +224,13 @@ class LDAP_result extends DB_result
     {
         return(strcmp(strtolower($this->_recordset[$a][$this->dbh->sorting]), strtolower($this->_recordset[$b][$this->dbh->sorting])));
     }
-  
+
     /**
      * Get the number of rows in a result set.
      *
      * @return int the number of rows, or a DB error
      *
-     * @access public     
+     * @access public
      */
     function numRows()
     {
@@ -240,7 +243,7 @@ class LDAP_result extends DB_result
      *
      * @return bool true if a new result is available or false if not.
      *
-     * @access public     
+     * @access public
      */
     function nextResult()
     {
@@ -251,7 +254,7 @@ class LDAP_result extends DB_result
      * Frees the resources allocated for this result set.
      * @return  int     error code
      *
-     * @access public     
+     * @access public
      */
     function free()
     {
@@ -273,7 +276,7 @@ class LDAP_result extends DB_result
     /**
     * returns the actual rows number
     * @return integer
-    */    
+    */
     function getRowCounter()
     {
         $this->getRows();
@@ -295,7 +298,7 @@ class LDAP_result extends DB_result
 class DB_ldap extends DB_common
 {
     // {{{ properties
-    
+
     /**
      * LDAP connection
      * @access private
@@ -307,6 +310,11 @@ class DB_ldap extends DB_common
      */
     var $base           = '';
     /**
+     * default base dn
+     * @access private
+     */
+    var $d_base           = '';
+    /**
      * query base dn
      * @access private
      */
@@ -317,6 +325,11 @@ class DB_ldap extends DB_common
      * @access private
      */
     var $manip          = array('add', 'compare', 'delete', 'modify', 'mod_add', 'mod_del', 'mod_replace', 'rename');
+    /**
+     * store the default real LDAP action to perform
+     * @access private
+     */
+    var $action         = 'search';
     /**
      * store the real LDAP action to perform
      * (ie PHP ldap function to call) for a query
@@ -348,6 +361,27 @@ class DB_ldap extends DB_common
             'transactions'  => false,
             'limit'         => false
         );
+        $this->errorcode_map = array(
+            0x10 => DB_ERROR_NOSUCHFIELD,               // LDAP_NO_SUCH_ATTRIBUTE
+            0x11 => DB_ERROR_INVALID,                   // LDAP_UNDEFINED_TYPE
+            0x12 => DB_ERROR_INVALID,                   // LDAP_INAPPROPRIATE_MATCHING
+            0x13 => DB_ERROR_INVALID,                   // LDAP_CONSTRAINT_VIOLATION
+            0x14 => DB_ERROR_ALREADY_EXISTS,            // LDAP_TYPE_OR_VALUE_EXISTS
+            0x15 => DB_ERROR_INVALID,                   // LDAP_INVALID_SYNTAX
+            0x20 => DB_ERROR_NOT_FOUND,                 // LDAP_NO_SUCH_OBJECT
+            0x21 => DB_ERROR_NOT_FOUND,                 // LDAP_ALIAS_PROBLEM
+            0x22 => DB_ERROR_INVALID,                   // LDAP_INVALID_DN_SYNTAX
+            0x23 => DB_ERROR_INVALID,                   // LDAP_IS_LEAF
+            0x24 => DB_ERROR_INVALID,                   // LDAP_ALIAS_DEREF_PROBLEM
+            0x30 => DB_ERROR_ACCESS_VIOLATION,          // LDAP_INAPPROPRIATE_AUTH
+            0x31 => DB_ERROR_ACCESS_VIOLATION,          // LDAP_INVALID_CREDENTIALS
+            0x32 => DB_ERROR_ACCESS_VIOLATION,          // LDAP_INSUFFICIENT_ACCESS
+            0x40 => DB_ERROR_MISMATCH,                  // LDAP_NAMING_VIOLATION
+            0x41 => DB_ERROR_MISMATCH,                  // LDAP_OBJECT_CLASS_VIOLATION
+            0x44 => DB_ERROR_ALREADY_EXISTS,            // LDAP_ALREADY_EXISTS
+            0x51 => DB_ERROR_CONNECT_FAILED,            // LDAP_SERVER_DOWN
+            0x57 => DB_ERROR_SYNTAX                     // LDAP_FILTER_ERROR
+        );
     }
 
     /**
@@ -365,21 +399,32 @@ class DB_ldap extends DB_common
         $this->dsn = $dsninfo;
         $user   = $dsninfo['username'];
         $pw     = $dsninfo['password'];
-        $host   = $dsninfo['hostspec'];
-        $this->base = $dsninfo['database'];
-
-        if ($host) {
-            $conn = ldap_connect($host);
+        if (($colon_pos = strpos($dsninfo['hostspec'], ':')) !== false) {
+            $host = substr($dsninfo['hostspec'], 0, $colon_pos);
+            $port = substr($dsninfo['hostspec'], $colon_pos + 1);
         } else {
-            return $this->raiseError("unknown host $host");
+            $host = $dsninfo['hostspec'];
+            $port = null;
+        }
+        $this->base = $dsninfo['database'];
+        $this->d_base = $this->base;
+
+        if (empty($host)) {
+            return $this->raiseError("no host specified $host");
+        } // else ...
+
+        if (isset($port)) {
+            $conn = ldap_connect($host, $port);
+        } else {
+            $conn = ldap_connect($host);
         }
         if (!$conn) {
             return $this->raiseError(DB_ERROR_CONNECT_FAILED);
         }
         if ($user && $pw) {
-            $bind = ldap_bind($conn, "${user}," . $this->base, $pw);
+            $bind = @ldap_bind($conn, $user, $pw);
         } else {
-            $bind = ldap_bind($conn);
+            $bind = @ldap_bind($conn);
         }
         if (!$bind) {
             return $this->raiseError(DB_ERROR_BIND_FAILED);
@@ -416,7 +461,7 @@ class DB_ldap extends DB_common
     function simpleQuery($filter, $action = null, $params = null)
     {
         if ($action === null) {
-            $action = (!empty($this->q_action) ? $this->q_action : 'search');
+            $action = (!empty($this->q_action) ? $this->q_action : $this->action);
         }
         if ($params === null) {
             $params = (count($this->q_params) > 0 ? $this->q_params : array());
@@ -437,6 +482,9 @@ class DB_ldap extends DB_common
             $this->sorting = $sorting;
             $this->sorting_method = $sorting_method;
             $this->attributes = $attributes;
+            # double escape char for filter: '(o=Przedsi\C4\99biorstwo)' => '(o=Przedsi\\C4\\99biorstwo)'
+            $filter = str_replace('\\', '\\\\', $filter);
+            $this->last_query = $filter;
             if ($action == 'search')
                 $result = @ldap_search($this->connection, $base, $filter, $attributes, $attrsonly, $sizelimit, $timelimit, $deref);
             else if ($action == 'list')
@@ -444,9 +492,9 @@ class DB_ldap extends DB_common
             else if ($action == 'read')
                 $result = @ldap_read($this->connection, $base, $filter, $attributes, $attrsonly, $sizelimit, $timelimit, $deref);
             else
-                return $this->raiseError(DB_ERROR_UNKNOWN_LDAP_ACTION);
+                return $this->ldapRaiseError(DB_ERROR_UNKNOWN_LDAP_ACTION);
             if (!$result) {
-                return $this->raiseError();
+                return $this->ldapRaiseError();
             }
         } else {
             # If first argument is an array, it contains the entry with DN.
@@ -466,6 +514,7 @@ class DB_ldap extends DB_common
             while (list($k, $v) = each($params)) {
                 if (isset(${$k})) ${$k} = $v;
             }
+            $this->last_query = $filter;
             if ($action == 'add')
                 $result = @ldap_add($this->connection, $filter, $entry);
             else if ($action == 'compare')
@@ -483,9 +532,9 @@ class DB_ldap extends DB_common
             else if ($action == 'rename')
                 $result = @ldap_rename($this->connection, $filter, $newrdn, $newparent, $deleteoldrdn);
             else
-                return $this->raiseError(DB_ERROR_UNKNOWN_LDAP_ACTION);
+                return $this->ldapRaiseError(DB_ERROR_UNKNOWN_LDAP_ACTION);
             if (!$result) {
-                return $this->raiseError();
+                return $this->ldapRaiseError();
             }
         }
         $this->freeQuery();
@@ -502,9 +551,8 @@ class DB_ldap extends DB_common
      * @return LDAP_result object or DB Error object if no result
      * @see DB_common::executeEmulateQuery $this->simpleQuery()
      */
-    function execute($stmt, $data = false, $action = 'search', $params = array())
+    function execute($stmt, $data = false, $action = null, $params = array())
     {
-        $this->q_action = $action;
         $this->q_params = $params;
         $realquery = $this->executeEmulateQuery($stmt, $data);
         if (DB::isError($realquery)) {
@@ -528,9 +576,9 @@ class DB_ldap extends DB_common
      * @return LDAP_result object or DB Error object if no result
      * @see DB_common::executeMultiple
      */
-    function executeMultiple($stmt, &$data, $action = 'search', $params = array())
+    function executeMultiple($stmt, &$data, $action = null, $params = array())
     {
-        $this->q_action = $action;
+        $this->q_action = $action ? $action : $this->action;
         $this->q_params = $params;
         return(parent::executeMultiple($stmt, $data));
     }
@@ -545,9 +593,9 @@ class DB_ldap extends DB_common
      * @return LDAP_result object or DB Error object if no result
      * @see DB_common::prepare() $this->execute()$this->simpleQuery()
      */
-    function &query($query, $data = array(), $action = 'search', $params = array()) {
-        $this->q_action = $action;
-        $this->q_params = $params;
+    function &query($query, $data = array(), $action = null, $params = array()) {
+        // $this->q_action = $action ? $action : $this->action;
+        // $this->q_params = $params;
         if (sizeof($data) > 0) {
             $sth = $this->prepare($query);
             if (DB::isError($sth)) {
@@ -578,7 +626,7 @@ class DB_ldap extends DB_common
         $this->limit_count = $count;
         return $query;
     }
-    
+
     /**
      * Executes a query returning only a specified number of rows
      *
@@ -592,10 +640,10 @@ class DB_ldap extends DB_common
      * @param array $params array of additional parameters to pass to the PHP ldap function requested
      * @return LDAP_result object or DB Error object if no result
      */
-    function limitQuery($query, $from, $count, $action = 'search', $params = array())
+    function limitQuery($query, $from, $count, $action = null, $params = array())
     {
         $query = $this->modifyLimitQuery($query, $from, $count);
-        $this->q_action = $action;
+        $this->q_action = $action ? $action : $this->action;
         $this->q_params = $params;
         return $this->query($query, $action, $params);
     }
@@ -614,9 +662,9 @@ class DB_ldap extends DB_common
      * @see DB_common::getOne()
      * @access public
      */
-    function &getOne($query, $data = array(), $action = 'search', $params = array())
+    function &getOne($query, $data = array(), $action = null, $params = array())
     {
-        $this->q_action = $action;
+        $this->q_action = $action ? $action : $this->action;
         $this->q_params = $params;
         return(parent::getOne($query, $data));
     }
@@ -640,9 +688,9 @@ class DB_ldap extends DB_common
     function &getRow($query,
                      $data = null,
                      $fetchmode = DB_FETCHMODE_DEFAULT,
-                     $action = 'search', $params = array())
+                     $action = null, $params = array())
     {
-        $this->q_action = $action;
+        $this->q_action = $action ? $action : $this->action;
         $this->q_params = $params;
         return(parent::getRow($query, $data, $fetchmode));
     }
@@ -664,9 +712,9 @@ class DB_ldap extends DB_common
      * @see DB_common::getCol()
      * @access public
      */
-    function &getCol($query, $col = 0, $data = array(), $action = 'search', $params = array())
+    function &getCol($query, $col = 0, $data = array(), $action = null, $params = array())
     {
-        $this->q_action = $action;
+        $this->q_action = $action ? $action : $this->action;
         $this->q_params = $params;
         return(parent::getCol($query, $col, $data));
     }
@@ -693,13 +741,13 @@ class DB_ldap extends DB_common
      */
     function &getAssoc($query, $force_array = false, $data = array(),
                        $fetchmode = DB_FETCHMODE_ORDERED, $group = false,
-                       $action = 'search', $params = array())
+                       $action = null, $params = array())
     {
-        $this->q_action = $action;
+        $this->q_action = $action ? $action : $this->action;
         $this->q_params = $params;
         return(parent::getAssoc($query, $force_array, $data, $fetchmode, $group));
     }
-    
+
     /**
      * Fetch all the rows returned from a query.
      *
@@ -716,13 +764,13 @@ class DB_ldap extends DB_common
     function &getAll($query,
                      $data = null,
                      $fetchmode = DB_FETCHMODE_DEFAULT,
-                     $action = 'search', $params = array())
+                     $action = null, $params = array())
     {
-        $this->q_action = $action;
+        $this->q_action = $action ? $action : $this->action;
         $this->q_params = $params;
         return(parent::getAll($query, $data, $fetchmode));
     }
-    
+
     function numRows($result)
     {
         return $result->numRows();
@@ -730,12 +778,12 @@ class DB_ldap extends DB_common
 
     function getTables()
     {
-        return $this->raiseError(DB_ERROR_NOT_CAPABLE);
+        return $this->ldapRaiseError(DB_ERROR_NOT_CAPABLE);
     }
 
     function getListOf($type)
     {
-        return $this->raiseError(DB_ERROR_NOT_CAPABLE);
+        return $this->ldapRaiseError(DB_ERROR_NOT_CAPABLE);
     }
 
     function isManip($action)
@@ -758,9 +806,27 @@ class DB_ldap extends DB_common
         return true;
     }
 
+    // Deprecated, will be removed in future releases.
     function base($base = null)
     {
         $this->q_base = ($base !== null) ? $base : null;
+        return true;
+    }
+
+    function ldapSetBase($base = null)
+    {
+        $this->base = ($base !== null) ? $base : $this->d_base;
+        $this->q_base = '';
+        return true;
+    }
+
+    function ldapSetAction($action = 'search')
+    {
+        if ($action != 'search' && $action != 'list' && $action != 'read') {
+            return $this->ldapRaiseError(DB_ERROR_UNKNOWN_LDAP_ACTION);
+        }
+        $this->action = $action;
+        $this->q_action = '';
         return true;
     }
 
@@ -796,11 +862,11 @@ class DB_ldap extends DB_common
                     $repeat = 1;
                     $data = $this->createSequence($seq_name);
                     if (DB::isError($data)) {
-                        return $this->raiseError($data);
+                        return $this->ldapRaiseError($data);
                     }
                 } else {
                     // Other error
-                    return $this->raiseError($data);
+                    return $this->ldapRaiseError($data);
                 }
             } else {
                 // Increment sequence value
@@ -813,13 +879,13 @@ class DB_ldap extends DB_common
                 $data = $this->simpleQuery($data, 'modify');
                 $this->popErrorHandling();
                 if (DB::isError($data)) {
-                    return $this->raiseError($data);
+                    return $this->ldapRaiseError($data);
                 }
                 // Get the entry and check if it contains our unique value
                 $this->base($seq_name);
                 $data = $this->getRow("objectClass=*");
                 if (DB::isError($data)) {
-                    return $this->raiseError($data);
+                    return $this->ldapRaiseError($data);
                 }
                 if ($data["uid"] != $seq_unique) {
                     // It is not our entry. Wait a little time and repeat
@@ -830,7 +896,7 @@ class DB_ldap extends DB_common
                 }
             }
         } while ($repeat);
-        
+
         if (DB::isError($data)) {
             return $data;
         }
@@ -899,6 +965,27 @@ class DB_ldap extends DB_common
         $this->popErrorHandling();
         return $data;
     }
+
+    // {{{ ldapRaiseError()
+
+    function ldapRaiseError($errno = null)
+    {
+        if ($errno === null) {
+            $errno = $this->errorCode(ldap_errno($this->connection));
+        }
+        if ($this->q_action !== null) {
+            return $this->raiseError($errno, null, null,
+                sprintf('%s base="%s" filter="%s"',
+                    $this->q_action, $this->q_base, $this->last_query
+                ),
+                $errno == DB_ERROR_UNKNOWN_LDAP_ACTION ? null : @ldap_error($this->connection));
+        } else {
+            return $this->raiseError($errno, null, null, "???",
+                @ldap_error($this->connection));
+        }
+    }
+
+    // }}}
 
 }
 

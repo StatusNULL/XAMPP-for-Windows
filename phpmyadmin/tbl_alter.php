@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_alter.php,v 2.3 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: tbl_alter.php,v 2.8 2004/05/20 16:14:08 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -52,8 +52,8 @@ if (isset($submit)) {
         }
         if ($field_attribute[$i] != '') {
             $query .= ' ' . $field_attribute[$i];
-        } else if (PMA_MYSQL_INT_VERSION >= 40100 && $field_charset[$i] != '') {
-            $query .= ' CHARACTER SET ' . $field_charset[$i];
+        } else if (PMA_MYSQL_INT_VERSION >= 40100 && $field_collation[$i] != '') {
+            $query .= PMA_generateCharsetQueryPart($field_collation[$i]);
         }
         if ($field_default[$i] != '') {
             if (strtoupper($field_default[$i]) == 'NULL') {
@@ -72,14 +72,13 @@ if (isset($submit)) {
 
     // To allow replication, we first select the db to use and then run queries
     // on this db.
-    $sql_query     = 'USE ' . PMA_backquote($db);
-    $result        = PMA_mysql_query($sql_query) or PMA_mysqlDie('', '', '', $err_url);
+     PMA_DBI_select_db($db) or PMA_mysqlDie(PMA_DBI_getError(), 'USE ' . PMA_backquote($db) . ';', '', $err_url);
     // Optimization fix - 2 May 2001 - Robbat2
     $sql_query = 'ALTER TABLE ' . PMA_backquote($table) . ' CHANGE ' . $query;
-    $error_create = false;
-    $result    = PMA_mysql_query($sql_query) or $error_create = true;
+    $error_create = FALSE;
+    $result    = PMA_DBI_try_query($sql_query) or $error_create = TRUE;
 
-    if ($error_create == false) {
+    if ($error_create == FALSE) {
         $message   = $strTable . ' ' . htmlspecialchars($table) . ' ' . $strHasBeenAltered;
         $btnDrop   = 'Fake';
 
@@ -91,14 +90,14 @@ if (isset($submit)) {
 
         // garvin: Update comment table, if a comment was set.
         if (isset($field_comments) && is_array($field_comments) && $cfgRelation['commwork']) {
-            foreach($field_comments AS $fieldindex => $fieldcomment) {
+            foreach ($field_comments AS $fieldindex => $fieldcomment) {
                 PMA_setComment($db, $table, $field_name[$fieldindex], $fieldcomment, $field_orig[$fieldindex]);
             }
         }
 
         // garvin: Rename relations&display fields, if altered.
         if (($cfgRelation['displaywork'] || $cfgRelation['relwork']) && isset($field_orig) && is_array($field_orig)) {
-            foreach($field_orig AS $fieldindex => $fieldcontent) {
+            foreach ($field_orig AS $fieldindex => $fieldcontent) {
                 if ($field_name[$fieldindex] != $fieldcontent) {
                     if ($cfgRelation['displaywork']) {
                         $table_query = 'UPDATE ' . PMA_backquote($cfgRelation['table_info'])
@@ -136,7 +135,7 @@ if (isset($submit)) {
 
         // garvin: Update comment table for mime types [MIME]
         if (isset($field_mimetype) && is_array($field_mimetype) && $cfgRelation['commwork'] && $cfgRelation['mimework'] && $cfg['BrowseMIME']) {
-            foreach($field_mimetype AS $fieldindex => $mimetype) {
+            foreach ($field_mimetype AS $fieldindex => $mimetype) {
                 PMA_setMIME($db, $table, $field_name[$fieldindex], $mimetype, $field_transformation[$fieldindex], $field_transformation_options[$fieldindex]);
             }
         }
@@ -175,10 +174,9 @@ if ($abort == FALSE) {
         } else {
             $field = PMA_sqlAddslashes($selected[$i], TRUE);
         }
-        $local_query   = 'SHOW FIELDS FROM ' . PMA_backquote($table) . ' FROM ' . PMA_backquote($db) . " LIKE '$field'";
-        $result        = PMA_mysql_query($local_query) or PMA_mysqlDie('', $local_query, '', $err_url);
-        $fields_meta[] = PMA_mysql_fetch_array($result);
-        mysql_free_result($result);
+        $result        = PMA_DBI_query('SHOW FULL FIELDS FROM ' . PMA_backquote($table) . ' FROM ' . PMA_backquote($db) . ' LIKE \'' . $field . '\';');
+        $fields_meta[] = PMA_DBI_fetch_assoc($result);
+        PMA_DBI_free_result($result);
     }
 
     $num_fields  = count($fields_meta);

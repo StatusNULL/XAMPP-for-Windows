@@ -1,5 +1,5 @@
 <?php
-// $Id: pager_sliding_notExpanded_test.php,v 1.4 2003/11/17 20:08:08 quipo Exp $
+// $Id: pager_sliding_notExpanded_test.php,v 1.2 2004/04/29 20:18:10 quipo Exp $
 
 require_once 'simple_include.php';
 require_once 'pager_include.php';

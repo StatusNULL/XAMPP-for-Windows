@@ -16,7 +16,7 @@
 // | Authors: Alexander Wirtz <alex@pc4p.net>                             |
 // +----------------------------------------------------------------------+
 //
-// $Id: globalweather-basic.php,v 1.3 2003/12/31 23:31:22 eru Exp $
+// $Id: globalweather-basic.php,v 1.4 2004/05/07 14:41:36 eru Exp $
 
 require_once "Services/Weather.php";
 
@@ -28,9 +28,9 @@ if (Services_Weather::isError($globalweather)) {
 }
 
 /* Erase comments to enable caching
-$globalweather->setCache("file", array("cache_dir" => "/tmp/cache/"));
-if (Services_Weather::isError($globalweather)) {
-    echo "Error: ".$globalweather->getMessage()."\n";
+$status = $globalweather->setCache("file", array("cache_dir" => "/tmp/cache/"));
+if (Services_Weather::isError($status)) {
+    echo "Error: ".$status->getMessage()."\n";
 }
 */
 

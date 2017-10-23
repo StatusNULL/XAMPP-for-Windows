@@ -6,7 +6,7 @@
    Transformations  -  FAQ  -  Developers  -  Credits  -  Translators
    ______________________________________________________________________
 
-                      phpMyAdmin 2.5.7-pl1 Documentation
+                      phpMyAdmin 2.6.0-pl1 Documentation
 
      * SourceForge phpMyAdmin project page   [ http://www.phpmyadmin.net/
        ] 
@@ -14,12 +14,12 @@
           + Version history: ChangeLog
           + General notes: README
           + License: LICENSE
-     * Documentation   version:   $Id:   Documentation.html,v   2.14.2.10
-       2004/06/30 17:57:23 lem9 Exp $
+     * Documentation    version:   $Id:   Documentation.html,v   2.86.2.1
+       2004/09/28 19:58:45 lem9 Exp $
 
 Requirements
 
-     * php 4.1.0 or later
+     * php 4.1.0 or later (*)
        If  you  want  to  display  inline  thumbnails  of  JPEGs with the
        original aspect ratio, you also need GD2 support in PHP.
      * MySQL 3.23.32 or newer (details);
@@ -53,6 +53,7 @@ Introduction
        functions,  like displaying BLOB-data as image or download-link or
        ...
      * support InnoDB tables and foreign keys (see FAQ 3.6)
+     * support mysqli, the improved MySQL extension (see FAQ 1.17)
      * communicate in 47 different languages
 
    (*)   phpMyAdmin  can compress (Zip, GZip -RFC 1952- or Bzip2 formats)
@@ -72,47 +73,69 @@ Installation
    scripts before uploading them to your server, as PHP seems not to like
    Mac-style end of lines character ("\r").
 
-   Quick Install:
+  Quick Install
+
     1. Untar   or   unzip   the   distribution  (be  sure  to  unzip  the
        subdirectories):   tar   -xzvf   phpMyAdmin_x.x.x.tar.gz  in  your
        webserver's document root. If you don't have direct access to your
        document root, put the files in a directory on your local machine,
        and,  after  step  3,  transfer  the  directory on your web server
        using, for example, ftp.
-    2. Open  the  file  config.inc.php in your favorite editor and change
+    2. Ensure  that all the scripts have the appropriate owner (if PHP is
+       running  in safe mode, having some scripts with an owner different
+       from  the  owner  of other scripts will be a problem). See FAQ 4.2
+       for suggestions.
+    3. Open  the  file  config.inc.php in your favorite editor and change
        the values for host, user, password and authentication mode to fit
        your environment. Here, "host" means the MySQL server. Also insert
        the  correct  value  for  $cfg['PmaAbsoluteUri'].  Have  a look at
        Configuration section for an explanation of all values.
-    3. It  is  recommended  that  you  protect the directory in which you
+    4. It  is  recommended  that  you  protect the directory in which you
        installed  phpMyAdmin  (unless  it's  on a closed intranet, or you
        wish  to  use  HTTP  or  cookie  authentication), for example with
        HTTP-AUTH (in a .htaccess file). See the multi-user sub-section of
        the FAQ for additional information, especially FAQ 4.4.
-    4. Open  the file <www.your-host.com>/<your-install-dir>/index.php in
+    5. Open  the file <www.your-host.com>/<your-install-dir>/index.php in
        your  browser.  phpMyAdmin should now display a welcome screen and
        your  databases,  or  a  login  dialog  if  using  HTTP  or cookie
        authentication mode.
-    5. For a whole set of new features (bookmarks, comments, SQL-history,
-       PDF-generation,  field  contents transformation, etc.) you need to
-       create  a  set  of  tables  in  your database. Please look at your
-       scripts/   directory,   where   you  should  find  a  file  called
-       create_tables.sql. (If you are using a Windows server, pay special
-       attention  to  FAQ  1.23).  You can already use your phpMyAdmin to
-       create  the  tables  for you. Please be aware that you may have to
-       have special (administrator) privileges to create the database and
-       tables.  After  having  imported  the  create_tables.sql file, you
-       should  specify  the  table names in your config.inc.php file. The
-       directives  used  for  that  can  be  found  in  the Configuration
-       section.
 
-   Upgrading from an older version:
-     * Please  do not copy your older config.inc.php over the new one: it
-       may  offer  new  configuration  variables, and the new version may
-       depend  on  these  for normal behavior. It is suggested instead to
-       insert your site values in the new one.
+  Linked-tables infrastructure
 
-   Using authentication modes:
+   For  a  whole  set  of new features (bookmarks, comments, SQL-history,
+   PDF-generation,  field  contents  transformation,  etc.)  you  need to
+   create  a  set  of special tables. Those tables can be located in your
+   own  database,  or in a central database for a multi-user installation
+   (this  database would then be accessed by the controluser, so no other
+   user should have rights to it).
+   Please  look  at your scripts/ directory, where you should find a file
+   called  create_tables.sql.  (If  you  are  using a Windows server, pay
+   special attention to FAQ 1.23).
+   If  your  MySQL  server's  version  is  4.1.2  or  later,  please  use
+   create_tables_mysql_4_1_2+.sql instead, for a new installation.
+   If  you already had this infrastructure and upgraded to MySQL 4.1.2 or
+   later, please use upgrade_tables_mysql_4_1_2+.sql.
+   You  can  use  your phpMyAdmin to create the tables for you. Please be
+   aware  that  you may need special (administrator) privileges to create
+   the  database  and  tables,  and that the script may need some tuning,
+   depending on the database name.
+   After  having  imported the create_tables.sql file, you should specify
+   the  table  names in your config.inc.php file. The directives used for
+   that  can be found in the Configuration section. You will also need to
+   have a controluser with the proper rights to those tables (see section
+   Using authentication modes below).
+
+  Upgrading from an older version
+
+     * You  can  safely copy your older config.inc.php over a new one, if
+       you  can live with default values for possible new parameters (you
+       can check release notes to see what new features were added). This
+       compatibility  will  stay  for long time, current version supports
+       importing  config  files from 2.2 and maybe even older (nobody has
+       tried that).
+
+  Using authentication modes
+
      * HTTP   and  cookie  authentication  modes  are  recommended  in  a
        multi-user  environment  where  you  want  to give users access to
        their own database and don't want them to play around with others.
@@ -132,8 +155,9 @@ Installation
        blowfish algorithm, in a temporary cookie.
      * For 'HTTP' and 'cookie' modes, phpMyAdmin needs a controluser that
        has  only  the  SELECT  privilege  on  the mysql.user (all columns
-       except  "Password"),  mysql.db  (all  columns) & mysql.tables_priv
-       (all columns except "Grantor" & "Timestamp") tables.
+       except   "Password"),  mysql.db  (all  columns),  mysql.host  (all
+       columns)  and  mysql.tables_priv  (all  columns except "Grantor" &
+       "Timestamp") tables.
        You   must   specify  the  details  for  the  controluser  in  the
        config.inc.php  file under the $cfg['Servers'][$i]['controluser']&
        $cfg['Servers'][$i]['controlpass'] settings.
@@ -188,7 +212,8 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON <pma_db>.* TO 'pma'@'localhost';
        With  HTTP  or  cookie authentication mode, you don't need to fill
        the user/password fields inside the $cfg['Servers'] array.
 
-   'http' authentication mode:
+    'http' authentication mode
+
      * Was called 'advanced' in versions before 2.2.3.
      * Introduced  in 1.3.0, it uses Basic HTTP authentication method and
        allows you to login as any valid MySQL user.
@@ -197,7 +222,8 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON <pma_db>.* TO 'pma'@'localhost';
      * See  also  FAQ  4.4  about not using the .htaccess mechanism along
        with 'http' authentication mode.
 
-   'cookie' authentication mode:
+    'cookie' authentication mode
+
      * You   can   use   this  method  as  a  replacement  for  the  HTTP
        authentication (for example, if you're running IIS).
      * Obviously, the user must enable cookies in the browser.
@@ -206,7 +232,8 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON <pma_db>.* TO 'pma'@'localhost';
      * If    you    want    to    login    to    arbitrary   server   see
        $cfg['AllowArbitraryServer'] directive.
 
-   'config' authentication mode:
+    'config' authentication mode
+
      * This  mode  is the less secure one because it requires you to fill
        the $cfg['Servers'][$i]['user'] and
        $cfg['Servers'][$i]['password'] fields.
@@ -226,7 +253,11 @@ Configuration
    the  *nix  end  of  line  character  ("\n") in your text editor before
    registering a script you have modified.
 
-   All configurable data is placed in config.inc.php.
+   Configuration   note:  Almost  all  configurable  data  is  placed  in
+   config.inc.php.  The  parameters  which relate to design (like colors)
+   are  placed in themes/themename/layout.inc.php. You might also want to
+   modify  config.footer.inc.php  and  config.header.inc.php files to add
+   your site specific code to be included on start and end of each page.
 
    $cfg['PmaAbsoluteUri'] string
           Sets  here the complete URL (with full path) to your phpMyAdmin
@@ -240,25 +271,6 @@ Configuration
           Starting  with  version  2.3.0,  you  can  try  to  leave  this
           parameter  empty,  because the program tries to auto-detect its
           proper value. Additional details are in the configuration file.
-          Alternatively,  this  setting can be dynamically completed. For
-          example, you can try to use such a kind of code:
-
-$cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
-                       . $_SERVER['HTTP_HOST']
-                       . (!empty($_SERVER['SERVER_PORT']) ? ':' . $_SERVER['SERVER_PORT'] : '')
-                       . substr($_SERVER['PHP_SELF'], 0, strrpos($_SERVER['PHP_SELF'], '/')+1);
-
-    or
-
-$cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
-                       . $_SERVER['SERVER_NAME']
-                       . (!empty($_SERVER['SERVER_PORT']) ? ':' . $_SERVER['SERVER_PORT'] : '')
-                       . substr($_SERVER['SCRIPT_NAME'], 0, strrpos($_SERVER['SCRIPT_NAME'], '/')+1);
-
-
-          Please   note   that   the  $_SERVER  array  doesn't  exist  in
-          PHP < 4.1.0.  Try  to  replace $_SERVER by $HTTP_SERVER_VARS or
-          $GLOBALS in this case.
 
    $cfg['PmaAbsoluteUri_DisableWarning'] boolean
           By  default,  when  you leave $cfg['PmaAbsoluteUri'] empty, and
@@ -318,6 +330,16 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
           are not supported on some platforms.
           To  use  the socket mode, your MySQL server must be on the same
           machine as the Web server.
+
+   $cfg['Servers'][$i]['extension'] string
+          What  php  MySQL  extension  to  use  for the connection. Valid
+          options are:
+          mysql :   The  classic MySQL extension. This is the recommended
+          and default method at this time.
+          mysqli :   The  improved MySQL extension. This extension became
+          available  with php 5.0.0 and is the recommended way to connect
+          to a server running MySQL 4.1.x.
+          Note: phpMyAdmin's MySQL 4.1 support is experimental!
 
    $cfg['Servers'][$i]['compress'] boolean
           Whether  to  use  a  compressed  protocol  for the MySQL server
@@ -402,47 +424,24 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
           example.
 
    $cfg['Servers'][$i]['pmadb'] string
-          Starting with version 2.3.0 phpMyAdmin offers a lot of features
-          to work with master / foreign - tables. To use those as well as
-          the  bookmark feature you need special tables with a predefined
-          structure, which we explain below.
-          See  the Quick Install section in this document for a quick way
-          of  creating  those  tables.  Also,  if you are using a Windows
-          server, read FAQ 1.23.
+          The   name   of   the  database  containing  the  linked-tables
+          infrastructure.
+          See  the  Linked-tables infrastructure section in this document
+          to see the benefits of this infrastructure, and for a quick way
+          of creating this database and the needed tables.
           If  you  are the only user of this phpMyAdmin installation, you
           can use your current database to store those special tables; in
           this   case,   just   put   your   current   database  name  in
-          $cfg['Servers'][$i]['pmadb'].
-          If you are setting up a multi-user phpMyAdmin installation, you
-          will   need   to  create  a  new  database  and  setup  special
-          privileges, so, as superuser:
-
-          + create a new database for phpMyAdmin:
-              CREATE DATABASE phpmyadmin;
-            Note  that "controluser" must have SELECT, INSERT, UPDATE and
-            DELETE privileges on this database. Here is a query to set up
-            those  privileges  (using  "phpmyadmin" as the database name,
-            and "pma" as the controluser):
-              GRANT   SELECT,INSERT,UPDATE,DELETE   ON   phpmyadmin.*  to
-            'pma'@'localhost';
-            do not give any other user rights on this database.
-          + enter the database name in $cfg['Servers'][$i]['pmadb']
+          $cfg['Servers'][$i]['pmadb'].  For  a  multi-user installation,
+          set  this  parameter  to  the  name  of  your  central database
+          containing the linked-tables infrastructure.
 
    $cfg['Servers'][$i]['bookmarktable'] string
           Since release 2.2.0 phpMyAdmin allows to bookmark queries. This
           can be useful for queries you often run.
-          To allow the usage of this functionality you have to:
+          To allow the usage of this functionality:
 
-          + set up "pmadb" as described above
-          + within this database create a table following this scheme:
-                 CREATE TABLE `pma_bookmark` (
-                   id int(11) DEFAULT '0' NOT NULL auto_increment,
-                   dbase varchar(255) NOT NULL,
-                   user varchar(255) NOT NULL,
-                   label varchar(255) NOT NULL,
-                   query text NOT NULL,
-                   PRIMARY KEY (id)
-                 ) TYPE=MyISAM COMMENT='Bookmarks';
+          + set up pmadb and the linked-tables infrastructure
           + enter the table name in $cfg['Servers'][$i]['bookmarktable']
 
    $cfg['Servers'][$i]['relation'] string
@@ -467,21 +466,9 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
             the table_coords table).
 
           The keys can be numeric or character.
-          To allow the usage of this functionality the superuser has to:
+          To allow the usage of this functionality:
 
-          + set up "pmadb" as described above
-          + within this database create a table following this scheme:
-                 CREATE TABLE `pma_relation` (
-                   `master_db` varchar(64) NOT NULL default '',
-                   `master_table` varchar(64) NOT NULL default '',
-                   `master_field` varchar(64) NOT NULL default '',
-                   `foreign_db` varchar(64) NOT NULL default '',
-                   `foreign_table` varchar(64) NOT NULL default '',
-                   `foreign_field` varchar(64) NOT NULL default '',
-                   PRIMARY      KEY     (`master_db`,     `master_table`,
-            `master_field`),
-                   KEY foreign_field (foreign_db, foreign_table)
-                 ) TYPE=MyISAM COMMENT='Relation table';
+          + set up pmadb and the linked-tables infrastructure
           + put the relation table name in
             $cfg['Servers'][$i]['relation']
           + now  as  normal user open phpMyAdmin and for each one of your
@@ -497,18 +484,9 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
           table, which field is to be displayed as a tool-tip when moving
           the cursor over the corresponding key.
           This  configuration variable will hold the name of this special
-          table.  To  allow the usage of this functionality the superuser
-          has to:
+          table. To allow the usage of this functionality:
 
-          + set up "pmadb" as described above
-          + within this database create a table following this scheme:
-                 CREATE TABLE `pma_table_info` (
-                   `db_name` varchar(64) NOT NULL default '',
-                   `table_name` varchar(64) NOT NULL default '',
-                   `display_field` varchar(64) NOT NULL default '',
-                   PRIMARY KEY (`db_name`, `table_name`)
-                 )    TYPE=MyISAM    COMMENT='Table    information    for
-            phpMyAdmin';
+          + set up pmadb and the linked-tables infrastructure
           + put the table name in $cfg['Servers'][$i]['table_info']
           + then for each table where you want to use this feature, click
             "Structure/Relation  view/Choose  field to display" to choose
@@ -523,34 +501,13 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
           two tables "pdf_pages" (storing information about the available
           PDF  pages)  and "table_coords" (storing coordinates where each
           table will be placed on a PDF schema output).
-          You  must  be  using the "relation" feature and have a table of
-          PDF  pages (see $cfg['Servers'][$i]['pdf_pages']) to create PDF
-          output.
-          To allow the usage of this functionality the superuser has to:
+          You must be using the "relation" feature.
+          To allow the usage of this functionality:
 
-          + set up "pmadb" as described above
-          + within this database create a table following this scheme:
-                 CREATE TABLE `pma_table_coords` (
-                   `db_name` varchar(64) NOT NULL default '',
-                   `table_name` varchar(64) NOT NULL default '',
-                   `pdf_page_number` int NOT NULL default '0',
-                   `x` float unsigned NOT NULL default '0',
-                   `y` float unsigned NOT NULL default '0',
-                   PRIMARY       KEY       (`db_name`,      `table_name`,
-            `pdf_page_number`)
-                 )  TYPE=MyISAM COMMENT='Table coordinates for phpMyAdmin
-            PDF output';
-          + also within this database create:
-                 CREATE TABLE `pma_pdf_pages` (
-                   `db_name` varchar(64) NOT NULL default '',
-                   `page_nr` int(10) unsigned NOT NULL auto_increment,
-                   `page_descr` varchar(50) NOT NULL default '',
-                   PRIMARY KEY (page_nr),
-                   KEY (db_name)
-                 ) TYPE=MyISAM COMMENT='PDF Relationpages for PMA';
-          + put the first table name in
-            $cfg['Servers'][$i]['table_coords'] and the second table name
-            in $cfg['Servers'][$i]['pdf_pages']
+          + set up pmadb and the linked-tables infrastructure
+          + put the correct table names in
+            $cfg['Servers'][$i]['table_coords'] and
+            $cfg['Servers'][$i]['pdf_pages']
 
           Usage tips: PDF output.
 
@@ -564,31 +521,17 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
           within  the  header  of  table in browse view. They can also be
           shown  in  a  table dump. Please see the relevant configuration
           directives later on.
-          Also new in release 2.5.0 is a mime-transformation system which
+          Also new in release 2.5.0 is a MIME-transformation system which
           is   also   based   on   the  following  table  structure.  See
           Transformations   for   further   information.   To   use   the
-          mime-transformation  system, your column_info table has to have
+          MIME-transformation  system, your column_info table has to have
           the    three    new    fields   'mimetype',   'transformation',
           'transformation_options'.
-          To allow the usage of this functionality the superuser has to:
+          To allow the usage of this functionality:
 
-          + set up "pmadb" as described above
-          + within this database create a table following this scheme:
-                 CREATE TABLE `pma_column_info` (
-                   id int(5) unsigned NOT NULL auto_increment,
-                   db_name varchar(64) NOT NULL default '',
-                   table_name varchar(64) NOT NULL default '',
-                   column_name varchar(64) NOT NULL default '',
-                   `comment` varchar(255) NOT NULL default '',
-                   mimetype varchar(255) NOT NULL default '',
-                   transformation varchar(255) NOT NULL default '',
-                   transformation_options  varchar(255)  NOT NULL default
-            '',
-                   PRIMARY KEY (id),
-                   UNIQUE KEY db_name (db_name, table_name, column_name)
-                 ) TYPE=MyISAM COMMENT='Comments for Columns';
+          + set up pmadb and the linked-tables infrastructure
           + put the table name in $cfg['Servers'][$i]['column_info']
-          + To update your PRE-2.5.0 Column_comments Table use this:
+          + to update your PRE-2.5.0 Column_comments Table use this:
                  ALTER TABLE `pma_column_comments`
                    ADD `mimetype` VARCHAR( 255 ) NOT NULL ,
                    ADD `transformation` VARCHAR( 255 ) NOT NULL ,
@@ -609,20 +552,9 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
           list gets cut to the maximum amount.
           The   query   history   is   only  available  if  you  use  the
           JavaScript-based query window, see $cfg['QueryFrame'].
-          To allow the usage of this functionality the superuser has to:
+          To allow the usage of this functionality:
 
-          + set up "pmadb" as described above
-          + within this database create a table following this scheme:
-                 CREATE TABLE `pma_history` (
-                   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-                   `username` VARCHAR( 64 ) NOT NULL ,
-                   `db` VARCHAR( 64 ) NOT NULL ,
-                   `table` VARCHAR( 64 ) NOT NULL ,
-                   `timevalue` TIMESTAMP NOT NULL ,
-                   `sqlquery` TEXT NOT NULL ,
-                   PRIMARY KEY ( `id` ) ,
-                   INDEX ( `username` , `db` , `table` , `timevalue` )
-                   ) TYPE=MyISAM COMMENT='SQL history';
+          + set up pmadb and the linked-tables infrastructure
           + put the table name in $cfg['Servers'][$i]['history']
 
    $cfg['Servers'][$i]['verbose_check'] string
@@ -778,9 +710,25 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
           will  see the name 'MyName' used consequently in the left frame
           and the tool-tip shows the real name of the DB.
 
-   $cfg['ShowTooltipAliasTB'] boolean
+   $cfg['ShowTooltipAliasTB'] boolean/string
           Same as $cfg['ShowTooltipAliasDB'], except this works for table
-          names.
+          names.  When  setting  this  to  'nested',  the  Alias  of  the
+          Tablename  is  only  used to split/nest the tables according to
+          the  $cfg['LeftFrameTableSeparator']  directive.  So  only  the
+          folder is called like the Alias, the tablename itself stays the
+          real tablename.
+
+   $cfg['LeftDisplayLogo'] boolean
+          Defines  whether  to  display the phpMyAdmin logo at the top of
+          the left frame or not. Defaults to TRUE.
+
+   $cfg['LeftDisplayServers'] boolean
+          Defines  whether  to  display a server choice at the top of the
+          left frame or not. Defaults to FALSE.
+
+   $cfg['DisplayServersList'] boolean
+          Defines  whether to display this server choice as links instead
+          of in a drop-down. Defaults to FALSE (drop-down).
 
    $cfg['ShowStats'] boolean
           Defines  whether  to  display  space usage and statistics about
@@ -981,31 +929,40 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
           Default is auto.
 
    $cfg['LeftWidth'] integer
-          Left frame width in pixel.
+          Left frame width in pixel. See themes/themename/layout.inc.php.
 
    $cfg['LeftBgColor'] string [HTML color]
           $cfg['RightBgColor'] string [HTML color]
-          The background colors (HTML) used for both the frames.
+          The  background  colors  (HTML)  used  for both the frames. See
+          themes/themename/layout.inc.php.
 
    $cfg['RightBgImage'] string
           The  URI  of  the background image used for the right frame. It
-          must be an absolute URI.
+          must be an absolute URI. See themes/themename/layout.inc.php.
 
    $cfg['LeftPointerColor'] string [HTML color]
           The  color  (HTML) used for the pointer in the left frame (does
-          not work with Netscape 4).
+          not work with Netscape 4). See themes/themename/layout.inc.php.
+
+   $cfg['LeftPointerEnable'] boolean
+          A value of TRUE activates the left pointer (when LeftFrameLight
+          is FALSE).
 
    $cfg['Border'] integer
-          The size of a table's border.
+          The size of a table's border. See
+          themes/themename/layout.inc.php.
 
    $cfg['ThBgcolor'] string [HTML color]
-          The color (HTML) used for table headers.
+          The    color    (HTML)    used    for    table   headers.   See
+          themes/themename/layout.inc.php.
 
    $cfg['BgcolorOne'] string [HTML color]
-          The color (HTML) #1 for table rows.
+          The color (HTML) #1 for table rows. See
+          themes/themename/layout.inc.php.
 
    $cfg['BgcolorTwo'] string [HTML color]
-          The color (HTML) #2 for table rows.
+          The color (HTML) #2 for table rows. See
+          themes/themename/layout.inc.php.
 
    $cfg['BrowsePointerColor'] string [HTML color]
           $cfg['BrowseMarkerColor'] string [HTML color]
@@ -1014,8 +971,13 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
           The  former feature highlights the row over which your mouse is
           passing  and  the  latter lets you visually mark/unmark rows by
           clicking on them.
-          You  can  disable  both  of  these  features  by  emptying  the
-          respective directive.
+          See themes/themename/layout.inc.php.
+
+   $cfg['BrowsePointerEnable'] boolean
+          Whether to activate the browse pointer or not.
+
+   $cfg['BrowseMarkerEnable'] boolean
+          Whether to activate the browse marker or not.
 
    $cfg['TextareaCols'] integer
           $cfg['TextareaRows'] integer
@@ -1110,6 +1072,10 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
           must  be  owned by the same user as the owner of the phpMyAdmin
           scripts.
 
+   $cfg['TempDir'] string
+          The name of the directory, where temporary files can be stored.
+          This is needed for native MS Excel export, see FAQ 6.23
+
    $cfg['Export'] array
           In  this array are defined default parameters for export, names
           of  items  are similar to texts seen on export page, so you can
@@ -1120,21 +1086,23 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
 
    $cfg['QueryFrame'] boolean
           $cfg['QueryFrameJS'] boolean
-          $cfg['QueryFrameDebug'] boolean
           $cfg['QueryWindowWidth'] integer
           $cfg['QueryWindowHeight'] integer
           $cfg['QueryHistoryDB'] boolean
           $cfg['QueryWindowDefTab'] string
           $cfg['QueryHistoryMax'] integer
-          All  those  variables  affect  the new query frame/window. When
-          $cfg['QueryFrame']  is  set  to true a new frame is embedded on
-          the left with a small area. Clicking on that results in opening
-          a direct interface to enter SQL queries.
+          All   those  variables  affect  the  query  box  feature.  When
+          $cfg['QueryFrame']  is set to true, a link or icon is displayed
+          on the left panel. Clicking on it opens the query box, a direct
+          interface to enter SQL queries.
           When $cfg['QueryFrameJS'] is set to true, clicking on that link
-          opens a new custom sized browser window
+          opens  the  query  box,  a  new  custom  sized  browser  window
           ($cfg['QueryWindowWidth'],   $cfg['QueryWindowWidth']   -  both
-          integers  for the size in pixels). If set to false, clicking on
-          the link only opens the SQL input in the mainframe.
+          integers  for the size in pixels). Also, a click on [Edit] from
+          the  results  page  (in  the  "Showing Rows" section) opens the
+          query  box  and  puts  the  current  query inside it. If set to
+          false,  clicking  on  the  link only opens the SQL input in the
+          main frame.
           The  usage of the JavaScript query window is recommended if you
           have  a JavaScript enabled browser. Basic functions are used to
           exchange quite a few variables, so most 4th generation browsers
@@ -1165,8 +1133,6 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
           specify  the  default  tab  to  be  used when opening the query
           window.  It  can  be set to either 'sql', 'files', 'history' or
           'full'.
-          The  variable $cfg['QueryFrameDebug'] can be used by developers
-          for easier future feature integration.
 
    $cfg['BrowseMIME'] boolean
           Enable MIME-transformations.
@@ -1204,11 +1170,44 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
           functionality  was kindly borrowed from www.youngpup.net and is
           underlying so specific license.
 
+   $cfg['NaturalOrder'] boolean
+          Sorts  database and table names according to natural order (for
+          example,  t1, t2, t10). Currently implemented in the left panel
+          (Light mode) and in Database view, for the table list.
+
+   $cfg['ShowHttpHostTitle'] boolean
+          Shows the HTTP host name in window's title bar.
+
+   $cfg['SetHttpHostTitle'] string
+          If  $cfg['ShowHttpHostTitle']  is  TRUE, it shows the real HTTP
+          host name, unless an alternate name is set here.
+
+   $cfg['ErrorIconic'] boolean
+          Uses icons for warnings, errors and informations.
+
+   $cfg['MainPageIconic'] boolean
+          Uses  icons  on main page in lists, on right panel top menu and
+          menu tabs.
+
+   $cfg['ReplaceHelpImg'] boolean
+          Shows a help button instead of the "Documentation" message.
+
+   $cfg['ThemePath'] string
+          If  theme  manager  is  active,  use  this  as  the path of the
+          subdirectory containing all the themes.
+
+   $cfg['ThemeManager'] boolean
+          Enables user-selectable themes. See FAQ 2.7.
+
+   $cfg['ThemeDefault'] string
+          The default theme (a subdirectory under cfg['ThemePath']).
+
    $cfg['DefaultQueryTable'] string
    $cfg['DefaultQueryDatabase'] string
-          Default  query that will be displayed in query boxes, when user
-          didn't  specify  any. Use %d for database name and %t for table
-          name.
+          Default queries that will be displayed in query boxes when user
+          didn't specify any. Use %d for database name, %t for table name
+          and  %f for a comma separated list of field names. Note that %t
+          and %f are only applicable to $cfg['DefaultQueryTable'].
 
    $cfg['SQP']['fmtType'] string [html|none]
           The  main  use  of  the  new  SQL Parser is to pretty-print SQL
@@ -1325,6 +1324,22 @@ $cfg['PmaAbsoluteUri'] = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://'
           $cfg['RestrictColumnTypes']  and  for first_timestamp, which is
           used for first timestamp column in table.
 
+   $cfg['NumOperators'] array
+          Operators  available  for search operations on numeric and date
+          fields.
+
+   $cfg['TextOperators'] array
+          Operators  available for search operations on character fields.
+          Note  that  we  put  LIKE  by default instead of LIKE %...%, to
+          avoid unintended performance problems in case of huge tables.
+
+   $cfg['EnumOperators'] array
+          Operators available for search operations on enum fields.
+
+   $cfg['NullOperators'] array
+          Additionnal  operators available for search operations when the
+          field can be null.
+
 Transformations
 
    Introduction  -  Usage  -  File structure
@@ -1365,7 +1380,7 @@ Transformations
      * The field 'MIME-type' is a dropdown field. You have the options to
        leave  that  field empty or to use 'auto' [this feature is not yet
        available].  Please note that transformations are inactive as long
-       as no mime-type is selected.
+       as no MIME-type is selected.
      * The  field  'Browser transformation' is a drop-down field. You can
        choose   from   a   hopefully   growing   amount   of  pre-defined
        transformations.  See  below  for information on how to build your
@@ -1668,24 +1683,23 @@ FAQ - Frequently Asked Questions
 
     [1.17] Which MySQL versions does phpMyAdmin support?
 
-   All  MySQL  versions from 3.23.32 till 4.0 are fully supported. Please
-   note  that  the  older your MySQL version is, the more limitations you
-   will have to face.
-   phpMyAdmin  provides  experimental support for MySQL 4.1 and 5.0. That
-   means that although you can assign character sets to a table or field,
-   phpMyAdmin  will  not recode the data when inserting or extracting it.
-   Instead,  it  will  still  use the character set you specified for the
-   MySQL onnection.
+   All  MySQL versions from 3.23.32 till 5.0 (except for 4.1.0 and 4.1.1)
+   are fully supported. Please note that the older your MySQL version is,
+   the more limitations you will have to face.
+   phpMyAdmin  may connect to your MySQL server using php's classic MySQL
+   extension  as  well  as  the improved MySQL extension (MySQLi) that is
+   available in php 5.0.
+   Either  way,  the  developers  of both extensions recommend to use the
+   classic extension for MySQL 4.0 and below and MySQLi for MySQL 4.1 and
+   newer.
    When  compiling  php, we strongly recommend that you manually link the
-   MySQL  extension  to a MySQL client library of at least the same minor
-   version  since  the one that is bundled with current php distributions
-   is rather old and might cause problems (see also FAQ 1.17a).
-   Also, we do not yet support the improved MySQL extension (mysqli) that
-   comes  with php 5. For the moment, the old MySQL extension should also
-   work fine here, if compiled correctly.
+   MySQL  extension  of your choice to a MySQL client library of at least
+   the  same  minor  version  since the one that is bundled with some php
+   distributions  is  rather  old  and might cause problems (see also FAQ
+   1.17a).
    MySQL 5.1 is not yet supported.
 
-    [1.17a] I cannot connect to the MySQL server. It alawys returns the error
+    [1.17a] I cannot connect to the MySQL server. It alaways returns the error
     message, "Client does not support authentication protocol requested by
     server; consider upgrading MySQL client"
 
@@ -1768,7 +1782,7 @@ FAQ - Frequently Asked Questions
 
    This is a permission problem. Right-click on the phpmyadmin folder and
    choose  properties.  Under the tab Security, click on "Add" and select
-   the user "IUSER_machine" from the list. Now set his permissions and it
+   the  user "IUSR_machine" from the list. Now set his permissions and it
    should work.
 
     [1.27] I get empty page when I want to view huge page (eg.
@@ -1810,6 +1824,13 @@ FAQ - Frequently Asked Questions
 
    This  problem  is  known  to  happen  when the server is running Turck
    MMCache but upgrading MMCache to version 2.3.21 solves the problem.
+
+    [1.31] Does phpMyAdmin support php5?
+
+   Yes.
+   However,  phpMyAdmin needs to be backwards compatible to php4. This is
+   why  you  won't  be  able to run phpMyAdmin having enabled E_STRICT in
+   your error_reporting settings.
 
   [2. Configuration]
 
@@ -1875,7 +1896,7 @@ FAQ - Frequently Asked Questions
 
     [2.6] I get an "Access denied for user: 'root@localhost' (Using password:
     YES)"-error when trying to access a MySQL-Server on a host which is
-    port-forwarded for my localhost
+    port-forwarded for my localhost.
 
    When  you  are  using a port on your localhost, which you redirect via
    port-forwarding  to another host, MySQL is not resolving the localhost
@@ -1886,6 +1907,43 @@ FAQ - Frequently Asked Questions
    this configuration with port forwarding.
    If  you  enter  "127.0.0.1" as hostname, everything is right and MySQL
    uses the TCP connection.
+
+    [2.7] Using and creating themes
+
+   Themes are configured with $cfg['ThemePath'], $cfg['ThemeManager'] and
+   $cfg['ThemeDefault'].
+   Under   $cfg['ThemePath'],   you   should  not  delete  the  directory
+   "original"  or  its  underlying  structure, because this is the system
+   theme  used  by phpMyAdmin. "original" contains all images and styles,
+   for  backwards compatibility and for all themes that would not include
+   images or css-files.
+   If $cfg['ThemeManager'] is enabled, you can select your favorite theme
+   on the main page. Your selected theme will be stored in a cookie.
+
+   To create a theme:
+     * make  a  new  subdirectory  (for  example "your_theme_name") under
+       $cfg['ThemePath'] (by default themes)
+     * copy    the    files    and   directories   from   "original"   to
+       "your_theme_name"
+     * edit the css-files in "your_theme_name/css"
+     * put your new images in "your_theme_name/img"
+     * edit layout.inc.php in "your_theme_name"
+     * edit  info.inc.php  in  "your_theme_name"  to  contain your chosen
+       theme name, that will be visible in user interface
+     * make   a   new   screenshot  of  your  theme  and  save  it  under
+       "your_theme_name/screen.png"
+
+   In  theme  directory  there  is file info.inc.php which contains theme
+   verbose  name,  theme generation and theme version. These versions and
+   generations  are  enumerated  from  1  and  do  not  have  any  direct
+   dependance on phpMyAdmin version. Themes within same generation should
+   be bacward compatible - theme with version 2 should work in phpMyAdmin
+   requiring   version   1.   Themes   with   different   generation  are
+   incompatible.
+
+   If  you  do  not  want to use your own symbols and buttons, remove the
+   directory  "img" in "your_theme_name". phpMyAdmin will use the default
+   icons and buttons (from the system-theme "original").
 
   [3. Known limitations]
 
@@ -1944,6 +2002,7 @@ FAQ - Frequently Asked Questions
    having more than one index field in the foreign key.
    In  Query-by-example  (Query),  automatic generation of the query LEFT
    JOIN from the foreign table.
+   In PDF schema editing, automatic layout.
 
     [3.7] I have table with many (100+) fields and when I try to browse table I
     get series of errors like "Warning: unable to parse url". How can this be
@@ -2009,7 +2068,7 @@ FAQ - Frequently Asked Questions
    phpMyAdmin's HTTP authentication feature.
    Suggestions:
      * Your config.inc.php file should be chmod 660.
-     * All  your  phpMyAdmin  files  should  be chown phpmy.apache, where
+     * All  your  phpMyAdmin files should be chown -R phpmy.apache, where
        phpmy is a user whose password is only known to you, and apache is
        the group under which Apache runs.
      * You should use PHP safe mode, to protect from other users that try
@@ -2161,12 +2220,16 @@ FAQ - Frequently Asked Questions
    This  is a bug in Internet Explorer, other browsers do not behave this
    way.
 
-    [5.14] Using Opera6, I can manage to get to the authentification, but
-    nothing happens after that, only a blank screen.
+    [5.14] Using Opera6, I can manage to get to the authentication, but nothing
+    happens after that, only a blank screen.
 
    Having  $cfg['QueryFrameJS']  set  to  TRUE,  this  leads  to a bug in
    Opera6,  because  it  is  not  able to interpret frameset definitiions
    written by JavaScript. Please upgrade to Opera7 at least.
+
+    [5.15] I have display problems with Safari.
+
+   Please upgrade to at least version 1.2.3.
 
   [6. Using phpMyAdmin]
 
@@ -2363,11 +2426,15 @@ FAQ - Frequently Asked Questions
    with  XML,  PCRE  and  PEAR  support. On your system command line, run
    "pear install Net_Socket Net_URL HTTP_Request Mail_Mime Net_DIME SOAP"
    to get the necessary PEAR modules for usage.
-   If  you  use it, you should be aware that any SQL statement you submit
-   will  be  stored  anonymously  (database/table/column  names, strings,
-   numbers replaced with generic values). The Mimer SQL Validator itself,
-   is  ©  2001  Upright  Database  Technology. We utilize it as free SOAP
-   service.
+   On  a  more  recent  pear  version,  I  had problems with the state of
+   Net_DIME    being    beta,   so   this   single   command   "pear   -d
+   preferred_state=beta   install  -a  SOAP"  installed  all  the  needed
+   modules.
+   If  you  use the Validator, you should be aware that any SQL statement
+   you  submit  will  be stored anonymously (database/table/column names,
+   strings,   numbers  replaced  with  generic  values).  The  Mimer  SQL
+   Validator itself, is © 2001 Upright Database Technology. We utilize it
+   as free SOAP service.
 
     [6.15] I want to add a BLOB field and put an index on it, but MySQL says
     "BLOB column '...' used in key specification without a key length".
@@ -2454,8 +2521,8 @@ FAQ - Frequently Asked Questions
    Upgrading  to  MySQL  4  usually  gives users those global privileges:
    CREATE TEMPORARY TABLES, SHOW DATABASES, LOCK TABLES. Those privileges
    also  enables  users  to see all the database names, until you upgrade
-   the  grant  tables  as  described  in  the MySQL manual, section 2.5.8
-   ("Upgrading the Grant tables"). See this bug report.
+   the  grant  tables  as  described  in  the  MySQL manual. See this bug
+   report.
    So if your users do not need those privileges, you can remove them and
    their databases list will shorten.
 
@@ -2478,6 +2545,31 @@ FAQ - Frequently Asked Questions
 
    Yes.  If  a  bookmark  has  the same label as a table name, it will be
    executed.
+
+    [6.23] Export: I heard phpMyAdmin can export MS Excel files, how can I
+    enable that?
+
+   You can either export as CSV suitable for MS Excel, which works out of
+   the  box  or  you  can  try native experimental MS Excel exporter. For
+   enabling  this  you  need  to  set  $cfg['TempDir'] to place where web
+   server  user  can  write (for example './tmp') and install PEAR module
+   Spreadsheet_Excel_Writer  into  php include path. The installation can
+   be done by following command:
+    pear -d preferred_state=beta install -a Spreadsheet_Excel_Writer
+
+   First  part  of  switches  set we want to install beta version of that
+   module (no stable version available yet) and then we tell pear we want
+   to satisfy dependencies.
+
+   If  you  are running in PHP safe mode, you will have to set in php.ini
+   the safe_mode_include_dir to the directory where your PEAR modules are
+   located, for example:
+    safe_mode_include_dir = /usr/local/lib/php
+
+   To create the temporary directory on a UNIX-based system, you can do:
+    cd phpMyAdmin
+    mkdir tmp
+    chmod o+rwx tmp
 
   [7. phpMyAdmin project]
 
@@ -2588,8 +2680,8 @@ Developers Information
    information:
      * All       files       include       header.inc.php       (layout),
        libraries/common.lib.php (common functions) and config.inc.php.
-       All  configuration  data belongs in config.inc.php. Please keep it
-       free from other code.
+       Only  configuration  data should go in config.inc.php. Please keep
+       it free from other code.
        Commonly used functions should be added to
        libraries/common.lib.php  and  more  specific  ones  may  be added
        within a library stored into the libraries sub-directory.
@@ -2685,8 +2777,10 @@ CREDITS, in chronological order
     * bugfixes
 
 - Alexander M. Turek <me_at_derrabus.de>
+    * MySQL 4.0 / 4.1 / 5.0 compatibility
+    * abstract database interface (PMA_DBI) with MySQLi support
+    * privileges administration
     * XML exports
-    * MySQL 4 related features
     * various features and fixes
     * German language file updates
 
@@ -2735,10 +2829,18 @@ CREDITS, in chronological order
     * SQL validator server
 
 - Ivan R. Lanin <ivanlanin_at_users.sourceforge.net>
-    * phpMyAdmin logo
+    * phpMyAdmin logo (until June 2004)
 
 - Mike Cochrane <mike_at_graftonhall.co.nz>
     * blowfish library from the Horde project
+
+- Marcel Tschopp <ne0x_at_users.sourceforge.net>
+    * mysqli support
+    * many bugfixes and improvements
+
+- Michael Keck <mkkeck_at_users.sourceforge.net>
+    * redesign for 2.6.0
+    * phpMyAdmin sailboat logo (June 2004)
 
 And also to the following people who have contributed minor changes,
 enhancements, bugfixes or support for a new language since version 2.1.0:

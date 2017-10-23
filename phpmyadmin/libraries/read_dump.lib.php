@@ -1,5 +1,5 @@
 <?php
-/* $Id: read_dump.lib.php,v 2.2 2003/11/26 22:52:23 rabus Exp $ */
+/* $Id: read_dump.lib.php,v 2.9 2004/09/20 17:46:10 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -18,11 +18,14 @@
  */
 function PMA_splitSqlFile(&$ret, $sql, $release)
 {
-    $sql          = trim($sql);
+    // do not trim, see bug #1030644
+    //$sql          = trim($sql);
+    $sql          = rtrim($sql, "\n\r");
     $sql_len      = strlen($sql);
     $char         = '';
     $string_start = '';
     $in_string    = FALSE;
+    $nothing      = TRUE;
     $time0        = time();
 
     for ($i = 0; $i < $sql_len; ++$i) {
@@ -69,11 +72,22 @@ function PMA_splitSqlFile(&$ret, $sql, $release)
                 } // end if...elseif...else
             } // end for
         } // end if (in string)
+       
+        // lets skip comments (/*, -- and #)
+        else if (($char == '-' && $sql_len > $i + 2 && $sql[$i + 1] == '-' && $sql[$i + 2] <= ' ') || $char == '#' || ($char == '/' && $sql_len > $i + 1 && $sql[$i + 1] == '*')) {
+            $i = strpos($sql, $char == '/' ? '*/' : "\n", $i);
+            // didn't we hit end of string?
+            if ($i === FALSE) {
+                break;
+            }
+            if ($char == '/') $i++;
+        }
 
         // We are not in a string, first check for delimiter...
         else if ($char == ';') {
             // if delimiter found, add the parsed part to the returned array
-            $ret[]      = substr($sql, 0, $i);
+            $ret[]      = array('query' => substr($sql, 0, $i), 'empty' => $nothing);
+            $nothing    = TRUE;
             $sql        = ltrim(substr($sql, min($i + 1, $sql_len)));
             $sql_len    = strlen($sql);
             if ($sql_len) {
@@ -87,39 +101,13 @@ function PMA_splitSqlFile(&$ret, $sql, $release)
         // ... then check for start of a string,...
         else if (($char == '"') || ($char == '\'') || ($char == '`')) {
             $in_string    = TRUE;
+            $nothing      = FALSE;
             $string_start = $char;
         } // end else if (is start of string)
 
-        // ... for start of a comment (and remove this comment if found)...
-        else if ($char == '#'
-                 || ($char == ' ' && $i > 1 && $sql[$i-2] . $sql[$i-1] == '--')) {
-            // starting position of the comment depends on the comment type
-            $start_of_comment = (($sql[$i] == '#') ? $i : $i-2);
-            // if no "\n" exits in the remaining string, checks for "\r"
-            // (Mac eol style)
-            $end_of_comment   = (strpos(' ' . $sql, "\012", $i+2))
-                              ? strpos(' ' . $sql, "\012", $i+2)
-                              : strpos(' ' . $sql, "\015", $i+2);
-            if (!$end_of_comment) {
-                // no eol found after '#', add the parsed part to the returned
-                // array if required and exit
-                if ($start_of_comment > 0) {
-                    $ret[]    = trim(substr($sql, 0, $start_of_comment));
-                }
-                return TRUE;
-            } else {
-                $sql          = substr($sql, 0, $start_of_comment)
-                              . ltrim(substr($sql, $end_of_comment));
-                $sql_len      = strlen($sql);
-                $i--;
-            } // end if...else
-        } // end else if (is comment)
-
-        // ... and finally disactivate the "/*!...*/" syntax if MySQL < 3.22.07
-        else if ($release < 32270
-                 && ($char == '!' && $i > 1  && $sql[$i-2] . $sql[$i-1] == '/*')) {
-            $sql[$i] = ' ';
-        } // end else if
+        elseif ($nothing) {
+            $nothing = FALSE;
+        }
 
         // loic1: send a fake header each 30 sec. to bypass browser timeout
         $time1     = time();
@@ -131,7 +119,7 @@ function PMA_splitSqlFile(&$ret, $sql, $release)
 
     // add any rest to the returned array
     if (!empty($sql) && preg_match('@[^[:space:]]+@', $sql)) {
-        $ret[] = $sql;
+        $ret[] = array('query' => $sql, 'empty' => $nothing);
     }
 
     return TRUE;

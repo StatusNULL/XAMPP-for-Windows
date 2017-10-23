@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: sync_lang.sh,v 2.3.2.1 2004/06/07 10:24:45 rabus Exp $
+# $Id: sync_lang.sh,v 2.10 2004/09/22 12:53:52 nijel Exp $
 ##
 # Shell script that synchronises all translations in phpMyAdmin
 ##
@@ -11,6 +11,10 @@
 # Written by Michal Cihar <nijel at users.sourceforge.net>
 ##
 # Changes:
+# 2004-09-22
+#   * default to iconv, as it doesn't break things as recode does
+# 2004-09-03
+#   * hack for hebrew
 # 2003-11-18
 #   * switch php3 -> php
 # 2003-04-14
@@ -46,14 +50,16 @@ case "$1" in
         ;;
     --recode)
         echo Using recode on user request
+        echo '(please use iconv for arabic)'
         CONVERTOR=recode
         CONVERTOR_PARAMS=" -f %s..%s"
         shift
         ;;
     *)
-        echo Using recode as default, force with --iconv/--recode
-        CONVERTOR=recode
-        CONVERTOR_PARAMS=" -f %s..%s"
+        echo Using iconv as default, force with --iconv/--recode
+        CONVERTOR=iconv
+        # the space on following is REQUIRED
+        CONVERTOR_PARAMS=" -f %s -t %s"
         ;;
 esac
 
@@ -71,8 +77,7 @@ fi
 # Here should be listed all translations for which conversion should be done.
 # The name is filename without inc.php.
 #
-BASE_TRANSLATIONS=`cat <<EOT
-afrikaans-iso-8859-1
+BASE_TRANSLATIONS="afrikaans-iso-8859-1
 albanian-iso-8859-1
 arabic-windows-1256
 azerbaijani-iso-8859-9
@@ -81,8 +86,8 @@ bosnian-windows-1250
 brazilian_portuguese-iso-8859-1
 bulgarian-windows-1251
 catalan-iso-8859-1
-chinese_big5-utf-8
-chinese_gb
+chinese_traditional-utf-8
+chinese_simplified-gb2312
 croatian-iso-8859-2
 czech-utf-8
 danish-iso-8859-1
@@ -99,7 +104,7 @@ hungarian-iso-8859-2
 indonesian-iso-8859-1
 italian-iso-8859-1
 japanese-euc
-korean-ks_c_5601-1987
+korean-euc-kr
 latvian-windows-1257
 lithuanian-windows-1257
 malay-iso-8859-1
@@ -116,9 +121,8 @@ slovak-iso-8859-2
 spanish-iso-8859-1
 swedish-iso-8859-1
 thai-tis-620
-turkish-iso-8859-9
-ukrainian-windows-1251
-EOT`
+turkish-utf-8
+ukrainian-windows-1251"
 
 ##
 # which translations should not be translated to utf-8
@@ -126,10 +130,7 @@ EOT`
 # List here any translation that should not be converted to utf-8. The name is
 # same as above.
 #
-IGNORE_UTF=`cat <<EOT
-hebrew-iso-8859-8-i
-korean-ks_c_5601-1987
-EOT`
+IGNORE_UTF=""
 
 ##
 # which translations should not be automatically generated
@@ -138,10 +139,8 @@ EOT`
 # translation for that language (usually for those which are not correctly
 # supported by convertor).
 #
-IGNORE_TRANSLATIONS=`cat <<EOT
-japanese-sjis
-russian-dos-866
-EOT`
+IGNORE_TRANSLATIONS="japanese-sjis
+russian-cp-866"
 
 ##
 # end of configuration, you hopefully won't need to edit anything bellow
@@ -178,6 +177,11 @@ for base in $BASE_TRANSLATIONS ; do
 
     # charset of source file
     src_charset=$(grep '\$charset' $base.inc.php | sed "s%^[^'\"]*['\"]\\([^'\"]*\\)['\"][^'\"]*$%\\1%")
+    replace_charset=$src_charset
+    # special case for hebrew
+    if [ $src_charset = 'iso-8859-8-i' ] ; then
+        src_charset=iso-8859-8
+    fi
     echo "$base [charset $src_charset]"
 
     is_utf=no
@@ -205,7 +209,7 @@ for base in $BASE_TRANSLATIONS ; do
         if [ $charset = 'utf-8' ] ; then
             # if we convert to utf-8, we should add allow_recoding
             is_utf=yes
-            $CONVERTOR $(printf "$CONVERTOR_PARAMS" $src_charset $charset) < $base.inc.php| sed -e "s/$src_charset/$charset/" -e '/\$charset/a\
+            $CONVERTOR $(printf "$CONVERTOR_PARAMS" $src_charset $charset) < $base.inc.php| sed -e "s/$replace_charset/$charset/" -e '/\$charset/a\
 $allow_recoding = TRUE;' > $TEMPFILE
             if [ -s $TEMPFILE ] ; then
                 cat $TEMPFILE > $file
@@ -217,7 +221,7 @@ $allow_recoding = TRUE;' > $TEMPFILE
         elif [ $src_charset = 'utf-8' ] ; then
             is_utf=yes
             # if we convert from utf-8, we should remove allow_recoding
-            $CONVERTOR $(printf "$CONVERTOR_PARAMS" $src_charset $charset) < $base.inc.php| grep -v allow_recoding | sed "s/$src_charset/$charset/" > $TEMPFILE
+            $CONVERTOR $(printf "$CONVERTOR_PARAMS" $src_charset $charset) < $base.inc.php| grep -v allow_recoding | sed "s/$replace_charset/$charset/" > $TEMPFILE
             if [ -s $TEMPFILE ] ; then
                 cat $TEMPFILE > $file
                 echo done
@@ -227,7 +231,7 @@ $allow_recoding = TRUE;' > $TEMPFILE
             fi
         else
             # just convert
-            $CONVERTOR $(printf "$CONVERTOR_PARAMS" $src_charset $charset) < $base.inc.php| sed "s/$src_charset/$charset/" > $TEMPFILE
+            $CONVERTOR $(printf "$CONVERTOR_PARAMS" $src_charset $charset) < $base.inc.php| sed "s/$replace_charset/$charset/" > $TEMPFILE
             if [ -s $TEMPFILE ] ; then
                 cat $TEMPFILE > $file
                 echo done
@@ -248,7 +252,7 @@ $allow_recoding = TRUE;' > $TEMPFILE
             echo -n " creating utf-8 translation ... "
             charset=utf-8
             file=$lang-$charset.inc.php
-            $CONVERTOR $(printf "$CONVERTOR_PARAMS" $src_charset $charset) < $base.inc.php| sed -e "s/$src_charset/$charset/" -e '/\$charset/a\
+            $CONVERTOR $(printf "$CONVERTOR_PARAMS" $src_charset $charset) < $base.inc.php| sed -e "s/$replace_charset/$charset/" -e '/\$charset/a\
 $allow_recoding = TRUE;' > $TEMPFILE
             if [ -s $TEMPFILE ] ; then
                 cat $TEMPFILE > $file

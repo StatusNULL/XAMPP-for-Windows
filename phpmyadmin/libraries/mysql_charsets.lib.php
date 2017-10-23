@@ -1,30 +1,28 @@
 <?php
-/* $Id: mysql_charsets.lib.php,v 2.7.2.2 2004/06/07 10:09:53 rabus Exp $ */
+/* $Id: mysql_charsets.lib.php,v 2.23 2004/09/21 11:00:43 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 if (PMA_MYSQL_INT_VERSION >= 40100){
 
-    $res = PMA_mysql_query('SHOW CHARACTER SET;', $userlink)
-        or PMA_mysqlDie(PMA_mysql_error($userlink), 'SHOW CHARACTER SET;');
+    $res = PMA_DBI_query('SHOW CHARACTER SET;');
 
     $mysql_charsets = array();
-    while ($row = PMA_mysql_fetch_array($res, MYSQL_ASSOC)) {
+    while ($row = PMA_DBI_fetch_assoc($res)) {
         $mysql_charsets[] = $row['Charset'];
         $mysql_charsets_maxlen[$row['Charset']] = $row['Maxlen'];
         $mysql_charsets_descriptions[$row['Charset']] = $row['Description'];
     }
-    @mysql_free_result($res);
+    @PMA_DBI_free_result($res);
     unset($res, $row);
 
-    $res = PMA_mysql_query('SHOW COLLATION;', $userlink)
-        or PMA_mysqlDie(PMA_mysql_error($userlink), 'SHOW COLLATION;');
+    $res = PMA_DBI_query('SHOW COLLATION;');
 
     $mysql_charsets_count = count($mysql_charsets);
     sort($mysql_charsets, SORT_STRING);
 
     $mysql_collations = array_flip($mysql_charsets);
     $mysql_default_collations = $mysql_collations_flat = array();;
-    while ($row = PMA_mysql_fetch_array($res, MYSQL_ASSOC)) {
+    while ($row = PMA_DBI_fetch_assoc($res)) {
         if (!is_array($mysql_collations[$row['Charset']])) {
             $mysql_collations[$row['Charset']] = array($row['Collation']);
         } else {
@@ -38,12 +36,12 @@ if (PMA_MYSQL_INT_VERSION >= 40100){
 
     $mysql_collations_count = count($mysql_collations_flat);
     sort($mysql_collations_flat, SORT_STRING);
-    foreach($mysql_collations AS $key => $value) {
+    foreach ($mysql_collations AS $key => $value) {
         sort($mysql_collations[$key], SORT_STRING);
         reset($mysql_collations[$key]);
     }
 
-    @mysql_free_result($res);
+    @PMA_DBI_free_result($res);
     unset($res, $row);
 
     function PMA_getCollationDescr($collation) {
@@ -99,8 +97,14 @@ if (PMA_MYSQL_INT_VERSION >= 40100){
             case 'hungarian':
                 $descr = $GLOBALS['strHungarian'];
                 break;
+            case 'icelandic':
+                $descr = $GLOBALS['strIcelandic'];
+                break;
             case 'japanese':
                 $descr = $GLOBALS['strJapanese'];
+                break;
+            case 'latvian':
+                $descr = $GLOBALS['strLatvian'];
                 break;
             case 'lithuanian':
                 $descr = $GLOBALS['strLithuanian'];
@@ -108,8 +112,29 @@ if (PMA_MYSQL_INT_VERSION >= 40100){
             case 'korean':
                 $descr = $GLOBALS['strKorean'];
                 break;
+            case 'persian':
+                $descr = $GLOBALS['strPersian'];
+                break;
+            case 'polish':
+                $descr = $GLOBALS['strPolish'];
+                break;
+            case 'roman':
+                $descr = $GLOBALS['strWestEuropean'];
+                break;
+            case 'romanian':
+                $descr = $GLOBALS['strRomanian'];
+                break;
+            case 'slovak':
+                $descr = $GLOBALS['strSlovak'];
+                break;
+            case 'slovenian':
+                $descr = $GLOBALS['strSlovenian'];
+                break;
             case 'spanish':
                 $descr = $GLOBALS['strSpanish'];
+                break;
+            case 'spanish2':
+                $descr = $GLOBALS['strTraditionalSpanish'];
                 break;
             case 'swedish':
                 $descr = $GLOBALS['strSwedish'];
@@ -122,6 +147,9 @@ if (PMA_MYSQL_INT_VERSION >= 40100){
                 break;
             case 'ukrainian':
                 $descr = $GLOBALS['strUkrainian'];
+                break;
+            case 'unicode':
+                $descr = $GLOBALS['strUnicode'] . ' (' . $GLOBALS['strMultilingual'] . ')';
                 break;
             case 'bin':
                 $is_bin = TRUE;
@@ -217,7 +245,7 @@ if (PMA_MYSQL_INT_VERSION >= 40100){
                     $descr .= ', ' . $GLOBALS['strBinary'];
                 }
                 break;
-            default: return '';
+            default: $descr = $GLOBALS['strUnknown'];
         }
         if (!empty($parts[2])) {
             if ($parts[2] == 'ci') {
@@ -231,15 +259,12 @@ if (PMA_MYSQL_INT_VERSION >= 40100){
 
     function PMA_getDbCollation($db) {
         global $userlink;
-
         if (PMA_MYSQL_INT_VERSION >= 40101) {
             // MySQL 4.1.0 does not support seperate charset settings
             // for databases.
-
-            $sql_query = 'SHOW CREATE DATABASE ' . PMA_backquote($db) . ';';
-            $res = PMA_mysql_query($sql_query, $userlink) or PMA_mysqlDie(PMA_mysql_error($userlink), $sql_query);
-            $row = PMA_mysql_fetch_row($res);
-            mysql_free_result($res);
+            $res = PMA_DBI_query('SHOW CREATE DATABASE ' . PMA_backquote($db) . ';', NULL, PMA_DBI_QUERY_STORE);
+            $row = PMA_DBI_fetch_row($res);
+            PMA_DBI_free_result($res);
             $tokenized = explode(' ', $row[1]);
             unset($row, $res, $sql_query);
 
@@ -257,6 +282,50 @@ if (PMA_MYSQL_INT_VERSION >= 40100){
             }
         }
         return '';
+    }
+
+    define('PMA_CSDROPDOWN_COLLATION', 0);
+    define('PMA_CSDROPDOWN_CHARSET',   1);
+    
+    function PMA_generateCharsetDropdownBox($type = PMA_CSDROPDOWN_COLLATION, $name = NULL, $id = NULL, $default = NULL, $label = TRUE, $indent = 0, $submitOnChange = FALSE) {
+        global $mysql_charsets, $mysql_charsets_descriptions, $mysql_collations;
+
+        if (empty($name)) {
+            if ($type == PMA_CSDROPDOWN_COLLATION) {
+                $name = 'collation';
+            } else {
+                $name = 'character_set';
+            }
+        }
+
+        $spacer = '';
+        for ($i = 1; $i <= $indent; $i++) $spacer .= '    ';
+
+        $return_str  = $spacer . '<select name="' . htmlspecialchars($name) . '"' . (empty($id) ? '' : ' id="' . htmlspecialchars($id) . '"') . ($submitOnChange ? ' onchange="this.form.submit();"' : '') . '>' . "\n";
+        if ($label) {
+            $return_str .= $spacer . '    <option value="">' . ($type == PMA_CSDROPDOWN_COLLATION ? $GLOBALS['strCollation'] : $GLOBALS['strCharset']) . '</option>' . "\n";
+        }
+        $return_str .= $spacer . '    <option value=""></option>' . "\n";
+        foreach ($mysql_charsets as $current_charset) {
+            $current_cs_descr = empty($mysql_charsets_descriptions[$current_charset]) ? $current_charset : $mysql_charsets_descriptions[$current_charset];
+            if ($type == PMA_CSDROPDOWN_COLLATION) {
+                $return_str .= $spacer . '    <optgroup label="' . $current_charset . '" title="' . $current_cs_descr . '">' . "\n";
+                foreach ($mysql_collations[$current_charset] as $current_collation) {
+                    $return_str .= $spacer . '        <option value="' . $current_collation . '" title="' . PMA_getCollationDescr($current_collation) . '"' . ($default == $current_collation ? ' selected="selected"' : '') . '>' . $current_collation . '</option>' . "\n";
+                }
+                $return_str .= $spacer . '    </optgroup>' . "\n";
+            } else {
+                $return_str .= $spacer . '    <option value="' . $current_charset . '" title="' . $current_cs_descr . '"' . ($default == $current_charset ? ' selected="selected"' : '') . '>' . $current_charset . '</option>' . "\n";
+            }
+        }
+        $return_str .= $spacer . '</select>' . "\n";
+
+        return $return_str;
+    }
+
+    function PMA_generateCharsetQueryPart($collation) {
+        list($charset) = explode('_', $collation);
+        return ' CHARACTER SET ' . $charset . ($charset == $collation ? '' : ' COLLATE ' . $collation);
     }
 
 }

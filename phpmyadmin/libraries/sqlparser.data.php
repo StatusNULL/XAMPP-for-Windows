@@ -1,5 +1,5 @@
 <?php
-/* $Id: sqlparser.data.php,v 2.5 2004/01/09 14:16:45 lem9 Exp $ */
+/* $Id: sqlparser.data.php,v 2.12 2004/09/07 04:09:26 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -78,6 +78,7 @@ $PMA_SQPdata_function_name = array (
     'FROM_UNIXTIME',
     'GET_LOCK',
     'GREATEST',
+    'GROUP_CONCAT',
     'GROUP_UNIQUE_USERS',
     'HEX',
     'IFNULL',
@@ -168,7 +169,7 @@ $PMA_SQPdata_function_name = array (
     'YEARWEEK'
 );
 //$PMA_SQPdata_function_name_cnt = count($PMA_SQPdata_function_name);
-$PMA_SQPdata_function_name_cnt = 151;
+$PMA_SQPdata_function_name_cnt = 152;
 
 $PMA_SQPdata_column_attrib = array (
     'AUTO_INCREMENT',
@@ -232,6 +233,7 @@ $PMA_SQPdata_reserved_word = array (
     'CONSTRAINT',
     'CREATE',
     'CROSS',
+    'CURRENT_TIMESTAMP',
     'DATA',
     'DATABASE',
     'DATABASES',
@@ -254,6 +256,8 @@ $PMA_SQPdata_reserved_word = array (
     'ELSE',
     'ENCLOSED',
     'END',
+    'ENGINE',
+    'ENGINES',
     'ESCAPE',
     'ESCAPED',
     'EVENTS',
@@ -394,6 +398,7 @@ $PMA_SQPdata_reserved_word = array (
     'SECOND',
     'SELECT',
     'SERIALIZABLE',
+    'SESSION',
     'SHARE',
     'SHOW',
     'SHUTDOWN',
@@ -422,6 +427,7 @@ $PMA_SQPdata_reserved_word = array (
     'STARTING',
     'STATUS',
     'STOP',
+    'STORAGE',
     'STRAIGHT_JOIN',
     'STRING',
     'STRIPED',
@@ -435,6 +441,7 @@ $PMA_SQPdata_reserved_word = array (
     'TRAILING',
     'TRUNCATE',
     'TYPE',
+    'TYPES',
     'UNCOMMITTED',
     'UNION',
     'UNIQUE',
@@ -454,10 +461,11 @@ $PMA_SQPdata_reserved_word = array (
     'YEAR_MONTH'
 );
 //$PMA_SQPdata_reserved_word_cnt = count($PMA_SQPdata_reserved_word);
-$PMA_SQPdata_reserved_word_cnt = 259;
+$PMA_SQPdata_reserved_word_cnt = 265;
 
 $PMA_SQPdata_column_type = array (
     'BIGINT',
+    'BINARY',
     'BIT',
     'BLOB',
     'BOOL',
@@ -502,6 +510,6 @@ $PMA_SQPdata_column_type = array (
     'YEAR'
 );
 //$PMA_SQPdata_column_type_cnt = count($PMA_SQPdata_column_type);
-$PMA_SQPdata_column_type_cnt = 43;
+$PMA_SQPdata_column_type_cnt = 44;
 
 ?>

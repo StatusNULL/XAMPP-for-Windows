@@ -1,5 +1,10 @@
 <?php
-// $Id: simple_include.php,v 1.1 2003/11/30 17:30:01 quipo Exp $
+// $Id: simple_include.php,v 1.2 2004/02/01 13:41:49 quipo Exp $
+//
+// This testsuite requires SimpleTest.
+// You can find it here:
+// http://www.lastcraft.com/simple_test.php
+//
 if (!defined('SIMPLE_TEST')) {
     define('SIMPLE_TEST', '../simpletest/');
 }

@@ -1,5 +1,5 @@
 <?php
-/* $Id: mult_submits.inc.php,v 2.3.4.1 2004/01/14 14:22:45 lem9 Exp $ */
+/* $Id: mult_submits.inc.php,v 2.9 2004/08/12 15:13:19 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -87,8 +87,7 @@ if (!empty($submit_mult) && !empty($what)) {
     $full_query     = '';
     $selected_cnt   = count($selected);
     $i = 0;
-    foreach($selected AS $idx => $sval) {
-        $i++;
+    foreach ($selected AS $idx => $sval) {
         switch ($what) {
             case 'row_delete':
                 $full_query .= htmlspecialchars(urldecode($sval))
@@ -133,12 +132,30 @@ if (!empty($submit_mult) && !empty($what)) {
                 }
                 break;
         } // end switch
+        $i++;
     }
 
     // Displays the form
-    echo $strDoYouReally . '&nbsp;:<br />' . "\n";
+?>
+<!-- Do it really ? -->
+<table border="0" cellpadding="3" cellspacing="0">
+    <tr>
+        <th class="tblHeadError" align="left">
+            <?php
+    echo ($GLOBALS['cfg']['ErrorIconic'] ? '<img src="' . $GLOBALS['pmaThemeImage'] . 's_really.png" border="0" hspace="2" width="11" height="11" valign="middle" />' : '');
+    echo $strDoYouReally . ':&nbsp;' . "\n";
+            ?>
+        </th>
+    </tr>
+    <tr>
+        <td bgcolor="<?php echo $GLOBALS['cfg']['BgcolorOne']; ?>">
+           <?php
     echo '<tt>' . $full_query . '</tt>&nbsp;?<br/>' . "\n";
-    ?>
+           ?>
+        </td>
+    </tr>
+    <tr>
+       <td align="right" nowrap="nowrap">
 <form action="<?php echo $action; ?>" method="post">
     <?php
     echo "\n";
@@ -150,7 +167,7 @@ if (!empty($submit_mult) && !empty($what)) {
     } else  {
         echo PMA_generate_common_hidden_inputs();
     }
-    foreach($selected AS $idx => $sval) {
+    foreach ($selected AS $idx => $sval) {
         echo '    <input type="hidden" name="selected[]" value="' . htmlspecialchars($sval) . '" />' . "\n";
     }
     ?>
@@ -162,9 +179,12 @@ if (!empty($submit_mult) && !empty($what)) {
         echo '<input type="hidden" name="original_url_query" value="' . $original_url_query . '" />' . "\n";
     }
     ?>
-    <input type="submit" name="mult_btn" value="<?php echo $strYes; ?>" />
-    <input type="submit" name="mult_btn" value="<?php echo $strNo; ?>" />
+    <input type="submit" name="mult_btn" value="<?php echo $strYes; ?>" id="buttonYes" />
+    <input type="submit" name="mult_btn" value="<?php echo $strNo; ?>" id="buttonNo" />
 </form>
+        </td>
+    </tr>
+</table>
     <?php
     echo"\n";
 
@@ -253,16 +273,16 @@ else if ($mult_btn == $strYes) {
             $sql_query .= $a_query . ';' . "\n";
 
             if ($query_type != 'drop_db') {
-                PMA_mysql_select_db($db);
+                PMA_DBI_select_db($db);
             }
-            $result = @PMA_mysql_query($a_query) or PMA_mysqlDie('', $a_query, FALSE, $err_url);
+            $result = @PMA_DBI_query($a_query) or PMA_mysqlDie('', $a_query, FALSE, $err_url);
         } // end if
     } // end for
 
     if ($query_type == 'drop_tbl'
         || $query_type == 'drop_fld') {
-        PMA_mysql_select_db($db);
-        $result = @PMA_mysql_query($sql_query) or PMA_mysqlDie('', '', FALSE, $err_url);
+        PMA_DBI_select_db($db);
+        $result = PMA_DBI_query($sql_query);
     } elseif ($query_type == 'repair_tbl'
         || $query_type == 'analyze_tbl'
         || $query_type == 'check_tbl'

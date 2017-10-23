@@ -18,24 +18,26 @@
 // |                                                                      |
 // +----------------------------------------------------------------------+
 //
-// $Id: pearcmd.php,v 1.9 2004/01/26 01:59:14 pajoye Exp $
+// $Id: pearcmd.php,v 1.10 2004/03/13 17:37:23 cellog Exp $
 
 ob_end_clean();
 /**
  * @nodep Gtk
  */
-if ('C:\xampp\php\pear' != '@'.'include_path'.'@') {
-    ini_set('include_path', 'C:\xampp\php\pear');
+if ('C:\xarelease149\xampp\php\pear' != '@'.'include_path'.'@') {
+    ini_set('include_path', 'C:\xarelease149\xampp\php\pear');
 }
 ini_set('allow_url_fopen', true);
-set_time_limit(0);
+if (!ini_get('safe_mode')) {
+    set_time_limit(0);
+}
 ob_implicit_flush(true);
 ini_set('track_errors', true);
 ini_set('html_errors', false);
 ini_set('magic_quotes_runtime', false);
 set_error_handler('error_handler');
 
-$pear_package_version = "1.3";
+$pear_package_version = "1.3.1";
 
 require_once 'PEAR.php';
 require_once 'PEAR/Config.php';

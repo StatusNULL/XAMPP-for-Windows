@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_printview.php,v 2.3 2003/12/22 19:39:49 lem9 Exp $ */
+/* $Id: db_printview.php,v 2.8 2004/05/20 16:14:08 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -32,46 +32,45 @@ $cfgRelation = PMA_getRelationsParam();
 // staybyte: speedup view on locked tables - 11 June 2001
 // Special speedup for newer MySQL Versions (in 4.0 format changed)
 if ($cfg['SkipLockedTables'] == TRUE) {
-    $local_query  = 'SHOW OPEN TABLES FROM ' . PMA_backquote($db);
-    $result        = PMA_mysql_query($local_query) or PMA_mysqlDie('', $local_query, '', $err_url);
+    $result = PMA_DBI_query('SHOW OPEN TABLES FROM ' . PMA_backquote($db) . ';');
     // Blending out tables in use
-    if ($result != FALSE && mysql_num_rows($result) > 0) {
-        while ($tmp = PMA_mysql_fetch_array($result)) {
+    if ($result != FALSE && PMA_DBI_num_rows($result) > 0) {
+        while ($tmp = PMA_DBI_fetch_row($result)) {
             // if in use memorize tablename
             if (preg_match('@in_use=[1-9]+@i', $tmp[0])) {
                 $sot_cache[$tmp[0]] = TRUE;
             }
         }
-        mysql_free_result($result);
+        PMA_DBI_free_result($result);
+        unset($result);
 
         if (isset($sot_cache)) {
-            $local_query = 'SHOW TABLES FROM ' . PMA_backquote($db);
-            $result      = PMA_mysql_query($local_query) or PMA_mysqlDie('', $local_query, '', $err_url);
-            if ($result != FALSE && mysql_num_rows($result) > 0) {
-                while ($tmp = PMA_mysql_fetch_array($result)) {
+            $result      = PMA_DBI_query('SHOW TABLES FROM ' . PMA_backquote($db) . ';', NULL, PMA_DBI_QUERY_STORE);
+            if ($result != FALSE && PMA_DBI_num_rows($result) > 0) {
+                while ($tmp = PMA_DBI_fetch_row($result)) {
                     if (!isset($sot_cache[$tmp[0]])) {
-                        $local_query = 'SHOW TABLE STATUS FROM ' . PMA_backquote($db) . ' LIKE \'' . addslashes($tmp[0]) . '\'';
-                        $sts_result  = PMA_mysql_query($local_query) or PMA_mysqlDie('', $local_query, '', $err_url);
-                        $sts_tmp     = PMA_mysql_fetch_array($sts_result);
+                        $sts_result  = PMA_DBI_query('SHOW TABLE STATUS FROM ' . PMA_backquote($db) . ' LIKE \'' . addslashes($tmp[0]) . '\';');
+                        $sts_tmp     = PMA_DBI_fetch_assoc($sts_result);
                         $tables[]    = $sts_tmp;
                     } else { // table in use
                         $tables[]    = array('Name' => $tmp[0]);
                     }
                 }
-                mysql_free_result($result);
+                PMA_DBI_free_result($result);
+                unset($result);
                 $sot_ready = TRUE;
             }
         }
     }
 }
 if (!isset($sot_ready)) {
-    $local_query = 'SHOW TABLE STATUS FROM ' . PMA_backquote($db);
-    $result      = PMA_mysql_query($local_query) or PMA_mysqlDie('', $local_query, '', $err_url);
-    if ($result != FALSE && mysql_num_rows($result) > 0) {
-        while ($sts_tmp = PMA_mysql_fetch_array($result)) {
+    $result      = PMA_DBI_query('SHOW TABLE STATUS FROM ' . PMA_backquote($db) . ';');
+    if (PMA_DBI_num_rows($result) > 0) {
+        while ($sts_tmp = PMA_DBI_fetch_assoc($result)) {
             $tables[] = $sts_tmp;
         }
-        mysql_free_result($result);
+        PMA_DBI_free_result($result);
+        unset($res);
     }
 }
 $num_tables = (isset($tables) ? count($tables) : 0);
@@ -120,7 +119,7 @@ else {
 </tr>
     <?php
     $i = $sum_entries = $sum_size = 0;
-    foreach($tables AS $keyname => $sts_data) {
+    foreach ($tables AS $keyname => $sts_data) {
         $table     = $sts_data['Name'];
         $bgcolor   = ($i++ % 2) ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo'];
         echo "\n";

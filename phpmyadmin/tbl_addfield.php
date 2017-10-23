@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_addfield.php,v 2.3 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: tbl_addfield.php,v 2.7 2004/08/12 15:13:19 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -24,7 +24,15 @@ $err_url = 'tbl_properties.php?' . PMA_generate_common_url($db, $table);
  * The form used to define the field to add has been submitted
  */
 $abort = false;
-if (isset($submit)) {
+if (isset($submit_num_fields)) {
+    if (isset($orig_after_field)) {
+        $after_field = $orig_after_field;
+    }
+    if (isset($orig_field_where)) {
+        $field_where = $orig_field_where;
+    }
+    $regenerate = TRUE;
+} else if (isset($submit)) {
     $query = '';
 
     // Transforms the radio button field_key into 3 arrays
@@ -83,10 +91,10 @@ if (isset($submit)) {
             } // end if (auto_increment)
         }
 
-        if ($after_field != '--end--') {
-            // Only the first field can be added somewhere else than at the end
+        if ($field_where != 'last') {
+            // Only the first field can be added somewhere other than at the end
             if ($i == 0) {
-                if ($after_field == '--first--') {
+                if ($field_where == 'first') {
                     $query .= ' FIRST';
                 } else {
                     $query .= ' AFTER ' . PMA_backquote(urldecode($after_field));
@@ -101,11 +109,10 @@ if (isset($submit)) {
 
     // To allow replication, we first select the db to use and then run queries
     // on this db.
-    $sql_query     = 'USE ' . PMA_backquote($db);
-    $result        = PMA_mysql_query($sql_query) or PMA_mysqlDie('', '', '', $err_url);
+    PMA_DBI_select_db($db) or PMA_mysqlDie(PMA_getError(), 'USE ' . PMA_backquotes($db), '', $err_url);
     $sql_query     = 'ALTER TABLE ' . PMA_backquote($table) . ' ADD ' . $query;
-    $error_create = false;
-    $result        = PMA_mysql_query($sql_query)  or $error_create = true;
+    $error_create = FALSE;
+    PMA_DBI_try_query($sql_query) or $error_create = TRUE;
 
     if ($error_create == false) {
 
@@ -123,8 +130,8 @@ if (isset($submit)) {
             } // end for
             $primary     = preg_replace('@, $@', '', $primary);
             if (!empty($primary)) {
-                $sql_query      = 'ALTER TABLE ' . PMA_backquote($table) . ' ADD PRIMARY KEY (' . $primary . ')';
-                $result         = PMA_mysql_query($sql_query) or PMA_mysqlDie('', '', '', $err_url);
+                $sql_query      = 'ALTER TABLE ' . PMA_backquote($table) . ' ADD PRIMARY KEY (' . $primary . ');';
+                $result         = PMA_DBI_query($sql_query);
                 $sql_query_cpy  .= "\n" . $sql_query . ';';
             }
         } // end if
@@ -142,7 +149,7 @@ if (isset($submit)) {
             $index     = preg_replace('@, $@', '', $index);
             if (!empty($index)) {
                 $sql_query      = 'ALTER TABLE ' . PMA_backquote($table) . ' ADD INDEX (' . $index . ')';
-                $result         = PMA_mysql_query($sql_query) or PMA_mysqlDie('', '', '', $err_url);
+                $result         = PMA_DBI_query($sql_query);
                 $sql_query_cpy  .= "\n" . $sql_query . ';';
             }
         } // end if
@@ -160,7 +167,7 @@ if (isset($submit)) {
             $unique = preg_replace('@, $@', '', $unique);
             if (!empty($unique)) {
                 $sql_query      = 'ALTER TABLE ' . PMA_backquote($table) . ' ADD UNIQUE (' . $unique . ')';
-                $result         = PMA_mysql_query($sql_query) or PMA_mysqlDie('', '', '', $err_url);
+                $result         = PMA_DBI_query($sql_query);
                 $sql_query_cpy  .= "\n" . $sql_query . ';';
             }
         } // end if
@@ -177,7 +184,7 @@ if (isset($submit)) {
             $fulltext = preg_replace('@, $@', '', $fulltext);
             if (!empty($fulltext)) {
                 $sql_query      = 'ALTER TABLE ' . PMA_backquote($table) . ' ADD FULLTEXT (' . $fulltext . ')';
-                $result         = PMA_mysql_query($sql_query) or PMA_mysqlDie('', '', '', $err_url);
+                $result         = PMA_DBI_query($sql_query);
                 $sql_query_cpy  .= "\n" . $sql_query . ';';
             }
         } // end if
@@ -190,14 +197,14 @@ if (isset($submit)) {
 
         // garvin: Update comment table, if a comment was set.
         if (isset($field_comments) && is_array($field_comments) && $cfgRelation['commwork']) {
-            foreach($field_comments AS $fieldindex => $fieldcomment) {
+            foreach ($field_comments AS $fieldindex => $fieldcomment) {
                 PMA_setComment($db, $table, $field_name[$fieldindex], $fieldcomment);
             }
         }
 
         // garvin: Update comment table for mime types [MIME]
         if (isset($field_mimetype) && is_array($field_mimetype) && $cfgRelation['commwork'] && $cfgRelation['mimework'] && $cfg['BrowseMIME']) {
-            foreach($field_mimetype AS $fieldindex => $mimetype) {
+            foreach ($field_mimetype AS $fieldindex => $mimetype) {
                 PMA_setMIME($db, $table, $field_name[$fieldindex], $mimetype, $field_transformation[$fieldindex], $field_transformation_options[$fieldindex]);
             }
         }
@@ -216,6 +223,9 @@ if (isset($submit)) {
         $num_fields = $orig_num_fields;
         if (isset($orig_after_field)) {
             $after_field = $orig_after_field;
+        }
+        if (isset($orig_field_where)) {
+            $field_where = $orig_field_where;
         }
         $regenerate = true;
     }

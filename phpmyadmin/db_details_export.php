@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_details_export.php,v 2.2 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: db_details_export.php,v 2.3 2004/06/13 21:32:16 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -10,16 +10,14 @@ $sub_part  = '_export';
 require('./db_details_common.php');
 $url_query .= '&amp;goto=db_details_export.php';
 require('./db_details_db_info.php');
-
+?>
+<!-- Dump of Database -->
+<?php
 /**
  * Displays the form
  */
-?>
-<h2>
-    <?php echo $strViewDumpDB . "\n"; ?>
-</h2>
+$export_page_title = $strViewDumpDB;
 
-<?php
 $multi_values = '';
 if ($num_tables > 1) {
 
@@ -48,8 +46,7 @@ if ($num_tables > 1) {
     $multi_values .= '<br />
             <a href="' . $checkall_url . '&amp;selectall=1" onclick="setSelectOptions(\'dump\', \'table_select[]\', true); return false;">' . $strSelectAll . '</a>
             &nbsp;/&nbsp;
-            <a href="' . $checkall_url . '" onclick="setSelectOptions(\'dump\', \'table_select[]\', false); return false;">' . $strUnselectAll . '</a>
-            <br /><br />';
+            <a href="' . $checkall_url . '" onclick="setSelectOptions(\'dump\', \'table_select[]\', false); return false;">' . $strUnselectAll . '</a>';
 } elseif ($num_tables == 0) {
     echo $strDatabaseNoTable;
     require_once('./footer.inc.php');

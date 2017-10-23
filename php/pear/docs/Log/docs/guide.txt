@@ -8,8 +8,8 @@
 
 :Author:        Jon Parise
 :Contact:       jon@php.net
-:Date:          $Date: 2004/01/31 21:48:16 $
-:Revision:      $Revision: 1.10 $
+:Date:          $Date: 2004/08/19 06:35:57 $
+:Revision:      $Revision: 1.13 $
 
 .. contents:: Contents
 .. section-numbering::
@@ -501,6 +501,9 @@ The SQL (DB) Handler
 The SQL handler sends log events to a database using `PEAR's DB abstraction
 layer`_.
 
+**Note:** Due to the constraints of the database schema, the SQL handler
+limits the length of the ``$ident`` string to sixteen (16) characters.
+
 Configuration
 ~~~~~~~~~~~~~
 +-------------------+-----------+---------------+---------------------------+
@@ -513,6 +516,16 @@ Configuration
 |                   |           |               | If specified, this object |
 |                   |           |               | will be used, and ``dsn`` |
 |                   |           |               | will be ignored.          |
++-------------------+-----------+---------------+---------------------------+
+| ``sequence``      | String    | ``log_id``    | The name of the sequence  |
+|                   |           |               | to use when generating    |
+|                   |           |               | unique event IDs.         |
++-------------------+-----------+---------------+---------------------------+
+| ``identLimit``    | Integer   | 16            | The maximum length of the |
+|                   |           |               | ``ident`` string.         |
+|                   |           |               | **Changing this value may |
+|                   |           |               | require updates to the SQL|
+|                   |           |               | schema, as well.**        |
 +-------------------+-----------+---------------+---------------------------+
 
 .. _DB: http://pear.php.net/package/DB

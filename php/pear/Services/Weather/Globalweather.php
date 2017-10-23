@@ -16,30 +16,40 @@
 // | Authors: Alexander Wirtz <alex@pc4p.net>                             |
 // +----------------------------------------------------------------------+
 //
-// $Id: Globalweather.php,v 1.19 2004/03/31 12:32:58 eru Exp $
+// $Id: Globalweather.php,v 1.27 2004/05/04 13:57:34 eru Exp $
 
+/**
+* @package      Services_Weather
+* @filesource
+*/
+
+/**
+*/
 require_once "Services/Weather/Common.php";
 
 // {{{ class Services_Weather_Globalweather
 /**
 * PEAR::Services_Weather_Globalweather
 *
-* This class acts as an interface to the soap service of capescience.com. It searches for given
-* locations and retrieves current weather data.
+* This class acts as an interface to the soap service of capescience.com.
+* It searches for given locations and retrieves current weather data.
 *
-* GlobalWeather is a SOAP frontend for METAR data, provided by CapeScience. If you want to
-* use METAR, you should try this class first, as it is much more comfortable (and also a bit
-* faster) than the native METAR-class provided by this package.
+* GlobalWeather is a SOAP frontend for METAR data, provided by CapeScience.
+* If you want to use METAR, you should try this class first, as it is much
+* more comfortable (and also a bit faster) than the native METAR-class
+* provided by this package. On the other hand, this service won't supply
+* TAFs, the forecast system accompanying METAR, so you have to make
+* the call here...
 *
 * For a working example, please take a look at
 *     docs/Services_Weather/examples/globalweather-basic.php
 *
 * @author       Alexander Wirtz <alex@pc4p.net>
 * @link         http://www.capescience.com/webservices/globalweather/index.shtml
-* @example      docs/Services_Weather/examples/globalweather-basic.php
+* @example      examples/globalweather-basic.php globalweather-basic.php
 * @package      Services_Weather
 * @license      http://www.php.net/license/2_02.txt
-* @version      1.2
+* @version      1.3
 */
 class Services_Weather_Globalweather extends Services_Weather_Common {
 
@@ -94,13 +104,13 @@ class Services_Weather_Globalweather extends Services_Weather_Common {
         include_once "SOAP/Client.php";
         $this->_wsdl = new SOAP_WSDL("http://live.capescience.com/wsdl/GlobalWeather.wsdl", array("timeout" => $this->_httpTimeout));
         if (isset($this->_wsdl->fault) && Services_Weather::isError($this->_wsdl->fault)) {
-            $error = Services_Weather::raiseError(SERVICES_WEATHER_ERROR_WRONG_SERVER_DATA);
+            $error = Services_Weather::raiseError(SERVICES_WEATHER_ERROR_WRONG_SERVER_DATA, __FILE__, __LINE__);
             return;
         }
 
         eval($this->_wsdl->generateAllProxies());
         if (!class_exists("WebService_GlobalWeather_StationInfo") || !class_exists("WebService_GlobalWeather_GlobalWeather")) {
-            $error = Services_Weather::raiseError(SERVICES_WEATHER_ERROR_WRONG_SERVER_DATA);
+            $error = Services_Weather::raiseError(SERVICES_WEATHER_ERROR_WRONG_SERVER_DATA, __FILE__, __LINE__);
             return;
         }
 
@@ -111,7 +121,8 @@ class Services_Weather_Globalweather extends Services_Weather_Common {
 
     // {{{ _checkLocationID()
     /**
-    * Checks the id for valid values and thus prevents silly requests to GlobalWeather server
+    * Checks the id for valid values and thus prevents silly requests to
+    * GlobalWeather server
     *
     * @param    string                      $id
     * @return   PEAR_Error|bool
@@ -121,10 +132,10 @@ class Services_Weather_Globalweather extends Services_Weather_Common {
     */
     function _checkLocationID($id)
     {
-        if (!strlen($id)) {
-            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_NO_LOCATION);
+        if (is_array($id) || is_object($id) || !strlen($id)) {
+            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_NO_LOCATION, __FILE__, __LINE__);
         } elseif ($this->_stationSoap->isValidCode($id) === false) {
-            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_INVALID_LOCATION);
+            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_INVALID_LOCATION, __FILE__, __LINE__);
         }
 
         return true;
@@ -133,7 +144,8 @@ class Services_Weather_Globalweather extends Services_Weather_Common {
 
     // {{{ searchLocation()
     /**
-    * Searches IDs for given location, returns array of possible locations or single ID
+    * Searches IDs for given location, returns array of possible locations
+    * or single ID
     *
     * @param    string                      $location
     * @param    bool                        $useFirst       If set, first ID of result-array is returned
@@ -148,10 +160,10 @@ class Services_Weather_Globalweather extends Services_Weather_Common {
         $search = $this->_stationSoap->searchByName($location);
 
         if (Services_Weather::isError($search)) {
-            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_WRONG_SERVER_DATA);
+            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_WRONG_SERVER_DATA, __FILE__, __LINE__);
         } else {
             if (!is_array($search) || !sizeof($search)) {
-                return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_UNKNOWN_LOCATION);
+                return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_UNKNOWN_LOCATION, __FILE__, __LINE__);
             } else {
                 if (!$useFirst && (sizeof($search) > 1)) {
                     $searchReturn = array();
@@ -170,7 +182,8 @@ class Services_Weather_Globalweather extends Services_Weather_Common {
 
     // {{{ searchLocationByCountry()
     /**
-    * Returns IDs with location-name for a given country or all available countries, if no value was given 
+    * Returns IDs with location-name for a given country or all available
+    * countries, if no value was given 
     *
     * @param    string                      $country
     * @return   PEAR_Error|array
@@ -184,7 +197,7 @@ class Services_Weather_Globalweather extends Services_Weather_Common {
         if (!strlen($country)) {
             $countries = $this->_stationSoap->listCountries();
             if (Services_Weather::isError($countries)) {
-                return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_WRONG_SERVER_DATA);
+                return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_WRONG_SERVER_DATA, __FILE__, __LINE__);
             }
             return $countries;
         }
@@ -193,9 +206,9 @@ class Services_Weather_Globalweather extends Services_Weather_Common {
         $countryLocs = $this->_stationSoap->searchByCountry($country);
         // Check result for validity
         if (Services_Weather::isError($countryLocs)) {
-            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_WRONG_SERVER_DATA);
+            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_WRONG_SERVER_DATA, __FILE__, __LINE__);
         } elseif (!is_array($countryLocs)) {
-            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_UNKNOWN_LOCATION);
+            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_UNKNOWN_LOCATION, __FILE__, __LINE__);
         }
 
         // Construct the result
@@ -206,22 +219,6 @@ class Services_Weather_Globalweather extends Services_Weather_Common {
         asort($locations);
 
         return $locations;
-    }
-    // }}}
-
-    // {{{ getUnits()
-    /**
-    * Returns the units for the current query
-    *
-    * @param    string                      $id
-    * @param    string                      $unitsFormat
-    * @return   array
-    * @deprecated
-    * @access   public
-    */
-    function getUnits($id = null, $unitsFormat = "")
-    {
-        return $this->getUnitsFormat($unitsFormat);
     }
     // }}}
 
@@ -375,7 +372,7 @@ class Services_Weather_Globalweather extends Services_Weather_Common {
 	            if (strtoupper($this->_weather->sky->layers[$i]->type) != "CLEAR") {
 	                $layers[$i]             = array();
 	                $layers[$i]["amount"]   = $clouds[$this->_weather->sky->layers[$i]->extent];
-	                $layers[$i]["height"]   = $this->convertDistance($this->_weather->sky->layers[$i]->altitude / 1000, "km", "ft");
+	                $layers[$i]["height"]   = $this->convertDistance($this->_weather->sky->layers[$i]->altitude, "m", $units["height"]);
 	                if (strtoupper($this->_weather->sky->layers[$i]->type) != "CLOUD") {
 	                    $layers[$i]["type"] = ucwords(str_replace("_", "", $this->_weather->sky->layers[$i]->type));
 	                }

@@ -1,7 +1,7 @@
 <?php
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 // +----------------------------------------------------------------------+
-// | Copyright (c) 2002 Brent Cook                                        |
+// | Copyright (c) 2002-2003 Brent Cook                                        |
 // +----------------------------------------------------------------------+
 // | This library is free software; you can redistribute it and/or        |
 // | modify it under the terms of the GNU Lesser General Public           |
@@ -20,7 +20,7 @@
 // | Author: Brent Cook <busterb@mail.utexas.edu>                         |
 // +----------------------------------------------------------------------+
 //
-// $Id: test_compatibility.php,v 1.1 2002/09/25 01:19:08 busterb Exp $
+// $Id: test_compatibility.php,v 1.2 2003/01/04 11:54:51 mj Exp $
 //
 
 // test functionality of the dba compatibility layer

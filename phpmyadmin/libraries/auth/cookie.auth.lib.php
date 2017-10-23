@@ -1,5 +1,5 @@
 <?php
-/* $Id: cookie.auth.lib.php,v 2.3 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: cookie.auth.lib.php,v 2.18 2004/09/14 14:42:47 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -11,7 +11,7 @@
 
 
 if (!isset($coming_from_common)) {
-   exit();
+   exit;
 }
 
 require_once('./libraries/blowfish.php');
@@ -22,6 +22,7 @@ PMA_setFontSizes();
 $pma_uri_parts = parse_url($cfg['PmaAbsoluteUri']);
 $cookie_path   = substr($pma_uri_parts['path'], 0, strrpos($pma_uri_parts['path'], '/'));
 $is_https      = (isset($pma_uri_parts['scheme']) && $pma_uri_parts['scheme'] == 'https') ? 1 : 0;
+$current_time  = time();
 
 /**
  * String padding
@@ -76,7 +77,7 @@ function PMA_blowfish_encrypt($data, $secret) {
         }
         $encrypt .= $pma_cipher->encryptBlock($block, $secret);
     }
-    return $encrypt;
+    return base64_encode($encrypt);
 }
 
 /**
@@ -91,9 +92,10 @@ function PMA_blowfish_encrypt($data, $secret) {
  *
  * @author  lem9
  */
-function PMA_blowfish_decrypt($data, $secret) {
+function PMA_blowfish_decrypt($encdata, $secret) {
     $pma_cipher = new Horde_Cipher_blowfish;
     $decrypt = '';
+    $data = base64_decode($encdata);
     for ($i=0; $i<strlen($data); $i+=8) {
         $decrypt .= $pma_cipher->decryptBlock(substr($data, $i, 8), $secret);
     }
@@ -146,23 +148,23 @@ function PMA_auth()
     // should be recalled, else skip the IE autocomplete feature.
     if ($cfg['LoginCookieRecall']) {
         // username
-        if (!empty($GLOBALS['pma_cookie_username'])) {
-            $default_user = $GLOBALS['pma_cookie_username'];
-        }
-        else if (!empty($_COOKIE) && isset($_COOKIE['pma_cookie_username'])) {
-            $default_user = $_COOKIE['pma_cookie_username'];
+        // do not try to use pma_cookie_username as it was encoded differently
+        // in previous versions and would produce an undefined offset in blowfish
+
+        if (!empty($_COOKIE) && isset($_COOKIE['pma_cookie_username-' . $server])) {
+            $default_user = $_COOKIE['pma_cookie_username-' . $server];
         }
 
-        if (isset($default_user) && get_magic_quotes_gpc()) {
-            $default_user = stripslashes($default_user);
-        }
+        $decrypted_user = isset($default_user) ? PMA_blowfish_decrypt($default_user, $GLOBALS['cfg']['blowfish_secret']) : '';
+        $pos = strrpos($decrypted_user, ':');
+        $default_user = substr($decrypted_user, 0, $pos);
 
         // server name
         if (!empty($GLOBALS['pma_cookie_servername'])) {
             $default_server = $GLOBALS['pma_cookie_servername'];
         }
-        else if (!empty($_COOKIE) && isset($_COOKIE['pma_cookie_servername'])) {
-            $default_server = $_COOKIE['pma_cookie_servername'];
+        else if (!empty($_COOKIE) && isset($_COOKIE['pma_cookie_servername-' . $server])) {
+            $default_server = $_COOKIE['pma_cookie_servername-' . $server];
         }
         if (isset($default_server) && get_magic_quotes_gpc()) {
             $default_server = stripslashes($default_server);
@@ -180,6 +182,10 @@ function PMA_auth()
     // Defines the charset to be used
     header('Content-Type: text/html; charset=' . $GLOBALS['charset']);
 
+    require_once('./libraries/select_theme.lib.php');
+    // Defines the "item" image depending on text direction
+    $item_img = $GLOBALS['pmaThemeImage'] . 'item_ltr.png';
+
     // Title
     ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -189,40 +195,87 @@ function PMA_auth()
 <head>
 <title>phpMyAdmin <?php echo PMA_VERSION; ?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=<?php echo $GLOBALS['charset']; ?>" />
-<base href="<?php echo $cfg['PmaAbsoluteUri']; ?>" />
-<style type="text/css">
+<script language="JavaScript" type="text/javascript">
 <!--
-body            {font-family: <?php echo $right_font_family; ?>; font-size: <?php echo $font_size; ?>; color: #000000}
-td              {font-family: <?php echo $right_font_family; ?>; font-size: <?php echo $font_size; ?>; color: #000000}
-h1              {font-family: <?php echo $right_font_family; ?>; font-size: <?php echo $font_bigger; ?>; font-weight: bold}
-select          {font-family: <?php echo $right_font_family; ?>; font-size: <?php echo $font_size; ?>; background-color:#ffffff; color:#000000}
-input.textfield {font-family: <?php echo $right_font_family; ?>; font-size: <?php echo $font_size; ?>; background-color:#ffffff; color:#000000}
-.warning        {font-family: <?php echo $right_font_family; ?>; font-size: <?php echo $font_size; ?>; font-weight: bold; color: #FF0000}
+    /* added 2004-06-10 by Michael Keck
+     *       we need this for Backwards-Compatibility and resolving problems
+     *       with non DOM browsers, which may have problems with css 2 (like NC 4)
+    */
+    var isDOM      = (typeof(document.getElementsByTagName) != 'undefined'
+                      && typeof(document.createElement) != 'undefined')
+                   ? 1 : 0;
+    var isIE4      = (typeof(document.all) != 'undefined'
+                      && parseInt(navigator.appVersion) >= 4)
+                   ? 1 : 0;
+    var isNS4      = (typeof(document.layers) != 'undefined')
+                   ? 1 : 0;
+    var capable    = (isDOM || isIE4 || isNS4)
+                   ? 1 : 0;
+    // Uggly fix for Opera and Konqueror 2.2 that are half DOM compliant
+    if (capable) {
+        if (typeof(window.opera) != 'undefined') {
+            var browserName = ' ' + navigator.userAgent.toLowerCase();
+            if ((browserName.indexOf('konqueror 7') == 0)) {
+                capable = 0;
+            }
+        } else if (typeof(navigator.userAgent) != 'undefined') {
+            var browserName = ' ' + navigator.userAgent.toLowerCase();
+            if ((browserName.indexOf('konqueror') > 0) && (browserName.indexOf('konqueror/3') == 0)) {
+                capable = 0;
+            }
+        } // end if... else if...
+    } // end if
+    document.writeln('<link rel="stylesheet" type="text/css" href="<?php echo defined('PMA_PATH_TO_BASEDIR') ? PMA_PATH_TO_BASEDIR : './'; ?>css/phpmyadmin.css.php?lang=<?php echo $GLOBALS['available_languages'][$GLOBALS['lang']][2]; ?>&amp;js_frame=right&amp;js_isDOM=' + isDOM + '" />');
 //-->
-</style>
+</script>
+<noscript>
+    <link rel="stylesheet" type="text/css" href="<?php echo defined('PMA_PATH_TO_BASEDIR') ? PMA_PATH_TO_BASEDIR : './'; ?>css/phpmyadmin.css.php?lang=<?php echo $GLOBALS['available_languages'][$GLOBALS['lang']][2]; ?>&amp;js_frame=right" />
+</noscript>
+
+<base href="<?php echo $cfg['PmaAbsoluteUri']; ?>" />
+<script language="javascript" type="text/javascript">
+<!--
+// show login form in top frame
+if (top != self) {
+    window.top.location.href=location;
+}
+//-->
+</script>
 </head>
 
 <body bgcolor="<?php echo $cfg['RightBgColor']; ?>">
-<center>
-<a href="http://www.phpmyadmin.net" target="_blank"><img name="imLogo" id="imLogo" src="images/pma_logo.png" border="0" width="88" height="31" alt="phpMyAdmin" /></a>
-<h1><?php echo sprintf($GLOBALS['strWelcome'], ' phpMyAdmin ' . PMA_VERSION . ' - ' . $GLOBALS['strLogin']); ?></h1>
-<br />
 
+<?php include('./config.header.inc.php'); ?>
+
+<center>
+<a href="http://www.phpmyadmin.net" target="_blank"><?php
+    $logo_image = $GLOBALS['pmaThemeImage'] . 'logo_right.png';
+    if (@file_exists($logo_image)) {
+        echo '<img src="' . $logo_image . '" id="imLogo" name="imLogo" alt="phpMyAdmin" border="0" />';
+    } else {
+        echo '<img name="imLogo" id="imLogo" src="' . $GLOBALS['pmaThemeImage'] . 'pma_logo.png' . '" '
+           . 'border="0" width="88" height="31" alt="phpMyAdmin" />';
+    }
+?></a>
+<h2><?php echo sprintf($GLOBALS['strWelcome'], ' phpMyAdmin ' . PMA_VERSION); ?></h2>
     <?php
     // Displays the languages form
     if (empty($cfg['Lang'])) {
         echo "\n";
         ?>
 <!-- Language selection -->
-<form method="post" action="index.php">
+<form method="post" action="index.php" target="_top">
     <input type="hidden" name="server" value="<?php echo $server; ?>" />
-    <b>Language:&nbsp;</b>
+    <table border="0" cellpadding="3" cellspacing="0">
+        <tr>
+            <td><b>Language:&nbsp;</b></td>
+            <td>
     <select name="lang" dir="ltr" onchange="this.form.submit();">
         <?php
         echo "\n";
 
         uasort($available_languages, 'PMA_cookie_cmp');
-        foreach($available_languages AS $id => $tmplang) {
+        foreach ($available_languages AS $id => $tmplang) {
             $lang_name = ucfirst(substr(strstr($tmplang[0], '|'), 1));
             if ($lang == $id) {
                 $selected = ' selected="selected"';
@@ -235,8 +288,8 @@ input.textfield {font-family: <?php echo $right_font_family; ?>; font-size: <?ph
         ?>
     </select>
     <input type="submit" value="<?php echo $GLOBALS['strGo']; ?>" />
-</form>
-<br />
+            </td>
+        </tr>
         <?php
     }
     echo "\n\n";
@@ -245,37 +298,53 @@ input.textfield {font-family: <?php echo $right_font_family; ?>; font-size: <?ph
 
     if ($GLOBALS['cfg']['blowfish_secret']=='') {
     ?>
-<p class="warning"><?php echo $GLOBALS['strSecretRequired']; ?></p>
-</body>
-</html>
-    <?php
-    exit();
+        <tr><td colspan="2" height="5"></td></tr>
+        <tr>
+            <th colspan="2" align="left" class="tblHeadError">
+                <div class="errorhead"><?php echo $GLOBALS['strError']; ?></div>
+            </th>
+        </tr>
+        <tr>
+            <td class="tblError" colspan="2" align="left"><?php echo $GLOBALS['strSecretRequired']; ?></td>
+        </tr>
+<?php
+        include('./config.footer.inc.php');
+        echo '        </table>' . "\n"
+           . '    </form>' . "\n"
+           . '    </body>' . "\n"
+           . '</html>';
+        exit();
     }
-    ?>
-<p><?php echo '(' . $GLOBALS['strCookiesRequired'] . ')'; ?></p>
+?>
+    </table>
+</form>
 <br />
-
-
 <!-- Login form -->
-<form method="post" action="index.php" name="login_form"<?php echo $autocomplete; ?>>
-    <table cellpadding="5">
+<form method="post" action="index.php" name="login_form"<?php echo $autocomplete; ?> target="_top">
+    <table cellpadding="3" cellspacing="0">
+      <tr>
+        <th align="left" colspan="2" class="tblHeaders" style="font-size: 14px; font-weight: bold;"><?php echo $GLOBALS['strLogin']; ?></th>
+    </tr>
+    <tr>
+        <td align="center" colspan="2" bgcolor="<?php echo $GLOBALS['cfg']['BgcolorOne']; ?>"><?php echo '(' . $GLOBALS['strCookiesRequired'] . ')'; ?></td>
+    </tr>
 <?php if ($GLOBALS['cfg']['AllowArbitraryServer']) { ?>
     <tr>
-        <td align="<?php echo $cell_align; ?>"><b><?php echo $GLOBALS['strLogServer']; ?>&nbsp;</b></td>
-        <td align="<?php echo $cell_align; ?>">
+        <td align="right" bgcolor="<?php echo $GLOBALS['cfg']['BgcolorOne']; ?>"><b><?php echo $GLOBALS['strLogServer']; ?>:&nbsp;</b></td>
+        <td align="<?php echo $cell_align; ?>" bgcolor="<?php echo $GLOBALS['cfg']['BgcolorOne']; ?>">
             <input type="text" name="pma_servername" value="<?php echo (isset($default_server) ? $default_server : ''); ?>" size="24" class="textfield" onfocus="this.select()" />
         </td>
     </tr>
 <?php } ?>
     <tr>
-        <td align="<?php echo $cell_align; ?>"><b><?php echo $GLOBALS['strLogUsername']; ?>&nbsp;</b></td>
-        <td align="<?php echo $cell_align; ?>">
+        <td align="right" bgcolor="<?php echo $GLOBALS['cfg']['BgcolorOne']; ?>"><b><?php echo $GLOBALS['strLogUsername']; ?>&nbsp;</b></td>
+        <td align="<?php echo $cell_align; ?>" bgcolor="<?php echo $GLOBALS['cfg']['BgcolorOne']; ?>">
             <input type="text" name="pma_username" value="<?php echo (isset($default_user) ? $default_user : ''); ?>" size="24" class="textfield" onfocus="this.select()" />
         </td>
     </tr>
     <tr>
-        <td align="<?php echo $cell_align; ?>"><b><?php echo $GLOBALS['strLogPassword']; ?>&nbsp;</b></td>
-        <td align="<?php echo $cell_align; ?>">
+        <td align="right" bgcolor="<?php echo $GLOBALS['cfg']['BgcolorOne']; ?>"><b><?php echo $GLOBALS['strLogPassword']; ?>&nbsp;</b></td>
+        <td align="<?php echo $cell_align; ?>" bgcolor="<?php echo $GLOBALS['cfg']['BgcolorOne']; ?>">
             <input type="password" name="pma_password" value="" size="24" class="textfield" onfocus="this.select()" />
         </td>
     </tr>
@@ -284,8 +353,8 @@ input.textfield {font-family: <?php echo $right_font_family; ?>; font-size: <?ph
         echo "\n";
         ?>
     <tr>
-        <td align="<?php echo $cell_align; ?>"><b><?php echo $GLOBALS['strServerChoice']; ?>&nbsp;:&nbsp;</b></td>
-        <td align="<?php echo $cell_align; ?>">
+        <td align="right" bgcolor="<?php echo $GLOBALS['cfg']['BgcolorOne']; ?>"><b><?php echo $GLOBALS['strServerChoice']; ?>:&nbsp;</b></td>
+        <td align="<?php echo $cell_align; ?>" bgcolor="<?php echo $GLOBALS['cfg']['BgcolorOne']; ?>">
             <select name="server"
             <?php
             if ($GLOBALS['cfg']['AllowArbitraryServer']) {
@@ -296,7 +365,7 @@ input.textfield {font-family: <?php echo $right_font_family; ?>; font-size: <?ph
         <?php
         echo "\n";
         // Displays the MySQL servers choice
-        foreach($cfg['Servers'] AS $key => $val) {
+        foreach ($cfg['Servers'] AS $key => $val) {
             if (!empty($val['host']) || $val['auth_type'] == 'arbitrary') {
                 echo '                <option value="' . $key . '"';
                 if (!empty($server) && ($server == $key)) {
@@ -338,11 +407,13 @@ input.textfield {font-family: <?php echo $right_font_family; ?>; font-size: <?ph
     } // end if (server choice)
     echo "\n";
     if (!empty($conn_error)) {
-        echo '<tr><td colspan="2" align="center"><p class="warning">'. $conn_error . '</p></td></tr>' . "\n";
+        echo '<tr><td colspan="2" height="5"></td></tr>';
+        echo '<tr><th colspan="2" align="left" class="tblHeadError"><div class="errorhead">' . $GLOBALS['strError'] . '</div></th></tr>' . "\n";
+        echo '<tr><td colspan="2" align="left" class="tblError">'. $conn_error . '</td></tr>' . "\n";
     }
     ?>
     <tr>
-        <td colspan="2" align="center">
+        <td colspan="2" align="right">
     <?php
     if (count($cfg['Servers']) == 1) {
         echo '    <input type="hidden" name="server" value="' . $server . '" />';
@@ -351,7 +422,12 @@ input.textfield {font-family: <?php echo $right_font_family; ?>; font-size: <?ph
     ?>
             <input type="hidden" name="lang" value="<?php echo $lang; ?>" />
             <input type="hidden" name="convcharset" value="<?php echo $convcharset; ?>" />
-            <input type="submit" value="<?php echo $GLOBALS['strLogin']; ?>" />
+    <?php
+    if (isset($GLOBALS['db'])) {
+        echo '            <input type="hidden" name="db" value="' . htmlspecialchars($GLOBALS['db']) . '" />' . "\n";
+    }
+    ?>
+            <input type="submit" value="<?php echo $GLOBALS['strLogin']; ?>" id="buttonYes" />
         </td>
     </tr>
     </table>
@@ -369,6 +445,9 @@ if (uname.value == '') {
 }
 //-->
 </script>
+
+<?php include('./config.footer.inc.php'); ?>
+
 </body>
 
 </html>
@@ -400,7 +479,7 @@ if (uname.value == '') {
 function PMA_auth_check()
 {
     global $PHP_AUTH_USER, $PHP_AUTH_PW, $pma_auth_server;
-    global $pma_servername, $pma_username, $pma_password, $old_usr;
+    global $pma_servername, $pma_username, $pma_password, $old_usr, $server;
     global $from_cookie;
 
     // Initialization
@@ -410,7 +489,7 @@ function PMA_auth_check()
 
     // The user wants to be logged out -> delete password cookie
     if (!empty($old_usr)) {
-        setcookie('pma_cookie_password', '', 0, $GLOBALS['cookie_path'], '' , $GLOBALS['is_https']);
+        setcookie('pma_cookie_password-' . $server, '', 0, $GLOBALS['cookie_path'], '' , $GLOBALS['is_https']);
     }
 
     // The user just logged in
@@ -433,32 +512,40 @@ function PMA_auth_check()
                 $pma_auth_server = $pma_cookie_servername;
                 $from_cookie   = TRUE;
             }
-            else if (!empty($_COOKIE) && isset($_COOKIE['pma_cookie_servername'])) {
-                $pma_auth_server = $_COOKIE['pma_cookie_servername'];
+            else if (!empty($_COOKIE) && isset($_COOKIE['pma_cookie_servername-' . $server])) {
+                $pma_auth_server = $_COOKIE['pma_cookie_servername-' . $server];
                 $from_cookie   = TRUE;
             }
         }
+
         // username
-        if (!empty($pma_cookie_username)) {
-            $PHP_AUTH_USER = $pma_cookie_username;
+        if (!empty($_COOKIE) && isset($_COOKIE['pma_cookie_username-' . $server])) {
+            $PHP_AUTH_USER = $_COOKIE['pma_cookie_username-' . $server];
             $from_cookie   = TRUE;
         }
-        else if (!empty($_COOKIE) && isset($_COOKIE['pma_cookie_username'])) {
-            $PHP_AUTH_USER = $_COOKIE['pma_cookie_username'];
-            $from_cookie   = TRUE;
+        $decrypted_user = PMA_blowfish_decrypt($PHP_AUTH_USER, $GLOBALS['cfg']['blowfish_secret']);
+        $pos = strrpos($decrypted_user, ':');
+        $PHP_AUTH_USER = substr($decrypted_user, 0, $pos);
+
+        $decrypted_time = (int)substr($decrypted_user, $pos + 1);
+
+        /* User inactive too long */
+        /* FIXME: maybe we could say it to user... */
+        if ($decrypted_time < $GLOBALS['current_time'] - $GLOBALS['cfg']['LoginCookieValidity']) {
+            return FALSE;
         }
+
         // password
         if (!empty($pma_cookie_password)) {
             $PHP_AUTH_PW   = $pma_cookie_password;
         }
-        else if (!empty($_COOKIE) && isset($_COOKIE['pma_cookie_password'])) {
-            $PHP_AUTH_PW   = $_COOKIE['pma_cookie_password'];
+        else if (!empty($_COOKIE) && isset($_COOKIE['pma_cookie_password-' . $server])) {
+            $PHP_AUTH_PW   = $_COOKIE['pma_cookie_password-' . $server];
         }
         else {
             $from_cookie   = FALSE;
         }
-        $PHP_AUTH_PW = base64_decode($PHP_AUTH_PW);
-        $PHP_AUTH_PW = PMA_blowfish_decrypt($PHP_AUTH_PW,$GLOBALS['cfg']['blowfish_secret']);
+        $PHP_AUTH_PW = PMA_blowfish_decrypt($PHP_AUTH_PW, $GLOBALS['cfg']['blowfish_secret'] . $decrypted_time);
 
         if ($PHP_AUTH_PW == "\xff(blank)") {
             $PHP_AUTH_PW   = '';
@@ -469,10 +556,6 @@ function PMA_auth_check()
     if (!$from_cookie && !$from_form) {
         return FALSE;
     } elseif ($from_cookie) {
-        if (get_magic_quotes_gpc()) {
-            $PHP_AUTH_USER = stripslashes($PHP_AUTH_USER);
-            // no need to strip password as it is encrypted during transfer
-        }
         return TRUE;
     } else {
         // we don't need to strip here, it is done in grab_globals
@@ -527,38 +610,43 @@ function PMA_auth_set_user()
     $cfg['Server']['user']     = $PHP_AUTH_USER;
     $cfg['Server']['password'] = $PHP_AUTH_PW;
 
-    // Set cookies if required (once per session) and, in this case, force
+    // Name and password cookies needs to be refreshed each time
+    // Duration = one month for username
+    setcookie('pma_cookie_username-' . $server,
+        PMA_blowfish_encrypt($cfg['Server']['user'] . ':' . $GLOBALS['current_time'],
+            $GLOBALS['cfg']['blowfish_secret']),
+        time() + (60 * 60 * 24 * 30),
+        $GLOBALS['cookie_path'], '',
+        $GLOBALS['is_https']);
+
+    // Duration = till the browser is closed for password (we don't want this to be saved)
+    setcookie('pma_cookie_password-' . $server,
+        PMA_blowfish_encrypt(!empty($cfg['Server']['password']) ? $cfg['Server']['password'] : "\xff(blank)",
+            $GLOBALS['cfg']['blowfish_secret'] . $GLOBALS['current_time']),
+        0,
+        $GLOBALS['cookie_path'], '',
+        $GLOBALS['is_https']);
+
+    // Set server cookies if required (once per session) and, in this case, force
     // reload to ensure the client accepts cookies
     if (!$from_cookie) {
         if ($GLOBALS['cfg']['AllowArbitraryServer']) {
             if (isset($pma_auth_server) && !empty($pma_auth_server) && $pma_server_changed) {
                 // Duration = one month for serverrname
-                setcookie('pma_cookie_servername',
+                setcookie('pma_cookie_servername-' . $server,
                     $cfg['Server']['host'],
                     time() + (60 * 60 * 24 * 30),
                     $GLOBALS['cookie_path'], '',
                     $GLOBALS['is_https']);
             } else {
                 // Delete servername cookie
-                setcookie('pma_cookie_servername', '', 0, $GLOBALS['cookie_path'], '' , $GLOBALS['is_https']);
+                setcookie('pma_cookie_servername-' . $server, '', 0, $GLOBALS['cookie_path'], '' , $GLOBALS['is_https']);
             }
         }
-        // Duration = one month for username
-        setcookie('pma_cookie_username',
-            $cfg['Server']['user'],
-            time() + (60 * 60 * 24 * 30),
-            $GLOBALS['cookie_path'], '',
-            $GLOBALS['is_https']);
 
-        // Duration = till the browser is closed for password
-        // Some binary contents are now retrieved properly when stored
-        // as a cookie, so we base64_encode()
-        setcookie('pma_cookie_password',
-            base64_encode(PMA_blowfish_encrypt(((!empty($cfg['Server']['password'])) ? $cfg['Server']['password'] : "\xff(blank)"), $GLOBALS['cfg']['blowfish_secret'])),
-            0,
-            $GLOBALS['cookie_path'], '',
-            $GLOBALS['is_https']);
         // loic1: workaround against a IIS 5.0 bug
+        // lem9: here, PMA_sendHeaderLocation() has not yet been defined,
+        //       so use the workaround
         if (empty($GLOBALS['SERVER_SOFTWARE'])) {
             if (isset($_SERVER) && !empty($_SERVER['SERVER_SOFTWARE'])) {
                 $GLOBALS['SERVER_SOFTWARE'] = $_SERVER['SERVER_SOFTWARE'];
@@ -586,13 +674,13 @@ function PMA_auth_set_user()
  */
 function PMA_auth_fails()
 {
-global $conn_error;
+global $conn_error, $server;
 
     // Deletes password cookie and displays the login form
-    setcookie('pma_cookie_password', base64_encode(''), 0, $GLOBALS['cookie_path'], '' , $GLOBALS['is_https']);
+    setcookie('pma_cookie_password-' . $server, '', 0, $GLOBALS['cookie_path'], '' , $GLOBALS['is_https']);
 
-    if (PMA_mysql_error()) {
-        $conn_error = PMA_mysql_error();
+    if (PMA_DBI_getError()) {
+        $conn_error = PMA_DBI_getError();
     } else if (isset($php_errormsg)) {
         $conn_error = $php_errormsg;
     } else {

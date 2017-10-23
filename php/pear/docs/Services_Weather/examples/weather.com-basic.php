@@ -16,7 +16,7 @@
 // | Authors: Alexander Wirtz <alex@pc4p.net>                             |
 // +----------------------------------------------------------------------+
 //
-// $Id: weather.com-basic.php,v 1.5 2004/03/28 13:19:39 eru Exp $
+// $Id: weather.com-basic.php,v 1.6 2004/05/07 14:41:36 eru Exp $
 
 require_once "Services/Weather.php";
 
@@ -31,9 +31,9 @@ if (Services_Weather::isError($weatherDotCom)) {
 $weatherDotCom->setAccountData("<PartnerID>", "<LicenseKey>");
 
 /* Erase comments to enable caching
-$weatherDotCom->setCache("file", array("cache_dir" => "/tmp/cache/"));
-if (Services_Weather::isError($weatherDotCom)) {
-    echo "Error: ".$weatherDotCom->getMessage()."\n";
+$status = $weatherDotCom->setCache("file", array("cache_dir" => "/tmp/cache/"));
+if (Services_Weather::isError($status)) {
+    echo "Error: ".$status->getMessage()."\n";
 }
 */
 

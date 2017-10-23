@@ -5,7 +5,7 @@
  * @package HTML_Template_Sigma
  * @author Alexey Borzov <avb@php.net>
  * 
- * $Id: example_4.php,v 1.1 2003/04/27 08:23:04 avb Exp $
+ * $Id: example_4.php,v 1.2 2004/04/14 09:41:55 avb Exp $
  */ 
 
 require_once 'HTML/Template/Sigma.php';
@@ -23,6 +23,11 @@ function translate($str)
     global $lang, $aryI18n;
 
     return isset($aryI18n[$lang][$str])? $aryI18n[$lang][$str]: $str;
+}
+
+function letters($str)
+{
+    return preg_replace('/[^\\w\\s]/', '', $str);
 }
 
 $ary = array(
@@ -86,6 +91,12 @@ foreach (array_keys($aryI18n) as $lang) {
     ));
     $tpl->parse('i18n_block');
 }
+
+// 3. Shorthand for callbacks, built-in callbacks
+// We add a variable that cannot be safely displayed either in HTML,
+// in URLs or inside JavaScript string constants without appropriate encoding
+$tpl->setVariable('escaped', '"Foo & Bar"');
+$tpl->setCallbackFunction('letters', 'letters');
 
 // output the results
 $tpl->show();

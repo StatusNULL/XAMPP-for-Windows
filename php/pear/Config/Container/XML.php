@@ -15,7 +15,7 @@
 // | Author: Bertrand Mansion <bmansion@mamasam.com>                      |
 // +----------------------------------------------------------------------+
 //
-// $Id: XML.php,v 1.10 2003/11/29 11:25:30 mansion Exp $
+// $Id: XML.php,v 1.11 2004/06/04 09:59:59 mansion Exp $
 
 require_once('XML/Parser.php');
 require_once('XML/Util.php');
@@ -90,7 +90,7 @@ class Config_Container_XML extends XML_Parser {
     {
         $this->folding = false;
         $this->cdata = null;
-        $this->XML_Parser(null, 'event');
+        $this->XML_Parser($this->options['encoding'], 'event');
         $this->containers[0] =& $obj->container;
         if (is_string($datasrc)) {
             if ($this->options['isFile']) {

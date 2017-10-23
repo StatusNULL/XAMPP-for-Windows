@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_details_common.php,v 2.3 2003/12/30 18:24:10 rabus Exp $ */
+/* $Id: db_details_common.php,v 2.9 2004/08/03 11:09:02 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -25,10 +25,10 @@ $err_url   = $cfg['DefaultTabDatabase'] . '?' . PMA_generate_common_url($db);
 if (!isset($is_db) || !$is_db) {
     // Not a valid db name -> back to the welcome page
     if (!empty($db)) {
-        $is_db = @PMA_mysql_select_db($db);
+        $is_db = PMA_DBI_select_db($db);
     }
     if (empty($db) || !$is_db) {
-        header('Location: ' . $cfg['PmaAbsoluteUri'] . 'main.php?' . PMA_generate_common_url('', '', '&') . (isset($message) ? '&message=' . urlencode($message) : '') . '&reload=1');
+        PMA_sendHeaderLocation($cfg['PmaAbsoluteUri'] . 'main.php?' . PMA_generate_common_url('', '', '&') . (isset($message) ? '&message=' . urlencode($message) : '') . '&reload=1');
         exit;
     }
 } // end if (ensures db exists)
@@ -36,10 +36,12 @@ if (!isset($is_db) || !$is_db) {
 /**
  * Changes database charset if requested by the user
  */
-if (isset($submitcharset) && PMA_MYSQL_INT_VERSION >= 40101) {
-    $sql_query     = 'ALTER DATABASE ' . PMA_backquote($db) . ' DEFAULT CHARACTER SET ' . $db_charset;
-    $result        = PMA_mysql_query($sql_query, $userlink) or PMA_mysqlDie(PMA_mysql_error($userlink), $sql_query, '', $err_url);
-    $message       = $strSuccess;
+if (isset($submitcollation) && !empty($db_collation) && PMA_MYSQL_INT_VERSION >= 40101) {
+    list($db_charset) = explode('_', $db_collation);
+    $sql_query        = 'ALTER DATABASE ' . PMA_backquote($db) . ' DEFAULT' . PMA_generateCharsetQueryPart($db_collation);
+    $result           = PMA_DBI_query($sql_query);
+    $message          = $strSuccess;
+    unset($db_charset, $db_collation);
 }
 
 // Displays headers
@@ -52,7 +54,30 @@ if (!isset($message)) {
         ?>
 <script type="text/javascript" language="javascript1.2">
 <!--
-window.parent.frames['nav'].location.replace('./left.php?<?php echo PMA_generate_common_url($db, '', '&'); ?>&hash=' + <?php echo (($cfg['QueryFrame'] && $cfg['QueryFrameJS']) ? 'window.parent.frames[\'queryframe\'].document.hashform.hash.value' : "'" . md5($cfg['PmaAbsoluteUri']) . "'"); ?>);
+var hashformDone = false;
+function hashformReload() {
+<?php
+    if ($cfg['QueryFrame'] && $cfg['QueryFrameJS']) {
+?>
+    if (hashformDone != true) {
+        if (typeof(window.parent.frames['queryframe'].document.hashform.hash) != 'undefined' && typeof(window.parent.frames['nav']) != 'undefined') {
+            window.parent.frames['nav'].location.replace('./left.php?<?php echo PMA_generate_common_url('', '', '&');?>&hash=' +
+                                                         window.parent.frames['queryframe'].document.hashform.hash.value);
+            hashformDone = true;
+        } else {
+            setTimeout("hashformReload();",500);
+        }
+    }
+<?php
+    } else {
+?>
+        window.parent.frames['nav'].location.replace('./left.php?<?php echo PMA_generate_common_url('', '', '&');?>&hash=' +
+                                                         '<?php echo md5($cfg['PmaAbsoluteUri']); ?>');
+<?php
+    }
+?>
+}
+setTimeout("hashformReload();",500);
 //-->
 </script>
         <?php

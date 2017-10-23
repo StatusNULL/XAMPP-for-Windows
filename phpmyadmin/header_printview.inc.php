@@ -1,5 +1,5 @@
 <?php
-/* $Id: header_printview.inc.php,v 2.3.2.1 2004/01/23 16:07:10 rabus Exp $ */
+/* $Id: header_printview.inc.php,v 2.4 2004/01/23 15:56:39 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**

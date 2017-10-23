@@ -1,5 +1,5 @@
 <?php
-/* $Id: header_http.inc.php,v 2.0 2003/11/18 15:20:43 nijel Exp $ */
+/* $Id: header_http.inc.php,v 2.1 2004/04/27 12:36:11 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**

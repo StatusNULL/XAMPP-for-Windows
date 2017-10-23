@@ -17,7 +17,7 @@
 // |          Bertrand Mansion <bmansion@mamasam.com>                     |
 // +----------------------------------------------------------------------+
 //
-// $Id: advcheckbox.php,v 1.13 2004/02/29 09:34:42 avb Exp $
+// $Id: advcheckbox.php,v 1.14 2004/04/19 11:40:01 avb Exp $
 
 require_once('HTML/QuickForm/checkbox.php');
 
@@ -247,7 +247,9 @@ class HTML_QuickForm_advcheckbox extends HTML_QuickForm_checkbox
                         $value = $this->_findValue($caller->_defaultValues);
                     }
                 }
-                $this->setValue($value);
+                if (null !== $value) {
+                    $this->setValue($value);
+                }
                 break;
             default:
                 parent::onQuickFormEvent($event, $arg, $caller);

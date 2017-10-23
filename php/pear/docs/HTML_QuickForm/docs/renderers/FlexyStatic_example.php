@@ -1,11 +1,11 @@
-<?
+<?php
 /**
  * Example of usage for HTML_QuickForm Object renderer 
  * with Flexy template engine and static template
  *
  * @author Ron McClain <mixtli@cats.ucsc.edu>
  *
- * $Id: FlexyStatic_example.php,v 1.3 2003/11/03 12:55:53 avb Exp $ 
+ * $Id: FlexyStatic_example.php,v 1.4 2004/06/24 19:23:10 ths Exp $ 
  */
 
 require_once('HTML/Template/Flexy.php');
@@ -127,7 +127,7 @@ $options = array(
 
 $template = new HTML_Template_Flexy($options);
 
-$renderer =& new HTML_QuickForm_Renderer_ObjectFlexy(&$template);
+$renderer =& new HTML_QuickForm_Renderer_ObjectFlexy($template);
 $renderer->setLabelTemplate("label.html");
 $renderer->setHtmlTemplate("html.html");
 

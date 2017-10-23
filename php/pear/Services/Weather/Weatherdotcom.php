@@ -16,35 +16,46 @@
 // | Authors: Alexander Wirtz <alex@pc4p.net>                             |
 // +----------------------------------------------------------------------+
 //
-// $Id: Weatherdotcom.php,v 1.34 2004/03/31 12:32:58 eru Exp $
+// $Id: Weatherdotcom.php,v 1.43 2004/07/10 11:12:44 eru Exp $
 
+/**
+* @package      Services_Weather
+* @filesource
+*/
+
+/**
+*/
 require_once "Services/Weather/Common.php";
 
 // {{{ class Services_Weather_Weatherdotcom
 /**
 * PEAR::Services_Weather_Weatherdotcom
 *
-* This class acts as an interface to the xml service of weather.com. It searches for given
-* locations and retrieves current weather data as well as forecast for up to 10 days.
+* This class acts as an interface to the xml service of weather.com. It
+* searches for given locations and retrieves current weather data as well
+* as forecast for up to 10 days.
 *
 * For using the weather.com xml-service please visit
 *     http://www.weather.com/services/xmloap.html
-* and follow the link to sign up, it's free! You will receive an email where to download
-* the SDK with the needed images and guidelines how to publish live data from weather.com.
-* Unfortunately the guidelines are a bit harsh, that's why there's no actual data-representation
-* in this class, just the raw data.
-* Also weather.com demands active caching, so I'd strongly recommend enabling the caching
-* implemented in this class. It obeys to the times as written down in the guidelines.
+* and follow the link to sign up, it's free! You will receive an email
+* where to download the SDK with the needed images and guidelines how to
+* publish live data from weather.com. Unfortunately the guidelines are a
+* bit harsh, that's why there's no actual data-representation in this
+* class, just the raw data. Also weather.com demands active caching, so I'd
+* strongly recommend enabling the caching implemented in this class. It
+* obeys to the times as written down in the guidelines.
 *
-* For a working example, please take a look at
+* For working examples, please take a look at
 *     docs/Services_Weather/examples/weather.com-basic.php
+*     docs/Services_Weather/examples/weather.com-extensive.php
 *
 * @author       Alexander Wirtz <alex@pc4p.net>
 * @link         http://www.weather.com/services/xmloap.html
-* @example      docs/Services_Weather/examples/weather.com-basic.php
+* @example      examples/weather.com-basic.php      weather.com-basic.php
+* @example      examples/weather.com-extensive.php  weather.com-extensive.php
 * @package      Services_Weather
 * @license      http://www.php.net/license/2_02.txt
-* @version      1.2
+* @version      1.3
 */
 class Services_Weather_Weatherdotcom extends Services_Weather_Common {
 
@@ -64,6 +75,14 @@ class Services_Weather_Weatherdotcom extends Services_Weather_Common {
     * @access   private
     */
     var $_licenseKey = "";
+
+    /**
+    * Object containing the promotional links-data
+    *
+    * @var      object stdClass             $_links
+    * @access   private
+    */
+    var $_links;
 
     /**
     * XML_Unserializer, used for processing the xml
@@ -119,7 +138,8 @@ class Services_Weather_Weatherdotcom extends Services_Weather_Common {
 
     // {{{ setAccountData()
     /**
-    * Sets the neccessary account-information for weather.com, you'll receive them after registering for the XML-stream
+    * Sets the neccessary account-information for weather.com, you'll
+    * receive them after registering for the XML-stream
     *
     * @param    string                      $partnerID
     * @param    string                      $licenseKey
@@ -138,7 +158,8 @@ class Services_Weather_Weatherdotcom extends Services_Weather_Common {
 
     // {{{ _checkLocationID()
     /**
-    * Checks the id for valid values and thus prevents silly requests to weather.com server
+    * Checks the id for valid values and thus prevents silly requests to
+    * weather.com server
     *
     * @param    string                      $id
     * @return   PEAR_Error|bool
@@ -148,10 +169,10 @@ class Services_Weather_Weatherdotcom extends Services_Weather_Common {
     */
     function _checkLocationID($id)
     {
-        if (!strlen($id)) {
-            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_NO_LOCATION);
+        if (is_array($id) || is_object($id) || !strlen($id)) {
+            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_NO_LOCATION, __FILE__, __LINE__);
         } elseif (!ctype_alnum($id) || (strlen($id) > 8)) {
-            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_INVALID_LOCATION);
+            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_INVALID_LOCATION, __FILE__, __LINE__);
         }
 
         return true;
@@ -175,7 +196,7 @@ class Services_Weather_Weatherdotcom extends Services_Weather_Common {
 		$request = &new HTTP_Request($url, array("timeout" => $this->_httpTimeout));
 		$status = $request->sendRequest();
         if (Services_Weather::isError($status)) {
-            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_WRONG_SERVER_DATA);
+            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_WRONG_SERVER_DATA, __FILE__, __LINE__);
         }
 		$data = $request->getResponseBody();
     	
@@ -183,18 +204,18 @@ class Services_Weather_Weatherdotcom extends Services_Weather_Common {
         $status = $this->_unserializer->unserialize($data);
 
         if (Services_Weather::isError($status)) {
-            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_WRONG_SERVER_DATA);
+            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_WRONG_SERVER_DATA, __FILE__, __LINE__);
         } else {
             $root = $this->_unserializer->getRootName();
             $data = $this->_unserializer->getUnserializedData();
 
             if (Services_Weather::isError($root)) {
                 // Something wrong here...
-                return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_WRONG_SERVER_DATA);
+                return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_WRONG_SERVER_DATA, __FILE__, __LINE__);
             } elseif ($root == "error") {
                 // We got an error back from weather.com
                 $errno  = key(get_object_vars($data));
-                return Services_Weather::raiseError($errno);
+                return Services_Weather::raiseError($errno, __FILE__, __LINE__);
             } else {
                 // Valid data, lets get started
                 // Loop through the different sub-parts of the data fro processing
@@ -202,6 +223,9 @@ class Services_Weather_Weatherdotcom extends Services_Weather_Common {
                     switch ($key) {
                         case "head":
                             continue 2;
+                            break;
+                        case "prmo":
+                            $varname  = "links";
                             break;
                         case "loc":
                             $varname  = "location";
@@ -230,7 +254,8 @@ class Services_Weather_Weatherdotcom extends Services_Weather_Common {
 
     // {{{ searchLocation()
     /**
-    * Searches IDs for given location, returns array of possible locations or single ID
+    * Searches IDs for given location, returns array of possible locations
+    * or single ID
     *
     * @param    string                      $location
     * @param    bool                        $useFirst       If set, first ID of result-array is returned
@@ -246,14 +271,14 @@ class Services_Weather_Weatherdotcom extends Services_Weather_Common {
         $status = $this->_unserializer->unserialize($searchURL, true, array("overrideOptions" => true, "complexType" => "array", "keyAttribute" => "id"));
 
         if (Services_Weather::isError($status)) {
-            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_WRONG_SERVER_DATA);
+            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_WRONG_SERVER_DATA, __FILE__, __LINE__);
         } else {
             $search = $this->_unserializer->getUnserializedData();
 
             if (Services_Weather::isError($search)) {
-                return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_WRONG_SERVER_DATA);
+                return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_WRONG_SERVER_DATA, __FILE__, __LINE__);
             } elseif (!is_array($search) || !sizeof($search)) {
-                return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_UNKNOWN_LOCATION);
+                return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_UNKNOWN_LOCATION, __FILE__, __LINE__);
             } else {
                 if (!$useFirst && (sizeof($search) > 1)) {
                     $searchReturn = $search;
@@ -283,19 +308,50 @@ class Services_Weather_Weatherdotcom extends Services_Weather_Common {
     }
     // }}}
 
-    // {{{ getUnits()
+    // {{{ getLinks()
     /**
-    * Returns the units for the current query
+    * Returns the data for the promotional links belonging to the ID
     *
     * @param    string                      $id
-    * @param    string                      $unitsFormat
-    * @return   array
-    * @deprecated
+    * @return   PEAR_Error|array
+    * @throws   PEAR_Error
     * @access   public
     */
-    function getUnits($id = null, $unitsFormat = "")
+    function getLinks($id = "")
     {
-        return $this->getUnitsFormat($unitsFormat);
+        $status = $this->_checkLocationID($id);
+
+        if (Services_Weather::isError($status)) {
+            return $status;
+        }
+
+        $linksReturn = array();
+        $linksURL    = "http://xoap.weather.com/weather/local/".$id."?prod=xoap&par=".$this->_partnerID."&key=".$this->_licenseKey."&link=xoap";
+
+        if ($this->_cacheEnabled && ($links = $this->_cache->get($id, "links"))) {
+            // Get data from cache
+            $this->_links = $links;
+            $linksReturn["cache"] = "HIT";
+        } else {
+            // Same as in the function above...
+            $status = $this->_parseWeatherData($id, $linksURL);
+
+            if (Services_Weather::isError($status)) {
+                return $status;
+            }
+            $linksReturn["cache"] = "MISS";
+        }
+
+        $linksReturn["promo"] = array();
+        for ($i = 0; $i < sizeof($this->_links->link); $i++) {
+            $linksReturn["promo"][$i] = array();
+            $linksReturn["promo"][$i]["title"] = $this->_links->link[$i]->t;
+            // B0rked response (returned is &par=xoap, should be &prod=xoap), fix it
+            $linksReturn["promo"][$i]["link"]  = str_replace("par=", "prod=", $this->_links->link[$i]->l);
+            $linksReturn["promo"][$i]["link"] .= "&par=".$this->_partnerID;
+        }   
+
+        return $linksReturn;
     }
     // }}}
 
@@ -317,7 +373,7 @@ class Services_Weather_Weatherdotcom extends Services_Weather_Common {
         }
 
         $locationReturn = array();
-        $locationURL    = "http://xoap.weather.com/weather/local/".$id."?prod=xoap&par=".$this->_partnerID."&key=".$this->_licenseKey."&unit=s";
+        $locationURL    = "http://xoap.weather.com/weather/local/".$id."?prod=xoap&par=".$this->_partnerID."&key=".$this->_licenseKey;
 
         if ($this->_cacheEnabled && ($location = $this->_cache->get($id, "location"))) {
             // Get data from cache
@@ -332,6 +388,7 @@ class Services_Weather_Weatherdotcom extends Services_Weather_Common {
             }
             $locationReturn["cache"] = "MISS";
         }
+
         $locationReturn["name"]      = $this->_location->dnam;
         $locationReturn["time"]      = date($this->_timeFormat, strtotime($this->_location->tm));
         $locationReturn["latitude"]  = $this->_location->lat;
@@ -382,8 +439,16 @@ class Services_Weather_Weatherdotcom extends Services_Weather_Common {
             $weatherReturn["cache"] = "MISS";
         }
         
-        $update  = str_replace("Local Time", "", $this->_weather->lsup);
-        $weatherReturn["update"]            = gmdate(trim($this->_dateFormat." ".$this->_timeFormat), strtotime($update));
+        // Some explanation for the next two lines:
+        // weather.com isn't always supplying the timezone in the update string, but
+        // uses "Local Time" as reference, which is imho utterly stupid, because it's
+        // inconsistent. Well, what I do here is check for this string and if I can
+        // find it, I calculate the difference between the timezone at the location
+        // and this computers timezone. This amount of seconds is then subtracted from
+        // the time the update-string has delivered.
+        $update   = str_replace("Local Time", "", $this->_weather->lsup);
+        $adjustTZ = ($update == $this->_weather->lsup) ? 0 : $this->_location->zone * 3600 - date("Z");
+        $weatherReturn["update"]            = gmdate(trim($this->_dateFormat." ".$this->_timeFormat), strtotime($update) - $adjustTZ);
         $weatherReturn["updateRaw"]         = $this->_weather->lsup;
         $weatherReturn["station"]           = $this->_weather->obst;
         $weatherReturn["temperature"]       = $this->convertTemperature($this->_weather->tmp, "f", $units["temp"]);
@@ -452,10 +517,18 @@ class Services_Weather_Weatherdotcom extends Services_Weather_Common {
             $forecastReturn["cache"] = "MISS";
         }
 
-        $update = implode(" ", array_slice(explode(" ", $this->_forecast->lsup ), 0, 3));
-
-        $forecastReturn["update"] = date($this->_dateFormat." ".$this->_timeFormat, strtotime($update));
-        $forecastReturn["days"]   = array();
+        // Some explanation for the next two lines: (same as above)
+        // weather.com isn't always supplying the timezone in the update string, but
+        // uses "Local Time" as reference, which is imho utterly stupid, because it's
+        // inconsistent. Well, what I do here is check for this string and if I can
+        // find it, I calculate the difference between the timezone at the location
+        // and this computers timezone. This amount of seconds is then subtracted from
+        // the time the update-string has delivered.
+        $update   = str_replace("Local Time", "", $this->_forecast->lsup);
+        $adjustTZ = ($update == $this->_forecast->lsup) ? 0 : $this->_location->zone * 3600 - date("Z");
+        $forecastReturn["update"]    = gmdate($this->_dateFormat." ".$this->_timeFormat, strtotime($update) - $adjustTZ);
+        $forecastReturn["updateRaw"] = $this->_forecast->lsup;
+        $forecastReturn["days"]      = array();
 
         for ($i = 0; $i < $days; $i++) {
             $day = array(

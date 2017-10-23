@@ -1,5 +1,5 @@
 <?php
-/* $Id: overview.php,v 2.3 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: overview.php,v 2.4 2004/05/20 16:14:13 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -28,7 +28,7 @@ $types = PMA_getAvailableMIMEtypes();
 
 <h2><?php echo $strMIME_available_mime; ?></h2>
 <?php
-foreach($types['mimetype'] AS $key => $mimetype) {
+foreach ($types['mimetype'] AS $key => $mimetype) {
 
     if (isset($types['empty_mimetype'][$mimetype])) {
         echo '<i>' . $mimetype . '</i><br />';
@@ -54,7 +54,7 @@ foreach($types['mimetype'] AS $key => $mimetype) {
 <?php
 @reset($types);
 $i = 0;
-foreach($types['transformation'] AS $key => $transform) {
+foreach ($types['transformation'] AS $key => $transform) {
     $i++;
     $func = strtolower(preg_replace('@(\.inc\.php3?)$@i', '', $types['transformation_file'][$key]));
     $desc = 'strTransformation_' . $func;

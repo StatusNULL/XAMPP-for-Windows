@@ -33,7 +33,7 @@
 // |          Lorenzo Alberton <l.alberton at quipo.it>                    |
 // +-----------------------------------------------------------------------+
 //
-// $Id: Pager.php,v 1.12 2004/01/13 00:15:00 quipo Exp $
+// $Id: Pager.php,v 1.14 2004/04/15 18:10:00 quipo Exp $
 
 /**
  * File Pager.php
@@ -47,12 +47,11 @@
  *
  * @author  Richard Heyes <richard@phpguru.org>,
  * @author  Lorenzo Alberton <l.alberton at quipo.it>
- * @version  $Id: Pager.php,v 1.12 2004/01/13 00:15:00 quipo Exp $
+ * @version  $Id: Pager.php,v 1.14 2004/04/15 18:10:00 quipo Exp $
  * @package Pager
  */
 class Pager
 {
-
     // {{{ Pager()
 
     /**
@@ -134,11 +133,38 @@ class Pager
      */
     function Pager($options = array())
     {
-        $mode = (isset($options['mode']) ? $options['mode'] : 'Jumping');
-        $pager_class = 'Pager_' . ucfirst($mode);
-        $pager_classfile = 'Pager' . DIRECTORY_SEPARATOR . $mode . '.php';
-        require_once $pager_classfile;
-        $this = new $pager_class($options);
+        //this check evaluates to true on 5.0.0RC-dev,
+        //so i'm using another one, for now...
+        //if (version_compare(phpversion(), '5.0.0') == -1) {
+        if (get_class($this) == 'pager') { //php4 lowers class names
+            // assign factoried method to this for PHP 4
+            eval('$this = Pager::factory($options);');
+        } else { //php5 is case sensitive
+            $msg = 'In PHP5 you must use the "Pager::factory($params)" method'
+                  .' instead of "new Pager($params)"';
+            trigger_error($msg, E_USER_WARNING);
+        }
+    }
+
+    // }}}
+    // {{{ _factory()
+
+    /**
+     * Return a pager based on $mode and $options
+     *
+     * @access public
+     * @static
+     * @param  string $options Optional parameters for the storage class
+     * @return object Object   Storage object
+     */
+    function &factory($options = array())
+    {
+        $mode = (isset($options['mode']) ? ucfirst($options['mode']) : 'Jumping');
+        $classname = 'Pager_' . $mode;
+        $classfile = 'Pager' . DIRECTORY_SEPARATOR . $mode . '.php';
+        require_once $classfile;
+        $pager =& new $classname($options);
+        return $pager;
     }
 
     // }}}

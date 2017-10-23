@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_properties_table_info.php,v 2.3.2.1 2004/06/07 10:09:52 rabus Exp $ */
+/* $Id: tbl_properties_table_info.php,v 2.8 2004/06/02 13:31:04 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 // this should be recoded as functions, to avoid messing with global
@@ -15,19 +15,18 @@ PMA_checkParameters(array('db', 'table'));
  * Gets table informations
  */
 // The 'show table' statement works correct since 3.23.03
-$local_query         = 'SHOW TABLE STATUS LIKE \'' . PMA_sqlAddslashes($table, TRUE) . '\'';
-$table_info_result   = PMA_mysql_query($local_query) or PMA_mysqlDie('', $local_query, '', $err_url_0);
-$showtable           = PMA_mysql_fetch_array($table_info_result);
+$table_info_result   = PMA_DBI_query('SHOW TABLE STATUS LIKE \'' . PMA_sqlAddslashes($table, TRUE) . '\';');
+$showtable           = PMA_DBI_fetch_assoc($table_info_result);
 if (!isset($showtable['Type']) && isset($showtable['Engine'])) {
     $showtable['Type'] =& $showtable['Engine'];
 }
-$tbl_type            = strtoupper($showtable['Type']);
-$tbl_charset         = empty($showtable['Collation']) ? '' : $showtable['Collation'];
+$tbl_type            = isset($showtable['Type']) ? strtoupper($showtable['Type']) : '';
+$tbl_collation       = empty($showtable['Collation']) ? '' : $showtable['Collation'];
 $table_info_num_rows = (isset($showtable['Rows']) ? $showtable['Rows'] : 0);
 $show_comment        = (isset($showtable['Comment']) ? $showtable['Comment'] : '');
 $auto_increment      = (isset($showtable['Auto_increment']) ? $showtable['Auto_increment'] : '');
 
-$tmp                 = explode(' ', $showtable['Create_options']);
+$tmp                 = isset($showtable['Create_options']) ? explode(' ', $showtable['Create_options']) : array();
 $tmp_cnt             = count($tmp);
 for ($i = 0; $i < $tmp_cnt; $i++) {
     $tmp1            = explode('=', $tmp[$i]);
@@ -36,7 +35,7 @@ for ($i = 0; $i < $tmp_cnt; $i++) {
     }
 } // end for
 unset($tmp1, $tmp);
-mysql_free_result($table_info_result);
+PMA_DBI_free_result($table_info_result);
 
 
 /**

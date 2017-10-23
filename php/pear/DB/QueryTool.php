@@ -15,28 +15,39 @@
 // | Author:  Wolfram Kriesing, Paolo Panto, vision:produktion <wk@visionp.de>
 // +----------------------------------------------------------------------+
 //
-// $Id: QueryTool.php,v 1.1.1.1 2003/01/17 12:39:01 cain Exp $
+// $Id: QueryTool.php,v 1.3 2004/04/06 12:25:42 quipo Exp $
 //
 
 require_once 'DB/QueryTool/EasyJoin.php';
 
-
 /**
-*   this class should be extended
-*   This class is here to make it easy using the base 
-*   class of the package by it's package name.
-*   Since I tried to seperate the functionality a bit inside the
-*   really working classes i decided to have this class here just to 
-*   provide the name, since the functionality inside the other
-*   classes might be restructured a bit but this name always stays.
-*
-*   @package    DB_QueryTool
-*   @version    2002/04/02
-*   @access     public
-*   @author     Wolfram Kriesing <wk@visionp.de>
-*/
+ * this class should be extended
+ * This class is here to make it easy using the base
+ * class of the package by it's package name.
+ * Since I tried to seperate the functionality a bit inside the
+ * really working classes i decided to have this class here just to
+ * provide the name, since the functionality inside the other
+ * classes might be restructured a bit but this name always stays.
+ *
+ * @package    DB_QueryTool
+ * @version    2002/04/02
+ * @access     public
+ * @author     Wolfram Kriesing <wk@visionp.de>
+ */
 class DB_QueryTool extends DB_QueryTool_EasyJoin
 {
-}
+    // {{{ DB_QueryTool()
 
+    /**
+     * call parent constructor
+     * @param mixed $dsn DSN string, DSN array or DB object
+     * @param array $options
+     */
+    function DB_QueryTool($dsn=false, $options=array())
+    {
+        parent::__construct($dsn, $options);
+    }
+
+    // }}}
+}
 ?>

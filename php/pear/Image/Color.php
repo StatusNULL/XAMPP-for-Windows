@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------+
 // | PHP Version 4                                                        |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2002 The PHP Group                                |
+// | Copyright (c) 1997-2003 The PHP Group                                |
 // +----------------------------------------------------------------------+
 // | This source file is subject to version 2.02 of the PHP license,      |
 // | that is bundled with this package in the file LICENSE, and is        |
@@ -15,9 +15,10 @@
 // | Authors: Jason Lotito <jason@lehighweb.com>                          |
 // |          Ulf Wendel <ulf.wendel@phpdoc.de>                           |
 // |          Sebastian Bergmann <sb@sebastian-bergmann.de>               |
+// |          Laurent Laville <pear@laurent-laville.org>                  |
 // +----------------------------------------------------------------------+
 //
-// $Id: Color.php,v 1.9 2002/12/28 23:08:27 sebastian Exp $
+// $Id: Color.php,v 1.13 2004/05/06 06:15:25 sebastian Exp $
 
 /**
 *    Color
@@ -469,10 +470,28 @@ class Image_Color
     * @access   public
     */  
     function allocateColor(&$img, $color) {
-        $color = $this->color2RGB($color);
+        $color = Image_Color::color2RGB($color);
 
         return ImageColorAllocate($img, $color[0], $color[1], $color[2]);
     }                 
+
+    /**
+    * @access   public
+    * @static
+    * @author   Laurent Laville <pear@laurent-laville.org>
+    */
+    function color2RGB($color)
+    {
+        $c = array();
+
+        if ($color{0} == '#') {
+            $c = Image_Color::hex2rgb($color);
+        } else {
+             $c = Image_Color::namedColor2RGB($color);
+        }
+
+        return $c;
+    }
 
     /**
     * Returns the RGB interger values of a named color, [0,0,0] if unknown.
@@ -645,14 +664,14 @@ class Image_Color
     }
 
     /**
-    * Returns the RGB integer values of a color specified by a "percentage string" like "%50,%20,%100". 
+    * Returns the RGB integer values of a color specified by a "percentage string" like "50%,20%,100%". 
     *
     * @param    string
     * @return   array   [int red, int green, int blue]
     * @access   public
     */
     function percentageColor2RGB($color) {
-        // split the string %50,%20,%100 by ,
+        // split the string 50%,20%,100% by ,
         $color = explode(",", $color);        
                 
         foreach ($color as $k => $v) {

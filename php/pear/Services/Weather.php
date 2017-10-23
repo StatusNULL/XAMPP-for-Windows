@@ -16,8 +16,15 @@
 // | Authors: Alexander Wirtz <alex@pc4p.net>                             |
 // +----------------------------------------------------------------------+
 //
-// $Id: Weather.php,v 1.24 2004/03/28 13:19:39 eru Exp $
+// $Id: Weather.php,v 1.31 2004/05/04 13:47:41 eru Exp $
 
+/**
+* @package      Services_Weather
+* @filesource
+*/
+
+/**
+*/
 // {{{ constants
 // {{{ cache times
 define("SERVICES_WEATHER_EXPIRES_UNITS",      900);
@@ -51,16 +58,16 @@ define("SERVICES_WEATHER_ERROR_INVALID_LICENSE_KEY",    102);
 *
 * This class acts as an interface to various online weather-services.
 *
-* Services_Weather searches for given locations and retrieves current weather data
-* and, dependant on the used service, also forecasts. Up to now, SOAP services from
-* CapeScience and EJSE, XML from weather.com and METAR from noaa.gov are supported,
-* further services will get included, if they become available and are
-* properly documented.
+* Services_Weather searches for given locations and retrieves current
+* weather data and, dependant on the used service, also forecasts. Up to
+* now, SOAP services from CapeScience and EJSE, XML from weather.com and
+* METAR/TAF from noaa.gov are supported, further services will get
+* included, if they become available and are properly documented.
 *
 * @author       Alexander Wirtz <alex@pc4p.net>
 * @package      Services_Weather
 * @license      http://www.php.net/license/2_02.txt
-* @version      1.2
+* @version      1.3
 */
 class Services_Weather {
 
@@ -79,14 +86,18 @@ class Services_Weather {
     * o dateFormat          string to use for date output
     * o timeFormat          string to use for time output
     * --- EJSE Options
-    * none
+    * o none
     * --- GlobalWeather Options
-    * none
-    * --- METAR Options
+    * o none
+    * --- METAR/TAF Options
     * o dsn                 String for defining the DB connection
     * o dbOptions           passes DB options
-    * o source              http, ftp or file - type of data-source
-    * o sourcePath          where to look for the source, URI or filepath
+    * o sourceMetar         http, ftp or file - type of data-source for METAR
+    * o sourcePathMetar     where to look for the source, URI or filepath,
+    *                       of METAR information
+    * o sourceTaf           http, ftp or file - type of data-source for TAF
+    * o sourcePathTaf       where to look for the source, URI or filepath,
+    *                       of TAF information
     * --- weather.com Options
     * o partnerID           You'll receive these keys after registering
     * o licenseKey          with the weather.com XML-service
@@ -118,7 +129,7 @@ class Services_Weather {
 
         // No such service... bail out
         if (!class_exists($classname)) {
-            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_SERVICE_NOT_FOUND);
+            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_SERVICE_NOT_FOUND, __FILE__, __LINE__);
         }
 
         // Create service and return
@@ -142,7 +153,7 @@ class Services_Weather {
     */
    function apiVersion()
     {
-        return "1.2";
+        return "1.3";
     }
     // }}}
 
@@ -200,16 +211,22 @@ class Services_Weather {
     * Creates error, same as in PEAR with a customized flavor
     *
     * @param    int                         $code
+    * @param    string                      $file
+    * @param    int                         $line
     * @return   PEAR_Error
     * @access   private
     */
-    function &raiseError($code = SERVICES_WEATHER_ERROR_UNKNOWN_ERROR)
+    function &raiseError($code = SERVICES_WEATHER_ERROR_UNKNOWN_ERROR, $file = "", $line = 0)
     {
         // This should improve the performance of the script, as PEAR is only included, when
         // really needed.
         include_once "PEAR.php";
 
-        $message = "Services_Weather: ".Services_Weather::_errorMessage($code);
+        $message = "Services_Weather";
+        if ($file != "" && $line > 0) {
+            $message .= " (".basename($file).":".$line.")";
+        }
+        $message .= ": ".Services_Weather::_errorMessage($code);
 
         return PEAR::raiseError($message, $code, PEAR_ERROR_RETURN, E_USER_NOTICE, "Services_Weather_Error", null, false);
     }

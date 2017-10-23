@@ -16,8 +16,15 @@
 // | Authors: Alexander Wirtz <alex@pc4p.net>                             |
 // +----------------------------------------------------------------------+
 //
-// $Id: Metar.php,v 1.36 2004/03/31 12:32:58 eru Exp $
+// $Id: Metar.php,v 1.65 2004/07/11 21:45:41 eru Exp $
 
+/**
+* @package      Services_Weather
+* @filesource
+*/
+
+/**
+*/
 require_once "Services/Weather/Common.php";
 
 require_once "DB.php";
@@ -26,31 +33,37 @@ require_once "DB.php";
 /**
 * PEAR::Services_Weather_Metar
 *
-* This class acts as an interface to the metar service of weather.noaa.gov. It searches for
-* locations given in ICAO notation and retrieves the current weather data.
+* This class acts as an interface to the METAR/TAF service of
+* weather.noaa.gov. It searches for locations given in ICAO notation and
+* retrieves the current weather data.
 *
-* Of course the parsing of the METAR-data has its limitations, as it follows the
-* Federal Meteorological Handbook No.1 with modifications to accomodate for non-US reports,
-* so if the report deviates from these standards, you won't get it parsed correctly.
-* Anything that is not parsed, is saved in the "noparse" array-entry, returned by
-* getWeather(), so you can do your own parsing afterwards. This limitation is specifically
-* given for remarks, as the class is not processing everything mentioned there, but you will
-* get the most common fields like precipitation and temperature-changes. Again, everything
-* not parsed, goes into "noparse".
+* Of course the parsing of the METAR-data has its limitations, as it
+* follows the Federal Meteorological Handbook No.1 with modifications to
+* accomodate for non-US reports, so if the report deviates from these
+* standards, you won't get it parsed correctly.
+* Anything that is not parsed, is saved in the "noparse" array-entry,
+* returned by getWeather(), so you can do your own parsing afterwards. This
+* limitation is specifically given for remarks, as the class is not
+* processing everything mentioned there, but you will get the most common
+* fields like precipitation and temperature-changes. Again, everything not
+* parsed, goes into "noparse".
 *
-* If you think, some important field is missing or not correctly parsed, please file a feature-
-* request/bugreport at http://pear.php.net/ and be sure to provide the METAR report with a
-* _detailed_ explanation!
+* If you think, some important field is missing or not correctly parsed,
+* please file a feature-request/bugreport at http://pear.php.net/ and be
+* sure to provide the METAR (or TAF) report with a _detailed_ explanation!
 *
-* For a working example, please take a look at
+* For working examples, please take a look at
 *     docs/Services_Weather/examples/metar-basic.php
+*     docs/Services_Weather/examples/metar-extensive.php
 *
 * @author       Alexander Wirtz <alex@pc4p.net>
 * @link         http://weather.noaa.gov/weather/metar.shtml
-* @example      docs/Services_Weather/examples/metar-basic.php
+* @link         http://weather.noaa.gov/weather/taf.shtml
+* @example      examples/metar-basic.php        metar-basic.php
+* @example      examples/metar-extensive.php    metar-extensive.php
 * @package      Services_Weather
 * @license      http://www.php.net/license/2_02.txt
-* @version      1.2
+* @version      1.3
 */
 class Services_Weather_Metar extends Services_Weather_Common
 {
@@ -66,18 +79,34 @@ class Services_Weather_Metar extends Services_Weather_Common
     /**
     * The source METAR uses
     *
-    * @var      string                      $_source
+    * @var      string                      $_sourceMetar
     * @access   private
     */
-    var $_source;
+    var $_sourceMetar;
+
+    /**
+    * The source TAF uses
+    *
+    * @var      string                      $_sourceTaf
+    * @access   private
+    */
+    var $_sourceTaf;
 
     /**
     * This path is used to find the METAR data
     *
-    * @var      string                      $_sourcePath
+    * @var      string                      $_sourcePathMetar
     * @access   private
     */
-    var $_sourcePath;
+    var $_sourcePathMetar;
+
+    /**
+    * This path is used to find the TAF data
+    *
+    * @var      string                      $_sourcePathTaf
+    * @access   private
+    */
+    var $_sourcePathTaf;
     // }}}
 
     // {{{ constructor
@@ -112,24 +141,39 @@ class Services_Weather_Metar extends Services_Weather_Common
             return;
         }
         
-        if (isset($options["source"])) {
-            if (isset($options["sourcePath"])) {
-                $this->setMetarSource($options["source"], $options["sourcePath"]);
+        // Setting the data sources for METAR and TAF - have to watch out for older API usage
+        if (($source = isset($options["source"])) || isset($options["sourceMetar"])) {
+            $sourceMetar = $source ? $options["source"] : $options["sourceMetar"]; 
+            if (($sourcePath = isset($options["sourcePath"])) || isset($options["sourcePathMetar"])) {
+                $sourcePathMetar = $sourcePath ? $options["sourcePath"] : $options["sourcePathMetar"];
             } else {
-                $this->setMetarSource($options["source"]);
+                $sourcePathMetar = "";
             }
         } else {
-            $this->setMetarSource("http");
+            $sourceMetar = "http";
+            $sourcePathMetar = "";
         }
+        if (isset($options["sourceTaf"])) {
+            $sourceTaf = $options["sourceTaf"];
+            if (isset($option["sourcePathTaf"])) {
+                $sourcePathTaf = $options["sourcePathTaf"];
+            } else {
+                $soucePathTaf = "";
+            }
+        } else {
+            $sourceTaf = "http";
+            $sourcePathTaf = "";
+        }
+        $this->setMetarSource($sourceMetar, $sourcePathMetar, $sourceTaf, $sourcePathTaf);
     }
     // }}}
 
     // {{{ setMetarDB()
     /**
-    * Sets the parameters needed for connecting to the DB, where the location-
-    * search is fetching its data from. You need to build a DB with the external
-    * tool buildMetarDB first, it fetches the locations and airports from a
-    * NOAA-website.
+    * Sets the parameters needed for connecting to the DB, where the
+    * location-search is fetching its data from. You need to build a DB
+    * with the external tool buildMetarDB first, it fetches the locations
+    * and airports from a NOAA-website.
     *
     * @param    string                      $dsn
     * @param    array                       $dbOptions
@@ -158,32 +202,52 @@ class Services_Weather_Metar extends Services_Weather_Common
 
     // {{{ setMetarSource()
     /**
-    * Sets the source, where the class tries to locate the METAR data
+    * Sets the source, where the class tries to locate the METAR/TAF data
     *
     * Source can be http, ftp or file.
-    * An alternate sourcepath can be provided.
+    * Alternate sourcepaths can be provided.
     *
-    * @param    string                      $source
-    * @param    string                      $sourcePath
+    * @param    string                      $sourceMetar
+    * @param    string                      $sourcePathMetar
+    * @param    string                      $sourceTaf
+    * @param    string                      $sourcePathTaf
     * @access   public
     */
-    function setMetarSource($source, $sourcePath = "")
+    function setMetarSource($sourceMetar, $sourcePathMetar = "", $sourceTaf = "", $sourcePathTaf = "")
     {
-        if (in_array($source, array("http", "ftp", "file"))) {
-            $this->_source = $source;
+        if (in_array($sourceMetar, array("http", "ftp", "file"))) {
+            $this->_sourceMetar = $sourceMetar;
         }
-        if (strlen($sourcePath)) {
-            $this->_sourcePath = $sourcePath;
+        if (strlen($sourcePathMetar)) {
+            $this->_sourcePathMetar = $sourcePathMetar;
         } else {
-            switch ($source) {
+            switch ($sourceMetar) {
                 case "http":
-                    $this->_sourcePath = "http://weather.noaa.gov/pub/data/observations/metar/stations/";
+                    $this->_sourcePathMetar = "http://weather.noaa.gov/pub/data/observations/metar/stations/";
                     break;
                 case "ftp":
-                    $this->_sourcePath = "ftp://weather.noaa.gov/data/observations/metar/stations/";
+                    $this->_sourcePathMetar = "ftp://weather.noaa.gov/data/observations/metar/stations/";
                     break;
                 case "file":
-                    $this->_sourcePath = "./";
+                    $this->_sourcePathMetar = "./";
+                    break;
+            }
+        }
+        if (in_array($sourceTaf, array("http", "ftp", "file"))) {
+            $this->_sourceTaf = $sourceTaf;
+        }
+        if (strlen($sourcePathTaf)) {
+            $this->_sourcePathTaf = $sourcePathTaf;
+        } else {
+            switch ($sourceTaf) {
+                case "http":
+                    $this->_sourcePathTaf = "http://weather.noaa.gov/pub/data/forecasts/taf/stations/";
+                    break;
+                case "ftp":
+                    $this->_sourcePathTaf = "ftp://weather.noaa.gov/data/forecasts/taf/stations/";
+                    break;
+                case "file":
+                    $this->_sourcePathTaf = "./";
                     break;
             }
         }
@@ -192,7 +256,8 @@ class Services_Weather_Metar extends Services_Weather_Common
 
     // {{{ _checkLocationID()
     /**
-    * Checks the id for valid values and thus prevents silly requests to METAR server
+    * Checks the id for valid values and thus prevents silly requests to
+    * METAR server
     *
     * @param    string                      $id
     * @return   PEAR_Error|bool
@@ -202,10 +267,10 @@ class Services_Weather_Metar extends Services_Weather_Common
     */
     function _checkLocationID($id)
     {
-        if (!strlen($id)) {
-            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_NO_LOCATION);
+        if (is_array($id) || is_object($id) || !strlen($id)) {
+            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_NO_LOCATION, __FILE__, __LINE__);
         } elseif (!ctype_alpha($id) || (strlen($id) > 4)) {
-            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_INVALID_LOCATION);
+            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_INVALID_LOCATION, __FILE__, __LINE__);
         }
 
         return true;
@@ -216,7 +281,8 @@ class Services_Weather_Metar extends Services_Weather_Common
     /**
     * Parses the data returned by the provided source and caches it
     *    
-    * METAR KPIT 091955Z COR 22015G25KT 3/4SM R28L/2600FT TSRA OVC010CB 18/16 A2992 RMK SLP045 T01820159
+    * METAR KPIT 091955Z COR 22015G25KT 3/4SM R28L/2600FT TSRA OVC010CB
+    * 18/16 A2992 RMK SLP045 T01820159
     *
     * @param    string                      $source
     * @return   PEAR_Error|array
@@ -239,6 +305,7 @@ class Services_Weather_Metar extends Services_Weather_Common
             );
             $clouds    = array(
                 "skc"         => "sky clear",
+                "nsc"         => "no significant cloud",
                 "few"         => "few",
                 "sct"         => "scattered",
                 "bkn"         => "broken",
@@ -251,7 +318,8 @@ class Services_Weather_Metar extends Services_Weather_Common
             $conditions = array(
                 "+"           => "heavy",        "-"           => "light",
 
-                "vc"          => "vicinity",
+                "vc"          => "vicinity",     "re"          => "recent",
+                "nsw"         => "no significant weather",
 
                 "mi"          => "shallow",      "bc"          => "patches",
                 "pr"          => "partial",      "ts"          => "thunderstorm",
@@ -276,13 +344,13 @@ class Services_Weather_Metar extends Services_Weather_Common
                 "+fc"         => "tornado/waterspout"
             );
             $sensors = array(
-                "rvrno"     => "Runway Visual Range Detector offline",
-                "pwino"     => "Present Weather Identifier offline",
-                "pno"       => "Tipping Bucket Rain Gauge offline",
-                "fzrano"    => "Freezing Rain Sensor offline",
-                "tsno"      => "Lightning Detection System offline",
-                "visno_loc" => "2nd Visibility Sensor offline",
-                "chino_loc" => "2nd Ceiling Height Indicator offline"
+                "rvrno"  => "Runway Visual Range Detector offline",
+                "pwino"  => "Present Weather Identifier offline",
+                "pno"    => "Tipping Bucket Rain Gauge offline",
+                "fzrano" => "Freezing Rain Sensor offline",
+                "tsno"   => "Lightning Detection System offline",
+                "visno"  => "2nd Visibility Sensor offline",
+                "chino"  => "2nd Ceiling Height Indicator offline"
             );
         }
  
@@ -293,25 +361,22 @@ class Services_Weather_Metar extends Services_Weather_Common
             "type"        => "AUTO|COR",
             "wind"        => "(\d{3}|VAR|VRB)(\d{2,3})(G(\d{2}))?(\w{2,3})",
             "windVar"     => "(\d{3})V(\d{3})",
-            "visibility1" => "\d",
-            "visibility2" => "M?(\d{4})|((\d{1,2}|(\d)\/(\d))(SM|KM))|(CAVOK)",
+            "visibility"  => "(\d{4})|((M|P)?((\d{1,2}|((\d) )?(\d)\/(\d))(SM|KM)))|(CAVOK)",
             "runway"      => "R(\d{2})(\w)?\/(P|M)?(\d{4})(FT)?(V(P|M)?(\d{4})(FT)?)?(\w)?",
-            "condition"   => "(-|\+|VC)?(MI|BC|PR|TS|BL|SH|DR|FZ)?(DZ|RA|SN|SG|IC|PL|GR|GS|UP)?(BR|FG|FU|VA|DU|SA|HZ|PY)?(PO|SQ|FC|SS|DS)?",
-            "clouds"      => "(SKC|CLR|((FEW|SCT|BKN|OVC|VV)(\d{3})(TCU|CB)?))",
+            "condition"   => "(-|\+|VC|RE|NSW)?(MI|BC|PR|TS|BL|SH|DR|FZ)?((DZ)|(RA)|(SN)|(SG)|(IC)|(PL)|(GR)|(GS)|(UP))*(BR|FG|FU|VA|DU|SA|HZ|PY)?(PO|SQ|FC|SS|DS)?",
+            "clouds"      => "(SKC|CLR|NSC|((FEW|SCT|BKN|OVC|VV)(\d{3})(TCU|CB)?))",
             "temperature" => "(M)?(\d{2})\/((M)?(\d{2})|XX|\/\/)?",
             "pressure"    => "(A)(\d{4})|(Q)(\d{4})",
-            "nosig"       => "NOSIG",
+            "trend"       => "NOSIG|TEMPO|BECMG",
             "remark"      => "RMK"
         );
         
         $remarks = array(
             "nospeci"     => "NOSPECI",
             "autostation" => "AO(1|2)",
-            "presschg"    => "PRESS(R|F)R",
+            "presschg"    => "PRES(R|F)R",
             "seapressure" => "SLP(\d{3}|NO)",
-            "1hprecip"    => "P(\d{4})",
-            "6hprecip"    => "6(\d{4}|\/{4})",
-            "24hprecip"   => "7(\d{4}|\/{4})",
+            "precip"      => "(P|6|7)(\d{4}|\/{4})",
             "snowdepth"   => "4\/(\d{3})",
             "snowequiv"   => "933(\d{3})",
             "cloudtypes"  => "8\/(\d|\/)(\d|\/)(\d|\/)",
@@ -321,7 +386,7 @@ class Services_Weather_Metar extends Services_Weather_Common
             "6hmintemp"   => "2(0|1)(\d{3})",
             "24htemp"     => "4(0|1)(\d{3})(0|1)(\d{3})",
             "3hpresstend" => "5([0-8])(\d{3})",
-            "sensors"     => "RVRNO|PWINO|PNO|FZRANO|TSNO|VISNO_LOC|CHINO_LOC",
+            "sensors"     => "RVRNO|PWINO|PNO|FZRANO|TSNO|VISNO|CHINO",
             "maintain"    => "[\$]"
         );        
 
@@ -329,21 +394,25 @@ class Services_Weather_Metar extends Services_Weather_Common
 
         // Check for correct data, 2 lines in size
         if (!$data || !is_array($data) || sizeof($data) < 2) {
-            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_WRONG_SERVER_DATA);
-        } elseif (sizeof($data) > 2) {
-            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_UNKNOWN_LOCATION);
+            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_WRONG_SERVER_DATA, __FILE__, __LINE__);
         } else {
             if (SERVICES_WEATHER_DEBUG) {
-                echo $data[0].$data[1];
+                for ($i = 0; $i < sizeof($data); $i++) {
+                    echo $data[$i];
+                }
             }
             // Ok, we have correct data, start with parsing the first line for the last update
             $weatherData = array();
             $weatherData["station"]   = "";
             $weatherData["update"]    = strtotime(trim($data[0])." GMT");
-            $weatherData["updateRaw"] = $data[0];
-            // and prepare the second line for stepping through
-            $metar = explode(" ", trim($data[1]));
+            $weatherData["updateRaw"] = trim($data[0]);
+            // and prepare the rest for stepping through
+            array_shift($data);
+            $metar = explode(" ", preg_replace("/\s{2,}/", " ", implode(" ", $data)));
 
+            // Add a few local variables for data processing
+            $trendCount = 0;             // If we have trends, we need this
+            $pointer    =& $weatherData; // Pointer to the array we add the data to 
             for ($i = 0; $i < sizeof($metar); $i++) {
                 // Check for whitespace and step loop, if nothing's there
                 $metar[$i] = trim($metar[$i]);
@@ -362,97 +431,90 @@ class Services_Weather_Metar extends Services_Weather_Common
                     if (($found = preg_match("/^".$regexp."$/i", $metar[$i], $result)) == true) {
                         switch ($key) {
                             case "station":
-                                $weatherData["station"] = $result[0];
+                                $pointer["station"] = $result[0];
                                 unset($metarCode["station"]);
                                 break;
                             case "wind":
                                 // Parse wind data, first the speed, convert from kt to chosen unit
-                                $weatherData["wind"] = $this->convertSpeed($result[2], strtolower($result[5]), "mph");
+                                $pointer["wind"] = $this->convertSpeed($result[2], strtolower($result[5]), "mph");
                                 if ($result[1] == "VAR" || $result[1] == "VRB") {
                                     // Variable winds
-                                    $weatherData["windDegrees"]   = "Variable";
-                                    $weatherData["windDirection"] = "Variable";
+                                    $pointer["windDegrees"]   = "Variable";
+                                    $pointer["windDirection"] = "Variable";
                                 } else {
                                     // Save wind degree and calc direction
-                                    $weatherData["windDegrees"]   = $result[1];
-                                    $weatherData["windDirection"] = $compass[round($result[1] / 22.5) % 16];
+                                    $pointer["windDegrees"]   = intval($result[1]);
+                                    $pointer["windDirection"] = $compass[round($result[1] / 22.5) % 16];
                                 }
                                 if (is_numeric($result[4])) {
                                     // Wind with gusts...
-                                    $weatherData["windGust"] = $this->convertSpeed($result[4], strtolower($result[5]), "mph");
+                                    $pointer["windGust"] = $this->convertSpeed($result[4], strtolower($result[5]), "mph");
                                 }
-                                // We got that, unset
-                                unset($metarCode["wind"]);
                                 break;
                             case "windVar":
                                 // Once more wind, now variability around the current wind-direction
-                                $weatherData["windVariability"] = array("from" => $result[1], "to" => $result[2]);
-                                unset($metarCode["windVar"]);
+                                $pointer["windVariability"] = array("from" => intval($result[1]), "to" => intval($result[2]));
                                 break;
-                            case "visibility1":
-                                // Visibility will come as x y/z, first the single digit part
-                                $weatherData["visibility"] = $result[0];
-                                unset($metarCode["visibility1"]);
-                                break;
-                            case "visibility2":
+                            case "visibility":
+                                $pointer["visQualifier"] = "AT";
                                 if (is_numeric($result[1]) && ($result[1] == 9999)) {
                                     // Upper limit of visibility range
                                     $visibility = $this->convertDistance(10, "km", "sm");
-                                    $weatherData["visQualifier"] = "BEYOND";
+                                    $pointer["visQualifier"] = "BEYOND";
                                 } elseif (is_numeric($result[1])) {
                                     // 4-digit visibility in m
                                     $visibility = $this->convertDistance(($result[1]/1000), "km", "sm");
-                                    $weatherData["visQualifier"] = "AT";
-                                } elseif (!isset($result[7]) || $result[7] != "CAVOK") {
-                                    if (is_numeric($result[3])) {
+                                } elseif (!isset($result[11]) || $result[11] != "CAVOK") {
+                                    if ($result[3] == "M") {
+                                        $pointer["visQualifier"] = "BELOW";
+                                    } elseif ($result[3] == "P") {
+                                        $pointer["visQualifier"] = "BEYOND";
+                                    }
+                                    if (is_numeric($result[5])) {
                                         // visibility as one/two-digit number
-                                        $visibility = $this->convertDistance($result[3], $result[6], "sm");
-                                        $weatherData["visQualifier"] = "AT";
+                                        $visibility = $this->convertDistance($result[5], $result[10], "sm");
                                     } else {
                                         // the y/z part, add if we had a x part (see visibility1)
-                                        $visibility = $this->convertDistance($result[4] / $result[5], $result[6], "sm");
-                                        if (isset($weatherData["visibility"])) {
-                                            $visibility += $weatherData["visibility"];
-                                        }
-                                        if ($result[0]{0} == "M") {
-                                            $weatherData["visQualifier"] = "BELOW";
+                                        if (is_numeric($result[7])) {
+                                            $visibility = $this->convertDistance($result[7] + $result[8] / $result[9], $result[10], "sm");
                                         } else {
-                                            $weatherData["visQualifier"] = "AT";
-                                        } 
+                                            $visibility = $this->convertDistance($result[8] / $result[9], $result[10], "sm");
+                                        }
                                     }
                                 } else {
-                                    $weatherData["visQualifier"] = "BEYOND";
-                                    $visibility               = $this->convertDistance(10, "km", "sm");
-                                    $weatherData["clouds"]    = array("amount" => "none", "height" => "below 5000ft");
-                                    $weatherData["condition"] = "no significant weather";
+                                    $pointer["visQualifier"] = "BEYOND";
+                                    $visibility = $this->convertDistance(10, "km", "sm");
+                                    $pointer["clouds"] = array("amount" => "Clear below", "height" => 5000);
+                                    $pointer["condition"] = "no significant weather";
                                 }
-                                $weatherData["visibility"] = $visibility;
-                                unset($metarCode["visibility2"]);
+                                $pointer["visibility"] = $visibility;
                                 break;
                             case "condition":
                                 // First some basic setups
-                                if (!isset($weatherData["condition"])) {
-                                    $weatherData["condition"] = "";
-                                } elseif (strlen($weatherData["condition"]) > 0) {
-                                    $weatherData["condition"] .= ",";
+                                if (!isset($pointer["condition"])) {
+                                    $pointer["condition"] = "";
+                                } elseif (strlen($pointer["condition"]) > 0) {
+                                    $pointer["condition"] .= ",";
                                 }
 
                                 if (in_array(strtolower($result[0]), $conditions)) {
                                     // First try matching the complete string
-                                    $weatherData["condition"] .= " ".$conditions[strtolower($result[0])];
+                                    $pointer["condition"] .= " ".$conditions[strtolower($result[0])];
                                 } else {
                                     // No luck, match part by part
-                                    for ($c = 1; $c < sizeof($result); $c++) {
-                                        if (strlen($result[$c]) > 0) {
-                                            $weatherData["condition"] .= " ".$conditions[strtolower($result[$c])];
+                                    array_shift($result);
+                                    $result = array_unique($result);
+                                    foreach ($result as $condition) {
+                                        if (strlen($condition) > 0) {
+                                            $pointer["condition"] .= " ".$conditions[strtolower($condition)];
                                         }
                                     }
                                 }
-                                $weatherData["condition"] = trim($weatherData["condition"]);
+                                $pointer["condition"] = trim($pointer["condition"]);
                                 break;
                             case "clouds":
-                                if (!isset($weatherData["clouds"])) {
-                                    $weatherData["clouds"] = array();
+                                if (!isset($pointer["clouds"])) {
+                                    $pointer["clouds"] = array();
                                 }
 
                                 if (sizeof($result) == 5) {
@@ -464,10 +526,10 @@ class Services_Weather_Metar extends Services_Weather_Common
                                     $cloud = array("amount" => $clouds[strtolower($result[3])], "height" => ($result[4]*100), "type" => $clouds[strtolower($result[5])]);
                                 }
                                 else {
-                                    // SKC or CLR
+                                    // SKC or CLR or NSC
                                     $cloud = array("amount" => $clouds[strtolower($result[0])]);
                                 }
-                                $weatherData["clouds"][] = $cloud;
+                                $pointer["clouds"][] = $cloud;
                                 break;
                             case "temperature":
                                 // normal temperature in first part
@@ -475,46 +537,56 @@ class Services_Weather_Metar extends Services_Weather_Common
                                 if ($result[1] == "M") {
                                     $result[2] *= -1;
                                 }
-                                $weatherData["temperature"] = $this->convertTemperature($result[2], "c", "f");
+                                $pointer["temperature"] = $this->convertTemperature($result[2], "c", "f");
                                 if (sizeof($result) > 4) {
                                     // same for dewpoint
                                     if ($result[4] == "M") {
                                         $result[5] *= -1;
                                     }
-                                    $weatherData["dewPoint"] = $this->convertTemperature($result[5], "c", "f");
-                                    $weatherData["humidity"] = $this->calculateHumidity($result[2], $result[5]);
+                                    $pointer["dewPoint"] = $this->convertTemperature($result[5], "c", "f");
+                                    $pointer["humidity"] = $this->calculateHumidity($result[2], $result[5]);
                                 }
-                                if (isset($weatherData["wind"])) {
+                                if (isset($pointer["wind"])) {
                                     // Now calculate windchill from temperature and windspeed
-                                    $weatherData["feltTemperature"] = $this->calculateWindChill($weatherData["temperature"], $weatherData["wind"]);
+                                    $pointer["feltTemperature"] = $this->calculateWindChill($pointer["temperature"], $pointer["wind"]);
                                 }
-                                unset($metarCode["temperature"]);
                                 break;
                             case "pressure":
                                 if ($result[1] == "A") {
                                     // Pressure provided in inches
-                                    $weatherData["pressure"] = $result[2] / 100;
+                                    $pointer["pressure"] = $result[2] / 100;
                                 } elseif ($result[3] == "Q") {
                                     // ... in hectopascal
-                                    $weatherData["pressure"] = $this->convertPressure($result[4], "hpa", "in");
+                                    $pointer["pressure"] = $this->convertPressure($result[4], "hpa", "in");
                                 }
-                                unset($metarCode["pressure"]);
                                 break;
-                            case "nosig":
-                            case "nospeci":
-                                // No change during the last hour
-                                if (!isset($weatherData["remark"])) {
-                                    $weatherData["remark"] = array();
+                            case "trend":
+                                // We may have a trend here... extract type and set pointer on
+                                // created new array
+                                if (!isset($weatherData["trend"])) {
+                                    $weatherData["trend"] = array();
+                                    $weatherData["trend"][$trendCount] = array();
                                 }
-                                $weatherData["remark"]["nosig"] = "No changes in weather conditions";
-                                unset($metarCode[$key]);
+                                $pointer =& $weatherData["trend"][$trendCount];
+                                $trendCount++;
+                                $pointer["type"] = $result[0];
+                                while (isset($metar[$i + 1]) && preg_match("/^(FM|TL|AT)(\d{2})(\d{2})$/i", $metar[$i + 1], $lresult)) {
+                                    if ($lresult[1] == "FM") {
+                                        $pointer["from"] = $lresult[2].":".$lresult[3];                                
+                                    } elseif ($lresult[1] == "TL") {
+                                        $pointer["to"] = $lresult[2].":".$lresult[3];
+                                    } else {
+                                        $pointer["at"] = $lresult[2].":".$lresult[3];
+                                    }
+                                    // As we have just extracted the time for this trend
+                                    // from our METAR, increase field-counter
+                                    $i++;
+                                }
                                 break;
                             case "remark":
                                 // Remark part begins
                                 $metarCode = $remarks;
-                                if (!isset($weatherData["remark"])) {
-                                    $weatherData["remark"] = array();
-                                }
+                                $weatherData["remark"] = array();
                                 break;
                             case "autostation":
                                 // Which autostation do we have here?
@@ -548,60 +620,24 @@ class Services_Weather_Metar extends Services_Weather_Common
                                 }
                                 unset($metarCode["seapressure"]);
                                 break;
-                            case "1hprecip":
-                                // Precipitation for the last hour in inches
+                            case "precip":
+                                // Precipitation in inches
+                                static $hours;
                                 if (!isset($weatherData["precipitation"])) {
                                     $weatherData["precipitation"] = array();
+                                    $hours = array("P" => "1", "6" => "3/6", "7" => "24");
                                 }
-                                if (!is_numeric($result[1])) {
+                                if (!is_numeric($result[2])) {
                                     $precip = "indeterminable";
-                                } elseif ($result[1] == "0000") {
+                                } elseif ($result[2] == "0000") {
                                     $precip = "traceable";
                                 }else {
-                                    $precip = $result[1] / 100;
+                                    $precip = $result[2] / 100;
                                 }
                                 $weatherData["precipitation"][] = array(
                                     "amount" => $precip,
-                                    "hours"  => "1" 
+                                    "hours"  => $hours[$result[1]]
                                 );
-                                unset($metarCode["1hprecip"]);
-                                break;
-                            case "6hprecip":
-                                // Same for last 3 resp. 6 hours... no way to determine
-                                // which report this is, so keeping the text general
-                                if (!isset($weatherData["precipitation"])) {
-                                    $weatherData["precipitation"] = array();
-                                }
-                                if (!is_numeric($result[1])) {
-                                    $precip = "indeterminable";
-                                } elseif ($result[1] == "0000") {
-                                    $precip = "traceable";
-                                }else {
-                                    $precip = $result[1] / 100;
-                                }
-                                $weatherData["precipitation"][] = array(
-                                    "amount" => $precip,
-                                    "hours"  => "3/6" 
-                                );
-                                unset($metarCode["6hprecip"]);
-                                break;
-                            case "24hprecip":
-                                // And the same for the last 24 hours
-                                if (!isset($weatherData["precipitation"])) {
-                                    $weatherData["precipitation"] = array();
-                                }
-                                if (!is_numeric($result[1])) {
-                                    $precip = "indeterminable";
-                                } elseif ($result[1] == "0000") {
-                                    $precip = "traceable";
-                                }else {
-                                    $precip = $result[1] / 100;
-                                }
-                                $weatherData["precipitation"][] = array(
-                                    "amount" => $precip,
-                                    "hours"  => "24" 
-                                );
-                                unset($metarCode["24hprecip"]);
                                 break;
                             case "snowdepth":
                                 // Snow depth in inches
@@ -672,6 +708,11 @@ class Services_Weather_Metar extends Services_Weather_Common
                                 // possible, sorry
                                 unset($metarCode["3hpresstend"]);
                                 break;
+                            case "nospeci":
+                                // No change during the last hour
+                                $weatherData["remark"]["nospeci"] = "No changes in weather conditions";
+                                unset($metarCode["nospeci"]);
+                                break;
                             case "sensors":
                                 // We may have multiple broken sensors, so do not unset
                                 if (!isset($weatherData["remark"]["sensors"])) {
@@ -713,9 +754,466 @@ class Services_Weather_Metar extends Services_Weather_Common
     }
     // }}}
 
+    // {{{ _parseForecastData()
+    /**
+    * Parses the data returned by the provided source and caches it
+    *    
+    * TAF KLGA 271734Z 271818 11007KT P6SM -RA SCT020 BKN200
+    *   FM2300 14007KT P6SM SCT030 BKN150
+    *   FM0400 VRB03KT P6SM SCT035 OVC080 PROB30 0509 P6SM -RA BKN035
+    *   FM0900 VRB03KT 6SM -RA BR SCT015 OVC035
+    *       TEMPO 1215 5SM -RA BR SCT009 BKN015
+    *       BECMG 1517 16007KT P6SM NSW SCT015 BKN070
+    *
+    * @param    string                      $source
+    * @return   PEAR_Error|array
+    * @throws   PEAR_Error::SERVICES_WEATHER_ERROR_WRONG_SERVER_DATA
+    * @throws   PEAR_Error::SERVICES_WEATHER_ERROR_UNKNOWN_LOCATION
+    * @access   private
+    */
+    function _parseForecastData($source)
+    {
+        static $compass;
+        static $clouds;
+        static $conditions;
+        static $sensors;
+        if (!isset($compass)) {
+            $compass = array(
+                "N", "NNE", "NE", "ENE",
+                "E", "ESE", "SE", "SSE",
+                "S", "SSW", "SW", "WSW",
+                "W", "WNW", "NW", "NNW"
+            );
+            $clouds    = array(
+                "skc"         => "sky clear",
+                "nsc"         => "no significant cloud",
+                "few"         => "few",
+                "sct"         => "scattered",
+                "bkn"         => "broken",
+                "ovc"         => "overcast",
+                "vv"          => "vertical visibility",
+                "tcu"         => "Towering Cumulus",
+                "cb"          => "Cumulonimbus",
+                "clr"         => "clear below 12,000 ft"
+            );
+            $conditions = array(
+                "+"           => "heavy",        "-"           => "light",
+
+                "vc"          => "vicinity",     "re"          => "recent",
+                "nsw"         => "no significant weather",
+
+                "mi"          => "shallow",      "bc"          => "patches",
+                "pr"          => "partial",      "ts"          => "thunderstorm",
+                "bl"          => "blowing",      "sh"          => "showers",
+                "dr"          => "low drifting", "fz"          => "freezing",
+
+                "dz"          => "drizzle",      "ra"          => "rain",
+                "sn"          => "snow",         "sg"          => "snow grains",
+                "ic"          => "ice crystals", "pe"          => "ice pellets",
+                "gr"          => "hail",         "gs"          => "small hail/snow pellets",
+                "up"          => "unknown precipitation",
+
+                "br"          => "mist",         "fg"          => "fog",
+                "fu"          => "smoke",        "va"          => "volcanic ash",
+                "sa"          => "sand",         "hz"          => "haze",
+                "py"          => "spray",        "du"          => "widespread dust",
+
+                "sq"          => "squall",       "ss"          => "sandstorm",
+                "ds"          => "duststorm",    "po"          => "well developed dust/sand whirls",
+                "fc"          => "funnel cloud",
+
+                "+fc"         => "tornado/waterspout"
+            );
+        }
+
+        $tafCode = array(
+            "report"      => "TAF|AMD",
+            "station"     => "\w{4}",
+            "update"      => "(\d{2})?(\d{4})Z",
+            "valid"       => "(\d{2})(\d{2})(\d{2})",
+            "wind"        => "(\d{3}|VAR|VRB)(\d{2,3})(G(\d{2}))?(\w{2,3})",
+            "visibility"  => "(\d{4})|((M|P)?((\d{1,2}|((\d) )?(\d)\/(\d))(SM|KM)))|(CAVOK)",
+            "condition"   => "(-|\+|VC|RE|NSW)?(MI|BC|PR|TS|BL|SH|DR|FZ)?((DZ)|(RA)|(SN)|(SG)|(IC)|(PL)|(GR)|(GS)|(UP))*(BR|FG|FU|VA|DU|SA|HZ|PY)?(PO|SQ|FC|SS|DS)?",
+            "clouds"      => "(SKC|CLR|NSC|((FEW|SCT|BKN|OVC|VV)(\d{3})(TCU|CB)?))",
+            "windshear"   => "WS(\d{3})\/(\d{3})(\d{2,3})(\w{2,3})",
+            "tempmax"     => "TX(\d{2})\/(\d{2})(\w)",
+            "tempmin"     => "TN(\d{2})\/(\d{2})(\w)",
+            "tempmaxmin"  => "TX(\d{2})\/(\d{2})(\w)TN(\d{2})\/(\d{2})(\w)",
+            "from"        => "FM(\d{2})(\d{2})",
+            "fmc"         => "(PROB|BECMG|TEMPO)(\d{2})?"
+        );
+
+        $data = @file($source);
+
+        // Check for correct data
+        if (!$data || !is_array($data) || sizeof($data) < 2) {
+            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_WRONG_SERVER_DATA, __FILE__, __LINE__);
+        } else {
+            if (SERVICES_WEATHER_DEBUG) {
+                for ($i = 0; $i < sizeof($data); $i++) {
+                    echo $data[$i];
+                }
+            }
+            // Ok, we have correct data, start with parsing the first line for the last update
+            $forecastData = array();
+            $forecastData["station"]   = "";
+            $forecastData["update"]    = strtotime(trim($data[0])." GMT");
+            $forecastData["updateRaw"] = trim($data[0]);
+            // and prepare the rest for stepping through
+            array_shift($data);
+            $taf = explode(" ", preg_replace("/\s{2,}/", " ", implode(" ", $data)));
+
+            // Add a few local variables for data processing
+            $fromTime =  "";            // The timeperiod the data gets added to
+            $fmcCount =  0;             // If we have FMCs (Forecast Meteorological Conditions), we need this
+            $pointer  =& $forecastData; // Pointer to the array we add the data to 
+            for ($i = 0; $i < sizeof($taf); $i++) {
+                // Check for whitespace and step loop, if nothing's there
+                $taf[$i] = trim($taf[$i]);
+                if (!strlen($taf[$i])) {
+                    continue;
+                }
+
+                if (SERVICES_WEATHER_DEBUG) {
+                    $tab = str_repeat("\t", 2 - floor((strlen($taf[$i]) + 2) / 8));
+                    echo "\"".$taf[$i]."\"".$tab."-> ";
+                }
+
+                $found = false;
+                foreach ($tafCode as $key => $regexp) {
+                    // Check if current code matches current taf snippet
+                    if (($found = preg_match("/^".$regexp."$/i", $taf[$i], $result)) == true) {
+                        $insert = array();
+                        switch ($key) {
+                            case "station":
+                                $pointer["station"] = $result[0];
+                                unset($tafCode["station"]);
+                                break;
+                            case "valid":
+                                $pointer["validRaw"] = $result[0];
+                                // Generates the timeperiod the report is valid for
+                                list($year, $month, $day) = explode("-", date("Y-m-d", $forecastData["update"]));
+                                // Date is in next month
+                                if ($result[1] < $day) {
+                                    $month++;
+                                }
+                                $pointer["validFrom"] = gmmktime($result[2], 0, 0, $month, $result[1], $year);
+                                // Valid time ends next day
+                                if ($result[2] >= $result[3]) {
+                                    $result[1]++;
+                                }
+                                $pointer["validTo"]   = gmmktime($result[3], 0, 0, $month, $result[1], $year);
+                                unset($tafCode["valid"]);
+                                // Now the groups will start, so initialize the time groups
+                                $pointer["time"] = array();
+                                $fromTime = $result[2].":00";
+                                $pointer["time"][$fromTime] = array();
+                                // Set pointer to the first timeperiod
+                                $pointer =& $pointer["time"][$fromTime];
+                                break;
+                            case "wind":
+                                // Parse wind data, first the speed, convert from kt to chosen unit
+                                $pointer["wind"] = $this->convertSpeed($result[2], strtolower($result[5]), "mph");
+                                if ($result[1] == "VAR" || $result[1] == "VRB") {
+                                    // Variable winds
+                                    $pointer["windDegrees"]   = "Variable";
+                                    $pointer["windDirection"] = "Variable";
+                                } else {
+                                    // Save wind degree and calc direction
+                                    $pointer["windDegrees"]   = $result[1];
+                                    $pointer["windDirection"] = $compass[round($result[1] / 22.5) % 16];
+                                }
+                                if (is_numeric($result[4])) {
+                                    // Wind with gusts...
+                                    $pointer["windGust"] = $this->convertSpeed($result[4], strtolower($result[5]), "mph");
+                                }
+                                if (isset($probability)) {
+                                    $pointer["windProb"] = $probability;
+                                    unset($probability);
+                                }
+                                break;
+                            case "visibility":
+                                $pointer["visQualifier"] = "AT";
+                                if (is_numeric($result[1]) && ($result[1] == 9999)) {
+                                    // Upper limit of visibility range
+                                    $visibility = $this->convertDistance(10, "km", "sm");
+                                    $pointer["visQualifier"] = "BEYOND";
+                                } elseif (is_numeric($result[1])) {
+                                    // 4-digit visibility in m
+                                    $visibility = $this->convertDistance(($result[1]/1000), "km", "sm");
+                                } elseif (!isset($result[11]) || $result[11] != "CAVOK") {
+                                    if ($result[3] == "M") {
+                                        $pointer["visQualifier"] = "BELOW";
+                                    } elseif ($result[3] == "P") {
+                                        $pointer["visQualifier"] = "BEYOND";
+                                    }
+                                    if (is_numeric($result[5])) {
+                                        // visibility as one/two-digit number
+                                        $visibility = $this->convertDistance($result[5], $result[10], "sm");
+                                    } else {
+                                        // the y/z part, add if we had a x part (see visibility1)
+                                        if (is_numeric($result[7])) {
+                                            $visibility = $this->convertDistance($result[7] + $result[8] / $result[9], $result[10], "sm");
+                                        } else {
+                                            $visibility = $this->convertDistance($result[8] / $result[9], $result[10], "sm");
+                                        }
+                                    }
+                                } else {
+                                    $pointer["visQualifier"] = "BEYOND";
+                                    $visibility = $this->convertDistance(10, "km", "sm");
+                                    $pointer["clouds"] = array("amount" => "none", "height" => "below 5000ft");
+                                    $pointer["condition"] = "no significant weather";
+                                }
+                                if (isset($probability)) {
+                                    $pointer["visProb"] = $probability;
+                                    unset($probability);
+                                }
+                                $pointer["visibility"] = $visibility;
+                                break;
+                            case "condition":
+                                // First some basic setups
+                                if (!isset($pointer["condition"])) {
+                                    $pointer["condition"] = "";
+                                } elseif (strlen($pointer["condition"]) > 0) {
+                                    $pointer["condition"] .= ",";
+                                }
+
+                                if (in_array(strtolower($result[0]), $conditions)) {
+                                    // First try matching the complete string
+                                    $pointer["condition"] .= " ".$conditions[strtolower($result[0])];
+                                } else {
+                                    // No luck, match part by part
+                                    array_shift($result);
+                                    $result = array_unique($result);
+                                    foreach ($result as $condition) {
+                                        if (strlen($condition) > 0) {
+                                            $pointer["condition"] .= " ".$conditions[strtolower($condition)];
+                                        }
+                                    }
+                                }
+                                $pointer["condition"] = trim($pointer["condition"]);
+                                if (isset($probability)) {
+                                    $pointer["condition"] .= " (".$probability."% prob.)";
+                                    unset($probability);
+                                }
+                                break;
+                            case "clouds":
+                                if (!isset($pointer["clouds"])) {
+                                    $pointer["clouds"] = array();
+                                }
+
+                                if (sizeof($result) == 5) {
+                                    // Only amount and height
+                                    $cloud = array("amount" => $clouds[strtolower($result[3])], "height" => ($result[4] * 100));
+                                }
+                                elseif (sizeof($result) == 6) {
+                                    // Amount, height and type
+                                    $cloud = array("amount" => $clouds[strtolower($result[3])], "height" => ($result[4] * 100), "type" => $clouds[strtolower($result[5])]);
+                                }
+                                else {
+                                    // SKC or CLR or NSC
+                                    $cloud = array("amount" => $clouds[strtolower($result[0])]);
+                                }
+                                if(isset($probability)) {
+                                    $cloud["prob"] = $probability;
+                                    unset($probability);
+                                }
+                                $pointer["clouds"][] = $cloud;
+                                break;
+                            case "windshear":
+                                // Parse windshear, if available
+                                $pointer["windshear"]          = $this->convertSpeed($result[3], strtolower($result[4]), "mph");
+                                $pointer["windshearHeight"]    = $result[1] * 100;
+                                $pointer["windshearDegrees"]   = $result[2];
+                                $pointer["windshearDirection"] = $compass[round($result[2] / 22.5) % 16];
+                                break;
+                            case "tempmax":
+                                $forecastData["temperatureHigh"] = $this->convertTemperature($result[1], "c", "f");
+                                break;
+                            case "tempmin":
+                                // Parse max/min temperature
+                                $forecastData["temperatureLow"]  = $this->convertTemperature($result[1], "c", "f");
+                                break;
+                            case "tempmaxmin":
+                                $forecastData["temperatureHigh"] = $this->convertTemperature($result[1], "c", "f");
+                                $forecastData["temperatureLow"]  = $this->convertTemperature($result[4], "c", "f");
+                                break;
+                            case "from":
+                                // Next timeperiod is coming up, prepare array and
+                                // set pointer accordingly
+                                $fromTime = $result[1].":".$result[2];
+                                $forecastData["time"][$fromTime] = array();
+                                $fmcCount = 0;
+                                $pointer =& $forecastData["time"][$fromTime];
+                                break;
+                            case "fmc";
+                                // Test, if this is a probability for the next FMC                                
+                                if (preg_match("/^BECMG|TEMPO$/i", $taf[$i + 1], $lresult)) {
+                                    // Set type to BECMG or TEMPO
+                                    $type = $lresult[0];
+                                    // Set probability
+                                    $probability = $result[2];
+                                    // Now extract time for this group
+                                    preg_match("/^(\d{2})(\d{2})$/i", $taf[$i + 2], $lresult);
+                                    $from = $lresult[1].":00";
+                                    $to   = $lresult[2].":00";
+                                    $to   = ($to == "24:00") ? "00:00" : $to;
+                                    // As we now have type, probability and time for this FMC
+                                    // from our TAF, increase field-counter
+                                    $i += 2;
+                                } elseif (preg_match("/^(\d{2})(\d{2})$/i", $taf[$i + 1], $lresult)) {
+                                    // Normal group, set type and use extracted time
+                                    $type = $result[1];
+                                    // Check for PROBdd
+                                    if (isset($result[2])) {
+                                        $probability = $result[2];
+                                    }
+                                    $from = $lresult[1].":00";
+                                    $to   = $lresult[2].":00";
+                                    $to   = ($to == "24:00") ? "00:00" : $to;
+                                    // Same as above, we have a time for this FMC from our TAF, 
+                                    // increase field-counter
+                                    $i += 1;
+                                } else {
+                                    // This is either a PROBdd or a malformed TAF
+                                    if (isset($result[2])) {
+                                        $probability = $result[2];
+                                    }
+                                }
+
+                                // Handle the FMC, generate neccessary array if it's the first...
+                                if (isset($type)) {
+                                    if (!isset($forecastData["time"][$fromTime]["fmc"])) {
+                                        $forecastData["time"][$fromTime]["fmc"] = array();
+                                    }
+                                    $forecastData["time"][$fromTime]["fmc"][$fmcCount] = array();
+                                    // ...and set pointer.
+                                    $pointer =& $forecastData["time"][$fromTime]["fmc"][$fmcCount];
+                                    $fmcCount++;
+                                    // Insert data
+                                    $pointer["type"] = $type;
+                                    $pointer["from"] = $from;
+                                    $pointer["to"]   = $to;
+                                    unset($type, $from, $to);
+                                    if (isset($probability)) {
+                                        $pointer["probability"] = $probability;
+                                        unset($probability);
+                                    }
+                                }
+                                break;
+                            default:
+                                // Do nothing
+                                break;
+                        }
+                        if (SERVICES_WEATHER_DEBUG) {
+                            echo $key."\n";
+                        }
+                        break;
+                    }
+                }
+                if (!$found) {
+                    if (SERVICES_WEATHER_DEBUG) {
+                        echo "n/a\n";
+                    }
+                    if (!isset($forecastData["noparse"])) {
+                        $forecastData["noparse"] = array();
+                    }
+                    $forecastData["noparse"][] = $taf[$i];
+                }
+            }
+        }
+        if (isset($forecastData["noparse"])) {
+            $forecastData["noparse"] = implode(" ",  $forecastData["noparse"]);
+        }
+
+        return $forecastData;
+    }
+    // }}}
+
+    // {{{ _convertReturn()
+    /**
+    * Converts the data in the return array to the desired units and/or
+    * output format. 
+    *
+    * @param    array                       $target
+    * @param    string                      $units
+    * @param    string                      $location
+    * @access   private
+    */
+    function _convertReturn(&$target, $units, $location)
+    {
+        if (is_array($target)) {
+            foreach ($target as $key => $val) {
+                if (is_array($val)) {
+                    // Another array detected, so recurse into it to convert the units
+                    $this->_convertReturn($target[$key], $units, $location);
+                } else {
+                    switch ($key) {
+                        case "station":
+                            $newVal = $location["name"];
+                            break;
+                        case "update":
+                        case "validFrom":
+                        case "validTo":
+                            $newVal = gmdate(trim($this->_dateFormat." ".$this->_timeFormat), $val);
+                            break;
+                        case "wind":
+                        case "windGust":
+                        case "windshear":
+                            $newVal = $this->convertSpeed($val, "mph", $units["wind"]);
+                            break;
+                        case "visibility":
+                            $newVal = $this->convertDistance($val, "sm", $units["vis"]);
+                            break;
+                        case "height":
+                        case "windshearHeight":
+                            $newVal = $this->convertDistance($val, "ft", $units["height"]);
+                            break;
+                        case "temperature":
+                        case "temperatureHigh":
+                        case "temperatureLow":
+                        case "dewPoint":
+                        case "feltTemperature":
+                            $newVal = $this->convertTemperature($val, "f", $units["temp"]);
+                            break;
+                        case "pressure":
+                            $newVal = $this->convertPressure($val, "in", $units["pres"]);
+                            break;
+                        case "amount":
+                        case "snowdepth":
+                        case "snowequiv":
+                            if (is_numeric($val)) {
+                                $newVal = $this->convertPressure($val, "in", $units["rain"]);
+                            } else {
+                                $newVal = $val;
+                            }
+                            break;
+                        case "seapressure":
+                            $newVal = $this->convertPressure($val, "in", $units["pres"]);
+                            break;
+                        case "1htemp":
+                        case "1hdew":
+                        case "6hmaxtemp":
+                        case "6hmintemp":
+                        case "24hmaxtemp":
+                        case "24hmintemp":
+                            $newVal = $this->convertTemperature($val, "f", $units["temp"]);
+                            break;
+                        default:
+                            continue 2;
+                            break;
+                    }
+                    $target[$key] = $newVal;
+                }
+            }
+        }
+    }
+    // }}}
+
     // {{{ searchLocation()
     /**
-    * Searches IDs for given location, returns array of possible locations or single ID
+    * Searches IDs for given location, returns array of possible locations
+    * or single ID
     *
     * @param    string|array                $location
     * @param    bool                        $useFirst       If set, first ID of result-array is returned
@@ -728,7 +1226,7 @@ class Services_Weather_Metar extends Services_Weather_Common
     function searchLocation($location, $useFirst = false)
     {
         if (!isset($this->_db) || !DB::isConnection($this->_db)) {
-            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_DB_NOT_CONNECTED);
+            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_DB_NOT_CONNECTED, __FILE__, __LINE__);
         }
         
         if (is_string($location)) {
@@ -755,7 +1253,7 @@ class Services_Weather_Metar extends Services_Weather_Common
             if (DB::isError($result)) {
                 return $result;
             } elseif (strtolower(get_class($result)) != "db_result" || $result->numRows() == 0) {
-                return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_UNKNOWN_LOCATION);
+                return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_UNKNOWN_LOCATION, __FILE__, __LINE__);
             }
             
             // Result is valid, start preparing the return
@@ -787,7 +1285,7 @@ class Services_Weather_Metar extends Services_Weather_Common
             // Location was provided as coordinates, search nearest airport
             $icao = $this->searchAirport($location[0], $location[1]);
         } else {
-            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_INVALID_LOCATION);
+            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_INVALID_LOCATION, __FILE__, __LINE__);
         }
 
         return $icao;
@@ -796,7 +1294,8 @@ class Services_Weather_Metar extends Services_Weather_Common
 
     // {{{ searchLocationByCountry()
     /**
-    * Returns IDs with location-name for a given country or all available countries, if no value was given 
+    * Returns IDs with location-name for a given country or all available
+    * countries, if no value was given 
     *
     * @param    string                      $country
     * @return   PEAR_Error|array
@@ -808,7 +1307,7 @@ class Services_Weather_Metar extends Services_Weather_Common
     function searchLocationByCountry($country = "")
     {
         if (!isset($this->_db) || !DB::isConnection($this->_db)) {
-            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_DB_NOT_CONNECTED);
+            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_DB_NOT_CONNECTED, __FILE__, __LINE__);
         }
 
         // Return the available countries as no country was given
@@ -833,7 +1332,7 @@ class Services_Weather_Metar extends Services_Weather_Common
         if (DB::isError($result)) {
             return $result;
         } elseif (strtolower(get_class($result)) != "db_result" || $result->numRows() == 0) {
-            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_UNKNOWN_LOCATION);
+            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_UNKNOWN_LOCATION, __FILE__, __LINE__);
         }
 
         // Construct the result
@@ -855,7 +1354,8 @@ class Services_Weather_Metar extends Services_Weather_Common
 
     // {{{ searchAirport()
     /**
-    * Searches the nearest airport(s) for given coordinates, returns array of IDs or single ID
+    * Searches the nearest airport(s) for given coordinates, returns array
+    * of IDs or single ID
     *
     * @param    float                       $latitude
     * @param    float                       $longitude
@@ -869,10 +1369,10 @@ class Services_Weather_Metar extends Services_Weather_Common
     function searchAirport($latitude, $longitude, $numResults = 1)
     {
         if (!isset($this->_db) || !DB::isConnection($this->_db)) {
-            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_DB_NOT_CONNECTED);
+            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_DB_NOT_CONNECTED, __FILE__, __LINE__);
         }
         if (!is_numeric($latitude) || !is_numeric($longitude)) {
-            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_INVALID_LOCATION);
+            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_INVALID_LOCATION, __FILE__, __LINE__);
         }           
         
         // Get all airports
@@ -881,7 +1381,7 @@ class Services_Weather_Metar extends Services_Weather_Common
         if (DB::isError($result)) {
             return $result;
         } elseif (strtolower(get_class($result)) != "db_result" || $result->numRows() == 0) {
-            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_UNKNOWN_LOCATION);
+            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_UNKNOWN_LOCATION, __FILE__, __LINE__);
         }
 
         // Result is valid, start search
@@ -927,24 +1427,8 @@ class Services_Weather_Metar extends Services_Weather_Common
             // Return found locations
             return $search["icao"];
         } else {
-            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_UNKNOWN_LOCATION);
+            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_UNKNOWN_LOCATION, __FILE__, __LINE__);
         }
-    }
-    // }}}
-
-    // {{{ getUnits()
-    /**
-    * Returns the units for the current query
-    *
-    * @param    string                      $id
-    * @param    string                      $unitsFormat
-    * @return   array
-    * @deprecated
-    * @access   public
-    */
-    function getUnits($id = null, $unitsFormat = "")
-    {
-        return $this->getUnitsFormat($unitsFormat);
     }
     // }}}
 
@@ -980,7 +1464,7 @@ class Services_Weather_Metar extends Services_Weather_Common
             if (DB::isError($result)) {
                 return $result;
             } elseif (strtolower(get_class($result)) != "db_result" || $result->numRows() == 0) {
-                return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_UNKNOWN_LOCATION);
+                return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_UNKNOWN_LOCATION, __FILE__, __LINE__);
             }
             // Result is ok, put things into object
             $this->_location = $result->fetchRow(DB_FETCHMODE_ASSOC);
@@ -1049,14 +1533,14 @@ class Services_Weather_Metar extends Services_Weather_Common
             $weatherReturn["cache"] = "HIT";
         } else {
             // Set the source
-            if ($this->_source == "file") {
-                $source = realpath($this->_sourcePath.$id.".TXT");
+            if ($this->_sourceMetar == "file") {
+                $source = realpath($this->_sourcePathMetar."/".$id.".TXT");
             } else {
-                $source = $this->_sourcePath.$id.".TXT";
+                $source = $this->_sourcePathMetar."/".$id.".TXT";
             }
 
             // Download and parse weather
-            $weatherReturn  = $this->_parseWeatherData($source, $units);
+            $weatherReturn  = $this->_parseWeatherData($source);
 
             if (Services_Weather::isError($weatherReturn)) {
                 return $weatherReturn;
@@ -1070,78 +1554,7 @@ class Services_Weather_Metar extends Services_Weather_Common
             $weatherReturn["cache"] = "MISS";
         }
 
-        if (isset($weatherReturn["remark"])) {
-            foreach ($weatherReturn["remark"] as $key => $val) {
-                switch ($key) {
-                    case "seapressure":
-                        $newVal = $this->convertPressure($val, "in", $units["pres"]);
-                        break;
-                    case "snowdepth":
-                    case "snowequiv":
-                        $newVal = $this->convertPressure($val, "in", $units["rain"]);
-                        break;
-                    case "1htemp":
-                    case "1hdew":
-                    case "6hmaxtemp":
-                    case "6hmintemp":
-                    case "24hmaxtemp":
-                    case "24hmintemp":
-                        $newVal = $this->convertTemperature($val, "f", $units["temp"]);
-                        break;
-                    default:
-                        continue 2;
-                        break;
-                }
-                $weatherReturn["remark"][$key] = $newVal;
-            }
-        }
-
-        foreach ($weatherReturn as $key => $val) {
-            switch ($key) {
-                case "station":
-                    $newVal = $location["name"];
-                    break;
-                case "update":
-                    $newVal = gmdate(trim($this->_dateFormat." ".$this->_timeFormat), $val);
-                    break;
-                case "wind":
-                case "windGust":
-                    $newVal = $this->convertSpeed($val, "mph", $units["wind"]);
-                    break;
-                case "visibility":
-                    $newVal = $this->convertDistance($val, "sm", $units["vis"]);
-                    break;
-                case "temperature":
-                case "dewPoint":
-                case "feltTemperature":
-                    $newVal = $this->convertTemperature($val, "f", $units["temp"]);
-                    break;
-                case "pressure":
-                    $newVal = $this->convertPressure($val, "in", $units["pres"]);
-                    break;
-                case "precipitation":
-                    $newVal = array();
-                    for ($p = 0; $p < sizeof($val); $p++) {
-                        $newVal[$p] = array();
-                        if (is_numeric($val[$p]["amount"])) {
-                            $newVal[$p]["amount"] = $this->convertPressure($val[$p]["amount"], "in", $units["rain"]);
-                        } else {
-                            $newVal[$p]["amount"] = $val[$p]["amount"];
-                        }
-                        $newVal[$p]["hours"]  = $val[$p]["hours"];
-                    }
-                    break;
-/*
-                case "remark":
-                    $newVal = implode(", ", $val);
-                    break;
-*/
-                default:
-                    continue 2;
-                    break;
-            }
-            $weatherReturn[$key] = $newVal;
-        }
+        $this->_convertReturn($weatherReturn, $units, $location);
 
         return $weatherReturn;
     }
@@ -1149,19 +1562,60 @@ class Services_Weather_Metar extends Services_Weather_Common
     
     // {{{ getForecast()
     /**
-    * METAR has no forecast per se, so this function is just for
-    * compatibility purposes.
+    * METAR provides no forecast per se, we use the TAF reports to generate
+    * a forecast for the announced timeperiod
     *
-    * @param    string                      $int
-    * @param    int                         $days
+    * @param    string                      $id
+    * @param    int                         $days           Ignored, not applicable
     * @param    string                      $unitsFormat
-    * @return   bool
+    * @return   PEAR_Error|array
+    * @throws   PEAR_Error
     * @access   public
-    * @deprecated
     */
-    function getForecast($id = null, $days = null, $unitsFormat = null)
+    function getForecast($id = "", $days = null, $unitsFormat = "")
     {
-        return false;
+        $id     = strtoupper($id);
+        $status = $this->_checkLocationID($id);
+
+        if (Services_Weather::isError($status)) {
+            return $status;
+        }
+
+        // Get other data
+        $units    = $this->getUnitsFormat($unitsFormat);
+        $location = $this->getLocation($id);
+
+        if ($this->_cacheEnabled && ($forecast = $this->_cache->get("METAR-".$id, "forecast"))) {
+            // Wee... it was cached, let's have it...
+            $forecastReturn  = $forecast;
+            $this->_forecast = $forecastReturn;
+            $forecastReturn["cache"] = "HIT";
+        } else {
+            // Set the source
+            if ($this->_sourceTaf == "file") {
+                $source = realpath($this->_sourcePathTaf."/".$id.".TXT");
+            } else {
+                $source = $this->_sourcePathTaf."/".$id.".TXT";
+            }
+
+            // Download and parse weather
+            $forecastReturn  = $this->_parseForecastData($source);
+
+            if (Services_Weather::isError($forecastReturn)) {
+                return $forecastReturn;
+            }
+            if ($this->_cacheEnabled) {
+                // Cache weather
+                $expire = constant("SERVICES_WEATHER_EXPIRES_FORECAST");
+                $this->_cache->extSave("METAR-".$id, $forecastReturn, $unitsFormat, $expire, "forecast");
+            }
+            $this->_forecast = $forecastReturn;
+            $forecastReturn["cache"] = "MISS";
+        }
+
+        $this->_convertReturn($forecastReturn, $units, $location);
+
+        return $forecastReturn;
     }
     // }}}
 }

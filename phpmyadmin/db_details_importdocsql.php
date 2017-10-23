@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_details_importdocsql.php,v 2.3 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: db_details_importdocsql.php,v 2.5 2004/06/15 16:49:13 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -64,7 +64,7 @@ if (isset($cfg['docSQLDir']) && !empty($cfg['docSQLDir'])) {
             }
 
             if (isset($lines) && is_array($lines) && count($lines) > 0) {
-                foreach($lines AS $lkey => $line) {
+                foreach ($lines AS $lkey => $line) {
                     //echo '<p>' . $line . '</p>';
                     $inf     = explode('|',$line);
                     if (!empty($inf[1]) && strlen(trim($inf[1])) > 0) {
@@ -201,7 +201,7 @@ if (isset($cfg['docSQLDir']) && !empty($cfg['docSQLDir'])) {
         } else {
 
             // echo '<h1>Starting Import</h1>';
-            $docpath = $cfg['docSQLDir'] . preg_replace('@\.\.*@', '.', $docpath);
+            $docpath = $cfg['docSQLDir'] . PMA_securePath($docpath);
             if (substr($docpath, -1) != '/') {
                 $docpath .= '/';
             }

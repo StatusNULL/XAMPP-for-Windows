@@ -1,7 +1,7 @@
 <?php
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 // +----------------------------------------------------------------------+
-// | Copyright (c) 2002 Brent Cook                                        |
+// | Copyright (c) 2002-2003 Brent Cook                                        |
 // +----------------------------------------------------------------------+
 // | This library is free software; you can redistribute it and/or        |
 // | modify it under the terms of the GNU Lesser General Public           |
@@ -18,7 +18,7 @@
 // | Foundation, Inc., 59 Temple Place, Suite 330,Boston,MA 02111-1307 USA|
 // +----------------------------------------------------------------------+
 //
-// $Id: Compatibility.php,v 1.9 2002/11/30 05:13:15 busterb Exp $
+// $Id: Compatibility.php,v 1.10 2003/01/04 11:54:51 mj Exp $
 
 /** 
  * dba compatibility layer

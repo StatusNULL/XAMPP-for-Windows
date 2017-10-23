@@ -17,7 +17,7 @@
 // | Maintainer: Daniel Convissor <danielc@php.net>                       |
 // +----------------------------------------------------------------------+
 //
-// $Id: ibase.php,v 1.65 2004/03/05 01:46:53 danielc Exp $
+// $Id: ibase.php,v 1.69 2004/06/24 15:24:56 danielc Exp $
 
 
 // Bugs:
@@ -31,7 +31,7 @@ require_once 'DB/common.php';
  * extension.
  *
  * @package  DB
- * @version  $Id: ibase.php,v 1.65 2004/03/05 01:46:53 danielc Exp $
+ * @version  $Id: ibase.php,v 1.69 2004/06/24 15:24:56 danielc Exp $
  * @category Database
  * @author   Sterling Hughes <sterling@php.net>
  */
@@ -170,7 +170,7 @@ class DB_ibase extends DB_common
      * @author Ludovico Magnocavallo <ludo@sumatrasolutions.com>
      * @access private
      */
-    function modifyLimitQuery($query, $from, $count)
+    function modifyLimitQuery($query, $from, $count, $params = array())
     {
         if ($this->dsn['dbsyntax'] == 'firebird') {
             //$from++; // SKIP starts from 1, ie SKIP 1 starts from the first record
@@ -362,7 +362,7 @@ class DB_ibase extends DB_common
             $data = array($data);
         }
 
-        $types =& $this->prepare_types[$stmt];
+        $types =& $this->prepare_types[(int)$stmt];
         if (count($types) != count($data)) {
             $tmp =& $this->raiseError(DB_ERROR_MISMATCH);
             return $tmp;
@@ -652,7 +652,7 @@ class DB_ibase extends DB_common
             /*
              * Probably received a result resource identifier.
              * Copy it.
-             * Depricated.  Here for compatibility only.
+             * Deprecated.  Here for compatibility only.
              */
              $id = $result;
             $got_string = false;

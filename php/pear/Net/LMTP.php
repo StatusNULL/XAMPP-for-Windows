@@ -647,12 +647,14 @@ class Net_LMTP {
      */
     function data($data)
     {
-        if (isset($this->_esmtp['SIZE'])) {
+
+        if (isset($this->_esmtp['SIZE']) && ($this->_esmtp['SIZE'] > 0)) {
             if (strlen($data) >= $this->_esmtp['SIZE']) {
                 $this->disconnect();
                 return new PEAR_Error('Message size excedes the server limit');
             }
         }
+    
 
         /*
          * Change Unix (\n) and Mac (\r) linefeeds into Internet-standard CRLF

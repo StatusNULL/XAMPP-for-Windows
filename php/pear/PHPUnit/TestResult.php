@@ -12,7 +12,7 @@
 // | license@php.net so we can mail you a copy immediately.                 |
 // +------------------------------------------------------------------------+
 //
-// $Id: TestResult.php,v 1.6 2003/03/26 18:04:32 sebastian Exp $
+// $Id: TestResult.php,v 1.10 2004/09/28 06:52:48 sebastian Exp $
 //
 
 require_once 'PHPUnit/TestFailure.php';
@@ -21,9 +21,11 @@ require_once 'PHPUnit/TestListener.php';
 /**
  * A TestResult collects the results of executing a test case.
  *
- * @package PHPUnit
- * @author  Sebastian Bergmann <sb@sebastian-bergmann.de>
- *          Based upon JUnit, see http://www.junit.org/ for details.
+ * @author      Sebastian Bergmann <sb@sebastian-bergmann.de>
+ * @copyright   Copyright &copy; 2002-2004 Sebastian Bergmann <sb@sebastian-bergmann.de>
+ * @license     http://www.php.net/license/3_0.txt The PHP License, Version 3.0
+ * @category    PHP
+ * @package     PHPUnit
  */
 class PHPUnit_TestResult {
     /**
@@ -60,7 +62,7 @@ class PHPUnit_TestResult {
     * @var    boolean
     * @access private
     */
-    var $_stop = false;
+    var $_stop = FALSE;
 
     /**
     * Adds an error to the list of errors.
@@ -244,7 +246,7 @@ class PHPUnit_TestResult {
     * @access public
     */
     function stop() {
-        $this->_stop = true;
+        $this->_stop = TRUE;
     }
 
     /**
@@ -289,9 +291,9 @@ class PHPUnit_TestResult {
     */
     function wasSuccessful() {
         if (empty($this->_errors) && empty($this->_failures)) {
-            return true;
+            return TRUE;
         } else {
-            return false;
+            return FALSE;
         }
     }
 }

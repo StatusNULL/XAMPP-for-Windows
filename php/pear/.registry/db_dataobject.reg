@@ -1,10 +1,102 @@
-a:14:{s:8:"provides";a:0:{}s:8:"filelist";a:7:{s:14:"DataObject.php";a:4:{s:4:"role";s:3:"php";s:14:"baseinstalldir";s:2:"DB";s:12:"replacements";a:1:{i:0;a:3:{s:4:"from";s:9:"@version@";s:2:"to";s:7:"version";s:4:"type";s:12:"package-info";}}s:12:"installed_as";s:35:"C:\xampp\php\pear\DB\DataObject.php";}s:19:"DataObject/Cast.php";a:3:{s:4:"role";s:3:"php";s:14:"baseinstalldir";s:2:"DB";s:12:"installed_as";s:40:"C:\xampp\php\pear\DB\DataObject\Cast.php";}s:24:"DataObject/Generator.php";a:3:{s:4:"role";s:3:"php";s:14:"baseinstalldir";s:2:"DB";s:12:"installed_as";s:45:"C:\xampp\php\pear\DB\DataObject\Generator.php";}s:27:"DataObject/createTables.php";a:3:{s:4:"role";s:3:"php";s:14:"baseinstalldir";s:2:"DB";s:12:"installed_as";s:48:"C:\xampp\php\pear\DB\DataObject\createTables.php";}s:16:"docs/example.ini";a:3:{s:4:"role";s:3:"doc";s:14:"baseinstalldir";s:2:"DB";s:12:"installed_as";s:53:"C:\xampp\php\pear\docs\DB_DataObject\docs\example.ini";}s:38:"scripts/DB_DataObject_createTables.bat";a:3:{s:4:"role";s:6:"script";s:14:"baseinstalldir";s:2:"DB";s:12:"installed_as";s:54:"C:\xampp\php\DB\scripts\DB_DataObject_createTables.bat";}s:7:"dirtree";a:5:{s:20:"C:\xampp\php\pear\DB";b:1;s:31:"C:\xampp\php\pear\DB\DataObject";b:1;s:41:"C:\xampp\php\pear\docs\DB_DataObject\docs";b:1;s:23:"C:\xampp\php\DB\scripts";b:1;s:15:"C:\xampp\php\DB";b:1;}}s:7:"package";s:13:"DB_DataObject";s:7:"summary";s:51:"An SQL Builder, Object Interface to Database Tables";s:11:"description";s:361:"DataObject performs 2 tasks:
+a:14:{s:8:"provides";a:0:{}s:8:"filelist";a:8:{s:14:"DataObject.php";a:5:{s:4:"role";s:3:"php";s:14:"baseinstalldir";s:2:"DB";s:6:"md5sum";s:32:"8f670d12b8126e3c57eeff43a7d5fa9e";s:12:"replacements";a:1:{i:0;a:3:{s:4:"from";s:9:"@version@";s:2:"to";s:7:"version";s:4:"type";s:12:"package-info";}}s:12:"installed_as";s:48:"C:\xarelease149\xampp\php\pear\DB\DataObject.php";}s:19:"DataObject/Cast.php";a:4:{s:4:"role";s:3:"php";s:14:"baseinstalldir";s:2:"DB";s:6:"md5sum";s:32:"f3faa3383d83fd95f90454ef3de23d49";s:12:"installed_as";s:53:"C:\xarelease149\xampp\php\pear\DB\DataObject\Cast.php";}s:24:"DataObject/Generator.php";a:4:{s:4:"role";s:3:"php";s:14:"baseinstalldir";s:2:"DB";s:6:"md5sum";s:32:"3028b388a5022e3f0f02179b27ef196b";s:12:"installed_as";s:58:"C:\xarelease149\xampp\php\pear\DB\DataObject\Generator.php";}s:27:"DataObject/createTables.php";a:4:{s:4:"role";s:3:"php";s:14:"baseinstalldir";s:2:"DB";s:6:"md5sum";s:32:"388d35c593ffa8543646ed12abb01152";s:12:"installed_as";s:61:"C:\xarelease149\xampp\php\pear\DB\DataObject\createTables.php";}s:20:"DataObject/Error.php";a:4:{s:4:"role";s:3:"php";s:14:"baseinstalldir";s:2:"DB";s:6:"md5sum";s:32:"af02e7575c22b9503d69c4447a4eb0ab";s:12:"installed_as";s:54:"C:\xarelease149\xampp\php\pear\DB\DataObject\Error.php";}s:16:"docs/example.ini";a:4:{s:4:"role";s:3:"doc";s:14:"baseinstalldir";s:2:"DB";s:6:"md5sum";s:32:"076795e2d0f273ee83d6c908b1acab6d";s:12:"installed_as";s:66:"C:\xarelease149\xampp\php\pear\docs\DB_DataObject\docs\example.ini";}s:38:"scripts/DB_DataObject_createTables.bat";a:4:{s:4:"role";s:6:"script";s:14:"baseinstalldir";s:2:"DB";s:6:"md5sum";s:32:"ef88826fadc5e821f0973e30a82ea877";s:12:"installed_as";s:67:"C:\xarelease149\xampp\php\DB\scripts\DB_DataObject_createTables.bat";}s:7:"dirtree";a:5:{s:33:"C:\xarelease149\xampp\php\pear\DB";b:1;s:44:"C:\xarelease149\xampp\php\pear\DB\DataObject";b:1;s:54:"C:\xarelease149\xampp\php\pear\docs\DB_DataObject\docs";b:1;s:36:"C:\xarelease149\xampp\php\DB\scripts";b:1;s:28:"C:\xarelease149\xampp\php\DB";b:1;}}s:7:"package";s:13:"DB_DataObject";s:7:"summary";s:51:"An SQL Builder, Object Interface to Database Tables";s:11:"description";s:361:"DataObject performs 2 tasks:
   1. Builds SQL statements based on the objects vars and the builder methods.
   2. acts as a datastore for a table row.
   The core class is designed to be extended for each of your tables so that you put the
   data logic inside the data classes.
   included is a Generator to make your configuration files and your base classes.
-  nd";s:11:"maintainers";a:1:{i:0;a:4:{s:6:"handle";s:6:"alan_k";s:4:"name";s:12:"Alan Knowles";s:5:"email";s:17:"alan@akbkhome.com";s:4:"role";s:4:"lead";}}s:7:"version";s:5:"1.5.3";s:12:"release_date";s:10:"2004-01-29";s:15:"release_license";s:11:"PHP License";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:500:"Bug fix release.
+  nd";s:11:"maintainers";a:1:{i:0;a:4:{s:6:"handle";s:6:"alan_k";s:4:"name";s:12:"Alan Knowles";s:5:"email";s:17:"alan@akbkhome.com";s:4:"role";s:4:"lead";}}s:7:"version";s:5:"1.7.2";s:12:"release_date";s:10:"2004-08-28";s:15:"release_license";s:11:"PHP License";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:560:"Minor bug fix / Minor feature addition release
+  
+  
+Bug Fixes:
+  #1835 - more fixes to ensure that joinAdd works correctly.
+  #2106 - Update with old object having no changes does not raise an error
+  #---- - fixed problem of call() code producing parse error on PHP5.0.1 
+  #2205 - fixed case sensitivity of PHP5 call() 
+  #---- - fixed undefined index in delete after a fetch()
+  
+Features Added:
+  #2086 - Support for buliding dataobjects for Views (use option build_view=1)
+  #2240 - factory() called on a dataobject returns a new instance of that object.";s:12:"release_deps";a:4:{i:1;a:3:{s:4:"type";s:3:"php";s:3:"rel";s:2:"ge";s:7:"version";s:3:"4.2";}i:2;a:4:{s:4:"type";s:3:"pkg";s:3:"rel";s:2:"ge";s:7:"version";s:3:"1.6";s:4:"name";s:2:"DB";}i:3;a:5:{s:4:"type";s:3:"pkg";s:3:"rel";s:2:"ge";s:7:"version";s:5:"0.1.1";s:8:"optional";s:3:"yes";s:4:"name";s:8:"Validate";}i:4;a:4:{s:4:"type";s:3:"pkg";s:3:"rel";s:2:"ge";s:7:"version";s:5:"1.4.3";s:4:"name";s:4:"Date";}}s:9:"changelog";a:33:{i:0;a:4:{s:7:"version";s:5:"1.7.1";s:12:"release_date";s:10:"2004-08-09";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:222:"Minor bug fix release
+  
+  
+Bug Fixes:
+  #2088 - class_prefix may be left out.
+  #------ php4.2 compatibility should work as advertised in last realease
+  #------ Generator didnt have DB loaded due to lazy load changes.
+
+
+";}i:1;a:4:{s:7:"version";s:5:"1.7.0";s:12:"release_date";s:10:"2004-06-03";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:1621:"Major bug fix release, Minor features added.  
+  
+  
+Bug Fixes:
+  #1559 - __FUNCTION__ remove, so dependancy on php 4.2 may still be valid.
+  #1595 - regex include/exclude working correctly (Thanks to Stephane Gully)
+  #1664 - configuration line links_{databasename} now available 
+  #1726 - enable orderby and limit can be used with delete()   
+  #1697 - prevent generator from adding an extra line created after definition.
+  #1704 - update only adds null when the column is not marked 'not null'
+  #1778 - toArray() returns a merge of defined table and actual results
+  #1828 - Generator will die, if tableinfo is not supported.      
+  #1833 - links() now returns an empty array (no links) or null (no links.ini)
+      so it can be used generically with : $ar = (array) $do->links();
+  #1835 - getLinks, getLink etc. now use ->links(), so you can define your
+      own links() to return table links, rather than use links.ini files.
+  #1923 - removed all @ silencers, and replace with empty/isset.
+  #1935 - selectAs() - removed double quoteIdentifiers
+  #2068 - workaround for DB bug, postgres nextval() being rawurlencoded
+  #1980 - logic error when using quoteIdentifiers
+  
+Changes:
+  * DebugLevel(1) now displays native errors from database when queries fail.
+  * Result Field names now stored seperately from Result Object
+  * free() method added, to clean up memory instantly, if you are doing alot of queries.
+      = Cleans Result Fields, Result Object, NumRows returned in Connection object.
+  * include path is used to do file hunting if factory fails to find file.
+  * DB is lazy loaded on connection.b
+
+
+";}i:2;a:4:{s:7:"version";s:5:"1.6.1";s:12:"release_date";s:10:"2004-06-03";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:60:"Minor Bug Fix
+
+* fixed count() breaks when countWhat used.
+
+";}i:3;a:4:{s:7:"version";s:5:"1.6.0";s:12:"release_date";s:10:"2004-04-24";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:1825:"Minor Feature Release and many bug fixes..
+
+* DB_DataObject_Error added to enable testing for dataobject errors
+* Date fixes - needs latest date package.
+* Generator fails with clear message if backend doesnt support tableInfo
+* added cidr, inet, macaddr for postgres
+* new options to filter generation of classes
+  generator_include_regex = /foo_.*/i
+  generator_exclude_regex = /tmp_.*/i
+* result column list is now stored for all queries (in the result object)
+  so toArray() allways relates to the query.
+* php version correted in package file.
+* getLinks called before other database call fixed.
+* Updating without changing things, no longer raises a pear error,
+  it just returns 0 (eg. no rows affected)
+* now Depends on 1.4 DB - escapeSimple is now used
+* extra option to disable assumtions to use pear db's nextID
+  dont_use_pear_sequences = true
+* DebugLevel($val) if $val is not an integer - it is assumed to be a callback.
+* fixed clearing of data results after last fetch (reduces memory consumption 
+  when doing many queries)
+* strtolower any class name tests.
+* count accepts 1 or 2 arguments
+  $countWhat or $whereAddonly, or $countWhat and $whereAddonly
+  eg. $countWhat = "distinct id"
+  eg. $countWhat = true (means $whereAdd = true)
+* selectAdd() returns existing value, so you can modify it.
+* most debugging & raiseError calls are dynamic, so you can overload them.
+* numbers allowed in tablenames.
+* ini filename uses database_{projectname} => {projectname}.ini so
+  database names are portable, and multiple projects are theoretically feasible.
+* __clone is replaced with clone() for PHP5 compaitiblity.
+* use PEAR::getStaticProperty("DB","options") for oracle portablity settings.
+* null checked against not null spec.
+
+And probably a few more - as it's been quite a while since the last release..
+
+";}i:4;a:4:{s:7:"version";s:5:"1.5.3";s:12:"release_date";s:10:"2004-01-29";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:505:"Bug fix release.
 
 Changes:
   - fixed toValue()
@@ -16,7 +108,12 @@ Fixes
 * fix bug #630 - correct handling of YEAR (it's an int)
 * fix bug #630 - mysql timestamps are ingored for updated and insert (use query() if you want to change
   them manually.
-* fix bug #620 - limit accepts floats and doubles, as long as they are really integers..";s:12:"release_deps";a:4:{i:1;a:3:{s:4:"type";s:3:"php";s:3:"rel";s:2:"ge";s:7:"version";s:3:"4.1";}i:2;a:4:{s:4:"type";s:3:"pkg";s:3:"rel";s:2:"ge";s:7:"version";s:3:"1.3";s:4:"name";s:2:"DB";}i:3;a:5:{s:4:"type";s:3:"pkg";s:3:"rel";s:2:"ge";s:7:"version";s:5:"0.1.1";s:8:"optional";s:3:"yes";s:4:"name";s:8:"Validate";}i:4;a:4:{s:4:"type";s:3:"pkg";s:3:"rel";s:2:"ge";s:7:"version";s:3:"1.4";s:4:"name";s:4:"Date";}}s:9:"changelog";a:28:{i:0;a:4:{s:7:"version";s:5:"1.5.2";s:12:"release_date";s:10:"2004-01-24";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:965:"Bug fix release.
+* fix bug #620 - limit accepts floats and doubles, as long as they are really integers..
+
+
+
+
+";}i:5;a:4:{s:7:"version";s:5:"1.5.2";s:12:"release_date";s:10:"2004-01-24";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:965:"Bug fix release.
 
 Changes:
   - removed automatic strtotime() in setters and setFrom
@@ -34,7 +131,7 @@ so it can be used to test connections.
 * fix bug #603 to prevent clearing of queries after fetch, use the option keep_query_after_fetch = 1
 * fix bug #359 (again) - _link_loaded array should only contain links that where sucessfully loaded
 
-";}i:1;a:4:{s:7:"version";s:5:"1.5.1";s:12:"release_date";s:10:"2004-01-22";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:388:"Bug fix release.
+";}i:6;a:4:{s:7:"version";s:5:"1.5.1";s:12:"release_date";s:10:"2004-01-22";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:388:"Bug fix release.
 Fixes
 * fixed fromValue had problems with null and DataOBject_Cast objects
 * NOT NULL checking enabled in fromValue (eg. setters)
@@ -44,7 +141,7 @@ Fixes
 * Dependancy on Date added. (it is used by the setter/getters)
 
 
-";}i:2;a:4:{s:7:"version";s:3:"1.5";s:12:"release_date";s:10:"2004-01-20";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:1561:"New Features / Fixes
+";}i:7;a:4:{s:7:"version";s:3:"1.5";s:12:"release_date";s:10:"2004-01-20";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:1561:"New Features / Fixes
 * proxy and auto schema building
   - you can use dataobjects wihout running create tables.
   - schema is created on the fly if no schema file exists
@@ -75,8 +172,8 @@ Bug Fixes
 * fix bug #501 - autoload/factory  now uses full path (not require path)
 * fix bug #507 - sequences broken
 
-";}i:3;a:4:{s:7:"version";s:3:"1.4";s:12:"release_date";s:10:"2003-12-20";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:1:"
-";}i:4;a:4:{s:7:"version";s:3:"1.3";s:12:"release_date";s:10:"2003-11-14";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:2185:"New Features
+";}i:8;a:4:{s:7:"version";s:3:"1.4";s:12:"release_date";s:10:"2003-12-20";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:1:"
+";}i:9;a:4:{s:7:"version";s:3:"1.3";s:12:"release_date";s:10:"2003-11-14";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:2185:"New Features
 - Inserts and updates do not use keys in the data creation part of the query
   (Markus Wolff)
 
@@ -130,7 +227,7 @@ Fixes:
   This is usefull when working with ZendOptimizer, that may segfault with certain optimization levels
 
 
-";}i:5;a:4:{s:7:"version";s:3:"1.2";s:12:"release_date";s:10:"2003-08-07";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:577:"New Features:
+";}i:10;a:4:{s:7:"version";s:3:"1.2";s:12:"release_date";s:10:"2003-08-07";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:577:"New Features:
 - A Number of the private methods have been made Public,
   changes:
     - _get_table()  = table()
@@ -145,7 +242,7 @@ Fixes:
 - Generator is now more tollerant of editors that alter the spaces before
   the autocode markers ### (Andreas Ljunggren)
 
-";}i:6;a:4:{s:7:"version";s:3:"1.1";s:12:"release_date";s:10:"2003-08-07";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:324:"Bug Fixes
+";}i:11;a:4:{s:7:"version";s:3:"1.1";s:12:"release_date";s:10:"2003-08-07";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:324:"Bug Fixes
 - limit argument testing now accepts "10" (a string with an integer
 in it, as a valid argument) (Demian Turner)
 New Features
@@ -153,14 +250,14 @@ New Features
   multiple targets links of the  same table, eg. user->friend,
   user->parent both connect to the user table..  (Andy Crain)
 
-";}i:7;a:4:{s:7:"version";s:5:"1.0.2";s:12:"release_date";s:10:"2003-07-31";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:72:"Minor Bugfix Release
+";}i:12;a:4:{s:7:"version";s:5:"1.0.2";s:12:"release_date";s:10:"2003-07-31";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:72:"Minor Bugfix Release
 - Fix static Get call, case sensitivity properly.
 
-";}i:8;a:4:{s:7:"version";s:5:"1.0.1";s:12:"release_date";s:10:"2003-07-18";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:99:"Minor Bugfix Release
+";}i:13;a:4:{s:7:"version";s:5:"1.0.1";s:12:"release_date";s:10:"2003-07-18";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:99:"Minor Bugfix Release
 - Fix Select defaults back to * after an fetch
 - Fix Update with NULL values
 
-";}i:9;a:4:{s:7:"version";s:3:"1.0";s:12:"release_date";s:10:"2003-07-16";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:1233:"- Gold 1.0 Release.. - final stable release in this series. Future versions
+";}i:14;a:4:{s:7:"version";s:3:"1.0";s:12:"release_date";s:10:"2003-07-16";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:1233:"- Gold 1.0 Release.. - final stable release in this series. Future versions
   (eg. 1.1.*(dev)->1.2.*(release)) series will be generally API compatible,
   however is likely to use MDB rather than DB.
 - fix bug #23983 - argument checking on whereAdd, orderBy, limit and a few others
@@ -180,7 +277,7 @@ New Features
   be a little unstable especially with Zend Encoder. (Note: if DataObjects causes crashes
   , remove the overload code at the bottom of DataObjects.php)
 
-";}i:10;a:4:{s:7:"version";s:4:"0.19";s:12:"release_date";s:10:"2003-05-22";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:1663:"- fix bug #23712 - deleting (and probably updating as well) an object while
+";}i:15;a:4:{s:7:"version";s:4:"0.19";s:12:"release_date";s:10:"2003-05-22";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:1663:"- fix bug #23712 - deleting (and probably updating as well) an object while
   being fetched. (Michael McCarthy for spotting this)
 - fix generator overwriting code when file was edited in a Windows editor
   (Robert Janeczek)
@@ -209,7 +306,7 @@ New Features
   true or 1 means that you can write a PEAR::error handler to catch the errors and
   display a nice it's not working message
 
-";}i:11;a:4:{s:7:"version";s:4:"0.18";s:12:"release_date";s:10:"2003-05-17";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:647:"- add table prefix to autobuilt queries (assist in ambigous querys for joins)
+";}i:16;a:4:{s:7:"version";s:4:"0.18";s:12:"release_date";s:10:"2003-05-17";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:647:"- add table prefix to autobuilt queries (assist in ambigous querys for joins)
   (Daniel Von Fange)
 - change update and delete to return the number of rows affected or false on failure
 - various code tidy ups - standards etc. (Arnaud Limbourg)
@@ -220,10 +317,10 @@ New Features
 - added dependancies on PHP4.3, DB 1.3 and Validate (although Validate is optional)
 - added table prefix to count query (Richard Wallace)
 
-";}i:12;a:4:{s:7:"version";s:4:"0.17";s:12:"release_date";s:10:"2003-03-12";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:107:"- Usual post feature bug fix release
+";}i:17;a:4:{s:7:"version";s:4:"0.17";s:12:"release_date";s:10:"2003-03-12";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:107:"- Usual post feature bug fix release
 - fix loading of links.ini for joinAdd, getLinks etc. (Geoff Hopson)
 
-";}i:13;a:4:{s:7:"version";s:4:"0.16";s:12:"release_date";s:10:"2003-03-06";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:754:"- replaced config storage  - should improve performance
+";}i:18;a:4:{s:7:"version";s:4:"0.16";s:12:"release_date";s:10:"2003-03-06";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:754:"- replaced config storage  - should improve performance
 - removed production option (not required due to improved config storage)
 - bugfix : added checks for is_array on ignore_sequence_keys (Hermen Heinen)
 - add toArray($format) which supports sprintf to enable easy integration with
@@ -235,27 +332,27 @@ New Features
   try this on databases that do not directly support limit queries. (Geoff Hopson)
   * I'm open on better ideas for this - probably wrapping the find() select call
 
-";}i:14;a:4:{s:7:"version";s:4:"0.15";s:12:"release_date";s:10:"2003-02-13";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:407:"- modified find(true), so that it calls fetch rather than fetchrow
+";}i:19;a:4:{s:7:"version";s:4:"0.15";s:12:"release_date";s:10:"2003-02-13";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:407:"- modified find(true), so that it calls fetch rather than fetchrow
   so that overriding fetch will affect get() calls.
   (probably depreciates fetchrow now .. shout if anyone is using it)
 - added escape method as a quasi quote wrapper into pear::DB - useful for
   building your own queries - eg. like requests.. (does not add quotes)
 - fixed bug with delete not using primary key if it was set. (Ian Eure)
 
-";}i:15;a:4:{s:7:"version";s:4:"0.14";s:12:"release_date";s:10:"2003-02-06";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:220:"- added get affected rows to update/insert/delete
+";}i:20;a:4:{s:7:"version";s:4:"0.14";s:12:"release_date";s:10:"2003-02-06";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:220:"- added get affected rows to update/insert/delete
   they will return false if no data is affected and set
   the Objects lastError value.
   Note: databases that do not support affectedRows(), will always
   return false.
 
-";}i:16;a:4:{s:7:"version";s:4:"0.13";s:12:"release_date";s:10:"2003-01-23";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:82:"- bug fix release - debug_ignore_updates worked in reverse.. (Alexander Mazurov)
+";}i:21;a:4:{s:7:"version";s:4:"0.13";s:12:"release_date";s:10:"2003-01-23";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:82:"- bug fix release - debug_ignore_updates worked in reverse.. (Alexander Mazurov)
 
-";}i:17;a:4:{s:7:"version";s:4:"0.12";s:12:"release_date";s:10:"2003-01-22";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:217:"- Usual post release bug fix.
+";}i:22;a:4:{s:7:"version";s:4:"0.12";s:12:"release_date";s:10:"2003-01-22";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:217:"- Usual post release bug fix.
 - fixes *.links.ini incorrectly using *.links (Damian Turner)
 - Adds the ability to get PEAR Connection and result objects
   getDatabaseConnection() and getDatabaseResult() (jason rust)
 
-";}i:18;a:4:{s:7:"version";s:4:"0.11";s:12:"release_date";s:10:"2003-01-21";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:478:"- changed connecition and result caching to use global private variable, rather
+";}i:23;a:4:{s:7:"version";s:4:"0.11";s:12:"release_date";s:10:"2003-01-21";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:478:"- changed connecition and result caching to use global private variable, rather
   than getStaticProperty
 - results objects are not stored on insert/update/delete (speed increase
   on large inserts can be as much as 10x faster)
@@ -265,14 +362,14 @@ New Features
 - new configuration option for whether to use insert id's and sequences.
 - Generator no creates boolean bit (mitchell perilstein)
 
-";}i:19;a:4:{s:7:"version";s:4:"0.10";s:12:"release_date";s:10:"2002-12-09";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:289:"- bug fix - Generator incorrectly set _database, causing generation of database.ini files to fail
+";}i:24;a:4:{s:7:"version";s:4:"0.10";s:12:"release_date";s:10:"2002-12-09";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:289:"- bug fix - Generator incorrectly set _database, causing generation of database.ini files to fail
 - change addslashes to PEAR::DB::quote()
 - generator now only replaces DB_DataObjects with extends variable if set,
   you can use generator_rewrite_class to set what is a valid replacement.
 
-";}i:20;a:4:{s:7:"version";s:3:"0.9";s:12:"release_date";s:10:"2002-12-06";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:47:"- bug fix release - dsn was not set correctly
+";}i:25;a:4:{s:7:"version";s:3:"0.9";s:12:"release_date";s:10:"2002-12-06";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:47:"- bug fix release - dsn was not set correctly
 
-";}i:21;a:4:{s:7:"version";s:3:"0.8";s:12:"release_date";s:10:"2002-09-21";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:837:"- changed to stable status as it appears to be pretty stable now.
+";}i:26;a:4:{s:7:"version";s:3:"0.8";s:12:"release_date";s:10:"2002-09-21";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:837:"- changed to stable status as it appears to be pretty stable now.
 - update and insert now return FALSE on error conditions (Peter Gebauer)
   which can be checked using === FALSE, and the error obtained using $object->_lastError
 - delete will only use primary keys if they are set, otherwise it will use all object
@@ -284,20 +381,20 @@ New Features
 - experimental addJoin method (Stijn de Reede)
 - Allow active options array (eg. dynamic changing of database config) (Sergey Lipnevich)
 
-";}i:22;a:4:{s:7:"version";s:3:"0.6";s:12:"release_date";s:10:"2002-09-10";s:13:"release_state";s:4:"beta";s:13:"release_notes";s:64:"- bug fix release on insert (broke due to compatibility fixes)
+";}i:27;a:4:{s:7:"version";s:3:"0.6";s:12:"release_date";s:10:"2002-09-10";s:13:"release_state";s:4:"beta";s:13:"release_notes";s:64:"- bug fix release on insert (broke due to compatibility fixes)
 
-";}i:23;a:4:{s:7:"version";s:3:"0.5";s:12:"release_date";s:10:"2002-09-07";s:13:"release_state";s:4:"beta";s:13:"release_notes";s:198:"- fixed database.links.ini file loading in wrong location (Jens Fischer)
+";}i:28;a:4:{s:7:"version";s:3:"0.5";s:12:"release_date";s:10:"2002-09-07";s:13:"release_state";s:4:"beta";s:13:"release_notes";s:198:"- fixed database.links.ini file loading in wrong location (Jens Fischer)
 - fixed type on extends (Jens Fischer)
 - added __clone() support to pre- php5 classes
 - added multiple linked table support
 
-";}i:24;a:4:{s:7:"version";s:3:"0.4";s:12:"release_date";s:10:"2002-08-21";s:13:"release_state";s:4:"beta";s:13:"release_notes";s:51:"- Bug fix release - createTables used wrong argv
+";}i:29;a:4:{s:7:"version";s:3:"0.4";s:12:"release_date";s:10:"2002-08-21";s:13:"release_state";s:4:"beta";s:13:"release_notes";s:51:"- Bug fix release - createTables used wrong argv
 
 
-";}i:25;a:4:{s:7:"version";s:3:"0.3";s:12:"release_date";s:10:"2002-08-16";s:13:"release_state";s:4:"beta";s:13:"release_notes";s:46:"- Fixed Globals requirement in createTables,
+";}i:30;a:4:{s:7:"version";s:3:"0.3";s:12:"release_date";s:10:"2002-08-16";s:13:"release_state";s:4:"beta";s:13:"release_notes";s:46:"- Fixed Globals requirement in createTables,
 
-";}i:26;a:4:{s:7:"version";s:3:"0.2";s:12:"release_date";s:10:"2002-07-12";s:13:"release_state";s:4:"beta";s:13:"release_notes";s:87:"Removed list method, First upload as pear package. - Documentation now in PEAR Manual
+";}i:31;a:4:{s:7:"version";s:3:"0.2";s:12:"release_date";s:10:"2002-07-12";s:13:"release_state";s:4:"beta";s:13:"release_notes";s:87:"Removed list method, First upload as pear package. - Documentation now in PEAR Manual
 
-";}i:27;a:4:{s:7:"version";s:3:"0.1";s:12:"release_date";s:10:"2002-06-25";s:13:"release_state";s:4:"beta";s:13:"release_notes";s:11:"PEARified
+";}i:32;a:4:{s:7:"version";s:3:"0.1";s:12:"release_date";s:10:"2002-06-25";s:13:"release_state";s:4:"beta";s:13:"release_notes";s:11:"PEARified
 
-";}}s:13:"_lastmodified";i:1080134630;}
+";}}s:13:"_lastmodified";i:1096629496;}

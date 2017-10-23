@@ -7,13 +7,14 @@
 </head>
 
 <body leftmargin=0 topmargin=0 class=n>
+
 <? include("lang/".file_get_contents("lang.tmp").".php"); ?>
 
 <table border=0 cellpadding=0 cellspacing=0>
 <tr valign=top>
 <td align=right class=navi>
 <img src=img/blank.gif width=145 height=15><br>
-<span class=nh><?=$TEXT['navi-xampp']?></span><br>
+<span class=nh><?=$TEXT['navi-xampp']?> <?include(".version")?></span><br>
 </td></tr>
 <tr><td bgcolor=#fb7922 colspan=1 background="img/strichel.gif" class=white><img src=img/blank.gif width=1 height=1></td></tr>
 <tr valign=top><td align=right class=navi>
@@ -46,7 +47,12 @@
 <?include("naviservers.inc");?>
 <?include("naviother.inc");?>
 <br>&nbsp;<br>
-
+<span class=nh><?=$TEXT['navi-specialguest']?></span><br>
+</td></tr>
+<tr><td bgcolor=#fb7922 colspan=1 background="img/strichel.gif" class=white><img src=img/blank.gif width=1 height=1></td></tr>
+<tr valign=top><td align=right class=navi>
+<?include("naviguest.inc");?>
+<br>
 <span class=nh><?=$TEXT['navi-languages']?></span><br>
 </td></tr>
 <tr><td bgcolor=#fb7922 colspan=1 background="img/strichel.gif" class=white><img src=img/blank.gif width=1 height=1></td></tr>

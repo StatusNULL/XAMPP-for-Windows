@@ -1,7 +1,7 @@
 <?php
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 // +----------------------------------------------------------------------+
-// | Copyright (c) 2002 Brent Cook                                        |
+// | Copyright (c) 2002-2003 Brent Cook                                        |
 // +----------------------------------------------------------------------+
 // | This library is free software; you can redistribute it and/or        |
 // | modify it under the terms of the GNU Lesser General Public           |
@@ -17,8 +17,11 @@
 // | License along with this library; if not, write to the Free Software  |
 // | Foundation, Inc., 59 Temple Place, Suite 330,Boston,MA 02111-1307 USA|
 // +----------------------------------------------------------------------+
+// | Authors: Brent Cook <busterb@mail.utexas.edu>                        |
+// |          Olaf Conradi <conrado@drake.bt.co.uk>                       |
+// +----------------------------------------------------------------------+
 //
-// $Id: DBA.php,v 1.30 2002/12/18 02:27:28 busterb Exp $
+// $Id: DBA.php,v 1.36 2004/05/04 04:42:31 busterb Exp $
 //
 
 require_once('PEAR.php');
@@ -88,6 +91,27 @@ class DBA extends PEAR
     }
 
     /**
+     * Deletes a DBA database from the filesystem
+     *
+     * @static
+     * @param   string $driver type of storage object to return
+     * @return  object DBA storage object, returned by reference
+     */
+    function db_drop($name, $driver = 'file')
+    {
+        if (!function_exists('dba_open') || ($driver=='file')) {
+            require_once 'DBA/Driver/File.php';
+            return DBA_Driver_File::db_drop($name);
+        } elseif (in_array($driver, DBA::getDriverList())) {
+            require_once 'DBA/Driver/Builtin.php';
+            return DBA_Driver_Builtin::db_drop($name);
+        } else {
+            return DBA::raiseError(DBA_ERROR_UNSUP_DRIVER, NULL, NULL,
+                'driver: '.$driver);
+        }
+    }
+    
+    /**
      * Returns whether a result code from a DBA method is an error
      *
      * @param   int       $value  result code
@@ -97,7 +121,7 @@ class DBA extends PEAR
     function isError($value)
     {
         return (is_object($value) &&
-            (get_class($value) == 'dba_error' || is_subclass_of($value, 'dba_error')));
+            (is_a($value, 'dba_error') || is_subclass_of($value, 'dba_error')));
     }
     
     /**
@@ -197,7 +221,11 @@ class DBA extends PEAR
      */
     function getDriverList()
     {
-        return array_merge(dba_handlers(), array('file'));
+        if (function_exists('dba_handlers')) {
+            return array_merge(dba_handlers(), array('file'));
+        } else {
+            return array('file');
+        }
     }
 }
 

@@ -1,5 +1,5 @@
 <?php
-/* $Id: server_common.inc.php,v 2.2 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: server_common.inc.php,v 2.3 2004/01/22 02:13:47 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -35,10 +35,15 @@ require_once('./header.inc.php');
 // priv CREATE TEMPORARY TABLES or LOCK TABLES can do a 'USE mysql'
 // (even if they cannot see the tables)
 
-$is_superuser = @PMA_mysql_query('SELECT COUNT(*) FROM mysql.user', $userlink);
+$is_superuser = PMA_DBI_try_query('SELECT COUNT(*) FROM mysql.user');
 
 // now, select the mysql db
 if ($is_superuser) {
-    @PMA_mysql_query('USE mysql', $userlink);
+    PMA_DBI_free_result($is_superuser);
+    PMA_DBI_select_db('mysql', $userlink);
+    $is_superuser = TRUE;
+} else {
+    $is_superuser = FALSE;
 }
+
 ?>

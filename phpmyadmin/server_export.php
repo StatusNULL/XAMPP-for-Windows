@@ -1,5 +1,5 @@
 <?php
-/* $Id: server_export.php,v 2.2 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: server_export.php,v 2.4 2004/06/13 21:32:16 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -31,15 +31,12 @@ if ($server > 0 && empty($dblist)) {
 
 
 <!-- Dump of a server -->
-<h2>
-    <?php echo $strViewDumpDatabases . "\n"; ?>
-</h2>
-
-<?php
+<?php 
+$export_page_title = $strViewDumpDatabases . "\n";
 $multi_values = '<div align="center"><select name="db_select[]" size="6" multiple="multiple">';
 $multi_values .= "\n";
 
-foreach($dblist AS $current_db) {
+foreach ($dblist AS $current_db) {
     if (!empty($selectall) || (isset($tmp_select) && strpos(' ' . $tmp_select, '|' . $current_db . '|'))) {
         $is_selected = ' selected="selected"';
     } else {

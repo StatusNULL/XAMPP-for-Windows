@@ -9,7 +9,7 @@ $TEXT['global-xampp']="XAMPP for Windows";
 // NAVIGATION
 // ---------------------------------------------------------------------
 
-$TEXT['navi-xampp']="XAMPP 1.4.8";
+$TEXT['navi-xampp']="XAMPP";
 $TEXT['navi-welcome']="Welcome";
 $TEXT['navi-status']="Status";
 $TEXT['navi-security']="Security";
@@ -39,6 +39,9 @@ $TEXT['navi-webalizer']="Webalizer";
 $TEXT['navi-mercury']="Mercury Mail";
 $TEXT['navi-filezilla']="FileZilla FTP";
 $TEXT['navi-jpgraph']="JpGraph";
+
+$TEXT['navi-specialguest']="Current Guest";
+$TEXT['navi-guest1']="FCKeditor";
 
 $TEXT['navi-languages']="Languages";
 $TEXT['navi-english']="English";
@@ -121,7 +124,7 @@ $TEXT['start-subhead']="Congratulations:<br>You successfully installed XAMPP on 
 
 $TEXT['start-text1']="Now you can start using Apache and Co. Firstly you should try »Status« on the left navigation to make sure everything works fine.";
 
-$TEXT['start-text2']="Attention: The XAMPP in version 1.4.x is modified for a package management. There are following packages/addons: <UL><LI>XAMPP basic package</LI><LI>XAMPP Perl addon</LI><LI>XAMPP Python addon<LI></LI>XAMPP Utility addon (more utils but inactiv)</LI><LI>XAMPP Server addon (more server but inactiv)</LI><LI>XAMPP Other addon (other things but inactiv)</LI></UL>";
+$TEXT['start-text2']="Attention: The XAMPP in version 1.4.x is modified for a package management. There are following packages/addons: <UL><LI>XAMPP Basic package </LI><LI>XAMPP Perl addon</LI><LI>XAMPP Tomcat addon</LI><LI>XAMPP Cocoon addon</LI><LI>XAMPP Python addon (developer version)</LI></Ul>And for the future: <ul><LI>XAMPP Utility addon (more utils but inactiv)</LI><LI>XAMPP Server addon (more server but inactiv)</LI><LI>XAMPP Other addon (other things but inactiv)</LI></UL>";
 
 $TEXT['start-text3']="Please arrange your personality XAMPP. But take care. For a normal initialization of each additional addon, please execute the \"setup_xampp.bat\" once. For the installer versions: All installer addons need the installer version of XAMPP! Otherwise you can always use the zip or 7zip-exe addons.";
 
@@ -380,5 +383,21 @@ $TEXT['switch-make2']="<br><br> .. secured for PHP4 ...<br>";
 $TEXT['switch-make3']="<br><br> .. secured for PHP5 ...<br>";
 $TEXT['switch-make4']="<br><br>And these files are going back with the PHP switching!!<p>";
 $TEXT['switch-not']="<B>My PHP is okay AND i will NOT a \"switch\" !!!</B><br>Super! Then forget this here ... ;-)<br>";
+
+// ---------------------------------------------------------------------
+// Cocoon
+// ---------------------------------------------------------------------
+
+$TEXT['go-cocoon']="Cocoon now with http://localhost/cocoon/";
+$TEXT['path-cocoon']="And the correct folder on your disk is: ...\\xampp\\tomcat\\webapps\\cocoon";
+
+// ---------------------------------------------------------------------
+// Guest
+// ---------------------------------------------------------------------
+
+$TEXT['guest1-name']="Current Guest in this release: <i>FCKeditor</i>";
+$TEXT['guest1-text1']="A very nice HMTL ONLINE editor with much more JavaScript. Optimized for the IE. But do not function with the Mozilla FireFox.";
+$TEXT['guest1-text2']="FCKeditor Homepage: <a href=\"http://www.fckeditor.net\" target=\"_new\">www.fckeditor.net</a>. Note: The Arial font do NOT function here, but i do not know why!"; 
+$TEXT['guest1-text3']="<a href=\"guest-FCKeditor/fckedit-dynpage.php\" target=\"_new\">The example page written with the FCKeditor.</A>"; 
 
 ?>

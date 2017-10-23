@@ -11,7 +11,7 @@
 // | Authors: Sandy McArthur Jr. <Leknor@Leknor.com>                      |
 // +----------------------------------------------------------------------+
 //
-// $Id: Id.php,v 1.3 2004/01/15 16:27:16 alexmerz Exp $
+// $Id: Id.php,v 1.7 2004/06/12 10:43:16 alexmerz Exp $
 //
 
 // Uncomment the folling define if you want the class to automatically
@@ -29,17 +29,17 @@
 // Tip: make sure you use a <PRE> block so the print_r's are readable.
 // define('ID3_SHOW_DEBUG', true);
 
-include "PEAR.php" ;
+require_once "PEAR.php" ;
 
 /**
 * File not opened
-* @const PEAR_MP3_ID_FNO 
+* @const PEAR_MP3_ID_FNO
 */
 define('PEAR_MP3_ID_FNO', 1);
 
 /**
 * Read error
-* @const PEAR_MP3_ID_RE 
+* @const PEAR_MP3_ID_RE
 */
 define('PEAR_MP3_ID_RE', 2);
 
@@ -379,7 +379,7 @@ class MP3_Id {
      * @param boolean   $id3v1  true to remove the tag
      * @param boolean   $id3v2  true to remove the tag (Not yet implemented)
      *
-     * @access public     
+     * @access public
      */
     function remove($id3v1 = true, $id3v2 = true) {
     if ($this->debug) print($this->debugbeg . "remove()<HR>\n");
@@ -409,11 +409,11 @@ class MP3_Id {
     if ($this->debug) print($this->debugbeg . "_read_v1()<HR>\n");
 
     if (! ($f = @fopen($this->file, 'rb')) ) {
-        return PEAR::raiseError( "Unable to open " . $file, PEAR_MP3_ID_FNO);
+        return PEAR::raiseError( "Unable to open " . $this->file, PEAR_MP3_ID_FNO);
     }
 
     if (fseek($f, -128, SEEK_END) == -1) {
-        return PEAR::raiseError( 'Unable to see to end - 128 of ' . $file, PEAR_MP3_ID_RE);
+        return PEAR::raiseError( 'Unable to see to end - 128 of ' . $this->file, PEAR_MP3_ID_RE);
     }
 
     $r = fread($f, 128);
@@ -975,5 +975,3 @@ class MP3_Id {
 } // end of id3
 
 ?>
-
-

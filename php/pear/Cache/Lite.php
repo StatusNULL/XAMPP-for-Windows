@@ -22,7 +22,7 @@
 *
 * @package Cache_Lite
 * @category Caching
-* @version $Id: Lite.php,v 1.18 2004/01/08 18:00:28 fab Exp $
+* @version $Id: Lite.php,v 1.20 2004/07/14 10:24:03 fab Exp $
 * @author Fabien MARTY <fab@php.net>
 */
 
@@ -268,7 +268,7 @@ class Cache_Lite
                     $data = $this->_read();
                 }
             } else {
-                if (@filemtime($this->_file) > $this->_refreshTime) {
+                if ((file_exists($this->_file)) && (@filemtime($this->_file) > $this->_refreshTime)) {
                     $data = $this->_read();
                 }
             }
@@ -332,6 +332,15 @@ class Cache_Lite
     function remove($id, $group = 'default')
     {
         $this->_setFileName($id, $group);
+        if ($this->_memoryCaching) {
+            if (isset($this->_memoryCachingArray[$this->_file])) {
+                unset($this->_memoryCachingArray[$this->_file]);
+                $this->_memoryCachingCounter = $this->_memoryCachingCounter - 1;
+            }
+            if ($this->_onlyMemoryCaching) {
+                return true;
+            }
+        }
         if (!@unlink($this->_file)) {
             $this->raiseError('Cache_Lite : Unable to remove cache !', -3);   
             return false;
@@ -357,9 +366,9 @@ class Cache_Lite
             $motif = ($group) ? 'cache_'.$group.'_' : 'cache_';
         }
         if ($this->_memoryCaching) {
-            while (list($key, $value) = each($this->_memoryCaching)) {
+            while (list($key, $value) = each($this->_memoryCachingArray)) {
                 if (strpos($key, $motif, 0)) {
-                    unset($this->_memoryCaching[$key]);
+                    unset($this->_memoryCachingArray[$key]);
                     $this->_memoryCachingCounter = $this->_memoryCachingCounter - 1;
                 }
             }

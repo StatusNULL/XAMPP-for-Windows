@@ -1,5 +1,5 @@
 <?php
-/* $Id: browse_foreigners.php,v 2.6 2004/01/05 16:56:46 garvinhicking Exp $ */
+/* $Id: browse_foreigners.php,v 2.17 2004/09/16 10:01:12 garvinhicking Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -43,12 +43,21 @@ PMA_setFontSizes();
     <script type="text/javascript" language="javascript">
     self.focus();
     function formupdate(field, key) {
-        if (opener && opener.document && opener.document.insertForm && opener.document.insertForm.elements['field_' + field + '<?php echo (isset($pk) ? '[multi_edit][' . $pk . ']' : ''); ?>[]']) {
-            opener.document.insertForm.elements['field_' + field + '<?php echo (isset($pk) ? '[multi_edit][' . $pk . ']' : ''); ?>[]'].value = key;
-            self.close();
-        } else {
-            alert('<?php echo PMA_jsFormat($strWindowNotFound); ?>');
+        if (opener && opener.document && opener.document.insertForm) {
+            if (opener.document.insertForm.elements['field_' + field + '<?php echo (isset($pk) ? '[multi_edit][' . urlencode($pk) . ']' : ''); ?>[]']) {
+                // Edit/Insert form
+                opener.document.insertForm.elements['field_' + field + '<?php echo (isset($pk) ? '[multi_edit][' . urlencode($pk) . ']' : ''); ?>[]'].value = key;
+                self.close();
+                return false;
+            } else if (opener.document.insertForm.elements['field_' + field + '[<?php echo isset($fieldkey) ? $fieldkey : 0; ?>]']) {
+                // Search form
+                opener.document.insertForm.elements['field_' + field + '[<?php echo isset($fieldkey) ? $fieldkey : 0; ?>]'].value = key;
+                self.close();
+                return false;
+            }
         }
+
+        alert('<?php echo PMA_jsFormat($strWindowNotFound); ?>');
     }
     </script>
 </head>
@@ -78,11 +87,12 @@ require('./libraries/get_foreign.lib.php');
 <form action="browse_foreigners.php" method="post">
 <?php echo PMA_generate_common_hidden_inputs($db, $table); ?>
 <input type="hidden" name="field" value="<?php echo urlencode($field); ?>" />
+<input type="hidden" name="field" value="<?php echo isset($fieldkey) ? $fieldkey : ''; ?>" />
 <?php
 if (isset($pk)) {
-    $pk_uri = '&amp;pk=' . $pk;
+    $pk_uri = '&amp;pk=' . urlencode($pk);
 ?>
-<input type="hidden" name="pk" value="<?php echo $pk; ?>" />
+<input type="hidden" name="pk" value="<?php echo urlencode($pk); ?>" />
 <?php
 } else {
     $pk_uri = '&amp;';
@@ -103,7 +113,7 @@ $nbTotalPage = @ceil($the_total / $session_max_rows);
 
 if ($the_total > $per_page) {
     $gotopage = '<br />' . $GLOBALS['strPageNumber']
-              . '<select name="goToPage" onChange="goToUrl(this, \'browse_foreigners.php?field=' . urlencode($field) . '&amp;' . PMA_generate_common_url($db, $table) . $pk_uri . '\');">';
+              . '<select name="goToPage" onchange="goToUrl(this, \'browse_foreigners.php?field=' . urlencode($field) . '&amp;' . PMA_generate_common_url($db, $table) . $pk_uri . '&amp;fieldkey=' . (isset($fieldkey) ? $fieldkey : '') . '&amp;\');">';
     if ($nbTotalPage < 200) {
         $firstPage = 1;
         $lastPage  = $nbTotalPage;
@@ -138,35 +148,35 @@ $header = '    <tr>
 
 echo $header;
 
-if (isset($disp) && $disp) {
+if (isset($disp_row) && is_array($disp_row)) {
     function dimsort($arrayA, $arrayB) {
         $keyA = key($arrayA);
         $keyB = key($arrayB);
-        
+
         if ($arrayA[$keyA] == $arrayB[$keyB]) {
             return 0;
         }
-        
+
         return ($arrayA[$keyA] < $arrayB[$keyB]) ? -1 : 1;
     }
 
     $mysql_key_relrow = array();
     $mysql_val_relrow = array();
     $count = 0;
-    while ($relrow = @PMA_mysql_fetch_array($disp)) {
+    foreach ($disp_row AS $disp_row_key => $relrow) {
         if ($foreign_display != FALSE) {
             $val = $relrow[$foreign_display];
         } else {
             $val = '';
         }
-        
+
         $mysql_key_relrow[$count] = array($relrow[$foreign_field]   => $val);
         $mysql_val_relrow[$count] = array($val                      => $relrow[$foreign_field]);
         $count++;
     }
-    
+
     usort($mysql_val_relrow, 'dimsort');
-    
+
     $hcount = 0;
     for ($i = 0; $i < $count; $i++) {
         $hcount++;
@@ -186,7 +196,7 @@ if (isset($disp) && $disp) {
             $vtitle = '';
         } else {
             $vtitle = htmlspecialchars($val);
-            $value  = htmlspecialchars(substr($val, 0, $cfg['LimitChars']) . '...');
+            $value  = htmlspecialchars(PMA_substr($val, 0, $cfg['LimitChars']) . '...');
         }
 
         $key_equals_data = isset($data) && $key == $data;
@@ -194,7 +204,7 @@ if (isset($disp) && $disp) {
     <tr>
         <td nowrap="nowrap" bgcolor="<?php echo $bgcolor; ?>"><?php echo ($key_equals_data ? '<b>' : '') . '<a href="#" title="' . $strUseThisValue . ($vtitle != '' ? ': ' . $vtitle : '') . '" onclick="formupdate(\'' . md5($field) . '\', \'' . htmlspecialchars($key) . '\'); return false;">' . htmlspecialchars($key) . '</a>' . ($key_equals_data ? '</b>' : ''); ?></td>
         <td bgcolor="<?php echo $bgcolor; ?>"><?php echo ($key_equals_data ? '<b>' : '') .                 '<a href="#" title="' . $strUseThisValue . ($vtitle != '' ? ': ' . $vtitle : '') . '" onclick="formupdate(\'' . md5($field) . '\', \'' . htmlspecialchars($key) . '\'); return false;">' . $value . '</a>' . ($key_equals_data ? '</b>' : ''); ?></td>
-        <td width="20%"><img src="images/spacer.gif" alt="" width="1" height="1"></td>
+        <td width="20%"><img src="<?php echo $GLOBALS['pmaThemeImage'] . 'spacer.png'; ?>" alt="" width="1" height="1"></td>
 <?php
         $key   = key($mysql_key_relrow[$i]);
         $val   = $mysql_key_relrow[$i][$key];
@@ -229,10 +239,10 @@ echo $header;
  * Close MySql connections
  */
 if (isset($dbh) && $dbh) {
-    @mysql_close($dbh);
+    @PMA_DBI_close($dbh);
 }
 if (isset($userlink) && $userlink) {
-    @mysql_close($userlink);
+    @PMA_DBI_close($userlink);
 }
 
 

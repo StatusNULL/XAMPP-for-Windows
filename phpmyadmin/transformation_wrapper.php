@@ -1,5 +1,5 @@
 <?php
-/* $Id: transformation_wrapper.php,v 2.3 2003/12/12 13:32:35 garvinhicking Exp $ */
+/* $Id: transformation_wrapper.php,v 2.7 2004/08/21 13:41:41 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 $is_transformation_wrapper = true;
@@ -26,16 +26,14 @@ require_once('./libraries/db_table_exists.lib.php');
 /**
  * Get the list of the fields of the current table
  */
-PMA_mysql_select_db($db);
-$table_def = PMA_mysql_query('SHOW FIELDS FROM ' . PMA_backquote($table));
+PMA_DBI_select_db($db);
+$table_def = PMA_DBI_query('SHOW FIELDS FROM ' . PMA_backquote($table), NULL, PMA_DBI_QUERY_STORE);
 if (isset($primary_key)) {
-    $local_query = 'SELECT * FROM ' . PMA_backquote($table) . ' WHERE ' . $primary_key;
-    $result      = PMA_mysql_query($local_query) or PMA_mysqlDie('', $local_query, '', '');
-    $row         = PMA_mysql_fetch_array($result);
+    $result      = PMA_DBI_query('SELECT * FROM ' . PMA_backquote($table) . ' WHERE ' . $primary_key . ';', NULL, PMA_DBI_QUERY_STORE);
+    $row         = PMA_DBI_fetch_assoc($result);
 } else {
-    $local_query = 'SELECT * FROM ' . PMA_backquote($table) . ' LIMIT 1';
-    $result      = PMA_mysql_query($local_query) or PMA_mysqlDie('', $local_query, '', '');
-    $row         = PMA_mysql_fetch_array($result);
+    $result      = PMA_DBI_query('SELECT * FROM ' . PMA_backquote($table) . ' LIMIT 1;', NULL, PMA_DBI_QUERY_STORE);
+    $row         = PMA_DBI_fetch_assoc($result);
 }
 
 // No row returned
@@ -49,7 +47,7 @@ if ($cfgRelation['commwork'] && $cfgRelation['mimework']) {
     $mime_map = PMA_getMime($db, $table);
     $mime_options = PMA_transformation_getOptions((isset($mime_map[urldecode($transform_key)]['transformation_options']) ? $mime_map[urldecode($transform_key)]['transformation_options'] : ''));
 
-    foreach($mime_options AS $key => $option) {
+    foreach ($mime_options AS $key => $option) {
         if (substr($option, 0, 10) == '; charset=') {
             $mime_options['charset'] = $option;
         }
@@ -91,7 +89,7 @@ if (!isset($resize)) {
     $ratioWidth = $srcWidth/$newWidth;
     $ratioHeight = $srcHeight/$newHeight;
 
-    if( $ratioWidth < $ratioHeight){
+    if ($ratioWidth < $ratioHeight){
         $destWidth = $srcWidth/$ratioHeight;
         $destHeight = $newHeight;
     }else{
@@ -121,9 +119,9 @@ if (!isset($resize)) {
  * Close MySql non-persistent connections
  */
 if (isset($GLOBALS['dbh']) && $GLOBALS['dbh']) {
-    @mysql_close($GLOBALS['dbh']);
+    @PMA_DBI_close($GLOBALS['dbh']);
 }
 if (isset($GLOBALS['userlink']) && $GLOBALS['userlink']) {
-    @mysql_close($GLOBALS['userlink']);
+    @PMA_DBI_close($GLOBALS['userlink']);
 }
 ?>

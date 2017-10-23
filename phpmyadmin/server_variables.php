@@ -1,5 +1,5 @@
 <?php
-/* $Id: server_variables.php,v 2.2 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: server_variables.php,v 2.7 2004/08/12 15:13:19 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -19,7 +19,8 @@ require('./server_links.inc.php');
  * Displays the sub-page heading
  */
 echo '<h2>' . "\n"
-   . '    ' . $strServerVars . "\n"
+   . ($cfg['MainPageIconic'] ? '<img src="' . $pmaThemeImage . 's_vars.png" width="16" height="16" border="0" hspace="2" align="middle" />' : '' )
+   . '' . $strServerVars . "\n"
    . '</h2>' . "\n";
 
 
@@ -36,22 +37,25 @@ if (!$is_superuser && !$cfg['ShowMysqlVars']) {
  * Sends the queries and buffers the results
  */
 if (PMA_MYSQL_INT_VERSION >= 40003) {
-    $res = @PMA_mysql_query('SHOW SESSION VARIABLES;', $userlink) or PMA_mysqlDie(PMA_mysql_error($userlink), 'SHOW SESSION VARIABLES;');
-    while ($row = PMA_mysql_fetch_row($res)) {
+    $res = PMA_DBI_query('SHOW SESSION VARIABLES;');
+    while ($row = PMA_DBI_fetch_row($res)) {
         $serverVars[$row[0]] = $row[1];
     }
-    @mysql_free_result($res);
-    $res = @PMA_mysql_query('SHOW GLOBAL VARIABLES;', $userlink) or PMA_mysqlDie(PMA_mysql_error($userlink), 'SHOW GLOBAL VARIABLES;');
-    while ($row = PMA_mysql_fetch_row($res)) {
+    PMA_DBI_free_result($res);
+    unset($res, $row);
+    $res = PMA_DBI_query('SHOW GLOBAL VARIABLES;');
+    while ($row = PMA_DBI_fetch_row($res)) {
         $serverVarsGlobal[$row[0]] = $row[1];
     }
-    @mysql_free_result($res);
+    PMA_DBI_free_result($res);
+    unset($res, $row);
 } else {
-    $res = @PMA_mysql_query('SHOW VARIABLES;', $userlink) or PMA_mysqlDie(PMA_mysql_error($userlink), 'SHOW VARIABLES;');
-    while ($row = PMA_mysql_fetch_row($res)) {
+    $res = PMA_DBI_query('SHOW VARIABLES;');
+    while ($row = PMA_DBI_fetch_row($res)) {
         $serverVars[$row[0]] = $row[1];
     }
-    @mysql_free_result($res);
+    PMA_DBI_free_result($res);
+    unset($res, $row);
 }
 unset($res);
 unset($row);
@@ -61,7 +65,7 @@ unset($row);
  * Displays the page
  */
 ?>
-<table border="0">
+<table border="0" cellpadding="2" cellspacing="1" width="90%">
     <tr>
         <th>&nbsp;<?php echo $strVar; ?>&nbsp;</th>
 <?php
@@ -77,19 +81,26 @@ echo '&nbsp;</th>' . "\n";
     </tr>
 <?php
 $useBgcolorOne = TRUE;
+$on_mouse='';
 foreach ($serverVars as $name => $value) {
+        if ($GLOBALS['cfg']['BrowsePointerEnable'] == TRUE) {
+            $on_mouse = ' onmouseover="this.style.backgroundColor=\'' . $GLOBALS['cfg']['BrowsePointerColor'] . '\';"'
+                      . ' onmouseout="this.style.backgroundColor=\'' . ($useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']) . '\';"';
+        } else {
+            $on_mouse = '';
+        }
 ?>
-    <tr>
-        <td bgcolor="<?php echo $useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']; ?>">
-            <?php echo htmlspecialchars(str_replace('_', ' ', $name)) . "\n"; ?>
+    <tr bgcolor="<?php echo $useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']; ?>"<?php echo $on_mouse; ?>>
+        <td nowrap="nowrap" valign="top">
+            <b><?php echo htmlspecialchars(str_replace('_', ' ', $name)) . "\n"; ?></b>
         </td>
-        <td bgcolor="<?php echo $useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']; ?>">
+        <td>
             <?php echo htmlspecialchars($value) . "\n"; ?>
         </td>
 <?php
     if (PMA_MYSQL_INT_VERSION >= 40003) {
 ?>
-        <td bgcolor="<?php echo $useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']; ?>">
+        <td>
             <?php echo htmlspecialchars($serverVarsGlobal[$name]) . "\n"; ?>
         </td>
 <?php

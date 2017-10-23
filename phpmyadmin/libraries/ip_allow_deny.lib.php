@@ -1,5 +1,5 @@
 <?php
-/* $Id: ip_allow_deny.lib.php,v 2.2 2003/11/26 22:52:23 rabus Exp $ */
+/* $Id: ip_allow_deny.lib.php,v 2.3 2004/05/20 16:14:11 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -252,7 +252,7 @@ function PMA_allowDeny($type)
         'localhost' => '127.0.0.1/8'
     );
 
-    foreach($rules AS $rule) {
+    foreach ($rules AS $rule) {
         // extract rule data
         $rule_data = explode(' ', $rule);
 

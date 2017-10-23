@@ -16,7 +16,7 @@
 // | Author: Alexey Borzov <borz_off@cs.msu.su>                           |
 // +----------------------------------------------------------------------+
 //
-// $Id: ITDynamic.php,v 1.3 2003/06/20 20:27:47 avb Exp $
+// $Id: ITDynamic.php,v 1.4 2004/06/02 16:57:35 mansion Exp $
 
 require_once 'HTML/QuickForm/Renderer.php';
 
@@ -246,6 +246,8 @@ class HTML_QuickForm_Renderer_ITDynamic extends HTML_QuickForm_Renderer
         }
         if ($this->_tpl->blockExists($prefix . '_' . $type)) {
             return $prefix . '_' . $type;
+        } elseif ($this->_tpl->blockExists($prefix . '_' . $name)) {
+            return $prefix . '_' . $name;
         } else {
             return $prefix . '_element';
         }

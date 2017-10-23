@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_create.php,v 2.4 2003/12/11 23:16:22 rabus Exp $ */
+/* $Id: db_create.php,v 2.8 2004/04/17 03:06:53 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -24,12 +24,16 @@ $err_url = 'main.php?' . PMA_generate_common_url();
  * Builds and executes the db creation sql query
  */
 $sql_query = 'CREATE DATABASE ' . PMA_backquote($db);
-if (isset($db_charset) && isset($mysql_charsets) && in_array($db_charset, $mysql_charsets)) {
-    $sql_query .= ' DEFAULT CHARACTER SET ' . $db_charset;
+if (!empty($db_collation) && PMA_MYSQL_INT_VERSION >= 40101) {
+    list($db_charset) = explode('_', $db_collation);
+    if (in_array($db_charset, $mysql_charsets) && in_array($db_collation, $mysql_collations[$db_charset])) {
+        $sql_query .= ' DEFAULT' . PMA_generateCharsetQueryPart($db_collation);
+    }
+    unset($db_charset, $db_collation);
 }
 $sql_query .= ';';
 
-$result = PMA_mysql_query($sql_query) or PMA_mysqlDie('', $sql_query, FALSE, $err_url);
+$result = PMA_DBI_query($sql_query);
 
 
 /**

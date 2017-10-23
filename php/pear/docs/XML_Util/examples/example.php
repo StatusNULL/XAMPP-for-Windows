@@ -1,4 +1,16 @@
 <?PHP
+/**
+ * several examples for the methods of XML_Util
+ *
+ * $Id: example.php,v 1.10 2004/06/27 18:17:39 schst Exp $
+ *
+ * @author      Stephan Schmidt
+ * @package     XML_Util
+ * @subpackage  examples
+ * @category    XML
+ */
+    error_reporting(E_ALL);
+
     require_once 'XML/Util.php';
     
     /**
@@ -182,4 +194,15 @@
     print "</pre>";
     print "\n<br><br>\n";
     
+    /**
+    * trying to create an XML tag without a name
+    */
+    $tag = array(
+                  "attributes"   => array( "foo" => "bar" ),
+                );
+    print "trying to create an XML tag without a name:<br>\n";
+    print "<pre>";
+    print_r(XML_Util::createTagFromArray($tag));
+    print "</pre>";
+    print "\n<br><br>\n";
 ?>

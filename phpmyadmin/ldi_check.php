@@ -1,5 +1,5 @@
 <?php
-/* $Id: ldi_check.php,v 2.3 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: ldi_check.php,v 2.4 2004/06/15 16:52:18 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -48,7 +48,7 @@ if (isset($btnLDI) && isset($local_textfile) && $local_textfile != '') {
     if (substr($cfg['UploadDir'], -1) != '/') {
         $cfg['UploadDir'] .= '/';
     }
-    $textfile = $DOCUMENT_ROOT . dirname($PHP_SELF) . '/' . preg_replace('@^./@s', '', $cfg['UploadDir']) . preg_replace('@\.\.*@', '.', $local_textfile);
+    $textfile = $DOCUMENT_ROOT . dirname($PHP_SELF) . '/' . preg_replace('@^./@s', '', $cfg['UploadDir']) . PMA_securePath($local_textfile);
     if (file_exists($textfile)) {
         $open_basedir = @ini_get('open_basedir');
 

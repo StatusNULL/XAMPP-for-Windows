@@ -17,7 +17,7 @@
 // | Maintainer: Daniel Convissor <danielc@php.net>                       |
 // +----------------------------------------------------------------------+
 //
-// $Id: oci8.php,v 1.62 2004/03/12 01:15:57 danielc Exp $
+// $Id: oci8.php,v 1.67 2004/06/24 15:24:56 danielc Exp $
 
 
 // be aware...  OCIError() only appears to return anything when given a
@@ -34,7 +34,7 @@ require_once 'DB/common.php';
  * Definitely works with versions 8 and 9 of Oracle.
  *
  * @package  DB
- * @version  $Id: oci8.php,v 1.62 2004/03/12 01:15:57 danielc Exp $
+ * @version  $Id: oci8.php,v 1.67 2004/06/24 15:24:56 danielc Exp $
  * @category Database
  * @author   James L. Pine <jlp@valinux.com>
  */
@@ -90,6 +90,7 @@ class DB_oci8 extends DB_common
             1722 => DB_ERROR_INVALID_NUMBER,
             2289 => DB_ERROR_NOSUCHTABLE,
             2291 => DB_ERROR_CONSTRAINT,
+            2292 => DB_ERROR_CONSTRAINT,
             2449 => DB_ERROR_CONSTRAINT,
         );
     }
@@ -424,7 +425,7 @@ class DB_oci8 extends DB_common
         if (!$stmt = @OCIParse($this->connection, $newquery)) {
             return $this->oci8RaiseError();
         }
-        $this->prepare_types[$stmt] = $types;
+        $this->prepare_types[(int)$stmt] = $types;
         $this->manip_query[(int)$stmt] = DB::isManip($query);
         return $stmt;
     }
@@ -454,7 +455,7 @@ class DB_oci8 extends DB_common
 
         $this->_data = $data;
 
-        $types =& $this->prepare_types[$stmt];
+        $types =& $this->prepare_types[(int)$stmt];
         if (count($types) != count($data)) {
             $tmp =& $this->raiseError(DB_ERROR_MISMATCH);
             return $tmp;
@@ -600,19 +601,28 @@ class DB_oci8 extends DB_common
      *
      * @author Tomas V.V.Cox <cox@idecnet.com>
      */
-    function modifyLimitQuery($query, $from, $count)
+    function modifyLimitQuery($query, $from, $count, $params = array())
     {
         // Let Oracle return the name of the columns instead of
         // coding a "home" SQL parser
-        $q_fields = "SELECT * FROM ($query) WHERE NULL = NULL";
-        if (!$result = @OCIParse($this->connection, $q_fields)) {
-            $this->last_query = $q_fields;
-            return $this->oci8RaiseError();
+
+        if (count($params)) {
+            $result = $this->prepare("SELECT * FROM ($query) "
+                                     . 'WHERE NULL = NULL');
+            $tmp =& $this->execute($result, $params);
+        } else {
+            $q_fields = "SELECT * FROM ($query) WHERE NULL = NULL";
+
+            if (!$result = @OCIParse($this->connection, $q_fields)) {
+                $this->last_query = $q_fields;
+                return $this->oci8RaiseError();
+            }
+            if (!@OCIExecute($result, OCI_DEFAULT)) {
+                $this->last_query = $q_fields;
+                return $this->oci8RaiseError($result);
+            }
         }
-        if (!@OCIExecute($result, OCI_DEFAULT)) {
-            $this->last_query = $q_fields;
-            return $this->oci8RaiseError($result);
-        }
+
         $ncols = OCINumCols($result);
         $cols  = array();
         for ( $i = 1; $i <= $ncols; $i++ ) {
@@ -842,7 +852,7 @@ class DB_oci8 extends DB_common
             } else {
                 /*
                  * ELSE, probably received a result resource identifier.
-                 * Depricated.  Here for compatibility only.
+                 * Deprecated.  Here for compatibility only.
                  */
             }
 

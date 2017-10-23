@@ -235,7 +235,7 @@ class Structures_Graph_Node {
     */
     function connectTo(&$destinationNode) {
         // We only connect to nodes
-        if (!is_a($node, 'Structures_Graph_Node')) 
+        if (!is_a($destinationNode, 'Structures_Graph_Node')) 
             Pear::raiseError('Structures_Graph_Node::connectTo received an object that is not a Structures_Graph_Node', STRUCTURES_GRAPH_ERROR_GENERIC);
         // Nodes must already be in graphs to be connected
         if ($this->_graph == null)

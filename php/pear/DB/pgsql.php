@@ -18,7 +18,7 @@
 // | Maintainer: Daniel Convissor <danielc@php.net>                       |
 // +----------------------------------------------------------------------+
 //
-// $Id: pgsql.php,v 1.72 2004/03/02 15:51:40 lsmith Exp $
+// $Id: pgsql.php,v 1.82 2004/09/25 21:58:00 danielc Exp $
 
 require_once 'DB/common.php';
 
@@ -27,7 +27,7 @@ require_once 'DB/common.php';
  * extension.
  *
  * @package  DB
- * @version  $Id: pgsql.php,v 1.72 2004/03/02 15:51:40 lsmith Exp $
+ * @version  $Id: pgsql.php,v 1.82 2004/09/25 21:58:00 danielc Exp $
  * @category Database
  * @author   Rui Hirokawa <hirokawa@php.net>
  * @author   Stig Bakken <ssb@php.net>
@@ -100,6 +100,9 @@ class DB_pgsql extends DB_common
             if ($dsninfo['socket']) {
                 $connstr .= 'host=' . $dsninfo['socket'];
             }
+            if ($dsninfo['port']) {
+                $connstr .= ' port=' . $dsninfo['port'];
+            }
         }
 
         if ($dsninfo['database']) {
@@ -111,22 +114,26 @@ class DB_pgsql extends DB_common
         if ($dsninfo['password']) {
             $connstr .= ' password=\'' . addslashes($dsninfo['password']) . '\'';
         }
-        if (isset($dsninfo['options'])) {
+        if (!empty($dsninfo['options'])) {
             $connstr .= ' options=' . $dsninfo['options'];
         }
-        if (isset($dsninfo['tty'])) {
+        if (!empty($dsninfo['tty'])) {
             $connstr .= ' tty=' . $dsninfo['tty'];
         }
 
         $connect_function = $persistent ? 'pg_pconnect' : 'pg_connect';
-        // catch error
-        ob_start();
-        $conn = $connect_function($connstr);
-        $error = ob_get_contents();
-        ob_end_clean();
+
+        $ini = ini_get('track_errors');
+        if ($ini) {
+            $conn = @$connect_function($connstr);
+        } else {
+            ini_set('track_errors', 1);
+            $conn = @$connect_function($connstr);
+            ini_set('track_errors', $ini);
+        }
         if ($conn == false) {
             return $this->raiseError(DB_ERROR_CONNECT_FAILED, null,
-                                     null, null, strip_tags($error));
+                                     null, null, strip_tags($php_errormsg));
         }
         $this->connection = $conn;
         return DB_OK;
@@ -237,7 +244,7 @@ class DB_pgsql extends DB_common
         if (!isset($error_regexps)) {
             $error_regexps = array(
                 '/(([Rr]elation|[Ss]equence|[Tt]able)( [\"\'].*[\"\'])? does not exist|[Cc]lass ".+" not found)$/' => DB_ERROR_NOSUCHTABLE,
-                '/[Cc]olumn [\"\'].*[\"\'] does not exist/' => DB_ERROR_NOSUCHFIELD,
+                '/[Cc]olumn [\"\'].*[\"\'] .*does not exist/' => DB_ERROR_NOSUCHFIELD,
                 '/[Rr]elation [\"\'].*[\"\'] already exists|[Cc]annot insert a duplicate key into (a )?unique index.*/' => DB_ERROR_ALREADY_EXISTS,
                 '/(divide|division) by zero$/'          => DB_ERROR_DIVZERO,
                 '/pg_atoi: error in .*: can\'t parse /' => DB_ERROR_INVALID_NUMBER,
@@ -282,8 +289,9 @@ class DB_pgsql extends DB_common
      */
     function fetchInto($result, &$arr, $fetchmode, $rownum=null)
     {
-        $rownum = ($rownum !== null) ? $rownum : $this->row[$result];
-        if ($rownum >= $this->num_rows[$result]) {
+        $result_int = (int)$result;
+        $rownum = ($rownum !== null) ? $rownum : $this->row[$result_int];
+        if ($rownum >= $this->num_rows[$result_int]) {
             return null;
         }
         if ($fetchmode & DB_FETCHMODE_ASSOC) {
@@ -307,7 +315,7 @@ class DB_pgsql extends DB_common
         if ($this->options['portability'] & DB_PORTABILITY_NULL_TO_EMPTY) {
             $this->_convertNullArrayValuesToEmpty($arr);
         }
-        $this->row[$result] = ++$rownum;
+        $this->row[$result_int] = ++$rownum;
         return DB_OK;
     }
 
@@ -595,7 +603,7 @@ class DB_pgsql extends DB_common
     // }}}
     // {{{ modifyLimitQuery()
 
-    function modifyLimitQuery($query, $from, $count)
+    function modifyLimitQuery($query, $from, $count, $params = array())
     {
         $query = $query . " LIMIT $count OFFSET $from";
         return $query;
@@ -801,7 +809,7 @@ class DB_pgsql extends DB_common
                         FROM pg_class c, pg_user u
                         WHERE c.relowner = u.usesysid AND c.relkind = 'r'
                         AND not exists (select 1 from pg_views where viewname = c.relname)
-                        AND c.relname !~ '^pg_'
+                        AND c.relname !~ '^(pg_|sql_)'
                         UNION
                         SELECT c.relname as \"Name\"
                         FROM pg_class c

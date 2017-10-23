@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_create.php,v 2.3 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: tbl_create.php,v 2.8 2004/09/05 14:51:49 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -19,20 +19,22 @@ PMA_checkParameters(array('db', 'table'));
 /**
  * Defines the url to return to in case of error in a sql statement
  */
-$err_url = 'tbl_properties.php?' . PMA_generate_common_url($db, $table);
+$err_url = $cfg['DefaultTabTable'] . '?' . PMA_generate_common_url($db, $table);
 
 
 /**
  * Selects the database to work with
  */
-PMA_mysql_select_db($db);
+PMA_DBI_select_db($db);
 
 
 /**
  * The form used to define the structure of the table has been submitted
  */
-$abort = false;
-if (isset($submit)) {
+$abort = FALSE;
+if (isset($submit_num_fields)) {
+    $regenerate = TRUE;
+} else if (isset($submit)) {
     $sql_query = $query_cpy = '';
 
     // Transforms the radio button field_key into 3 arrays
@@ -61,8 +63,8 @@ if (isset($submit)) {
         }
         if ($field_attribute[$i] != '') {
             $query .= ' ' . $field_attribute[$i];
-        } else if (PMA_MYSQL_INT_VERSION >= 40100 && !empty($field_charset[$i])) {
-            $query .= ' CHARACTER SET ' . $field_charset[$i];
+        } else if (PMA_MYSQL_INT_VERSION >= 40100 && !empty($field_collation[$i])) {
+            $query .= PMA_generateCharsetQueryPart($field_collation[$i]);
         }
         if ($field_default[$i] != '') {
             if (strtoupper($field_default[$i]) == 'NULL') {
@@ -163,9 +165,9 @@ if (isset($submit)) {
         $sql_query .= ' TYPE = ' . $tbl_type;
         $query_cpy .= "\n" . 'TYPE = ' . $tbl_type;
     }
-    if (PMA_MYSQL_INT_VERSION >= 40100 && !empty($tbl_charset)) {
-        $sql_query .= ' CHARACTER SET = ' . $tbl_charset;
-        $query_cpy .= "\n" . 'CHARACTER SET = ' . $tbl_charset;
+    if (PMA_MYSQL_INT_VERSION >= 40100 && !empty($tbl_collation)) {
+        $sql_query .= PMA_generateCharsetQueryPart($tbl_collation);
+        $query_cpy .= "\n" . PMA_generateCharsetQueryPart($tbl_collation);
     }
 
     if (!empty($comment)) {
@@ -174,10 +176,10 @@ if (isset($submit)) {
     }
 
     // Executes the query
-    $error_create = false;
-    $result    = PMA_mysql_query($sql_query) or $error_create = true;
+    $error_create = FALSE;
+    $result    = PMA_DBI_try_query($sql_query) or $error_create = TRUE;
 
-    if ($error_create == false) {
+    if ($error_create == FALSE) {
         $sql_query = $query_cpy . ';';
         unset($query_cpy);
         $message   = $strTable . ' ' . htmlspecialchars($table) . ' ' . $strHasBeenCreated;
@@ -190,14 +192,14 @@ if (isset($submit)) {
 
         // garvin: Update comment table, if a comment was set.
         if (isset($field_comments) && is_array($field_comments) && $cfgRelation['commwork']) {
-            foreach($field_comments AS $fieldindex => $fieldcomment) {
+            foreach ($field_comments AS $fieldindex => $fieldcomment) {
                 PMA_setComment($db, $table, $field_name[$fieldindex], $fieldcomment);
             }
         }
 
         // garvin: Update comment table for mime types [MIME]
         if (isset($field_mimetype) && is_array($field_mimetype) && $cfgRelation['commwork'] && $cfgRelation['mimework'] && $cfg['BrowseMIME']) {
-            foreach($field_mimetype AS $fieldindex => $mimetype) {
+            foreach ($field_mimetype AS $fieldindex => $mimetype) {
                 PMA_setMIME($db, $table, $field_name[$fieldindex], $mimetype, $field_transformation[$fieldindex], $field_transformation_options[$fieldindex]);
             }
         }
@@ -211,7 +213,7 @@ if (isset($submit)) {
         // to prevent total loss of that data, we embed the form once again.
         // The variable $regenerate will be used to restore data in tbl_properties.inc.php
         $num_fields = $orig_num_fields;
-        $regenerate = true;
+        $regenerate = TRUE;
     }
 } // end do create table
 

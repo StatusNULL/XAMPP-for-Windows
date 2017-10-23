@@ -5,7 +5,7 @@
  * 
  * @author Alexey Borzov <avb@php.net>
  * 
- * $Id: Sigma_api_testcase.php,v 1.4 2003/05/19 15:06:39 avb Exp $
+ * $Id: Sigma_api_testcase.php,v 1.6 2004/04/14 09:41:53 avb Exp $
  */
 
 class Sigma_api_TestCase extends PHPUnit_TestCase
@@ -39,7 +39,7 @@ class Sigma_api_TestCase extends PHPUnit_TestCase
 
     function _methodExists($name) 
     {
-        if (in_array(strtolower($name), get_class_methods($this->tpl))) {
+        if (in_array(strtolower($name), array_map('strtolower', get_class_methods($this->tpl)))) {
             return true;
         }
         $this->assertTrue(false, 'method '. $name . ' not implemented in ' . get_class($this->tpl));
@@ -362,6 +362,29 @@ class Sigma_api_TestCase extends PHPUnit_TestCase
             $this->assertTrue(false, 'Error loading template file: '. $result->getMessage());
         }
         $this->assertEquals(array('outer'), $this->tpl->getPlaceholderList('outer_block'));
+    }
+
+    function testCallbackShorthand()
+    {
+        $this->tpl->setTemplate('{var}|{var:h}|{var:u}|{var:j}|{var:uppercase}', true, true);
+        $this->tpl->setCallbackFunction('uppercase', 'strtoupper');
+        $this->tpl->setVariable('var', '"m&m"');
+        $this->assertEquals('"m&m"|&quot;m&amp;m&quot;|%22m%26m%22|\\"m&m\\"|"M&M"', $this->tpl->get());
+    }
+
+    function testClearVariables()
+    {
+        if (!$this->_methodExists('clearVariables')) {
+            return;
+        }
+        $this->tpl->setTemplate('<!-- BEGIN block -->{var_1}:<!-- END block -->{var_2}', true, true);
+        $this->tpl->setVariable(array(
+            'var_1' => 'a',
+            'var_2' => 'b'
+        ));
+        $this->tpl->parse('block');
+        $this->tpl->clearVariables();
+        $this->assertEquals('a:', $this->_stripWhitespace($this->tpl->get()));
     }
 }
 

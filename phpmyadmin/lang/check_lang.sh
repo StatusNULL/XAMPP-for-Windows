@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: check_lang.sh,v 2.1 2003/11/26 20:42:58 nijel Exp $
+# $Id: check_lang.sh,v 2.2 2004/06/29 08:20:47 nijel Exp $
 ##
 # Shell script to check that all language files are syncronized
 # Catches duplicate/missing strings
@@ -13,6 +13,11 @@ TMPDIR="tmp-check"
 FILEPAT="*.inc.php"
 STRINGMATCH='^[[:space:]]*\$[[:alnum:]_]+[[:blank:]]+='
 IGNOREMATCH='strEncto|strKanjiEncodConvert|strXkana|allow_recoding'
+
+if [ "`which diffstat`" = "" ] ; then
+    echo 'You need diffstat to use this!'
+    exit 1
+fi
 
 rm -rf $TMPDIR
 mkdir -p $TMPDIR

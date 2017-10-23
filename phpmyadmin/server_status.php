@@ -1,5 +1,5 @@
 <?php
-/* $Id: server_status.php,v 2.4 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: server_status.php,v 2.10 2004/08/12 15:13:19 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -20,15 +20,15 @@ require('./server_links.inc.php');
  */
 if (!empty($innodbstatus)) {
     echo '<h2>' . "\n"
+       . ($GLOBALS['cfg']['MainPageIconic'] ? '<img src="' . $GLOBALS['pmaThemeImage'] . 's_status.png" width="16" height="16" border="0" hspace="2" align="middle" />' : '' )
        . '    ' . $strInnodbStat . "\n"
        . '</h2>' . "\n";
-    $sql_query = 'SHOW INNODB STATUS;';
-    $res = PMA_mysql_query($sql_query, $userlink) or PMA_mysqlDie(PMA_mysql_error($userlink), $sql_query);
-    $row = PMA_mysql_fetch_row($res);
+    $res = PMA_DBI_query('SHOW INNODB STATUS;');
+    $row = PMA_DBI_fetch_row($res);
     echo '<pre>' . "\n"
        . htmlspecialchars($row[0]) . "\n"
        . '</pre>' . "\n";
-    mysql_free_result($res);
+    PMA_DBI_free_result($res);
     require_once('./footer.inc.php');
 }
 
@@ -36,6 +36,7 @@ if (!empty($innodbstatus)) {
  * Displays the sub-page heading
  */
 echo '<h2>' . "\n"
+   . ($GLOBALS['cfg']['MainPageIconic'] ? '<img src="' . $GLOBALS['pmaThemeImage'] . 's_status.png" width="16" height="16" border="0" hspace="2" align="middle" />' : '' )
    . '    ' . $strServerStatus . "\n"
    . '</h2>' . "\n";
 
@@ -52,29 +53,27 @@ if (!$is_superuser && !$cfg['ShowMysqlInfo']) {
 /**
  * Sends the query and buffers the result
  */
-$res = @PMA_mysql_query('SHOW STATUS;', $userlink) or PMA_mysqlDie(PMA_mysql_error($userlink), 'SHOW STATUS;');
-while ($row = PMA_mysql_fetch_row($res)) {
+$res = PMA_DBI_query('SHOW STATUS;');
+while ($row = PMA_DBI_fetch_row($res)) {
     $serverStatus[$row[0]] = $row[1];
 }
-@mysql_free_result($res);
-unset($res);
-unset($row);
+PMA_DBI_free_result($res);
+unset($res, $row);
 
 
 /**
  * Displays the page
  */
 //Uptime calculation
-$res = @PMA_mysql_query('SELECT UNIX_TIMESTAMP() - ' . $serverStatus['Uptime'] . ';');
-$row = PMA_mysql_fetch_row($res);
+$res = PMA_DBI_query('SELECT UNIX_TIMESTAMP() - ' . $serverStatus['Uptime'] . ';');
+$row = PMA_DBI_fetch_row($res);
 echo sprintf($strServerStatusUptime, PMA_timespanFormat($serverStatus['Uptime']), PMA_localisedDate($row[0])) . "\n";
-mysql_free_result($res);
-unset($res);
-unset($row);
+PMA_DBI_free_result($res);
+unset($res, $row);
 //Get query statistics
 $queryStats = array();
 $tmp_array = $serverStatus;
-foreach($tmp_array AS $name => $value) {
+foreach ($tmp_array AS $name => $value) {
     if (substr($name, 0, 4) == 'Com_') {
         $queryStats[str_replace('_', ' ', substr($name, 4))] = $value;
         unset($serverStatus[$name]);
@@ -86,10 +85,10 @@ unset($tmp_array);
     <li>
         <!-- Server Traffic -->
         <?php echo $strServerTrafficNotes; ?><br />
-        <table border="0">
+        <table border="0" cellpadding="5" cellspacing="0">
             <tr>
                 <td valign="top">
-                    <table border="0">
+                    <table border="0" cellpadding="2" cellspacing="1">
                         <tr>
                             <th colspan="2">&nbsp;<?php echo $strTraffic; ?>&nbsp;</th>
                             <th>&nbsp;&oslash;&nbsp;<?php echo $strPerHour; ?>&nbsp;</th>
@@ -112,7 +111,7 @@ unset($tmp_array);
                     </table>
                 </td>
                 <td valign="top">
-                    <table border="0">
+                    <table border="0" cellpadding="2" cellspacing="1">
                         <tr>
                             <th colspan="2">&nbsp;<?php echo $strConnections; ?>&nbsp;</th>
                             <th>&nbsp;&oslash;&nbsp;<?php echo $strPerHour; ?>&nbsp;</th>
@@ -141,15 +140,13 @@ unset($tmp_array);
             </tr>
         </table>
     </li>
-    <br />
     <li>
         <!-- Queries -->
         <?php echo sprintf($strQueryStatistics, number_format($serverStatus['Questions'], 0, $number_decimal_separator, $number_thousands_separator)) . "\n"; ?>
-        <table border="0">
+        <table border="0" cellpadding="5" cellspacing="0">
             <tr>
                 <td colspan="2">
-                    <br />
-                    <table border="0" align="right">
+                    <table border="0" cellpadding="2" cellspacing="1" width="100%">
                         <tr>
                             <th>&nbsp;<?php echo $strTotalUC; ?>&nbsp;</th>
                             <th>&nbsp;&oslash;&nbsp;<?php echo $strPerHour; ?>&nbsp;</th>
@@ -167,7 +164,7 @@ unset($tmp_array);
             </tr>
             <tr>
                 <td valign="top">
-                    <table border="0">
+                    <table border="0" cellpadding="2" cellspacing="1">
                         <tr>
                             <th colspan="2">&nbsp;<?php echo $strQueryType; ?>&nbsp;</th>
                             <th>&nbsp;&oslash;&nbsp;<?php echo $strPerHour; ?>&nbsp;</th>
@@ -197,7 +194,7 @@ foreach ($queryStats as $name => $value) {
                     </table>
                 </td>
                 <td valign="top">
-                    <table border="0">
+                    <table border="0" cellpadding="2" cellspacing="1">
                         <tr>
                             <th colspan="2">&nbsp;<?php echo $strQueryType; ?>&nbsp;</th>
                             <th>&nbsp;&oslash;&nbsp;<?php echo $strPerHour; ?>&nbsp;</th>
@@ -226,14 +223,13 @@ unset($serverStatus['Uptime']);
 
 if (!empty($serverStatus)) {
 ?>
-    <br />
     <li>
         <!-- Other status variables -->
         <b><?php echo $strMoreStatusVars; ?></b><br />
-        <table border="0">
+        <table border="0" cellpadding="5" cellspacing="0">
             <tr>
                 <td valign="top">
-                    <table border="0">
+                    <table border="0" cellpadding="2" cellspacing="1">
                         <tr>
                             <th>&nbsp;<?php echo $strVar; ?>&nbsp;</th>
                             <th>&nbsp;<?php echo $strValue; ?>&nbsp;</th>
@@ -241,7 +237,7 @@ if (!empty($serverStatus)) {
 <?php
     $useBgcolorOne = TRUE;
     $countRows = 0;
-    foreach($serverStatus AS $name => $value) {
+    foreach ($serverStatus AS $name => $value) {
 ?>
                         <tr>
                             <td bgcolor="<?php echo $useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']; ?>">&nbsp;<?php echo htmlspecialchars(str_replace('_', ' ', $name)); ?>&nbsp;</td>
@@ -255,7 +251,7 @@ if (!empty($serverStatus)) {
                     </table>
                 </td>
                 <td valign="top">
-                    <table border="0">
+                    <table border="0" cellpadding="2" cellspacing="1">
                         <tr>
                             <th>&nbsp;<?php echo $strVar; ?>&nbsp;</th>
                             <th>&nbsp;<?php echo $strValue; ?>&nbsp;</th>
@@ -272,9 +268,9 @@ if (!empty($serverStatus)) {
     </li>
 <?php
 }
-$res = PMA_mysql_query('SHOW VARIABLES LIKE "have_innodb";', $userlink);
+$res = PMA_DBI_query('SHOW VARIABLES LIKE "have_innodb";');
 if ($res) {
-    $row = PMA_mysql_fetch_row($res);
+    $row = PMA_DBI_fetch_row($res);
     if (!empty($row[1]) && $row[1] == 'YES') {
 ?>
     <br />

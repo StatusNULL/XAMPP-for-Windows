@@ -1,58 +1,136 @@
 <?php
 
-    function dump ( $var, $desc = null ) {
+	require_once 'Net/FTP.php';
+	require_once 'Var_Dump.php';
+	
+	// Initializing test variables (required!)
+	
+    $host           = '';
+    $port           = 21;
+    $user           = '';
+    $pass           = '';
     
-        if (isset($desc)) {
-            echo "<br><b>$desc</b>";
+    $baseDir        = './test/';
+    $testUpDir      = 'test_up/';
+    $testDownDir    = 'test_down/';
+    $singleTestFile = 'test.zip';
+	
+	// Initializing Var_Var_Dump::display
+	
+	if (isset($_SERVER)) {
+	    Var_Dump::displayInit(array(
+            'display_mode'=>'XHTML_Text'
+        ), array(
+            'mode'=>'normal',
+            'offset'=>4
+        ));
+        function head ( $text ) {
+            echo '<br /><b>'.$text.'</b><br />';
         }
-        echo "<br><pre>";
-        var_dump($var);
-        echo "</pre><br>";
-    }
+	} else {
+	    Var_Dump::displayInit(array('display_mode'=>'Text'));
+	    function head ( $text ) {
+	        echo "\n--- ".$text." ---\n";
+	    }
+	}
 
-    require_once 'Net/FTP.php';
-    
-    // $ftp = new Net_FTP('localhost', 21);
+	head("\$ftp = new Net_FTP();");
     $ftp = new Net_FTP();
     
-    dump($ftp->setHostname('localhost'), 'FTP::setHostname()');
-    dump($ftp->setPort(21), 'FTP::setPort()');
-    dump($ftp->connect(), 'FTP::connect()');
-    // dump($ftp->connect('localhost', 21), 'FTP::connect()');
-
-    dump($ftp->setUsername('xxx'), 'FTP::setUsername()');
-    dump($ftp->setPassword('xxx'), 'FTP::setPassword()');
-    dump($ftp->login(), 'FTP::login()');
-    // dump($ftp->login('xxx', 'xxx'), 'FTP::login()');
-
-    dump($ftp->pwd(), 'FTP::pwd()');
+    head("\$ftp->setHostname($host)");
+    Var_Dump::display($ftp->setHostname($host));
     
-    dump($ftp->mkdir('test'), 'FTP::mkdir()');
-    dump($ftp->rm('test/', true), 'FTP::rm()');
+    head("\$ftp->setPort($port)");
+    Var_Dump::display($ftp->setPort($port));
     
-    dump($ftp->cd('download'), 'FTP::cd()');
+    head("\$ftp->connect($host, $port)");
+    Var_Dump::display($ftp->connect());
     
-    // dump($ftp->ls(null, NET_FTP_FILES_ONLY), 'FTP::ls()');
-    // dump($ftp->ls(null, NET_FTP_DIRS_ONLY), 'FTP::ls()');
-    dump($ftp->ls(), 'FTP::ls()');
+    head("\$ftp->setUsername($user)");
+    Var_Dump::display($ftp->setUsername($user));
     
-    // dump($ftp->execute('CHMOD 777 proftpd-1.2.8.tar.gz'), 'FTP::exec()');
+    head("\$ftp->setPassword(xxx)");
+    Var_Dump::display($ftp->setPassword($pass));
     
-    // dump($ftp->mdtm('proftpd-1.2.8.tar.gz'), 'FTP::mdtm()');
-    dump($ftp->mdtm('proftpd-1.2.8.tar.gz', 'd.m.Y'), 'FTP::mdtm()');
+    head("\$ftp->login($user, xxx)");
+    Var_Dump::display($ftp->login($user, $pass));
     
-    dump($ftp->size('proftpd-1.2.8.tar.gz'), 'FTP::size()');
+    head("\$ftp->pwd()");
+    Var_Dump::display($ftp->pwd());
     
-    dump($ftp->get('proftpd-1.2.8.tar.gz', './proftpd-1.2.8.tar.gz', true, FTP_BINARY), 'FTP::get()');
-    dump($ftp->cd('..'), 'FTP::cd()');
+    head("\$ftp->ls(null, NET_FTP_DIRS_FILES)");
+    Var_Dump::display($ftp->ls(null, NET_FTP_DIRS_FILES));
     
-    // dump($ftp->getRecursive('download/', 'download_remote/'), 'FTP::getRecursive()');
-    // dump($ftp->putRecursive('download_remote/', 'uploaded/', true), 'FTP::putRecursive()');
+    head("\$ftp->mkdir($baseDir)");
+    Var_Dump::display($ftp->mkdir($baseDir));
     
-    dump($ftp->rm('uploaded/', true), 'FTP::rm()');
+    head("\$ftp->cd($baseDir)");
+    Var_Dump::display($ftp->cd($baseDir));
     
+    head("\$ftp->ls(null, NET_FTP_RAWLIST)");
+    Var_Dump::display($ftp->ls(null, NET_FTP_RAWLIST));
     
-    dump($ftp->disconnect(), 'FTP::disconnect()');
+    head("\$ftp->put($baseDir$singleTestFile, $singleTestFile)");
+    Var_Dump::display($ftp->put($baseDir.$singleTestFile, $singleTestFile));
     
+    head("\$ftp->ls(null, NET_FTP_FILES_ONLY)");
+    Var_Dump::display($ftp->ls(null, NET_FTP_FILES_ONLY));
+    
+    head("\$ftp->put($baseDir$singleTestFile, $singleTestFile, true)");
+    Var_Dump::display($ftp->put($baseDir.$singleTestFile, $singleTestFile, true));
+    
+    head("\$ftp->ls(null, NET_FTP_FILES_ONLY)");
+    Var_Dump::display($ftp->ls(null, NET_FTP_FILES_ONLY));
+    
+    head("\$ftp->mdtm($singleTestFile, 'd.m.Y H:i:s')");
+    Var_Dump::display($ftp->mdtm($singleTestFile, 'd.m.Y'));
+    
+    head("\$ftp->size($singleTestFile)");
+    Var_Dump::display($ftp->size($singleTestFile));
+    
+    head("\$ftp->get($singleTestFile, $baseDir$singleTestFile, true)");
+    Var_Dump::display($ftp->get($singleTestFile, $baseDir.$singleTestFile, true));
+    
+    head("\$ftp->chmod($singleTestFile, 700)");
+    Var_Dump::display($ftp->chmod($singleTestFile, 700));
+    
+    head("\$ftp->ls(null, NET_FTP_FILES_ONLY)");
+    Var_Dump::display($ftp->ls(null, NET_FTP_FILES_ONLY));
+    
+    head("\$ftp->cd('../')");
+    Var_Dump::display($ftp->cd('../'));
+    
+    head("\$ftp->chmodRecursive($baseDir, 777)");
+    Var_Dump::display($ftp->chmodRecursive($baseDir, 777));
+    
+    head("\$ftp->ls(null, NET_FTP_DIRS_ONLY)");
+    Var_Dump::display($ftp->ls(null, NET_FTP_DIRS_ONLY));
+    
+    head("\$ftp->putRecursive($baseDir$testUpDir, $baseDir$testUpDir)");
+    Var_Dump::display($ftp->putRecursive($baseDir.$testUpDir, $baseDir.$testUpDir));
+    
+    head("\$ftp->putRecursive($baseDir$testUpDir, $baseDir$testUpDir)");
+    Var_Dump::display($ftp->putRecursive($baseDir.$testUpDir, $baseDir.$testUpDir, true));
+    
+    head("\$ftp->cd($baseDir:$testUpDir)");
+    Var_Dump::display($ftp->cd($baseDir.$testUpDir));
+    
+    head("\$ftp->ls(null, NET_FTP_DIRS_FILES)");
+    Var_Dump::display($ftp->ls(null, NET_FTP_DIRS_FILES));
+    
+    head("\$ftp->cd(../../)");
+    Var_Dump::display($ftp->cd('../../'));
+    
+    head("\$ftp->getRecursive($baseDir$testUpDir, $baseDir$testDownDir)");
+    Var_Dump::display($ftp->getRecursive($baseDir.$testUpDir, $baseDir.$testDownDir, true));
+    
+    head("\$ftp->rm($baseDir, true)");
+    Var_Dump::display($ftp->rm($baseDir, true));
+    
+    head("\$ftp->ls(null, NET_FTP_DIRS_ONLY)");
+    Var_Dump::display($ftp->ls(null, NET_FTP_DIRS_ONLY));
+    
+    head("\$ftp->disconnect()");
+    Var_Dump::display($ftp->disconnect());
     
 ?>

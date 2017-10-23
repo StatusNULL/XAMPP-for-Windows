@@ -3,7 +3,7 @@
 /**
  * API Unit tests for PEAR_PackageFileManager package.
  * 
- * @version    $Id: PEAR_PackageFileManager_File_TestCase_dirList.php,v 1.6 2004/02/07 06:13:27 cellog Exp $
+ * @version    $Id: PEAR_PackageFileManager_File_TestCase_dirList.php,v 1.7 2004/04/27 04:53:53 cellog Exp $
  * @author     Laurent Laville <pear@laurent-laville.org> portions from HTML_CSS
  * @author     Greg Beaver
  * @package    PEAR_PackageFileManager
@@ -230,6 +230,30 @@ class PEAR_PackageFileManager_File_TestCase_dirList extends PHPUnit_TestCase
         $this->assertEquals(
             array(
                 dirname(__FILE__) . DIRECTORY_SEPARATOR . 'footest/blarfoo/blartest.txt',
+            ),
+            $res,
+            'incorrect dir structure');
+        $this->assertFalse($this->errorThrown, 'error thrown');
+    }
+    
+    function test_bug1217()
+    {
+        if (!$this->_methodExists('dirList')) {
+            return;
+        }
+        if (!$this->_methodExists('_setupIgnore')) {
+            return;
+        }
+        $this->packagexml->_options['addhiddenfiles'] = false;
+        $this->packagexml->_setupIgnore(false, 0);
+        $this->packagexml->_setupIgnore(false, 1);
+        $res = $this->packagexml->dirList(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'test_bug1217');
+        $this->assertEquals(
+            array(
+                dirname(__FILE__) . DIRECTORY_SEPARATOR . 'test_bug1217/0',
+                dirname(__FILE__) . DIRECTORY_SEPARATOR . 'test_bug1217/firstfile.php',
+                dirname(__FILE__) . DIRECTORY_SEPARATOR . 'test_bug1217/fourthfile.php',
+                dirname(__FILE__) . DIRECTORY_SEPARATOR . 'test_bug1217/secondfile.php',
             ),
             $res,
             'incorrect dir structure');

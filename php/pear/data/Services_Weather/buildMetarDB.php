@@ -17,15 +17,7 @@
 // | Authors: Alexander Wirtz <alex@pc4p.net>                             |
 // +----------------------------------------------------------------------+
 //
-// $Id: buildMetarDB.php,v 1.16 2004/01/06 19:36:28 eru Exp $
-
-require_once "DB.php";
-
-// {{{ constants
-// {{{ natural constants and measures
-define("SERVICES_WEATHER_RADIUS_EARTH", 6378.15);
-// }}}
-// }}}
+// $Id: buildMetarDB.php,v 1.21 2004/05/05 08:33:43 eru Exp $
 
 /**
 * This script downloads, saves and processes the textfiles needed for
@@ -42,8 +34,23 @@ define("SERVICES_WEATHER_RADIUS_EARTH", 6378.15);
 * @author       Alexander Wirtz <alex@pc4p.net>
 * @link         http://weather.noaa.gov/tg/site.shtml
 * @package      Services_Weather
-* @version      1.2
+* @subpackage   buildMetarDB
+* @filesource
+* @version      1.3
 */
+
+/**
+*/
+require_once "DB.php";
+
+/**
+* @ignore
+*/
+// {{{ constants
+// {{{ natural constants and measures
+define("SERVICES_WEATHER_RADIUS_EARTH", 6378.15);
+// }}}
+// }}}
 
 // {{{ Services_Weather_checkData()
 /**
@@ -310,7 +317,7 @@ $dsninfo = array(
     "password" => $dbPass,
     "hostspec" => $dbHost,
     "database" => $dbName,
-    "mode"     => 0644
+    "mode"     => "0644"
 );
 
 $db  = DB::connect($dsninfo, $dbOptions);

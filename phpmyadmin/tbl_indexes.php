@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_indexes.php,v 2.3 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: tbl_indexes.php,v 2.19 2004/08/21 11:47:04 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -29,22 +29,22 @@ $index_types       = array(
 if (!defined('PMA_IDX_INCLUDED')) {
     // Not a valid db name -> back to the welcome page
     if (!empty($db)) {
-        $is_db = @PMA_mysql_select_db($db);
+        $is_db = PMA_DBI_select_db($db);
     }
     if (empty($db) || !$is_db) {
-        header('Location: ' . $cfg['PmaAbsoluteUri'] . 'main.php?' . PMA_generate_common_url('', '', '&') . (isset($message) ? '&message=' . urlencode($message) : '') . '&reload=1');
+        PMA_sendHeaderLocation($cfg['PmaAbsoluteUri'] . 'main.php?' . PMA_generate_common_url('', '', '&') . (isset($message) ? '&message=' . urlencode($message) : '') . '&reload=1');
         exit;
     }
     // Not a valid table name -> back to the default db_details sub-page
     if (!empty($table)) {
-        $is_table = @PMA_mysql_query('SHOW TABLES LIKE \'' . PMA_sqlAddslashes($table, TRUE) . '\'');
+        $is_table = PMA_DBI_query('SHOW TABLES LIKE \'' . PMA_sqlAddslashes($table, TRUE) . '\'', NULL, PMA_DBI_QUERY_STORE);
     }
     if (empty($table)
-        || !($is_table && @mysql_numrows($is_table))) {
-        header('Location: ' . $cfg['PmaAbsoluteUri'] . $cfg['DefaultTabDatabase'] . '?' . PMA_generate_common_url($db, '', '&') . (isset($message) ? '&message=' . urlencode($message) : '') . '&reload=1');
+        || !($is_table && PMA_DBI_num_rows($is_table))) {
+        PMA_sendHeaderLocation($cfg['PmaAbsoluteUri'] . $cfg['DefaultTabDatabase'] . '?' . PMA_generate_common_url($db, '', '&') . (isset($message) ? '&message=' . urlencode($message) : '') . '&reload=1');
         exit;
     } else if (isset($is_table)) {
-        mysql_free_result($is_table);
+        PMA_DBI_free_result($is_table);
     }
 
     // Displays headers (if needed)
@@ -66,17 +66,17 @@ $prev_index   = '';
 $indexes_info = array();
 $indexes_data = array();
 // keys had already been grabbed in "tbl_properties.php"
-if (defined('PMA_IDX_INCLUDED')) {
-    $idx_cnt     = count($ret_keys);
-} else {
+if (!defined('PMA_IDX_INCLUDED')) {
     $local_query = 'SHOW KEYS FROM ' . PMA_backquote($table);
-    $result      = PMA_mysql_query($local_query) or PMA_mysqlDie('', $local_query, '', $err_url_0);
-    $idx_cnt     = mysql_num_rows($result);
+    $result      = PMA_DBI_query($local_query) or PMA_mysqlDie('', $local_query, '', $err_url_0);
+    $ret_keys    = array();
+    while ($row = PMA_DBI_fetch_assoc($result)) {
+        $ret_keys[]  = $row;
+    }
+    PMA_DBI_free_result($result);
 }
 
-for ($i = 0; $i < $idx_cnt; $i++) {
-    $row = (defined('PMA_IDX_INCLUDED') ? $ret_keys[$i] : PMA_mysql_fetch_array($result));
-
+foreach ($ret_keys as $row) { 
     if ($row['Key_name'] != $prev_index ){
         $indexes[]  = $row['Key_name'];
         $prev_index = $row['Key_name'];
@@ -101,25 +101,19 @@ for ($i = 0; $i < $idx_cnt; $i++) {
     }
 } // end while
 
-if (defined('PMA_IDX_INCLUDED')) {
-    unset($ret_keys);
-} else if ($result) {
-    mysql_free_result($result);
-}
-
 // Get fields and stores their name/type
 // fields had already been grabbed in "tbl_properties.php"
-if (defined('PMA_IDX_INCLUDED')) {
-    mysql_data_seek($fields_rs, 0);
-} else {
-    $local_query = 'SHOW FIELDS FROM ' . PMA_backquote($table);
-    $fields_rs   = PMA_mysql_query($local_query) or PMA_mysqlDie('', $local_query, '', $err_url_0);
-    $fields_cnt  = mysql_num_rows($fields_rs);
+if (!defined('PMA_IDX_INCLUDED')) {
+    $fields_rs   = PMA_DBI_query('SHOW FIELDS FROM ' . PMA_backquote($table) . ';');
+    $save_row   = array();
+    while ($row = PMA_DBI_fetch_assoc($fields_rs)) {
+        $save_row[] = $row;
+    }
 }
 
 $fields_names           = array();
 $fields_types           = array();
-while ($row = PMA_mysql_fetch_array($fields_rs)) {
+foreach ($save_row AS $saved_row_key => $row) {
     $fields_names[]     = $row['Field'];
     // loic1: set or enum types: slashes single quotes inside options
     if (preg_match('@^(set|enum)\((.+)\)$@i', $row['Type'], $tmp)) {
@@ -131,7 +125,7 @@ while ($row = PMA_mysql_fetch_array($fields_rs)) {
 } // end while
 
 if ($fields_rs) {
-    mysql_free_result($fields_rs);
+    PMA_DBI_free_result($fields_rs);
 }
 
 
@@ -188,7 +182,7 @@ if (!defined('PMA_IDX_INCLUDED')
             break;
     } // end switch
     $index_fields         = '';
-    foreach($column AS $i => $name) {
+    foreach ($column AS $i => $name) {
         if ($name != '--ignore--') {
             $index_fields .= (empty($index_fields) ? '' : ',')
                           . PMA_backquote($name)
@@ -201,7 +195,7 @@ if (!defined('PMA_IDX_INCLUDED')
         $sql_query .= $index_fields . ')';
     }
 
-    $result    = PMA_mysql_query($sql_query) or PMA_mysqlDie('', $sql_query, FALSE, $err_url);
+    $result    = PMA_DBI_query($sql_query);
     $message   = $strTable . ' ' . htmlspecialchars($table) . ' ' . $strHasBeenAltered;
 
     $active_page = 'tbl_properties_structure.php';
@@ -265,7 +259,7 @@ else if (!defined('PMA_IDX_INCLUDED')
         } // end for
 
         // Restore entered values
-        foreach($column AS $i => $name) {
+        foreach ($column AS $i => $name) {
             if ($name != '--ignore--'){
                 $edited_index_data[$i+1]['Column_name'] = $name;
                 $edited_index_data[$i+1]['Sub_part']    = $sub_part[$i];
@@ -276,8 +270,10 @@ else if (!defined('PMA_IDX_INCLUDED')
     ?>
 
 <!-- Build index form -->
-<form action="tbl_indexes.php" method="post" name="index_frm"
+<form action="./tbl_indexes.php" method="post" name="index_frm"
     onsubmit="if (typeof(this.elements['index'].disabled) != 'undefined') {this.elements['index'].disabled = false}">
+<table border="0" cellpadding="2" cellspacing="1">
+    <tr><td class="tblHeaders" colspan="2">
     <?php echo PMA_generate_common_hidden_inputs($db, $table); ?>
     <?php
     if (isset($create_index)) {
@@ -286,19 +282,23 @@ else if (!defined('PMA_IDX_INCLUDED')
     echo "\n";
     ?>
     <input type="hidden" name="old_index" value="<?php echo (isset($create_index) ? '' : htmlspecialchars($old_index)); ?>" />
-    <b><?php echo '------ ' . (isset($create_index) ? $strCreateIndexTopic : $strModifyIndexTopic) . ' ------'; ?></b>
-    <br /><br />
+    <?php echo ' ' . (isset($create_index) ? $strCreateIndexTopic : $strModifyIndexTopic) . ' '; ?>
+    </th></tr>
 
-    <table border="0">
+
     <tr>
-        <td><?php echo $strIndexName; ?>&nbsp;</td>
+        <td align="right"><b><?php echo $strIndexName; ?></b>&nbsp;</th>
         <td>
-            <input type="text" name="index" value="<?php echo htmlspecialchars($index); ?>" class="textfield" onfocus="this.select()" />
-            &nbsp;<?php echo $strPrimaryKeyWarning . "\n"; ?>
+            <input type="text" name="index" value="<?php echo htmlspecialchars($index); ?>" size="25" onfocus="this.select()" />
         </td>
     </tr>
+    <tr><td align="right"><?php
+    if ($cfg['ErrorIconic']) {
+        echo '<img src="' . $pmaThemeImage . 's_warn.png" width="16" height="16" border="0" alt="Attention" />';
+    }
+?></td><td><?php echo $strPrimaryKeyWarning . "\n"; ?></td></tr>
     <tr>
-        <td><?php echo $strIndexType; ?>&nbsp;</td>
+        <td align="right"><b><?php echo $strIndexType; ?></b>&nbsp;</td>
         <td>
             <select name="index_type" onchange="return checkIndexName()">
     <?php
@@ -318,19 +318,18 @@ else if (!defined('PMA_IDX_INCLUDED')
         } // end if... else...
     } // end for
     ?>
-            </select>&nbsp;
+            </select>
             <?php echo PMA_showMySQLDocu('Reference', 'ALTER_TABLE') . "\n"; ?>
         </td>
     </tr>
-    </table><br />
 
-    <table border="<?php echo $cfg['Border']; ?>" cellpadding="5">
+    <tr><td valign="top" align="right"><b><?php echo $strFields; ?> :</b>&nbsp;</td><td><table border="<?php echo $cfg['Border']; ?>" cellpadding="2" cellspacing="1">
     <tr>
         <th><?php echo $strField; ?></th>
         <th><?php echo $strSize; ?></th>
     </tr>
     <?php
-    foreach($edited_index_info['Sequences'] AS $row_no => $seq_index) {
+    foreach ($edited_index_info['Sequences'] AS $row_no => $seq_index) {
         $add_type     = (is_array($fields_types) && count($fields_types) == count($fields_names));
         $selected     = $edited_index_data[$seq_index]['Column_name'];
         if (!empty($edited_index_data[$seq_index]['Sub_part'])) {
@@ -347,7 +346,7 @@ else if (!defined('PMA_IDX_INCLUDED')
                 <option value="--ignore--"<?php if ('--ignore--' == $selected) echo ' selected="selected"'; ?>>
                     -- <?php echo $strIgnore; ?> --</option>
         <?php
-        foreach($fields_names AS $key => $val) {
+        foreach ($fields_names AS $key => $val) {
             if ($index_type != 'FULLTEXT'
                 || preg_match('@^(varchar|text|tinytext|mediumtext|longtext)@i', $fields_types[$key])) {
                 echo "\n" . '                '
@@ -368,11 +367,7 @@ else if (!defined('PMA_IDX_INCLUDED')
 
     echo "\n";
     ?>
-    </table><br />
-
-    <input type="submit" name="do_save_data" value="<?php echo $strSave; ?>" /><br />
-
-    <?php
+    <tr><td colspan="2"><?php
     echo "\n";
     if (isset($added_fields)) {
         echo '    <input type="hidden" name="prev_add_fields" value="' . $added_fields . '" />';
@@ -380,26 +375,55 @@ else if (!defined('PMA_IDX_INCLUDED')
     if (isset($idx_num_fields)) {
         echo '    <input type="hidden" name="idx_num_fields" value="' . $idx_num_fields . '" />' . "\n";
     }
-    echo '    <hr /><br />' . "\n";
-    echo '    ' . sprintf($strAddToIndex,  '<input type="text" name="added_fields" size="4" value="1" class="textfield" onfocus="this.select()" />') . "\n";
-    echo '    &nbsp;<input type="submit" name="add_fields" value="' . $strGo . '" onclick="return checkFormElementInRange(this.form, \'added_fields\', 1)" />' . "\n";
-
+    echo '    ' . "\n";
+    echo '    ' . sprintf($strAddToIndex,  '<input type="text" name="added_fields" size="2" value="1" onfocus="this.select()" style="vertical-align: middle;" />') . "\n";
+    echo '    &nbsp;<input type="submit" name="add_fields" value="' . $strGo . '" onclick="return checkFormElementInRange(this.form, \'added_fields\', 1)" style="vertical-align: middle;" />' . "\n";
+?></td>
+</tr>
+    </table></td></tr>
+<tr><td colspan="2" class="tblFooters" align="center">
+    <input type="submit" name="do_save_data" value="<?php echo $strSave; ?>" /></td></tr>
+</table>
+</form>
+<?php
 } else {
     /**
      * Display indexes
      */
     ?>
     <!-- Indexes form -->
-    <form action="tbl_indexes.php" method="post">
+    <form action="./tbl_indexes.php" method="post">
+    <table border="0" cellpadding="2" cellspacing="1">
+    <tr><td class="tblHeaders" colspan="7">
         <?php echo PMA_generate_common_hidden_inputs($db, $table); ?>
     <?php
     echo "\n";
-    echo '        ' . $strIndexes . '&nbsp;:' . "\n";
-    echo '        ' . PMA_showMySQLDocu('MySQL_Optimisation', 'Optimising_Database_Structure') . '<br />' ."\n";
+    echo '        ' . $strIndexes . ':' . "\n";
+    echo '        ' . PMA_showMySQLDocu('MySQL_Optimisation', 'Optimising_Database_Structure') . "\n";
+?></td></tr><?php
+    $edit_link_text = '';
+    $drop_link_text = '';
 
-    if ($idx_cnt > 0) {
+    // We need to copy the value or else the == 'both' check will always return true
+    $propicon = (string)$cfg['PropertiesIconic'];
+    
+    if ($cfg['PropertiesIconic'] === true || $propicon == 'both') {
+        $edit_link_text = '<img src="' . $pmaThemeImage . 'b_edit.png" width="16" height="16" hspace="2" border="0" title="' . $strEdit . '" alt="' . $strEdit . '" />';
+        $drop_link_text = '<img src="' . $pmaThemeImage . 'b_drop.png" width="16" height="16" hspace="2" border="0" title="' . $strDrop . '" alt="' . $strDrop . '" />';
+    }
+    //print_r($cfg['PropertiesIconic']);
+    if ($cfg['PropertiesIconic'] === false || $propicon == 'both') {
+        $edit_link_text .= $strEdit;
+        $drop_link_text .= $strDrop;
+    }
+    if ($propicon == 'both') {
+        $edit_link_text = '<nobr>' . $edit_link_text . '</nobr>';
+        $drop_link_text = '<nobr>' . $drop_link_text . '</nobr>';
+    }
+
+    if (count($ret_keys) > 0) {
         ?>
-        <table border="<?php echo $cfg['Border']; ?>">
+        <!--table border="<?php echo $cfg['Border']; ?>" cellpadding="2" cellspacing="1"-->
         <tr>
             <th><?php echo $strKeyname; ?></th>
             <th><?php echo $strType; ?></th>
@@ -409,7 +433,7 @@ else if (!defined('PMA_IDX_INCLUDED')
         </tr>
         <?php
         echo "\n";
-        foreach($indexes AS $index_no => $index_name) {
+        foreach ($indexes AS $index_no => $index_name) {
             $cell_bgd = (($index_no % 2) ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']);
             $index_td = '            <td bgcolor="' . $cell_bgd . '" rowspan="' . count($indexes_info[$index_name]['Sequences']) . '">' . "\n";
             echo '        <tr>' . "\n";
@@ -436,7 +460,7 @@ else if (!defined('PMA_IDX_INCLUDED')
                  . '            </td>' . "\n";
 
             echo $index_td
-                 . '                <a href="tbl_indexes.php?' . $url_query . '&amp;index=' . urlencode($index_name) . '">' . ($cfg['PropertiesIconic'] ? '<img src="./images/button_edit.png" width="12" height="13" hspace="7" border="0" title="' . $strEdit . '" alt="' . $strEdit . '">' : $strEdit) . '</a>' . "\n"
+                 . '                <a href="tbl_indexes.php?' . $url_query . '&amp;index=' . urlencode($index_name) . '">' . $edit_link_text . '</a>' . "\n"
                  . '            </td>' . "\n";
 
             if ($index_name == 'PRIMARY') {
@@ -449,10 +473,10 @@ else if (!defined('PMA_IDX_INCLUDED')
                 $zero_rows = urlencode(sprintf($strIndexHasBeenDropped, htmlspecialchars($index_name)));
             }
             echo $index_td
-                 . '                <a href="sql.php?' . $url_query . '&amp;sql_query=' . $local_query . '&amp;zero_rows=' . $zero_rows . '" onclick="return confirmLink(this, \'' . $js_msg . '\')">' . ($cfg['PropertiesIconic'] ? '<img src="./images/button_drop.png" width="11" height="12" hspace="7" border="0" title="' . $strDrop . '" alt="' . $strDrop . '">' : $strDrop) . '</a>' . "\n"
+                 . '                <a href="sql.php?' . $url_query . '&amp;sql_query=' . $local_query . '&amp;zero_rows=' . $zero_rows . '" onclick="return confirmLink(this, \'' . $js_msg . '\')">' . $drop_link_text  . '</a>' . "\n"
                  . '            </td>' . "\n";
 
-            foreach($indexes_info[$index_name]['Sequences'] AS $row_no => $seq_index) {
+            foreach ($indexes_info[$index_name]['Sequences'] AS $row_no => $seq_index) {
                 if ($row_no > 0) {
                     echo '        <tr>' . "\n";
                 }
@@ -473,26 +497,29 @@ else if (!defined('PMA_IDX_INCLUDED')
             } // end while
         } // end while
         ?>
-        </table><br />
+        <!--/table><br /-->
         <?php
         echo "\n\n";
     } // end display indexes
     else {
         // none indexes
-        echo "\n" . '        <br />' . "\n";
-        echo '        <i>' . $strNoIndex . '</i><br /><br />' . "\n\n";
+        echo "\n" . '        <tr><td colspan=7" align="center">' . "\n";
+        if ($cfg['ErrorIconic']) {
+            echo '<img src="' . $pmaThemeImage . 's_warn.png" width="16" height="16" border="0" alt="Warning" hspace="2" align="middle" />';
+        }
+        echo '        <b>' . $strNoIndex . '</b></td></tr>' . "\n\n";
     }
 
-    echo '        ' . sprintf($strCreateIndex, '<input type="text" size="4" name="idx_num_fields" value="1" class="textfield" />') . "\n";
-    echo '        &nbsp;<input type="submit" name="create_index" value="' . $strGo . '" onclick="return checkFormElementInRange(this.form, \'idx_num_fields\', 1)" />' . "\n";
-    echo '    ';
+    echo '<tr><td colspan="7" class="tblFooters" nowrap="nowrap" align="center">        '
+       . sprintf($strCreateIndex, '<input type="text" size="2" name="idx_num_fields" value="1" style="vertical-align: middle;" />') . "\n";
+    echo '        &nbsp;<input type="submit" name="create_index" value="' . $strGo . '" onclick="return checkFormElementInRange(this.form, \'idx_num_fields\', 1)" style="vertical-align: middle;" />' . "\n";
+    echo '</td></tr>    ';
+?>
+</table></form>
+<?php
 } // end display indexes
 
-?>
-</form>
 
-
-<?php
 /**
  * Displays the footer
  */

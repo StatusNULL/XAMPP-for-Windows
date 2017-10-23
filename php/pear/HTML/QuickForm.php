@@ -17,7 +17,7 @@
 // |          Bertrand Mansion <bmansion@mamasam.com>                     |
 // +----------------------------------------------------------------------+
 //
-// $Id: QuickForm.php,v 1.139 2004/03/20 11:23:10 avb Exp $
+// $Id: QuickForm.php,v 1.144 2004/06/15 10:51:42 mansion Exp $
 
 require_once('PEAR.php');
 require_once('HTML/Common.php');
@@ -45,7 +45,8 @@ $GLOBALS['HTML_QUICKFORM_ELEMENT_TYPES'] =
             'header'        =>array('HTML/QuickForm/header.php', 'HTML_QuickForm_header'),
             'html'          =>array('HTML/QuickForm/html.php', 'HTML_QuickForm_html'),
             'hierselect'    =>array('HTML/QuickForm/hierselect.php', 'HTML_QuickForm_hierselect'),
-            'autocomplete'  =>array('HTML/QuickForm/autocomplete.php', 'HTML_QuickForm_autocomplete')
+            'autocomplete'  =>array('HTML/QuickForm/autocomplete.php', 'HTML_QuickForm_autocomplete'),
+            'xbutton'       =>array('HTML/QuickForm/xbutton.php','HTML_QuickForm_xbutton')
         );
 
 $GLOBALS['_HTML_QuickForm_registered_rules'] = array(
@@ -256,10 +257,11 @@ class HTML_QuickForm extends HTML_Common {
         if (!$trackSubmit || isset($_REQUEST['_qf__' . $formName])) {
             if (1 == get_magic_quotes_gpc()) {
                 $this->_submitValues = $this->_recursiveFilter('stripslashes', 'get' == $method? $_GET: $_POST);
+                $this->_submitFiles  = $this->_recursiveFilter('stripslashes', $_FILES);
             } else {
                 $this->_submitValues = 'get' == $method? $_GET: $_POST;
+                $this->_submitFiles  = $_FILES;
             }
-            $this->_submitFiles =& $_FILES;
         }
         if ($trackSubmit) {
             unset($this->_submitValues['_qf__' . $formName]);
@@ -1559,6 +1561,10 @@ class HTML_QuickForm extends HTML_Common {
 
                     if (isset($rule['group'])) {
                         $group    =& $this->getElement($rule['group']);
+                        // No JavaScript validation for frozen elements
+                        if ($group->isFrozen()) {
+                            continue 2;
+                        }
                         $elements =& $group->getElements();
                         foreach (array_keys($elements) as $key) {
                             if ($elementName == $group->getElementName($key)) {
@@ -1575,6 +1581,16 @@ class HTML_QuickForm extends HTML_Common {
                     } else {
                         $element =& $this->getElement($elementName);
                     }
+                    // No JavaScript validation for frozen elements
+                    if (is_object($element) && $element->isFrozen()) {
+                        continue 2;
+                    } elseif (is_array($element)) {
+                        foreach (array_keys($element) as $key) {
+                            if ($element[$key]->isFrozen()) {
+                                continue 3;
+                            }
+                        }
+                    }
 
                     $test[] = $registry->getValidationScript($element, $elementName, $rule);
                     unset($element);
@@ -1584,7 +1600,7 @@ class HTML_QuickForm extends HTML_Common {
         if (count($test) > 0) {
             return
                 "\n<script type=\"text/javascript\">\n" .
-                "<!-- \n" . 
+                "//<![CDATA[\n" . 
                 "function validate_" . $this->_attributes['id'] . "(frm) {\n" .
                 "  var value = '';\n" .
                 "  var errFlag = new Array();\n" .
@@ -1598,7 +1614,7 @@ class HTML_QuickForm extends HTML_Common {
                 "  }\n" .
                 "  return true;\n" .
                 "}\n" .
-                "//-->\n" .
+                "//]]>\n" .
                 "</script>";
         }
         return '';
@@ -1630,12 +1646,13 @@ class HTML_QuickForm extends HTML_Common {
      * 
      * @since     2.0
      * @access    public
+     * @param     bool      Whether to collect hidden elements (passed to the Renderer's constructor)
      * @return    array of form contents
      */
-    function toArray()
+    function toArray($collectHidden = false)
     {
         include_once 'HTML/QuickForm/Renderer/Array.php';
-        $renderer =& new HTML_QuickForm_Renderer_Array();
+        $renderer =& new HTML_QuickForm_Renderer_Array($collectHidden);
         $this->accept($renderer);
         return $renderer->toArray();
      } // end func toArray

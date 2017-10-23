@@ -17,7 +17,7 @@
 // | Maintainer: Daniel Convissor <danielc@php.net>                       |
 // +----------------------------------------------------------------------+
 //
-// $Id: mysql.php,v 1.68 2004/03/11 04:20:11 danielc Exp $
+// $Id: mysql.php,v 1.74 2004/04/29 22:42:57 danielc Exp $
 
 
 // XXX legend:
@@ -39,7 +39,7 @@ require_once 'DB/common.php';
  * This is for MySQL versions 4.0 and below.
  *
  * @package  DB
- * @version  $Id: mysql.php,v 1.68 2004/03/11 04:20:11 danielc Exp $
+ * @version  $Id: mysql.php,v 1.74 2004/04/29 22:42:57 danielc Exp $
  * @category Database
  * @author   Stig Bakken <ssb@php.net>
  */
@@ -84,6 +84,7 @@ class DB_mysql extends DB_common
             1008 => DB_ERROR_CANNOT_DROP,
             1022 => DB_ERROR_ALREADY_EXISTS,
             1046 => DB_ERROR_NODBSELECTED,
+            1048 => DB_ERROR_CONSTRAINT,
             1050 => DB_ERROR_ALREADY_EXISTS,
             1051 => DB_ERROR_NOSUCHTABLE,
             1054 => DB_ERROR_NOSUCHFIELD,
@@ -92,8 +93,8 @@ class DB_mysql extends DB_common
             1100 => DB_ERROR_NOT_LOCKED,
             1136 => DB_ERROR_VALUE_COUNT_ON_ROW,
             1146 => DB_ERROR_NOSUCHTABLE,
-            1048 => DB_ERROR_CONSTRAINT,
-            1216 => DB_ERROR_CONSTRAINT
+            1216 => DB_ERROR_CONSTRAINT,
+            1217 => DB_ERROR_CONSTRAINT,
         );
     }
 
@@ -501,7 +502,7 @@ class DB_mysql extends DB_common
             $result = $this->query("UPDATE ${seqname} ".
                                    'SET id=LAST_INSERT_ID(id+1)');
             $this->popErrorHandling();
-            if ($result == DB_OK) {
+            if ($result === DB_OK) {
                 /** COMMON CASE **/
                 $id = @mysql_insert_id($this->connection);
                 if ($id != 0) {
@@ -520,7 +521,7 @@ class DB_mysql extends DB_common
                 }
 
                 // add the default value
-                $result = $this->query("REPLACE INTO ${seqname} VALUES (0)");
+                $result = $this->query("REPLACE INTO ${seqname} (id) VALUES (0)");
                 if (DB::isError($result)) {
                     return $this->raiseError($result);
                 }
@@ -585,7 +586,7 @@ class DB_mysql extends DB_common
             return $res;
         }
         // insert yields value 1, nextId call will generate ID 2
-        $res = $this->query("INSERT INTO ${seqname} VALUES(0)");
+        $res = $this->query("INSERT INTO ${seqname} (id) VALUES (0)");
         if (DB::isError($res)) {
             return $res;
         }
@@ -733,7 +734,7 @@ class DB_mysql extends DB_common
     // }}}
     // {{{ modifyLimitQuery()
 
-    function modifyLimitQuery($query, $from, $count)
+    function modifyLimitQuery($query, $from, $count, $params = array())
     {
         if (DB::isManip($query)) {
             return $query . " LIMIT $count";

@@ -1,4 +1,4 @@
-/* $Id: left.js,v 2.0 2003/11/18 15:20:43 nijel Exp $ */
+/* $Id: left.js,v 2.3 2004/06/23 14:32:46 lem9 Exp $ */
 
 
 // These scripts were originally found on cooltype.com.
@@ -23,10 +23,17 @@
 
 var isExpanded   = false;
 
+/**
+ * 2004-05-28: Michael Keck (mkkeck)
+ *             modified for theme manager
+ *             Please see left.php (line 264 and 265)
+ */
+
 var imgOpened    = new Image(9,9);
-imgOpened.src    = 'images/minus.png';
+imgOpened.src    = imgUrlMinus;
+
 var imgClosed    = new Image(9,9);
-imgClosed.src    = 'images/plus.png';
+imgClosed.src    = imgUrlPlus;
 
 
 /**
@@ -126,7 +133,7 @@ function initIt()
     for (i = 0; i < tempCollCnt; i++) {
       if (tempColl[i].id == expandedDb)
         tempColl[i].style.display = 'block';
-      else if (tempColl[i].className == 'child')
+      else if (tempColl[i].className == 'child' || tempColl[i].className == 'child nowrap')
         tempColl[i].style.display = 'none';
     }
   } // end of the DOM case
@@ -136,7 +143,7 @@ function initIt()
     for (i = 0; i < tempCollCnt; i++) {
       if (tempColl(i).id == expandedDb)
         tempColl(i).style.display = 'block';
-      else if (tempColl(i).className == 'child')
+      else if (tempColl(i).className == 'child' || tempColl(i).className == 'child nowrap')
         tempColl(i).style.display = 'none';
     }
   } // end of the IE4 case

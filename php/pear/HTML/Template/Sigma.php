@@ -17,7 +17,7 @@
 // |          Alexey Borzov <avb@php.net>                                 |
 // +----------------------------------------------------------------------+
 //
-// $Id: Sigma.php,v 1.9 2003/10/02 13:47:48 avb Exp $
+// $Id: Sigma.php,v 1.11 2004/05/31 14:09:42 avb Exp $
 //
 
 require_once 'PEAR.php';
@@ -113,7 +113,7 @@ define('SIGMA_INVALID_CALLBACK',          -13);
 *
 * @author   Ulf Wendel <ulf.wendel@phpdoc.de>
 * @author   Alexey Borzov <avb@php.net>
-* @version  $Revision: 1.9 $
+* @version  $Revision: 1.11 $
 * @access   public
 * @package  HTML_Template_Sigma
 */
@@ -366,12 +366,17 @@ class HTML_Template_Sigma extends PEAR
     {
         // the class is inherited from PEAR to be able to use $this->setErrorHandling()
         $this->PEAR();
-        $this->variablesRegExp       = '@'.$this->openingDelimiter.'('.$this->variablenameRegExp.')'.$this->closingDelimiter.'@sm';
+        $this->variablesRegExp       = '@' . $this->openingDelimiter . '(' . $this->variablenameRegExp . ')' .
+                                       '(:(' . $this->functionnameRegExp . '))?' . $this->closingDelimiter . '@sm';
         $this->removeVariablesRegExp = '@'.$this->openingDelimiter.'\s*('.$this->variablenameRegExp.')\s*'.$this->closingDelimiter.'@sm';
         $this->blockRegExp           = '@<!--\s+BEGIN\s+('.$this->blocknameRegExp.')\s+-->(.*)<!--\s+END\s+\1\s+-->@sm';
         $this->functionRegExp        = '@' . $this->functionPrefix . '(' . $this->functionnameRegExp . ')\s*\(@sm';
         $this->setRoot($root);
         $this->setCacheRoot($cacheRoot);
+
+        $this->setCallbackFunction('h', 'htmlspecialchars');
+        $this->setCallbackFunction('u', 'urlencode');
+        $this->setCallbackFunction('j', array(&$this, '_jsEscape'));
     }
 
 
@@ -603,36 +608,37 @@ class HTML_Template_Sigma extends PEAR
                 $varKeys     = array_keys($vars);
                 $varValues   = $this->_options['preserve_data']? array_map(array(&$this, '_preserveOpeningDelimiter'), array_values($vars)): array_values($vars);
             }
-            // perform callbacks
-            if (!empty($this->_functions[$block])) {
-                foreach ($this->_functions[$block] as $id => $data) {
-                    $placeholder = $this->openingDelimiter . '__function_' . $id . '__' . $this->closingDelimiter;
-                    // do not waste time calling function more than once
-                    if (!isset($vars[$placeholder])) {
-                        $args         = array();
-                        $preserveArgs = isset($this->_callback[$data['name']]['preserveArgs']) && $this->_callback[$data['name']]['preserveArgs'];
-                        foreach ($data['args'] as $arg) {
-                            $args[] = (empty($varKeys) || $preserveArgs)? $arg: str_replace($varKeys, $varValues, $arg);
-                        }
-                        if (isset($this->_callback[$data['name']]['data'])) {
-                            $res = call_user_func_array($this->_callback[$data['name']]['data'], $args);
-                        } else {
-                            $res = isset($args[0])? $args[0]: '';
-                        }
-                        $outer = str_replace($placeholder, $res, $outer);
-                        // save the result to variable cache, it can be requested somewhere else
-                        $vars[$placeholder] = $res;
-                    }
-                }
-            }
-            // substitute variables only on non-recursive call, thus all
-            // variables from all inner blocks get substituted
-            if (!$flagRecursion && !empty($varKeys)) {
-                $outer = str_replace($varKeys, $varValues, $outer);
-            }
 
             // check whether the block is considered "empty" and append parsed content if not
             if (!$empty || ('__global__' == $block) || !$this->removeEmptyBlocks || isset($this->_touchedBlocks[$block])) {
+                // perform callbacks
+                if (!empty($this->_functions[$block])) {
+                    foreach ($this->_functions[$block] as $id => $data) {
+                        $placeholder = $this->openingDelimiter . '__function_' . $id . '__' . $this->closingDelimiter;
+                        // do not waste time calling function more than once
+                        if (!isset($vars[$placeholder])) {
+                            $args         = array();
+                            $preserveArgs = isset($this->_callback[$data['name']]['preserveArgs']) && $this->_callback[$data['name']]['preserveArgs'];
+                            foreach ($data['args'] as $arg) {
+                                $args[] = (empty($varKeys) || $preserveArgs)? $arg: str_replace($varKeys, $varValues, $arg);
+                            }
+                            if (isset($this->_callback[$data['name']]['data'])) {
+                                $res = call_user_func_array($this->_callback[$data['name']]['data'], $args);
+                            } else {
+                                $res = isset($args[0])? $args[0]: '';
+                            }
+                            $outer = str_replace($placeholder, $res, $outer);
+                            // save the result to variable cache, it can be requested somewhere else
+                            $vars[$placeholder] = $res;
+                        }
+                    }
+                }
+                // substitute variables only on non-recursive call, thus all
+                // variables from all inner blocks get substituted
+                if (!$flagRecursion && !empty($varKeys)) {
+                    $outer = str_replace($varKeys, $varValues, $outer);
+                }
+
                 $this->_parsedBlocks[$block] .= $outer;
                 if (isset($this->_touchedBlocks[$block])) {
                     unset($this->_touchedBlocks[$block]);
@@ -1146,6 +1152,23 @@ class HTML_Template_Sigma extends PEAR
     }
 
 
+   /**
+    * Clears the variables
+    * 
+    * Global variables are not affected. The method is useful when you add
+    * a lot of variables via setVariable() and are not sure whether all of 
+    * them appear in the block you parse(). If you clear the variables after
+    * parse(), you don't risk them suddenly showing up in other blocks.
+    * 
+    * @access public
+    * @see    setVariable()
+    */
+    function clearVariables()
+    {
+        $this->_variables = array();
+    }
+
+
     //------------------------------------------------------------
     //
     // Private methods follow
@@ -1183,10 +1206,21 @@ class HTML_Template_Sigma extends PEAR
     function _buildBlockVariables($block = '__global__')
     {
         $this->_blockVariables[$block] = array();
-        preg_match_all($this->variablesRegExp, $this->_blocks[$block], $regs);
-        if (0 != count($regs[1])) {
-            foreach ($regs[1] as $k => $var) {
-                $this->_blockVariables[$block][$var] = true;
+        $this->_functions[$block]      = array();
+        preg_match_all($this->variablesRegExp, $this->_blocks[$block], $regs, PREG_SET_ORDER);
+        foreach ($regs as $match) {
+            $this->_blockVariables[$block][$match[1]] = true;
+            if (!empty($match[3])) {
+                $funcData = array(
+                    'name' => $match[3],
+                    'args' => array($this->openingDelimiter . $match[1] . $this->closingDelimiter)
+                );
+                $funcId   = substr(md5(serialize($funcData)), 0, 10);
+
+                // update block info
+                $this->_blocks[$block] = str_replace($match[0], '{__function_' . $funcId . '__}', $this->_blocks[$block]);
+                $this->_blockVariables[$block]['__function_' . $funcId . '__'] = true;
+                $this->_functions[$block][$funcId] = $funcData;
             }
         }
         $this->_buildFunctionlist($block);
@@ -1588,7 +1622,6 @@ class HTML_Template_Sigma extends PEAR
     */
     function _buildFunctionlist($block)
     {
-        $this->_functions[$block] = array();
         $template = $this->_blocks[$block];
 
         while (preg_match($this->functionRegExp, $template, $regs)) {
@@ -1676,6 +1709,22 @@ class HTML_Template_Sigma extends PEAR
         return (false === strpos($str, $this->openingDelimiter))? 
                 $str:
                 str_replace($this->openingDelimiter, $this->openingDelimiter . '%preserved%' . $this->closingDelimiter, $str);
+    }
+
+
+   /**
+    * Quotes the string so that it can be used in Javascript string constants
+    *
+    * @access private
+    * @param  string
+    * @return string
+    */
+    function _jsEscape($value)
+    {
+        return strtr($value, array(
+                    "\r" => '\r', "'"  => "\\'", "\n" => '\n', 
+                    '"'  => '\"', "\t" => '\t',  '\\' => '\\\\'
+               ));
     }
 }
 ?>

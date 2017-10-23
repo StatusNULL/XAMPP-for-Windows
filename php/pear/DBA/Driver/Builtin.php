@@ -1,7 +1,7 @@
 <?php
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 // +----------------------------------------------------------------------+
-// | Copyright (c) 2002 Brent Cook                                        |
+// | Copyright (c) 2002-2003 Brent Cook                                        |
 // +----------------------------------------------------------------------+
 // | This library is free software; you can redistribute it and/or        |
 // | modify it under the terms of the GNU Lesser General Public           |
@@ -18,7 +18,7 @@
 // | Foundation, Inc., 59 Temple Place, Suite 330,Boston,MA 02111-1307 USA|
 // +----------------------------------------------------------------------+
 //
-// $Id: Builtin.php,v 1.11 2002/11/30 05:13:15 busterb Exp $
+// $Id: Builtin.php,v 1.13 2003/01/27 04:31:42 busterb Exp $
 
 require_once 'DBA.php';
 
@@ -341,6 +341,27 @@ class DBA_Driver_Builtin extends DBA
         } else {
             return false;
         }
+    }
+    // }}}
+
+    // {{{ getkeys()
+    /**
+     * Returns all keys in the database
+     *
+     * @access  public
+     * @return  mixed  array
+     */
+    function getkeys()
+    {
+        $keys = array();
+        if ($this->isReadable()) {
+            $key = $this->firstkey();
+            while ($key !== FALSE) {
+                $keys[] = $key;
+                $key = $this->nextkey($key);
+            }
+        }
+        return $keys;
     }
     // }}}
 

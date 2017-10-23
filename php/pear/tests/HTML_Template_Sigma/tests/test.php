@@ -2,7 +2,7 @@
 /**
  * Unit tests for HTML_Template_Sigma class
  * 
- * $Id: test.php,v 1.2 2003/10/02 13:47:48 avb Exp $
+ * $Id: test.php,v 1.3 2004/04/10 10:28:45 avb Exp $
  */
 
 require_once 'System.php';
@@ -34,7 +34,7 @@ $suite =& new PHPUnit_TestSuite();
 
 foreach ($testcases as $testcase) {
     include_once $testcase . '.php';
-    $methods = preg_grep('/^test/', get_class_methods($testcase));
+    $methods = preg_grep('/^test/i', get_class_methods($testcase));
     foreach ($methods as $method) {
         $suite->addTest(new $testcase($method));
     }

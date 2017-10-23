@@ -17,7 +17,7 @@
 // | Maintainer: Daniel Convissor <danielc@php.net>                       |
 // +----------------------------------------------------------------------+
 //
-// $Id: dbase.php,v 1.19 2004/03/05 01:46:53 danielc Exp $
+// $Id: dbase.php,v 1.21 2004/08/03 01:46:17 danielc Exp $
 
 
 // XXX legend:
@@ -31,7 +31,7 @@ require_once 'DB/common.php';
  * extension.
  *
  * @package  DB
- * @version  $Id: dbase.php,v 1.19 2004/03/05 01:46:53 danielc Exp $
+ * @version  $Id: dbase.php,v 1.21 2004/08/03 01:46:17 danielc Exp $
  * @category Database
  * @author   Stig Bakken <ssb@php.net>
  */
@@ -77,13 +77,18 @@ class DB_dbase extends DB_common
             return $this->raiseError(DB_ERROR_EXTENSION_NOT_FOUND);
         }
         $this->dsn = $dsninfo;
-        ob_start();
-        $conn  = @dbase_open($dsninfo['database'], 0);
-        $error = ob_get_contents();
-        ob_end_clean();
+
+        $ini = ini_get('track_errors');
+        if ($ini) {
+            $conn  = @dbase_open($dsninfo['database'], 0);
+        } else {
+            ini_set('track_errors', 1);
+            $conn  = @dbase_open($dsninfo['database'], 0);
+            ini_set('track_errors', $ini);
+        }
         if (!$conn) {
             return $this->raiseError(DB_ERROR_CONNECT_FAILED, null,
-                                     null, null, strip_tags($error));
+                                     null, null, strip_tags($php_errormsg));
         }
         $this->connection = $conn;
         return DB_OK;
@@ -105,7 +110,7 @@ class DB_dbase extends DB_common
     function &query($query = null)
     {
         // emulate result resources
-        $this->res_row[$this->result] = 0;
+        $this->res_row[(int)$this->result] = 0;
         $tmp =& new DB_result($this, $this->result++);
         return $tmp;
     }
@@ -134,7 +139,7 @@ class DB_dbase extends DB_common
     function fetchInto($result, &$arr, $fetchmode, $rownum=null)
     {
         if ($rownum === null) {
-            $rownum = $this->res_row[$result]++;
+            $rownum = $this->res_row[(int)$result]++;
         }
         if ($fetchmode & DB_FETCHMODE_ASSOC) {
             $arr = @dbase_get_record_with_names($this->connection, $rownum);

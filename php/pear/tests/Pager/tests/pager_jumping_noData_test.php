@@ -1,5 +1,5 @@
 <?php
-// $Id: pager_jumping_noData_test.php,v 1.1 2003/11/30 17:30:01 quipo Exp $
+// $Id: pager_jumping_noData_test.php,v 1.2 2004/04/29 20:18:10 quipo Exp $
 
 require_once 'simple_include.php';
 require_once 'pager_include.php';
@@ -15,7 +15,7 @@ class TestOfPagerJumpingNoData extends UnitTestCase {
             'perPage'  => 2,
             'mode'     => 'Jumping',
         );
-        $this->pager = new Pager($options);
+        $this->pager = Pager::factory($options);
     }
     function tearDown() {
         unset($this->pager);

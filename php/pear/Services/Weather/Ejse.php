@@ -16,8 +16,15 @@
 // | Authors: Alexander Wirtz <alex@pc4p.net>                             |
 // +----------------------------------------------------------------------+
 //
-// $Id: Ejse.php,v 1.9 2004/03/31 12:32:58 eru Exp $
+// $Id: Ejse.php,v 1.14 2004/05/01 12:49:26 eru Exp $
 
+/**
+* @package      Services_Weather
+* @filesource
+*/
+
+/**
+*/
 require_once "Services/Weather/Common.php";
 
 // {{{ class Services_Weather_Ejse
@@ -34,10 +41,10 @@ require_once "Services/Weather/Common.php";
 *
 * @author       Alexander Wirtz <alex@pc4p.net>
 * @link         http://www.ejse.com/services/weather_xml_web_services.htm
-* @example      docs/Services_Weather/examples/ejse-basic.php
+* @example      examples/ejse-basic.php ejse-basic.php
 * @package      Services_Weather
 * @license      http://www.php.net/license/2_02.txt
-* @version      1.2
+* @version      1.3
 */
 class Services_Weather_Ejse extends Services_Weather_Common {
 
@@ -84,13 +91,13 @@ class Services_Weather_Ejse extends Services_Weather_Common {
         include_once "SOAP/Client.php";
         $this->_wsdl = new SOAP_WSDL("http://www.ejse.com/WeatherService/Service.asmx?WSDL", array("timeout" => $this->_httpTimeout));
         if (isset($this->_wsdl->fault) && Services_Weather::isError($this->_wsdl->fault)) {
-            $error = Services_Weather::raiseError(SERVICES_WEATHER_ERROR_WRONG_SERVER_DATA);
+            $error = Services_Weather::raiseError(SERVICES_WEATHER_ERROR_WRONG_SERVER_DATA, __FILE__, __LINE__);
             return;
         }
 
         eval($this->_wsdl->generateAllProxies());
         if (!class_exists("WebService_Service_ServiceSoap")) {
-            $error = Services_Weather::raiseError(SERVICES_WEATHER_ERROR_WRONG_SERVER_DATA);
+            $error = Services_Weather::raiseError(SERVICES_WEATHER_ERROR_WRONG_SERVER_DATA, __FILE__, __LINE__);
             return;
         }
 
@@ -110,10 +117,10 @@ class Services_Weather_Ejse extends Services_Weather_Common {
     */
     function _checkLocationID($id)
     {
-        if (!strlen($id)) {
-            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_NO_LOCATION);
+        if (is_array($id) || is_object($id) || !strlen($id)) {
+            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_NO_LOCATION, __FILE__, __LINE__);
         } elseif (!ctype_digit($id) || (strlen($id) != 5)) {
-            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_INVALID_LOCATION);
+            return Services_Weather::raiseError(SERVICES_WEATHER_ERROR_INVALID_LOCATION, __FILE__, __LINE__);
         }
 
         return true;
@@ -150,22 +157,6 @@ class Services_Weather_Ejse extends Services_Weather_Common {
     function searchLocationByCountry($country = null)
     {
         return $false;
-    }
-    // }}}
-
-    // {{{ getUnits()
-    /**
-    * Returns the units for the current query
-    *
-    * @param    string                      $id
-    * @param    string                      $unitsFormat
-    * @return   array
-    * @deprecated
-    * @access   public
-    */
-    function getUnits($id = null, $unitsFormat = "")
-    {
-        return $this->getUnitsFormat($unitsFormat);
     }
     // }}}
 

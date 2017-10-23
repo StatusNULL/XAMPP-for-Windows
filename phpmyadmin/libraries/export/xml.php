@@ -1,5 +1,5 @@
 <?php
-/* $Id: xml.php,v 2.1 2003/11/20 16:31:51 garvinhicking Exp $ */
+/* $Id: xml.php,v 2.7 2004/04/14 13:51:11 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -18,6 +18,17 @@ function PMA_exportComment($text) {
 }
 
 /**
+ * Outputs export footer
+ *
+ * @return  bool        Whether it suceeded
+ *
+ * @access  public
+ */
+function PMA_exportFooter() {
+    return TRUE;
+}
+
+/**
  * Outputs export header
  *
  * @return  bool        Whether it suceeded
@@ -27,7 +38,7 @@ function PMA_exportComment($text) {
 function PMA_exportHeader() {
     global $crlf;
     global $cfg;
-    
+
     if ($GLOBALS['output_charset_conversion']) {
         $charset = $GLOBALS['charset_of_file'];
     } else {
@@ -113,31 +124,30 @@ function PMA_exportDBCreate($db) {
  * @access  public
  */
 function PMA_exportData($db, $table, $crlf, $error_url, $sql_query) {
-    $result      = PMA_mysql_query($sql_query) or PMA_mysqlDie('', $sql_query, '', $error_url);
-    
-    $columns_cnt = mysql_num_fields($result);
+    $result      = PMA_DBI_query($sql_query, NULL, PMA_DBI_QUERY_UNBUFFERED);
+
+    $columns_cnt = PMA_DBI_num_fields($result);
     for ($i = 0; $i < $columns_cnt; $i++) {
-        $columns[$i] = stripslashes(mysql_field_name($result, $i));
+        $columns[$i] = stripslashes(PMA_DBI_field_name($result, $i));
     }
     unset($i);
-    
+
     $buffer      = '  <!-- ' . $GLOBALS['strTable'] . ' ' . $table . ' -->' . $crlf;
     if (!PMA_exportOutputHandler($buffer)) return FALSE;
-    
-    while ($record = PMA_mysql_fetch_array($result, MYSQL_ASSOC)) {
+
+    while ($record = PMA_DBI_fetch_row($result)) {
         $buffer         = '    <' . $table . '>' . $crlf;
         for ($i = 0; $i < $columns_cnt; $i++) {
-            // There is no way to dectect a "NULL" value with PHP3
-            if ( isset($record[$columns[$i]]) && (!function_exists('is_null') || !is_null($record[$columns[$i]]))) {
-                $buffer .= '        <' . $columns[$i] . '>' . htmlspecialchars(stripslashes($record[$columns[$i]]))
+            if ( isset($record[$i]) && !is_null($record[$i])) {
+                $buffer .= '        <' . $columns[$i] . '>' . htmlspecialchars($record[$i])
                         .  '</' . $columns[$i] . '>' . $crlf;
             }
         }
         $buffer         .= '    </' . $table . '>' . $crlf;
-        
+
         if (!PMA_exportOutputHandler($buffer)) return FALSE;
     }
-    mysql_free_result($result);
+    PMA_DBI_free_result($result);
 
     return TRUE;
 } // end of the 'PMA_getTableXML()' function

@@ -1,5 +1,5 @@
 <?php
-/* $Id: latex.php,v 2.2 2003/11/20 16:31:51 garvinhicking Exp $ */
+/* $Id: latex.php,v 2.12 2004/05/20 16:14:13 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -18,7 +18,7 @@
 function PMA_texEscape($string) {
    $escape = array('$', '%', '{', '}',  '&',  '#', '_', '^');
    $cnt_escape = count($escape);
-   for($k=0; $k < $cnt_escape; $k++) {
+   for ($k=0; $k < $cnt_escape; $k++) {
       $string = str_replace($escape[$k], '\\' . $escape[$k], $string);
    }
    return $string;
@@ -33,6 +33,17 @@ function PMA_texEscape($string) {
  */
 function PMA_exportComment($text) {
     return PMA_exportOutputHandler('% ' . $text . $GLOBALS['crlf']);
+}
+
+/**
+ * Outputs export footer
+ *
+ * @return  bool        Whether it suceeded
+ *
+ * @access  public
+ */
+function PMA_exportFooter() {
+    return TRUE;
 }
 
 /**
@@ -118,18 +129,18 @@ function PMA_exportDBCreate($db) {
  * @access  public
  */
 function PMA_exportData($db, $table, $crlf, $error_url, $sql_query) {
-    $result      = PMA_mysql_query($sql_query) or PMA_mysqlDie('', $sql_query, '', $error_url);
+    $result      = PMA_DBI_try_query($sql_query, NULL, PMA_DBI_QUERY_UNBUFFERED);
 
-    $columns_cnt = mysql_num_fields($result);
+    $columns_cnt = PMA_DBI_num_fields($result);
     for ($i = 0; $i < $columns_cnt; $i++) {
-        $columns[$i] = mysql_field_name($result, $i);
+        $columns[$i] = PMA_DBI_field_name($result, $i);
     }
     unset($i);
 
     $buffer      = $crlf . '%' . $crlf . '% ' . $GLOBALS['strData'] . ': ' . $table . $crlf . '%' . $crlf
                  . ' \\begin{longtable}{|';
 
-    for($index=0;$index<$columns_cnt;$index++) {
+    for ($index=0;$index<$columns_cnt;$index++) {
        $buffer .= 'l|';
     }
     $buffer .= '} ' . $crlf ;
@@ -159,11 +170,11 @@ function PMA_exportData($db, $table, $crlf, $error_url, $sql_query) {
     }
 
     // print the whole table
-    while ($record = PMA_mysql_fetch_array($result, MYSQL_ASSOC)) {
+    while ($record = PMA_DBI_fetch_assoc($result)) {
 
         $buffer = '';
         // print each row
-        for($i = 0; $i < $columns_cnt; $i++) {
+        for ($i = 0; $i < $columns_cnt; $i++) {
             if ( isset($record[$columns[$i]]) && (!function_exists('is_null') || !is_null($record[$columns[$i]]))) {
                 $column_value = PMA_texEscape(stripslashes($record[$columns[$i]]));
             } else {
@@ -171,7 +182,7 @@ function PMA_exportData($db, $table, $crlf, $error_url, $sql_query) {
             }
 
             // last column ... no need for & character
-            if($i == ($columns_cnt - 1)) {
+            if ($i == ($columns_cnt - 1)) {
                 $buffer .= $column_value;
             } else {
                 $buffer .= $column_value . " & ";
@@ -184,7 +195,7 @@ function PMA_exportData($db, $table, $crlf, $error_url, $sql_query) {
     $buffer = ' \\end{longtable}' . $crlf;
     if (!PMA_exportOutputHandler($buffer)) return FALSE;
 
-    mysql_free_result($result);
+    PMA_DBI_free_result($result);
     return TRUE;
 
 } // end getTableLaTeX
@@ -210,12 +221,23 @@ function PMA_exportStructure($db, $table, $crlf, $error_url, $do_relation = fals
     global $cfgRelation;
 
     /**
+     * Get the unique keys in the table
+     */
+    $keys_query     = 'SHOW KEYS FROM ' . PMA_backquote($table) . ' FROM '. PMA_backquote($db);
+    $keys_result    = PMA_DBI_query($keys_query);
+    $unique_keys    = array();
+    while ($key = PMA_DBI_fetch_assoc($keys_result)) {
+        if ($key['Non_unique'] == 0) $unique_keys[] = $key['Column_name'];
+    }
+    PMA_DBI_free_result($keys_result);
+    
+    /**
      * Gets fields properties
      */
-    PMA_mysql_select_db($db);
+    PMA_DBI_select_db($db);
     $local_query = 'SHOW FIELDS FROM ' . PMA_backquote($db) . '.' . PMA_backquote($table);
-    $result      = PMA_mysql_query($local_query) or PMA_mysqlDie('', $local_query, '', $error_url);
-    $fields_cnt  = mysql_num_rows($result);
+    $result      = PMA_DBI_query($local_query);
+    $fields_cnt  = PMA_DBI_num_rows($result);
 
     // Check if we can use Relations (Mike Beck)
     if ($do_relation && !empty($cfgRelation['relation'])) {
@@ -232,16 +254,6 @@ function PMA_exportStructure($db, $table, $crlf, $error_url, $do_relation = fals
     else {
            $have_rel = FALSE;
     } // end if
-
-    /**
-     * Get the unique keys in the table
-     */
-    $keys_query     = 'SHOW KEYS FROM ' . PMA_backquote($table) . ' FROM '. PMA_backquote($db);
-    $keys_result    = PMA_mysql_query($keys_query) or PMA_mysqlDie('', $keys_query, '', $error_url);
-    $unique_keys    = array();
-    while($key = PMA_mysql_fetch_array($keys_result)) {
-        if ($key['Non_unique'] == 0) $unique_keys[] = $key['Column_name'];
-    }
 
     /**
      * Displays the table structure
@@ -266,7 +278,7 @@ function PMA_exportStructure($db, $table, $crlf, $error_url, $do_relation = fals
     }
     $buffer = $alignment . '} ' . $crlf ;
 
-    $header .= ' \\hline ';
+    $header = ' \\hline ';
     $header .= '\\multicolumn{1}{|c|}{\\textbf{' . $GLOBALS['strField'] . '}} & \\multicolumn{1}{|c|}{\\textbf{' . $GLOBALS['strType'] . '}} & \\multicolumn{1}{|c|}{\\textbf{' . $GLOBALS['strNull'] . '}} & \\multicolumn{1}{|c|}{\\textbf{' . $GLOBALS['strDefault'] . '}}';
     if ($do_relation && $have_rel) {
         $header .= ' & \\multicolumn{1}{|c|}{\\textbf{' . $GLOBALS['strLinksTo'] . '}}';
@@ -298,7 +310,7 @@ function PMA_exportStructure($db, $table, $crlf, $error_url, $do_relation = fals
 
     if (!PMA_exportOutputHandler($buffer)) return FALSE;
 
-    while ($row = PMA_mysql_fetch_array($result)) {
+    while ($row = PMA_DBI_fetch_assoc($result)) {
 
         $type             = $row['Type'];
         // reformat mysql query output - staybyte - 9. June 2001
@@ -378,7 +390,7 @@ function PMA_exportStructure($db, $table, $crlf, $error_url, $do_relation = fals
 
         if (!PMA_exportOutputHandler($buffer)) return FALSE;
     } // end while
-    mysql_free_result($result);
+    PMA_DBI_free_result($result);
 
     $buffer = ' \\end{longtable}' . $crlf;
     return PMA_exportOutputHandler($buffer);

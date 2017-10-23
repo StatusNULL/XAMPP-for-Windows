@@ -18,7 +18,7 @@
 // | Maintainer: Daniel Convissor <danielc@php.net>                       |
 // +----------------------------------------------------------------------+
 //
-// $Id: DB.php,v 1.58 2004/03/13 16:17:19 danielc Exp $
+// $Id: DB.php,v 1.59 2004/07/08 21:15:11 danielc Exp $
 //
 // Database independent query interface.
 
@@ -264,7 +264,7 @@ define('DB_PORTABILITY_ALL', 63);
  * @author   Stig Bakken <ssb@php.net>
  * @author   Tomas V.V.Cox <cox@idecnet.com>
  * @since    PHP 4.0
- * @version  $Id: DB.php,v 1.58 2004/03/13 16:17:19 danielc Exp $
+ * @version  $Id: DB.php,v 1.59 2004/07/08 21:15:11 danielc Exp $
  * @category Database
  */
 class DB
@@ -665,10 +665,10 @@ class DB
         if ($dsn) {
             // /database
             if (($pos = strpos($dsn, '?')) === false) {
-                $parsed['database'] = $dsn;
+                $parsed['database'] = rawurldecode($dsn);
             // /database?param1=value1&param2=value2
             } else {
-                $parsed['database'] = substr($dsn, 0, $pos);
+                $parsed['database'] = rawurldecode(substr($dsn, 0, $pos));
                 $dsn = substr($dsn, $pos + 1);
                 if (strpos($dsn, '&') !== false) {
                     $opts = explode('&', $dsn);

@@ -1,5 +1,5 @@
 <?php
-/* $Id: charset_conversion.lib.php,v 2.3 2004/01/06 21:49:42 rabus Exp $ */
+/* $Id: charset_conversion.lib.php,v 2.5 2004/06/07 13:24:35 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -144,7 +144,7 @@ function PMA_convert_display_charset($what) {
     }
     else if (is_array($what)) {
         $result = array();
-        foreach($what AS $key => $val) {
+        foreach ($what AS $key => $val) {
             if (is_string($val) || is_array($val)) {
                 if (is_string($key)) {
                     $result[PMA_convert_display_charset($key)] = PMA_convert_display_charset($val);
@@ -240,6 +240,7 @@ function PMA_convert_charset($what) {
  * @author  nijel
  */
 function PMA_convert_string($src_charset, $dest_charset, $what) {
+    if ($src_charset == $dest_charset) return $what;
     switch ($GLOBALS['PMA_recoding_engine']) {
         case PMA_CHARSET_RECODE:
             return recode_string($src_charset . '..'  . $dest_charset, $what);

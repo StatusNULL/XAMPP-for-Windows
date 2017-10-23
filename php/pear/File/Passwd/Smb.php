@@ -11,7 +11,7 @@
 // | Copyright (c) 2003-2004 Michael Wallner <mike@iworks.at>             |
 // +----------------------------------------------------------------------+
 //
-// $Id: Smb.php,v 1.14 2004/03/30 10:41:30 mike Exp $
+// $Id: Smb.php,v 1.15 2004/06/07 19:19:47 mike Exp $
 
 /**
 * Manipulate SMB server passwd files.
@@ -72,7 +72,7 @@ require_once 'Crypt/CHAP.php';
 * @author   Michael Bretterklieber <michael@bretterklieber.com>
 * @author   Michael Wallner <mike@php.net>
 * @package  File_Passwd
-* @version  $Revision: 1.14 $
+* @version  $Revision: 1.15 $
 * @access   public
 */
 class File_Passwd_Smb extends File_Passwd_Common
@@ -93,7 +93,7 @@ class File_Passwd_Smb extends File_Passwd_Common
     */
     function File_Passwd_Smb($file = 'smbpasswd')
     {
-        $this->__construct($file);
+        File_Passwd_Smb::__construct($file);
     }
     
     /**
@@ -393,6 +393,25 @@ class File_Passwd_Smb extends File_Passwd_Common
                         $userdata['comment']. "\n";
         }
         return $this->_save($content);
-    }    
+    }
+    
+    /**
+    * Generate Password
+    *
+    * @static
+    * @access   public
+    * @return   string  The crypted password.
+    * @param    string  $pass The plaintext password.
+    * @param    string  $mode The encryption mode to use (nt|lm).
+    */
+    function generatePassword($pass, $mode = 'nt')
+    {
+        $chap = &new Crypt_CHAP_MSv1;
+        $hash = strToLower($mode) == 'nt' ? 
+            $chap->ntPasswordHash($pass) :
+            $chap->lmPasswordHash($pass);
+        return strToUpper(bin2hex($hash));
+    }
+    
 }
 ?>

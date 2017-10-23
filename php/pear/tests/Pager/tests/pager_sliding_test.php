@@ -1,5 +1,5 @@
 <?php
-// $Id: pager_sliding_test.php,v 1.4 2003/11/17 20:08:08 quipo Exp $
+// $Id: pager_sliding_test.php,v 1.4 2004/05/11 09:14:22 quipo Exp $
 
 require_once 'simple_include.php';
 require_once 'pager_include.php';
@@ -15,7 +15,7 @@ class TestOfPagerSliding extends UnitTestCase {
             'perPage'  => 2,
             'mode'     => 'Sliding',
         );
-        $this->pager = new Pager($options);
+        $this->pager = Pager::factory($options);
     }
     function tearDown() {
         unset($this->pager);
@@ -29,9 +29,17 @@ class TestOfPagerSliding extends UnitTestCase {
     function testPageRangeByPageId_outOfRange() {
         $this->assertEqual(array(0, 0), $this->pager->getPageRangeByPageId(20));
     }
-//////////
     function testPageRangeByPageId2() {
         $this->assertEqual(array(2, 6), $this->pager->getPageRangeByPageId(4));
+    }
+    function testGetPageData() {
+        $this->assertEqual(array(0=>1, 1=>2), $this->pager->getPageData());
+    }
+    function testGetPageData2() {
+        $this->assertEqual(array(2=>3, 3=>4), $this->pager->getPageData(2));
+    }
+    function testGetPageData_OutOfRange() {
+        $this->assertEqual(false, $this->pager->getPageData(20));
     }
     /**
      * Returns offsets for given pageID. Eg, if you pass pageID=5 and your

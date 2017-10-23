@@ -1,12 +1,12 @@
-  ApacheFriends XAMPP (basic package) version 1.4.8 (win32)
+  ApacheFriends XAMPP (basic package) version 1.4.9 (win32)
 
-  + Apache 2.0.51 [CAN-2004-0811.patch]
+  + Apache 2.0.52
   + MySQL 4.0.21
   + PHP 5.0.2 + PHP 4.3.9 + PEAR
   + PHP-Switch win32 1.0 (von Apachefriends, man nehme die "php-switch.bat")   	
   + MiniPerl 5.8.3
   + SQLite 2.8.15
-  + PHPMyAdmin 2.5.7 pl1
+  + PHPMyAdmin 2.6.0 pl1
   + ADODB 4.52
   + Mercury Mail Transport System for Win32 and NetWare Systems v4.01a
   + FileZilla FTP Server 0.9.2
@@ -160,5 +160,5 @@ PHPMyAdmin zugreifen darf.
 ---------------------------------------------------------------	
     
 Have a lot of fun! Viel Spaﬂ! Bonne Chance!
-Last revised version 25.09.2004 Kay Vogelgesang
+Last revised version 29.09.2004 Kay Vogelgesang
  

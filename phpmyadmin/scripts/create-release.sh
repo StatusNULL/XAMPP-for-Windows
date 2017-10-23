@@ -1,6 +1,17 @@
 #!/bin/sh
 #
-# $Id: create-release.sh,v 2.4.2.3 2004/06/08 22:16:25 rabus Exp $
+# $Id: create-release.sh,v 2.11 2004/08/23 12:53:01 nijel Exp $
+#
+# 2003-08-23, nijel@users.sourceforge.net:
+# - support for creating snapshots outside sourceforge:
+#    * cvs server name can be read from environment variable cvsserver
+#    * do not change to directories as used on sourceforge if $2 is local
+#
+# 2003-08-13, nijel@users.sourceforge.net:
+# - config.default -> config.default.php
+#
+# 2004-08-09, lem9@users.sourceforge.net:
+# - remember to create a new bug tracking group
 #
 # 2004-06-07  rabus@users.sourceforge.net
 # - create backup config file
@@ -49,7 +60,7 @@
 # - added release todo list
 #
 
-cvsserver=cvs1
+cvsserver=${cvsserver:-cvs1}
 
 if [ $# == 0 ]
 then
@@ -60,11 +71,10 @@ then
   exit 65
 fi
 
-if [ $# == 1 ]
+if [ "$1" == "snapshot" ]
 then
   branch=''
-fi
-if [ $# == 2 ]
+elif [ "$#" == 2 ]
 then
   branch="-r $2"
 fi
@@ -114,8 +124,9 @@ END
  fi
 fi
 
+if [ "$mode" == "snapshot" -a "$2" != "local" ] ; then
 # Goto project dir
-cd /home/groups/p/ph/phpmyadmin/htdocs
+    cd /home/groups/p/ph/phpmyadmin/htdocs
 
 ## Move old cvs dir
 #if [ -e cvs ];
@@ -124,11 +135,12 @@ cd /home/groups/p/ph/phpmyadmin/htdocs
 #fi
 
 # Keep one previous version of the cvs directory
-if [ -e cvs-prev ];
-then
-    rm -rf cvs-prev
+    if [ -e cvs-prev ];
+    then
+        rm -rf cvs-prev
+    fi
+    mv cvs cvs-prev
 fi
-mv cvs cvs-prev
 
 # Do CVS checkout
 mkdir cvs
@@ -169,10 +181,10 @@ find phpMyAdmin \( -name '*.sh' -o -name '*.pl' \) -print0 | xargs -0 chmod 755
 lynx --dont_wrap_pre --nolist --dump phpMyAdmin/Documentation.html > phpMyAdmin/Documentation.txt
 
 # Creating a backup config.inc.php
-cp phpMyAdmin/config.inc.php phpMyAdmin/config.default
+cp phpMyAdmin/config.inc.php phpMyAdmin/config.default.php
 
 # Renaming directory
- mv phpMyAdmin phpMyAdmin-$target
+mv phpMyAdmin phpMyAdmin-$target
 
 # Building distribution kits
 zip -9 -r phpMyAdmin-${target}.zip phpMyAdmin-${target}
@@ -239,15 +251,21 @@ Todo now:
               " <title>phpMyAdmin 2.2.2-rc1 - Documentation</title> "
               " <h1>phpMyAdmin 2.2.2-rc1 Documentation</h1> "
         - in translators.html
- 9. the end :-)
+
+ 9. add a group for bug tracking this new version, at
+    https://sourceforge.net/tracker/admin/index.php?group_id=23067&atid=377408&add_group=1
+
+10. the end :-)
 
 END
 
 fi
 
-cd ..
-find cvs -type d -print0 | xargs -0 chmod 775
-find cvs -type f -print0 | xargs -0 chmod 664
+if [ "$mode" == "snapshot" -a "$2" != "local" ] ; then
+    cd ..
+    find cvs -type d -print0 | xargs -0 chmod 775
+    find cvs -type f -print0 | xargs -0 chmod 664
+fi
 
 # Removed due to not needed thanks to clever scripting by Robbat2
 # 9. update the demo subdirectory:

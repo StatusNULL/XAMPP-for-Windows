@@ -1,11 +1,8 @@
 <?php
-/* $Id: footer.inc.php,v 2.2 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: footer.inc.php,v 2.11 2004/07/05 13:18:08 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
- * In this file you may add PHP or HTML statements that will be used to define
- * the footer for phpMyAdmin pages.
- *
  * WARNING: This script has to be included at the very end of your code because
  *          it will stop the script execution!
  */
@@ -23,20 +20,39 @@ if ($cfg['QueryFrame'] && $cfg['QueryFrameJS']) {
 <script type="text/javascript">
 <!--
 <?php
-    if ($cfg['QueryFrameDebug']) {
+    if (!isset($no_history) && !empty($db) && (!isset($error_message) || $error_message == '')) {
+        $tables              = PMA_DBI_try_query('SHOW TABLES FROM ' . PMA_backquote($db) . ';', NULL, PMA_DBI_QUERY_STORE);
+        $num_tables          = ($tables) ? @PMA_DBI_num_rows($tables) : 0;
+        $common_url_query    = PMA_generate_common_url($db);
+        if ($num_tables) {
+            $num_tables_disp = ' (' . $num_tables . ')';
+        } else {
+            $num_tables_disp = ' (-)';
+        }
     ?>
-        document.writeln("Updating query window. DB: <?php echo (isset($db) ? addslashes($db) : 'FALSE'); ?>, Table: <?php echo (isset($table) ? addslashes($table) : 'FALSE'); ?><br>");
-        document.writeln("Window: " + parent.frames.queryframe.querywindow.location + "<br>");
-    <?php
+    var dbBoxSetupDone = false;
+    function dbBoxSetup() {
+        if (dbBoxSetupDone != true) {
+            if (parent.frames.queryframe && parent.frames.queryframe.document.left && parent.frames.queryframe.document.left.lightm_db) {
+                parent.frames.queryframe.document.left.lightm_db.value = '<?php echo addslashes($db); ?>';
+                dbBoxSetupDone = true;
+            } else {
+                setTimeout("dbBoxSetup();",500);
+            }
+        }		
     }
-    ?>
-
-    <?php
-    if (!isset($no_history) && (!isset($error_message) || $error_message == '')) {
-    ?>
     if (parent.frames.queryframe && parent.frames.queryframe.document && parent.frames.queryframe.document.queryframeform) {
         parent.frames.queryframe.document.queryframeform.db.value = "<?php echo (isset($db) ? addslashes($db) : ''); ?>";
         parent.frames.queryframe.document.queryframeform.table.value = "<?php echo (isset($table) ? addslashes($table) : ''); ?>";
+    }
+    if (parent.frames.queryframe && parent.frames.queryframe.document && parent.frames.queryframe.document.left && parent.frames.queryframe.document.left.lightm_db) {
+        selidx = parent.frames.queryframe.document.left.lightm_db.selectedIndex;
+        if (parent.frames.queryframe.document.left.lightm_db.options[selidx].value == "<?php echo addslashes($db); ?>") {
+            parent.frames.queryframe.document.left.lightm_db.options[selidx].text = "<?php echo addslashes($db) . $num_tables_disp; ?>";
+        } else {
+            parent.frames.queryframe.location.reload();
+            setTimeout("dbBoxSetup();",2000);
+        }
     }
     <?php
     }
@@ -44,8 +60,6 @@ if ($cfg['QueryFrame'] && $cfg['QueryFrameJS']) {
 
     function reload_querywindow () {
         if (parent.frames.queryframe && parent.frames.queryframe.querywindow && !parent.frames.queryframe.querywindow.closed && parent.frames.queryframe.querywindow.location) {
-            <?php echo ($cfg['QueryFrameDebug'] ? 'document.writeln("<a href=\'#\' onClick=\'parent.frames.queryframe.querywindow.focus(); return false;\'>Query Window</a> can be updated.<br>");' : ''); ?>
-
             <?php
             if (!isset($no_history) && (!isset($error_message) || $error_message == '')) {
                 if (isset($LockFromUpdate) && $LockFromUpdate == '1' && isset($sql_query)) {
@@ -64,7 +78,6 @@ if ($cfg['QueryFrame'] && $cfg['QueryFrameJS']) {
 
                 <?php echo (isset($sql_query) ? 'parent.frames.queryframe.querywindow.document.querywindow.query_history_latest.value = "' . urlencode($sql_query) . '";' : '// no sql query update') . "\n"; ?>
 
-                <?php echo ($cfg['QueryFrameDebug'] ? 'alert(\'Querywindow submits. Last chance to check variables.\');' : '') . "\n"; ?>
                 parent.frames.queryframe.querywindow.document.querywindow.submit();
             }
             <?php
@@ -91,7 +104,7 @@ if ($cfg['QueryFrame'] && $cfg['QueryFrameJS']) {
             return false;
         } else if (parent.frames.queryframe) {
             new_win_url = 'querywindow.php?sql_query=' + sql_query + '&<?php echo PMA_generate_common_url(isset($db) ? addslashes($db) : '', isset($table) ? addslashes($table) : '', '&'); ?>';
-            parent.frames.queryframe.querywindow=window.open(new_win_url, '','toolbar=0,location=1,directories=0,status=1,menubar=0,scrollbars=yes,resizable=yes,width=<?php echo $cfg['QueryWindowWidth']; ?>,height=<?php echo $cfg['QueryWindowHeight']; ?>');
+            parent.frames.queryframe.querywindow=window.open(new_win_url, '','toolbar=0,location=0,directories=0,status=1,menubar=0,scrollbars=yes,resizable=yes,width=<?php echo $cfg['QueryWindowWidth']; ?>,height=<?php echo $cfg['QueryWindowHeight']; ?>');
 
             if (!parent.frames.queryframe.querywindow.opener) {
                parent.frames.queryframe.querywindow.opener = parent.frames.queryframe;
@@ -120,15 +133,17 @@ if (isset($focus_querywindow) && $focus_querywindow == "true") {
 
 
 /**
- * Close MySql non-persistent connections
+ * Close database connections
  */
 if (isset($GLOBALS['dbh']) && $GLOBALS['dbh']) {
-    @mysql_close($GLOBALS['dbh']);
+    @PMA_DBI_close($GLOBALS['dbh']);
 }
 if (isset($GLOBALS['userlink']) && $GLOBALS['userlink']) {
-    @mysql_close($GLOBALS['userlink']);
+    @PMA_DBI_close($GLOBALS['userlink']);
 }
 ?>
+
+<?php include('./config.footer.inc.php'); ?>
 
 </body>
 

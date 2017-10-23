@@ -15,7 +15,7 @@
 // | Authors: Fabien MARTY <fabien.marty@free.fr> |
 // +----------------------------------------------------------------------+
 //
-// $Id: HTTP_Request.php,v 1.8 2003/01/04 11:54:45 mj Exp $
+// $Id: HTTP_Request.php,v 1.9 2003/07/13 08:27:18 fab Exp $
 
 require_once 'Cache.php';
 require_once 'HTTP/Request.php';
@@ -56,7 +56,7 @@ define('CACHE_HTTP_REQUEST_RETURN_PEAR_ERROR', 3);
 * ?>
 *
 * @author   Fabien MARTY <fabien.marty@free.fr>
-* @version  $Id: HTTP_Request.php,v 1.8 2003/01/04 11:54:45 mj Exp $
+* @version  $Id: HTTP_Request.php,v 1.9 2003/07/13 08:27:18 fab Exp $
 * @package  Cache
 */
 
@@ -142,7 +142,7 @@ class Cache_HTTP_Request extends Cache
         $this->Cache($container, $containerOptions);
         $this->_request = &new HTTP_Request($url, $params);
         $this->_id = md5($url.serialize($params));
-        $this->_id2 = md5($this->id); // we need two keys
+        $this->_id2 = md5($this->_id); // we need two keys
         $this->_mode = $mode;
         $this->_expires = $expires;
     }

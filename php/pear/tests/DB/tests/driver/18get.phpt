@@ -1,5 +1,7 @@
 --TEST--
 DB_driver::get
+--INI--
+error_reporting = 2047
 --SKIPIF--
 <?php
 
@@ -10,20 +12,20 @@ DB_driver::get
  *      DB_Common::getListOf(), DB_Common::getOne(), DB_Common::getRow()
  *
  * @package  DB
- * @version  $Id: 18get.phpt,v 1.3 2004/02/18 05:38:11 danielc Exp $
+ * @version  $Id: 18get.phpt,v 1.7 2004/09/22 22:16:47 danielc Exp $
  * @category Database
  * @author   Daniel Convissor <danielc@analysisandsolutions.com>
  * @internal
  */
 
 chdir(dirname(__FILE__));
-require_once './driver/skipif.inc';
+require_once './skipif.inc';
 
 ?>
 --FILE--
 <?php
 
-// $Id: 18get.phpt,v 1.3 2004/02/18 05:38:11 danielc Exp $
+// $Id: 18get.phpt,v 1.7 2004/09/22 22:16:47 danielc Exp $
 
 /**
  * Connect to the database and make the <kbd>phptest</kbd> table.
@@ -123,6 +125,20 @@ print "\n===================================================\n";
 print "testing getCol:\n";
 $ret =& $dbh->getCol("SELECT * FROM phptest ORDER BY b");
 print_r($ret);
+
+print "testing getCol on query with no records:\n";
+$ret =& $dbh->getCol('SELECT * FROM phptest WHERE a > 200');
+print_r($ret);
+
+print "testing getCol with invalid column id:\n";
+$dbh->setErrorHandling(PEAR_ERROR_RETURN);
+$ret =& $dbh->getCol('SELECT b FROM phptest ORDER BY b', 1);
+if (DB::isError($ret)) {
+    echo $ret->getMessage() . "\n";
+} else {
+    print ">> Should have produced 'no such field' error\n";
+}
+$dbh->setErrorHandling(PEAR_ERROR_CALLBACK, 'pe');
 
 print "testing getCol with 1 col:\n";
 $ret =& $dbh->getCol("SELECT * FROM phptest ORDER BY b", 1);
@@ -321,6 +337,12 @@ Array
     [1] => 42
     [2] => 2
 )
+testing getCol on query with no records:
+Array
+(
+)
+testing getCol with invalid column id:
+DB Error: no such field
 testing getCol with 1 col:
 Array
 (

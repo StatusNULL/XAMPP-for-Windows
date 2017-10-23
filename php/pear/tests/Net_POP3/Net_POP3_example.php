@@ -30,15 +30,17 @@
 // |                                                                       |
 // +-----------------------------------------------------------------------+
 // | Author: Richard Heyes <richard@phpguru.org>                           |
+// | Co-Author: Damian Fernandez Sosa <damlists@cnba.uba.ar>               |
 // +-----------------------------------------------------------------------+
 //
-// $Id: Net_POP3_example.php,v 1.2 2002/07/27 13:07:55 richard Exp $
+// $Id: Net_POP3_example.php,v 1.1.1.1 2004/08/27 02:21:36 damian Exp $
 ?>
 <html>
 <body>
 <?php
 
 include('Net/POP3.php');
+
 
 
 
@@ -58,12 +60,15 @@ $port="110";
 $pop3 =& new Net_POP3();
 
 
-$pop3->setDebug();
+//$pop3->setDebug();
 
 // Connect to localhost on usual port
 // If not given, defaults are localhost:110
 
-$pop3->connect($host , $port );
+if(PEAR::isError( $ret= $pop3->connect($host , $port ) )){
+    echo "ERROR: " . $ret->getMessage() . "\n";
+    exit();
+}
 
 
 // Login using username/password. APOP will
@@ -71,7 +76,26 @@ $pop3->connect($host , $port );
 
 //$pop3->login($user , $pass , 'APOP');
 //$pop3->login($user , $pass , 'CRAM-MD5');
-$pop3->login($user , $pass );
+
+if(PEAR::isError( $ret= $pop3->login($user , $pass,'USER' ) )){
+    echo "ERROR: " . $ret->getMessage() . "\n";
+    exit();
+}
+
+/*
+if(PEAR::isError( $ret= $pop3->login($user , $pass ) )){
+    echo "ERROR: " . $ret->getMessage() . "\n";
+    exit();
+}
+*/
+/*
+if(PEAR::isError( $ret= $pop3->login($user , $pass , 'CRAM-MD5') )){
+    echo "ERROR: " . $ret->getMessage() . "\n";
+    exit();
+}
+*/
+
+
 
 
 // Get the raw headers of message 1

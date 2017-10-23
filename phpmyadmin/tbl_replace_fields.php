@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_replace_fields.php,v 2.5.2.1 2004/03/03 20:16:32 lem9 Exp $ */
+/* $Id: tbl_replace_fields.php,v 2.7 2004/05/13 14:56:18 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 // note: grab_globals has extracted the fields from _FILES
@@ -120,11 +120,11 @@ if (!$check_stop) {
     
     $f = 'field_' . md5($key);
     $t_fval = (isset($$f) ? $$f : null);
-    
+  
     if (isset($t_fval['multi_edit']) && isset($t_fval['multi_edit'][$enc_primary_key])) {
         $fval = &$t_fval['multi_edit'][$enc_primary_key];
     } else {
-        $fval = &$t_fval;
+        $fval = null;
     }
     
     switch (strtolower($val)) {
@@ -142,7 +142,6 @@ if (!$check_stop) {
                             } else {
                                 // the data here is urlencoded
                                 $val = "'" . PMA_sqlAddslashes(urldecode($val)) . "'";
-                                //$val = "'" . PMA_sqlAddslashes($val) . "'";
                             }
                         } else {
                             $val     = "''";
@@ -154,7 +153,6 @@ if (!$check_stop) {
                         $val = implode(',', $fval);
                         // the data here is urlencoded
                         $val = "'" . PMA_sqlAddslashes(urldecode($val)) . "'";
-                        //$val = "'" . PMA_sqlAddslashes($val) . "'";
                     } else {
                         $val = "''";
                     }

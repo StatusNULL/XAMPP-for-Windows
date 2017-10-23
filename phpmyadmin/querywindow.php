@@ -1,5 +1,5 @@
 <?php
-/* $Id: querywindow.php,v 2.2 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: querywindow.php,v 2.15 2004/08/12 15:13:19 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -48,26 +48,7 @@ require_once('./libraries/header_meta_style.inc.php');
 ?>
 
 <script type="text/javascript" language="javascript">
-<?php
-if ($cfg['QueryFrame'] && $cfg['QueryFrameJS'] && $cfg['QueryFrameDebug']) {
-    $js_db = (isset($db) ? $db : 'FALSE');
-    $js_table = (isset($table) ? $table : 'FALSE');
-    $js_server = (isset($server) ? $server : 'FALSE');
-
-    $js_true_db = '\' + document.querywindow.db.value + \'';
-    $js_true_table = '\' + document.querywindow.table.value + \'';
-    $js_true_server = '\' + document.querywindow.server.value + \'';
-
-    $js_parent = '\' + opener.location.href + \'';
-    $js_frame = '\' + opener.parent.location.href + \'';
-?>
-function debug() {
-    alert('<?php echo sprintf($strQueryFrameDebugBox, $js_db, $js_table, $js_server, $js_true_db, $js_true_table, $js_true_server, $js_parent, $js_frame); ?>');
-    return false;
-}
-<?php
-}
-?>
+<!--
 function query_auto_commit() {
     document.sqlform.submit();
 }
@@ -79,11 +60,13 @@ function query_tab_commit(tab) {
 }
 
 // js form validation stuff
+/**/
 var errorMsg0   = '<?php echo str_replace('\'', '\\\'', $GLOBALS['strFormEmpty']); ?>';
 var errorMsg1   = '<?php echo str_replace('\'', '\\\'', $GLOBALS['strNotNumber']); ?>';
 var errorMsg2   = '<?php echo str_replace('\'', '\\\'', $GLOBALS['strNotValidNumber']); ?>';
 var noDropDbMsg = '<?php echo((!$GLOBALS['cfg']['AllowUserDropDatabase']) ? str_replace('\'', '\\\'', $GLOBALS['strNoDropDatabases']) : ''); ?>';
 var confirmMsg  = '<?php echo(($GLOBALS['cfg']['Confirm']) ? str_replace('\'', '\\\'', $GLOBALS['strDoYouReally']) : ''); ?>';
+/**/
 //-->
 </script>
 <script src="libraries/functions.js" type="text/javascript" language="javascript"></script>
@@ -98,21 +81,28 @@ if ($cfg['QueryFrameJS'] && !isset($no_js)) {
     if ($cfg['LightTabs']) {
         echo '&nbsp;';
     } else {
-        echo '<table border="0" cellspacing="0" cellpadding="3" width="100%" class="tabs">
-        <tr>
-            <td width="8">&nbsp;</td>';
+    echo '<table border="0" cellspacing="0" cellpadding="0" width="100%">' . "\n"
+       . '    <tr>' . "\n"
+       . '        <td class="nav" align="left" nowrap="nowrap" valign="bottom">'
+       . '            <table border="0" cellpadding="0" cellspacing="0"><tr>'
+       . '                <td nowrap="nowrap"><img src="' .$GLOBALS['pmaThemeImage'] . 'spacer.png'  . '" width="2" height="1" border="0" alt="" /></td>'
+       . '                <td class="navSpacer"><img src="' .$GLOBALS['pmaThemeImage'] . 'spacer.png'  .'" width="1" height="1" border="0" alt="" /></td>';
     }
     echo "\n";
-    echo PMA_printTab($strSQL, '#', '', 'onClick="javascript:query_tab_commit(\'sql\');return false;"', '', (isset($querydisplay_tab) && $querydisplay_tab == 'sql' ? TRUE : FALSE));
-    echo PMA_printTab($strImportFiles, '#', '', 'onClick="javascript:query_tab_commit(\'files\');return false;"', '', (isset($querydisplay_tab) && $querydisplay_tab == 'files' ? TRUE : FALSE));
-    echo PMA_printTab($strQuerySQLHistory, '#', '', 'onClick="javascript:query_tab_commit(\'history\');return false;"', '', (isset($querydisplay_tab) && $querydisplay_tab == 'history' ? TRUE : FALSE));
+    echo PMA_printTab(($GLOBALS['cfg']['PropertiesIconic'] != false ? '<img src="' . $GLOBALS['pmaThemeImage'] . 'b_sql.png" width="16" height="16" border="0" hspace="2" align="middle" alt="'.$strSQL.'" />' : '') . $strSQL, '#', '', 'onclick="javascript:query_tab_commit(\'sql\');return false;"', '', '', (isset($querydisplay_tab) && $querydisplay_tab == 'sql' ? TRUE : FALSE));
+    echo PMA_printTab(($GLOBALS['cfg']['PropertiesIconic'] != false ? '<img src="' . $GLOBALS['pmaThemeImage'] . 'b_import.png" width="16" height="16" border="0" hspace="2" align="middle" alt="'.$strImportFiles.'" />' : '') . $strImportFiles, '#', '', 'onclick="javascript:query_tab_commit(\'files\');return false;"', '', '', (isset($querydisplay_tab) && $querydisplay_tab == 'files' ? TRUE : FALSE));
+    echo PMA_printTab($strQuerySQLHistory, '#', '', 'onclick="javascript:query_tab_commit(\'history\');return false;"', '', '', (isset($querydisplay_tab) && $querydisplay_tab == 'history' ? TRUE : FALSE));
 
     if ($cfg['QueryWindowDefTab'] == 'full') {
-        echo PMA_printTab($strAll, '#', '', 'onClick="javascript:query_tab_commit(\'full\');return false;"', '', (isset($querydisplay_tab) && $querydisplay_tab == 'full' ? TRUE : FALSE));
+        echo PMA_printTab($strAll, '#', '', 'onclick="javascript:query_tab_commit(\'full\');return false;"', '', '', (isset($querydisplay_tab) && $querydisplay_tab == 'full' ? TRUE : FALSE));
     }
 
     if (!$cfg['LightTabs']) {
-        echo '</tr></table>';
+    echo '                <td nowrap="nowrap"><img src="' .$GLOBALS['pmaThemeImage'] . 'spacer.png'  . '" width="2" height="1" border="0" alt="" /></td>'
+       . '            </tr></table>' . "\n"
+       . '        </td>' . "\n"
+       . '    </tr>' . "\n"
+       . '</table>';
     } else {
         echo '<br />';
     }
@@ -129,15 +119,15 @@ if ($cfg['PropertiesIconic'] == true) {
     $propicon = (string)$cfg['PropertiesIconic'];
 
     if ($propicon == 'both') {
-        $iconic_spacer = '<nobr>';
+        $iconic_spacer = '<div class="nowrap">';
     } else {
         $iconic_spacer = '';
     }
 
-    $titles['Change']        = $iconic_spacer . '<img hspace="7" width="12" height="13" src="images/button_edit.png" alt="' . $strChange . '" title="' . $strChange . '" border="0" />';
+    $titles['Change']        = $iconic_spacer . '<img hspace="2" width="16" height="16" src="' . $pmaThemeImage . 'b_edit.png" alt="' . $strChange . '" title="' . $strChange . '" border="0" />';
 
     if ($propicon == 'both') {
-        $titles['Change']        .= '&nbsp;' . $strChange . '&nbsp;</nobr>';
+        $titles['Change']        .= '&nbsp;' . $strChange . '&nbsp;</div>';
     }
 } else {
     $titles['Change']        = $strChange;
@@ -160,8 +150,8 @@ if ($cfg['QueryFrame'] && $cfg['QueryFrameJS']) {
         $input_query_history[] = '<input type="hidden" name="query_history_table[]" value="' . (isset($query_history_latest_table) ? htmlspecialchars($query_history_latest_table) : '') . '" />';
 
         $sql_history[] = '<li>'
-                       . '<a href="#" onClick="document.querywindow.querydisplay_tab.value = \'' . (isset($querydisplay_tab) && $querydisplay_tab != 'full' ? 'sql' : 'full') . '\'; document.querywindow.query_history_latest.value = \'' . preg_replace('/(\n)/i', ' ', addslashes(htmlspecialchars($query_history_latest))) . '\'; document.querywindow.auto_commit.value = \'false\'; document.querywindow.db.value = \'' . htmlspecialchars($query_history_latest_db) . '\'; document.querywindow.query_history_latest_db.value = \'' . htmlspecialchars($query_history_latest_db) . '\'; document.querywindow.table.value = \'' . (isset($query_history_latest_table) ? htmlspecialchars($query_history_latest_table) : '') . '\'; document.querywindow.query_history_latest_table.value = \'' . (isset($query_history_latest_table) ? htmlspecialchars($query_history_latest_table) : '') . '\'; document.querywindow.submit(); return false;">' . $titles['Change'] . '</a>'
-                       . '<a href="#" onClick="document.querywindow.querydisplay_tab.value = \'' . (isset($querydisplay_tab) && $querydisplay_tab != 'full' ? 'sql' : 'full') . '\'; document.querywindow.query_history_latest.value = \'' . preg_replace('/(\n)/i', ' ', addslashes(htmlspecialchars($query_history_latest))) . '\'; document.querywindow.auto_commit.value = \'true\'; document.querywindow.db.value = \'' . htmlspecialchars($query_history_latest_db) . '\'; document.querywindow.query_history_latest_db.value = \'' . htmlspecialchars($query_history_latest_db) . '\'; document.querywindow.table.value = \'' . (isset($query_history_latest_table) ? htmlspecialchars($query_history_latest_table) : '') . '\'; document.querywindow.query_history_latest_table.value = \'' . (isset($query_history_latest_table) ? htmlspecialchars($query_history_latest_table) : '') . '\'; document.querywindow.submit(); return false;">[' . htmlspecialchars($query_history_latest_db) . '] ' . urldecode($query_history_latest) . '</a>'
+                       . '<a href="#" onclick="document.querywindow.querydisplay_tab.value = \'' . (isset($querydisplay_tab) && $querydisplay_tab != 'full' ? 'sql' : 'full') . '\'; document.querywindow.query_history_latest.value = \'' . preg_replace('/(\n)/i', ' ', addslashes(htmlspecialchars($query_history_latest))) . '\'; document.querywindow.auto_commit.value = \'false\'; document.querywindow.db.value = \'' . htmlspecialchars($query_history_latest_db) . '\'; document.querywindow.query_history_latest_db.value = \'' . htmlspecialchars($query_history_latest_db) . '\'; document.querywindow.table.value = \'' . (isset($query_history_latest_table) ? htmlspecialchars($query_history_latest_table) : '') . '\'; document.querywindow.query_history_latest_table.value = \'' . (isset($query_history_latest_table) ? htmlspecialchars($query_history_latest_table) : '') . '\'; document.querywindow.submit(); return false;">' . $titles['Change'] . '</a>'
+                       . '&nbsp;<a href="#" onclick="document.querywindow.querydisplay_tab.value = \'' . (isset($querydisplay_tab) && $querydisplay_tab != 'full' ? 'sql' : 'full') . '\'; document.querywindow.query_history_latest.value = \'' . preg_replace('/(\n)/i', ' ', addslashes(htmlspecialchars($query_history_latest))) . '\'; document.querywindow.auto_commit.value = \'true\'; document.querywindow.db.value = \'' . htmlspecialchars($query_history_latest_db) . '\'; document.querywindow.query_history_latest_db.value = \'' . htmlspecialchars($query_history_latest_db) . '\'; document.querywindow.table.value = \'' . (isset($query_history_latest_table) ? htmlspecialchars($query_history_latest_table) : '') . '\'; document.querywindow.query_history_latest_table.value = \'' . (isset($query_history_latest_table) ? htmlspecialchars($query_history_latest_table) : '') . '\'; document.querywindow.submit(); return false;">[' . htmlspecialchars($query_history_latest_db) . '] ' . urldecode($query_history_latest) . '</a>'
                        . '</li>' . "\n";
 
         $sql_query = urldecode($query_history_latest);
@@ -180,11 +170,11 @@ if ($cfg['QueryFrame'] && $cfg['QueryFrameJS']) {
 
         $temp_history = PMA_getHistory($cfg['Server']['user']);
         if (is_array($temp_history) && count($temp_history) > 0) {
-            foreach($temp_history AS $history_nr => $history_array) {
+            foreach ($temp_history AS $history_nr => $history_array) {
                 if (!isset($dup_sql[$history_array['sqlquery']])) {
                     $sql_history[] = '<li>'
-                                   . '<a href="#" onClick="document.querywindow.querydisplay_tab.value = \'' . (isset($querydisplay_tab) && $querydisplay_tab != 'full' ? 'sql' : 'full') . '\'; document.querywindow.query_history_latest.value = \'' . preg_replace('/(\n)/i', ' ', addslashes(htmlspecialchars($history_array['sqlquery']))) . '\'; document.querywindow.auto_commit.value = \'false\'; document.querywindow.db.value = \'' . htmlspecialchars($history_array['db']) . '\'; document.querywindow.query_history_latest_db.value = \'' . htmlspecialchars($history_array['db']) . '\'; document.querywindow.table.value = \'' . (isset($history_array['table']) ? htmlspecialchars($history_array['table']) : '') . '\'; document.querywindow.query_history_latest_table.value = \'' . (isset($history_array['table']) ? htmlspecialchars($history_array['table']) : '') . '\'; document.querywindow.submit(); return false;">' . $titles['Change'] . '</a>'
-                                   . '<a href="#" onClick="document.querywindow.querydisplay_tab.value = \'' . (isset($querydisplay_tab) && $querydisplay_tab != 'full' ? 'sql' : 'full') . '\'; document.querywindow.query_history_latest.value = \'' . preg_replace('/(\n)/i', ' ', addslashes(htmlspecialchars($history_array['sqlquery']))) . '\'; document.querywindow.auto_commit.value = \'true\'; document.querywindow.db.value = \'' . htmlspecialchars($history_array['db']) . '\'; document.querywindow.query_history_latest_db.value = \'' . htmlspecialchars($history_array['db']) . '\'; document.querywindow.table.value = \'' . (isset($history_array['table']) ? htmlspecialchars($history_array['table']) : '') . '\'; document.querywindow.query_history_latest_table.value = \'' . (isset($history_array['table']) ? htmlspecialchars($history_array['table']) : '') . '\'; document.querywindow.submit(); return false;">[' . htmlspecialchars($history_array['db']) . '] ' . urldecode($history_array['sqlquery']) . '</a>'
+                                   . '<a href="#" onclick="document.querywindow.querydisplay_tab.value = \'' . (isset($querydisplay_tab) && $querydisplay_tab != 'full' ? 'sql' : 'full') . '\'; document.querywindow.query_history_latest.value = \'' . preg_replace('/(\n)/i', ' ', addslashes(htmlspecialchars($history_array['sqlquery']))) . '\'; document.querywindow.auto_commit.value = \'false\'; document.querywindow.db.value = \'' . htmlspecialchars($history_array['db']) . '\'; document.querywindow.query_history_latest_db.value = \'' . htmlspecialchars($history_array['db']) . '\'; document.querywindow.table.value = \'' . (isset($history_array['table']) ? htmlspecialchars($history_array['table']) : '') . '\'; document.querywindow.query_history_latest_table.value = \'' . (isset($history_array['table']) ? htmlspecialchars($history_array['table']) : '') . '\'; document.querywindow.submit(); return false;">' . $titles['Change'] . '</a>'
+                                   . '<a href="#" onclick="document.querywindow.querydisplay_tab.value = \'' . (isset($querydisplay_tab) && $querydisplay_tab != 'full' ? 'sql' : 'full') . '\'; document.querywindow.query_history_latest.value = \'' . preg_replace('/(\n)/i', ' ', addslashes(htmlspecialchars($history_array['sqlquery']))) . '\'; document.querywindow.auto_commit.value = \'true\'; document.querywindow.db.value = \'' . htmlspecialchars($history_array['db']) . '\'; document.querywindow.query_history_latest_db.value = \'' . htmlspecialchars($history_array['db']) . '\'; document.querywindow.table.value = \'' . (isset($history_array['table']) ? htmlspecialchars($history_array['table']) : '') . '\'; document.querywindow.query_history_latest_table.value = \'' . (isset($history_array['table']) ? htmlspecialchars($history_array['table']) : '') . '\'; document.querywindow.submit(); return false;">[' . htmlspecialchars($history_array['db']) . '] ' . urldecode($history_array['sqlquery']) . '</a>'
                                    . '</li>' . "\n";
                     $dup_sql[$history_array['sqlquery']] = true;
                 }
@@ -195,7 +185,7 @@ if ($cfg['QueryFrame'] && $cfg['QueryFrameJS']) {
 
         if (isset($query_history) && is_array($query_history)) {
             $current_index = count($query_history);
-            foreach($query_history AS $query_no => $query_sql) {
+            foreach ($query_history AS $query_no => $query_sql) {
                 if (!isset($dup_sql[$query_sql])) {
 
                     $input_query_history[] = '<input type="hidden" name="query_history[]" value="' . $query_sql . '" />';
@@ -203,8 +193,8 @@ if ($cfg['QueryFrame'] && $cfg['QueryFrameJS']) {
                     $input_query_history[] = '<input type="hidden" name="query_history_table[]" value="' . (isset($query_history_table[$query_no]) ? htmlspecialchars($query_history_table[$query_no]) : '') . '" />';
 
                     $sql_history[] = '<li>'
-                                   . '<a href="#" onClick="document.querywindow.querydisplay_tab.value = \'' . (isset($querydisplay_tab) && $querydisplay_tab != 'full' ? 'sql' : 'full') . '\'; document.querywindow.query_history_latest.value = \'' . htmlspecialchars($query_sql) . '\'; document.querywindow.auto_commit.value = \'false\'; document.querywindow.db.value = \'' . htmlspecialchars($query_history_db[$query_no]) . '\'; document.querywindow.query_history_latest_db.value = \'' . htmlspecialchars($query_history_db[$query_no]) . '\'; document.querywindow.table.value = \'' . (isset($query_history_table[$query_no]) ? htmlspecialchars($query_history_table[$query_no]) : '') . '\'; document.querywindow.query_history_latest_table.value = \'' . (isset($query_history_table[$query_no]) ? htmlspecialchars($query_history_table[$query_no]) : '') . '\'; document.querywindow.submit(); return false;">' . $titles['Change'] . '</a>'
-                                   . '<a href="#" onClick="document.querywindow.querydisplay_tab.value = \'' . (isset($querydisplay_tab) && $querydisplay_tab != 'full' ? 'sql' : 'full') . '\'; document.querywindow.query_history_latest.value = \'' . htmlspecialchars($query_sql) . '\'; document.querywindow.auto_commit.value = \'true\'; document.querywindow.db.value = \'' . htmlspecialchars($query_history_db[$query_no]) . '\'; document.querywindow.query_history_latest_db.value = \'' . htmlspecialchars($query_history_db[$query_no]) . '\'; document.querywindow.table.value = \'' . (isset($query_history_table[$query_no]) ? htmlspecialchars($query_history_table[$query_no]) : '') . '\'; document.querywindow.query_history_latest_table.value = \'' . (isset($query_history_table[$query_no]) ? htmlspecialchars($query_history_table[$query_no]) : '') . '\'; document.querywindow.submit(); return false;">[' . htmlspecialchars($query_history_db[$query_no]) . '] ' . urldecode($query_sql) . '</a>'
+                                   . '<a href="#" onclick="document.querywindow.querydisplay_tab.value = \'' . (isset($querydisplay_tab) && $querydisplay_tab != 'full' ? 'sql' : 'full') . '\'; document.querywindow.query_history_latest.value = \'' . htmlspecialchars($query_sql) . '\'; document.querywindow.auto_commit.value = \'false\'; document.querywindow.db.value = \'' . htmlspecialchars($query_history_db[$query_no]) . '\'; document.querywindow.query_history_latest_db.value = \'' . htmlspecialchars($query_history_db[$query_no]) . '\'; document.querywindow.table.value = \'' . (isset($query_history_table[$query_no]) ? htmlspecialchars($query_history_table[$query_no]) : '') . '\'; document.querywindow.query_history_latest_table.value = \'' . (isset($query_history_table[$query_no]) ? htmlspecialchars($query_history_table[$query_no]) : '') . '\'; document.querywindow.submit(); return false;">' . $titles['Change'] . '</a>'
+                                   . '<a href="#" onclick="document.querywindow.querydisplay_tab.value = \'' . (isset($querydisplay_tab) && $querydisplay_tab != 'full' ? 'sql' : 'full') . '\'; document.querywindow.query_history_latest.value = \'' . htmlspecialchars($query_sql) . '\'; document.querywindow.auto_commit.value = \'true\'; document.querywindow.db.value = \'' . htmlspecialchars($query_history_db[$query_no]) . '\'; document.querywindow.query_history_latest_db.value = \'' . htmlspecialchars($query_history_db[$query_no]) . '\'; document.querywindow.table.value = \'' . (isset($query_history_table[$query_no]) ? htmlspecialchars($query_history_table[$query_no]) : '') . '\'; document.querywindow.query_history_latest_table.value = \'' . (isset($query_history_table[$query_no]) ? htmlspecialchars($query_history_table[$query_no]) : '') . '\'; document.querywindow.submit(); return false;">[' . htmlspecialchars($query_history_db[$query_no]) . '] ' . urldecode($query_sql) . '</a>'
                                    . '</li>' . "\n";
                     $dup_sql[$query_sql] = true;
                 } // end if check if this item exists
@@ -235,9 +225,7 @@ if ($cfg['QueryFrame'] && $cfg['QueryFrameJS']) {
 
     if (isset($sql_history) && isset($querydisplay_tab) && ($querydisplay_tab == 'history' || $querydisplay_tab == 'full') && is_array($sql_history) && count($sql_history) > 0) {
     ?>
-    <li>
-        <div style="margin-bottom: 10px"><?php echo $strQuerySQLHistory . ':<br><ul>' . implode('', $sql_history) . '</ul>'; ?></div>
-    </li>
+        <?php echo $strQuerySQLHistory . ':<br /><ul>' . implode('', $sql_history) . '</ul>'; ?>
     <?php
     }
 ?>
@@ -262,17 +250,6 @@ if ($cfg['QueryFrame'] && $cfg['QueryFrameJS']) {
 </form>
 <?php
 }
-
-/* REMOVE ME */
-if ($cfg['QueryFrame'] && $cfg['QueryFrameJS'] && $cfg['QueryFrameDebug']) {
-?>
-<br>
-<center>
-    <a href='#' onClick='return debug();'><?php echo $strQueryFrameDebug; ?></a>
-</center>
-<?php
-}
-/* REMOVE ME */
 ?>
 
 </body>
@@ -283,10 +260,10 @@ if ($cfg['QueryFrame'] && $cfg['QueryFrameJS'] && $cfg['QueryFrameDebug']) {
  * Close MySql connections
  */
 if (isset($dbh) && $dbh) {
-    @mysql_close($dbh);
+    PMA_DBI_close($dbh);
 }
 if (isset($userlink) && $userlink) {
-    @mysql_close($userlink);
+    PMA_DBI_close($userlink);
 }
 
 

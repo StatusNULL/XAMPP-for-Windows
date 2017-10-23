@@ -1,15 +1,18 @@
 <?php
-/* $Id: defines.lib.php,v 2.6.2.9 2004/06/30 18:47:05 lem9 Exp $ */
+/* $Id: defines.lib.php,v 2.23.2.1 2004/09/28 19:57:07 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
  * DEFINES VARIABLES & CONSTANTS
  * Overview:
  *    PMA_VERSION              (string) - phpMyAdmin version string
+ *    PMA_THEME_VERSION        (int)    - phpMyAdmin theme version integer
+ *    PMA_THEME_GENERATION     (int)    - phpMyAdmin theme generation integer
  *    PMA_PHP_INT_VERSION      (int)    - eg: 30017 instead of 3.0.17 or
  *                                        40006 instead of 4.0.6RC3
  *    PMA_IS_WINDOWS           (bool)   - mark if phpMyAdmin running on windows
- *                                        server
+ *    PMA_IS_IIS               (bool)   - true is phpMyAdmin is running
+ *                                        on Microsoft IIS server
  *    PMA_IS_GD2               (bool)   - true if GD2 is present
  *    PMA_USR_OS               (string) - the plateform (os) of the user
  *    PMA_USR_BROWSER_AGENT    (string) - the browser of the user
@@ -17,7 +20,15 @@
  */
 // phpMyAdmin release
 if (!defined('PMA_VERSION')) {
-    define('PMA_VERSION', '2.5.7-pl1');
+    define('PMA_VERSION', '2.6.0-pl1');
+}
+
+if (!defined('PMA_THEME_VERSION')) {
+    define('PMA_THEME_VERSION', 1);
+}
+
+if (!defined('PMA_THEME_GENERATION')) {
+    define('PMA_THEME_GENERATION', 1);
 }
 
 // php version
@@ -46,6 +57,16 @@ if (!defined('PMA_IS_WINDOWS')) {
         define('PMA_IS_WINDOWS', 1);
     } else {
         define('PMA_IS_WINDOWS', 0);
+    }
+}
+
+// Whether the Web server php is running on is IIS
+if (!defined('PMA_IS_IIS')) {
+    if (isset($_SERVER['SERVER_SOFTWARE'])
+    && stristr($_SERVER['SERVER_SOFTWARE'], 'Microsoft/IIS')) {
+        define('PMA_IS_IIS', 1);
+    } else {
+        define('PMA_IS_IIS', 0);
     }
 }
 

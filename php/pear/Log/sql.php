@@ -1,9 +1,9 @@
 <?php
 /**
- * $Header: /repository/pear/Log/Log/sql.php,v 1.29 2004/01/19 08:02:40 jon Exp $
+ * $Header: /repository/pear/Log/Log/sql.php,v 1.34 2004/08/19 06:35:57 jon Exp $
  * $Horde: horde/lib/Log/sql.php,v 1.12 2000/08/16 20:27:34 chuck Exp $
  *
- * @version $Revision: 1.29 $
+ * @version $Revision: 1.34 $
  * @package Log
  */
 
@@ -63,6 +63,21 @@ class Log_sql extends Log {
      */
     var $_table = 'log_table';
 
+    /**
+     * String holding the name of the ID sequence.
+     * @var string
+     * @access private
+     */
+    var $_sequence = 'log_id';
+
+    /**
+     * Maximum length of the $ident string.  This corresponds to the size of
+     * the 'ident' column in the SQL table.
+     * @var integer
+     * @access private
+     */
+    var $_identLimit = 16;
+
 
     /**
      * Constructs a new sql logging object.
@@ -78,8 +93,20 @@ class Log_sql extends Log {
     {
         $this->_id = md5(microtime());
         $this->_table = $name;
-        $this->_ident = $ident;
         $this->_mask = Log::UPTO($level);
+
+        /* If a specific sequence name was provided, use it. */
+        if (!empty($conf['sequence'])) {
+            $this->_sequence = $conf['sequence'];
+        }
+
+        /* If a specific sequence name was provided, use it. */
+        if (isset($conf['identLimit'])) {
+            $this->_identLimit = $conf['identLimit'];
+        }
+
+        /* Now that the ident limit is confirmed, set the ident string. */
+        $this->setIdent($ident);
 
         /* If an existing database connection was provided, use it. */
         if (isset($conf['db'])) {
@@ -130,6 +157,21 @@ class Log_sql extends Log {
     }
 
     /**
+     * Sets this Log instance's identification string.  Note that this
+     * SQL-specific implementation will limit the length of the $ident string
+     * to sixteen (16) characters.
+     *
+     * @param string    $ident      The new identification string.
+     *
+     * @access  public
+     * @since   Log 1.8.5
+     */
+    function setIdent($ident)
+    {
+        $this->_ident = substr($ident, 0, $this->_identLimit);
+    }
+
+    /**
      * Inserts $message to the currently open database.  Calls open(),
      * if necessary.  Also passes the message along to any Log_observer
      * instances that are observing this Log.
@@ -163,7 +205,7 @@ class Log_sql extends Log {
         $message = $this->_extractMessage($message);
 
         /* Build the SQL query for this log entry insertion. */
-        $id = $this->_db->nextId('log_id');
+        $id = $this->_db->nextId($this->_sequence);
         $q = sprintf('insert into %s (id, logtime, ident, priority, message)' .
                      'values(%d, CURRENT_TIMESTAMP, %s, %d, %s)',
                      $this->_table, $id, $this->_db->quote($this->_ident),

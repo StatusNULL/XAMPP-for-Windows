@@ -2,7 +2,7 @@
 /**
  * Example for HTML_QuickForm_Controller: registration wizard
  * 
- * $Id: regWizard.php,v 1.2 2003/10/02 12:49:38 avb Exp $
+ * $Id: regWizard.php,v 1.3 2004/04/10 09:57:07 avb Exp $
  * 
  * @author Bertrand Mansion <bmansion@mamasam.com>
  */
@@ -90,7 +90,7 @@ class Page_Account_Information extends HTML_QuickForm_Page
         $prevnext[] =& $this->createElement('submit',   $this->getButtonName('next'), 'Finish');
         $this->addGroup($prevnext, 'buttons', '', '&nbsp;', false);
         
-        $this->addRule('name', 'First and last names are required', 'required');
+        $this->addGroupRule('name', 'First and last names are required', 'required');
         $this->addRule('company', 'Company is required', 'required');
         $this->addRule('address1', 'Address is required', 'required');
         $this->addRule('city', 'City is required', 'required');

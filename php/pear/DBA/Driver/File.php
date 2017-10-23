@@ -1,7 +1,7 @@
 <?php
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 // +----------------------------------------------------------------------+
-// | Copyright (c) 2002 Brent Cook                                        |
+// | Copyright (c) 2002-2003 Brent Cook                                        |
 // +----------------------------------------------------------------------+
 // | This library is free software; you can redistribute it and/or        |
 // | modify it under the terms of the GNU Lesser General Public           |
@@ -18,7 +18,7 @@
 // | Foundation, Inc., 59 Temple Place, Suite 330,Boston,MA 02111-1307 USA|
 // +----------------------------------------------------------------------+
 //
-// $Id: File.php,v 1.10 2002/11/30 05:13:15 busterb Exp $
+// $Id: File.php,v 1.12 2003/01/27 04:31:42 busterb Exp $
 
 require_once 'DBA.php';
 
@@ -416,11 +416,29 @@ class DBA_Driver_File extends DBA
      */
     function nextkey()
     {
-        if ($this->isReadable() &&($this->size() > 0)
+        if ($this->isReadable() && ($this->size() > 0)
             && next($this->_usedBlocks)) {
             return key($this->_usedBlocks);
         } else {
             return false;
+        }
+    }
+    // }}}
+
+
+    // {{{ getkeys()
+    /**
+     * Returns all keys in the database
+     *
+     * @access  public
+     * @return  mixed  array
+     */
+    function getkeys()
+    {
+        if ($this->isReadable() && ($this->size() > 0)) {
+            return array_keys($this->_usedBlocks);
+        } else {
+            return array();
         }
     }
     // }}}

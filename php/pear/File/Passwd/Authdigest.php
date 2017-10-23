@@ -11,7 +11,7 @@
 // | Copyright (c) 2003-2004 Michael Wallner <mike@iworks.at>             |
 // +----------------------------------------------------------------------+
 //
-// $Id: Authdigest.php,v 1.9 2004/03/14 14:28:12 mike Exp $
+// $Id: Authdigest.php,v 1.10 2004/06/07 19:19:47 mike Exp $
 
 /**
 * Manipulate AuthDigestFiles as used for HTTP Digest Authentication.
@@ -53,7 +53,7 @@ require_once 'File/Passwd/Common.php';
 * 
 * @author   Michael Wallner <mike@php.net>
 * @package  File_Passwd
-* @version  $Revision: 1.9 $
+* @version  $Revision: 1.10 $
 * @access   public
 */
 class File_Passwd_Authdigest extends File_Passwd_Common
@@ -74,7 +74,7 @@ class File_Passwd_Authdigest extends File_Passwd_Common
     */
     function File_Passwd_Authdigest($file = '.htdigest')
     {
-        $this->__construct($file);
+        parent::__construct($file);
     }
 
     /**
@@ -333,5 +333,21 @@ class File_Passwd_Authdigest extends File_Passwd_Common
         $this->_contents = array();
         return true;
     }
+    
+    /**
+    * Generate Password
+    *
+    * @static
+    * @access   public
+    * @return   string  The crypted password.
+    * @param    string  $user The username.
+    * @param    string  $realm The realm the user is in.
+    * @param    string  $pass The plaintext password.
+    */
+    function generatePassword($user, $realm, $pass)
+    {
+        return md5("$user:$realm:$pass");
+    }
+    
 }
 ?>

@@ -1,5 +1,5 @@
 <?php
-// $Id: pager_test.php,v 1.4 2003/11/17 20:08:08 quipo Exp $
+// $Id: pager_test.php,v 1.5 2004/06/23 22:59:25 quipo Exp $
 
 require_once 'simple_include.php';
 require_once 'pager_include.php';
@@ -15,7 +15,7 @@ class TestOfPager extends UnitTestCase {
             'perPage' => 5,
 
         );
-        $this->pager = new Pager($options);
+        $this->pager = Pager::factory($options);
     }
     function tearDown() {
         unset($this->pager);
@@ -52,6 +52,64 @@ class TestOfPager extends UnitTestCase {
     }
     function testOffsetByPageId_outOfRange() {
         $this->assertEqual(array(0, 0), $this->pager->getOffsetByPageId(20));
+    }
+    function testGetPageData() {
+        $this->assertEqual(array(0=>1, 1=>2, 2=>3, 3=>4, 4=>5), $this->pager->getPageData());
+    }
+    function testGetPageData2() {
+        $this->assertEqual(array(5=>6, 6=>7, 7=>8, 8=>9, 9=>10), $this->pager->getPageData(2));
+    }
+    function testGetPageData_OutOfRange() {
+        $this->assertEqual(false, $this->pager->getPageData(3));
+    }
+    function testSelectBox() {
+        $selectBox  = '<select name="'.$this->pager->_sessionVar.'">';
+        $selectBox .= '<option value="5" selected="selected">5</option>';
+        $selectBox .= '<option value="10">10</option>';
+        $selectBox .= '<option value="15">15</option>';
+        $selectBox .= '</select>';
+        $this->assertEqual($selectBox, $this->pager->getPerPageSelectBox(5, 15, 5));
+    }
+    function testSelectBoxWithString() {
+        $selectBox  = '<select name="'.$this->pager->_sessionVar.'">';
+        $selectBox .= '<option value="5" selected="selected">5 bugs</option>';
+        $selectBox .= '<option value="10">10 bugs</option>';
+        $selectBox .= '<option value="15">15 bugs</option>';
+        $selectBox .= '</select>';
+        $this->assertEqual($selectBox, $this->pager->getPerPageSelectBox(5, 15, 5, false, '%d bugs'));
+    }
+    function testSelectBoxWithShowAll() {
+        $selectBox  = '<select name="'.$this->pager->_sessionVar.'">';
+        $selectBox .= '<option value="3">3</option>';
+        $selectBox .= '<option value="4">4</option>';
+        $selectBox .= '<option value="5" selected="selected">5</option>';
+        $selectBox .= '<option value="6">6</option>';
+        $selectBox .= '<option value="10">10</option>';
+        $selectBox .= '</select>';
+        $this->assertEqual($selectBox, $this->pager->getPerPageSelectBox(3, 6, 1, true));
+    }
+    function testSelectBoxWithShowAllAndText() {
+        $this->pager->_showAllText = 'Show All';
+        $selectBox  = '<select name="'.$this->pager->_sessionVar.'">';
+        $selectBox .= '<option value="3">3 bugs</option>';
+        $selectBox .= '<option value="4">4 bugs</option>';
+        $selectBox .= '<option value="5" selected="selected">5 bugs</option>';
+        $selectBox .= '<option value="6">6 bugs</option>';
+        $selectBox .= '<option value="10">Show All</option>';
+        $selectBox .= '</select>';
+        $this->assertEqual($selectBox, $this->pager->getPerPageSelectBox(3, 6, 1, true, '%d bugs'));
+    }
+    function testSelectBoxWithShowAllWithExtraAttribs() {
+        $this->pager->_showAllText = 'Show All';
+        $selectBox  = '<select name="'.$this->pager->_sessionVar.'" onmouseover="doSth">';
+        $selectBox .= '<option value="3">3 bugs</option>';
+        $selectBox .= '<option value="4">4 bugs</option>';
+        $selectBox .= '<option value="5" selected="selected">5 bugs</option>';
+        $selectBox .= '<option value="6">6 bugs</option>';
+        $selectBox .= '<option value="10">Show All</option>';
+        $selectBox .= '</select>';
+        $params = array('optionText' => '%d bugs', 'attributes' => 'onmouseover="doSth"');
+        $this->assertEqual($selectBox, $this->pager->getPerPageSelectBox(3, 6, 1, true, $params));
     }
 }
 ?>

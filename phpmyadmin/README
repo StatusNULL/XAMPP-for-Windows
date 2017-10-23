@@ -1,11 +1,11 @@
-$Id: README,v 2.3.2.10 2004/06/30 18:49:27 lem9 Exp $
+$Id: README,v 2.19.2.1 2004/09/28 19:58:02 lem9 Exp $
 
 phpMyAdmin - Readme
 ===================
 
-  A set of PHP-scripts to administrate MySQL over the WWW.
+  A set of PHP-scripts to manage MySQL over the web.
 
-  Version 2.5.7-pl1
+  Version 2.6.0-pl1
   -----------------
   http://www.phpmyadmin.net/
 
@@ -16,6 +16,7 @@ phpMyAdmin - Readme
                             Alexander M. Turek <me_at_derrabus.de>
                             Michal Cihar <michal_at_cihar.com>
                             Garvin Hicking <me_at_supergarv.de>
+                            Marcel Tschopp <ne0x_at_users.sourceforge.net>
                             [check Documentation.txt/.html file for more details]
 
     This program is free software; you can redistribute it and/or modify
@@ -34,12 +35,10 @@ phpMyAdmin - Readme
   Requirements:
     php 4.1.0 or later
     MySQL 3.23.32 or later
-        Note: The implemented support for MySQL 4.1.x and 5.0.x is experimental!
-              For more details, see Documentation.txt / .html
     a web-browser (doh!)
 
   Summary:
-    phpMyAdmin is intended to handle the adminstration of MySQL over the WWW.
+    phpMyAdmin is intended to handle the administration of MySQL over the WWW.
     Currently it can:
       - create and drop databases
       - create, copy, drop and alter tables

@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_search.php,v 2.2 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: db_search.php,v 2.9 2004/09/05 23:40:28 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 /**
  * Credits for this script goes to Thomas Chaumeny <chaume92 at aol.com>
@@ -20,14 +20,8 @@ $url_query .= '&amp;goto=db_search.php';
 /**
  * Get the list of tables from the current database
  */
-$list_tables  = PMA_mysql_list_tables($db);
-$num_tables   = ($list_tables ? mysql_num_rows($list_tables) : 0);
-for ($i = 0; $i < $num_tables; $i++) {
-    $tables[] = PMA_mysql_tablename($list_tables, $i);
-}
-if ($num_tables) {
-    mysql_free_result($list_tables);
-}
+$tables     = PMA_DBI_get_tables($db);
+$num_tables = count($tables);
 
 
 /**
@@ -63,17 +57,17 @@ if (isset($submit_search)) {
         $sqlstr_delete = 'DELETE';
 
         // Fields to select
-        $local_query           = 'SHOW FIELDS FROM ' . PMA_backquote($table) . ' FROM ' . PMA_backquote($GLOBALS['db']);
-        $res                   = @PMA_mysql_query($local_query) or PMA_mysqlDie('', $local_query, FALSE, $err_url);
-        $res_cnt               = ($res ? mysql_num_rows($res) : 0);
-        for ($i = 0; $i < $res_cnt; $i++) {
-            $tblfields[]       = PMA_backquote(PMA_mysql_result($res, $i, 'field'));
-        } // end if
-        $sqlstr_fieldstoselect = ' ' . implode(', ', $tblfields);
+        $res                  = PMA_DBI_query('SHOW ' . (PMA_MYSQL_INT_VERSION >= 40100 ? 'FULL ' : '') . 'FIELDS FROM ' . PMA_backquote($table) . ' FROM ' . PMA_backquote($GLOBALS['db']) . ';');
+        while ($current = PMA_DBI_fetch_assoc($res)) {
+            if (PMA_MYSQL_INT_VERSION >= 40100) {
+                list($current['Charset']) = explode('_', $current['Collation']);
+            }
+            $current['Field'] = PMA_backquote($current['Field']);
+            $tblfields[]      = $current;
+        } // while
+        PMA_DBI_free_result($res);
+        unset($current, $res);
         $tblfields_cnt         = count($tblfields);
-        if ($res) {
-            mysql_free_result($res);
-        }
 
         // Table to use
         $sqlstr_from = ' FROM ' . PMA_backquote($GLOBALS['db']) . '.' . PMA_backquote($table);
@@ -88,15 +82,23 @@ if (isset($submit_search)) {
         $automatic_wildcard   = (($search_option <3) ? '%' : '');
 
         for ($i = 0; $i < $search_wds_cnt; $i++) {
-            // Elimines empty values
+            // Eliminates empty values
             if (!empty($search_words[$i])) {
                 for ($j = 0; $j < $tblfields_cnt; $j++) {
-                    $thefieldlikevalue[] = $tblfields[$j]
-                                         . ' ' . $like_or_regex
-                                         . ' \''
+                    $prefix = PMA_MYSQL_INT_VERSION >= 40100 && $tblfields[$j]['Charset'] != 'NULL'
+                            ? 'CONVERT(_utf8 '
+                            : '';
+                    $suffix = PMA_MYSQL_INT_VERSION >= 40100 && $tblfields[$j]['Charset'] != 'NULL'
+                            ? ' USING ' . $tblfields[$j]['Charset'] . ')'
+                            : '';
+                    $thefieldlikevalue[] = $tblfields[$j]['Field']
+                                         . ' ' . $like_or_regex . ' '
+                                         . $prefix
+                                         . '\''
                                          . $automatic_wildcard
                                          . $search_words[$i]
-                                         . $automatic_wildcard . '\'';
+                                         . $automatic_wildcard . '\''
+                                         . $suffix;
                 } // end for
 
                 $fieldslikevalues[]      = ($search_wds_cnt > 1)
@@ -111,7 +113,7 @@ if (isset($submit_search)) {
         unset($fieldslikevalues);
 
         // Builds complete queries
-        $sql['select_fields'] = $sqlstr_select . $sqlstr_fieldstoselect . $sqlstr_from . $sqlstr_where;
+        $sql['select_fields'] = $sqlstr_select . ' * ' . $sqlstr_from . $sqlstr_where;
         $sql['select_count']  = $sqlstr_select . ' COUNT(*) AS count' . $sqlstr_from . $sqlstr_where;
         $sql['delete']        = $sqlstr_delete . $sqlstr_from . $sqlstr_where;
 
@@ -187,14 +189,10 @@ if (isset($submit_search)) {
             $newsearchsqls = PMA_getSearchSqls($onetable, $search_str, $search_option);
 
             // Executes the "COUNT" statement
-            $local_query   = $newsearchsqls['select_count'];
-            $res           = @PMA_mysql_query($local_query)  or PMA_mysqlDie('', $local_query, FALSE, $err_url);
-            if ($res) {
-                $res_cnt   = PMA_mysql_result($res, 0, 'count');
-                mysql_free_result($res);
-            } else {
-                $res_cnt   = 0;
-            } // end if... else ...
+            $res                     = PMA_DBI_query($newsearchsqls['select_count']);
+            $res_cnt                 = PMA_DBI_fetch_assoc($res);
+            $res_cnt                 = $res_cnt['count'];
+            PMA_DBI_free_result($res);
             $num_search_result_total = $res_cnt;
 
             echo '    <!-- Search results in table ' . $onetable . ' (' . $res_cnt . ') -->' . "\n"
@@ -226,14 +224,11 @@ if (isset($submit_search)) {
                 $newsearchsqls = PMA_getSearchSqls($table_select[$i], $search_str, $search_option);
 
                 // Executes the "COUNT" statement
-                $local_query   = $newsearchsqls['select_count'];
-                $res           = @PMA_mysql_query($local_query)  or PMA_mysqlDie('', $local_query, FALSE, $err_url);
-                if ($res) {
-                    $res_cnt   = PMA_mysql_result($res, 0, 'count');
-                    mysql_free_result($res);
-                } else {
-                    $res_cnt   = 0;
-                } // end if... else ...
+                $res           = PMA_DBI_query($newsearchsqls['select_count']);
+                $res_cnt       = PMA_DBI_fetch_assoc($res);
+                $res_cnt       = $res_cnt['count'];
+                PMA_DBI_free_result($res);
+                unset($res);
                 $num_search_result_total += $res_cnt;
 
                 echo '        <!-- Search results in table ' . $table_select[$i] . ' (' . $res_cnt . ') -->' . "\n"
@@ -279,31 +274,28 @@ if (empty($search_option)) {
 }
 ?>
 <!-- Display search form -->
-<p align="center">
-    <b><?php echo $strSearchFormTitle; ?></b>
-</p>
-
 <a name="db_search"></a>
 <form method="post" action="db_search.php" name="db_search">
     <?php echo PMA_generate_common_hidden_inputs($db); ?>
 
-    <table>
+    <table border="0" cellpadding="3" cellspacing="0">
     <tr>
-        <td>
-            <?php echo $strSearchNeedle; ?>&nbsp;
+        <th class="tblHeaders" align="center" colspan="2"><?php echo $strSearchFormTitle; ?></th>
+    </tr>
+    <tr><td colspan="2"></td></tr>
+    <tr>
+        <td bgcolor="<?php echo $cfg['BgcolorOne']; ?>">
+            <?php echo $strSearchNeedle; ?>&nbsp;<br />
         </td>
-        <td>
-            <input type="text" name="search_str" size="30" value="<?php echo $searched; ?>" />
+        <td bgcolor="<?php echo $cfg['BgcolorOne']; ?>">
+            <input type="text" name="search_str" size="60" value="<?php echo $searched; ?>" />
         </td>
     </tr>
-    <tr>
-        <td colspan="2">&nbsp;</td>
-    </tr>
-    <tr>
-        <td valign="top">
+    <tr><td colspan="2"></td></tr><tr>
+        <td align="right" valign="top" bgcolor="<?php echo $cfg['BgcolorOne']; ?>">
             <?php echo $strSearchType; ?>&nbsp;
         </td>
-        <td>
+        <td bgcolor="<?php echo $cfg['BgcolorOne']; ?>">
             <input type="radio" id="search_option_1" name="search_option" value="1"<?php if ($search_option == 1) echo ' checked="checked"'; ?> />
             <label for="search_option_1"><?php echo $strSearchOption1; ?></label>&nbsp;*<br />
             <input type="radio" id="search_option_2" name="search_option" value="2"<?php if ($search_option == 2) echo ' checked="checked"'; ?> />
@@ -311,20 +303,19 @@ if (empty($search_option)) {
             <input type="radio" id="search_option_3" name="search_option" value="3"<?php if ($search_option == 3) echo ' checked="checked"'; ?> />
             <label for="search_option_3"><?php echo $strSearchOption3; ?></label><br />
             <input type="radio" id="search_option_4" name="search_option" value="4"<?php if ($search_option == 4) echo ' checked="checked"'; ?> />
-            <label for="search_option_4"><?php echo $strSearchOption4 . '</label> ' . PMA_showMySQLDocu('Regexp', 'Regexp'); ?><br />
+            <label for="search_option_4"><?php echo $strSearchOption4; ?></label><?php echo PMA_showMySQLDocu('Regexp', 'Regexp'); ?><br />
             <br />
             *&nbsp;<?php echo $strSplitWordsWithSpace . "\n"; ?>
         </td>
     </tr>
+    <tr><td colspan="2"></td></tr>
     <tr>
-        <td colspan="2">&nbsp;</td>
-    </tr>
-    <tr>
-        <td valign="top">
+        <td align="right" valign="top" bgcolor="<?php echo $cfg['BgcolorOne']; ?>">
             <?php echo $strSearchInTables; ?>&nbsp;
         </td>
-        <td>
+        <td rowspan="2" bgcolor="<?php echo $cfg['BgcolorOne']; ?>">
 <?php
+$strDoSelectAll='&nbsp;';
 if ($num_tables > 1) {
     $i = 0;
 
@@ -346,12 +337,11 @@ if ($num_tables > 1) {
         $i++;
     } // end while
     echo '            </select>' . "\n";
-    ?>
-            <br />
-            <a href="db_search.php?<?php echo $url_query; ?>&amp;selectall=1#db_search" onclick="setSelectOptions('db_search', 'table_select[]', true); return false;"><?php echo $strSelectAll; ?></a>
-            &nbsp;/&nbsp;
-            <a href="db_search.php?<?php echo $url_query; ?>&amp;unselectall=1#db_search" onclick="setSelectOptions('db_search', 'table_select[]', false); return false;"><?php echo $strUnselectAll; ?></a>
-    <?php
+    $strDoSelectAll = '<a href="db_search.php?' . $url_query . '&amp;selectall=1#db_search"'
+                    . ' onclick="setSelectOptions(\'db_search\', \'table_select[]\', true); return false;">' . $strSelectAll . '</a>'
+                    . '&nbsp;/&nbsp;'
+                    . '<a href="db_search.php?' . $url_query . '&amp;unselectall=1#db_search"'
+                    . ' onclick="setSelectOptions(\'db_search\', \'table_select[]\', false); return false;">' . $strUnselectAll . '</a>';
 }
 else {
     echo "\n";
@@ -362,13 +352,10 @@ else {
 echo"\n";
 ?>
         </td>
-    </tr>
-
-    <tr>
-        <td colspan="2">&nbsp;</td>
-    </tr>
-    <tr>
-        <td colspan="2"><input type="submit" name="submit_search" value="<?php echo $strGo; ?>" /></td>
+    </tr><tr><td align="right" valign="bottom" bgcolor="<?php echo $cfg['BgcolorOne']; ?>"><?php echo $strDoSelectAll; ?></td></tr>
+    <tr><td colspan="2"></td>
+    </tr><tr>
+        <td colspan="2" align="right" class="tblHeaders"><input type="submit" name="submit_search" value="<?php echo $strGo; ?>" id="buttonGo" /></td>
     </tr>
     </table>
 </form>

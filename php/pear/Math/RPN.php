@@ -16,7 +16,7 @@
  *
  *
  * @author   Maciej Szczytowski <admin@e-rower.pl>
- * @version  1.0
+ * @version  1.1
  * @package  math
  * @access   public
  */
@@ -118,8 +118,8 @@ class Math_Rpn
         'E'  => array ('power of 10', 3, 1, '_E'),
         'abs'  => array ('absolute value', 3, 1, '_abs'),
         '!'    => array ('factorial', 3, 1, '_factorial'),
-        'pi'   => array ('value of pi', 3, 0, '_const_pi'),
-        'e'    => array ('value of e', 3, 0, '_const_e'),
+        'pi'   => array ('value of pi', 4, 0, '_const_pi'),
+        'e'    => array ('value of e', 4, 0, '_const_e'),
         'mod'    => array ('modulo', 3, 2, '_mod'),
         'div'    => array ('integer division', 3, 2, '_div'),
     );
@@ -351,6 +351,8 @@ class Math_Rpn
     function _stringToArray () {
         $temp_operator = null;
         $temp_value = null;
+
+        $this->_input = str_replace(" ","",$this->_input);
 
         for($i = 0; $i < strlen($this->_input); $i++) {
             if ($this->_input[$i] == ' ') {
@@ -935,11 +937,11 @@ class Math_Rpn
             $arg = $operator[2];
             $function = $operator[3];
 
-            if (($arg==2) && ((!is_numeric($temp[$pos-1])) || (!is_numeric($temp[$pos-2])))) {
+            if (($arg==2) && (!isset($temp[$pos-1]) || !is_numeric($temp[$pos-1]) || !isset($temp[$pos-2]) || !is_numeric($temp[$pos-2]))) {
                 $this->_error = $this->_raiseError('Syntax error');
                 $this->_value = null;
                 return $this->_value;
-            } elseif (($arg==1) && (!is_numeric($temp[$pos-1]))) {
+            } elseif (($arg==1) && (!isset($temp[$pos-1]) || !is_numeric($temp[$pos-1]))) {
                 $this->_error = $this->_raiseError('Syntax error');
                 $this->_value = null;
                 return $this->_value;

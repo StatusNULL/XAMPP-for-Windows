@@ -1,5 +1,5 @@
 <?php
-/* $Id: server_links.inc.php,v 2.2 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: server_links.inc.php,v 2.7 2004/08/12 15:13:19 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 // Check parameters
@@ -41,27 +41,40 @@ if (!empty($message)) {
 /**
  * Displays tab links
  */
-?>
-<table border="0" cellspacing="0" cellpadding="3" width="100%" class="tabs">
-    <tr>
-        <td width="8">&nbsp;</td>
-<?php
-echo PMA_printTab($strDatabases, 'server_databases.php', $url_query);
+if ($cfg['LightTabs']) {
+    echo '&nbsp;';
+} else {
+    echo '<table border="0" cellspacing="0" cellpadding="0" width="100%">' . "\n"
+       . '    <tr>' . "\n"
+       . '        <td class="nav" align="left" nowrap="nowrap" valign="bottom">'
+       . '            <table border="0" cellpadding="0" cellspacing="0"><tr>'
+       . '                <td nowrap="nowrap"><img src="' .$GLOBALS['pmaThemeImage'] . 'spacer.png'  .'" width="2" height="1" border="0" alt="" /></td>'
+       . '                <td class="navSpacer"><img src="' .$GLOBALS['pmaThemeImage'] . 'spacer.png'  . '" width="1" height="1" border="0" alt="" /></td>';
+}
+echo PMA_printTab(($GLOBALS['cfg']['MainPageIconic'] ? '<img src="' . $GLOBALS['pmaThemeImage'] . 's_db.png" width="16" height="16" border="0" hspace="2" align="middle" alt="'.$strDatabases.'" />' : '') . $strDatabases, 'server_databases.php', $url_query);
 if ($cfg['ShowMysqlInfo']) {
-    echo PMA_printTab($strStatus, 'server_status.php', $url_query);
+    echo PMA_printTab(($GLOBALS['cfg']['MainPageIconic'] ? '<img src="' . $GLOBALS['pmaThemeImage'] . 's_status.png" width="16" height="16" border="0" hspace="2" align="middle" alt="'.$strStatus.'" />' : '') . $strStatus, 'server_status.php', $url_query);
 }
 if ($cfg['ShowMysqlVars']) {
-    echo PMA_printTab($strServerTabVariables, 'server_variables.php', $url_query);
+    echo PMA_printTab(($GLOBALS['cfg']['MainPageIconic'] ? '<img src="' . $GLOBALS['pmaThemeImage'] . 's_vars.png" width="16" height="16" border="0" hspace="2" align="middle" alt="'.$strServerTabVariables.'" />' : '') . $strServerTabVariables, 'server_variables.php', $url_query);
 }
 if (PMA_MYSQL_INT_VERSION >= 40100) {
-    echo PMA_printTab($strCharsets, 'server_collations.php', $url_query);
+    echo PMA_printTab(($GLOBALS['cfg']['MainPageIconic'] ? '<img src="' . $GLOBALS['pmaThemeImage'] . 's_asci.png" width="16" height="16" border="0" hspace="2" align="middle" alt="'.$strCharsets.'" />' : '') . $strCharsets, 'server_collations.php', $url_query);
 }
 if ($is_superuser) {
-    echo PMA_printTab($strPrivileges, 'server_privileges.php', $url_query);
+    echo PMA_printTab(($GLOBALS['cfg']['MainPageIconic'] ? '<img src="' . $GLOBALS['pmaThemeImage'] . 's_rights.png" width="16" height="16" border="0" hspace="2" align="middle" alt="'.$strPrivileges.'" />' : '') . $strPrivileges, 'server_privileges.php', $url_query);
 }
-echo PMA_printTab($strServerTabProcesslist, 'server_processlist.php', $url_query);
-echo PMA_printTab($strExport, 'server_export.php', $url_query);
+echo PMA_printTab(($GLOBALS['cfg']['MainPageIconic'] ? '<img src="' . $GLOBALS['pmaThemeImage'] . 's_process.png" width="16" height="16" border="0" hspace="2" align="middle" alt="'.$strServerTabProcesslist.'" />' : '') . $strServerTabProcesslist, 'server_processlist.php', $url_query);
+echo PMA_printTab(($GLOBALS['cfg']['MainPageIconic'] ? '<img src="' . $GLOBALS['pmaThemeImage'] . 'b_export.png" width="16" height="16" border="0" hspace="2" align="middle" alt="'.$strExport.'" />' : '') . $strExport, 'server_export.php', $url_query);
+if (!$cfg['LightTabs']) {
+    echo '                <td nowrap="nowrap"><img src="' .$GLOBALS['pmaThemeImage'] . 'spacer.png'  . '" width="2" height="1" border="0" alt="" /></td>'
+       . '            </tr></table>' . "\n"
+       . '        </td>' . "\n"
+       . '    </tr>' . "\n"
+       . '</table>';
+} else {
+    echo '<br />';
+}
+
 ?>
-    </tr>
-</table>
 <br />

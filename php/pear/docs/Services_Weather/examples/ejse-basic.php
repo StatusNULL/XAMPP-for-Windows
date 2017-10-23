@@ -16,7 +16,7 @@
 // | Authors: Alexander Wirtz <alex@pc4p.net>                             |
 // +----------------------------------------------------------------------+
 //
-// $Id: ejse-basic.php,v 1.2 2004/01/06 14:14:24 eru Exp $
+// $Id: ejse-basic.php,v 1.3 2004/05/07 14:41:36 eru Exp $
 
 require_once "Services/Weather.php";
 
@@ -28,9 +28,9 @@ if (Services_Weather::isError($ejse)) {
 }
 
 /* Erase comments to enable caching
-$ejse->setCache("file", array("cache_dir" => "/tmp/cache/"));
-if (Services_Weather::isError($ejse)) {
-    echo "Error: ".$ejse->getMessage()."\n";
+$status = $ejse->setCache("file", array("cache_dir" => "/tmp/cache/"));
+if (Services_Weather::isError($status)) {
+    echo "Error: ".$status->getMessage()."\n";
 }
 */
 

@@ -16,7 +16,7 @@
 // | Authors:  Alan Knowles <alan@akbkhome.com>                           |
 // +----------------------------------------------------------------------+
 //
-// $Id: Cast.php,v 1.5 2003/10/22 00:53:43 alan_k Exp $
+// $Id: Cast.php,v 1.6 2004/06/05 02:32:34 alan_k Exp $
 //
 //  Prototype Castable Object.. for DataObject queries
 //
@@ -53,7 +53,7 @@
 *
 *
 *
-* @version    $Id: Cast.php,v 1.5 2003/10/22 00:53:43 alan_k Exp $
+* @version    $Id: Cast.php,v 1.6 2004/06/05 02:32:34 alan_k Exp $
 */ 
 class DB_DataObject_Cast {
         
@@ -101,7 +101,7 @@ class DB_DataObject_Cast {
   
     function blob($value) {
         $r = new DB_DataObject_Cast;
-        $r->type = __FUNCTION__;
+        $r->type = 'blob';
         $r->value = $value;
         return $r;
     }
@@ -121,7 +121,7 @@ class DB_DataObject_Cast {
   
     function string($value) {
         $r = new DB_DataObject_Cast;
-        $r->type = __FUNCTION__;
+        $r->type = 'string';
         $r->value = $value;
         return $r;
     }
@@ -139,7 +139,7 @@ class DB_DataObject_Cast {
   
     function sql($value) {
         $r = new DB_DataObject_Cast;
-        $r->type = __FUNCTION__;
+        $r->type = 'sql';
         $r->value = $value;
         return $r;
     }
@@ -202,7 +202,7 @@ class DB_DataObject_Cast {
             $bits = explode('-',date('Y-m-d',mktime(1,1,1,$bits[1],$bits[2],$bits[0])));
         }
         $r = new DB_DataObject_Cast;
-        $r->type = __FUNCTION__;
+        $r->type = 'date';
         list($r->year,$r->month,$r->day) = $bits;
         return $r;
     }
@@ -338,4 +338,3 @@ class DB_DataObject_Cast {
     
 }
 
-?>

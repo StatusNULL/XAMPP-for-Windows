@@ -17,7 +17,7 @@
 // | Maintainer: Daniel Convissor <danielc@php.net>                       |
 // +----------------------------------------------------------------------+
 //
-// $Id: fbsql.php,v 1.33 2004/03/05 01:46:53 danielc Exp $
+// $Id: fbsql.php,v 1.36 2004/06/24 15:24:56 danielc Exp $
 
 
 // XXX legend:
@@ -37,7 +37,7 @@ require_once 'DB/common.php';
  * extension.
  *
  * @package  DB
- * @version  $Id: fbsql.php,v 1.33 2004/03/05 01:46:53 danielc Exp $
+ * @version  $Id: fbsql.php,v 1.36 2004/06/24 15:24:56 danielc Exp $
  * @category Database
  * @author   Frank M. Kromann <frank@frontbase.com>
  */
@@ -191,7 +191,7 @@ class DB_fbsql extends DB_common
         if (is_object($numrows)) {
             return $numrows;
         }
-        $this->num_rows[$result] = $numrows;
+        $this->num_rows[(int)$result] = $numrows;
         return $result;
     }
 
@@ -409,7 +409,7 @@ class DB_fbsql extends DB_common
         $seqname = $this->getSequenceName($seq_name);
         $repeat = 0;
         do {
-            $result = $this->query("INSERT INTO ${seqname} VALUES(NULL)");
+            $result = $this->query("INSERT INTO ${seqname} (id) VALUES (NULL)");
             if ($ondemand && DB::isError($result) &&
                 $result->getCode() == DB_ERROR_NOSUCHTABLE) {
                 $repeat = 1;
@@ -571,7 +571,7 @@ class DB_fbsql extends DB_common
             /*
              * Probably received a result resource identifier.
              * Copy it.
-             * Depricated.  Here for compatibility only.
+             * Deprecated.  Here for compatibility only.
              */
             $id = $result;
             $got_string = false;

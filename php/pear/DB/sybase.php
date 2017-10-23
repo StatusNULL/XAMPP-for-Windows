@@ -18,7 +18,7 @@
 // | Maintainer: Daniel Convissor <danielc@php.net>                       |
 // +----------------------------------------------------------------------+
 //
-// $Id: sybase.php,v 1.50 2004/03/05 01:46:53 danielc Exp $
+// $Id: sybase.php,v 1.52 2004/07/12 19:07:34 danielc Exp $
 
 
 // TODO
@@ -33,7 +33,7 @@ require_once 'DB/common.php';
  * extension.
  *
  * @package  DB
- * @version  $Id: sybase.php,v 1.50 2004/03/05 01:46:53 danielc Exp $
+ * @version  $Id: sybase.php,v 1.52 2004/07/12 19:07:34 danielc Exp $
  * @category Database
  * @author   Sterling Hughes <sterling@php.net>
  * @author   Antônio Carlos Venâncio Júnior <floripa@php.net>
@@ -96,17 +96,15 @@ class DB_sybase extends DB_common
 
         $interface = $dsninfo['hostspec'] ? $dsninfo['hostspec'] : 'localhost';
         $connect_function = $persistent ? 'sybase_pconnect' : 'sybase_connect';
+        $dsninfo['password'] = !empty($dsninfo['password']) ? $dsninfo['password'] : false;
+        $dsninfo['charset'] = isset($dsninfo['charset']) ? $dsninfo['charset'] : false;
+        $dsninfo['appname'] = isset($dsninfo['appname']) ? $dsninfo['appname'] : false;
 
-        if ($interface && $dsninfo['username'] && $dsninfo['password']) {
+        if ($interface && $dsninfo['username']) {
             $conn = @$connect_function($interface, $dsninfo['username'],
-                                       $dsninfo['password']);
-        } elseif ($interface && $dsninfo['username']) {
-            /*
-             * Using false for pw as a workaround to avoid segfault.
-             * See PEAR bug 631
-             */
-            $conn = @$connect_function($interface, $dsninfo['username'],
-                                       false);
+                                       $dsninfo['password'],
+                                       $dsninfo['charset'],
+                                       $dsninfo['appname']);
         } else {
             $conn = false;
         }
@@ -646,7 +644,7 @@ class DB_sybase extends DB_common
             /*
              * Probably received a result resource identifier.
              * Copy it.
-             * Depricated.  Here for compatibility only.
+             * Deprecated.  Here for compatibility only.
              */
             $id = $result;
             $got_string = false;

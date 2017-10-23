@@ -1,9 +1,9 @@
 <?php
 /**
- * $Header: /repository/pear/Log/Log/composite.php,v 1.22 2004/01/19 08:02:40 jon Exp $
+ * $Header: /repository/pear/Log/Log/composite.php,v 1.23 2004/08/09 06:04:11 jon Exp $
  * $Horde: horde/lib/Log/composite.php,v 1.2 2000/06/28 21:36:13 jon Exp $
  *
- * @version $Revision: 1.22 $
+ * @version $Revision: 1.23 $
  * @package Log
  */
 
@@ -58,6 +58,7 @@ class Log_composite extends Log
             foreach ($this->_children as $id => $child) {
                 $this->_children[$id]->open();
             }
+            $this->_opened = true;
         }
     }
 
@@ -72,6 +73,7 @@ class Log_composite extends Log
             foreach ($this->_children as $id => $child) {
                 $this->_children[$id]->close();
             }
+            $this->_opened = false;
         }
     }
 

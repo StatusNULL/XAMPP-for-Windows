@@ -18,7 +18,7 @@
 // | Maintainer: Daniel Convissor <danielc@php.net>                       |
 // +----------------------------------------------------------------------+
 //
-// $Id: sqlite.php,v 1.62 2004/03/11 03:48:49 danielc Exp $
+// $Id: sqlite.php,v 1.66 2004/04/28 20:13:10 danielc Exp $
 
 require_once 'DB/common.php';
 
@@ -27,7 +27,7 @@ require_once 'DB/common.php';
  * PECL extension.
  *
  * @package  DB
- * @version  $Id: sqlite.php,v 1.62 2004/03/11 03:48:49 danielc Exp $
+ * @version  $Id: sqlite.php,v 1.66 2004/04/28 20:13:10 danielc Exp $
  * @category Database
  * @author   Urs Gehrig <urs@circle.ch>
  * @author   Mika Tuupola <tuupola@appelsiini.net>
@@ -468,9 +468,9 @@ class DB_sqlite extends DB_common
         do {
             $repeat = 0;
             $this->pushErrorHandling(PEAR_ERROR_RETURN);
-            $result = $this->query("INSERT INTO $seqname VALUES (NULL)");
+            $result = $this->query("INSERT INTO $seqname (id) VALUES (NULL)");
             $this->popErrorHandling();
-            if ($result == DB_OK) {
+            if ($result === DB_OK) {
                 $id = @sqlite_last_insert_rowid($this->connection);
                 if ($id != 0) {
                     return $id;
@@ -626,7 +626,7 @@ class DB_sqlite extends DB_common
     // }}}
     // {{{ modifyLimitQuery()
 
-    function modifyLimitQuery($query, $from, $count)
+    function modifyLimitQuery($query, $from, $count, $params = array())
     {
         $query = $query . " LIMIT $count OFFSET $from";
         return $query;

@@ -1,5 +1,5 @@
 <?php
-/* $Id: header.inc.php,v 2.2.4.1 2004/01/23 16:06:54 rabus Exp $ */
+/* $Id: header.inc.php,v 2.19 2004/07/05 14:01:49 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 if (empty($GLOBALS['is_header_sent'])) {
@@ -22,7 +22,7 @@ if (empty($GLOBALS['is_header_sent'])) {
 
     require_once('./libraries/header_http.inc.php');
     require_once('./libraries/header_meta_style.inc.php');
-
+    /* replaced 2004-05-05 by Michael Keck (mkkeck)
     $title     = '';
     if (isset($GLOBALS['db'])) {
         $title .= str_replace('\'', '\\\'', $GLOBALS['db']);
@@ -35,6 +35,24 @@ if (empty($GLOBALS['is_header_sent'])) {
                . sprintf($GLOBALS['strRunning'], (empty($GLOBALS['cfg']['Server']['verbose']) ? str_replace('\'', '\\\'', $GLOBALS['cfg']['Server']['host']) : str_replace('\'', '\\\'', $GLOBALS['cfg']['Server']['verbose'])));
     }
     $title     .= (empty($title) ? '' : ' - ') . 'phpMyAdmin ' . PMA_VERSION;
+    */
+    /* the new one
+     * 2004-05-05: replaced by Michael Keck (mkkeck)
+     */
+    $title     = '';
+    if ($cfg['ShowHttpHostTitle']) {
+        $title .= (empty($GLOBALS['cfg']['SetHttpHostTitle']) ? $_SERVER['HTTP_HOST'] : $GLOBALS['cfg']['SetHttpHostTitle']) . ' >> ';
+    }
+    if (!empty($GLOBALS['cfg']['Server']) && isset($GLOBALS['cfg']['Server']['host'])) {
+        $title.=str_replace('\'', '\\\'', $GLOBALS['cfg']['Server']['host']);
+    }
+    if (isset($GLOBALS['db'])) {
+        $title .= ' >> ' . str_replace('\'', '\\\'', $GLOBALS['db']);
+    }
+    if (isset($GLOBALS['table'])) {
+        $title .= (empty($title) ? '' : ' ') . ' >> ' . str_replace('\'', '\\\'', $GLOBALS['table']);
+    }
+    $title .= ' | phpMyAdmin ' . PMA_VERSION;
     ?>
     <script type="text/javascript" language="javascript">
     <!--
@@ -54,6 +72,7 @@ if (empty($GLOBALS['is_header_sent'])) {
     var errorMsg2   = '<?php echo str_replace('\'', '\\\'', $GLOBALS['strNotValidNumber']); ?>';
     var noDropDbMsg = '<?php echo((!$GLOBALS['cfg']['AllowUserDropDatabase']) ? str_replace('\'', '\\\'', $GLOBALS['strNoDropDatabases']) : ''); ?>';
     var confirmMsg  = '<?php echo(($GLOBALS['cfg']['Confirm']) ? str_replace('\'', '\\\'', $GLOBALS['strDoYouReally']) : ''); ?>';
+    var confirmMsgDropDB  = '<?php echo(($GLOBALS['cfg']['Confirm']) ? str_replace('\'', '\\\'', $GLOBALS['strDropDatabaseStrongWarning']) : ''); ?>';
     //-->
     </script>
     <script src="libraries/functions.js" type="text/javascript" language="javascript"></script>
@@ -122,12 +141,20 @@ if (empty($GLOBALS['is_header_sent'])) {
     ?>
     <body bgcolor="<?php echo $GLOBALS['cfg']['RightBgColor'] . '"' . $bkg_img; ?>>
     <?php
+    include('./config.header.inc.php');
+
     if (!defined('PMA_DISPLAY_HEADING')) {
         define('PMA_DISPLAY_HEADING', 1);
     }
+
+    /**
+     * Display heading if needed. Design can be set in css file.
+     */
+
     if (PMA_DISPLAY_HEADING) {
+        echo '<table border="0" cellpadding="0" cellspacing="0">' . "\n"
+           . '    <tr>' . "\n";
         $header_url_qry = '?' . PMA_generate_common_url();
-        echo '<h1>' . "\n";
         $server_info = (!empty($cfg['Server']['verbose'])
                         ? $cfg['Server']['verbose']
                         : $server_info = $cfg['Server']['host'] . (empty($cfg['Server']['port'])
@@ -135,20 +162,40 @@ if (empty($GLOBALS['is_header_sent'])) {
                                                                    : ':' . $cfg['Server']['port']
                                                                   )
                        );
-        if (isset($GLOBALS['db'])) {
-            echo '    ' . $GLOBALS['strDatabase'] . ' <i><a class="h1" href="' . $GLOBALS['cfg']['DefaultTabDatabase'] . $header_url_qry . '&amp;db=' . urlencode($GLOBALS['db']) . '">' . htmlspecialchars($GLOBALS['db']) . '</a></i>' . "\n";
-            if (!empty($GLOBALS['table'])) {
-                echo '    - ' . $GLOBALS['strTable'] . ' <i><a class="h1" href="' . $GLOBALS['cfg']['DefaultTabTable'] . $header_url_qry . '&amp;db=' . urlencode($GLOBALS['db']) . '&amp;table=' . urlencode($GLOBALS['table']) . '">' . htmlspecialchars($GLOBALS['table']) . '</a></i>' . "\n";
-            }
-            echo '    ' . sprintf($GLOBALS['strRunning'], '<i><a class="h1" href="' . $GLOBALS['cfg']['DefaultTabServer'] . $header_url_qry . '">' . htmlspecialchars($server_info) . '</a></i>');
-        } else {
-            echo '    ' . sprintf($GLOBALS['strServer'], '<i><a class="h1" href="' . $GLOBALS['cfg']['DefaultTabServer'] . $header_url_qry . '">' . htmlspecialchars($server_info) . '</a></i>');
+        echo '        '
+           . '<td class="serverinfo">' . $GLOBALS['strServer'] . ':&nbsp;'
+           . '<a href="' . $GLOBALS['cfg']['DefaultTabServer'] . '?' . PMA_generate_common_url() . '">';
+        if ($GLOBALS['cfg']['MainPageIconic']) {
+            echo '<img src="' . $GLOBALS['pmaThemeImage'] . 's_host.png" width="16" height="16" border="0" alt="' . htmlspecialchars($server_info) . '" />';
         }
-        echo "\n" . '</h1>' . "\n";
+        echo htmlspecialchars($server_info) . '</a>' . "\n"
+           . '</td>' . "\n\n";
+
+        if (!empty($GLOBALS['db'])) {
+            echo '        '
+               . '<td class="serverinfo"><div></div></td>' . "\n" . '            '
+               . '<td class="serverinfo">' . $GLOBALS['strDatabase'] . ':&nbsp;'
+               . '<a href="' . $GLOBALS['cfg']['DefaultTabDatabase'] . '?' . PMA_generate_common_url($GLOBALS['db']) . '">';
+            if ($GLOBALS['cfg']['MainPageIconic']) {
+                echo '<img src="' . $GLOBALS['pmaThemeImage'] . 's_db.png" width="16" height="16" border="0" alt="' . htmlspecialchars($GLOBALS['db']) . '" />';
+            }
+            echo htmlspecialchars($GLOBALS['db']) . '</a>' . "\n"
+               . '</td>' . "\n\n";
+
+            if (!empty($GLOBALS['table'])) {
+                echo '        '
+                   . '<td class="serverinfo"><div></div></td>' . "\n" . '            '
+                   . '<td class="serverinfo">' . $GLOBALS['strTable'] . ':&nbsp;'
+                   . '<a href="' . $GLOBALS['cfg']['DefaultTabTable'] . '?' . PMA_generate_common_url($GLOBALS['db'], $GLOBALS['table']) . '">';
+                if ($GLOBALS['cfg']['MainPageIconic']) {
+                    echo '<img src="' . $GLOBALS['pmaThemeImage'] . 's_tbl.png" width="16" height="16" border="0" alt="' . htmlspecialchars($GLOBALS['table']) . '" />';
+                }
+                echo htmlspecialchars($GLOBALS['table']) . '</a>' . "\n"
+                   . '</td>' . "\n\n";
+            }
+        }
+        echo '    </tr>' . "\n" . '</table>';
     }
-    echo "\n";
-
-
     /**
      * Sets a variable to remember headers have been sent
      */

@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_printview.php,v 2.2 2003/11/26 22:52:24 rabus Exp $ */
+/* $Id: tbl_printview.php,v 2.7 2004/08/21 11:51:37 lem9 Exp $ */
 
 
 /**
@@ -38,7 +38,7 @@ if (isset($table)) {
 /**
  * Selects the database
  */
-PMA_mysql_select_db($db);
+PMA_DBI_select_db($db);
 
 
 /**
@@ -54,7 +54,7 @@ $multi_tables     = (count($the_tables) > 1);
 
 if ($multi_tables) {
     $tbl_list     = '';
-    foreach($the_tables AS $key => $table) {
+    foreach ($the_tables AS $key => $table) {
         $tbl_list .= (empty($tbl_list) ? '' : ', ')
                   . PMA_backquote(urldecode($table));
     }
@@ -65,7 +65,7 @@ if ($multi_tables) {
 $tables_cnt = count($the_tables);
 $counter    = 0;
 
-foreach($the_tables AS $key => $table) {
+foreach ($the_tables AS $key => $table) {
     $table = urldecode($table);
     if ($counter + 1 >= $tables_cnt) {
         $breakstyle = '';
@@ -79,21 +79,17 @@ foreach($the_tables AS $key => $table) {
     /**
      * Gets table informations
      */
-    $local_query  = 'SHOW TABLE STATUS LIKE \'' . PMA_sqlAddslashes($table, TRUE) . '\'';
-    $result       = PMA_mysql_query($local_query) or PMA_mysqlDie('', $local_query, '', $err_url);
-    $showtable    = PMA_mysql_fetch_array($result);
+    $result       = PMA_DBI_query('SHOW TABLE STATUS LIKE \'' . PMA_sqlAddslashes($table, TRUE) . '\';');
+    $showtable    = PMA_DBI_fetch_assoc($result);
     $num_rows     = (isset($showtable['Rows']) ? $showtable['Rows'] : 0);
     $show_comment = (isset($showtable['Comment']) ? $showtable['Comment'] : '');
-    if ($result) {
-        mysql_free_result($result);
-    }
+    PMA_DBI_free_result($result);
 
 
     /**
      * Gets table keys and retains them
      */
-    $local_query  = 'SHOW KEYS FROM ' . PMA_backquote($table);
-    $result       = PMA_mysql_query($local_query) or PMA_mysqlDie('', $local_query, '', $err_url);
+    $result       = PMA_DBI_query('SHOW KEYS FROM ' . PMA_backquote($table) . ';');
     $primary      = '';
     $indexes      = array();
     $lastIndex    = '';
@@ -101,7 +97,7 @@ foreach($the_tables AS $key => $table) {
     $indexes_data = array();
     $pk_array     = array(); // will be use to emphasis prim. keys in the table
                              // view
-    while ($row = PMA_mysql_fetch_array($result)) {
+    while ($row = PMA_DBI_fetch_assoc($result)) {
         // Backups the list of primary keys
         if ($row['Key_name'] == 'PRIMARY') {
             $primary .= $row['Column_name'] . ', ';
@@ -128,16 +124,15 @@ foreach($the_tables AS $key => $table) {
 
     } // end while
     if ($result) {
-        mysql_free_result($result);
+        PMA_DBI_free_result($result);
     }
 
 
     /**
      * Gets fields properties
      */
-    $local_query = 'SHOW FIELDS FROM ' . PMA_backquote($table);
-    $result      = PMA_mysql_query($local_query) or PMA_mysqlDie('', $local_query, '', $err_url);
-    $fields_cnt  = mysql_num_rows($result);
+    $result      = PMA_DBI_query('SHOW FIELDS FROM ' . PMA_backquote($table) . ';', NULL, PMA_DBI_QUERY_STORE);
+    $fields_cnt  = PMA_DBI_num_rows($result);
 
     // Check if we can use Relations (Mike Beck)
     if (!empty($cfgRelation['relation'])) {
@@ -193,7 +188,7 @@ foreach($the_tables AS $key => $table) {
 
     <?php
     $i = 0;
-    while ($row = PMA_mysql_fetch_array($result)) {
+    while ($row = PMA_DBI_fetch_assoc($result)) {
         $bgcolor = ($i % 2) ?$cfg['BgcolorOne'] : $cfg['BgcolorTwo'];
         $i++;
 
@@ -286,7 +281,7 @@ foreach($the_tables AS $key => $table) {
 </tr>
         <?php
     } // end while
-    mysql_free_result($result);
+    PMA_DBI_free_result($result);
 
     echo "\n";
     ?>
@@ -316,7 +311,7 @@ foreach($the_tables AS $key => $table) {
     </tr>
         <?php
         echo "\n";
-        foreach($indexes AS $index_no => $index_name) {
+        foreach ($indexes AS $index_no => $index_name) {
             $cell_bgd = (($index_no % 2) ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']);
             $index_td = '        <td class="print" rowspan="' . count($indexes_info[$index_name]['Sequences']) . '">' . "\n";
             echo '    <tr>' . "\n";
@@ -341,7 +336,7 @@ foreach($the_tables AS $key => $table) {
                  . '            ' . (isset($indexes_info[$index_name]['Cardinality']) ? $indexes_info[$index_name]['Cardinality'] : $strNone) . "\n"
                  . '        </td>' . "\n";
 
-            foreach($indexes_info[$index_name]['Sequences'] AS $row_no => $seq_index) {
+            foreach ($indexes_info[$index_name]['Sequences'] AS $row_no => $seq_index) {
                 if ($row_no > 0) {
                     echo '    <tr>' . "\n";
                 }

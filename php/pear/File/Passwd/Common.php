@@ -11,7 +11,7 @@
 // | Copyright (c) 2003-2004 Michael Wallner <mike@iworks.at>             |
 // +----------------------------------------------------------------------+
 //
-// $Id: Common.php,v 1.11 2004/03/14 14:28:12 mike Exp $
+// $Id: Common.php,v 1.12 2004/06/07 19:19:47 mike Exp $
 
 /**
 * Baseclass for File_Passwd_* classes.
@@ -44,7 +44,7 @@ require_once 'File/Passwd.php';
 * 
 * @author   Michael Wallner <mike@php.net>
 * @package  File_Passwd
-* @version  $Revision: 1.11 $
+* @version  $Revision: 1.12 $
 * @access   protected
 * @internal extend this class for your File_Passwd_* class
 */
@@ -219,7 +219,7 @@ class File_Passwd_Common
             return $fh;
         }
         $this->_contents = array();
-        while ($line = fgets($fh)){
+        while ($line = fgets($fh)) {
             $line = trim(preg_replace('/^(\S*.*)#.*$/', '\\1', $line));
             if (empty($line)) {
                 continue;
@@ -364,7 +364,7 @@ class File_Passwd_Common
         if (PEAR::isError($fh)) {
             return $fh;
         }
-        while($line = fgets($fh)){
+        while ($line = fgets($fh)) {
         	if (strstr($line, $id)) {
         	    File_Passwd_Common::_close($fh);
                 return trim($line);

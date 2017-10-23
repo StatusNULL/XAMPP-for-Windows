@@ -17,7 +17,7 @@
 // | Maintainer: Daniel Convissor <danielc@php.net>                       |
 // +----------------------------------------------------------------------+
 //
-// $Id: mssql.php,v 1.53 2004/03/05 01:46:53 danielc Exp $
+// $Id: mssql.php,v 1.55 2004/08/20 17:10:53 danielc Exp $
 
 require_once 'DB/common.php';
 
@@ -26,7 +26,7 @@ require_once 'DB/common.php';
  * extension.
  *
  * @package  DB
- * @version  $Id: mssql.php,v 1.53 2004/03/05 01:46:53 danielc Exp $
+ * @version  $Id: mssql.php,v 1.55 2004/08/20 17:10:53 danielc Exp $
  * @category Database
  * @author   Sterling Hughes <sterling@php.net>
  */
@@ -83,7 +83,7 @@ class DB_mssql extends DB_common
         }
         $this->dsn = $dsninfo;
         $dbhost = $dsninfo['hostspec'] ? $dsninfo['hostspec'] : 'localhost';
-        $dbhost .= $dsninfo['port'] ? ':' . $dsninfo['port'] : '';
+        $dbhost .= $dsninfo['port'] ? ',' . $dsninfo['port'] : '';
 
         $connect_function = $persistent ? 'mssql_pconnect' : 'mssql_connect';
 
@@ -534,7 +534,7 @@ class DB_mssql extends DB_common
             /*
              * Probably received a result resource identifier.
              * Copy it.
-             * Depricated.  Here for compatibility only.
+             * Deprecated.  Here for compatibility only.
              */
             $id = $result;
             $got_string = false;

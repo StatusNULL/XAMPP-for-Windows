@@ -18,7 +18,7 @@
 // | Maintainer: Daniel Convissor <danielc@php.net>                       |
 // +----------------------------------------------------------------------+
 //
-// $Id: common.php,v 1.96 2004/03/11 03:48:49 danielc Exp $
+// $Id: common.php,v 1.103 2004/06/24 15:24:56 danielc Exp $
 
 require_once 'PEAR.php';
 
@@ -27,7 +27,7 @@ require_once 'PEAR.php';
  * inherited by all such
  *
  * @package  DB
- * @version  $Id: common.php,v 1.96 2004/03/11 03:48:49 danielc Exp $
+ * @version  $Id: common.php,v 1.103 2004/06/24 15:24:56 danielc Exp $
  * @category Database
  * @author   Stig Bakken <ssb@php.net>
  * @author   Tomas V.V.Cox <cox@idecnet.com>
@@ -981,6 +981,7 @@ class DB_common extends PEAR
      */
     function executeEmulateQuery($stmt, $data = array())
     {
+        $stmt = (int)$stmt;
         if (!is_array($data)) {
             $data = array($data);
         }
@@ -1057,6 +1058,7 @@ class DB_common extends PEAR
      */
     function freePrepared($stmt)
     {
+        $stmt = (int)$stmt;
         // Free the internal prepared vars
         if (isset($this->prepare_tokens[$stmt])) {
             unset($this->prepare_tokens[$stmt]);
@@ -1101,7 +1103,7 @@ class DB_common extends PEAR
      *
      * @access private
      */
-    function modifyLimitQuery($query, $from, $count)
+    function modifyLimitQuery($query, $from, $count, $params = array())
     {
         return $query;
     }
@@ -1160,7 +1162,11 @@ class DB_common extends PEAR
      * @param string  $query query
      * @param integer $from  the row to start to fetching
      * @param integer $count the numbers of rows to fetch
-     * @param array   $params required for a statement
+     * @param mixed   $params array, string or numeric data to be used in
+     *                       execution of the statement.  Quantity of items
+     *                       passed must match quantity of placeholders in
+     *                       query:  meaning 1 placeholder for non-array
+     *                       parameters or 1 placeholder per array element.
      *
      * @return mixed a DB_Result object, DB_OK or a DB_Error
      *
@@ -1168,7 +1174,7 @@ class DB_common extends PEAR
      */
     function &limitQuery($query, $from, $count, $params = array())
     {
-        $query = $this->modifyLimitQuery($query, $from, $count);
+        $query = $this->modifyLimitQuery($query, $from, $count, $params);
         if (DB::isError($query)){
             return $query;
         }
@@ -1338,10 +1344,18 @@ class DB_common extends PEAR
         }
 
         $fetchmode = is_int($col) ? DB_FETCHMODE_ORDERED : DB_FETCHMODE_ASSOC;
-        $ret = array();
 
-        while (is_array($row = $res->fetchRow($fetchmode))) {
-            $ret[] = $row[$col];
+        if (!is_array($row = $res->fetchRow($fetchmode))) {
+            $ret = array();
+        } else {
+            if (!array_key_exists($col, $row)) {
+                $ret =& $this->raiseError(DB_ERROR_NOSUCHFIELD);
+            } else {
+                $ret = array($row[$col]);
+                while (is_array($row = $res->fetchRow($fetchmode))) {
+                    $ret[] = $row[$col];
+                }
+            }
         }
 
         $res->free();
@@ -1428,6 +1442,7 @@ class DB_common extends PEAR
      *                        passed must match quantity of placeholders in
      *                        query:  meaning 1 placeholder for non-array
      *                        parameters or 1 placeholder per array element.
+     * @param int     $fetchmode  the fetch mode to use
      * @param boolean $group  if true, the values of the returned array
      *                        is wrapped in another array.  If the same
      *                        key value (in the first column) repeats
@@ -1581,7 +1596,7 @@ class DB_common extends PEAR
             $res =& $this->query($query);
         }
 
-        if (DB::isError($res) || $res == DB_OK) {
+        if (DB::isError($res) || $res === DB_OK) {
             return $res;
         }
 

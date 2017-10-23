@@ -1,9 +1,12 @@
 --TEST--
 DB_driver::transaction test
+--INI--
+error_reporting = 2047
 --SKIPIF--
 <?php chdir(dirname(__FILE__)); require_once './skipif.inc'; ?>
 --FILE--
 <?php
+$needinnodb = true;
 require_once './mktable.inc';
 require_once '../transactions.inc';
 ?>

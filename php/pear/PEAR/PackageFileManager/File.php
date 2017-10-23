@@ -16,7 +16,7 @@
 // | Web           http://www.phpdoc.org                                    |
 // | Mirror        http://phpdocu.sourceforge.net/                          |
 // +------------------------------------------------------------------------+
-// $Id: File.php,v 1.17 2004/02/07 06:33:31 cellog Exp $
+// $Id: File.php,v 1.18 2004/04/27 04:53:53 cellog Exp $
 //
 /**
  * Retrieve the files from a directory listing
@@ -152,7 +152,7 @@ class PEAR_PackageFileManager_File {
         if (@is_dir($directory)) {
             $ret = array();
             $d = @dir($directory); // thanks to Jason E Sweat (jsweat@users.sourceforge.net) for fix
-            while($d && $entry=$d->read()) {
+            while($d && false !== ($entry=$d->read())) {
                 if ($this->_testFile($directory, $entry)) {
                     if (is_file($directory . '/' . $entry)) {
                         // if include option was set, then only pass included files
