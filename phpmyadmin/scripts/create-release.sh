@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: create-release.sh,v 2.18.2.2 2006/03/16 22:44:05 nijel Exp $
+# $Id: create-release.sh,v 2.23 2006/05/12 16:22:27 lem9 Exp $
 #
 # 2005-09-13, lem9@users.sourceforge.net
 # - no longer create a config.default.php from config.inc.php
@@ -67,7 +67,7 @@
 # - added release todo list
 #
 
-cvsserver=${cvsserver:-cvs}
+cvsserver=${cvsserver:-phpmyadmin.cvs}
 
 if [ $# = 0 ]
 then
@@ -252,8 +252,8 @@ Todo now:
         phpmyadmin-news@lists.sourceforge.net
         phpmyadmin-users@lists.sourceforge.net
 
-     Don't forget to update the Description section in the announcement,
-     based on Documentation.html.
+    Don't forget to update the Description section in the announcement,
+    based on Documentation.html.
 
  8. increment rc count or version in CVS :
         - in libraries/Config.class.php PMA_Config::__constructor() the line
@@ -266,7 +266,9 @@ Todo now:
  9. add a group for bug tracking this new version, at
     https://sourceforge.net/tracker/admin/index.php?group_id=23067&atid=377408&add_group=1
 
-10. the end :-)
+10. Visit http://phpmyadmin.net/home_page/version.php then copy the results to /home/groups/p/ph/phpmyadmin/htdocs/latest.txt. This is needed for users of the pre-2.8.0 scripts/upgrade.pl.
+
+11. the end :-)
 
 END
 

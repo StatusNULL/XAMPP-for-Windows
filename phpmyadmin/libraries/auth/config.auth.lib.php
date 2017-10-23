@@ -1,5 +1,5 @@
 <?php
-/* $Id: config.auth.lib.php,v 2.18.8.1 2006/08/11 16:41:26 lem9 Exp $ */
+/* $Id: config.auth.lib.php,v 2.20.2.1 2006/08/12 15:29:54 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 // +--------------------------------------------------------------------------+
@@ -123,13 +123,27 @@ function PMA_auth_fails()
         // 2003 is the error given by mysql
             echo '<p>' . $GLOBALS['strAccessDeniedExplanation'] . '</p>' . "\n";
         }
-        PMA_mysqlDie($conn_error, '');
+        PMA_mysqlDie($conn_error, '', true, '', false);
+    }
+    if ( ! empty( $GLOBALS['PMA_errors'] ) && is_array( $GLOBALS['PMA_errors'] ) ) {
+        foreach ( $GLOBALS['PMA_errors'] as $error ) {
+            echo '<div class="error">' . $error . '</div>' . "\n";
+        }
     }
 ?>
         </td>
     </tr>
-</table>
 <?php
+    if (count($GLOBALS['cfg']['Servers']) > 1) {
+        // offer a chance to login to other servers if the current one failed
+        require_once('./libraries/select_server.lib.php');
+        echo '<tr>' . "\n";
+        echo ' <td>' . "\n";
+        PMA_select_server(TRUE, TRUE);
+        echo ' </td>' . "\n";
+        echo '</tr>' . "\n";
+    }
+    echo '</table>' . "\n";
     require_once('./libraries/footer.inc.php');
     return TRUE;
 } // end of the 'PMA_auth_fails()' function

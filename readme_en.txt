@@ -1,4 +1,4 @@
-  ApacheFriends XAMPP (basic package) version 1.5.4
+  ApacheFriends XAMPP (basic package) version 1.5.4a
 
   + Apache 2.2.3
   + MySQL 5.0.24a
@@ -7,8 +7,8 @@
   + XAMPP Control Version 2.3 from www.nat32.com	
   + XAMPP Security 1.0	
   + SQLite 2.8.15
-  + OpenSSL 0.9.8c
-  + phpMyAdmin 2.8.2.4
+  + OpenSSL 0.9.8d
+  + phpMyAdmin  2.9.0.1
   + ADOdb 4.91
   + Mercury Mail Transport System v4.01b
   + FileZilla FTP Server 0.9.18

@@ -1,3 +1,9 @@
+30 Sept. 2006 XAMPP  1.5.4a
+
+- UPDATE OpenSSL 0.9.8d
+- UPDATE phpMyAdmin 2.9.0.1
+- Modify navi.php (pt)
+
 09 Sept. 2006 XAMPP  1.5.4 Release
 
 - UPDATE MySQL 5.0.24a

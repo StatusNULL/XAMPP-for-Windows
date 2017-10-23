@@ -74,24 +74,25 @@
 			</tr>
 			<tr valign="top">
 				<td align="right" class="navi">
-					<a target="_parent" class="n" href="lang.php?de"><?php echo $TEXT['navi-german']; ?></a><br>
-					<a target="_parent" class="n" href="lang.php?en"><?php echo $TEXT['navi-english']; ?></a><br>
-					<a target="_parent" class="n" href="lang.php?es"><?php echo $TEXT['navi-spanish']; ?></a><br>
-					<a target="_parent" class="n" href="lang.php?fr"><?php echo $TEXT['navi-french']; ?></a><br>
-					<a target="_parent" class="n" href="lang.php?it"><?php echo $TEXT['navi-italian']; ?></a><br>
-					<a target="_parent" class="n" href="lang.php?nl"><?php echo $TEXT['navi-dutch']; ?></a><br>
-					<a target="_parent" class="n" href="lang.php?no"><?php echo $TEXT['navi-norwegian']; ?></a><br>
-					<a target="_parent" class="n" href="lang.php?pl"><?php echo $TEXT['navi-polish']; ?></a><br>
-					<a target="_parent" class="n" href="lang.php?pt"><?php echo $TEXT['navi-portuguese']; ?></a><br>
-					<a target="_parent" class="n" href="lang.php?sl"><?php echo $TEXT['navi-slovenian']; ?></a><br>
-					<a target="_parent" class="n" href="lang.php?zh"><?php echo $TEXT['navi-chinese']; ?></a><p>
+<a target=_parent class=n href="lang.php?en"><?=$TEXT['navi-english']?></a><br>
+<a target=_parent class=n href="lang.php?de"><?=$TEXT['navi-german']?></a><br>
+<a target=_parent class=n href="lang.php?fr"><?=$TEXT['navi-french']?></a><br>
+<a target=_parent class=n href="lang.php?nl"><?=$TEXT['navi-dutch']?></a><br>
+<a target=_parent class=n href="lang.php?pl"><?=$TEXT['navi-polish']?></a><br>
+<a target=_parent class=n href="lang.php?es"><?=$TEXT['navi-spanish']?></a><br>
+<a target=_parent class=n href="lang.php?zh"><?=$TEXT['navi-chinese']?></a><br>
+<a target=_parent class=n href="lang.php?it"><?=$TEXT['navi-italian']?></a><br>
+<a target=_parent class=n href="lang.php?no"><?=$TEXT['navi-norwegian']?></a><br>
+<a target=_parent class=n href="lang.php?pt_br"><?=$TEXT['navi-ptbrazil']?></a><p>
 
-					<p class="navi">&copy;2002-2006<br>
-					<?php if ($lang == "de") { ?>
-						<a target="_new" href="http://www.apachefriends.org/index.html"><img border="0" src="img/apachefriends.gif" alt=""></a><p>
-					<?php } else { ?>
-						<a target="_new" href="http://www.apachefriends.org/index-en.html"><img border="0" src="img/apachefriends.gif" alt=""></a><p>
-					<?php }	?>
+					
+&nbsp;
+<p class=navi>&copy;2002-2006<br>
+<? if(file_get_contents("lang.tmp")=="de") { ?>
+<a target=content href="http://www.apachefriends.org/de/"><img border=0 src="img/apachefriends.gif"></a><p>
+<? } else { ?>
+<a target=content href="http://www.apachefriends.org/en/"><img border=0 src="img/apachefriends.gif"></a><p>
+<? } ?>
 				</td>
 			</tr>
 		</table>

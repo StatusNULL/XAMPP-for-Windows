@@ -13,19 +13,18 @@
 	<body class="white" bgcolor="#ffffff">
 		<center>
 			<img src="img/blank.gif" alt="" height="180" width="1"><br>
-			<img src="img/xampp-logo.jpg" alt="">
+		<img src="img/xampp-logo.jpg" alt="">
 			<p>
-			<a href="/xampp/lang.php?de">Deutsch</a> /
-			<a href="/xampp/lang.php?en">English</a> /
-			<a href="/xampp/lang.php?es">Spanish</a> /
-			<a href="/xampp/lang.php?fr">Francais</a> /
-			<a href="/xampp/lang.php?it">Italiano</a> /
-			<a href="/xampp/lang.php?nl">Nederlands</a> /
-			<a href="/xampp/lang.php?no">Norsk</a> /
-			<a href="/xampp/lang.php?pl">Polish</a> /
-			<a href="/xampp/lang.php?pt">Portuguese</a> /
-			<a href="/xampp/lang.php?sl">Slovenian</a> /
-			<a href="/xampp/lang.php?zh">Chinese</a>
+			<a href="/xampp/lang.php?en">English</a> / 
+<a href="/xampp/lang.php?de">Deutsch</a> /
+<a href="/xampp/lang.php?fr">Francais</a> /
+<a href="/xampp/lang.php?nl">Nederlands</a> /
+<a href="/xampp/lang.php?pl">Polski</a> /
+<a href="/xampp/lang.php?es">Español</a> /
+<a href="/xampp/lang.php?zh">&#20013;&#25991;</a> /
+<a href="/xampp/lang.php?it">Italiano</a> /
+<a href="/xampp/lang.php?no">Norsk</a> /
+<a href="/xampp/lang.php?pt_br">Português (Brasil)</a> 
 		</center>
 	</body>
 </html>
