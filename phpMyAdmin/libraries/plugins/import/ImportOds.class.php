@@ -15,7 +15,8 @@ if (! defined('PHPMYADMIN')) {
 /**
  * We need way to disable external XML entities processing.
  */
-if (!function_exists('libxml_disable_entity_loader')) {
+if (! function_exists('libxml_disable_entity_loader')) {
+    $GLOBALS['skip_import'] = true;
     return;
 }
 
@@ -179,7 +180,7 @@ class ImportOds extends ImportPlugin
             if (empty($root)) {
                 $sheets = array();
                 $message = PMA_Message::error(
-                    __('Could not parse OpenDocument Spreasheet!')
+                    __('Could not parse OpenDocument Spreadsheet!')
                 );
                 $error = true;
             } else {

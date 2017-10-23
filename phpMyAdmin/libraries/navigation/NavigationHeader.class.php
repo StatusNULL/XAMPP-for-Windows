@@ -41,6 +41,7 @@ class PMA_NavigationHeader
         $buffer .= '<div id="pma_navigation_resizer"></div>';
         $buffer .= '<div id="pma_navigation_collapser"></div>';
         $buffer .= '<div id="pma_navigation_content">';
+        $buffer .= '<div id="pma_navigation_header">';
         $buffer .= sprintf(
             '<a class="hide navigation_url" href="navigation.php%s"></a>',
             $link_url
@@ -54,6 +55,7 @@ class PMA_NavigationHeader
             __('Loading'),
             array('style' => 'visibility: hidden;', 'class' => 'throbber')
         );
+        $buffer .= '</div>'; // pma_navigation_header
         $buffer .= '<div id="pma_navigation_tree"' . $class . '>';
         return $buffer;
     }
@@ -79,9 +81,14 @@ class PMA_NavigationHeader
             }
             $retval .= '<div id="pmalogo">';
             if ($GLOBALS['cfg']['NavigationLogoLink']) {
-                $retval .= '    <a href="' . htmlspecialchars(
-                    $GLOBALS['cfg']['NavigationLogoLink']
-                );
+                $logo_link = trim(htmlspecialchars($GLOBALS['cfg']['NavigationLogoLink']));
+                // prevent XSS, see PMASA-2013-9
+                // if link has protocol, allow only http and https
+                if (preg_match('/^[a-z]+:/i', $logo_link)
+                    && ! preg_match('/^https?:/i', $logo_link)) {
+                    $logo_link = 'index.php';
+                }
+                $retval .= '    <a href="' . $logo_link;
                 switch ($GLOBALS['cfg']['NavigationLogoLinkWindow']) {
                 case 'new':
                     $retval .= '" target="_blank"';
@@ -166,9 +173,9 @@ class PMA_NavigationHeader
      */
     private function _links()
     {
-        $iconicNav = $GLOBALS['cfg']['NavigationBarIconic'];
-        $showIcon = $iconicNav === true || $iconicNav === 'both';
-        $showText = $iconicNav === false || $iconicNav === 'both';
+        // always iconic
+        $showIcon = true;
+        $showText = false;
 
         $retval  = '<!-- LINKS START -->';
         $retval .= '<div id="leftframelinks">';

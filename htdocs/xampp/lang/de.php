@@ -239,7 +239,7 @@
 
 	$TEXT['cds-text1'] = "Eine sehr einfach CD-Verwaltung. Da man Eintäge nicht mehr verbessern kann, wenn man sich mal vertippt hat, empfiehlt sich phpMyAdmin (unten links in der Navigation).";
 
-	$TEXT['cds-text2'] = "<b>Neu seit 0.9.6:</b> Ausgabe der eingestellten CDs als <a href='$_SERVER[PHP_SELF]?action=getpdf'>PDF-Dokument</a>.";
+	$TEXT['cds-text2'] = "<b>Neu seit 0.9.6:</b> Ausgabe der eingestellten CDs als <a href='cds.php?action=getpdf'>PDF-Dokument</a>.";
 
 	$TEXT['cds-error'] = "Kann die Datenbank nicht erreichen!<br>Läuft MySQL oder wurde das Passwort geändert?";
 	$TEXT['cds-head1'] = "Meine CDs";

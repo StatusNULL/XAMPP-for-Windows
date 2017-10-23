@@ -213,7 +213,7 @@
 
 	$TEXT['cds-text1'] = "Bardzo prosty skrypt CD.";
 
-	$TEXT['cds-text2'] = "Lista CD wygenerowana jako <a href='$_SERVER[PHP_SELF]?action=getpdf'>dokument PDF</a>.";
+	$TEXT['cds-text2'] = "Lista CD wygenerowana jako <a href='cds.php?action=getpdf'>dokument PDF</a>.";
 
 	$TEXT['cds-error'] = "Brak po&#322;&#261;czenia z baz&#261; danych!<br>Sprawd&#378; czy MySQL jest uruchomiony, oraz czy has&#322;o nie zosta&#322;o zmienione.";
 	$TEXT['cds-head1'] = "M&oacute;j katalog p&#322;yt CD";

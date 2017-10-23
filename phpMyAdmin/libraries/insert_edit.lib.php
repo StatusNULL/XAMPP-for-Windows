@@ -1483,7 +1483,7 @@ function PMA_getSubmitTypeDropDown($where_clause, $tabindex, $tabindex_for_value
  */
 function PMA_getAfterInsertDropDown($where_clause, $after_insert, $found_unique_key)
 {
-    $html_output = '<select name="after_insert">'
+    $html_output = '<select name="after_insert" class="control_at_footer">'
         . '<option value="back" '
         . ($after_insert == 'back' ? 'selected="selected"' : '') . '>'
         . __('Go back to previous page') . '</option>'
@@ -1737,7 +1737,6 @@ function PMA_getParamsForUpdateOrInsert()
         $is_insert  = $_REQUEST['submit_type'] == 'insert'
                       || $_REQUEST['submit_type'] == 'showinsert'
                       || $_REQUEST['submit_type'] == 'insertignore';
-        $is_insertignore  = $_REQUEST['submit_type'] == 'insertignore';
     } else {
         // new row => use indexes
         $loop_array = array();
@@ -1746,8 +1745,8 @@ function PMA_getParamsForUpdateOrInsert()
         }
         $using_key  = false;
         $is_insert  = true;
-        $is_insertignore = false;
     }
+    $is_insertignore  = $_REQUEST['submit_type'] == 'insertignore';
     return array($loop_array, $using_key, $is_insert, $is_insertignore);
 }
 

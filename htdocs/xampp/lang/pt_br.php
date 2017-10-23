@@ -243,7 +243,7 @@
 
 	$TEXT['cds-text1'] = "Um programa muito simples para coletânea de CD's.";
 
-	$TEXT['cds-text2'] = "Lista de CD's como um <a href='$_SERVER[PHP_SELF]?action=getpdf'>Arquivo PDF</a>.";
+	$TEXT['cds-text2'] = "Lista de CD's como um <a href='cds.php?action=getpdf'>Arquivo PDF</a>.";
 
 	$TEXT['cds-error'] = "Não foi possível conectar ao banco de dados!<br>O servidor MySQL está rodando ou você alterou a senha?";
 	$TEXT['cds-head1'] = "Meus CD's";

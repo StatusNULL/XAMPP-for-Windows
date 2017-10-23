@@ -1,6 +1,96 @@
 phpMyAdmin - ChangeLog
 ======================
 
+4.0.9.0 (2013-11-04)
+- bug #4104 Can't edit updatable view when searching
+- bug #4108 Missing refresh by deleting databases
+- bug #3995 Drizzle server charset notice
+- bug #3911 Filtering database names includes empty groupings
+- bug #3678 Does not display or manipulate bit(64) fields appropriately
+- bug #4129 Unneeded navi panel refresh
+- bug #4120 SSL redirects to port 80
+- bug #4144 DROP DATABASE displays wrong database name
+- bug #4059 Running delete query asks for confirmation but says it was already executed
+- bug #4147 Accessibility: Images without Alt nor title attribute 
+
+4.0.8.0 (2013-10-06)
+- bug #3988 Rename view is not working
+- bug #4041 Interaction between linkified fields and grid editing
+- bug #3975 Table grouping isn't implemented properly
+- bug #4060 Browser tries to remember wrong password when creating new user
+- bug #4002 Edit Index on big table doesn't show "Loading" or any message
+- bug #4098 Default table tab is ignored
+- bug #4099 Server/library difference warning: setting is ignored
+- bug #4100 table tree group strategy
+- bug #4102 ALTER TABLE ORDER BY and InnoDB
+- bug #4103 Tracking report: cannot delete a statement
+- bug #3996 Drizzle navigation doesn't expand
+- bug #4074 GIS column editor: point not displayed
+- bug #4109 Drizzle tables in navigation are shown as views
+- bug #4095 NUL symbols added to the end of database dump file
+- bug #4105 More disappears in table Structure
+- bug #3992 Multi-row edit doesn't clear values when checking NULL
+
+4.0.7.0 (2013-09-23)
+- bug #3993 Sorting in database overview with statistics doesn't work
+- bug Handle the situation where PHP_SELF is not set
+- bug #4080 Overwrite existing file not obeyed
+- bug #3929 Database-specific privileges are not copied when cloning user
+- bug #3997 Error handling in case MySQL extension is missing
+- bug #4089 Moving Columns will alter column definition
+- bug #4091 Insert ignore option does not work
+- bug #4090 Downloading BLOB downloads page template
+- bug #4092 Clicking on table name in view of information_schema redirects to wrong page
+- bug #4079 Copy Table Add AUTO_INCREMENT value checkbox not working
+- bug #4088 MySQL server version at index.php incorrect w/ controlhost
+- bug #4001 Import error: Class 'ImportOds' not found
+- bug #3986 Missing DROP VIEW button
+
+4.0.6.0 (2013-09-05)
+- bug #4036 Call to undefined function mb_detect_encoding (clarify the doc)
+- bug Missing hints when changing a column's structure
+- bug #4048 Cannot select foreign value in Search
+- bug #4025 gzip export is not actually compressed with mod_deflate
+- bug #4054 query analysis doesn't launch in status monitor
++ Add pmahomme icon credits (FamFamFam silk icon set)
+- bug #4064 Table structure statistics "Space usage" caption too small for l10n
+- bug #4051 Wrong tabindex when inserting rows
+- bug #4066 varchar field not truncated in table browse mode
++ rfe #1435 Opening database should expand it in the navigation menu
+- (performance) Removed ShowTooltip directive
+- bug #4046 Exporting huge Tables causes memory-Problems
+
+4.0.5.0 (2013-08-04)
+- bug #3977 Not detected configuration storage
+- bug #3970 Pressing enter in the filter field reloads page
+- bug #3984 Cannot insert in this table (PHP < 5.4)
+- bug #3989 Reloading privileges does not update the interface
+- bug #3960 NavigationBarIconic config not honored
+- bug #3985 Call to undefined function mb_detect_encoding
+- bug #4007 Analyze option not shown for InnoDB tables
+- bug #4015 Forcing a storage engine for configuration storage
+- bug Incorrect Drizzle 7 detection
+- bug #4019 Create database if not exists (export): add an option to the
+  interface to enable generating CREATE DATABASE and USE (false by default)
+- bug #4012 Crash on CSV file import
+- bug #4009 Statistic Monitor shows only last 3 digits in graph
+- bug #3998 Non-permanent SQL history not working
+- bug #3578 Transformations for text/plain on a BLOB column
+- [security] Improved protection against cross framing, see PMASA-2013-10
++ Reinstated configuration directive: AllowThirdPartyFraming
+
+4.0.4.2 (2013-07-28)
+- [security] fix unescaped parameter, see PMASA-2013-8
+- [security] Fix stored XSS in Server status monitor, see PMASA-2013-9
+- [security] Fix stored XSS in navigation panel logo link, see PMASA-2013-9
+- [security] Fix self-XSS in setup, trusted proxies validation, see PMASA-2013-9
+- [security] Fix full path disclosure, see PMASA-2013-12
+- [security] Fix control user SQL injection in pmd_pdf.php, see PMASA-2013-15
+- [security] Fix control user SQL injection in schema_export.php, see PMASA-2013-15
+- [security] Fix self-XSS in schema export, see PMASA-2013-14
+- [security] Fix unencoded json object, see PMASA-2013-11
+- [security] Fix stored XSS in link transformation plugin, see PMASA-2013-13
+
 4.0.4.1 (2013-06-30)
 - [security] Global variables scope injection vulnerability (see PMASA-2013-7)
 
@@ -9,7 +99,6 @@ phpMyAdmin - ChangeLog
 - bug #3961 Avoid Suhosin warning when in simulation mode
 - bug #3897 Row Statistics and Space usage bugs
 - bug #3966 Only display "table has no unique column" message when applicable
-- bug #3960 NavigationBarIconic config not honored
 - bug #3965 Default language wrong with zh-TW
 - bug #3921 Call to undefined function PMA_isSuperuser() if default server is
 not set 
@@ -187,6 +276,20 @@ underscore
 - [security] Global variables overwrite in export.php, reported by Janek Vind
   (see PMASA-2013-5)
 - bug #3892 [export] SQL Export files are empty
+
+3.5.8.2 (2013-07-28)
+- [security] Fix self-XSS in "Showing rows", see PMASA-2013-8
+- [security] Fix self-XSS in Display chart, see PMASA-2013-9
+- [security] Fix stored XSS in Server status monitor, see PMASA-2013-9
+- [security] Fix stored XSS in navigation panel logo link, see PMASA-2013-9
+- [security] Fix self-XSS in setup, trusted proxies validation, see PMASA-2013-9
++ [security] JSON content type header for version_check.php, see PMASA-2013-9
++ [security] Backport fix for jQuery issue #9521 from jQuery 1.6.3, see PMASA-2013-9
++ [security] Fix full path disclosure, see PMASA-2013-12
++ [security] Fix control user SQL injection in pmd_pdf.php, see PMASA-2013-15
++ [security] Fix control user SQL injection in schema_export.php, see PMASA-2013-15
+- [security] Fix self-XSS in schema export, see PMASA-2013-14
+- [security] Fix unencoded json object, see PMASA-2013-11
 
 3.5.8.1 (2013-04-24)
 - [security] Remote code execution (preg_replace), reported by Janek Vind

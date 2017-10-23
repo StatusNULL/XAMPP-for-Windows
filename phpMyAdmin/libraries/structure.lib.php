@@ -1131,6 +1131,8 @@ function PMA_getValuesForAriaTable($db_is_information_schema, $current_table,
  */
 function PMA_getValuesForPbmsTable($current_table, $is_show_stats, $sum_size)
 {
+    $formatted_size = $unit = '';
+
     if (($current_table['ENGINE'] == 'InnoDB'
         && $current_table['TABLE_ROWS'] < $GLOBALS['cfg']['MaxExactCount'])
         || !isset($current_table['TABLE_ROWS'])
@@ -1191,7 +1193,11 @@ function PMA_getHtmlForTableStructureHeader(
         if (PMA_DRIZZLE) {
             $colspan -= 2;
         }
-        if ($GLOBALS['cfg']['PropertiesIconic']) {
+        if (in_array(
+            $GLOBALS['cfg']['ActionLinksMode'],
+            array('icons', 'both')
+            )
+        ) {
             $colspan--;
         }
         $html_output .= '<th colspan="' . $colspan . '" '
@@ -1546,7 +1552,11 @@ function PMA_getHtmlForAddColumn($columns_list)
         $GLOBALS['db'],
         $GLOBALS['table']
     );
-    if ($GLOBALS['cfg']['PropertiesIconic']) {
+    if (in_array(
+        $GLOBALS['cfg']['ActionLinksMode'],
+        array('icons', 'both')
+        )
+    ) {
         $html_output .=PMA_Util::getImage(
             'b_insrow.png',
             __('Add column')
@@ -2450,7 +2460,9 @@ function PMA_moveColumns($db, $table)
             unset($data['Extra']);
         }
         $current_timestamp = false;
-        if ($data['Type'] == 'timestamp' && $data['Default'] == 'CURRENT_TIMESTAMP') {
+        if (($data['Type'] == 'timestamp' || $data['Type'] == 'datetime')
+            && $data['Default'] == 'CURRENT_TIMESTAMP'
+        ) {
             $current_timestamp = true;
         }
         $default_type
@@ -2458,7 +2470,7 @@ function PMA_moveColumns($db, $table)
                 ? 'NULL'
                 : ($current_timestamp
                     ? 'CURRENT_TIMESTAMP'
-                    : ($data['Default'] == ''
+                    : ($data['Default'] === null
                         ? 'NONE'
                         : 'USER_DEFINED'));
 

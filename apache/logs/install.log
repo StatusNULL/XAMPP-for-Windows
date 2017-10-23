@@ -1,10 +1,10 @@
 Installing Apache HTTP Server 2.x with
- DomainName =    example.com
- ServerName =    www.example.com
- ServerAdmin =   admin@example.com
- ServerPort =    80
+ DomainName    = example.com
+ ServerName    = www.example.com
+ ServerAdmin   = admin@example.com
+ ServerPort    = 80
  ServerSslPort = 443
- ServerRoot =    c:/Apache24
+ ServerRoot    = c:/Apache24
 Rewrote docs/conf/extra/httpd-autoindex.conf.in
  to c:/Apache24/conf/original/extra/httpd-autoindex.conf
 Rewrote docs/conf/extra/httpd-default.conf.in

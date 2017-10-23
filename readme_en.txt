@@ -6,7 +6,7 @@ libraries are installed on your system.
 
   + Apache 2.4.4
   + MySQL 5.5.32 (Community Server)
-  + PHP 5.4.19 (VC9 X86 32bit thread safe) + PEAR 
+  + PHP 5.4.22 (VC9 X86 32bit thread safe) + PEAR 
   + phpMyAdmin 4.0.4
   + OpenSSL 0.9.8y
   + ADOdb 5.18

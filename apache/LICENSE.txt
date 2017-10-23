@@ -544,6 +544,7 @@ CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 ====================================================================
 
 For the pcre.dll component:
@@ -574,7 +575,7 @@ Email domain:     cam.ac.uk
 University of Cambridge Computing Service,
 Cambridge, England.
 
-Copyright (c) 1997-2012 University of Cambridge
+Copyright (c) 1997-2013 University of Cambridge
 All rights reserved.
 
 
@@ -585,7 +586,7 @@ Written by:       Zoltan Herczeg
 Email local part: hzmester
 Emain domain:     freemail.hu
 
-Copyright(c) 2010-2012 Zoltan Herczeg
+Copyright(c) 2010-2013 Zoltan Herczeg
 All rights reserved.
 
 
@@ -596,7 +597,7 @@ Written by:       Zoltan Herczeg
 Email local part: hzmester
 Emain domain:     freemail.hu
 
-Copyright(c) 2009-2012 Zoltan Herczeg
+Copyright(c) 2009-2013 Zoltan Herczeg
 All rights reserved.
 
 
@@ -773,7 +774,7 @@ For the libeay32.dll, ssleay32.dll and openssl.exe components:
 
 For the mod_deflate zlib compression component:
 
- (C) 1995-2012 Jean-loup Gailly and Mark Adler
+ (C) 1995-2013 Jean-loup Gailly and Mark Adler
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages

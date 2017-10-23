@@ -29,15 +29,35 @@ class Node_Table extends Node
     public function __construct($name, $type = Node::OBJECT, $is_group = false)
     {
         parent::__construct($name, $type, $is_group);
-        $this->icon  = PMA_Util::getImage('b_browse.png');
+        switch ($GLOBALS['cfg']['NavigationTreeDefaultTabTable']) {
+        case 'tbl_structure.php':
+            $title = __('Structure');
+            break;
+        case 'tbl_sql.php':
+            $title = __('SQL');
+            break;
+        case 'tbl_select.php':
+            $title = __('Search');
+            break;
+        case 'tbl_change.php':
+            $title = __('Insert');
+            break;
+        case 'sql.php':
+            $title = __('Browse');
+            break;
+        }
+
+        $this->icon  = PMA_Util::getImage('b_browse.png', $title);
         $this->links = array(
-            'text' => 'sql.php?server=' . $GLOBALS['server']
+            'text' => $GLOBALS['cfg']['DefaultTabTable']
+                    . '?server=' . $GLOBALS['server']
                     . '&amp;db=%2$s&amp;table=%1$s'
                     . '&amp;pos=0&amp;token=' . $GLOBALS['token'],
             'icon' => $GLOBALS['cfg']['NavigationTreeDefaultTabTable']
                     . '?server=' . $GLOBALS['server']
                     . '&amp;db=%2$s&amp;table=%1$s&amp;token=' . $GLOBALS['token']
         );
+        $this->classes = 'table';
     }
 
     /**
@@ -194,33 +214,6 @@ class Node_Table extends Node
             break;
         default:
             break;
-        }
-        return $retval;
-    }
-
-    /**
-     * Returns the comment associated with node
-     * This method should be overridden by specific type of nodes
-     *
-     * @return string
-     */
-    public function getComment()
-    {
-        $db    = $this->realParent()->real_name;
-        $table = PMA_Util::sqlAddSlashes($this->real_name);
-        if (! $GLOBALS['cfg']['Servers'][$GLOBALS['server']]['DisableIS']) {
-            $db     = PMA_Util::sqlAddSlashes($db);
-            $query  = "SELECT `TABLE_COMMENT` ";
-            $query .= "FROM `INFORMATION_SCHEMA`.`TABLES` ";
-            $query .= "WHERE `TABLE_SCHEMA`='$db' ";
-            $query .= "AND `TABLE_NAME`='$table' ";
-            $retval = PMA_DBI_fetch_value($query);
-        } else {
-            $db     = PMA_Util::backquote($db);
-            $query  = "SHOW TABLE STATUS FROM $db ";
-            $query .= "WHERE Name = '$table'";
-            $arr = PMA_DBI_fetch_assoc(PMA_DBI_try_query($query));
-            $retval = $arr['Comment'];
         }
         return $retval;
     }

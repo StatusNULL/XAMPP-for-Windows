@@ -243,7 +243,7 @@
 
 	$TEXT['cds-text1'] = "シンプルなCDプログラム";
 
-	$TEXT['cds-text2'] = "CDリスト<a href='$_SERVER[PHP_SELF]?action=getpdf'>PDF ドキュメント</a>.";
+	$TEXT['cds-text2'] = "CDリスト<a href='cds.php?action=getpdf'>PDF ドキュメント</a>.";
 
 	$TEXT['cds-error'] = "データベースを接続できません！<br>MySQLは稼動していますか？またはパスワードを変えませんでしたか？";
 	$TEXT['cds-head1'] = "My CDs";

@@ -1,7 +1,7 @@
 This snapshot was automatically generated on
-Wed, 21 Aug 2013 01:04:55 +0000
+Wed, 13 Nov 2013 21:36:04 +0000
 
-Version: 5.4.19
+Version: 5.4.22
 Branch: HEAD
 Build: C:\php-sdk\php54dev\vc9\x86\obj\Release_TS
 

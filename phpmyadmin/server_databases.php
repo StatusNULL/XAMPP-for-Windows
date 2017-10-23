@@ -184,7 +184,6 @@ if ($databases_count > 0) {
     );
 
     $_url_params['pos'] = $pos;
-    $_url_params['drop_selected_dbs'] = 1;
 
     echo '<form class="ajax" action="server_databases.php" ';
     echo 'method="post" name="dbStatsForm" id="dbStatsForm">' . "\n";
@@ -233,8 +232,9 @@ if ($databases_count > 0) {
     }
 
     if ($is_superuser && ! PMA_DRIZZLE) {
-        echo '    <th>' . ($cfg['PropertiesIconic'] ? '' : __('Action')) . "\n"
-           . '    </th>' . "\n";
+        echo '    <th>' 
+            . ($cfg['ActionLinksMode'] == 'icons' ? '' : __('Action')) . "\n"
+            . '    </th>' . "\n";
     }
     echo '</tr>' . "\n"
        . '</thead>' . "\n"

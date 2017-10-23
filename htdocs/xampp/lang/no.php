@@ -238,7 +238,7 @@
 
 	$TEXT['cds-text1'] = "Et veldig enkelt cd program.";
 
-	$TEXT['cds-text2'] = "CD listen er <a href='$_SERVER[PHP_SELF]?action=getpdf'>PDF dokument</a>.";
+	$TEXT['cds-text2'] = "CD listen er <a href='cds.php?action=getpdf'>PDF dokument</a>.";
 
 	$TEXT['cds-error'] = "Kunne ikke koble til databse!<br>Er MySQL opprativ eller har du endret passord?";
 	$TEXT['cds-head1'] = "Mine CDer";

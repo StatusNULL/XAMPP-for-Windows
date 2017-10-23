@@ -816,6 +816,7 @@ div#tablestatistics table {
     margin-top: 0.5em;
     margin-bottom: 0.5em;
     margin-<?php echo $right; ?>: 0.5em;
+    min-width: 16em;
 }
 /* END table stats */
 
@@ -1402,7 +1403,7 @@ div.upload_progress_bar_outer
 
 div.upload_progress_bar_inner
 {
-    background-color: <?php echo $GLOBALS['cfg']['NaviBackground']; ?>;
+    background-color: <?php echo $GLOBALS['cfg']['NaviPointerBackground']; ?>;
     width: 0;
     height: 12px;
     margin: 1px;

@@ -576,13 +576,25 @@ class PMA_NavigationTree
                     $groups[$key]->separator = $node->separator;
                     $groups[$key]->separator_depth = $node->separator_depth - 1;
                     $groups[$key]->icon = '';
-                    if ($GLOBALS['cfg']['NavigationBarIconic']) {
+                    if (in_array(
+                        $GLOBALS['cfg']['TableNavigationLinksMode'],
+                        array('icons', 'both')
+                        )
+                    ) {
                         $groups[$key]->icon = PMA_Util::getImage(
                             'b_group.png'
                         );
                     }
                     $groups[$key]->pos2 = $node->pos2;
                     $groups[$key]->pos3 = $node->pos3;
+                    if ($node instanceof Node_Table_Container) {
+                        $tblGroup = '&amp;tbl_group='
+                            . urlencode($key . $node->separator);
+                        $groups[$key]->links = array(
+                            'text' => $node->links['text'] . $tblGroup,
+                            'icon' => $node->links['icon'] . $tblGroup
+                        );
+                    }
                     $node->addChild($groups[$key]);
                     foreach ($separators as $separator) {
                         // FIXME: this could be more efficient
@@ -590,7 +602,8 @@ class PMA_NavigationTree
                             $name_substring = substr(
                                 $child->name, 0, strlen($key) + strlen($separator)
                             );
-                            if ($name_substring == $key . $separator
+                            if (($name_substring == $key . $separator
+                                || $child->name == $key)
                                 && $child->type == Node::OBJECT
                             ) {
                                 $class = get_class($child);
@@ -635,7 +648,7 @@ class PMA_NavigationTree
         $retval  = $this->_fastFilterHtml($this->_tree);
         $retval .= $this->_getPageSelector($this->_tree);
         $this->groupTree();
-        $retval .= "<div><ul>";
+        $retval .= "<div id='pma_navigation_tree_content'><ul>";
         $children = $this->_tree->children;
         usort($children, array('PMA_NavigationTree', 'sortNode'));
         $this->_setVisibility();
@@ -814,7 +827,7 @@ class PMA_NavigationTree
                 if (strpos($class, 'last') === false) {
                     $retval .= "<b></b>";
                 }
-                $icon  = PMA_Util::getImage('b_plus.png');
+                $icon  = PMA_Util::getImage('b_plus.png', __('Expand/Collapse'));
                 $match = 1;
                 foreach ($this->_aPath as $path) {
                     $match = 1;
@@ -899,7 +912,11 @@ class PMA_NavigationTree
             if ($node->type == Node::CONTAINER) {
                 $retval .= "<i>";
             }
-            if ($GLOBALS['cfg']['NavigationBarIconic']) {
+            if (in_array(
+                $GLOBALS['cfg']['TableNavigationLinksMode'],
+                array('icons', 'both')
+                )
+            ) {
                 $retval .= "<div class='block'>";
                 if (isset($node->links['icon'])) {
                     $args = array();
@@ -924,17 +941,7 @@ class PMA_NavigationTree
                     $retval .= htmlspecialchars($node->name);
                     $retval .= "</a>";
                 } else {
-                    if ($GLOBALS['cfg']['ShowTooltip']) {
-                        $title = $node->getComment();
-                        if ($title) {
-                            $title = ' title="'
-                                . htmlentities($title, ENT_QUOTES, 'UTF-8') 
-                                . '"';
-                        }
-                    } else {
-                        $title = '';
-                    }
-                    $retval .= "<a$linkClass$title href='$link'>";
+                    $retval .= "<a$linkClass href='$link'>";
                     $retval .= htmlspecialchars($node->real_name);
                     $retval .= "</a>";
                 }

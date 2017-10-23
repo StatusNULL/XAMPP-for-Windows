@@ -5,6 +5,7 @@
  *
  * @package PhpMyAdmin
  */
+
 if (! defined('PHPMYADMIN')) {
     exit;
 }
@@ -101,7 +102,7 @@ class PMA_Config
      */
     function checkSystem()
     {
-        $this->set('PMA_VERSION', '4.0.4.1');
+        $this->set('PMA_VERSION', '4.0.9');
         /**
          * @deprecated
          */
@@ -1270,7 +1271,13 @@ class PMA_Config
 
                 // And finally the path could be already set from REQUEST_URI
                 if (empty($url['path'])) {
-                    $path = parse_url($GLOBALS['PMA_PHP_SELF']);
+                    // we got a case with nginx + php-fpm where PHP_SELF
+                    // was not set, so PMA_PHP_SELF was not set as well 
+                    if (isset($GLOBALS['PMA_PHP_SELF'])) {
+                        $path = parse_url($GLOBALS['PMA_PHP_SELF']);
+                    } else {
+                        $path = parse_url(PMA_getenv('REQUEST_URI'));
+                    }
                     $url['path'] = $path['path'];
                 }
             }
@@ -1326,6 +1333,13 @@ class PMA_Config
             }
             $pma_absolute_uri .= $path;
 
+            // This is to handle the case of a reverse proxy
+            if ($this->get('ForceSSL')) {
+               $this->set('PmaAbsoluteUri', $pma_absolute_uri);
+               $pma_absolute_uri = $this->getSSLUri();
+               $this->checkIsHttps();
+            }
+
             // We used to display a warning if PmaAbsoluteUri wasn't set, but now
             // the autodetect code works well enough that we don't display the
             // warning at all. The user can still set PmaAbsoluteUri manually.
@@ -1372,12 +1386,7 @@ class PMA_Config
         }
 
         // Reconstruct URL using parsed parts
-        if ($this->get('SSLPort')) {
-            $port_number = $this->get('SSLPort');
-        } else {
-            $port_number = 443;
-        }
-        return 'https://' . $parsed['host'] . ':' . $port_number . $parsed['path'];
+        return 'https://' . $parsed['host'] . ':443' . $parsed['path'];
     }
 
     /**

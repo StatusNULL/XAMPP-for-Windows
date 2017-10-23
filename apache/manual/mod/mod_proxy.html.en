@@ -72,6 +72,7 @@
         <tr><td>HTTP/0.9, HTTP/1.0, and
           HTTP/1.1</td><td><code class="module"><a href="../mod/mod_proxy_http.html">mod_proxy_http</a></code></td></tr>
         <tr><td>SCGI</td><td><code class="module"><a href="../mod/mod_proxy_scgi.html">mod_proxy_scgi</a></code></td></tr>
+        <tr><td>WS and WSS (Web-sockets)</td><td><code class="module"><a href="../mod/mod_proxy_wstunnel.html">mod_proxy_wstunnel</a></code></td></tr>
         </table>
       </li>
     </ul>
@@ -86,6 +87,7 @@
 <div id="quickview"><h3 class="directives">Directives</h3>
 <ul id="toc">
 <li><img alt="" src="../images/down.gif" /> <a href="#balancergrowth">BalancerGrowth</a></li>
+<li><img alt="" src="../images/down.gif" /> <a href="#balancerinherit">BalancerInherit</a></li>
 <li><img alt="" src="../images/down.gif" /> <a href="#balancermember">BalancerMember</a></li>
 <li><img alt="" src="../images/down.gif" /> <a href="#balancerpersist">BalancerPersist</a></li>
 <li><img alt="" src="../images/down.gif" /> <a href="#noproxy">NoProxy</a></li>
@@ -99,6 +101,7 @@
 <li><img alt="" src="../images/down.gif" /> <a href="#proxymatch">&lt;ProxyMatch&gt;</a></li>
 <li><img alt="" src="../images/down.gif" /> <a href="#proxymaxforwards">ProxyMaxForwards</a></li>
 <li><img alt="" src="../images/down.gif" /> <a href="#proxypass">ProxyPass</a></li>
+<li><img alt="" src="../images/down.gif" /> <a href="#proxypassinherit">ProxyPassInherit</a></li>
 <li><img alt="" src="../images/down.gif" /> <a href="#proxypassinterpolateenv">ProxyPassInterpolateEnv</a></li>
 <li><img alt="" src="../images/down.gif" /> <a href="#proxypassmatch">ProxyPassMatch</a></li>
 <li><img alt="" src="../images/down.gif" /> <a href="#proxypassreverse">ProxyPassReverse</a></li>
@@ -136,6 +139,7 @@
 <li><code class="module"><a href="../mod/mod_proxy_ftp.html">mod_proxy_ftp</a></code></li>
 <li><code class="module"><a href="../mod/mod_proxy_http.html">mod_proxy_http</a></code></li>
 <li><code class="module"><a href="../mod/mod_proxy_scgi.html">mod_proxy_scgi</a></code></li>
+<li><code class="module"><a href="../mod/mod_proxy_wstunnel.html">mod_proxy_wstunnel</a></code></li>
 <li><code class="module"><a href="../mod/mod_proxy_balancer.html">mod_proxy_balancer</a></code></li>
 <li><code class="module"><a href="../mod/mod_ssl.html">mod_ssl</a></code></li>
 </ul><ul class="seealso"><li><a href="#comments_section">Comments</a></li></ul></div>
@@ -488,6 +492,25 @@ ProxyPass /examples http://backend.example.com/examples timeout=10
 
 </div>
 <div class="top"><a href="#page-header"><img alt="top" src="../images/up.gif" /></a></div>
+<div class="directive-section"><h2><a name="BalancerInherit" id="BalancerInherit">BalancerInherit</a> <a name="balancerinherit" id="balancerinherit">Directive</a></h2>
+<table class="directive">
+<tr><th><a href="directive-dict.html#Description">Description:</a></th><td>Inherit ProxyPassed Balancers/Workers from the main server</td></tr>
+<tr><th><a href="directive-dict.html#Syntax">Syntax:</a></th><td><code>BalancerInherit On|Off</code></td></tr>
+<tr><th><a href="directive-dict.html#Default">Default:</a></th><td><code>BalancerInherit On</code></td></tr>
+<tr><th><a href="directive-dict.html#Context">Context:</a></th><td>server config, virtual host</td></tr>
+<tr><th><a href="directive-dict.html#Status">Status:</a></th><td>Extension</td></tr>
+<tr><th><a href="directive-dict.html#Module">Module:</a></th><td>mod_proxy</td></tr>
+<tr><th><a href="directive-dict.html#Compatibility">Compatibility:</a></th><td>BalancerInherit is only available in Apache HTTP Server 2.5.0
+        and later.</td></tr>
+</table>
+        <p>This directive will cause the current server/vhost to "inherit" ProxyPass
+            Balancers and Workers defined in the main server. This can cause issues and
+            inconsistent behavior if using the Balancer Manager and so should be disabled
+            if using that feature.</p>
+        <p>The setting in the global server defines the default for all vhosts.</p>
+    
+</div>
+<div class="top"><a href="#page-header"><img alt="top" src="../images/up.gif" /></a></div>
 <div class="directive-section"><h2><a name="BalancerMember" id="BalancerMember">BalancerMember</a> <a name="balancermember" id="balancermember">Directive</a></h2>
 <table class="directive">
 <tr><th><a href="directive-dict.html#Description">Description:</a></th><td>Add a member to a load balancing group</td></tr>
@@ -509,6 +532,11 @@ ProxyPass /examples http://backend.example.com/examples timeout=10
         <p>The balancerurl is only needed when not in <code>&lt;Proxy <var>balancer://</var>...&gt;</code>
             container directive. It corresponds to the url of a balancer defined in
             <code class="directive"><a href="#proxypass">ProxyPass</a></code> directive.</p>
+        <p>The path component of the balancer URL in any
+            <code>&lt;Proxy <var>balancer://</var>...&gt;</code> container directive
+            is ignored.</p>
+        <p>Trailing slashes should typically be removed from the URL of a
+            <code>BalancerMember</code>.</p>
     
 </div>
 <div class="top"><a href="#page-header"><img alt="top" src="../images/up.gif" /></a></div>
@@ -845,11 +873,14 @@ proxied</td></tr>
     input and output. The size must be at least <code>512</code>.</p>
 
     <p>In almost every case there's no reason to change that value.</p>
+
     <p>If used with AJP this directive sets the maximum AJP packet size in
-    bytes. If you change it from the default, you must also change the
-    <code>packetSize</code> attribute of your AJP connector on the
-    Tomcat side! The attribute <code>packetSize</code> is only available
-    in Tomcat <code>5.5.20+</code> and <code>6.0.2+</code></p>
+    bytes. Values larger than 65536 are set to 65536. If you change it from
+    the default, you must also change the <code>packetSize</code> attribute of
+    your AJP connector on the Tomcat side! The attribute
+    <code>packetSize</code> is only available in Tomcat <code>5.5.20+</code>
+    and <code>6.0.2+</code></p>
+
     <p>Normally it is not necessary to change the maximum packet size.
     Problems with the default value have been reported when sending
     certificates or certificate chains.</p>
@@ -924,6 +955,9 @@ through</td></tr>
     a local virtual path; <var>url</var> is a partial URL for the
     remote server and cannot include a query string.</p>
 
+    <div class="note"><strong>Note: </strong>This directive cannot be used within a 
+    <code>&lt;Directory&gt;</code> context.</div>
+    
     <div class="warning">The <code class="directive"><a href="#proxyrequests">ProxyRequests</a></code> directive should
     usually be set <strong>off</strong> when using
     <code class="directive">ProxyPass</code>.</div>
@@ -1203,7 +1237,7 @@ ProxyPass /mirror/foo http://backend.example.com
     </table>
 
     <p>If the Proxy directive scheme starts with the
-    <code>balancer://</code> (eg: <code>balancer://cluster/</code>,
+    <code>balancer://</code> (eg: <code>balancer://cluster</code>,
     any path information is ignored)  then a virtual worker that does not really
     communicate with the backend server will be created. Instead it is responsible
     for the management of several "real" workers. In that case the special set of
@@ -1252,7 +1286,7 @@ ProxyPass /mirror/foo http://backend.example.com
     <tr><td>scolonpathdelim</td>
         <td>Off</td>
         <td>If set to <code>On</code> the semi-colon character ';' will be
-        used as an additional sticky session path deliminator/separator. This
+        used as an additional sticky session path delimiter/separator. This
         is mainly used to emulate mod_jk's behavior when dealing with paths such
         as <code>JSESSIONID=6736bcf34;foo=aabfa</code>
     </td></tr>
@@ -1266,6 +1300,13 @@ ProxyPass /mirror/foo http://backend.example.com
         <td>A single or comma-separated list of HTTP status codes. If set this will
         force the worker into error state when the backend returns any status code
         in the list. Worker recovery behaves the same as other worker errors.
+    </td></tr>
+    <tr><td>failontimeout</td>
+        <td>Off</td>
+        <td>If set, an IO read timeout after a request is sent to the backend will
+        force the worker into error state. Worker recovery behaves the same as other
+        worker errors.
+        Available in Apache HTTP Server 2.4.5 and later.
     </td></tr>
     <tr><td>nonce</td>
         <td>&lt;auto&gt;</td>
@@ -1300,10 +1341,10 @@ ProxyPass /mirror/foo http://backend.example.com
 ProxyPass /special-area http://special.example.com smax=5 max=10
 ProxyPass / balancer://mycluster/ stickysession=JSESSIONID|jsessionid nofailover=On
 &lt;Proxy balancer://mycluster&gt;
-    BalancerMember ajp://1.2.3.4:8009/
-    BalancerMember ajp://1.2.3.5:8009/ loadfactor=20
+    BalancerMember ajp://1.2.3.4:8009
+    BalancerMember ajp://1.2.3.5:8009 loadfactor=20
     # Less powerful server, don't send as many requests there,
-    BalancerMember ajp://1.2.3.6:8009/ loadfactor=5
+    BalancerMember ajp://1.2.3.6:8009 loadfactor=5
 &lt;/Proxy&gt;
     </pre>
 
@@ -1311,12 +1352,12 @@ ProxyPass / balancer://mycluster/ stickysession=JSESSIONID|jsessionid nofailover
     <p>Setting up a hot-standby, that will only be used if no other
      members are available</p>
     <pre class="prettyprint lang-config">
-ProxyPass / balancer://hotcluster/ 
+ProxyPass / balancer://hotcluster/
 &lt;Proxy balancer://hotcluster&gt;
-    BalancerMember ajp://1.2.3.4:8009/ loadfactor=1
-    BalancerMember ajp://1.2.3.5:8009/ loadfactor=2
+    BalancerMember ajp://1.2.3.4:8009 loadfactor=1
+    BalancerMember ajp://1.2.3.5:8009 loadfactor=2
     # The server below is on hot standby
-    BalancerMember ajp://1.2.3.6:8009/ status=+H
+    BalancerMember ajp://1.2.3.6:8009 status=+H
     ProxySet lbmethod=bytraffic
 &lt;/Proxy&gt;
     </pre>
@@ -1329,15 +1370,6 @@ ProxyPass / balancer://hotcluster/
     backend.  Note that may affect the security of your backend, as it
     removes the normal limited protection against URL-based attacks
     provided by the proxy.</p>
-
-    <p>The optional <var>interpolate</var> keyword (available in
-    httpd 2.2.9 and later), in combination with
-    <code class="directive">ProxyPassInterpolateEnv</code> causes the ProxyPass
-    to interpolate environment variables, using the syntax
-    <var>${VARNAME}</var>.  Note that many of the standard CGI-derived
-    environment variables will not exist when this interpolation happens,
-    so you may still have to resort to <code class="module"><a href="../mod/mod_rewrite.html">mod_rewrite</a></code>
-    for complex rules.</p>
 
     <p>Normally, mod_proxy will include the query string when
     generating the <var>SCRIPT_FILENAME</var> environment variable.
@@ -1356,7 +1388,53 @@ ProxyPass / balancer://hotcluster/
     <code class="directive"><a href="../mod/mod_rewrite.html#rewriterule">RewriteRule</a></code> directive with the
     <code>[P]</code> flag.</p>
 
+    <p>The optional <var>interpolate</var> keyword (available in
+    httpd 2.2.9 and later), in combination with
+    <code class="directive">ProxyPassInterpolateEnv</code> causes the ProxyPass
+    to interpolate environment variables, using the syntax
+    <var>${VARNAME}</var>.  Note that many of the standard CGI-derived
+    environment variables will not exist when this interpolation happens,
+    so you may still have to resort to <code class="module"><a href="../mod/mod_rewrite.html">mod_rewrite</a></code>
+    for complex rules.  Also note that interpolation is not supported
+    within the scheme portion of a URL.  Dynamic determination of the
+    scheme can be accomplished with <code class="module"><a href="../mod/mod_rewrite.html">mod_rewrite</a></code> as in the
+    following example.</p>
 
+    <pre class="prettyprint lang-config">
+RewriteEngine On
+
+RewriteCond %{HTTPS} =off
+RewriteRule . - [E=protocol:http]
+RewriteCond %{HTTPS} =on
+RewriteRule . - [E=protocol:https]
+
+RewriteRule ^/mirror/foo/(.*) %{ENV:protocol}://backend.example.com/$1 [P]
+ProxyPassReverse  /mirror/foo/ http://backend.example.com/
+ProxyPassReverse  /mirror/foo/ https://backend.example.com/
+    </pre>
+
+
+</div>
+<div class="top"><a href="#page-header"><img alt="top" src="../images/up.gif" /></a></div>
+<div class="directive-section"><h2><a name="ProxyPassInherit" id="ProxyPassInherit">ProxyPassInherit</a> <a name="proxypassinherit" id="proxypassinherit">Directive</a></h2>
+<table class="directive">
+<tr><th><a href="directive-dict.html#Description">Description:</a></th><td>Inherit ProxyPass directives defined from the main server</td></tr>
+<tr><th><a href="directive-dict.html#Syntax">Syntax:</a></th><td><code>ProxyPassInherit On|Off</code></td></tr>
+<tr><th><a href="directive-dict.html#Default">Default:</a></th><td><code>ProxyPassInherit On</code></td></tr>
+<tr><th><a href="directive-dict.html#Context">Context:</a></th><td>server config, virtual host</td></tr>
+<tr><th><a href="directive-dict.html#Status">Status:</a></th><td>Extension</td></tr>
+<tr><th><a href="directive-dict.html#Module">Module:</a></th><td>mod_proxy</td></tr>
+<tr><th><a href="directive-dict.html#Compatibility">Compatibility:</a></th><td>ProxyPassInherit is only available in Apache HTTP Server 2.5.0 and later.
+        and later.</td></tr>
+</table>
+        <p>This directive will cause the current server/vhost to "inherit"
+            <code class="directive"><a href="#proxypass">ProxyPass</a></code>
+            directives defined in the main server. This can cause issues and
+            inconsistent behavior if using the Balancer Manager for dynamic changes
+            and so should be disabled if using that feature.</p>
+        <p>The setting in the global server defines the default for all vhosts.</p>
+        <p>Disabling ProxyPassInherit also disables <code class="directive"><a href="#balancerinherit">BalancerInherit</a></code>.</p>
+    
 </div>
 <div class="top"><a href="#page-header"><img alt="top" src="../images/up.gif" /></a></div>
 <div class="directive-section"><h2><a name="ProxyPassInterpolateEnv" id="ProxyPassInterpolateEnv">ProxyPassInterpolateEnv</a> <a name="proxypassinterpolateenv" id="proxypassinterpolateenv">Directive</a></h2>
@@ -1402,6 +1480,9 @@ ProxyPass / balancer://hotcluster/
        matches, the server will substitute any parenthesized matches into the given
        string and use it as a new <var>url</var>.</p>
 
+    <div class="note"><strong>Note: </strong>This directive cannot be used within a 
+    <code>&lt;Directory&gt;</code> context.</div>
+    
     <p>Suppose the local server has address <code>http://example.com/</code>;
     then</p>
 
@@ -1510,7 +1591,8 @@ ProxyPassReverseCookiePath  /  /mirror/foo/
     httpd 2.2.9 and later), used together with
     <code class="directive">ProxyPassInterpolateEnv</code>, enables interpolation
     of environment variables specified using the format <var>${VARNAME}</var>.
-    </p>
+    Note that interpolation is not supported within the scheme portion of a
+    URL.</p>
 
     <p>When used inside a <code class="directive"><a href="../mod/core.html#location">&lt;Location&gt;</a></code> section, the first argument is omitted and the local
     directory is obtained from the <code class="directive"><a href="../mod/core.html#location">&lt;Location&gt;</a></code>. The same occurs inside a <code class="directive"><a href="../mod/core.html#locationmatch">&lt;LocationMatch&gt;</a></code> section, but will probably not work as
@@ -1732,8 +1814,8 @@ expressions</td></tr>
 
     <div class="example"><pre class="prettyprint lang-config">
 &lt;Proxy balancer://hotcluster&gt;
-    BalancerMember http://www2.example.com:8080/ loadfactor=1
-    BalancerMember http://www3.example.com:8080/ loadfactor=2
+    BalancerMember http://www2.example.com:8080 loadfactor=1
+    BalancerMember http://www3.example.com:8080 loadfactor=2
     ProxySet lbmethod=bytraffic
 &lt;/Proxy&gt;
       </pre>

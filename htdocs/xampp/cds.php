@@ -101,7 +101,7 @@ if (urlencode(@$_REQUEST['action']) == "getpdf") {
 	{
 		$titel=mysql_real_escape_string($_REQUEST['titel']);
 		$interpret=mysql_real_escape_string($_REQUEST['interpret']);
-		$jahr=mysql_real_escape_string($_REQUEST['jahr']);
+		$jahr=intval($_REQUEST['jahr']);
 		if($jahr=="")$jahr="NULL";
 		mysql_query("INSERT INTO cds (titel,interpret,jahr) VALUES('$titel','$interpret',$jahr);");
 	}

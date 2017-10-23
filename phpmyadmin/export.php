@@ -7,6 +7,14 @@
  */
 
 /**
+ * If we are sending the export file (as opposed to just displaying it
+ * as text), we have to bypass the usual PMA_Response mechanism 
+ */
+if ($_POST['output_format'] == 'sendit') {
+    define('PMA_BYPASS_GET_INSTANCE', 1);
+}
+
+/**
  * Get the variables sent or posted to this script and a core script
  */
 require_once 'libraries/common.inc.php';
@@ -83,6 +91,7 @@ $post_params = array(
         'sql_disable_fk',
         'sql_compatibility',
         'sql_structure_or_data',
+        'sql_create_database',
         'sql_drop_table',
         'sql_procedure_function',
         'sql_create_table_statements',
@@ -267,11 +276,6 @@ function PMA_gzencodeNeeded()
 {
     if (@function_exists('gzencode')
         && ! @ini_get('zlib.output_compression')
-        // Here, we detect Apache's mod_deflate so we bet that
-        // this module is active for this instance of phpMyAdmin
-        // and therefore, will gzip encode the content
-        && ! (function_exists('apache_get_modules')
-            && in_array('mod_deflate', apache_get_modules()))
         && ! PMA_isGzHandlerEnabled()
     ) {
         return true;
@@ -498,7 +502,7 @@ if ($save_on_server) {
         . preg_replace('@[/\\\\]@', '_', $filename);
     unset($message);
     if (file_exists($save_filename)
-        && ((! $quick_export && empty($onserverover))
+        && ((! $quick_export && empty($_REQUEST['onserverover']))
         || ($quick_export
         && $_REQUEST['quick_export_onserverover'] != 'saveitover'))
     ) {
@@ -949,7 +953,6 @@ if (! empty($asfile)) {
         }
         exit();
     } else {
-        PMA_Response::getInstance()->disable();
         echo $dump_buffer;
     }
 } else {

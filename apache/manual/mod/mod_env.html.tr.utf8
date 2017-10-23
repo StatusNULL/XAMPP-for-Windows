@@ -84,7 +84,7 @@ etmek için kullanılır.</td></tr>
 <div class="directive-section"><h2><a name="SetEnv" id="SetEnv">SetEnv</a> <a name="setenv" id="setenv">Yönergesi</a></h2>
 <table class="directive">
 <tr><th><a href="directive-dict.html#Description">Açıklama:</a></th><td>Ortam değişkenlerini tanımlar.</td></tr>
-<tr><th><a href="directive-dict.html#Syntax">Sözdizimi:</a></th><td><code>SetEnv <var>ortam-değişkeni</var> <var>değer</var></code></td></tr>
+<tr><th><a href="directive-dict.html#Syntax">Sözdizimi:</a></th><td><code>SetEnv <var>ortam-değişkeni</var> [<var>değer</var>]</code></td></tr>
 <tr><th><a href="directive-dict.html#Context">Bağlam:</a></th><td>sunucu geneli, sanal konak, dizin, .htaccess</td></tr>
 <tr><th><a href="directive-dict.html#Override">Geçersizleştirme:</a></th><td>FileInfo</td></tr>
 <tr><th><a href="directive-dict.html#Status">Durum:</a></th><td>Temel</td></tr>
@@ -94,9 +94,12 @@ etmek için kullanılır.</td></tr>
       modüllerinde kullanılmak üzere bir dahili ortam değişkeni tanımlanmasını
       sağlar.</p>
 
-    <div class="example"><h3>Örnek</h3><p><code>
-      SetEnv SPECIAL_PATH /foo/bin
-    </code></p></div>
+    <pre class="prettyprint lang-config">
+SetEnv SPECIAL_PATH /foo/bin
+    </pre>
+
+
+    <p>Bir <var>değer</var> belirtilmezse değişkene boş dizgi atanır.</p>
 
     <div class="note"><p>Bu yönerge tarafından atanan dahili ortam değişkenleri, en başta
       işleme sokulan, ereşem denetimi, URI-dosya ismi eşleştirmesi gibi istek
@@ -126,9 +129,10 @@ etmek için kullanılır.</td></tr>
     <p>CGI betiklerine ve SSI sayfalarına bir daha aktarılmamak üzere bir
       dahili ortam değişkenini siler.</p>
 
-    <div class="example"><h3>Örnek</h3><p><code>
-      UnsetEnv LD_LIBRARY_PATH
-    </code></p></div>
+    <pre class="prettyprint lang-config">
+UnsetEnv LD_LIBRARY_PATH
+    </pre>
+
 
 </div>
 </div>

@@ -254,7 +254,7 @@
 
 	$TEXT['cds-text1'] = "A very simple CD programm.";
 
-	$TEXT['cds-text2'] = "CD list as <a href='$_SERVER[PHP_SELF]?action=getpdf'>PDF document</a>.";
+	$TEXT['cds-text2'] = "CD list as <a href='?action=getpdf'>PDF document</a>.";
 
 	$TEXT['cds-error'] = "Could not connect to database!<br>Is MySQL running or did you change the password?";
 	$TEXT['cds-head1'] = "My CDs";

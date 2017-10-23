@@ -51,6 +51,7 @@
      [ -<strong>v</strong> ]
      [ -<strong>e</strong> ]
      [ -<strong>c</strong> ]
+     [ -<strong>n</strong> <var>dosya_sayısı</var> ]
      <var>dosyaismi</var>
      <var>süre</var>|<var>boyut</var>(B|K|M|G)
      [ <var>saat_farkı</var> ]</code></p>
@@ -105,6 +106,11 @@
 
     <dt><code><strong>-c</strong></code></dt>
     <dd>Create log file for each interval, even if empty.</dd>
+
+    <dt><code><strong>-n</strong> <var>dosya_sayısı</var></code></dt>
+    <dd>Zaman damgalarına bakılmaksızın bir dosya serisi açılır. Örneğin -n3
+      belirtilirse "logfile", "logfile.1", "logfile.2" serisi açılır ve
+      "logfile" üzerine yazılır.</dd>
 
     <dt><code><var>dosyaismi</var></code></dt>
     <dd><p>Günlük dosyasının ismi yoluyla birlikte belirtilir.

@@ -104,7 +104,7 @@
 		<?php include "lang/".file_get_contents("lang.tmp").".php"; ?>
 
 		<br>
-		<form method="post" action="<?php echo $PHP_SELF; ?>">
+		<form method="post">
 			<table width="600" cellpadding="0" cellspacing="0" border="0">
 				<tr>
 					<td align="left" width="600" colspan="2"><hr width="80%" style="border: solid #bb3902 1px; height: 1px"></td>

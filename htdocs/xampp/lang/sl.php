@@ -239,7 +239,7 @@
 
 	$TEXT['cds-text1'] = "Zelo enostaven CD program.";
 
-	$TEXT['cds-text2'] = "CD je mo&#382;no pregledovati kot <a href='$_SERVER[PHP_SELF]?action=getpdf'>PDF dokument</a>.";
+	$TEXT['cds-text2'] = "CD je mo&#382;no pregledovati kot <a href='cds.php?action=getpdf'>PDF dokument</a>.";
 
 	$TEXT['cds-error'] = "Ne morem se povezati z bazo podatkov!<br>ali MySQL te&#269;e, ste morda spremenili geslo?";
 	$TEXT['cds-head1'] = "Moji CD-ji";

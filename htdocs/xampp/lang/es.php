@@ -241,7 +241,7 @@
 
 	$TEXT['cds-text1'] = "Una administración de CD muy sencilla. Ya que no se pueden corregir entradas, cuando te equivocas, se aconseja phpMyAdmin (abajo a la izquierda en la navegación).";
 
-	$TEXT['cds-text2'] = "<b>Nuevo desde 0.9.6:</b> Salida de los CDs elegidos cómo <a href='$_SERVER[PHP_SELF]?action=getpdf'>Documento PDF</a>.";
+	$TEXT['cds-text2'] = "<b>Nuevo desde 0.9.6:</b> Salida de los CDs elegidos cómo <a href='cds.php?action=getpdf'>Documento PDF</a>.";
 
 	$TEXT['cds-error'] = "No puede encontrar la base de datos!<br>¿Funciona MySQL o se cambió la clave de acceso?";
 	$TEXT['cds-head1'] = "Mis CDs";

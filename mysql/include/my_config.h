@@ -609,10 +609,10 @@
 #define PACKAGE "mysql"
 #define PACKAGE_BUGREPORT ""
 #define PACKAGE_NAME "MySQL Server"
-#define PACKAGE_STRING "MySQL Server 5.5.32"
+#define PACKAGE_STRING "MySQL Server 5.5.34"
 #define PACKAGE_TARNAME "mysql"
-#define PACKAGE_VERSION "5.5.32"
-#define VERSION "5.5.32"
+#define PACKAGE_VERSION "5.5.34"
+#define VERSION "5.5.34"
 #define PROTOCOL_VERSION 10
 
 

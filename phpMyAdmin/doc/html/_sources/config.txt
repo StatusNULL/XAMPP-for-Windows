@@ -119,6 +119,15 @@ Basic settings
 
     Show warning about incomplete translations on certain threshold.
 
+.. config:option:: $cfg['AllowThirdPartyFraming']
+
+    :type: boolean
+    :default: false
+    
+    Setting this to ``true`` allows phpMyAdmin to be included inside a frame,
+    and is a potential security hole allowing cross-frame scripting attacks or
+    clickjacking.
+
 Server connection settings
 --------------------------
 
@@ -1016,7 +1025,7 @@ Generic settings
 .. config:option:: $cfg['MaxNavigationItems']
 
     :type: integer
-    :default: 25
+    :default: 250
 
     The number of items that can be displayed on each page of the
     navigation tree.
@@ -1303,14 +1312,6 @@ Navigation panel setup
     The maximum number of recently used tables shown in the navigation
     panel. Set this to 0 (zero) to disable the listing of recent tables.
 
-.. config:option:: $cfg['ShowTooltip']
-
-    :type: boolean
-    :default: true
-
-    Defines whether to display item comments as tooltips in navigation
-    panel or not.
-
 .. config:option:: $cfg['NavigationDisplayLogo']
 
     :type: boolean
@@ -1481,14 +1482,13 @@ Database structure
 Browse mode
 -----------
 
-.. config:option:: $cfg['NavigationBarIconic']
+.. config:option:: $cfg['TableNavigationLinksMode']
 
     :type: string
-    :default: true
+    :default: ``'icons'``
 
-    Defines whether navigation bar buttons contain text or symbols only. A 
-    value of true displays icons, false displays text and 'both' displays 
-    both icons and text.
+    Defines whether the table navigation links contain ``'icons'``, ``'text'`` 
+    or ``'both'``. 
 
 .. config:option:: $cfg['ShowAll']
 
@@ -1672,15 +1672,22 @@ Export and import settings
 Tabs display settings
 ---------------------
 
-.. config:option:: $cfg['PropertiesIconic']
+.. config:option:: $cfg['TabsMode']
 
     :type: string
     :default: ``'both'``
 
-    If set to ``true``, will display icons instead of text for db and table
+    Defines whether the menu tabs contain ``'icons'``, ``'text'`` or ``'both'``. 
+
+.. config:option:: $cfg['ActionLinksMode']
+
+    :type: string
+    :default: ``'both'``
+
+    If set to ``icons``, will display icons instead of text for db and table
     properties links (like :guilabel:`Browse`, :guilabel:`Select`,
-    :guilabel:`Insert`, ...) and for the menu tabs. Can be set to ``'both'`` 
-    if you want icons AND text. When set to ``false``, will only show text.
+    :guilabel:`Insert`, ...). Can be set to ``'both'`` 
+    if you want icons AND text. When set to ``text``, will only show text.
 
 .. config:option:: $cfg['PropertiesNumColumns']
 

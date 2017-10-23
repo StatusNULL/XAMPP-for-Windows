@@ -246,7 +246,7 @@
 
 	$TEXT['cds-text1'] = "Un programme de CD très simple.";
 
-	$TEXT['cds-text2'] = "Liste de CD en temps que document <a href='$_SERVER[PHP_SELF]?action=getpdf'>PDF</a>.";
+	$TEXT['cds-text2'] = "Liste de CD en temps que document <a href='cds.php?action=getpdf'>PDF</a>.";
 
 	$TEXT['cds-error'] = "Impossible d'accéder à la base de données!<br>Est-ce que MySQL est lancé, ou avez vous changé le mot de passe?";
 	$TEXT['cds-head1'] = "Mes CDs";

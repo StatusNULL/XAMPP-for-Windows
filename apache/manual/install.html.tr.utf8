@@ -34,9 +34,10 @@
     <p>Bu belge Apache HTTP Sunucusunun sadece Unix ve Unix benzeri
       sistemlerde derlenmesini ve kurulmasını kapsar. Windows üzerinde
       derleme ve kurulum için <a href="platform/windows.html">Apache HTTP
-      Sunucusunun Microsoft Windows ile kullanımı</a> bölümüne bakınız. Diğer
-      platformlar için ise <a href="platform/">platform</a> belgelerine
-      bakınız.</p>
+      Sunucusunun Microsoft Windows ile kullanımı</a> ve <a href="platform/win_compiling.html">Apache HTTP
+      Sunucusunun Microsoft Windows için Derlenmesi</a> bölümüne bakınız.
+      Diğer platformlar için ise <a href="platform/">platform</a>
+      belgelerine bakınız.</p>
 
     <p>Apache HTTP Sunucusunun, derleme ortamını oluşturmak için çoğu Açık
       Kaynak Kodlu projenin yaptığı gibi <code>libtool</code> ve

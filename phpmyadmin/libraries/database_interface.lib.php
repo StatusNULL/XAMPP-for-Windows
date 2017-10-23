@@ -58,6 +58,12 @@ if (defined('TESTSUITE')) {
 
         // if it fails try alternative extension ...
         // and display an error ...
+        $docurl = PMA_Util::getDocuLink('faq', 'faqmysql');
+        $doclink = sprintf(
+            __('See %sour documentation%s for more information.'),
+            '[a@' . $docurl  . '@documentation]',
+            '[/a]'
+        );
 
         /**
          * @todo add different messages for alternative extension
@@ -66,7 +72,7 @@ if (defined('TESTSUITE')) {
         PMA_warnMissingExtension(
             $GLOBALS['cfg']['Server']['extension'],
             false,
-            PMA_Util::showDocu('faq', 'faqmysql')
+            $doclink
         );
 
         if ($GLOBALS['cfg']['Server']['extension'] === 'mysql') {
@@ -80,7 +86,7 @@ if (defined('TESTSUITE')) {
             PMA_warnMissingExtension(
                 $GLOBALS['cfg']['Server']['extension'],
                 true,
-                PMA_Util::showDocu('faq', 'faqmysql')
+                $doclink
             );
         }
 
@@ -1466,6 +1472,9 @@ function PMA_DBI_get_variable($var, $type = PMA_DBI_GETVAR_SESSION, $link = null
  */
 function PMA_DBI_postConnect($link, $is_controluser = false)
 {
+    if ($is_controluser) {
+        return;
+    }
     if (! defined('PMA_MYSQL_INT_VERSION')) {
         if (PMA_Util::cacheExists('PMA_MYSQL_INT_VERSION', true)) {
             define(
@@ -1483,6 +1492,10 @@ function PMA_DBI_postConnect($link, $is_controluser = false)
             define(
                 'PMA_MYSQL_VERSION_COMMENT',
                 PMA_Util::cacheGet('PMA_MYSQL_VERSION_COMMENT', true)
+            );
+            define(
+                'PMA_DRIZZLE',
+                PMA_Util::cacheGet('PMA_DRIZZLE', true)
             );
         } else {
             $version = PMA_DBI_fetch_single_row(
@@ -1528,10 +1541,24 @@ function PMA_DBI_postConnect($link, $is_controluser = false)
                 PMA_MYSQL_VERSION_COMMENT,
                 true
             );
+            // Detect Drizzle - it does not support character sets
+            $charset_result = PMA_DBI_get_variable(
+                'character_set_results',
+                PMA_DBI_GETVAR_GLOBAL,
+                $link
+            );
+            if ($charset_result) {
+                define('PMA_DRIZZLE', false);
+            } else {
+                define('PMA_DRIZZLE', true);
+            }
+            PMA_Util::cacheSet(
+                'PMA_DRIZZLE',
+                PMA_DRIZZLE,
+                true
+            );
+
         }
-        // detect Drizzle by version number:
-        // <year>.<month>.<build number>(.<patch rev)
-        define('PMA_DRIZZLE', PMA_MYSQL_MAJOR_VERSION >= 2009);
     }
 
     // Skip charsets for Drizzle
@@ -2110,25 +2137,25 @@ function PMA_is_system_schema($schema_name, $test_for_mysql_schema = false)
  */
 function PMA_getFirstOccurringRegularExpression($regex_array, $query)
 {
-    
+
     $minimum_first_occurence_index = null;
     $regex = null;
-    
+
     for ($i = 0; $i < count($regex_array); $i++) {
         if (preg_match($regex_array[$i], $query, $matches, PREG_OFFSET_CAPTURE)) {
-            
+
             if (is_null($minimum_first_occurence_index)
                 || ($matches[0][1] < $minimum_first_occurence_index)
             ) {
                 $regex = $regex_array[$i];
                 $minimum_first_occurence_index = $matches[0][1];
             }
-            
+
         }
     }
-    
+
     return $regex;
-    
+
 }
 
 ?>

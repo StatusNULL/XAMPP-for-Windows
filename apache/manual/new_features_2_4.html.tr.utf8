@@ -44,11 +44,13 @@
     
     <dl>
       <dt>Çalışma anında yüklenebilen MPM'ler</dt>
-      <dd>Çok sayıda MPM artık yüklenebilir modül olarak derlenebilmektedir.
+      <dd>Çok sayıda MPM artık <a href="mpm.html#dynamic">yüklenebilir
+        modül</a> olarak derlenebilmektedir.
         Kullanılacak MPM'in seçimi çalışma anında yapılabilmektedir.</dd>
 
       <dt>Event MPM</dt>
-      <dd>Event MPM artık deneysel değil, ancak tam olarak desteklenmiyor.</dd>
+      <dd><a href="mod/event.html">Event MPM</a> artık deneysel değil, ancak
+        tam olarak desteklenmiyor.</dd>
 
       <dt>Eşzamansıza destek</dt>
       <dd>MPM'leri ve platformları desteklemek için eşzamansız okuma/yazmaya
@@ -302,10 +304,10 @@
 <h2><a name="programs" id="programs">Programlardaki Gelişmeler</a></h2>
     
     <dl>
-        <dt>fcgistarter</dt>
+        <dt><code class="program"><a href="./programs/fcgistarter.html">fcgistarter</a></code></dt>
         <dd>Yeni FastCGI artalan sunucusu başlatma aracı</dd>
 
-        <dt>htcacheclean</dt>
+        <dt><code class="program"><a href="./programs/htcacheclean.html">htcacheclean</a></code></dt>
         <dd>Arabellekli URL'ler, istenirse metadata'yı da dahil ederek
           listelenebilmektedir.</dd>
         <dd>Bazı URL'ler arabellekten tek tek silinebilmektedir.</dd>
@@ -316,7 +318,7 @@
           sınıra ek olarak veya bunun yerine dosya düğümü sayısı ile
           sınırlanabilmektedir.</dd>
 
-        <dt>rotatelogs</dt>
+        <dt><code class="program"><a href="./programs/rotatelogs.html">rotatelogs</a></code></dt>
         <dd>Artık geçerli günlük dosyasına bir bağ oluşturulabiliyor.</dd>
         <dd>Artık özel bir döndürme sonrası betiği çalıştırılabiliyor.</dd>
     </dl>

@@ -27,7 +27,10 @@ class Node_Database extends Node
     public function __construct($name, $type = Node::OBJECT, $is_group = false)
     {
         parent::__construct($name, $type, $is_group);
-        $this->icon  = PMA_Util::getImage('s_db.png');
+        $this->icon  = PMA_Util::getImage(
+            's_db.png',
+            __('Database operations')
+        );
         $this->links = array(
             'text' => $GLOBALS['cfg']['DefaultTabDatabase']
                     . '?server=' . $GLOBALS['server']
@@ -35,6 +38,7 @@ class Node_Database extends Node
             'icon' => 'db_operations.php?server=' . $GLOBALS['server']
                     . '&amp;db=%1$s&amp;token=' . $GLOBALS['token']
         );
+        $this->classes = 'database';
     }
 
     /**
@@ -53,12 +57,16 @@ class Node_Database extends Node
         $db     = $this->real_name;
         switch ($type) {
         case 'tables':
-            if (! $GLOBALS['cfg']['Servers'][$GLOBALS['server']]['DisableIS']) {
+            if (! $GLOBALS['cfg']['Server']['DisableIS'] || PMA_DRIZZLE) {
                 $db     = PMA_Util::sqlAddSlashes($db);
                 $query  = "SELECT COUNT(*) ";
                 $query .= "FROM `INFORMATION_SCHEMA`.`TABLES` ";
                 $query .= "WHERE `TABLE_SCHEMA`='$db' ";
-                $query .= "AND `TABLE_TYPE`='BASE TABLE' ";
+                if (PMA_DRIZZLE) {
+                    $query .= "AND `TABLE_TYPE`='BASE' ";
+                } else {
+                    $query .= "AND `TABLE_TYPE`='BASE TABLE' ";
+                }
                 if (! empty($searchClause)) {
                     $query .= "AND `TABLE_NAME` LIKE '%";
                     $query .= PMA_Util::sqlAddSlashes(
@@ -84,12 +92,16 @@ class Node_Database extends Node
             }
             break;
         case 'views':
-            if (! $GLOBALS['cfg']['Servers'][$GLOBALS['server']]['DisableIS']) {
+            if (! $GLOBALS['cfg']['Server']['DisableIS'] || PMA_DRIZZLE) {
                 $db     = PMA_Util::sqlAddSlashes($db);
                 $query  = "SELECT COUNT(*) ";
                 $query .= "FROM `INFORMATION_SCHEMA`.`TABLES` ";
                 $query .= "WHERE `TABLE_SCHEMA`='$db' ";
-                $query .= "AND `TABLE_TYPE`!='BASE TABLE' ";
+                if (PMA_DRIZZLE) {
+                    $query .= "AND `TABLE_TYPE`!='BASE' ";
+                } else {
+                    $query .= "AND `TABLE_TYPE`!='BASE TABLE' ";
+                }
                 if (! empty($searchClause)) {
                     $query .= "AND `TABLE_NAME` LIKE '%";
                     $query .= PMA_Util::sqlAddSlashes(
@@ -115,7 +127,7 @@ class Node_Database extends Node
             }
             break;
         case 'procedures':
-            if (! $GLOBALS['cfg']['Servers'][$GLOBALS['server']]['DisableIS']) {
+            if (! $GLOBALS['cfg']['Server']['DisableIS']) {
                 $db     = PMA_Util::sqlAddSlashes($db);
                 $query  = "SELECT COUNT(*) ";
                 $query .= "FROM `INFORMATION_SCHEMA`.`ROUTINES` ";
@@ -143,7 +155,7 @@ class Node_Database extends Node
             }
             break;
         case 'functions':
-            if (! $GLOBALS['cfg']['Servers'][$GLOBALS['server']]['DisableIS']) {
+            if (! $GLOBALS['cfg']['Server']['DisableIS']) {
                 $db     = PMA_Util::sqlAddSlashes($db);
                 $query  = "SELECT COUNT(*) ";
                 $query .= "FROM `INFORMATION_SCHEMA`.`ROUTINES` ";
@@ -171,7 +183,7 @@ class Node_Database extends Node
             }
             break;
         case 'events':
-            if (! $GLOBALS['cfg']['Servers'][$GLOBALS['server']]['DisableIS']) {
+            if (! $GLOBALS['cfg']['Server']['DisableIS']) {
                 $db     = PMA_Util::sqlAddSlashes($db);
                 $query  = "SELECT COUNT(*) ";
                 $query .= "FROM `INFORMATION_SCHEMA`.`EVENTS` ";
@@ -221,12 +233,16 @@ class Node_Database extends Node
         $db       = $this->real_name;
         switch ($type) {
         case 'tables':
-            if (! $GLOBALS['cfg']['Servers'][$GLOBALS['server']]['DisableIS']) {
+            if (! $GLOBALS['cfg']['Server']['DisableIS'] || PMA_DRIZZLE) {
                 $db     = PMA_Util::sqlAddSlashes($db);
                 $query  = "SELECT `TABLE_NAME` AS `name` ";
                 $query .= "FROM `INFORMATION_SCHEMA`.`TABLES` ";
                 $query .= "WHERE `TABLE_SCHEMA`='$db' ";
-                $query .= "AND `TABLE_TYPE`='BASE TABLE' ";
+                if (PMA_DRIZZLE) {
+                    $query .= "AND `TABLE_TYPE`='BASE' ";
+                } else {
+                    $query .= "AND `TABLE_TYPE`='BASE TABLE' ";
+                }
                 if (! empty($searchClause)) {
                     $query .= "AND `TABLE_NAME` LIKE '%";
                     $query .= PMA_Util::sqlAddSlashes(
@@ -264,12 +280,16 @@ class Node_Database extends Node
             }
             break;
         case 'views':
-            if (! $GLOBALS['cfg']['Servers'][$GLOBALS['server']]['DisableIS']) {
+            if (! $GLOBALS['cfg']['Server']['DisableIS'] || PMA_DRIZZLE) {
                 $db     = PMA_Util::sqlAddSlashes($db);
                 $query  = "SELECT `TABLE_NAME` AS `name` ";
                 $query .= "FROM `INFORMATION_SCHEMA`.`TABLES` ";
                 $query .= "WHERE `TABLE_SCHEMA`='$db' ";
-                $query .= "AND `TABLE_TYPE`!='BASE TABLE' ";
+                if (PMA_DRIZZLE) {
+                    $query .= "AND `TABLE_TYPE`!='BASE' ";
+                } else {
+                    $query .= "AND `TABLE_TYPE`!='BASE TABLE' ";
+                }
                 if (! empty($searchClause)) {
                     $query .= "AND `TABLE_NAME` LIKE '%";
                     $query .= PMA_Util::sqlAddSlashes(
@@ -307,7 +327,7 @@ class Node_Database extends Node
             }
             break;
         case 'procedures':
-            if (! $GLOBALS['cfg']['Servers'][$GLOBALS['server']]['DisableIS']) {
+            if (! $GLOBALS['cfg']['Server']['DisableIS']) {
                 $db     = PMA_Util::sqlAddSlashes($db);
                 $query  = "SELECT `ROUTINE_NAME` AS `name` ";
                 $query .= "FROM `INFORMATION_SCHEMA`.`ROUTINES` ";
@@ -347,7 +367,7 @@ class Node_Database extends Node
             }
             break;
         case 'functions':
-            if (! $GLOBALS['cfg']['Servers'][$GLOBALS['server']]['DisableIS']) {
+            if (! $GLOBALS['cfg']['Server']['DisableIS']) {
                 $db     = PMA_Util::sqlAddSlashes($db);
                 $query  = "SELECT `ROUTINE_NAME` AS `name` ";
                 $query .= "FROM `INFORMATION_SCHEMA`.`ROUTINES` ";
@@ -387,7 +407,7 @@ class Node_Database extends Node
             }
             break;
         case 'events':
-            if (! $GLOBALS['cfg']['Servers'][$GLOBALS['server']]['DisableIS']) {
+            if (! $GLOBALS['cfg']['Server']['DisableIS']) {
                 $db     = PMA_Util::sqlAddSlashes($db);
                 $query  = "SELECT `EVENT_NAME` AS `name` ";
                 $query .= "FROM `INFORMATION_SCHEMA`.`EVENTS` ";
@@ -429,18 +449,6 @@ class Node_Database extends Node
             break;
         }
         return $retval;
-    }
-
-
-    /**
-     * Returns the comment associated with node
-     * This method should be overridden by specific type of nodes
-     *
-     * @return string
-     */
-    public function getComment()
-    {
-        return PMA_getDbComment($this->real_name);
     }
 }
 
