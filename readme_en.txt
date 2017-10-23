@@ -1,20 +1,18 @@
-###### ApacheFriends XAMPP version 1.7.5 ######
+###### ApacheFriends XAMPP version 1.7.7 ######
 
   + Apache 2.2.21
-  + MySQL 5.5.15 (Community Server)
+  + MySQL 5.5.16 (Community Server)
   + PHP 5.3.8 (VC9 X86 32bit thread safe) + PEAR
   + XAMPP Control Panel Version 2.5 from www.nat32.com 
   + (BETA) XAMPP Control Panel Version 3.0.2 by Steffen Strueber (not in the USB & lite version)
     see http://www.apachefriends.org/f/viewtopic.php?f=16&t=46743
   + XAMPP Security
-  + SQLite 2.8.15
   + OpenSSL 1.0.0e
-  + phpMyAdmin 3.4.4
+  + phpMyAdmin 3.4.5
   + ADOdb 5.14
   + Mercury Mail Transport System v4.62 (not in the USB & lite version)
   + FileZilla FTP Server 0.9.39 (not in the USB & lite version)
-  + Webalizer 2.01-10 (not in the USB & lite version)
-  + Zend Optimizer 3.3.0 
+  + Webalizer 2.23-04 (not in the USB & lite version)
   + Perl 5.10.1 (not in the USB & lite version)
   + Mod_perl 2.0.4 (not in the USB & lite version)
   + Tomcat 7.0.21 (not in the USB & lite version)
@@ -25,8 +23,7 @@
  
   + 64 MB RAM (RECOMMENDED)
   + 350 MB free fixed disk 
-  + Windows NT, 2000, 2003, XP (RECOMMENDED), VISTA
-  + Only 32 Bit (NOT for 64 bit systems) 
+  + Windows NT, 2000, 2003, XP (RECOMMENDED), VISTA, Windows 7
 
 ---------------------------------------------------------------
 

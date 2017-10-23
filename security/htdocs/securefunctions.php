@@ -37,7 +37,7 @@
 		global $notfind;
 
 		$curdir = getcwd();
-		list($partwampp, $directorwampp) = preg_split('/\\\htdocs/', $curdir);
+		list($partwampp, $directorwampp) = preg_split('/\\\security/', $curdir);
 		$configinc = "config.inc.php";
 		$phpmyadminconf = $partwampp."\phpmyadmin\\".$configinc;
 

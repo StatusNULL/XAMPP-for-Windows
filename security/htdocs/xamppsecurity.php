@@ -184,7 +184,7 @@
 						echo "<tr><td align=\"left\" width=\"200\">".$TEXT['mysql-rootsetup-passwd']."</td><td align=\"left\" width=\"400\"><input type=\"password\" name=\"mypasswd\" size=\"40\"></td></tr>";
 						echo "<tr><td align=\"left\" width=\"200\">".$TEXT['mysql-rootsetup-passwdrepeat']."</td><td align=\"left\" width=\"400\"><input type=\"password\" name=\"mypasswdrepeat\" size=\"40\"> </td></tr>";
 						echo "<tr><td align=\"left\" width=\"200\">&nbsp;</td><td align=\"center\" width=\"400\">&nbsp;</td></tr>";
-						if ($authphpmyadmin) {
+						/* if ($authphpmyadmin) {
 							if ($authphpmyadmin == "cookie") {
 								$checkedcookie = "checked";
 							} elseif ($currentstatus[0] == "http") {
@@ -192,7 +192,7 @@
 							} else {
 								$checkedcookie = "checked";
 							}
-						} else {
+						} else { */
 							phpmyadminstatus();
 							if ($currentstatus[0] == "cookie") {
 								$checkedcookie = "checked";
@@ -201,7 +201,7 @@
 							} else {
 								$checkedcookie = "checked";
 							}
-						}
+						//}
 
 						echo "<tr><td align=\"left\" width=\"200\">".$TEXT['mysql-rootsetup-phpmyadmin']."</td><td align=\"left\" width=\"400\"><i>http</i> <input type=\"radio\" value=\"http\" $checkedhttpd name=\"authphpmyadmin\">&nbsp;&nbsp;<i>cookie</i> <input type=\"radio\" value=\"cookie\" $checkedcookie name=\"authphpmyadmin\"></td></tr>";
 						echo "<tr><td align=\"left\" width=\"200\">&nbsp;</td><td align=\"center\" width=\"400\">&nbsp;</td></tr>";
