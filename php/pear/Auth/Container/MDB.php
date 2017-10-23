@@ -1,25 +1,35 @@
 <?php
-//
-// +----------------------------------------------------------------------+
-// | PHP Version 4                                                        |
-// +----------------------------------------------------------------------+
-// |                                                                      |
-// +----------------------------------------------------------------------+
-// | This source file is subject to version 2.02 of the PHP license,      |
-// | that is bundled with this package in the file LICENSE, and is        |
-// | available at through the world-wide-web at                           |
-// | http://www.php.net/license/2_02.txt.                                 |
-// | If you did not receive a copy of the PHP license and are unable to   |
-// | obtain it through the world-wide-web, please send a note to          |
-// | license@php.net so we can mail you a copy immediately.               |
-// +----------------------------------------------------------------------+
-// | Author: Lorenzo Alberton <l.alberton@quipo.it>                                  |
-// +----------------------------------------------------------------------+
-//
-// $Id: MDB.php,v 1.12 2003/10/13 08:08:45 yavo Exp $
-//
+/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
 
+/**
+ * Storage driver for use against PEAR MDB
+ *
+ * PHP versions 4 and 5
+ *
+ * LICENSE: This source file is subject to version 3.01 of the PHP license
+ * that is available through the world-wide-web at the following URI:
+ * http://www.php.net/license/3_01.txt.  If you did not receive a copy of
+ * the PHP License and are unable to obtain it through the web, please
+ * send a note to license@php.net so we can mail you a copy immediately.
+ *
+ * @category   Authentication
+ * @package    Auth
+ * @author     Lorenzo Alberton <l.alberton@quipo.it> 
+ * @author     Adam Ashley <aashley@php.net>
+ * @copyright  2001-2006 The PHP Group
+ * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
+ * @version    CVS: $Id: MDB.php,v 1.24 2006/03/02 06:53:08 aashley Exp $
+ * @link       http://pear.php.net/package/Auth
+ * @since      File available since Release 1.2.3
+ */
+
+/**
+ * Include Auth_Container base class
+ */
 require_once 'Auth/Container.php';
+/**
+ * Include PEAR MDB package
+ */
 require_once 'MDB.php';
 
 /**
@@ -28,12 +38,20 @@ require_once 'MDB.php';
  * This storage driver can use all databases which are supported
  * by the PEAR MDB abstraction layer to fetch login data.
  *
- * @author   Lorenzo Alberton <l.alberton@quipo.it>
- * @package  Auth
- * @version  $Revision: 1.12 $
+ * @category   Authentication
+ * @package    Auth
+ * @author     Lorenzo Alberton <l.alberton@quipo.it>
+ * @author     Adam Ashley <aashley@php.net>
+ * @copyright  2001-2006 The PHP Group
+ * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
+ * @version    Release: 1.3.0  File: $Revision: 1.24 $
+ * @link       http://pear.php.net/package/Auth
+ * @since      Class available since Release 1.2.3
  */
 class Auth_Container_MDB extends Auth_Container
 {
+
+    // {{{ properties
 
     /**
      * Additional options for the storage container
@@ -42,7 +60,7 @@ class Auth_Container_MDB extends Auth_Container
     var $options = array();
 
     /**
-     * DB object
+     * MDB object
      * @var object
      */
     var $db = null;
@@ -54,14 +72,15 @@ class Auth_Container_MDB extends Auth_Container
      */
     var $activeUser = '';
 
-    // {{{ Constructor
+    // }}}
+    // {{{ Auth_Container_MDB() [constructor]
 
     /**
      * Constructor of the container class
      *
-     * Initate connection to the database via PEAR::DB
+     * Initate connection to the database via PEAR::MDB
      *
-     * @param  string Connection data or DB object
+     * @param  string Connection data or MDB object
      * @return object Returns an error object if something went wrong
      */
     function Auth_Container_MDB($dsn)
@@ -85,14 +104,14 @@ class Auth_Container_MDB extends Auth_Container
      * Connect to database by using the given DSN string
      *
      * @access private
-     * @param  string DSN string
+     * @param  mixed DSN string | array | mdb object
      * @return mixed  Object on error, otherwise bool
      */
     function _connect($dsn)
     {
         if (is_string($dsn) || is_array($dsn)) {
-            $this->db =& MDB::Connect($dsn);
-        } elseif (get_parent_class($dsn) == "mdb_common") {
+            $this->db =& MDB::connect($dsn, $this->options['db_options']);
+        } elseif (is_subclass_of($dsn, 'mdb_common')) {
             $this->db = $dsn;
         } elseif (is_object($dsn) && MDB::isError($dsn)) {
             return PEAR::raiseError($dsn->getMessage(), $dsn->code);
@@ -108,9 +127,8 @@ class Auth_Container_MDB extends Auth_Container
 
         if (MDB::isError($this->db) || PEAR::isError($this->db)) {
             return PEAR::raiseError($this->db->getMessage(), $this->db->code);
-        } else {
-            return true;
         }
+        return true;
     }
 
     // }}}
@@ -123,10 +141,13 @@ class Auth_Container_MDB extends Auth_Container
      * the database. If that's not the case, a new connection is opened.
      *
      * @access private
-     * @return mixed True or a DB error object.
+     * @return mixed True or a MDB error object.
      */
     function _prepare()
     {
+        if (is_subclass_of($this->db, 'mdb_common')) {
+            return true;
+        }
         return $this->_connect($this->options['dsn']);
     }
 
@@ -171,6 +192,7 @@ class Auth_Container_MDB extends Auth_Container
         $this->options['dsn']         = '';
         $this->options['db_fields']   = '';
         $this->options['cryptType']   = 'md5';
+        $this->options['db_options']  = array();
     }
 
     // }}}
@@ -197,7 +219,6 @@ class Auth_Container_MDB extends Auth_Container
             }
             $this->options['db_fields'] = ', ' . $this->options['db_fields'];
         }
-
     }
 
     // }}}
@@ -214,9 +235,12 @@ class Auth_Container_MDB extends Auth_Container
      *
      * @param   string Username
      * @param   string Password
+     * @param   boolean If true password is secured using a md5 hash
+     *                  the frontend and auth are responsible for making sure the container supports
+     *                  challenge response password authentication
      * @return  mixed  Error object or boolean
      */
-    function fetchData($username, $password)
+    function fetchData($username, $password, $isChallengeResponse=false)
     {
         // Prepare for a database query
         $err = $this->_prepare();
@@ -224,10 +248,10 @@ class Auth_Container_MDB extends Auth_Container
             return PEAR::raiseError($err->getMessage(), $err->getCode());
         }
 
-        // Find if db_fileds contains a *, i so assume all col are selected
+        //Check if db_fields contains a *, if so assume all columns are selected
         if (strstr($this->options['db_fields'], '*')) {
             $sql_from = '*';
-        } else{
+        } else {
             $sql_from = $this->options['usernamecol'] . ', '. $this->options['passwordcol'] . $this->options['db_fields'];
         }
 
@@ -247,8 +271,23 @@ class Auth_Container_MDB extends Auth_Container
             $this->activeUser = '';
             return false;
         }
-        if ($this->verifyPassword(trim($password, "\r\n"),
-                                  trim($res[$this->options['passwordcol']], "\r\n"),
+
+        // Perform trimming here before the hashing
+        $password = trim($password, "\r\n");
+        $res[$this->options['passwordcol']] = trim($res[$this->options['passwordcol']], "\r\n");
+        
+        // If using Challenge Response md5 the pass with the secret
+        if ($isChallengeResponse) {
+            $res[$this->options['passwordcol']] =
+                md5($res[$this->options['passwordcol']].$this->_auth_obj->session['loginchallenege']);
+            // UGLY cannot avoid without modifying verifyPassword
+            if ($this->options['cryptType'] == 'md5') {
+                $res[$this->options['passwordcol']] = md5($res[$this->options['passwordcol']]);
+            }
+        }
+        
+        if ($this->verifyPassword($password,
+                                  $res[$this->options['passwordcol']],
                                   $this->options['cryptType'])) {
             // Store additional field values in the session
             foreach ($res as $key => $value) {
@@ -257,14 +296,10 @@ class Auth_Container_MDB extends Auth_Container
                     continue;
                 }
                 // Use reference to the auth object if exists
-                // This is because the auth session variable can change so a static call to setAuthData does not make sence
-                if(is_object($this->_auth_obj)){
-                    $this->_auth_obj->setAuthData($key, $value);
-                } else {
-                    Auth::setAuthData($key, $value);
-                }
+                // This is because the auth session variable can change so a static
+                // call to setAuthData does not make sense
+                $this->_auth_obj->setAuthData($key, $value);
             }
-
             return true;
         }
 
@@ -275,6 +310,12 @@ class Auth_Container_MDB extends Auth_Container
     // }}}
     // {{{ listUsers()
 
+    /**
+     * Returns a list of users from the container
+     *
+     * @return mixed array|PEAR_Error
+     * @access public
+     */
     function listUsers()
     {
         $err = $this->_prepare();
@@ -284,10 +325,10 @@ class Auth_Container_MDB extends Auth_Container
 
         $retVal = array();
 
-        // Find if db_fileds contains a *, i so assume all col are selected
+        //Check if db_fields contains a *, if so assume all columns are selected
         if (strstr($this->options['db_fields'], '*')) {
             $sql_from = '*';
-        } else{
+        } else {
             $sql_from = $this->options['db_fields'];
         }
 
@@ -324,11 +365,20 @@ class Auth_Container_MDB extends Auth_Container
      */
     function addUser($username, $password, $additional = "")
     {
-        if (function_exists($this->options['cryptType'])) {
+        $err = $this->_prepare();
+        if ($err !== true) {
+            return PEAR::raiseError($err->getMessage(), $err->getCode());
+        }
+
+        if (isset($this->options['cryptType']) && $this->options['cryptType'] == 'none') {
+            $cryptFunction = 'strval';
+        } elseif (isset($this->options['cryptType']) && function_exists($this->options['cryptType'])) {
             $cryptFunction = $this->options['cryptType'];
         } else {
             $cryptFunction = 'md5';
         }
+
+        $password = $cryptFunction($password);
 
         $additional_key   = '';
         $additional_value = '';
@@ -346,7 +396,7 @@ class Auth_Container_MDB extends Auth_Container
                          $this->options['passwordcol'],
                          $additional_key,
                          $this->db->getTextValue($username),
-                         $this->db->getTextValue($cryptFunction($password)),
+                         $this->db->getTextValue($password),
                          $additional_value
                          );
 
@@ -354,9 +404,8 @@ class Auth_Container_MDB extends Auth_Container
 
         if (MDB::isError($res)) {
             return PEAR::raiseError($res->getMessage(), $res->code);
-        } else {
-            return true;
         }
+        return true;
     }
 
     // }}}
@@ -372,6 +421,11 @@ class Auth_Container_MDB extends Auth_Container
      */
     function removeUser($username)
     {
+        $err = $this->_prepare();
+        if ($err !== true) {
+            return PEAR::raiseError($err->getMessage(), $err->getCode());
+        }
+
         $query = sprintf("DELETE FROM %s WHERE %s = %s",
                          $this->options['table'],
                          $this->options['usernamecol'],
@@ -381,12 +435,82 @@ class Auth_Container_MDB extends Auth_Container
         $res = $this->query($query);
 
         if (MDB::isError($res)) {
-           return PEAR::raiseError($res->getMessage(), $res->code);
-        } else {
-          return true;
+            return PEAR::raiseError($res->getMessage(), $res->code);
         }
+        return true;
     }
 
     // }}}
+    // {{{ changePassword()
+
+    /**
+     * Change password for user in the storage container
+     *
+     * @param string Username
+     * @param string The new password (plain text)
+     */
+    function changePassword($username, $password)
+    {
+        $err = $this->_prepare();
+        if ($err !== true) {
+            return PEAR::raiseError($err->getMessage(), $err->getCode());
+        }
+
+        if (isset($this->options['cryptType']) && $this->options['cryptType'] == 'none') {
+            $cryptFunction = 'strval';
+        } elseif (isset($this->options['cryptType']) && function_exists($this->options['cryptType'])) {
+            $cryptFunction = $this->options['cryptType'];
+        } else {
+            $cryptFunction = 'md5';
+        }
+
+        $password = $cryptFunction($password);
+
+        $query = sprintf("UPDATE %s SET %s = %s WHERE %s = %s",
+                         $this->options['table'],
+                         $this->options['passwordcol'],
+                         $this->db->getTextValue($password),
+                         $this->options['usernamecol'],
+                         $this->db->getTextValue($username)
+                         );
+
+        $res = $this->query($query);
+
+        if (MDB::isError($res)) {
+            return PEAR::raiseError($res->getMessage(), $res->code);
+        }
+        return true;
+    }
+
+    // }}}
+    // {{{ supportsChallengeResponse()
+
+    /**
+     * Determine if this container supports
+     * password authentication with challenge response
+     *
+     * @return bool
+     * @access public
+     */
+    function supportsChallengeResponse()
+    {
+        return in_array($this->options['cryptType'], array('md5', 'none', ''));
+    }
+
+    // }}}
+    // {{{ getCryptType()
+
+    /**
+     * Returns the selected crypt type for this container
+     *
+     * @return string Function used to crypt the password
+     */
+    function getCryptType()
+    {
+        return $this->options['cryptType'];
+    }
+
+    // }}}
+
 }
 ?>

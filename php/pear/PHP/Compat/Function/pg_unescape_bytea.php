@@ -16,7 +16,7 @@
 // |          Tobias <php@tobias.olsson.be>                               |
 // +----------------------------------------------------------------------+
 //
-// $Id: pg_unescape_bytea.php,v 1.1 2005/05/10 07:56:51 aidan Exp $
+// $Id: pg_unescape_bytea.php,v 1.2 2005/12/07 21:08:57 aidan Exp $
 
 
 /**
@@ -39,4 +39,5 @@ if (!function_exists('pg_unescape_bytea')) {
             $data);
     }
 }
+
 ?>

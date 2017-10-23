@@ -162,6 +162,8 @@
 	$TEXT['mysql-rootsetup-passwdrepeat'] = "Gjenta det nye passordet:";
 	$TEXT['mysql-rootsetup-passwdchange'] = "Passord endring";
 	$TEXT['mysql-rootsetup-phpmyadmin'] = "PhpMyAdmin identifikasjon:";
+	$TEXT['mysql-passwort-infile'] = "Safe plain password in text file?";
+	$TEXT['mysql-passwort-risk'] = "Security risk!";
 
 	$TEXT['xampp-setup-head'] = "XAMPP KATALOG BESKYTTELSE (.htaccess)";
 	$TEXT['xampp-setup-bruker'] = "bruker:";

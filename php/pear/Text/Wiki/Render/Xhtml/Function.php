@@ -9,7 +9,7 @@
  * @package    Text_Wiki
  * @author     Paul M. Jones <pmjones@php.net>
  * @license    http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
- * @version    CVS: $Id: Function.php,v 1.4 2005/07/30 08:03:28 toggg Exp $
+ * @version    CVS: $Id: Function.php,v 1.5 2006/02/10 23:07:03 toggg Exp $
  * @link       http://pear.php.net/package/Text_Wiki
  */
 
@@ -61,9 +61,9 @@ class Text_Wiki_Render_Xhtml_Function extends Text_Wiki_Render {
 
         // build the baseline output
         $output = $this->conf['format_main'];
-        $output = str_replace('%access', htmlspecialchars($access), $output);
-        $output = str_replace('%return', htmlspecialchars($return), $output);
-        $output = str_replace('%name', htmlspecialchars($name), $output);
+        $output = str_replace('%access', $this->textEncode($access), $output);
+        $output = str_replace('%return', $this->textEncode($return), $output);
+        $output = str_replace('%name', $this->textEncode($name), $output);
 
         // build the set of params
         $list = array();
@@ -77,9 +77,9 @@ class Text_Wiki_Render_Xhtml_Function extends Text_Wiki_Render {
             }
 
             // add the param elements
-            $tmp = str_replace('%type', htmlspecialchars($val['type']), $tmp);
-            $tmp = str_replace('%descr', htmlspecialchars($val['descr']), $tmp);
-            $tmp = str_replace('%default', htmlspecialchars($val['default']), $tmp);
+            $tmp = str_replace('%type', $this->textEncode($val['type']), $tmp);
+            $tmp = str_replace('%descr', $this->textEncode($val['descr']), $tmp);
+            $tmp = str_replace('%default', $this->textEncode($val['default']), $tmp);
             $list[] = $tmp;
         }
 
@@ -91,8 +91,8 @@ class Text_Wiki_Render_Xhtml_Function extends Text_Wiki_Render {
         $list = array();
         foreach ($throws as $key => $val) {
                $tmp = $this->conf['format_throws'];
-            $tmp = str_replace('%type', htmlspecialchars($val['type']), $tmp);
-            $tmp = str_replace('%descr', htmlspecialchars($val['descr']), $tmp);
+            $tmp = str_replace('%type', $this->textEncode($val['type']), $tmp);
+            $tmp = str_replace('%descr', $this->textEncode($val['descr']), $tmp);
             $list[] = $tmp;
         }
 

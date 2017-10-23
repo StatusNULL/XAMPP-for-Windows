@@ -1,3 +1,6 @@
+<?php
+	include "langsettings.php";
+?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 	"http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -8,8 +11,6 @@
 	</head>
 
 	<body>
-		<?php include "lang/".file_get_contents("lang.tmp").".php"; ?>
-
 		&nbsp;<p>
 		<h1><?php echo $TEXT['filezilla-head']; ?></h1>
 

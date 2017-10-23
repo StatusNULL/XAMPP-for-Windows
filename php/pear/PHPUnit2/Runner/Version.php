@@ -4,7 +4,7 @@
 /**
  * PHP Version 5
  *
- * Copyright (c) 2002-2005, Sebastian Bergmann <sb@sebastian-bergmann.de>.
+ * Copyright (c) 2002-2006, Sebastian Bergmann <sb@sebastian-bergmann.de>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,9 +39,9 @@
  * @category   Testing
  * @package    PHPUnit2
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
- * @copyright  2002-2005 Sebastian Bergmann <sb@sebastian-bergmann.de>
+ * @copyright  2002-2006 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    CVS: $Id: Version.php,v 1.7.2.1 2005/11/02 10:54:53 sebastian Exp $
+ * @version    CVS: $Id: Version.php,v 1.7.2.2 2005/12/17 16:04:56 sebastian Exp $
  * @link       http://pear.php.net/package/PHPUnit2
  * @since      File available since Release 2.0.0
  */
@@ -52,9 +52,9 @@
  * @category   Testing
  * @package    PHPUnit2
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
- * @copyright  2002-2005 Sebastian Bergmann <sb@sebastian-bergmann.de>
+ * @copyright  2002-2006 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 2.3.3
+ * @version    Release: 2.3.5
  * @link       http://pear.php.net/package/PHPUnit2
  * @since      Class available since Release 2.0.0
  */
@@ -67,7 +67,7 @@ class PHPUnit2_Runner_Version {
      * @static
      */
   	public static function id() {
-    		return '2.3.3';
+    		return '2.3.5';
   	}
 
     /**
@@ -76,7 +76,7 @@ class PHPUnit2_Runner_Version {
      * @static
      */
     public static function getVersionString() {
-        return 'PHPUnit 2.3.3 by Sebastian Bergmann.';
+        return 'PHPUnit 2.3.5 by Sebastian Bergmann.';
     }
 }
 

@@ -19,12 +19,10 @@
 include_once('Net/Sieve.php');
 error_reporting(E_ALL);
 
-
 $user='user';
-$pass='password';
+$passwd='password';
 $host='localhost';
 $port="2000";
-
 
 
 //you can create a file called passwords.php and store your $user,$pass,$host and $port values in it
@@ -53,16 +51,16 @@ $sieve=new Net_Sieve();
 
 $sieve->setDebug(true);
 
-if(PEAR::isError($error = $sieve->connect($host , $port) ) ){
+if(PEAR::isError($error = $sieve->connect($host , $port) ) ) {
     echo "  there was an error trying to connect to the server. The error is: " . $error->getMessage() . "\n" ;
     exit();
 }
 
 
 
-//if(PEAR::isError($error = $sieve->login($user, $passwd  , 'PLAIN' , '', false ) ) ){
-if(PEAR::isError($error = $sieve->login($user, $passwd  , null , '', false ) ) ){
-    echo "  there was an error trying to connect to the server. The error is: " . $error->getMessage()  . "\n";
+//if(PEAR::isError($error = $sieve->login($user, $passwd  , 'PLAIN' , '', false ) ) ) {
+if(PEAR::isError($error = $sieve->login($user, $passwd  , null , '', false ) ) ) {
+    echo "  there was an error trying to login to the server. The error is: " . $error->getMessage()  . "\n";
     exit();
 }
 
@@ -74,7 +72,7 @@ if(PEAR::isError($error = $sieve->login($user, $passwd  , null , '', false ) ) )
 echo "These are the scripts that I have in the server:\n";
 print_r($sieve->listScripts());
 echo "\n";
-
+exit();
 
 echo "I remove script 1 ($sieve_script_name1)......\n";
 if( !PEAR::isError($error = $sieve->removeScript($sieve_script_name1) ) ){
@@ -89,7 +87,7 @@ echo "\n";
 // I try to delete again de same script, the method must fail
 
 echo "I remove script 1 ($sieve_script_name1)......\n";
-if( !PEAR::isError($error = $sieve->removeScript($sieve_script_name1) ) ){
+if( !PEAR::isError($error = $sieve->removeScript($sieve_script_name1) ) ) {
     echo "  script '$sieve_script_name1' removed ok!\n";
 }else{
     echo "  there was an error trying to remove the script '$sieve_script_name1'. The error is: " . $error->getMessage() . "\n" ;
@@ -102,7 +100,7 @@ echo "\n";
 
 /*
 echo "I'll check if the server has space to store '$sieve_script_name1' script .....";
-if(!PEAR::isError( $error = $sieve->haveSpace($sieve_script_name1, strlen($sieve_script1)))){
+if(!PEAR::isError( $error = $sieve->haveSpace($sieve_script_name1, strlen($sieve_script1)))) {
     echo "  ok! the server has a lot of space!\n";
 }else{
     echo "  the server can't store the script. The error is: " . $error->getMessage() . "\n" ;
@@ -113,7 +111,7 @@ echo "\n";
 
 
 echo "I install the script '$sieve_script_name1' and mark it active.....\n";
-if(!PEAR::isError( $error = $sieve->installScript($sieve_script_name1, $sieve_script1,true))){
+if(!PEAR::isError( $error = $sieve->installScript($sieve_script_name1, $sieve_script1,true))) {
     echo "  script '$sieve_script_name1' installed ok!\n";
 }else{
     echo "  there was an error trying to install the script '$sieve_script_name1'. The error is: " . $error->getMessage() . "\n" ;
@@ -122,7 +120,7 @@ echo "\n";
 
 
 echo "This is the script I just installed.....\n";
-if(!PEAR::isError( $error = $sieve->getScript($sieve_script_name1 ))){
+if(!PEAR::isError( $error = $sieve->getScript($sieve_script_name1 ))) {
     echo "  script '$sieve_script_name1':\n$error\n";
 }else{
     echo "  there was an error trying to install the script '$sieve_script_name1'. The error is: " . $error->getMessage() . "\n" ;
@@ -132,7 +130,7 @@ if(!PEAR::isError( $error = $sieve->getScript($sieve_script_name1 ))){
 
 
 echo "I install the script '$sieve_script_name2' but it is not marked as active.....\n";
-if(!PEAR::isError( $error = $sieve->installScript($sieve_script_name2, $sieve_script2))){
+if(!PEAR::isError( $error = $sieve->installScript($sieve_script_name2, $sieve_script2))) {
     echo "  script '$sieve_script_name2' installed ok!\n";
 }else{
     echo "  there was an error trying to install the script '$sieve_script_name2'. The error is: " . $error->getMessage() . "\n" ;
@@ -141,7 +139,7 @@ echo "\n";
 
 
 echo "Now set script 2 as active...\n";
-if(!PEAR::isError($error = $sieve->setActive($sieve_script_name2))){
+if(!PEAR::isError($error = $sieve->setActive($sieve_script_name2))) {
     echo "  script '$sieve_script_name2' marked as active ok!\n";
 }else{
     echo "  there was an error trying to mark as active the script '$sieve_script_name2'. The error is: " . $error->getMessage() . "\n" ;
@@ -149,7 +147,7 @@ if(!PEAR::isError($error = $sieve->setActive($sieve_script_name2))){
 echo "\n";
 
 echo "Now get the active script....\n";
-if( !PEAR::isError($error = $script= $sieve->getActive() ) ){
+if( !PEAR::isError($error = $script= $sieve->getActive() ) ) {
     echo "the script marked as active is: $script\n";
 }else{
     echo "  there was an error trying to get the activescript, the error is:" . $script->getMessage() ;
@@ -172,7 +170,7 @@ echo "\n";
 
 
 $ext='pichula';
-if($sieve->hasExtension( $ext ) ){
+if($sieve->hasExtension( $ext ) ) {
     echo "this server supports the '$ext' extenssion\n";
 } else {
     echo "this server does not supports the '$ext' extenssion\n";
@@ -183,7 +181,7 @@ echo "\n";
 
 
 $ext='fileinto';
-if($sieve->hasExtension( $ext ) ){
+if($sieve->hasExtension( $ext ) ) {
     echo "this server supports the '$ext' extenssion\n";
 } else {
     echo "this server does not supports the '$ext' extenssion\n";

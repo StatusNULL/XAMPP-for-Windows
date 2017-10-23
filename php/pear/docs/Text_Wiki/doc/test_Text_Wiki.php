@@ -1,11 +1,17 @@
 <?php
+ini_set('display_errors', true);
+error_reporting(E_ALL);
+// needed for error checking
+require_once 'PEAR.php';
+// base class
+require_once 'Text/Wiki.php';
 /**
  * Eventually set an include path if all parsers/renderers not installed
- * $Id: test_Text_Wiki.php,v 1.6 2005/08/06 18:45:37 toggg Exp $
+ * $Id: test_Text_Wiki.php,v 1.18 2006/03/01 16:58:17 justinpatrin Exp $
  */
 $parser = $render = $source = '';
 $plist = array('Default', 'BBCode', 'Cowiki', 'Doku', 'Mediawiki', 'Tiki');
-$rlist = array('Xhtml', 'Plain', 'Latex', 'Cowiki', 'Doku', 'Tiki');
+$rlist = array('Xhtml', 'Plain', 'Latex', 'Cowiki', 'Doku', 'Tiki', 'Ooosxw', 'Pdf', 'Docbook');
 
 /**
  * Here we need to know if we are running from command line or from web
@@ -17,7 +23,7 @@ if (in_array(php_sapi_name(), array('cli', 'cgi'))) {
     $parser = isset($_SERVER['argv'][1]) ? $_SERVER['argv'][1] : 'BBCode';
     $render = isset($_SERVER['argv'][2]) ? $_SERVER['argv'][2] : 'Xhtml';
     if (!isset($_SERVER['argv'][3]) or !is_readable($sou = $_SERVER['argv'][3])) {
-    	die("Enter a text file to be processed as 3d argument\n First and second are parser and renderer\n");
+        die("Enter a text file to be processed as 3d argument\n First and second are parser and renderer\n");
     }
     $source = file_get_contents ($sou);
 } else {
@@ -26,7 +32,7 @@ if (in_array(php_sapi_name(), array('cli', 'cgi'))) {
     if (isset($_REQUEST['example'])
         && in_array($_REQUEST['exchoice'], $elist)) {
         $_REQUEST['source'] = file_get_contents ($_REQUEST['exchoice']);
-        if (preg_match('#(\b'.implode('\b|\b', $plist).'\b)#i',
+        if (preg_match('#(\b'.implode('\b|\b', $plist).'\b)#',
                          $_REQUEST['source'], $match)) {
             $_REQUEST['parser'] = $match[1];
         }
@@ -45,17 +51,19 @@ if (in_array(php_sapi_name(), array('cli', 'cgi'))) {
         die();
     }
 }
-// load the class file
-if ($parser != 'Default') {
-    require_once 'Text/Wiki/'.$parser.'.php';
-    $class = 'Text_Wiki_'.$parser;
-} else  {
-    require_once 'Text/Wiki.php';
-    $class = 'Text_Wiki';
-}
 
 // instantiate a Text_Wiki object from the given class
-$wiki =& new $class();
+$wiki = & Text_Wiki::singleton($parser);
+
+// If you want to include rules, use
+//$wiki = & Text_Wiki::singleton($parser, $rules);
+
+// If you want to get a new copy of the class use factory
+//$wiki =& Text_Wiki::factory($parser);
+
+//print "<pre>\n";
+//print_r($wiki);
+//print "</pre>\n";
 
 // when rendering XHTML, make sure wiki links point to a
 // specific base URL
@@ -75,7 +83,11 @@ $result = $wiki->transform($source, $render);
 if ($html) {
     echo bldHtml($result, $plist, $rlist, $elist);
 } else {
-    echo $result;
+    if (PEAR::isError($result)) {
+        var_dump($result);
+    } else {
+        echo $result;
+    }
 }
 function bldOpt($name, $list) {
     $ret = '';
@@ -90,10 +102,17 @@ function bldHtml($result, $plist, $rlist, $elist) {
     $optparser = bldOpt('parser', $plist);
     $optrender = bldOpt('render', $rlist);
     $optexample = bldOpt('exchoice', $elist);
-    $hresult = nl2br(htmlentities($result));
+    if (PEAR::isError($result)) {
+        $hresult = '<span class="error">' .
+            nl2br(htmlentities($result->toString ())) . '</span>';
+        $result = '';
+    } else {
+        $hresult = nl2br(htmlentities($result));
+    }
     if ($_REQUEST['render'] != 'Xhtml') {
         $result = '';
     }
+    $_REQUEST['source'] = htmlspecialchars($_REQUEST['source']);
     return <<<EOT
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -112,6 +131,9 @@ function bldHtml($result, $plist, $rlist, $elist) {
         background-color:orange;
         text-decoration: underline;
     }
+    .error {
+        color: red;
+    }
   </style>
 </head>
 <body>
@@ -122,14 +144,14 @@ Translate from
 <SELECT name="parser">{$optparser}</SELECT>
  to
 <SELECT name="render">{$optrender}</SELECT>
- <INPUT type="submit" name="translate" value="translate">
+ <INPUT type="submit" name="translate" value="translate" />
 <br />
 <textarea name="source" cols="60" rows="25">{$_REQUEST['source']}</textarea>
 <br />
 <h4> Or choose
 <SELECT name="exchoice">{$optexample}</SELECT>
  and
-<INPUT type="submit" name="example" value="Load example">
+<INPUT type="submit" name="example" value="Load example" />
 </h4>
 </FORM>
 </div>
@@ -149,7 +171,7 @@ function findExamples($dir=null) {
     while ($subfil = readdir($dh)) {
         if (!is_dir($subfil) && is_readable($subfil)
             && (substr($subfil, -4) == '.txt')) {
-        	$ret[] = $subfil;
+            $ret[] = $subfil;
         }
     }
     closedir($dh);

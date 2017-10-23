@@ -15,7 +15,7 @@
 // | Authors: Stephan Schmidt <schst@php.net>                             |
 // +----------------------------------------------------------------------+
 //
-// $Id: set_include_path.php,v 1.3 2004/11/14 16:10:50 aidan Exp $
+// $Id: set_include_path.php,v 1.4 2005/12/07 21:08:57 aidan Exp $
 
 
 /**
@@ -25,7 +25,7 @@
  * @package     PHP_Compat
  * @link        http://php.net/function.set_include_path
  * @author      Stephan Schmidt <schst@php.net>
- * @version     $Revision: 1.3 $
+ * @version     $Revision: 1.4 $
  * @since       PHP 4.3.0
  */
 if (!function_exists('set_include_path')) {
@@ -34,4 +34,5 @@ if (!function_exists('set_include_path')) {
         return ini_set('include_path', $new_include_path);
     }
 }
+
 ?>

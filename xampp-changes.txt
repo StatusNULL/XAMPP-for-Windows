@@ -1,3 +1,24 @@
+13 April 2006, XAMPP 1.5.2 Beta5
+- Update ZendOptimizer 3.0.0
+
+07 April 2006, XAMPP 1.5.2 Beta4
+- ADD Mercury/32 Security patches for MercuryW and MercuryH (Jan 2006, 120Kb)
+- Update ZendOptimizer 2.6.2
+- Update FileZilla FTP Server 0.9.14a
+- Update eAccelerator 
+- Update PEAR & PECL
+- Update phpMyAdmin 2.8.0.3
+- Update ADODB 4.80
+- ADD Spreadsheet Excel Reader
+- Fix security problem in xamppsecurity.php 
+- Fix Java Addon problem in status.php
+- Update MySQL 5.0.20
+- Update PHP 5.1.2 + PHP 4.4.2
+- Update XAMPP Control Version 2.2
+- Changes in navi.php (include .modell for XAMPP Lite or Not)
+- Remove go-pear.bat
+
+
 08 Jan 2006, XAMPP 1.5.1
 - UPDATE MySQL 5.0.18 (without ssl support)
 - CHANGE (Activate) PHP gettext module as default

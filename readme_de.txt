@@ -1,26 +1,25 @@
-  ApacheFriends XAMPP (basic package) version 1.5.1
+  ApacheFriends XAMPP (basic package) version 1.5.2
 
   + Apache 2.2.0
-  + MySQL 5.0.18
-  + PHP 5.1.1 + PHP 4.4.1-pl1 + PEAR
-  + eAccelerator 0.9.4-rc1
+  + MySQL 5.0.20
+  + PHP 5.1.2 + PHP 4.4.2-pl1 + PEAR
+  + eAccelerator 0.9.4-rc1 (nicht stabil with PHP 5.1.2)
   + PHP-Switch win32 1.0 (von Apachefriends, man nehme die "php-switch.bat") 
-  + XAMPP Control Version 2.1 from www.nat32.com	
+  + XAMPP Control Version 2.2 from www.nat32.com	
   + XAMPP Security 1.0	
   + SQLite 2.8.15
   + OpenSSL 0.9.8a
-  + phpMyAdmin 2.7.0 pl1
-  + ADOdb 4.68
-  + FPDF 1.5.3
+  + phpMyAdmin 2.8.0.3
+  + ADOdb 4.80
   + Mercury Mail Transport System v4.01b
-  + FileZilla FTP Server 0.9.11
+  + FileZilla FTP Server 0.9.14a
   + Webalizer 2.01-10
-  + Zend Optimizer 2.6.0
+  + Zend Optimizer 3.0.0
  
 * System Vorrausetzungen:
   
   + 64 MB RAM (recommended)
-  + 160 MB free Fixed Disk 
+  + 200 MB free Fixed Disk 
   + Windows 98, ME
   + Windows NT, 2000, XP (Recommended)
 

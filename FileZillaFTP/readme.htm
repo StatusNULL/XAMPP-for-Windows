@@ -1,5 +1,5 @@
-<p align="center"><b><u>FileZilla Server version 0.9.11 beta</u></b></p>
-<p align="center">Copyright 2001-2005<br>
+<p align="center"><b><u>FileZilla Server version 0.9.14 beta</u></b></p>
+<p align="center">Copyright 2001-2006<br>
 by <a href="mailto:Tim.Kosse@gmx.de">Tim Kosse</a><a href="http://sourceforge.net/projects/filezilla/"><br>
 http://sourceforge.net/projects/filezilla/</a></p>
 <p align="left"><u><b>Features:</b></u></p>
@@ -67,6 +67,42 @@ as restoring it to normal size.</p>
   </tr>
 </table>
 <p align="left"><b><u>Version History:</u></b></p>
+<p>For a more detailed list of changes, please have a look at the CVS changelog located at <a href="http://filezilla-project.org/changelog.php?type=2">http://filezilla-project.org/changelog.php?type=2</a>.</p>
+<p><b>Version 0.9.14</b></p>
+<blockquote>
+  <u>Fixed bugs:</u>
+  <ul>
+    <li>Fixed problem with SSL transfers aborting or even crashing the server.</li>
+  </ul>
+</blockquote>
+<p><b>Version 0.9.13</b></p>
+<blockquote>
+  <u>New features:</u>
+  <ul>
+    <li>Option to not use external ip address in passive mode if client is within local network. Enabled by default.</li>
+    <li>Option to ignore the address given in the PORT command if it's from an unrouteable address range, but the client has a routeable address. Enabled by default.</li>
+  </ul>
+  <u>Fixed bugs:</u>
+  <ul>
+    <li>Fixed problems with the case-(in)sensitivity of aliases</li>
+    <li>(0.9.13b) Fixed passive mode problems introduced in 0.9.13</li>
+  </ul>
+</blockquote>
+<p><b>Version 0.9.12</b></p>
+<blockquote>
+  <u>New features:</u>
+  <ul>
+    <li>Alias targets can now be virtual paths as well</li>
+    <li>Add option to allow reading of files which are opened for writing by another process</li>
+    <li>Always require a set password even for local connections now. If you don't remember your password, delete it from <b>FileZilla Server.xml</b></li>
+    <li>Workaround for SMC routers with P@SW bug</li>
+    <li>Added SITE NAMEFMT command with "1" as only supported naming format. Required by at least one client running on AS/400 server.</li>
+  </ul>
+  <u>Fixed bugs:</u>
+  <ul>
+    <li>Don't allow AUTH SSL/TLS command if already using SSL/TLS, broadcast SSL/TLS availability in FEAT response</li>
+  </ul>
+</blockquote>
 <p><b>Version 0.9.11</b></p>
 <blockquote>
   <u>Fixed bugs:</u>

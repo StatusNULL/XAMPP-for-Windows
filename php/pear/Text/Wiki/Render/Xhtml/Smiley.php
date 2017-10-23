@@ -10,7 +10,7 @@
  * @author     Bertrand Gugger <bertrand@toggg.com>
  * @copyright  2005 bertrand Gugger
  * @license    http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
- * @version    CVS: $Id: Smiley.php,v 1.1 2005/08/10 11:38:55 toggg Exp $
+ * @version    CVS: $Id: Smiley.php,v 1.2 2006/02/10 23:07:03 toggg Exp $
  * @link       http://pear.php.net/package/Text_Wiki
  */
 
@@ -64,7 +64,7 @@ class Text_Wiki_Render_Xhtml_Smiley extends Text_Wiki_Render {
         $imageSize = @getimagesize($imageFile);
 
         // return the HTML output
-        return '<img src="' . htmlspecialchars($imageFile) . '"' .
+        return '<img src="' . $this->textEncode($imageFile) . '"' .
             (is_array($imageSize) ?
                 ' width="' . $imageSize[0] . '" height="' . $imageSize[1] .'"' : '') .
             ' alt="' . $options['desc'] . '"' .

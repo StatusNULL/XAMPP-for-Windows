@@ -10,7 +10,7 @@ if %errorlevel% == 9009 echo You do not have Perl in your PATH.
 if errorlevel 1 goto script_failed_so_exit_with_non_zero_val 2>nul
 goto endofperl
 @rem ';
-#!c:\xampp\perl\bin\perl.exe
+#!\xampp\perl\bin\perl.exe
 #line 15
 use strict;
 use warnings;
@@ -76,25 +76,25 @@ EOU
 my ${CC} = q[cl];
 my ${LIBS} = q[];
 my ${APR_SO_EXT} = q[dll];
-my ${APR_DOTTED_VERSION} = q[0.9.6];
-my ${installbuilddir} = q[O:\apache\build];
-my ${APR_MAJOR_VERSION} = q[0];
-my ${bindir} = q[O:\apache\bin];
+my ${APR_DOTTED_VERSION} = q[1.2.3];
+my ${installbuilddir} = q[\xampp\apache\build];
+my ${APR_MAJOR_VERSION} = q[1];
+my ${bindir} = q[\xampp\apache\bin];
 my ${LD} = q[link];
 my ${CPP} = q[cl -nologo -E];
 my ${APR_SOURCE_DIR} = q[];
-my ${includedir} = q[O:\apache\include];
+my ${includedir} = q[\xampp\apache\include];
 my ${LDFLAGS} = q[ kernel32.lib /nologo /subsystem:windows /dll /machine:I386 ];
-my ${exec_prefix} = q[O:\apache];
-my ${APR_LIBNAME} = q[libapr.lib];
-my ${datadir} = q[O:\apache];
-my ${libdir} = q[O:\apache\lib];
+my ${exec_prefix} = q[\xampp\apache];
+my ${APR_LIBNAME} = q[libapr-1.lib];
+my ${datadir} = q[\xampp\apache];
+my ${libdir} = q[\xampp\apache\lib];
 my ${CFLAGS} = q[ /nologo /MD /W3 /O2 /D WIN32 /D _WINDOWS /D NDEBUG ];
 my ${APR_LIB_TARGET} = q[];
-my ${SHELL} = q[D:\WINNT\system32\cmd.exe];
+my ${SHELL} = q[C:\WINDOWS\system32\cmd.exe];
 my ${CPPFLAGS} = q[];
 my ${EXTRA_INCLUDES} = q[];
-my ${prefix} = q[O:\apache];
+my ${prefix} = q[\xampp\apache];
 
 my %opts = ();
 GetOptions(\%opts,

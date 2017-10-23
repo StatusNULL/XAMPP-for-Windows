@@ -10,7 +10,7 @@ if %errorlevel% == 9009 echo You do not have Perl in your PATH.
 if errorlevel 1 goto script_failed_so_exit_with_non_zero_val 2>nul
 goto endofperl
 @rem ';
-#!C:\xampp\perl\bin\perl.EXE -w
+#!\xampp\perl\bin\perl.exe -w
 #line 15
 # ====================================================================
 #
@@ -43,7 +43,7 @@ use File::Spec::Functions;
 
 my %config_vars = ();
 
-my $installbuilddir = 'O:\apache\build';
+my $installbuilddir = '\xampp\apache\build';
 get_config_vars("$installbuilddir/config_vars.mk",\%config_vars);
 
 # read the configuration variables once
@@ -54,6 +54,7 @@ my $exec_prefix     = get_vars('exec_prefix');
 my $datadir         = get_vars('datadir');
 my $localstatedir   = get_vars('localstatedir');
 my $CFG_TARGET      = get_vars('progname');
+my $progname        = get_vars('progname');
 my $CFG_SYSCONFDIR  = get_vars('sysconfdir');
 my $CFG_SYSCONF     = get_vars('sysconf');
 my $CFG_CFLAGS      = join ' ', map { get_vars($_) }
@@ -79,10 +80,10 @@ my %internal_vars = map {$_ => 1}
     qw(TARGET CC CFLAGS CFLAGS_SHLIB LD_SHLIB LDFLAGS_SHLIB LIBS_SHLIB
        PREFIX SBINDIR INCLUDEDIR LIBEXECDIR SYSCONFDIR SYSCONF);
 
-my $CP    = 'C:\xampp\perl\bin\perl.EXE -MExtUtils::Command -e cp';
-my $CHMOD = 'C:\xampp\perl\bin\perl.EXE -MExtUtils::Command -e chmod';
-my $RM_F  = 'C:\xampp\perl\bin\perl.EXE -MExtUtils::Command -e rm_f';
-my $TOUCH = 'C:\xampp\perl\bin\perl.EXE -MExtUtils::Command -e touch';
+my $CP    = 'D:\perl\bin\perl.EXE -MExtUtils::Command -e cp';
+my $CHMOD = 'D:\perl\bin\perl.EXE -MExtUtils::Command -e chmod';
+my $RM_F  = 'D:\perl\bin\perl.EXE -MExtUtils::Command -e rm_f';
+my $TOUCH = 'D:\perl\bin\perl.EXE -MExtUtils::Command -e touch';
 
 ##
 ##  parse argument line
@@ -315,6 +316,7 @@ if ($opt_g) {
     my $data = join('', <DATA>);
     $data =~ s!__END__.*!!s;
     $data =~ s|%NAME%|$name|sg;
+    $data =~ s|%PROGNAME%|$progname|sg;
     $data =~ s|%SYSCONF%|$CFG_SYSCONF|sg;
     $data =~ s|%PREFIX%|$prefix|sg;
     $data =~ s|%INSTALLBUILDDIR%|$installbuilddir|sg;
@@ -700,7 +702,7 @@ top_builddir=%PREFIX%
 
 #   the used tools
 APXS=apxs
-APACHECTL=Apache.exe -k
+APACHECTL=%PROGNAME% -k
 
 #   additional defines, includes and libraries
 #DEFS=-Dmy_define=my_value

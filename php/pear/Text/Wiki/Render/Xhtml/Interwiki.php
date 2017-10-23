@@ -9,7 +9,7 @@
  * @package    Text_Wiki
  * @author     Paul M. Jones <pmjones@php.net>
  * @license    http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
- * @version    CVS: $Id: Interwiki.php,v 1.10 2005/11/02 07:21:47 toggg Exp $
+ * @version    CVS: $Id: Interwiki.php,v 1.14 2006/02/25 05:03:13 toggg Exp $
  * @link       http://pear.php.net/package/Text_Wiki
  */
 
@@ -51,32 +51,38 @@ class Text_Wiki_Render_Xhtml_Interwiki extends Text_Wiki_Render {
 
     function token($options)
     {
-        $site = $options['site'];
-        $page = $options['page'];
         $text = $options['text'];
-        $css = $this->formatConf(' class="%s"', 'css');
-
-        if (isset($this->conf['sites'][$site])) {
-            $href = $this->conf['sites'][$site];
+        if (isset($options['url'])) {
+            // calculated by the parser (e.g. Mediawiki)
+            $href = $options['url'];
         } else {
-            return $text;
-        }
+            $site = $options['site'];
+            // toggg 2006/02/05 page name must be url encoded (e.g. may contain spaces)
+            $page = $this->urlEncode($options['page']);
 
-        // old form where page is at end,
-        // or new form with %s placeholder for sprintf()?
-        if (strpos($href, '%s') === false) {
-            // use the old form
-            $href = $href . $page;
-        } else {
-            // use the new form
-            $href = sprintf($href, $page);
+            if (isset($this->conf['sites'][$site])) {
+                $href = $this->conf['sites'][$site];
+            } else {
+                return $text;
+            }
+
+            // old form where page is at end,
+            // or new form with %s placeholder for sprintf()?
+            if (strpos($href, '%s') === false) {
+                // use the old form
+                $href = $href . $page;
+            } else {
+                // use the new form
+                $href = sprintf($href, $page);
+            }
         }
 
         // allow for alternative targets
         $target = $this->getConf('target');
 
         // build base link
-        $text = htmlspecialchars($text);
+        $css = $this->formatConf(' class="%s"', 'css');
+        $text = $this->textEncode($text);
         $output = "<a$css href=\"$href\"";
 
         // are we targeting a specific window?
@@ -84,7 +90,7 @@ class Text_Wiki_Render_Xhtml_Interwiki extends Text_Wiki_Render {
             // this is XHTML compliant, suggested by Aaron Kalin.
             // code tip is actually from youngpup.net, and it
             // uses the $target as the new window name.
-            $target = htmlspecialchars($target);
+            $target = $this->textEncode($target);
             $output .= " onclick=\"window.open(this.href, '$target');";
             $output .= " return false;\"";
         }

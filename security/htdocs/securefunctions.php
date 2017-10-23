@@ -7,6 +7,7 @@
 		$dir = $partwampp."\security\\";
 		global $rootpasswdupdate;
 		global $update;
+		global $mysqlpfile;
 		if (@mysql_connect("localhost", "root", "$currentpass")) {
 			mysql_select_db("mysql");
 
@@ -17,11 +18,13 @@
 			if (!file_exists($dir)) { // Fix by Wiedmann
 				mkdir($dir);
 			}
-
+			if ($mysqlpfile=="yes")
+			{
 			$datei = fopen($mypasswdtxtdir, 'w+');
 			$put = "mysql user = root\r\nmysql password = $newpass";
 			fputs($datei, $put);
 			fclose($datei);
+			}
 			$rootpasswdupdate = "yes";
 		} else {
 			$rootpasswdupdate = "no";
@@ -125,6 +128,7 @@
 		global $htpasswddir;
 		global $htpasswddirectory;
 		global $htxampp;
+		global $xapfile;
 		$curdir = getcwd();
 		list($partwampp, $directorwampp) = spliti('\\\security\\\htdocs', $curdir);
 		$htaccess = ".htaccess";
@@ -152,11 +156,13 @@
 			$handle = popen($htpassrealm, 'w');
 			pclose($handle);
 			chdir($curdir);
-
+			if ($xapfile=="yes")
+            {
 			$datei = fopen($xapasswdtxtdir, 'w+');
 			$put = "XAMPP user = $xauser\r\nXAMPP password = $xapasswd";
 			fputs($datei, $put);
 			fclose($datei);
+			}
 			$hdir = $dir.'htdocs\\';
 			copy($htxampp, $dir.'htdocs\\.htaccess');
 			$xamppdirconfig = "ok";

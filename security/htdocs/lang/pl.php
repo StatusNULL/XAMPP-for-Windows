@@ -171,6 +171,36 @@
 	$TEXT['start-text6'] = "Powodzenia, Kay Vogelgesang, Carsten Wiedmann + Kai 'Oswald' Seidler";
 
 	// ---------------------------------------------------------------------
+	// SECURITY SETUP
+	// ---------------------------------------------------------------------
+
+	$TEXT['mysql-security-head'] = "Security console MySQL & XAMPP directory protection";
+	$TEXT['mysql-rootsetup-head'] = "MYSQL SECTION: \"ROOT\" PASSWORD";
+	$TEXT['mysql-rootsetup-text1'] = "";
+	$TEXT['mysql-rootsetup-notrunning'] = "The MySQL server is not running or is blocked by a firewall! Please check this problem first ...";
+	$TEXT['mysql-rootsetup-passwdnotok'] = "The new password is identical with the repeat password. Please enter both passwords for new!";
+	$TEXT['mysql-rootsetup-passwdnull'] = "Zero passwords ('') will not accepted!";
+	$TEXT['mysql-rootsetup-passwdsuccess'] = "SUCCESS: The password for the SuperUser 'root' was set or updated!
+	But note: The initialization of the new password for \"root\" needs a RESTART OF MYSQL !!!! The data with the new password was safed in the following file:";
+	$TEXT['mysql-rootsetup-passwdnosuccess'] = "ERROR: The root password is perhaps wrong. MySQL decline the login with these current root password.";
+	$TEXT['mysql-rootsetup-passwdold'] = "Current passwort:";
+	$TEXT['mysql-rootsetup-passwd'] = "New password:";
+	$TEXT['mysql-rootsetup-passwdrepeat'] = "Repeat the new password:";
+	$TEXT['mysql-rootsetup-passwdchange'] = "Password changing";
+	$TEXT['mysql-rootsetup-phpmyadmin'] = "PhpMyAdmin authentification:";
+	$TEXT['mysql-passwort-infile'] = "Safe plain password in text file?";
+	$TEXT['mysql-passwort-risk'] = "Security risk!";
+
+	$TEXT['xampp-setup-head'] = "XAMPP DIRECTORY PROTECTION (.htaccess)";
+	$TEXT['xampp-setup-user'] = "User:";
+	$TEXT['xampp-setup-passwd'] = "Password:";
+	$TEXT['xampp-setup-start'] = "Make safe the XAMPP directory";
+	$TEXT['xampp-setup-notok'] = "<br><br>ERROR: The string for the user name and password must have at least three  characters and not more then 15 characters. Special characters like <צהü (usw.) and empty characters are not allowed!<br><br>";
+	$TEXT['xampp-setup-ok'] = "<br><br>The root password was successfully changed. Please restart MYSQL for loading these changes!<br><br>";
+	$TEXT['xampp-config-ok'] = "<br><br>SUCCESS: The XAMPP directory is protected now! All personal data was safed in the following file:<br>";
+	$TEXT['xampp-config-notok'] = "<br><br>ERROR: Your system could NOT activate the directory protection with the \".htaccess\" and the \"htpasswd.exe\". Perhaps PHP is in the \"Safe Mode\". <br><br>";
+
+	// ---------------------------------------------------------------------
 	// MANUALS
 	// ---------------------------------------------------------------------
 

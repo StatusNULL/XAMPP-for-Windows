@@ -9,7 +9,7 @@
  * @package    Text_Wiki
  * @author     Paul M. Jones <pmjones@php.net>
  * @license    http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
- * @version    CVS: $Id: Url.php,v 1.12 2005/07/30 08:03:29 toggg Exp $
+ * @version    CVS: $Id: Url.php,v 1.13 2006/02/10 23:07:03 toggg Exp $
  * @link       http://pear.php.net/package/Text_Wiki
  */
 
@@ -59,7 +59,7 @@ class Text_Wiki_Render_Xhtml_Url extends Text_Wiki_Render {
         // extension.
         $pos = strrpos($href, '.');
         $ext = strtolower(substr($href, $pos + 1));
-        $href = htmlspecialchars($href);
+        $href = $this->textEncode($href);
 
         // does the filename extension indicate an image file?
         if ($this->getConf('images') &&
@@ -68,7 +68,7 @@ class Text_Wiki_Render_Xhtml_Url extends Text_Wiki_Render {
             // create alt text for the image
             if (! isset($text) || $text == '') {
                 $text = basename($href);
-                $text = htmlspecialchars($text);
+                $text = $this->textEncode($text);
             }
 
             // generate an image tag
@@ -89,14 +89,14 @@ class Text_Wiki_Render_Xhtml_Url extends Text_Wiki_Render {
             }
 
             // generate a regular link (not an image)
-            $text = htmlspecialchars($text);
+            $text = $this->textEncode($text);
             $css = $this->formatConf(' class="%s"', "css_$type");
             $output = "<a$css href=\"$href\"";
 
             if ($target) {
                 // use a "popup" window.  this is XHTML compliant, suggested by
                 // Aaron Kalin.  uses the $target as the new window name.
-                $target = htmlspecialchars($target);
+                $target = $this->textEncode($target);
                 $output .= " onclick=\"window.open(this.href, '$target');";
                 $output .= " return false;\"";
             }

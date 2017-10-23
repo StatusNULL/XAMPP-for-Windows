@@ -165,6 +165,8 @@
 	$TEXT['mysql-rootsetup-passwdrepeat'] = "Wiederhole neues Passwort:";
 	$TEXT['mysql-rootsetup-passwdchange'] = "Passwort ändern";
 	$TEXT['mysql-rootsetup-phpmyadmin'] = "PhpMyAdmin Authentifikation:";
+	$TEXT['mysql-passwort-infile'] = "Passwort in Klartext in Datei speichern?";
+	$TEXT['mysql-passwort-risk'] = "Sicherheitsrisiko!";
 
 	$TEXT['xampp-setup-head'] = "XAMPP VERZEICHNIS SCHUTZ (.htaccess)";
 	$TEXT['xampp-setup-user'] = "Benutzer (User):";

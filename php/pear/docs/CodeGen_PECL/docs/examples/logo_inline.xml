@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<extension name="logo_inline" version="1.0.0">
+ <!-- testing a phpinfo with inline bas64 encoded data -->
+ <logo>
+<![CDATA[
+R0lGODdhFQASAOMAAMDEwJCQkLCwsGhoaFhcWLjAuDA0MPj8+FBUUPj4+AAA
+AAAAAAAAAAAAAAAAAAAAACwAAAAAFQASAAAEehDISWsNQIhBuv+DphWhABhH
+qq5GpgHluc5HK24vmiKGwfeIgdAU0wkSyCQSkAhgQhgdQUlNCAKkq0BaVWqh
+29S0i8QRtFyyNXQOhA9jshktVq8F7Xe8O3en5WxXTgEcdn2DAwF2hHiCGoQc
+HASSQgRukwiZmpucmwYRADs=
+]]>
+ </logo>
+</extension>

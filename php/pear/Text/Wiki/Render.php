@@ -9,7 +9,7 @@
  * @package    Text_Wiki
  * @author     Paul M. Jones <pmjones@php.net>
  * @license    http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
- * @version    CVS: $Id: Render.php,v 1.6 2005/07/29 08:57:29 toggg Exp $
+ * @version    CVS: $Id: Render.php,v 1.9 2006/02/17 05:42:55 toggg Exp $
  * @link       http://pear.php.net/package/Text_Wiki
  */
 
@@ -186,5 +186,32 @@ class Text_Wiki_Render {
         }
     }
 
+    /**
+    * Default method to render url
+    *
+    * @access public
+    * @param string $urlChunk a part of an url to render
+    * @return rendered url
+    *
+    */
+
+    function urlEncode($urlChunk)
+    {
+        return rawurlencode($urlChunk);
+    }
+
+    /**
+    * Default method to render text (htmlspecialchars)
+    *
+    * @access public
+    * @param string $text the text to render
+    * @return rendered text
+    *
+    */
+
+    function textEncode($text)
+    {
+        return htmlspecialchars($text);
+    }
 }
 ?>

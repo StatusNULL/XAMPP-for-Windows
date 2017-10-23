@@ -172,6 +172,8 @@
 	$TEXT['mysql-rootsetup-passwdrepeat'] = "Herhaal het nieuwe wachtwoord:";
 	$TEXT['mysql-rootsetup-passwdchange'] = "Wachtwoord wordt gewijzigd";
 	$TEXT['mysql-rootsetup-phpmyadmin'] = "PhpMyAdmin authentificatie:";
+	$TEXT['mysql-passwort-infile'] = "Safe plain password in text file?";
+	$TEXT['mysql-passwort-risk'] = "Security risk!";
 
 	$TEXT['xampp-setup-head'] = "XAMPP DIRECTORY BEVEILIGING (.htaccess)";
 	$TEXT['xampp-setup-user'] = "Gebruiker:";

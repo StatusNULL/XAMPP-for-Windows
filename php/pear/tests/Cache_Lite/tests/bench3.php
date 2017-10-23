@@ -1,7 +1,7 @@
 <?php
 
 // Bench script of Cache_Lite_Function
-// $Id: bench3.php,v 1.3 2002/09/28 18:05:29 fab Exp $
+// $Id: bench3.php,v 1.4 2005/12/04 16:03:55 fab Exp $
 
 require_once('Cache/Lite/Function.php');
 
@@ -46,7 +46,8 @@ class bench
         return "\$obj->test = $this->test and this is the result of the method \$obj->method_to_bench($arg1, $arg2) !<br>";        
     }
     
-    function static_method_to_bench($arg1, $arg2) {
+    function static_method_to_bench($arg1, $arg2) 
+    {
         for($i=0;$i<10000;$i++) {
             $tmp = md5(md5(md5('Loosing time...')));
         }

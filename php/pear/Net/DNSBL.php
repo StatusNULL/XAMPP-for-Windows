@@ -1,22 +1,6 @@
 <?php
+
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-// +----------------------------------------------------------------------+
-// | PEAR::Net_DNSBL                                                      |
-// +----------------------------------------------------------------------+
-// | Copyright (c) 2004 Sebastian Nohn <sebastian@nohn.net>               |
-// +----------------------------------------------------------------------+
-// | This source file is subject to version 3.0 of the PHP license,       |
-// | that is bundled with this package in the file LICENSE, and is        |
-// | available through the world-wide-web at the following url:           |
-// | http://www.php.net/license/3_0.txt.                                  |
-// | If you did not receive a copy of the PHP license and are unable to   |
-// | obtain it through the world-wide-web, please send a note to          |
-// | license@php.net so we can mail you a copy immediately.               |
-// +----------------------------------------------------------------------+
-// | Authors: Sebastian Nohn <sebastian@nohn.net>                         |
-// +----------------------------------------------------------------------+
-//
-// $Id: DNSBL.php,v 1.5 2004/11/29 08:42:09 nohn Exp $
 
 /**
  * PEAR::Net_DNSBL
@@ -24,14 +8,29 @@
  * This class acts as interface to generic Realtime Blocking Lists
  * (RBL)
  *
+ * PHP versions 4 and 5
+ *
+ * LICENSE: This source file is subject to version 3.0 of the PHP license
+ * that is available through the world-wide-web at the following URI:
+ * http://www.php.net/license/3_0.txt.  If you did not receive a copy of
+ * the PHP License and are unable to obtain it through the web, please
+ * send a note to license@php.net so we can mail you a copy immediately.
+ *
  * Net_RBL looks up an supplied host if it's listed in 1-n supplied
  * Blacklists
  *
- * @author  Sebastian Nohn <sebastian@nohn.net>
- * @package Net_DNSBL
- * @license http://www.php.net/license/3_0.txt
- * @version 0.5.3
+ * @category   Net
+ * @package    DNSBL
+ * @author     Sebastian Nohn <sebastian@nohn.net>
+ * @author     Ammar Ibrahim <fixxme@fixme.com>
+ * @copyright  2004-2006 Sebastian Nohn <sebastian@nohn.net>
+ * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
+ * @version    CVS: $Id: DNSBL.php,v 1.11 2006/03/11 14:47:42 nohn Exp $
+ * @link       http://pear.php.net/package/Net_DNSBL
+ * @see        Net_DNS
+ * @since      File available since Release 1.0.0
  */
+
 require_once 'Net/CheckIP.php';
 
 class Net_DNSBL {
@@ -44,8 +43,16 @@ class Net_DNSBL {
      * @var    array
      * @access protected
      */
-    var $blacklists = array('sbl-xbl.spamhaus.net',
+    var $blacklists = array('sbl-xbl.spamhaus.org',
                             'bl.spamcop.net');
+
+    /**     
+     * Array of Results
+     *
+     * @var    array
+     * @access protected
+     */
+    var $results    = array();
 
     /**
      * Set the blacklist to a desired blacklist.
@@ -76,6 +83,56 @@ class Net_DNSBL {
     }
 
     /** 
+     * Returns Blacklist and Reply from the Blacklist, a host is listed in.
+     *
+     * @param  string Host to check
+     * @access public
+     * @return array result. $result['dnsbl'] contains DNSBL,
+     *               $result['record'] contains returned DNS record.
+     */
+    function getDetails($host)
+    {
+        if (isset($this->results[$host]['dnsbl'])) {
+            return $this->results[$host];
+        } else {
+            return false;
+        }
+    } // function
+
+    /**
+     * Returns Blacklist, host is listed in.
+     *
+     * @param  string Host to check
+     * @access public
+     * @return bl, a host is listed in or false
+     */
+    function getListingBl($host)
+    {
+        if (isset($this->results[$host]['dnsbl'])) {
+            return $this->results[$host]['dnsbl'];
+        } else {
+            return false;
+        }
+    } // function
+
+    /**
+     * Returns result, when a host is listed.
+     *
+     * @param  string Host to check
+     * @access public
+     * @return bl, a host is listed in or false
+     */
+    function getListingRecord($host)
+    {
+        if (isset($this->results[$host]['record'])) {
+            return $this->results[$host]['record'];
+        } else {
+            return false;
+        }
+    } // function
+
+
+    /** 
      * Checks if the supplied Host is listed in one or more of the
      * RBLs.
      *
@@ -92,7 +149,9 @@ class Net_DNSBL {
             $result = gethostbyname($this->getHostForLookup($host, $blacklist));
             if ($result != $this->getHostForLookup($host, $blacklist)) { 
                 $isListed = true;
-                
+                $this->results[$host]['dnsbl']  = $blacklist;
+                $this->results[$host]['record'] = $result;
+                // $results[$host]['txt']    = 'FIXXME';
                 //if the Host was listed we don't need to check other RBLs,
                 break;
                 

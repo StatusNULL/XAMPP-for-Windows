@@ -3,7 +3,7 @@
 // +------------------------------------------------------------------------+
 // | PEAR :: Benchmark                                                      |
 // +------------------------------------------------------------------------+
-// | Copyright (c) 2001-2005 Sebastian Bergmann <sb@sebastian-bergmann.de>. |
+// | Copyright (c) 2001-2006 Sebastian Bergmann <sb@sebastian-bergmann.de>. |
 // +------------------------------------------------------------------------+
 // | This source file is subject to the New BSD license, That is bundled    |
 // | with this package in the file LICENSE, and is available through        |
@@ -14,7 +14,7 @@
 // | license@php.net so we can mail you a copy immediately.                 |
 // +------------------------------------------------------------------------+
 //
-// $Id: Iterate.php,v 1.11 2005/11/06 09:07:10 toggg Exp $
+// $Id: Iterate.php,v 1.12 2006/02/17 16:29:44 toggg Exp $
 //
 
 require_once 'Benchmark/Timer.php';
@@ -165,4 +165,3 @@ class Benchmark_Iterate extends Benchmark_Timer {
         return $result;
     }
 }
-?>

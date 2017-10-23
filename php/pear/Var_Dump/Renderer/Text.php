@@ -122,7 +122,12 @@ class Var_Dump_Renderer_Text extends Var_Dump_Renderer_Common
                     }
                     array_push($parent, $c);
                     if ($this->options['show_container'] or $this->depth[$c] > 0) {
-                        $txt .= $this->value[$c] . ' ' . $this->options['opening'] . "\n";
+                        if ($this->options['is_html']) {
+                            $txt .= htmlspecialchars($this->value[$c]);
+                        } else {
+                            $txt .= $this->value[$c];
+                        }
+                        $txt .= ' ' . $this->options['opening'] . "\n";
                     }
                     break;
                 case VAR_DUMP_FINISH_GROUP :

@@ -9,7 +9,7 @@
  * @package    Text_Wiki
  * @author     Paul M. Jones <pmjones@php.net>
  * @license    http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
- * @version    CVS: $Id: Code.php,v 1.12 2005/07/30 08:03:28 toggg Exp $
+ * @version    CVS: $Id: Code.php,v 1.13 2006/02/10 23:07:03 toggg Exp $
  * @link       http://pear.php.net/package/Text_Wiki
  */
 
@@ -110,7 +110,7 @@ class Text_Wiki_Render_Xhtml_Code extends Text_Wiki_Render {
             // convert entities.
             $text = str_replace("\t", "    ", $text);
             $text = "<html>\n$text\n</html>";
-            $text = htmlentities($text);
+            $text = $this->textEncode($text);
             $text = "<pre$css><code$css_html>$text</code></pre>";
 
         } else {
@@ -118,7 +118,7 @@ class Text_Wiki_Render_Xhtml_Code extends Text_Wiki_Render {
             // convert tabs to four spaces,
             // convert entities.
             $text = str_replace("\t", "    ", $text);
-            $text = htmlentities($text);
+            $text = $this->textEncode($text);
             $text = "<pre$css><code$css_code>$text</code></pre>";
         }
 

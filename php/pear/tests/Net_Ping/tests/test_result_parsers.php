@@ -1,6 +1,5 @@
 <?php
-  /* Usage: php test_result_parsers.php */
-
+// $Id: test_result_parsers.php,v 1.4 2004/02/01 09:39:54 mj Exp $
 error_reporting(E_ALL);
 require_once "../Ping.php";
 
@@ -11,7 +10,7 @@ function failure($os, $function)
   global $err;
  
   $err = true;
-  return "Failure parsing ".$os." result: ".$function."\n";
+  return "Failure parsing ".$os." result: ".$function."\n";;
 }
 
 //$oses = array('linux', 'freebsd', 'netbsd', 'openbsd', 'darwin', 'hpux', 'aix', 'windows');
@@ -147,7 +146,7 @@ function test_net_ping($os, $result, $expect)
   $ping = Net_Ping_Result::factory($result, $os);
 
   if(PEAR::isError($ping) ) {
-    echo failure($os, "factory(): ".$ping->getMessage());
+    echo failure($os, "factory()");
   }
 
   if( $expect['min'] !== $ping->getMin() ) {

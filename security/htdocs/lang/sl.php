@@ -165,6 +165,8 @@
 	$TEXT['mysql-rootsetup-passwdrepeat'] = "Potrdite novo geslo:";
 	$TEXT['mysql-rootsetup-passwdchange'] = "geslo spremenjeno";
 	$TEXT['mysql-rootsetup-phpmyadmin'] = "PhpMyAdmin avtentifikacija:";
+	$TEXT['mysql-passwort-infile'] = "Safe plain password in text file?";
+	$TEXT['mysql-passwort-risk'] = "Security risk!";
 
 	$TEXT['xampp-setup-head'] = "XAMPP ZA&#352;&#268;ITA MAP(.htaccess)";
 	$TEXT['xampp-setup-user'] = "Uporabnik:";

@@ -1,28 +1,41 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
-// +----------------------------------------------------------------------+
-// | PHP Version 4                                                        |
-// +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2003 The PHP Group                                |
-// +----------------------------------------------------------------------+
-// | This source file is subject to version 2.02 of the PHP license,      |
-// | that is bundled with this package in the file LICENSE, and is        |
-// | available at through the world-wide-web at                           |
-// | http://www.php.net/license/2_02.txt.                                 |
-// | If you did not receive a copy of the PHP license and are unable to   |
-// | obtain it through the world-wide-web, please send a note to          |
-// | license@php.net so we can mail you a copy immediately.               |
-// +----------------------------------------------------------------------+
-// | Authors: Stefan Ekman <stekman@sedata.org>                           |
-// |          Martin Jansen <mj@php.net>                                  |
-// |          Mika Tuupola <tuupola@appelsiini.net>                       |
-// +----------------------------------------------------------------------+
-//
-// $Id: File.php,v 1.14 2003/10/29 13:42:40 mike Exp $
-//
+/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
 
+/**
+ * Storage driver for use against a generic password file
+ *
+ * PHP versions 4 and 5
+ *
+ * LICENSE: This source file is subject to version 3.01 of the PHP license
+ * that is available through the world-wide-web at the following URI:
+ * http://www.php.net/license/3_01.txt.  If you did not receive a copy of
+ * the PHP License and are unable to obtain it through the web, please
+ * send a note to license@php.net so we can mail you a copy immediately.
+ *
+ * @category   Authentication
+ * @package    Auth
+ * @author     Stefan Ekman <stekman@sedata.org> 
+ * @author     Martin Jansen <mj@php.net>
+ * @author     Mika Tuupola <tuupola@appelsiini.net> 
+ * @author     Michael Wallner <mike@php.net>
+ * @author     Adam Ashley <aashley@php.net>
+ * @copyright  2001-2006 The PHP Group
+ * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
+ * @version    CVS: $Id: File.php,v 1.20 2006/03/02 06:53:08 aashley Exp $
+ * @link       http://pear.php.net/package/Auth
+ */
+
+/**
+ * Include PEAR File_Passwd package
+ */
 require_once "File/Passwd.php";
+/**
+ * Include Auth_Container base class
+ */
 require_once "Auth/Container.php";
+/**
+ * Include PEAR package for error handling
+ */
 require_once "PEAR.php";
 
 /**
@@ -30,13 +43,23 @@ require_once "PEAR.php";
  *
  * This storage container can handle CVS pserver style passwd files.
  *
- * @author   Stefan Ekman <stekman@sedata.org>
- * @author   Michael Wallner <mike@php.net>
- * @package  Auth
- * @version  $Revision: 1.14 $
+ * @category   Authentication
+ * @package    Auth
+ * @author     Stefan Ekman <stekman@sedata.org> 
+ * @author     Martin Jansen <mj@php.net>
+ * @author     Mika Tuupola <tuupola@appelsiini.net> 
+ * @author     Michael Wallner <mike@php.net>
+ * @author     Adam Ashley <aashley@php.net>
+ * @copyright  2001-2006 The PHP Group
+ * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
+ * @version    Release: 1.3.0  File: $Revision: 1.20 $
+ * @link       http://pear.php.net/package/Auth
  */
 class Auth_Container_File extends Auth_Container
 {
+
+    // {{{ properties
+
     /**
      * Path to passwd file
      * 
@@ -44,7 +67,8 @@ class Auth_Container_File extends Auth_Container
      */
     var $pwfile = '';
 
-    // {{{ Constructor
+    // }}}
+    // {{{ Auth_Container_File() [constructor]
 
     /**
      * Constructor of the container class
@@ -52,8 +76,11 @@ class Auth_Container_File extends Auth_Container
      * @param  string $filename             path to passwd file
      * @return object Auth_Container_File   new Auth_Container_File object
      */
-    function Auth_Container_File($filename)
-    {
+    function Auth_Container_File($filename) {
+        // Only file is a valid option here
+        if(is_array($filename)) {
+            $filename = $filename['file'];
+        }
         $this->pwfile = $filename;
     }
 
@@ -124,7 +151,7 @@ class Auth_Container_File extends Auth_Container
         }
         
         $res = $pw_obj->addUser($user, $pass, $cvs);
-        if(PEAR::isError($res)){
+        if (PEAR::isError($res)) {
             return false;
         }
         
@@ -152,9 +179,37 @@ class Auth_Container_File extends Auth_Container
             return false;
         }
         
-        
         $res = $pw_obj->delUser($user);
-        if(PEAR::isError($res)){
+        if (PEAR::isError($res)) {
+            return false;
+        }
+        
+        $res = $pw_obj->save();
+        if (PEAR::isError($res)) {
+            return false;
+        }
+        
+        return true;
+    }
+
+    // }}}
+    // {{{ changePassword()
+
+    /**
+     * Change password for user in the storage container
+     *
+     * @param string Username
+     * @param string The new password 
+     */
+    function changePassword($username, $password)
+    {
+        $pw_obj = &$this->_load();
+        if (PEAR::isError($pw_obj)) {
+            return false;
+        }
+        
+        $res = $pw_obj->changePasswd($username, $password);
+        if (PEAR::isError($res)) {
             return false;
         }
         
@@ -196,5 +251,6 @@ class Auth_Container_File extends Auth_Container
     }
 
     // }}}
+
 }
 ?>

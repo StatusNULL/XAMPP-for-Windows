@@ -41,7 +41,7 @@
  * @author     Chuck Hagenbuch <chuck@horde.org>
  * @author     Tobias Schlitt <toby@php.net>
  * @copyright  1997-2005 The PHP Group
- * @version    Release: 1.3.1
+ * @version    Release: @package_version@
  * @link       http://pear.php.net/package/Net_FTP
  * @since      1.3.0.0
  * @access     public

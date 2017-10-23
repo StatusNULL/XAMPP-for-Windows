@@ -7,7 +7,7 @@
 * @author 	Bertrand Mansion <bmansion@mamasam.com>
 * @package	Config
 */
-// $Id: IniCommented.php,v 1.3 2003/03/21 18:01:09 mansion Exp $
+// $Id: IniCommented.php,v 1.4 2005/12/24 02:16:57 aashley Exp $
 
 require_once('Config.php');
 

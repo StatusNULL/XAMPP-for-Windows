@@ -3,7 +3,7 @@
 // +----------------------------------------------------------------------+
 // | PHP Version 4                                                        |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2003 The PHP Group                                |
+// | Copyright (c) 1997-2004 The PHP Group                                |
 // +----------------------------------------------------------------------+
 // | This source file is subject to version 2.0 of the PHP license,       |
 // | that is bundled with this package in the file LICENSE, and is        |
@@ -19,7 +19,7 @@
 // |          Kai Schröder <k.schroeder@php.net>                          |
 // +----------------------------------------------------------------------+
 //
-// $Id: Ping.php,v 1.36 2004/02/08 23:17:22 jan Exp $
+// $Id: Ping.php,v 1.39 2005/12/19 21:49:29 jan Exp $
 
 require_once "PEAR.php";
 require_once "OS/Guess.php";
@@ -36,8 +36,8 @@ define('NET_PING_INVALID_ARGUMENTS',          2);
 define('NET_PING_CANT_LOCATE_PING_BINARY',    3);
 define('NET_PING_RESULT_UNSUPPORTED_BACKEND', 4);
 
-/**************************TODO*******************************************/
-/*
+
+/* TODO
  *
  * - add Net_Ping_Result parser for:
  *   + IRIX64
@@ -65,7 +65,7 @@ define('NET_PING_RESULT_UNSUPPORTED_BACKEND', 4);
 * ?>
 *
 * @author   Jan Lehnardt <jan@php.net>
-* @version  $Revision: 1.36 $
+* @version  $Revision: 1.39 $
 * @package  Net
 * @access   public
 */
@@ -524,7 +524,7 @@ class Net_Ping
 * Container class for Net_Ping results
 *
 * @author   Jan Lehnardt <jan@php.net>
-* @version  $Revision: 1.36 $
+* @version  $Revision: 1.39 $
 * @package  Net
 * @access   private
 */
@@ -633,7 +633,7 @@ class Net_Ping_Result
 	*/
 	function _prepareParseResult($sysname)
 	{
-        $parse_methods = array_values(get_class_methods('Net_Ping_Result'));
+        $parse_methods = array_values(array_map('strtolower', get_class_methods('Net_Ping_Result')));
 
 		return in_array('_parseresult'.$sysname, $parse_methods);
 	} /* function _prepareParseResult() */
@@ -901,8 +901,8 @@ class Net_Ping_Result
 
         $round_trip = explode(',', str_replace('=', ',', $this->_raw_data[$raw_data_len - 1]));
         $this->_round_trip['min'] = (int)substr(trim($round_trip[1]), 0, -2);
-        $this->_round_trip['avg'] = (int)substr(trim($round_trip[3]), 0, -2);
-        $this->_round_trip['max'] = (int)substr(trim($round_trip[5]), 0, -2);
+        $this->_round_trip['max'] = (int)substr(trim($round_trip[3]), 0, -2);
+        $this->_round_trip['avg'] = (int)substr(trim($round_trip[5]), 0, -2);
     } /* function _parseResultwindows() */
 
     /**

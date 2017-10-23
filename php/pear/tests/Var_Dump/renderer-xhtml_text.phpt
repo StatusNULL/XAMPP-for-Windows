@@ -22,7 +22,7 @@ Var_Dump::display($array);
   key1 =&gt; <span class="type">string(44)</span> <span class="value">The quick brown
 </span>                     <span class="value">fox jumped over
 </span>                     <span class="value">the lazy dog</span>
-  key2 =&gt; &array(3) {
+  key2 =&gt; &amp;array(3) {
     0 =&gt; <span class="type">bool</span> <span class="value">true</span>
     1 =&gt; <span class="type">int</span> <span class="value">123</span>
     2 =&gt; <span class="type">float</span> <span class="value">123.45</span>

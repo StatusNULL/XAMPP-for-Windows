@@ -1,7 +1,7 @@
 @echo off
 REM PHP Version 5
 REM
-REM Copyright (c) 2002-2005, Sebastian Bergmann <sb@sebastian-bergmann.de>.
+REM Copyright (c) 2002-2006, Sebastian Bergmann <sb@sebastian-bergmann.de>.
 REM All rights reserved.
 REM
 REM Redistribution and use in source and binary forms, with or without
@@ -33,27 +33,7 @@ REM LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 REM ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 REM POSSIBILITY OF SUCH DAMAGE.
 REM
-REM $Id: pear-phpunit.bat,v 1.3.2.1 2005/11/02 10:54:53 sebastian Exp $
+REM $Id: pear-phpunit.bat,v 1.3.2.2 2005/12/17 16:04:56 sebastian Exp $
 REM
 
-::----------------------------------------------------------------------------------
-:: Please set following to PHP's CLI
-:: NOTE: In PHP 4.2.x the PHP-CLI used to be named php-cli.exe. 
-::       PHP 4.3.x names it php.exe but stores it in a subdir called /cli/php.exe
-::       E.g. for PHP 4.2 C:\phpdev\php-4.2-Win32\php-cli.exe
-::            for PHP 4.3 C:\phpdev\php-4.3-Win32\cli\php.exe
-  
-:: Check PEAR global ENV, set them if they do not exist
-IF "%PHP_PEAR_INSTALL_DIR%"=="" SET "PHP_PEAR_INSTALL_DIR=%PHP_PEAR_BIN_DIR%\pear"
-IF "%PHP_PEAR_BIN_DIR%"=="" SET "PHP_PEAR_BIN_DIR=\xampp\php"
-IF "%PHP_PEAR_PHP_BIN%"=="" SET "PHP_PEAR_PHP_BIN=%PHP_PEAR_BIN_DIR%\php.exe"
-IF "%PHP_PEAR_SYSCONF_DIR%"=="" SET "PHP_PEAR_SYSCONF_DIR=%PHP_PEAR_BIN_DIR%"
-IF "%PHP_PEAR_EXTENSION_DIR%"=="" SET "PHP_PEAR_EXTENSION_DIR=%PHP_PEAR_BIN_DIR%\ext"
-IF "%PHP_PEAR_DOC_DIR%"=="" SET "PHP_PEAR_DOC_DIR=%PHP_PEAR_INSTALL_DIR%\docs"
-IF "%PHP_PEAR_DATA_DIR%"=="" SET "PHP_PEAR_DATA_DIR=%PHP_PEAR_INSTALL_DIR%\data"
-IF "%PHP_PEAR_TEST_DIR%"=="" SET "PHP_PEAR_TEST_DIR=%PHP_PEAR_INSTALL_DIR%\tests"
-IF "%PHP_PEAR_CACHE_DIR%"=="" SET "PHP_PEAR_CACHE_DIR=\xampp\tmp"
-
-SET phpCli=%PHP_PEAR_PHP_BIN%
-
-"%phpCli%" "%PHP_PEAR_INSTALL_DIR%\PHPUnit2\TextUI\TestRunner.php" %*
+"\xampp\php\php.exe" "\xampp\php\pear/PHPUnit2/TextUI/TestRunner.php" %*

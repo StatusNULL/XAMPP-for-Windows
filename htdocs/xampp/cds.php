@@ -1,6 +1,7 @@
 <?php
+	include "langsettings.php";
+
 	if (isset($_GET['action']) && ($_GET['action'] == "getpdf")) {
-		include "lang/".file_get_contents("lang.tmp").".php";
 		if (file_exists('../../security/mysqlrootpasswd.txt')) {
 			$rootpasswdfile = file('../../security/mysqlrootpasswd.txt');
 			$rootpasswd = trim(strrchr($rootpasswdfile[1], ' '));
@@ -64,8 +65,6 @@
 	</head>
 
 	<body>
-		<?php include "lang/".file_get_contents("lang.tmp").".php"; ?>
-
 		&nbsp;<p>
 		<h1><?php echo $TEXT['cds-head']; ?></h1>
 

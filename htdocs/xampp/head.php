@@ -1,3 +1,6 @@
+<?php
+	include "langsettings.php";
+?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 	"http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -12,7 +15,7 @@
 		<table cellpadding="0" cellspacing="0" border="0">
 			<tr>
 				<td><img src="img/blank.gif" alt="" width="111" height="1"></td>
-				<?php if (file_get_contents("lang.tmp") == "de") { ?>
+				<?php if ($lang == "de") { ?>
 					<td><a target="content" href="http://www.apachefriends.org/xampp.html"><img border="0" src="img/logo-small.gif" alt=""></a></td>
 				<?php } else { ?>
 					<td><a target="content" href="http://www.apachefriends.org/xampp-en.html"><img border="0" src="img/logo-small.gif" alt=""></a></td>
@@ -20,7 +23,7 @@
 				<td><img src="img/blank.gif" alt="" width="10" height="1"></td>
 				<td><img src="img/head-xampp.gif" alt=""></td>
 				<td><img src="img/blank.gif" alt="" width="10" height="1"></td>
-				<?php if (file_get_contents("lang.tmp") == "de") { ?>
+				<?php if ($lang == "de") { ?>
 					<td><img src="img/head-fuer.gif" alt=""></td>
 				<?php } else { ?>
 					<td><img src="img/head-for.gif" alt=""></td>

@@ -3,7 +3,7 @@
 // +----------------------------------------------------------------------+
 // | PEAR :: Benchmark                                                    |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 2002-2005 Matthias Englert <Matthias.Englert@gmx.de>.  |
+// | Copyright (c) 2002-2006 Matthias Englert <Matthias.Englert@gmx.de>.  |
 // +----------------------------------------------------------------------+
 // | This source file is subject to the New BSD license, That is bundled  |
 // | with this package in the file LICENSE, and is available through      |
@@ -14,7 +14,7 @@
 // | license@php.net so we can mail you a copy immediately.               |
 // +----------------------------------------------------------------------+
 //
-// $Id: Profiler.php,v 1.16 2005/11/06 09:07:10 toggg Exp $
+// $Id: Profiler.php,v 1.19 2006/03/01 19:26:09 anant Exp $
 //
 
 require_once 'PEAR.php';
@@ -232,19 +232,36 @@ class Benchmark_Profiler extends PEAR {
     /**
      * Returns formatted profiling information.
      *
+     * @param  string output format (auto, plain or html), default auto
      * @see    display()
      * @access private
      */
-    function _getOutput() {
-        if (function_exists('version_compare') &&
-            version_compare(phpversion(), '4.1', 'ge')) {
-            $http = isset($_SERVER['SERVER_PROTOCOL']);
-        } else {
-            global $HTTP_SERVER_VARS;
-            $http = isset($HTTP_SERVER_VARS['SERVER_PROTOCOL']);
+    function _getOutput($format) {
+        
+        /* Quickly find out the maximun length: Ineffecient, but will do for now! */
+        $informations = $this->getAllSectionsInformations();
+        $names = array_keys($informations);
+        
+        $maxLength = 0;
+        foreach ($names as $name)
+        {
+            if ($maxLength < strlen($name)) {
+                $maxLength = strlen($name);
+            }
+        }
+        $this->_maxStringLength = $maxLength;
+
+        if ($format == 'auto') {
+            if (function_exists('version_compare') &&
+                version_compare(phpversion(), '4.1', 'ge')) {
+                $format = isset($_SERVER['SERVER_PROTOCOL']) ? 'html' : 'plain';
+            } else {
+                global $HTTP_SERVER_VARS;
+                $format = isset($HTTP_SERVER_VARS['SERVER_PROTOCOL']) ? 'html' : 'plain';
+            }
         }
 
-        if ($http) {
+        if ($format == 'html') {
             $out = '<table style="border: 1px solid #000000; ">'."\n";
             $out .=
                 '<tr><td>&nbsp;</td><td align="center"><b>total ex. time</b></td>'.
@@ -253,17 +270,15 @@ class Benchmark_Profiler extends PEAR {
                 '<td align="center"><b>calls</b></td><td align="center"><b>callers</b></td></tr>'.
                 "\n";
         } else {
-            $dashes = $out = str_pad("\n", ($this->_maxStringLength + 52), '-', STR_PAD_LEFT);
-            $out .= str_pad('section', $this->_maxStringLength);
-            $out .= str_pad("total ex time", 22);
-            $out .= str_pad("netto ex time", 22);
-            $out .= str_pad("#calls", 22);
-            $out .= "perct\n";
+            $dashes = $out = str_pad("\n", ($this->_maxStringLength + 75), '-', STR_PAD_LEFT);
+            $out .= str_pad('Section', $this->_maxStringLength + 10);
+            $out .= str_pad("Total Ex Time", 22);
+            $out .= str_pad("Netto Ex Time", 22);
+            $out .= str_pad("#Calls", 10);
+            $out .= "Percentage\n";
             $out .= $dashes;
         }
-
-        $informations = $this->getAllSectionsInformations();
-
+           
         foreach($informations as $name => $values) {
             $percentage = $values['percentage'];
             $calls_str = "";
@@ -286,7 +301,7 @@ class Benchmark_Profiler extends PEAR {
                 $callers_str .= "$key ($val)";
             }
 
-            if ($http) {
+            if ($format == 'html') {
                 $out .= "<tr><td><b>$name</b></td><td>{$values['time']}</td><td>{$values['netto_time']}</td><td>{$values['num_calls']}</td>";
                 if (is_numeric($values['percentage'])) {
                     $out .= "<td align=\"right\">{$values['percentage']}%</td>\n";
@@ -295,10 +310,10 @@ class Benchmark_Profiler extends PEAR {
                 }
                 $out .= "<td>$calls_str</td><td>$callers_str</td></tr>";
             } else {
-                $out .= str_pad($name, $this->_maxStringLength, ' ');
+                $out .= str_pad($name, $this->_maxStringLength + 10);
                 $out .= str_pad($values['time'], 22);
                 $out .= str_pad($values['netto_time'], 22);
-                $out .= str_pad($values['num_calls'], 22);
+                $out .= str_pad($values['num_calls'], 10);
                 if (is_numeric($values['percentage'])) {
                     $out .= str_pad($values['percentage']."%\n", 8, ' ', STR_PAD_LEFT);
                 } else {
@@ -306,17 +321,22 @@ class Benchmark_Profiler extends PEAR {
                 }
             }
         }
-
-        return $out . '</table>';
+        
+        if ($format == 'html') {
+            return $out . '</table>';
+        } else {
+            return $out;
+        }
     }
 
     /**
      * Returns formatted profiling information.
      *
+     * @param  string output format (auto, plain or html), default auto
      * @access public
      */
-    function display() {
-        echo $this->_getOutput();
+    function display($format = 'auto') {
+        echo $this->_getOutput($format);
     }
 
     /**
@@ -425,4 +445,3 @@ class Benchmark_Profiler extends PEAR {
         return $microtime[1] . substr($microtime[0], 1);
     }
 }
-?>

@@ -19,7 +19,7 @@
  * @author     Tobias Schlitt <toby@php.net>
  * @copyright  1997-2005 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: FTP.php,v 1.42 2005/03/31 20:07:58 toby Exp $
+ * @version    CVS: $Id: FTP.php,v 1.47 2006/02/09 23:12:33 toby Exp $
  * @link       http://pear.php.net/package/Net_FTP
  * @since      File available since Release 0.0.1
  */
@@ -466,7 +466,7 @@ define('NET_FTP_ERR_PASSWORDNOSTRING', -33);
  * @package   FTP
  * @author    Tobias Schlitt <toby@php.net>
  * @copyright 1997-2005 The PHP Group
- * @version   Release: 1.3.1
+ * @version   Release: @package_version@
  * @link      http://pear.php.net/package/Net_FTP
  * @since     0.0.1
  * @access    public
@@ -569,13 +569,26 @@ class Net_FTP extends PEAR
     
     var $_ls_match = array(
         'unix'    => array(
-            'pattern' => '/(?:(d)|.)([rwxt-]+)\s+(\w+)\s+([\w\d]+)\s+([\w\d]+)\s+(\w+)\s+(\S+\s+\S+\s+\S+)\s+(.+)/',
-            'map'     => array('name'=>8,'size'=>6,'rights'=>2,'user'=>4,'group'=>5,
-                              'files_inside'=>3,'date'=>7,'is_dir'=>1)
+            'pattern' => '/(?:(d)|.)([rwxt-]+)\s+(\w+)\s+([\w\d-]+)\s+([\w\d-]+)\s+(\w+)\s+(\S+\s+\S+\s+\S+)\s+(.+)/',
+            'map'     => array(
+                'is_dir'        => 1,
+                'rights'        => 2,
+                'files_inside'  => 3,
+                'user'          => 4,
+                'group'         => 5,
+                'size'          => 6,
+                'date'          => 7,
+                'name'          => 8,
+            )
         ),
         'windows' => array(
             'pattern' => '/(.+)\s+(.+)\s+((<DIR>)|[0-9]+)\s+(.+)/',
-            'map'     => array('name'=>5,'date'=>1,'is_dir'=>3)
+            'map'     => array(
+                'name'   => 5,
+                'date'   => 1,
+                'size'   => 3,
+                'is_dir' => 4,
+            )
         )
     );
     
@@ -927,7 +940,10 @@ class Net_FTP extends PEAR
             $mode = NET_FTP_DIRS_ONLY;
             $dir_list = $this->ls($remote_path, $mode);
             foreach ($dir_list as $dir_entry) {
-
+                if ($dir_entry == '.' || $dir_entry == '..') {;
+                    continue;
+                }
+                
                 $remote_path_new = $remote_path.$dir_entry["name"]."/";
 
                 // Chmod the directory we're about to enter
@@ -1896,6 +1912,9 @@ class Net_FTP extends PEAR
         }
         $dir_list = $this->_ls_dirs($dir);
         foreach ($dir_list as $new_dir) {
+            if ($new_dir == '.' || $new_dir == '..') {
+                continue;
+            }
             $new_dir = $dir.$new_dir["name"]."/";
             $res = $this->_rm_dir_recursive($new_dir);
             if ($this->isError($res)) {
@@ -1921,6 +1940,9 @@ class Net_FTP extends PEAR
     function _ls_both($dir)
     {
         $list_splitted = $this->_list_and_parse($dir);
+        if (PEAR::isError($list_splitted)) {
+            return $list_splitted;
+        }
         if (!is_array($list_splitted["files"])) {
             $list_splitted["files"] = array();
         }
@@ -1990,6 +2012,12 @@ class Net_FTP extends PEAR
         if (count($dir_list) == 0) {
             return array('dirs' => $dirs_list, 'files' => $files_list);
         }
+
+        // Exception for some FTP servers seem to return this wiered result instead of an empty list
+        if (count($dirs_list) == 1 && $dirs_list[0] == 'total 0') {
+            return array('dirs' => array(), 'files' => $files_list);
+        }
+        
         if (!isset($this->_matcher) || PEAR::isError($this->_matcher)) {
             $this->_matcher = $this->_determine_os_match($dir_list);
             if (PEAR::isError($this->_matcher)) {

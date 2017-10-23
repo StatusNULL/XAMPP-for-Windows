@@ -9,7 +9,7 @@
  * @package    Text_Wiki
  * @author     Paul M. Jones <pmjones@php.net>
  * @license    http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
- * @version    CVS: $Id: Wikilink.php,v 1.10 2005/07/30 08:03:29 toggg Exp $
+ * @version    CVS: $Id: Wikilink.php,v 1.17 2006/02/28 03:15:09 justinpatrin Exp $
  * @link       http://pear.php.net/package/Text_Wiki
  */
 
@@ -70,7 +70,7 @@ class Text_Wiki_Render_Xhtml_Wikilink extends Text_Wiki_Render {
             $exists = call_user_func($callback, $page);
         } else {
             // no callback, go to the naive page array.
-            $list =& $this->getConf('pages');
+            $list = $this->getConf('pages');
             if (is_array($list)) {
                 // yes, check against the page list
                 $exists = in_array($page, $list);
@@ -82,9 +82,9 @@ class Text_Wiki_Render_Xhtml_Wikilink extends Text_Wiki_Render {
 
         // convert *after* checking against page names so as not to mess
         // up what the user typed and what we're checking.
-        $page = htmlspecialchars($page);
-        $anchor = htmlspecialchars($anchor);
-        $text = htmlspecialchars($text);
+        $page = $this->urlEncode($page);
+        $anchor = $this->urlEncode($anchor);
+        $text = $this->textEncode($text);
 
         // does the page exist?
         if ($exists) {
@@ -107,8 +107,9 @@ class Text_Wiki_Render_Xhtml_Wikilink extends Text_Wiki_Render {
 
             // get the CSS class and generate output
             $css = $this->formatConf(' class="%s"', 'css');
-            $output = "<a$css href=\"$href\">$text</a>";
 
+            $start = '<a'.$css.' href="'.$href.'">';
+            $end = '</a>';
         } else {
 
             // PAGE DOES NOT EXIST.
@@ -145,14 +146,36 @@ class Text_Wiki_Render_Xhtml_Wikilink extends Text_Wiki_Render {
             $pos = $this->getConf('new_text_pos');
             if (! $pos || ! $new) {
                 // no position (or no new_text), use css only on the page name
-                $output = "<a$css href=\"$href\">$page</a>";
+
+                //do we really want this? it breaks the text output of the output
+                //  if the page does not exist and the link text != page name
+                $text = $page;
+                $start = '<a'.$css.' href="'.$href.'">';
+                $end = '</a>';
             } elseif ($pos == 'before') {
                 // use the new_text BEFORE the page name
-                $output = "<a$css href=\"$href\">$new</a>$text";
+                $start = '<a'.$css.' href="'.$href.'">'.$new.'</a>';
+                $end = '';
             } else {
                 // default, use the new_text link AFTER the page name
-                $output = "$text<a$css href=\"$href\">$new</a>";
+                $start = '';
+                $end = '<a'.$css.' href="'.$href.'">'.$new.'</a>';
             }
+        }
+        if (!strlen($text)) {
+            $start .= $this->textEncode($options['page']);
+        }
+        if (isset($type)) {
+            switch ($type) {
+            case 'start':
+                $output = $start;
+                break;
+            case 'end':
+                $output = $end;
+                break;
+            }
+        } else {
+            $output = $start.$text.$end;
         }
         return $output;
     }

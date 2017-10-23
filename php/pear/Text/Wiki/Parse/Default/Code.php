@@ -12,7 +12,7 @@
 * 
 * @license LGPL
 * 
-* @version $Id: Code.php,v 1.7 2005/07/13 16:52:03 toggg Exp $
+* @version $Id: Code.php,v 1.10 2006/02/21 14:33:53 toggg Exp $
 * 
 */
 

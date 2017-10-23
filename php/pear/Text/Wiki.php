@@ -9,7 +9,7 @@
  * @package    Text_Wiki
  * @author     Paul M. Jones <pmjones@php.net>
  * @license    http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
- * @version    CVS: $Id: Wiki.php,v 1.34 2005/07/29 08:29:20 toggg Exp $
+ * @version    CVS: $Id: Wiki.php,v 1.44 2006/03/02 04:04:59 justinpatrin Exp $
  * @link       http://pear.php.net/package/Text_Wiki
  */
 
@@ -33,7 +33,7 @@ require_once 'Text/Wiki/Render.php';
  * @package    Text_Wiki
  * @author     Paul M. Jones <pmjones@php.net>
  * @license    http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
- * @version    Release: 1.0.3
+ * @version    Release: 1.1.0
  * @link       http://pear.php.net/package/Text_Wiki
  */
 class Text_Wiki {
@@ -230,6 +230,16 @@ class Text_Wiki {
 
     var $tokens = array();
 
+    /**
+    * How many tokens generated pro rules.
+    *
+    * Intended to load only necessary render objects
+    *
+    * @access private
+    * @var array
+    */
+    var $_countRulesTokens = array();
+
 
     /**
     *
@@ -330,10 +340,13 @@ class Text_Wiki {
     *
     * Constructor.
     *
+    * **DEPRECATED**
+    * Please use the singleton() or factory() methods.
+    *
     * @access public
     *
-    * @param array $rules The set of rules to load for this object.
-    *
+    * @param array $rules The set of rules to load for this object.  Defaults
+    *   to null, which will load the default ruleset for this parser.
     */
 
     function Text_Wiki($rules = null)
@@ -346,7 +359,6 @@ class Text_Wiki {
             'parse',
             $this->fixPath(dirname(__FILE__)) . 'Wiki/Parse/Default/'
         );
-
         $this->addPath(
             'render',
             $this->fixPath(dirname(__FILE__)) . 'Wiki/Render/'
@@ -354,6 +366,94 @@ class Text_Wiki {
 
     }
 
+    /**
+    * Singleton.
+    *
+    * This avoids instantiating multiple Text_Wiki instances where a number
+    * of objects are required in one call, e.g. to save memory in a
+    * CMS invironment where several parsers are required in a single page.
+    *
+    * $single = & singleton();
+    *
+    * or
+    *
+    * $single = & singleton('Parser', array('Prefilter', 'Delimiter', 'Code', 'Function',
+    *   'Html', 'Raw', 'Include', 'Embed', 'Anchor', 'Heading', 'Toc', 'Horiz',
+    *   'Break', 'Blockquote', 'List', 'Deflist', 'Table', 'Image', 'Phplookup',
+    *   'Center', 'Newline', 'Paragraph', 'Url', 'Freelink', 'Interwiki', 'Wikilink',
+    *   'Colortext', 'Strong', 'Bold', 'Emphasis', 'Italic', 'Underline', 'Tt',
+    *   'Superscript', 'Subscript', 'Revise', 'Tighten'));
+    *
+    * Call using a subset of this list.  The order of passing rulesets in the
+    * $rules array is important!
+    *
+    * After calling this, call $single->setParseConf(), setRenderConf() or setFormatConf()
+    * as usual for a constructed object of this class.
+    *
+    * The internal static array of singleton objects has no index on the parser
+    * rules, the only index is on the parser name.  So if you call this multiple
+    * times with different rules but the same parser name, you will get the same
+    * static parser object each time.
+    *
+    * @access public
+    * @static
+    * @since Method available since Release 1.1.0
+    * @param string $parser The parser to be used (defaults to 'Default').
+    * @param array $rules   The set of rules to instantiate the object. This
+    *    will only be used when the first call to singleton is made, if included
+    *    in further calls it will be effectively ignored.
+    * @return &object a reference to the Text_Wiki unique instantiation.
+    */
+    function &singleton($parser = 'Default', $rules = null)
+    {
+        static $only = array();
+        if (!isset($only[$parser])) {
+            $ret =& Text_Wiki::factory($parser, $rules);
+            if (PEAR::isError($ret)) {
+                return $ret;
+            }
+            $only[$parser] =& $ret;
+        }
+        return $only[$parser];
+    }
+
+    /**
+     * Returns a Text_Wiki Parser class for the specified parser.
+     *
+     * @access public
+     * @static
+     * @param string $parser The name of the parse to instantiate
+     * @param array $rules The rules to pass into the constructor
+     *    {@see Text_Wiki::singleton} for a list of rules
+     * @return Text_Wiki a Parser object extended from Text_Wiki
+     */
+    function &factory($parser = 'Default', $rules = null)
+    {
+        $class = 'Text_Wiki_' . $parser;
+        $file = str_replace('_', '/', $class).'.php';
+        if (!class_exists($class)) {
+            /*$exists = false;
+            foreach (split(PATH_SEPARATOR, get_include_path()) as $path) {
+                if (file_exists($path.'/'.$file)
+                    && is_readable($path.'/'.$file)) {
+                    $exists = true;
+                    break;
+                }
+            }*/
+            $fp = @fopen($file, 'r', true);
+            if ($fp === false) {
+                return PEAR::raiseError('Could not find file '.$file.' in include_path');
+            }
+            fclose($fp);
+            include_once($file);
+            if (!class_exists($class)) {
+                return PEAR::raiseError('Class '.$class.' does not exist after including '.$file);
+            }
+        }
+
+        $obj =& new $class($rules);
+        return $obj;
+    }
 
     /**
     *
@@ -705,7 +805,9 @@ class Text_Wiki {
         $new = ucwords(strtolower($new));
         $key = array_search($old, $this->rules);
         if ($key !== false) {
-            $this->rules[$old] = $new;
+            // delete the new name , case it was already there
+            $this->deleteRule($new);
+            $this->rules[$key] = $new;
         }
     }
 
@@ -811,6 +913,7 @@ class Text_Wiki {
 
         // reset the tokens.
         $this->tokens = array();
+        $this->_countRulesTokens = array();
 
         // apply the parse() method of each requested rule to the source
         // text.
@@ -863,7 +966,7 @@ class Text_Wiki {
         // load the format object, or crap out if we can't find it
         $result = $this->loadFormatObj($format);
         if ($this->isError($result)) {
-        	return $result;
+            return $result;
         }
 
         // pre-rendering activity
@@ -872,7 +975,7 @@ class Text_Wiki {
         }
 
         // load the render objects
-        foreach (array_keys($this->parseObj) as $rule) {
+        foreach (array_keys($this->_countRulesTokens) as $rule) {
             $this->loadRenderObj($format, $rule);
         }
 
@@ -1019,6 +1122,11 @@ class Text_Wiki {
             0 => $rule,
             1 => $options
         );
+        if (!isset($this->_countRulesTokens[$rule])) {
+            $this->_countRulesTokens[$rule] = 1;
+        } else {
+            ++$this->_countRulesTokens[$rule];
+        }
 
         // return a value
         if ($id_only) {
@@ -1053,11 +1161,22 @@ class Text_Wiki {
 
     function setToken($id, $rule, $options = array())
     {
+        $oldRule = $this->tokens[$id][0];
         // reset the token
         $this->tokens[$id] = array(
             0 => $rule,
             1 => $options
         );
+        if ($rule != $oldRule) {
+            if (!($this->_countRulesTokens[$oldRule]--)) {
+                unset($this->_countRulesTokens[$oldRule]);
+            }
+            if (!isset($this->_countRulesTokens[$rule])) {
+                $this->_countRulesTokens[$rule] = 1;
+            } else {
+                ++$this->_countRulesTokens[$rule];
+            }
+        }
     }
 
 
@@ -1087,7 +1206,7 @@ class Text_Wiki {
                 $this->parseObj[$rule] = null;
                 // can't find the class
                 return $this->error(
-                	"Parse rule '$rule' not found"
+                    "Parse rule '$rule' not found"
                 );
             }
         }
@@ -1123,7 +1242,7 @@ class Text_Wiki {
             } else {
                 // can't find the class
                 return $this->error(
-                	"Render rule '$rule' in format '$format' not found"
+                    "Render rule '$rule' in format '$format' not found"
                 );
             }
         }
@@ -1156,7 +1275,7 @@ class Text_Wiki {
             } else {
                 // can't find the class
                 return $this->error(
-                	"Rendering format class '$class' not found"
+                    "Rendering format class '$class' not found"
                 );
             }
         }
@@ -1286,10 +1405,10 @@ class Text_Wiki {
 
     function &error($message)
     {
-    	if (! class_exists('PEAR_Error')) {
-    		include_once 'PEAR.php';
-    	}
-    	return PEAR::throwError($message);
+        if (! class_exists('PEAR_Error')) {
+            include_once 'PEAR.php';
+        }
+        return PEAR::throwError($message);
     }
 
 
@@ -1307,7 +1426,7 @@ class Text_Wiki {
 
     function isError(&$obj)
     {
-    	return is_a($obj, 'PEAR_Error');
+        return is_a($obj, 'PEAR_Error');
     }
 }
 

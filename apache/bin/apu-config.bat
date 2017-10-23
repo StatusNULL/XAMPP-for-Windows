@@ -10,7 +10,7 @@ if %errorlevel% == 9009 echo You do not have Perl in your PATH.
 if errorlevel 1 goto script_failed_so_exit_with_non_zero_val 2>nul
 goto endofperl
 @rem ';
-#!c:\xampp\perl\bin\perl.exe
+#!\xampp\perl\bin\perl.exe
 #line 15
 use strict;
 use warnings;
@@ -75,26 +75,26 @@ EOU
 
 my ${CC} = q[cl];
 my ${LIBS} = q[];
-my ${installbuilddir} = q[O:\apache\build];
+my ${installbuilddir} = q[\xampp\apache\build];
 my ${APRUTIL_LIB_TARGET} = q[];
-my ${bindir} = q[O:\apache\bin];
+my ${bindir} = q[\xampp\apache\bin];
 my ${APRUTIL_SO_EXT} = q[dll];
 my ${LD} = q[link];
 my ${CPP} = q[cl -nologo -E];
 my ${LDFLAGS} = q[ kernel32.lib /nologo /subsystem:windows /dll /machine:I386 ];
-my ${includedir} = q[O:\apache\include];
-my ${exec_prefix} = q[O:\apache];
-my ${datadir} = q[O:\apache];
-my ${APRUTIL_LIBNAME} = q[libaprutil.lib];
-my ${libdir} = q[O:\apache\lib];
-my ${APRUTIL_DOTTED_VERSION} = q[0.9.6];
+my ${includedir} = q[\xampp\apache\include];
+my ${exec_prefix} = q[\xampp\apache];
+my ${datadir} = q[\xampp\apache];
+my ${APRUTIL_LIBNAME} = q[libaprutil-1.lib];
+my ${libdir} = q[\xampp\apache\lib];
+my ${APRUTIL_DOTTED_VERSION} = q[1.2.3];
 my ${CFLAGS} = q[ /nologo /MD /W3 /O2 /D WIN32 /D _WINDOWS /D NDEBUG ];
-my ${SHELL} = q[D:\WINNT\system32\cmd.exe];
+my ${SHELL} = q[C:\WINDOWS\system32\cmd.exe];
 my ${CPPFLAGS} = q[];
 my ${EXTRA_INCLUDES} = q[];
 my ${APRUTIL_SOURCE_DIR} = q[];
-my ${prefix} = q[O:\apache];
-my ${APRUTIL_MAJOR_VERSION} = q[0];
+my ${prefix} = q[\xampp\apache];
+my ${APRUTIL_MAJOR_VERSION} = q[1];
 
 my %opts = ();
 GetOptions(\%opts,

@@ -1,4 +1,6 @@
 <?php
+	include "langsettings.php";
+
 	// Copyright (C) 2002/2003 Kai Seidler <oswald@apachefriends.org>
 	//
 	// This program is free software; you can redistribute it and/or modify
@@ -34,8 +36,6 @@
 	</head>
 
 	<body>
-		<?php include "lang/".file_get_contents("lang.tmp").".php"; ?>
-
 		&nbsp;<p>
 		<h1><?php echo $TEXT['iart-head']; ?></h1>
 

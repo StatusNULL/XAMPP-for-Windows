@@ -9,7 +9,7 @@
  * @package    Text_Wiki
  * @author     Paul M. Jones <pmjones@php.net>
  * @license    http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
- * @version    CVS: $Id: Image.php,v 1.15 2005/07/30 08:03:28 toggg Exp $
+ * @version    CVS: $Id: Image.php,v 1.16 2006/02/10 23:07:03 toggg Exp $
  * @link       http://pear.php.net/package/Text_Wiki
  */
 
@@ -132,7 +132,7 @@ class Text_Wiki_Render_Xhtml_Image extends Text_Wiki_Render {
         }
 
         // start the HTML output
-        $output = '<img src="' . htmlspecialchars($src) . '"';
+        $output = '<img src="' . $this->textEncode($src) . '"';
 
         // get the CSS class but don't add it yet
         $css = $this->formatConf(' class="%s"', 'css');
@@ -152,14 +152,14 @@ class Text_Wiki_Render_Xhtml_Image extends Text_Wiki_Render {
                 $css = null;
             }
 
-            $key = htmlspecialchars($key);
-            $val = htmlspecialchars($val);
+            $key = $this->textEncode($key);
+            $val = $this->textEncode($val);
             $output .= " $key=\"$val\"";
         }
 
         // always add an "alt" attribute per Stephane Solliec
         if (! $alt) {
-            $alt = htmlspecialchars(basename($options['src']));
+            $alt = $this->textEncode(basename($options['src']));
             $output .= " alt=\"$alt\"";
         }
 
@@ -169,7 +169,7 @@ class Text_Wiki_Render_Xhtml_Image extends Text_Wiki_Render {
         // was the image clickable?
         if ($href) {
             // yes, add the href and return
-            $href = htmlspecialchars($href);
+            $href = $this->textEncode($href);
             $css = $this->formatConf(' class="%s"', 'css_link');
             $output = "<a$css href=\"$href\">$output</a>";
         }

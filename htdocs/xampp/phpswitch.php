@@ -1,3 +1,6 @@
+<?php
+	include "langsettings.php";
+?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 	"http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -9,7 +12,6 @@
 
 	<body>
 		<?php
-			include "lang/".file_get_contents("lang.tmp").".php";
 			global $switchphp;
 			$curdir = getcwd();
 			list($partwampp, $directorwampp) = spliti ('\\\htdocs\\\xampp', $curdir);
@@ -93,7 +95,7 @@
 			</tr>
 			<tr>
 				<td width="6%">&nbsp;</td>
-				<td width="*"><p><br>© ApacheFriends 2002-2005<p></td>
+				<td width="*"><p><br>© ApacheFriends 2002-2006<p></td>
 				<td width="6%">&nbsp;</td>
 			</tr>
 		</table>

@@ -9,7 +9,7 @@
  * @package    Text_Wiki
  * @author     Paul M. Jones <pmjones@php.net>
  * @license    http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
- * @version    CVS: $Id: Table.php,v 1.11 2005/09/30 15:20:20 toggg Exp $
+ * @version    CVS: $Id: Table.php,v 1.12 2005/12/06 15:29:29 ritzmo Exp $
  * @link       http://pear.php.net/package/Text_Wiki
  */
 
@@ -119,7 +119,7 @@ class Text_Wiki_Render_Xhtml_Table extends Text_Wiki_Render {
             }
 
             // done!
-            $html .= " $format>";
+            $html .= "$format>";
             return $html;
             break;
 

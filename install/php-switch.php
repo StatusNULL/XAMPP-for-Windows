@@ -1,13 +1,13 @@
 <?php
 	/*
 	#### Installer PHP  1.5  ####
-	#### Author: Kay Vogelgesang & Carsten Wiedmann for www.apachefriends.org 2005 ####
+	#### Author: Kay Vogelgesang & Carsten Wiedmann for www.apachefriends.org 2006 ####
 	*/
 
 	echo "\r\n  ########################################################################\n";
 	echo "  # ApacheFriends XAMPP PHP Switch win32 Version 1.5                     #\r\n";
 	echo "  #----------------------------------------------------------------------#\r\n";
-	echo "  # Copyright (c) 2002-2005 Apachefriends                                #\r\n";
+	echo "  # Copyright (c) 2002-2006 Apachefriends                                #\r\n";
 	echo "  #----------------------------------------------------------------------#\r\n";
 	echo "  # Authors: Kay Vogelgesang <kvo@apachefriends.org>                     #\r\n";
 	echo "  #          Carsten Wiedmann <webmaster@wiedmann-online.de>             #\r\n";
@@ -16,9 +16,9 @@
 	ini_set('default_socket_timeout', '3'); // Fix by Wiedmann
 	if (false !== ($handle = @fopen('http://127.0.0.1/', 'r'))) {
 		fclose($handle);
-		echo '   The Apache is running! Please stop the Apache before make this procedure!'."\n";
-		echo '   Der Apache laeuft gerade! Bitte den Apache fuer diese Prozedur stoppen!'."\n";
-		echo '   PHP Switch exit ...'."\n\n";
+		echo '   The Apache is running! Please stop the Apache before make this procedure!'."\r\n";
+		echo '   Der Apache laeuft gerade! Bitte den Apache fuer diese Prozedur stoppen!'."\r\n";
+		echo '   PHP Switch exit ...'."\r\n\r\n";
 		exit;
 	} else {
 		unset($handle);
@@ -42,10 +42,9 @@
 		$php4safety = $partwampp."\php\php4\php4.ini";
 		$php4dir = $partwampp."\php\php4";
 		$php5dir = $partwampp."\php";
+
 		$apachebin = $partwampp."\apache\bin";
-		// $httpconf = $partwampp."\apache\conf\httpd.conf";
 		$httpconf = $partwampp."\apache\conf\extra\httpd-xampp.conf";
-		
 
 		/// XAMPP main directrory is ...
 		$substit = "\\\\\\\\xampp";
@@ -87,17 +86,17 @@
 		set_time_limit(0);
 		define('NEWSTDIN', fopen("php://stdin", "r"));
 		while ($CS == "0") {
-			echo "\n  Type number or 'x' (exit) for selecting your choice!\n";
-			echo "  Gebe nun Nummer oder 'x' (exit) zum auswaehlen ein!\n\n";
+			echo "\r\n  Type number or 'x' (exit) for selecting your choice!\r\n";
+			echo "  Gebe nun Nummer oder 'x' (exit) zum auswaehlen ein!\r\n\r\n";
 			if ($phpcurrentv == "5") {
-				echo "  4) Switching to PHP 4 (zu PHP 4 wechseln)\n";
+				echo "  4) Switching to PHP 4 (zu PHP 4 wechseln)\r\n";
 			} elseif ($phpcurrentv == "4") {
-				echo "  5) Switching to PHP 5 (zu PHP 5 wechseln)\n";
+				echo "  5) Switching to PHP 5 (zu PHP 5 wechseln)\r\n";
 			} else {
-				echo "  5) Switching to PHP 5 (zu PHP 5 wechseln)\n";
-				echo "  4) Switching to PHP 4 (zu PHP 4 wechseln)\n";
+				echo "  5) Switching to PHP 5 (zu PHP 5 wechseln)\r\n";
+				echo "  4) Switching to PHP 4 (zu PHP 4 wechseln)\r\n";
 			}
-			echo "  x) Exit (Beenden)\n";
+			echo "  x) Exit (Beenden)\r\n";
 
 			switch (trim(fgets(NEWSTDIN, 256))) {
 				case 4:
@@ -149,11 +148,11 @@
 						'php5ts.dll' => 'php4ts.dll',
 						'php5apache2.dll' => 'php4apache2.dll',
 						'/php/php-cgi.exe' => '/php/php.exe',
-						strtr($php5dir.'\\', '\\', '/') => strtr($php4dir.'\\', '\\', '/')
+						'/xampp/php/' => '/xampp/php/php4/'
 					)
 				);
 				file_put_contents($httpconf, $httpconfcontent);
-				echo 'done!'."\n\n";
+				echo 'done!'."\r\n\r\n";
 			}
 
 			echo "  Copy now all php4 dlls to $apachebin\r\n\r\n";
@@ -202,11 +201,11 @@
 						'php4ts.dll' => 'php5ts.dll',
 						'php4apache2.dll' => 'php5apache2.dll',
 						'/php/php.exe' => '/php/php-cgi.exe',
-						strtr($php4dir.'\\', '\\', '/') => strtr($php5dir.'\\', '\\', '/')
+						'/xampp/php/php4/' => '/xampp/php/'
 					)
 				);
 				file_put_contents($httpconf, $httpconfcontent);
-				echo 'done!'."\n\n";
+				echo 'done!'."\r\n\r\n";
 			}
 
 			echo "  Copy now all php5 dlls to $apachebin\r\n\r\n";

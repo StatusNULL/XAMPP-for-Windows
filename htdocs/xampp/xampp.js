@@ -7,6 +7,7 @@ function o(x, m) {
 	lightm = m;
 }
 
+var last;
 function h(t) {
 	if (typeof last == "undefined") {
 		last = document.anchors[0];

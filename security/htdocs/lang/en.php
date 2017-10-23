@@ -168,6 +168,8 @@
 	$TEXT['mysql-rootsetup-passwdrepeat'] = "Repeat the new password:";
 	$TEXT['mysql-rootsetup-passwdchange'] = "Password changing";
 	$TEXT['mysql-rootsetup-phpmyadmin'] = "PhpMyAdmin authentification:";
+	$TEXT['mysql-passwort-infile'] = "Safe plain password in text file?";
+	$TEXT['mysql-passwort-risk'] = "Security risk!";
 
 	$TEXT['xampp-setup-head'] = "XAMPP DIRECTORY PROTECTION (.htaccess)";
 	$TEXT['xampp-setup-user'] = "User:";

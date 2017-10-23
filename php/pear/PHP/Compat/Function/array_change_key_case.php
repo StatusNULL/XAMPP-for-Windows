@@ -16,7 +16,7 @@
 // |          Aidan Lister <aidan@php.net>                                |
 // +----------------------------------------------------------------------+
 //
-// $Id: array_change_key_case.php,v 1.10 2005/01/26 04:55:13 aidan Exp $
+// $Id: array_change_key_case.php,v 1.11 2005/12/07 21:08:57 aidan Exp $
 
 
 if (!defined('CASE_LOWER')) {
@@ -36,7 +36,7 @@ if (!defined('CASE_UPPER')) {
  * @link        http://php.net/function.array_change_key_case
  * @author      Stephan Schmidt <schst@php.net>
  * @author      Aidan Lister <aidan@php.net>
- * @version     $Revision: 1.10 $
+ * @version     $Revision: 1.11 $
  * @since       PHP 4.2.0
  * @require     PHP 4.0.0 (user_error)
  */
@@ -60,4 +60,5 @@ if (!function_exists('array_change_key_case')) {
         return $output;
     }
 }
+
 ?>

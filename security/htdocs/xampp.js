@@ -7,9 +7,10 @@ function o(x, m) {
 	lightm = m;
 }
 
+var last;
 function h(t) {
 	if (typeof last == "undefined") {
-		last=document.anchors[0];
+		last = document.anchors[0];
 	}
 	last.className = 'n';
 	t.className = 'nh';

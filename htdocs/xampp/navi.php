@@ -1,5 +1,5 @@
-<?
-	include("langsettings.php");
+<?php
+	include "langsettings.php";
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 	"http://www.w3.org/TR/html4/loose.dtd">
@@ -12,13 +12,13 @@
 	</head>
 
 	<body class="n">
-		<?php include "lang/".file_get_contents("lang.tmp").".php"; ?>
-
 		<table border="0" cellpadding="0" cellspacing="0">
 			<tr valign="top">
 				<td align="right" class="navi">
 					<img src="img/blank.gif" alt="" width="145" height="15"><br>
-					<span class="nh">&nbsp;<?php echo $TEXT['navi-xampp']; ?><br>[PHP: <?php echo phpversion(); ?>]</span><br>
+					<span class="nh">&nbsp;<?php 
+					include ".modell"; 
+					?><br>[PHP: <?php echo phpversion(); ?>]</span><br>
 				</td>
 			</tr>
 			<tr>
@@ -84,11 +84,10 @@
 					<a target="_parent" class="n" href="lang.php?pl"><?php echo $TEXT['navi-polish']; ?></a><br>
 					<a target="_parent" class="n" href="lang.php?pt"><?php echo $TEXT['navi-portuguese']; ?></a><br>
 					<a target="_parent" class="n" href="lang.php?sl"><?php echo $TEXT['navi-slovenian']; ?></a><br>
-					<a target="_parent" class="n" href="lang.php?zh"><?php echo $TEXT['navi-chinese']; ?></a><br>
-					<a target=_parent class=n href="lang.php?pt_br"><?=$TEXT['navi-ptbrazil']?></a><p>
+					<a target="_parent" class="n" href="lang.php?zh"><?php echo $TEXT['navi-chinese']; ?></a><p>
 
-					<p class="navi">&copy;2002/2005<br>
-					<?php if (file_get_contents("lang.tmp") == "de") { ?>
+					<p class="navi">&copy;2002-2006<br>
+					<?php if ($lang == "de") { ?>
 						<a target="_new" href="http://www.apachefriends.org/index.html"><img border="0" src="img/apachefriends.gif" alt=""></a><p>
 					<?php } else { ?>
 						<a target="_new" href="http://www.apachefriends.org/index-en.html"><img border="0" src="img/apachefriends.gif" alt=""></a><p>

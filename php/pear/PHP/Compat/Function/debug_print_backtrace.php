@@ -16,7 +16,7 @@
 // |          Aidan Lister <aidan@php.net>                                |
 // +----------------------------------------------------------------------+
 //
-// $Id: debug_print_backtrace.php,v 1.2 2005/05/11 07:39:08 aidan Exp $
+// $Id: debug_print_backtrace.php,v 1.3 2005/08/17 02:58:09 aidan Exp $
 
 
 /**
@@ -27,9 +27,9 @@
  * @link        http://php.net/function.debug_print_backtrace
  * @author      Laurent Laville <pear@laurent-laville.org>
  * @author      Aidan Lister <aidan@php.net>
- * @version     $Revision: 1.2 $
+ * @version     $Revision: 1.3 $
  * @since       PHP 5
- * @require     PHP 4.0.0
+ * @require     PHP 4.3.0 (debug_backtrace)
  */
 if (!function_exists('debug_print_backtrace')) {
     function debug_print_backtrace()

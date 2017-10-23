@@ -15,6 +15,12 @@
 	$backslashrootreal[] = "$partwampp\cgi-bin\\perltest.cgi";
 	$backslashrootreal[] = "$partwampp\cgi-bin\\printenv.pl";
 	$backslashrootreal[] = "$partwampp\webalizer\\webalizer.conf";
+	$backslashrootreal[] = "$partwampp\apache\bin\\apr-config.bat";
+	$backslashrootreal[] = "$partwampp\apache\bin\\apr-config.pl";
+	$backslashrootreal[] = "$partwampp\apache\bin\\apu-config.bat";
+	$backslashrootreal[] = "$partwampp\apache\bin\\apu-config.pl";
+	$backslashrootreal[] = "$partwampp\apache\bin\\apxs.bat";
+	$backslashrootreal[] = "$partwampp\apache\bin\\apxs.pl";
 	$slashrootreal[] = "$partwampp\mysql\bin\\my.cnf";
 	$slashrootreal[] = "$partwampp\apache\conf\\httpd.conf";
 	$slashrootreal[] = "$partwampp\apache\conf\extra\\httpd-autoindex.conf";

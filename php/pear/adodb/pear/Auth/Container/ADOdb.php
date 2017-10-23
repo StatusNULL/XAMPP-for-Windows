@@ -21,9 +21,9 @@
 //
 
 require_once 'Auth/Container.php';
-require_once 'adodb/adodb.inc.php';
-require_once 'adodb/adodb-pear.inc.php';
-require_once 'adodb/adodb-errorpear.inc.php';
+require_once 'adodb.inc.php';
+require_once 'adodb-pear.inc.php';
+require_once 'adodb-errorpear.inc.php';
 
 /**
  * Storage driver for fetching login data from a database using ADOdb-PHP.

@@ -4,7 +4,7 @@
 /**
  * PHP Version 5
  *
- * Copyright (c) 2002-2005, Sebastian Bergmann <sb@sebastian-bergmann.de>.
+ * Copyright (c) 2002-2006, Sebastian Bergmann <sb@sebastian-bergmann.de>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -13,7 +13,7 @@
  *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
- * 
+ *
  *   * Redistributions in binary form must reproduce the above copyright
  *     notice, this list of conditions and the following disclaimer in
  *     the documentation and/or other materials provided with the
@@ -39,9 +39,9 @@
  * @category   Testing
  * @package    PHPUnit2
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
- * @copyright  2002-2005 Sebastian Bergmann <sb@sebastian-bergmann.de>
+ * @copyright  2002-2006 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    CVS: $Id: ExceptionTestCase.php,v 1.15.2.3 2005/11/02 10:54:53 sebastian Exp $
+ * @version    CVS: $Id: ExceptionTestCase.php,v 1.15.2.6 2006/02/20 07:42:59 sebastian Exp $
  * @link       http://pear.php.net/package/PHPUnit2
  * @since      File available since Release 2.0.0
  */
@@ -54,9 +54,9 @@ require_once 'PHPUnit2/Framework/TestCase.php';
  * @category   Testing
  * @package    PHPUnit2
  * @author     Sebastian Bergmann <sb@sebastian-bergmann.de>
- * @copyright  2002-2005 Sebastian Bergmann <sb@sebastian-bergmann.de>
+ * @copyright  2002-2006 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    Release: 2.3.3
+ * @version    Release: 2.3.5
  * @link       http://pear.php.net/package/PHPUnit2
  * @since      Class available since Release 2.0.0
  */
@@ -64,10 +64,10 @@ class PHPUnit2_Extensions_ExceptionTestCase extends PHPUnit2_Framework_TestCase 
     /**
      * The name of the expected Exception.
      *
-     * @var    string
+     * @var    mixed
      * @access private
      */
-    private $expectedException = 'Exception';
+    private $expectedException = NULL;
 
     /**
      * @return string
@@ -79,16 +79,13 @@ class PHPUnit2_Extensions_ExceptionTestCase extends PHPUnit2_Framework_TestCase 
     }
 
     /**
-     * @param  string  $exceptionName
-     * @throws Exception
+     * @param  mixed  $exceptionName
      * @access public
      * @since  Method available since Release 2.2.0
      */
     public function setExpectedException($exceptionName) {
-        if (is_string($exceptionName) && class_exists($exceptionName)) {
+        if ((is_string($exceptionName) && class_exists($exceptionName)) || $exceptionName === NULL) {
             $this->expectedException = $exceptionName;
-        } else {
-            throw new Exception;
         }
     }
 
@@ -101,14 +98,17 @@ class PHPUnit2_Extensions_ExceptionTestCase extends PHPUnit2_Framework_TestCase 
         }
 
         catch (Exception $e) {
-            if ($e instanceof $this->expectedException) {
+            if ($this->expectedException !== NULL &&
+                $e instanceof $this->expectedException) {
                 return;
             } else {
                 throw $e;
             }
         }
 
-        $this->fail('Expected exception ' . $this->expectedException);
+        if ($this->expectedException !== NULL) {
+            $this->fail('Expected exception ' . $this->expectedException);
+        }
     }
 }
 

@@ -1,3 +1,6 @@
+<?php
+	header("Content-Type: text/html; charset=iso-8859-1");
+?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 	"http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -22,8 +25,7 @@
 			<a href="/xampp/lang.php?pl">Polish</a> /
 			<a href="/xampp/lang.php?pt">Portuguese</a> /
 			<a href="/xampp/lang.php?sl">Slovenian</a> /
-			<a href="/xampp/lang.php?zh">Chinese</a> / 
-			<a href="/xampp/lang.php?pt_br">Português (Brasil)</a>
+			<a href="/xampp/lang.php?zh">Chinese</a>
 		</center>
 	</body>
 </html>

@@ -1,5 +1,5 @@
 <?php
-	include "lang/".file_get_contents("lang.tmp").".php";
+	include "langsettings.php";
 
 	// Biorhythm by Till Gerken
 	// http://www.zend.com/zend/tut/dynamic.php

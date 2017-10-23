@@ -17,10 +17,10 @@
 
 		<?php
 			$curdir = getcwd();
-			list($partwampp, $directorwampp) = spliti ('\\\htdocs\\\xampp', $curdir);
+		 list($partwampp, $directorwampp) = spliti ('\\\htdocs\\\xampp', $curdir);
 			$i = 0;
 			$up = "";
-
+			
 			if ($_SERVER['SERVER_PORT'] == 443) {
 				$prot = "https";
 			} else {
@@ -102,6 +102,7 @@
 			line($TEXT['status-ssl'], $ssl);
 			line($TEXT['status-cgi'], $cgi);
 			line($TEXT['status-ssi'], $ssi);
+		
 
 			if ((file_exists("$partwampp\htdocs\python\\xa.py")) && (file_exists("$partwampp\apache\conf\python.conf"))) {
 				$a = @file("$b/python/xa.py");
@@ -109,7 +110,7 @@
 				line($TEXT['status-python'], $python);
 			}
 
-			if ((file_exists("$partwampp\htdocs\modperl\perl.pl")) && (file_exists("$partwampp\apache\conf\perl.conf"))) {
+			if ((file_exists("$partwampp\htdocs\modperl\perl.pl")) && (file_exists("$partwampp\apache\conf\extra\perl.conf"))) {
 				$a = @file("$b/modperl/perl.pl");
 				$perl = $a[0];
 				line($TEXT['status-perl'], $perl);
@@ -135,7 +136,7 @@
 				line($TEXT['status-ftp'], $ftp);
 			}
 
-			if (file_exists("$partwampp\tomcat\bin\tomcat.exe")) {
+			if (file_exists("$partwampp\\tomcat\conf\\server.xml")) {
 				if (($handle = @fsockopen($host, 8080, $errno, $errstr, $timeout)) == false) {
 					$tomcat = "NOK";
 				} else {

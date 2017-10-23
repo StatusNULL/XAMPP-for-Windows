@@ -1,6 +1,6 @@
 <?php
 // +-----------------------------------------------------------------------+
-// | Copyright (c) 2002, Richard Heyes                                     |
+// | Copyright (c) 2002-2005, Richard Heyes                                |
 // | All rights reserved.                                                  |
 // |                                                                       |
 // | Redistribution and use in source and binary forms, with or without    |
@@ -32,7 +32,7 @@
 // | Author: Richard Heyes <richard@phpguru.org>                           |
 // +-----------------------------------------------------------------------+
 //
-// $Id: SearchReplace.php,v 1.1 2002/04/21 19:38:32 richard Exp $
+// $Id: SearchReplace.php,v 1.12 2005/03/11 20:32:40 techtonik Exp $
 //
 // Search and Replace Utility
 //
@@ -59,6 +59,7 @@ class File_SearchReplace
     var $ignore_sep;
     var $occurences;
     var $search_function;
+    var $php5;
     var $last_error;
 
     // }}}
@@ -72,11 +73,11 @@ class File_SearchReplace
      * @param string $replace                   The string/regex to replace $find with.
      * @param array  $files                     The file(s) to perform this operation on.
      * @param array  $directories    (optional) The directories to perform this operation on.
-     * @param int    $include_subdir            If performing on directories, whether to traverse subdirectories.
+     * @param bool   $include_subdir            If performing on directories, whether to traverse subdirectories.
      * @param array  $ignore_lines              Ignore lines beginning with any of the strings in this array. This
      *                                          feature only works with the "normal" search.
      */
-    function File_SearchReplace($find, $replace, $files, $directories = '', $include_subdir = 1, $ignore_lines = array())
+    function File_SearchReplace($find, $replace, $files, $directories = '', $include_subdir = TRUE, $ignore_lines = array())
     {
 
         $this->find            = $find;
@@ -84,10 +85,11 @@ class File_SearchReplace
         $this->files           = $files;
         $this->directories     = $directories;
         $this->include_subdir  = $include_subdir;
-        $this->ignore_lines    = $ignore_lines;
+        $this->ignore_lines    = (array) $ignore_lines;
 
         $this->occurences      = 0;
         $this->search_function = 'search';
+        $this->php5            = (substr(PHP_VERSION, 0, 1) == 5) ? TRUE : FALSE;
         $this->last_error      = '';
 
     }
@@ -183,7 +185,7 @@ class File_SearchReplace
      * Accessor for setting include_subdir variable.
      *
      * @access public
-     * @param int $include_subdir Whether to traverse subdirectories or not.
+     * @param bool $include_subdir Whether to traverse subdirectories or not.
      */
     function setIncludeSubdir($include_subdir)
     {
@@ -256,20 +258,44 @@ class File_SearchReplace
      */
     function search($filename)
     {
-
         $occurences = 0;
         $file_array = file($filename);
 
-        for ($i=0; $i<count($file_array); $i++) {
+        if (empty($this->ignore_lines) && $this->php5) { // PHP5 acceleration
+            $file_array = str_replace($this->find, $this->replace, $file_array, $occurences);
 
-            if (count($this->ignore_lines) > 0) {
-                for ($j=0; $j<count($this->ignore_lines); $j++) {
-                    if (substr($file_array[$i],0,strlen($this->ignore_lines[$j])) == $this->ignore_lines[$j]) continue 2;
+        } else { // str_replace() doesn't return number of occurences in PHP4
+                 // so we need to count them manually and/or filter strings
+            $ignore_lines_num = count($this->ignore_lines);
+
+            // just for the sake of catching occurences
+            $local_find    = array_values((array) $this->find);
+            $local_replace = (is_array($this->replace)) ? array_values($this->replace) : $this->replace;
+
+            for ($i=0; $i < count($file_array); $i++) {
+
+                if ($ignore_lines_num > 0) {
+                    for ($j=0; $j < $ignore_lines_num; $j++) {
+                        if (substr($file_array[$i],0,strlen($this->ignore_lines[$j])) == $this->ignore_lines[$j]) continue 2;
+                    }
+                }
+
+                if ($this->php5) {
+                    $file_array[$i] = str_replace($this->find, $this->replace, $file_array[$i], $counted);
+                    $occurences += $counted;
+                } else {
+                    foreach ($local_find as $fk => $ff) {
+                        $occurences += substr_count($file_array[$i], $ff);
+                        if (!is_array($local_replace)) {
+                            $fr = $local_replace;
+                        } else {
+                            $fr = (isset($local_replace[$fk])) ? $local_replace[$fk] : "";
+                        }
+                        $file_array[$i] = str_replace($ff, $fr, $file_array[$i]);
+                    }
                 }
             }
 
-            $occurences += count(explode($this->find, $file_array[$i])) - 1;
-            $file_array[$i] = str_replace($this->find, $this->replace, $file_array[$i]);
         }
         if ($occurences > 0) $return = array($occurences, implode('', $file_array)); else $return = FALSE;
         return $return;
@@ -292,9 +318,33 @@ class File_SearchReplace
 
         clearstatcache();
 
-        $file       = fread($fp = fopen($filename, 'r'), filesize($filename)); fclose($fp);
-        $occurences = count(explode($this->find, $file)) - 1;
-        $file       = str_replace($this->find, $this->replace, $file);
+        $file          = fread($fp = fopen($filename, 'r'), filesize($filename)); fclose($fp);
+        $local_find    = array_values((array) $this->find);
+        $local_replace = (is_array($this->replace)) ? array_values($this->replace) : $this->replace;
+
+        $occurences    = 0;
+
+        // logic is the same as in str_replace function with one exception:
+        //   if <search> is a string and <replacement> is an array - substitution
+        //   is done from the first element of array. str_replace in this case
+        //   usualy fails with notice and returns "ArrayArrayArray..." string
+        // (this exclusive logic of SearchReplace will not work for php5, though,
+        // because I haven't decided yet whether it is bug or feature)
+
+        if ($this->php5) {
+            $file_array[$i] = str_replace($this->find, $this->replace, $file_array[$i], $counted);
+            $occurences += $counted;
+        } else {
+            foreach ($local_find as $fk => $ff) {
+                $occurences += substr_count($file, $ff);
+                if (!is_array($local_replace)) {
+                    $fr = $local_replace;
+                } else {
+                    $fr = (isset($local_replace[$fk])) ? $local_replace[$fk] : "";
+                }
+                $file = str_replace($ff, $fr, $file);
+            }
+        }
 
         if ($occurences > 0) $return = array($occurences, $file); else $return = FALSE;
         return $return;
@@ -318,8 +368,20 @@ class File_SearchReplace
         clearstatcache();
 
         $file       = fread($fp = fopen($filename, 'r'), filesize($filename)); fclose($fp);
-        $occurences = count($matches = preg_split($this->find, $file)) - 1;
-        $file       = preg_replace($this->find, $this->replace, $file);
+        $local_find    = array_values((array) $this->find);
+        $local_replace = (is_array($this->replace)) ? array_values($this->replace) : $this->replace;
+
+        $occurences = 0;
+
+        foreach($local_find as $fk => $ff) {
+            $occurences += preg_match_all($ff, $file, $matches);
+            if (!is_array($local_replace)) {
+                $fr = $local_replace;
+            } else {
+                $fr = (isset($local_replace[$fk])) ? $local_replace[$fk] : "";
+            }
+            $file = preg_replace($ff, $fr, $file);
+        }
 
         if ($occurences > 0) $return = array($occurences, $file); else $return = FALSE;
         return $return;
@@ -343,9 +405,20 @@ class File_SearchReplace
         clearstatcache();
 
         $file = fread($fp = fopen($filename, 'r'), filesize($filename)); fclose($fp);
+        $local_find    = array_values((array) $this->find);
+        $local_replace = (is_array($this->replace)) ? array_values($this->replace) : $this->replace;
 
-        $occurences = count($matches = split($this->find, $file)) -1;
-        $file       = ereg_replace($this->find, $this->replace, $file);
+        $occurences = 0;
+
+        foreach($local_find as $fk => $ff) {
+            $occurences += count(split($ff, $file)) - 1;
+            if (!is_array($local_replace)) {
+                $fr = $local_replace;
+            } else {
+                $fr = (isset($local_replace[$fk])) ? $local_replace[$fk] : "";
+            }
+            $file = ereg_replace($ff, $fr, $file);
+        }
 
         if ($occurences > 0) $return = array($occurences, $file); else $return = FALSE;
         return $return;
@@ -417,7 +490,7 @@ class File_SearchReplace
                 if ($file == '.' OR $file == '..') continue;
 
                 if (is_dir($this->directories[$i].$file) == TRUE) {
-                    if ($this->include_subdir == 1) {
+                    if ($this->include_subdir == TRUE) {
                         $this->directories[] = $this->directories[$i].$file.'/';
                         continue;
                     } else {
@@ -446,6 +519,7 @@ class File_SearchReplace
      */
     function doSearch()
     {
+        $this->occurences = 0;
         if ($this->find != '') {
             if ((is_array($this->files) AND count($this->files) > 0) OR $this->files != '') $this->doFiles($this->search_function);
             if ($this->directories != '')                                                   $this->doDirectories($this->search_function);

@@ -16,7 +16,7 @@
 // | Authors: Davey Shafik <davey@pixelated-dreams.com>                   |
 // +----------------------------------------------------------------------+
 //
-// $Id: Info.php,v 1.19 2005/01/03 17:33:43 davey Exp $
+// $Id: Info.php,v 1.24 2006/03/09 15:00:47 fa Exp $
 
 require_once 'PEAR/Remote.php';
 require_once 'PEAR/Registry.php';
@@ -51,7 +51,15 @@ class PEAR_Info
         $this->r = new PEAR_Remote($this->config);
         $this->reg = new PEAR_Registry($this->config->get('php_dir'));
         // get PEARs packageInfo to show version number at the top of the HTML
-        $pear = $this->reg->packageInfo("PEAR");
+        
+        if (method_exists($this->reg, 'getPackage')) {
+            $pear = $this->reg->getPackage("PEAR");
+            $pear_version = $pear->getVersion();
+        } else {
+            $pear = $this->reg->packageInfo('PEAR');
+            $pear_version = $pear['version'];
+        }
+        $this->index = array();
         $this->list_options = false;
         if ($this->config->get('preferred_state') == 'stable') {
             $this->list_options = true;
@@ -73,6 +81,7 @@ class PEAR_Info
             td, th { border: 1px solid #000000; font-size: 75%; vertical-align: baseline;}
             h1 {font-size: 150%; text-align: center;}
             h2 {font-size: 125%; text-align: center;}
+            h2 a:hover {text-decoration: none;}
             .p {text-align: left;}
             .e {background-color: #006600; font-weight: bold; color: #FFFFFF; width: 100px;}
             .e a:link { color: #FFFFFF; }
@@ -86,13 +95,13 @@ class PEAR_Info
         <table>
             <tr class="h">
                 <td>
-                    <a href="http://pear.php.net/"><img src="<?php echo $_SERVER['PHP_SELF'];?>?pear_image=true" alt="PEAR Logo" /></a><h1 class="p">PEAR <?php echo $pear['version']; ?></h1>
+                    <a href="http://pear.php.net/"><img src="<?php echo htmlentities($_SERVER['PHP_SELF']);?>?pear_image=true" alt="PEAR Logo" /></a><h1 class="p">PEAR <?php echo $pear_version; ?></h1>
                 </td>
             </tr>
         </table>
     <?php
             if (!isset($_GET['credits'])) {
-                echo '<h1><a href="' .$_SERVER['PHP_SELF']. '?credits=true">PEAR Credits</a></h1>';
+                echo '<h1><a href="' . htmlentities($_SERVER['PHP_SELF']). '?credits=true">PEAR Credits</a></h1>';
                 // Get packageInfo and Show the HTML for the Packages
                 $this->getConfig();
                 echo '<br />';
@@ -150,7 +159,7 @@ class PEAR_Info
         $packages = '';
         foreach ($available as $name) {
             $installed = $this->reg->packageInfo($name);
-            if (strlen($installed['package']) > 1) {
+            if (isset($installed['package']) && strlen($installed['package']) > 1) {
                 if (!isset($old_index)) {
                     $old_index = '';
                 }
@@ -329,9 +338,10 @@ class PEAR_Info
         }
         echo '<br /><table border="0" cellpadding="3" width="600">';
         echo '<tr class="h"><td>Package</td><td>Maintainers</td></tr>';
+        sort($available);
         foreach ($available as $name) {
             $installed = $this->reg->packageInfo($name);
-            if (strlen($installed['package']) > 1) {
+            if (isset($installed['package']) && strlen($installed['package']) > 1) {
                 ?>
                 <tr>
                     <td class="e">
