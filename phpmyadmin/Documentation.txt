@@ -6,7 +6,7 @@
    Transformations  -  FAQ  -  Developers  -  Credits  -  Translators
    ______________________________________________________________________
 
-                        phpMyAdmin 2.5.7 Documentation
+                      phpMyAdmin 2.5.7-pl1 Documentation
 
      * SourceForge phpMyAdmin project page   [ http://www.phpmyadmin.net/
        ] 
@@ -14,8 +14,8 @@
           + Version history: ChangeLog
           + General notes: README
           + License: LICENSE
-     * Documentation    version:   $Id:   Documentation.html,v   2.14.2.8
-       2004/06/08 23:07:00 rabus Exp $
+     * Documentation   version:   $Id:   Documentation.html,v   2.14.2.10
+       2004/06/30 17:57:23 lem9 Exp $
 
 Requirements
 
@@ -2556,6 +2556,27 @@ FAQ - Frequently Asked Questions
        We believe that an exploit for this weakness would be difficult to
        achieve.  However version 2.5.2 now encrypts the password with the
        well-known blowfish algorithm.
+
+    [8.2] Security alert, dated 2004-06-29.
+
+   Last update of this FAQ: 2004-06-30.
+   The  phpMyAdmin  development  team  received  notice  of this security
+   alert:
+   http://securityfocus.com/archive/1/367486/2004-06-26/2004-07-02/0
+   We  would  like  to  put emphasis on the disappointment we feel when a
+   bugreporter  does  not contact the authors of a software first, before
+   posting  any  exploits.  The common way to report this, is to give the
+   developers a reasonable amount of time to respond to an exploit before
+   it is made public.
+   We  acknowledge that phpMyAdmin versions 2.5.1 to 2.5.7 are vulnerable
+   to this problem, if each of the following conditions are met:
+     * The Web server hosting phpMyAdmin is not running in safe mode.
+     * In  config.inc.php,  $cfg['LeftFrameLight']  is  set to FALSE (the
+       default value of this parameter is TRUE).
+     * There  is no firewall blocking requests from the Web server to the
+       attacking host.
+
+   Version 2.5.7-pl1 was released with a fix for this vulnerability.
 
 Developers Information
 

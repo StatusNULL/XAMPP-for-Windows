@@ -1,5 +1,5 @@
 <?php
-/* $Id: left.php,v 2.5 2003/12/09 13:38:16 garvinhicking Exp $ */
+/* $Id: left.php,v 2.5.4.1 2004/06/30 18:42:18 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -45,6 +45,22 @@ require_once('./libraries/bookmark.lib.php');
 require_once('./libraries/relation.lib.php');
 $cfgRelation = PMA_getRelationsParam();
 
+function PMA_multimerge(&$stack, &$table) {
+global $list_item, $table_item;
+
+    $key = array_shift($table);
+
+    if (count($table) > 0) {
+        if (!isset($stack[$key])) {
+            $stack[$key] = '';
+        }
+        PMA_multimerge($stack[$key], $table);
+    } else {
+        $stack['pma_name'][]      = $table_item;
+        $stack['pma_list_item'][] = $list_item;
+    }
+}
+
 function PMA_reduceNest($_table) {
 
     if ($GLOBALS['cfg']['LeftFrameTableLevel'] > 0) {
@@ -52,7 +68,7 @@ function PMA_reduceNest($_table) {
         $temp_table = $_table;
         $new_table = array();
         $last_index = 0;
-        for ($ti = 0; $ti < $max; $ti++) {
+        for ($ti = 0; $ti <= $max; $ti++) {
             if (isset($temp_table[$ti])) {
                 $new_table[$ti] = $temp_table[$ti];
                 unset($temp_table[$ti]);
@@ -498,12 +514,12 @@ if ($num_dbs > 1) {
                             }
                         }
 
-                        unset($_table[count($_table)-1]);
                         $_table = PMA_reduceNest($_table);
 
-                        $eval_string = '$tablestack[\'' . implode('\'][\'', $_table) . '\'][\'pma_name\'][] = \'' . str_replace('\'', '\\\'', $table) . '\';';
-                        $eval_string .= '$tablestack[\'' . implode('\'][\'', $_table) . '\'][\'pma_list_item\'][] = \'' . str_replace('\'', '\\\'', $list_item) . '\';';
-                        eval($eval_string);
+                        if (count($_table) == 1) {
+                            array_unshift($_table, '');
+                        }
+                        PMA_multimerge($tablestack, $_table);
                     } else {
                         $tablestack['']['pma_name'][] = $table;
                         $tablestack['']['pma_list_item'][] = $list_item;
@@ -727,12 +743,12 @@ else if ($num_dbs == 1) {
                         }
                     }
 
-                    unset($_table[count($_table)-1]);
                     $_table = PMA_reduceNest($_table);
 
-                    $eval_string = '$tablestack[\'' . implode('\'][\'', $_table) . '\'][\'pma_name\'][] = \'' . str_replace('\'', '\\\'', $table) . '\';';
-                    $eval_string .= '$tablestack[\'' . implode('\'][\'', $_table) . '\'][\'pma_list_item\'][] = \'' . str_replace('\'', '\\\'', $list_item) . '\';';
-                    eval($eval_string);
+                    if (count($_table) == 1) {
+                        array_unshift($_table, '');
+                    }
+                    PMA_multimerge($tablestack, $_table);
                 } else {
                     $tablestack['']['pma_name'][] = $table;
                     $tablestack['']['pma_list_item'][] = $list_item;

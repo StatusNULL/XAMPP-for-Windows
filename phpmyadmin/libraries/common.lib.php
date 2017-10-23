@@ -1,5 +1,5 @@
 <?php
-/* $Id: common.lib.php,v 2.10.2.5 2004/06/07 11:34:49 rabus Exp $ */
+/* $Id: common.lib.php,v 2.10.2.6 2004/06/30 13:27:35 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -64,6 +64,12 @@ if (!isset($use_backquotes)) {
 if (!isset($pos)) {
     $pos              = 0;
 }
+
+/**
+ * 2004-06-30 rabus: Ensure, that $cfg variables are not set somwhere else
+ * before including the config file.
+ */
+unset($cfg);
 
 /**
  * Detects the config file we want to load

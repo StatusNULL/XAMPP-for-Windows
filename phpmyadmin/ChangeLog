@@ -2,8 +2,16 @@
 phpMyAdmin - Changelog
 ----------------------
 
-$Id: ChangeLog,v 2.111.2.45 2004/06/08 23:06:59 rabus Exp $
+$Id: ChangeLog,v 2.111.2.48 2004/06/30 18:44:38 lem9 Exp $
 $Source: /cvsroot/phpmyadmin/phpMyAdmin/ChangeLog,v $
+
+2004-06-30 Marc Delisle  <lem9@users.sourceforge.net>
+    * left.php: fix against security alert, thanks to Garvin
+    * Documentation.html: FAQ 8.2 for security alert
+    ### 2.5.7-pl1 released
+
+2004-06-30 Alexander M. Turek  <me@derrabus.de>
+    * libraries/common.lib.php: Fix against $_REQUEST['cfg'] exploits.
 
 2004-06-09 Alexander M. Turek  <me@derrabus.de>
     ### 2.5.7 released

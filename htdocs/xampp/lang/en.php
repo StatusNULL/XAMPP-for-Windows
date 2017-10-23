@@ -9,7 +9,7 @@ $TEXT['global-xampp']="XAMPP for Windows";
 // NAVIGATION
 // ---------------------------------------------------------------------
 
-$TEXT['navi-xampp']="XAMPP 1.4.3";
+$TEXT['navi-xampp']="XAMPP 1.4.4";
 $TEXT['navi-welcome']="Welcome";
 $TEXT['navi-status']="Status";
 $TEXT['navi-security']="Security";
@@ -120,7 +120,7 @@ $TEXT['start-subhead']="Congratulations:<br>You successfully installed XAMPP on 
 
 $TEXT['start-text1']="Now you can start using Apache and Co. Firstly you should try »Status« on the left navigation to make sure everything works fine.";
 
-$TEXT['start-text2']="Attention: The XAMPP in version 1.4.3 is modified for a package management. There are following packages/addons: <UL><LI>XAMPP basic package</LI><LI>XAMPP Perl addon</LI><LI>XAMPP Python addon<LI></LI>XAMPP Utility addon (more utils but inactiv)</LI><LI>XAMPP Server addon (more server but inactiv)</LI><LI>XAMPP Other addon (other things but inactiv)</LI></UL>";
+$TEXT['start-text2']="Attention: The XAMPP in version 1.4.4 is modified for a package management. There are following packages/addons: <UL><LI>XAMPP basic package</LI><LI>XAMPP Perl addon</LI><LI>XAMPP Python addon<LI></LI>XAMPP Utility addon (more utils but inactiv)</LI><LI>XAMPP Server addon (more server but inactiv)</LI><LI>XAMPP Other addon (other things but inactiv)</LI></UL>";
 
 $TEXT['start-text3']="Please arrange your personality XAMPP. But take care. For a normal initialization of each additional addon, please execute the \"setup_xampp.bat\" once. For the installer versions: All installer addons need the installer version of XAMPP! Otherwise you can always use the zip or 7zip-exe addons.";
 
@@ -172,7 +172,7 @@ $TEXT['components-text1']="XAMPP combines many different sofware packages into o
 
 $TEXT['components-text2']="Many thanks to the developers of these programs.";
 
-$TEXT['components-text3']="In the directory <b>\(mini)xampp\licenses</b> you will find all licenses files of these programs.";
+$TEXT['components-text3']="In the directory <b>\\xampp\licenses</b> you will find all licenses files of these programs.";
 
 // ---------------------------------------------------------------------
 // CD COLLECTION DEMO

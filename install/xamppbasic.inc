@@ -2,6 +2,9 @@
 $backslash[$bslashi++]="php.ini";
 $backslashrootawk['php.ini']="\"$awkpart\\\apache\\\bin\\\\";
 $backslashrootreal['php.ini']="$partwampp\apache\bin\\";
+$backslash[$bslashi++]="php-safe.ini";
+$backslashrootawk['php-safe.ini']="\"$awkpart\\\apache\\\bin\\\\";
+$backslashrootreal['php-safe.ini']="$partwampp\apache\bin\\";
 $backslash[$bslashi++]="pear.bat";
 $backslashrootawk['pear.bat']="\"$awkpart\\\php\\\\";
 $backslashrootreal['pear.bat']="$partwampp\php\\";
