@@ -1,5 +1,5 @@
 <?php
-/* $Id: sqlparser.lib.php,v 2.23 2004/08/09 01:22:59 lem9 Exp $ */
+/* $Id: sqlparser.lib.php,v 2.23.2.1 2004/11/10 00:40:48 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /** SQL Parser Functions for phpMyAdmin
@@ -149,7 +149,7 @@ if ($is_minimum_common == FALSE) {
     {
         global $SQP_errorString;
         $debugstr = 'ERROR: ' . $message . "\n";
-        $debugstr .= 'CVS: $Id: sqlparser.lib.php,v 2.23 2004/08/09 01:22:59 lem9 Exp $' . "\n";
+        $debugstr .= 'CVS: $Id: sqlparser.lib.php,v 2.23.2.1 2004/11/10 00:40:48 lem9 Exp $' . "\n";
         $debugstr .= 'MySQL: '.PMA_MYSQL_STR_VERSION . "\n";
         $debugstr .= 'USR OS, AGENT, VER: ' . PMA_USR_OS . ' ' . PMA_USR_BROWSER_AGENT . ' ' . PMA_USR_BROWSER_VER . "\n";
         $debugstr .= 'PMA: ' . PMA_VERSION . "\n";
@@ -308,7 +308,7 @@ if ($is_minimum_common == FALSE) {
                     // ($pos === FALSE)
                     if ($pos < 0) {
                         $debugstr = $GLOBALS['strSQPBugUnclosedQuote'] . ' @ ' . $startquotepos. "\n"
-                                  . 'STR: ' . $quotetype;
+                                  . 'STR: ' . htmlspecialchars($quotetype);
                         PMA_SQP_throwError($debugstr, $sql);
                         return $sql;
                     }
@@ -434,7 +434,7 @@ if ($is_minimum_common == FALSE) {
 
                     } else if ($last != '~') {
                         $debugstr =  $GLOBALS['strSQPBugUnknownPunctuation'] . ' @ ' . ($count1+1) . "\n"
-                                  . 'STR: ' . $punct_data;
+                                  . 'STR: ' . htmlspecialchars($punct_data);
                         PMA_SQP_throwError($debugstr, $sql);
                         return $sql;
                     }
@@ -476,7 +476,7 @@ if ($is_minimum_common == FALSE) {
                             continue;
                         } else {
                             $debugstr = $GLOBALS['strSQPBugInvalidIdentifer'] . ' @ ' . ($count1+1) . "\n"
-                                      . 'STR: ' . PMA_substr($sql, $count1, $count2 - $count1);
+                                      . 'STR: ' . htmlspecialchars(PMA_substr($sql, $count1, $count2 - $count1));
                             PMA_SQP_throwError($debugstr, $sql);
                             return $sql;
                         }

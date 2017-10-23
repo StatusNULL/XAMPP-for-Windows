@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_search.php,v 2.9 2004/09/05 23:40:28 lem9 Exp $ */
+/* $Id: db_search.php,v 2.9.2.1 2004/10/13 11:37:23 rabus Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 /**
  * Credits for this script goes to Thomas Chaumeny <chaume92 at aol.com>
@@ -50,7 +50,7 @@ if (isset($submit_search)) {
      */
     function PMA_getSearchSqls($table, $search_str, $search_option)
     {
-        global $err_url;
+        global $err_url, $charset_connection;
 
         // Statement types
         $sqlstr_select = 'SELECT';
@@ -85,11 +85,11 @@ if (isset($submit_search)) {
             // Eliminates empty values
             if (!empty($search_words[$i])) {
                 for ($j = 0; $j < $tblfields_cnt; $j++) {
-                    $prefix = PMA_MYSQL_INT_VERSION >= 40100 && $tblfields[$j]['Charset'] != 'NULL'
+                    $prefix = PMA_MYSQL_INT_VERSION >= 40100 && $tblfields[$j]['Charset'] != $charset_connection && $tblfields[$j]['Charset'] != 'NULL'
                             ? 'CONVERT(_utf8 '
                             : '';
-                    $suffix = PMA_MYSQL_INT_VERSION >= 40100 && $tblfields[$j]['Charset'] != 'NULL'
-                            ? ' USING ' . $tblfields[$j]['Charset'] . ')'
+                    $suffix = PMA_MYSQL_INT_VERSION >= 40100 && $tblfields[$j]['Charset'] != $charset_connection && $tblfields[$j]['Charset'] != 'NULL'
+                            ? ' USING ' . $tblfields[$j]['Charset'] . ') COLLATE ' . $tblfields[$j]['Collation']
                             : '';
                     $thefieldlikevalue[] = $tblfields[$j]['Field']
                                          . ' ' . $like_or_regex . ' '

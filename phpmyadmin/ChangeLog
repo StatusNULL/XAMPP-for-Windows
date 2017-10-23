@@ -2,8 +2,44 @@
 phpMyAdmin - Changelog
 ----------------------
 
-$Id: ChangeLog,v 2.682.2.4 2004/09/29 00:19:22 lem9 Exp $
+$Id: ChangeLog,v 2.682.2.10 2004/11/18 17:07:42 lem9 Exp $
 $Source: /cvsroot/phpmyadmin/phpMyAdmin/ChangeLog,v $
+
+2004-11-18 Marc Delisle  <lem9@users.sourceforge.net>
+    ### 2.6.0-pl3 released
+    
+2004-11-06 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/common.lib.php: put sanitize logic in PMA_sanitize()
+    * sql.php: sanitize confirm page
+
+2004-11-04 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/common.lib.php, tbl_replace.php, sql.php, read_dump.php,
+      server_privileges.php: now PMA_showMessage() sanitizes the message
+      to defeat XSS attacks. Calling scripts use special tags like
+      [br], [i], [/i], [b], [/b] in the message.
+
+2004-11-03 Michal Čihař  <michal@cihar.com>
+    * libraries/common.lib.php: More robust PmaAbsoluteUri detection.
+    * libraries/sqlparser.lib.php: Escape html special chars in parser bugs.
+
+2004-10-13 Alexander M. Turek  <me@derrabus.de>
+    * Documentation.html: Mike Beck's e-mail address has changed.
+
+2004-10-12 Alexander M. Turek  <me@derrabus.de>
+    * db_search.php, tbl_select.php, libraries/database_interface.lib.php:
+      - bug #1033388 (Illegal mix of collations for converted strings),
+      - don't convert if column charset and connection charset match.
+
+2004-10-12 Marc Delisle  <lem9@users.sourceforge.net>
+    ### 2.6.0-pl2 released
+
+2004-10-12 Michal Čihař  <michal@cihar.com>
+    * libraries/transformations/text_plain__external.inc.php: Escape special
+      shell chars to avoid their interpretation (bug #1044864).
+
+2004-09-29 Marc Delisle  <lem9@users.sourceforge.net>
+    * sql.php, libraries/common.lib.php: bug #1036678, incorrect appending
+      of LIMIT to queries, and bug #1037004, UPDATE statement not showing
 
 2004-09-28 Marc Delisle  <lem9@users.sourceforge.net>
     ### 2.6.0-pl1 released

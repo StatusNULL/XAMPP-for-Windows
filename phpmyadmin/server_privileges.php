@@ -1,5 +1,5 @@
 <?php
-/* $Id: server_privileges.php,v 2.29 2004/09/14 16:01:55 lem9 Exp $ */
+/* $Id: server_privileges.php,v 2.29.2.1 2004/11/10 00:41:47 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -595,7 +595,7 @@ if (!empty($adduser_submit) || !empty($change_copy)) {
     $res = PMA_DBI_query('SELECT "foo" FROM `user` WHERE ' . PMA_convert_using('User') . ' = ' . PMA_convert_using(PMA_sqlAddslashes($username), 'quoted') . ' AND ' . PMA_convert_using('Host') . ' = ' . PMA_convert_using($hostname, 'quoted') . ';');
     if (PMA_DBI_affected_rows() == 1) {
         PMA_DBI_free_result($res);
-        $message = sprintf($strUserAlreadyExists, '<i>\'' . $username . '\'@\'' . $hostname . '\'</i>');
+        $message = sprintf($strUserAlreadyExists, '[i]\'' . $username . '\'@\'' . $hostname . '\'[/i]');
         $adduser = 1;
     } else {
         PMA_DBI_free_result($res);

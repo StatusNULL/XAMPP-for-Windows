@@ -47,6 +47,8 @@ $TEXT['navi-guest1']="FCKeditor";
 $TEXT['navi-languages']="Sprachen";
 $TEXT['navi-english']="English";
 $TEXT['navi-german']="Deutsch";
+$TEXT['navi-french']="Francais";
+$TEXT['navi-dutch']="Nederlands";
 
 // ---------------------------------------------------------------------
 // STATUS
@@ -84,9 +86,16 @@ $TEXT['status-tab3']="Hinweis";
 // SECURITY
 // ---------------------------------------------------------------------
 
-$TEXT['security-head']="XAMPP-Sicherheit";
+$TEXT['security-head']="XAMPP SICHERHEIT";
 $TEXT['security-text1']="Anhand dieser Übersicht kann man sehen welche Punkte an der XAMPP-Installation noch unsicher sind und noch überprüft werden müssten. (Bitte unter der Tabelle weiterlesen.)";
-$TEXT['security-text2']="Die grün markierten Punkte sind sicher; die rot marktierten Punkte sind definitiv unsicher und bei den gelb martierten Punkten konnte die Sicherheit nicht überprüft werden (zum Beispiel weil das zu testende Programm gar nicht läuft).<p>Zum Schließen dieser Sicherheitslücken einfach als root den folgenden Befehl aufrufen:<p><b>/opt/lampp/lampp security</b><p>Dadurch wird ein dialoggeführtes Programm gestartet, welches alle diese Sicherheitslücken schließen kann.";
+$TEXT['security-text2']="Die grün markierten Punkte sind sicher; die rot marktierten Punkte sind definitiv unsicher und bei den gelb martierten Punkten konnte die Sicherheit nicht überprüft werden (zum Beispiel weil das zu testende Programm gar nicht läuft).<br>&nbsp;<br><B>Diese Sicherheitslücken im XAMPP Verzeichnis, dem ROOT Passwort für MySQL und der Sicherung von PHPMyAdmin können nun einfach über den folgenden Link geschlossen werden:</B><p>=> <A HREF=xamppsecurity.php><B>http://localhost/xampp/xamppsecurity.php</B></A> <= &nbsp;&nbsp;[nur über localhost möglich]<br>&nbsp;<br>&nbsp;<br>
+Weitere wichtige Hinweise:<UL>
+	<LI>Alle XAMPP Prüfungen beziehen sich nur auf den Host \"localhost\" (127.0.0.1).</LI>
+	<LI><I><B>Der FileZilla FTP und der Mercury Mail Server müsst ihr selbst absichern !!</B></I></LI>
+	<LI>Ein Rechner, der nicht von aussen via Internet oder Intranet angreifbar ist<br>(z.B. weil eine Firewall alle wichtigen Ports nach aussen blockt) ist generell SICHER gegen Angriffe von aussen.</LI>
+	<LI>Ein Server, der gar nicht \"an ist\" und damit läuft ist immer SICHER!</LI></UL>";
+$TEXT['security-text3']="<B>Bitte unbedingt beachten: Je mehr Sicherheit der XAMPP hat, desto weniger Beispiele werden fehlerfrei angezeigt. Wer beispielsweise PHP im \"safe mode\" fährt, wird nicht mehr vollständig auf alle Funktionen dieses Security Frondends zugreifen können. Oft bedeutet mehr Sicherheit gleichzeitig weniger Funktionalität.</B>";
+$TEXT['security-text4']="Die XAMPP Standard Ports:";
 
 $TEXT['security-ok']="SICHER";
 $TEXT['security-nok']="UNSICHER";
@@ -97,7 +106,7 @@ $TEXT['security-tab2']="Status";
 
 $TEXT['security-checkapache-nok']="Diese XAMPP-Seiten sind über's Netzwerk erreichbar";
 $TEXT['security-checkapache-ok']="Diese XAMPP-Seiten sind nicht über's Netzwerk erreichbar";
-$TEXT['security-checkapache-text']="Alles was Du hier sehen kannst (diese Seiten, dieser Text), kann potentiell auch jedere andere sehren, der Deinen Rechner über's Netzwerk erreichen kann. Wenn Du zum Beispiel mit diesem Rechner ins Internet geht, dann kann jeder im Internet, der Deine IP-Adresse kennt oder rät auf diese Seiten zugreifen.";
+$TEXT['security-checkapache-text']="Alles was Du hier sehen kannst, kann potentiell auch jeder Aussenstehender sehen und nutzen, der Deinen Rechner über's Netzwerk erreichen kann. Wenn Du zum Beispiel mit diesem Rechner ins Internet geht, dann kann jeder im Internet, der Deine IP-Adresse kennt oder rät auf diese Seiten zugreifen.";
 
 $TEXT['security-checkmysqlport-nok']="MySQL ist über's Netzwerk erreichbar";
 $TEXT['security-checkmysqlport-ok']="MySQL ist nicht über's Netzwerk erreichbar";
@@ -107,13 +116,57 @@ $TEXT['security-checkpmamysqluser-nok']="Der phpMyAdmin-Benutzer pma hat kein Pa
 $TEXT['security-checkpmamysqluser-ok']="Der phpMyAdmin-Benutzer hat ein Passwort";
 $TEXT['security-checkpmamysqluser-text']="phpMyAdmin speichtert seine eigenen Einstellungen in der MySQL-Datenbank. phpMyAdmin benutzt dazu den MySQL-Benutzer pma. Damit sonst niemand anderes als phpMyAdmin über diesen Benutzer auf die Datenbank zugreifen kann, sollte diesem Benutzer ein Passwort gesetzt werden.";
 
-$TEXT['security-checkmysql-nok']="MySQL-root hat kein Passwort";
-$TEXT['security-checkmysql-ok']="MySQL-root hat ein Passwort";
-$TEXT['security-checkmysql-text']="Der MySQL-root hat noch kein Passwort gesetzt bekommen. Jeder Benutzer auf dem Rechner kann so auf der MySQL-Datenbank machen was er will. Der MySQL-root sollte also auf alle Fälle ein Passwort gesetzt bekommen.";
+$TEXT['security-checkmysql-nok']="MySQL Admin User \"root\" hat kein Passwort";
+$TEXT['security-checkmysql-ok']="MySQL Admin User \"root\" hat ein Passwort";
+$TEXT['security-checkmysql-out']=" Ein MySQL Server läuft nicht oder wird von einer Firewall geblockt!";
+$TEXT['security-checkmysql-text']="Der MySQL Admin User \"root\" hat noch kein Passwort gesetzt bekommen. Jeder Benutzer auf dem Rechner kann so auf der MySQL-Datenbank machen was er will. Der MySQL-root sollte also auf alle Fälle ein Passwort gesetzt bekommen.";
 
-$TEXT['security-checkftppassword-nok']="Das FTP-Passwort ist noch immer 'lampp'";
-$TEXT['security-checkftppassword-ok']="Das FTP-Passwort wurde geändert";
-$TEXT['security-checkftppassword-text']="Wenn Du ProFTPD im XAMPP aktiviert hast, dann kannst Du standardmäßig mit dem Benutzernamen 'nobody' und dem Passwort 'lampp' Dateien für Deinen Webserver hochladen. Potentiell kann das nun natürlich jeder und daher sollte hier unbeding ein anderes Passwort gesetzt werden.";
+$TEXT['security-pop-nok']="Der Testuser (newuser) für den Mercury Mail Server (POP3) hat ein altes Passwort (wampp)";
+$TEXT['security-pop-ok']="Der Testuser \"newuser\" für den POP3 Server (Mercury Mail?) existiert nicht mehr oder hat ein neues Passwort";
+$TEXT['security-pop-out']="Ein POP3 Server wie Mercury Mail läuft nicht oder wird von einer Firewall geblockt!";
+$TEXT['security-pop-notload']="<I>Die für eine Prüfung notwendige IMAP Extension (php.ini) ist nicht geladen!</I><br>";
+$TEXT['security-pop-text']="Bitte UNBEDINGT den Mercury Mail Server auf alle User mit deren Passwörtern überprüfen und ggf. auch verändern!";
+
+$TEXT['security-checkftppassword-nok']="Das FileZilla FTP-Passwort ist noch immer 'wampp'";
+$TEXT['security-checkftppassword-ok']="Das FileZilla FTP-Passwort wurde geändert";
+$TEXT['security-checkftppassword-out']="Ein FTP Server läuft nicht  oder wird von einer Firewall geblockt!";
+$TEXT['security-checkftppassword-text']="Wenn Du den FileZilla FTP Server gestartet hast, kannst Du standardmäßig mit dem Benutzernamen 'newuser' und dem Passwort 'wampp' Dateien für Deinen Webserver hochladen. Potentiell kann das natürlich jeder und daher sollte hier unbeding ein anderes Passwort gesetzt werden.";
+
+$TEXT['security-phpmyadmin-nok']="PhpMyAdmin ist über das Netzwerk erreichbar";
+$TEXT['security-phpmyadmin-ok']="PhpMyAdmin Passwort Schutz wurde aktiviert";
+$TEXT['security-phpmyadmin-out']="PhpMyAdmin: Kann die 'config.inc.php' NICHT finden ...";
+$TEXT['security-phpmyadmin-text']="PhpMyAdmin ist ohne Passwort über das Netz erreichbar. Die Einstellung 'httpd' oder 'cookie' in der config.inc.php kann hier abhelfen.";
+
+$TEXT['security-checkphp-nok']="PHP läuft NICHT im \"Safe Mode\"";
+$TEXT['security-checkphp-ok']="PHP läuft im \"Safe Mode\"";
+$TEXT['security-checkphp-out']="Der PHP Status kann nicht kontrolliert werden!";
+$TEXT['security-checkphp-text']="Wer auf seinem Server die Ausführung von PHP auch für Aussenstehende zuläßt, sollte sich aus Gründen der Sicherheit überlegen, ob er PHP im sog. \"Safe Mode\" konfiguriert. Für reine Entwickler ist allerdings der \"Safe Mode\" nicht zu empfehlen, da manche Funktionen eingeschränkt oder überhaupt nicht mehr ausgeführt werden. <A HREF=\"http://www.php.net/features.safe-mode\" target=\"_new\"><font size=1>Mehr Info</font></A>";
+
+// ---------------------------------------------------------------------
+// SECURITY SETUP
+// ---------------------------------------------------------------------
+
+$TEXT['mysql-security-head']="Security Konsole MySQL | XAMPP Verzeichnis Schutz";
+$TEXT['mysql-rootsetup-head']="MYSQL SEKTION: \"ROOT\" PASSWORT";
+$TEXT['mysql-rootsetup-text1']="";
+$TEXT['mysql-rootsetup-notrunning']="Der MySQL Server ist nicht gestartet oder wird von einer Firewall geblockt! Bitte zuerst dieses Problem überprüfen ...";
+$TEXT['mysql-rootsetup-passwdnotok']="Das neuen Passwort war mit der Wiederholung des neuen Passworts nicht identisch! Bitte geben Sie das neue Passwort sowie dessen Wiederholung erneut ein!";
+$TEXT['mysql-rootsetup-passwdnull']="Null-Passwörter ('leer') werden nicht akzeptiert!";
+$TEXT['mysql-rootsetup-passwdsuccess']="ERFOLG: Das Passwort für den administrativen Benutzer 'root' wurde gesetzt oder aktualisiert! Die Initialisierung des neuen Passwortes erfolgt aber erst nach einem NEUSTART VON MYSQL !!!! Die Daten mit dem neuen Passwort wurde zur Sicherheit in folgende Datei archiviert:";
+$TEXT['mysql-rootsetup-passwdnosuccess']="FEHLER: ROOT Passwort ist vermutlich falsch. MySQL lehnte das Login mit dem aktuellen root-Passwort ab.";
+$TEXT['mysql-rootsetup-passwdold']="Akuelles Passwort:";
+$TEXT['mysql-rootsetup-passwd']="Neues Passwort:";
+$TEXT['mysql-rootsetup-passwdrepeat']="Wiederhole neues Passwort:";
+$TEXT['mysql-rootsetup-passwdchange']="Passwort ändern";
+$TEXT['mysql-rootsetup-phpmyadmin']="PhpMyAdmin Authentifikation:";
+
+$TEXT['xampp-setup-head']="XAMPP VERZEICHNIS SCHUTZ (.htaccess)";
+$TEXT['xampp-setup-user']="Benutzer (User):";
+$TEXT['xampp-setup-passwd']="Passwort:";
+$TEXT['xampp-setup-start']="XAMPP Verzeichnis sichern";
+$TEXT['xampp-setup-notok']="<br><br>FEHLER: Der String für den Benutzer sowie für das Passwort muss mindestens 3 und darf höchstens 15 Zeichen haben, und darf KEINE Sonderzeichen wie <öäü (usw.) als auch Leerzeichen enthalten.<br><br>";
+$TEXT['xampp-config-ok']="<br><br>ERFOLG: Das XAMPP Verzeichnis ist nach nun geschützt. Die Daten wurden in folgenden Dateien archiviert:<br>";
+$TEXT['xampp-config-notok']="<br><br>FEHLER: Das System konnte NICHT mit Hilfe der \".htaccess\" und der \"htpasswd.exe\" den Verzeichnisschutz aktivieren bzw. aktualisieren. Unter Umständen ist PHP im \"Safe Modus\".   <br><br>";
 
 // ---------------------------------------------------------------------
 // START
@@ -125,9 +178,9 @@ $TEXT['start-subhead']="Herzlichen Glückwunsch:<br>XAMPP wurde erfolgreich auf d
 
 $TEXT['start-text1']="Nun kann es losgehen. :) Als erstes bitte einmal auf der linken Seite auf »Status« klicken. Damit bekommt man einen Überblick was alles schon funktioniert. Ein paar Funktionen werden ausgeschaltet sein. Das ist Absicht so. Es sind Funktionen, die nicht überall funktionieren oder evtl. Probleme bereiten könnten.";
 
-$TEXT['start-text2']="Achtung: Der XAMPP wurde ab Version 1.4.x auf eine Einzelpaketverwaltung umgestellt. Es gibt nun die folgenden Pakete/Addons: <UL><LI>XAMPP Basis Paket</LI><LI>XAMPP Perl addon</LI><LI>XAMPP Tomcat addon</LI><LI>XAMPP Cocoon addon</LI><LI>XAMPP Python addon (developer version)</LI></Ul>Und für die Zukunft: <ul><LI>XAMPP Utility addon (Zubehör aber noch inaktiv)</LI><LI>XAMPP Server addon (weitere Server aber noch inaktiv)</LI><LI>XAMPP Other addon (weitere nützliche Sachen aber noch inaktiv)</LI></UL>";
+$TEXT['start-text-newest']="<B>Neu in der aktuellen Version ist ein XAMPP Sicherheitscheck!</B>";
 
-$TEXT['start-text3']="Bitte \"installiert\" die Zusatzpakete, die ihr noch benötigt, einfach hinterher. Nach dem erfolgreichen raufspielen bitte immer die \"setup_xampp.bat\" betätigen, um den XAMPP neu zu initialisieren. Ach so, die Installerversionen der einzelnen Addons funktionieren nur wenn das XAMPP Basispaket ebenfalls über eine Installerversion eingerichtet wurde.";
+$TEXT['start-text3']="";
 
 $TEXT['start-text4']="Für die OpenSSL Unterstützung benutzt bitte das Testzertifikat mit der URL <a href='https://127.0.0.1' target='_top'>https://127.0.0.1</a> bzw. <a href='https://localhost' target='_top'>https://localhost</a>";
 

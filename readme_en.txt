@@ -1,17 +1,18 @@
-  ApacheFriends XAMPP (basic package) version 1.4.9 (win32)
+  ApacheFriends XAMPP (basic package) version 1.4.10 (win32)
 
   + Apache 2.0.52
-  + MySQL 4.0.21
+  + MySQL 4.1.7
   + PHP 5.0.2 + PHP 4.3.9 + PEAR
-  + PHP-Switch win32 1.0 (by Apachefriends, use the "php-switch.bat")  	
+  + PHP-Switch win32 1.0 (von Apachefriends, man nehme die "php-switch.bat") 
+  + XAMPP Security 1.0	
   + MiniPerl 5.8.3
   + SQLite 2.8.15
-  + PHPMyAdmin 2.6.0 pl1
+  + PHPMyAdmin 2.6.0 pl3
   + ADODB 4.52
   + Mercury Mail Transport System for Win32 and NetWare Systems v4.01a
-  + FileZilla FTP Server 0.9.3
+  + FileZilla FTP Server 0.9.4d
   + Webalizer 2.01-10
-  + Zend Optimizer 2.5.3
+  + Zend Optimizer 2.5.7
  
 * System Requirements:
  
@@ -162,5 +163,5 @@ MYSQL NOTES:
   	    	
 ---------------------------------------------------------------    
 Have a lot of fun! Viel Spaﬂ! Bonne Chance!
-Last revised version 29.09.2004 Kay Vogelgesang
+Last revised version 04.12.2004 Kay Vogelgesang
      

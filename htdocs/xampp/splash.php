@@ -1,6 +1,5 @@
 <html>
 <head><title>XAMPP</title>
-<link REL="icon" HREF="img/xampp.ico">
 <link href="xampp.css" rel="stylesheet" type="text/css">
 </head>
 
@@ -15,7 +14,10 @@
 <img src="img/xampp-logo.jpg">
 <p>
 <a href="/xampp/lang.php?en">English</a> / 
-<a href="/xampp/lang.php?de">Deutsch</a>  
+<a href="/xampp/lang.php?de">Deutsch</a> /
+<a href="/xampp/lang.php?fr">Francais</a> /
+<a href="/xampp/lang.php?nl">Nederlands</a> <!-- /
+<a href="/xampp/lang.php?pl">Polish</a> -->
 </center>
 </body>
 </html>

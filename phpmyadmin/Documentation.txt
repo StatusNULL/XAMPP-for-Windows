@@ -6,7 +6,7 @@
    Transformations  -  FAQ  -  Developers  -  Credits  -  Translators
    ______________________________________________________________________
 
-                      phpMyAdmin 2.6.0-pl1 Documentation
+                      phpMyAdmin 2.6.0-pl3 Documentation
 
      * SourceForge phpMyAdmin project page   [ http://www.phpmyadmin.net/
        ] 
@@ -14,8 +14,8 @@
           + Version history: ChangeLog
           + General notes: README
           + License: LICENSE
-     * Documentation    version:   $Id:   Documentation.html,v   2.86.2.1
-       2004/09/28 19:58:45 lem9 Exp $
+     * Documentation    version:   $Id:   Documentation.html,v   2.86.2.3
+       2004/10/13 11:37:23 rabus Exp $
 
 Requirements
 
@@ -2784,7 +2784,7 @@ CREDITS, in chronological order
     * various features and fixes
     * German language file updates
 
-- Mike Beck <mike.beck_at_ibmiller.de>
+- Mike Beck <mike.beck_at_web.de>
     * automatic joins in QBE
     * links column in printview
     * Relation view

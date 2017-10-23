@@ -1,5 +1,5 @@
 <?php
-/* $Id: sql.php,v 2.32 2004/09/24 17:36:31 lem9 Exp $ */
+/* $Id: sql.php,v 2.32.2.2 2004/11/10 00:41:46 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -229,14 +229,14 @@ if ($do_confirm) {
     ?>
     <?php echo PMA_generate_common_hidden_inputs($db, (isset($table)?$table:'')); ?>
     <input type="hidden" name="sql_query" value="<?php echo urlencode($sql_query); ?>" />
-    <input type="hidden" name="zero_rows" value="<?php echo isset($zero_rows) ? $zero_rows : ''; ?>" />
+    <input type="hidden" name="zero_rows" value="<?php echo isset($zero_rows) ? PMA_sanitize($zero_rows) : ''; ?>" />
     <input type="hidden" name="goto" value="<?php echo $goto; ?>" />
-    <input type="hidden" name="back" value="<?php echo isset($back) ? $back : ''; ?>" />
-    <input type="hidden" name="reload" value="<?php echo isset($reload) ? $reload : 0; ?>" />
-    <input type="hidden" name="purge" value="<?php echo isset($purge) ? $purge : ''; ?>" />
-    <input type="hidden" name="cpurge" value="<?php echo isset($cpurge) ? $cpurge : ''; ?>" />
-    <input type="hidden" name="purgekey" value="<?php echo isset($purgekey) ? $purgekey : ''; ?>" />
-    <input type="hidden" name="show_query" value="<?php echo isset($show_query) ? $show_query : ''; ?>" />
+    <input type="hidden" name="back" value="<?php echo isset($back) ? PMA_sanitize($back) : ''; ?>" />
+    <input type="hidden" name="reload" value="<?php echo isset($reload) ? PMA_sanitize($reload) : 0; ?>" />
+    <input type="hidden" name="purge" value="<?php echo isset($purge) ? PMA_sanitize($purge) : ''; ?>" />
+    <input type="hidden" name="cpurge" value="<?php echo isset($cpurge) ? PMA_sanitize($cpurge) : ''; ?>" />
+    <input type="hidden" name="purgekey" value="<?php echo isset($purgekey) ? PMA_sanitize($purgekey) : ''; ?>" />
+    <input type="hidden" name="show_query" value="<?php echo isset($show_query) ? PMA_sanitize($show_query) : ''; ?>" />
     <input type="submit" name="btnDrop" value="<?php echo $strYes; ?>" id="buttonYes" />
     <input type="submit" name="btnDrop" value="<?php echo $strNo; ?>" id="buttonNo" />
     <?php
@@ -326,8 +326,6 @@ else {
             } else {
                 $display_query  = $display_query . $sql_limit_to_append;
             }
-        } else {
-            $display_query = $full_sql_query;
         }
     } else {
         $full_sql_query      = $sql_query;
@@ -578,7 +576,7 @@ else {
             $message = $strInsertedRows . '&nbsp;' . $num_rows;
             $insert_id = PMA_DBI_insert_id();
             if ($insert_id != 0) {
-                $message .= '<br />'.$strInsertedRowId . '&nbsp;' . $insert_id;
+                $message .= '[br]'.$strInsertedRowId . '&nbsp;' . $insert_id;
             }
         } else if ($is_affected) {
             $message = $strAffectedRows . '&nbsp;' . $num_rows;

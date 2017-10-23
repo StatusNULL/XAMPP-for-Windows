@@ -58,7 +58,7 @@ $cfg['PmaNoRelation_DisableWarning']  = FALSE;
  * If at least one server configuration uses 'cookie' auth_type,
  * enter here a passphrase that will be used by blowfish.
  */
-$cfg['blowfish_secret'] = ''; // $cfg['blowfish_secret'] = 'password';
+$cfg['blowfish_secret'] = 'xampp'; 
 
 /**
  * Server(s) configuration

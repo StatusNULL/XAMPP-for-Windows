@@ -1,1 +1,0 @@
-<a class=n target=content onClick="h(this);" href=FCKeditor.php><?=$TEXT['navi-guest1']?></a><br>

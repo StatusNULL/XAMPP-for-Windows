@@ -20,6 +20,7 @@
 <tr valign=top><td align=right class=navi>
 <a name=start id=start class=nh target=content onClick="h(this);" href=start.php><?=$TEXT['navi-welcome']?></a><br>
 <a class=n target=content onClick="h(this);" href=status.php><?=$TEXT['navi-status']?></a><br>
+<a class=n target=content onClick="h(this);" href=security.php><?=$TEXT['navi-security']?></a><br>
 <a class=n target=content onClick="h(this);" href=manuals.php><?=$TEXT['navi-doc']?></a><br>
 <a class=n target=content onClick="h(this);" href=components.php><?=$TEXT['navi-components']?></a><br>
 <a class=n target=content onClick="h(this);" href=phpinfo.php>phpinfo()</a><br>&nbsp;<br>
@@ -46,10 +47,9 @@
 <?include("navitools.inc");?>
 <?include("naviservers.inc");?>
 <?include("naviother.inc");?>
-<br>&nbsp;<br>
-<span class=nh><?=$TEXT['navi-specialguest']?></span><br>
+
 </td></tr>
-<tr><td bgcolor=#fb7922 colspan=1 background="img/strichel.gif" class=white><img src=img/blank.gif width=1 height=1></td></tr>
+<tr><td bgcolor=#fb7922 colspan=1 class=white><img src=img/blank.gif width=1 height=1></td></tr>
 <tr valign=top><td align=right class=navi>
 <?include("naviguest.inc");?>
 <br>
@@ -60,6 +60,9 @@
 
 <a target=_parent class=n href="lang.php?en"><?=$TEXT['navi-english']?></a><br>
 <a target=_parent class=n href="lang.php?de"><?=$TEXT['navi-german']?></a><br>
+<a target=_parent class=n href="lang.php?fr"><?=$TEXT['navi-french']?></a><br>
+<a target=_parent class=n href="lang.php?nl"><?=$TEXT['navi-dutch']?></a><p>
+<!-- <a target=_parent class=n href="lang.php?pl"><?=$TEXT['navi-polish']?></a><p> -->
 
 
 <p class=navi>&copy;2002/2004<br>

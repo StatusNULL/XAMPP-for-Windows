@@ -1,5 +1,5 @@
 <?php
-/* $Id: read_dump.php,v 2.26 2004/09/26 19:36:26 lem9 Exp $ */
+/* $Id: read_dump.php,v 2.26.2.1 2004/11/10 00:41:47 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -411,7 +411,7 @@ if (!empty($id_bookmark) && $action_bookmark == 2) {
         $message   = $strNoQuery;
     }
 } else if ($sql_query_cpy == '') {
-    $message   = "$strSuccess&nbsp;:<br />$strTheContent ($pieces_count $strInstructions)&nbsp;";
+    $message   = "$strSuccess&nbsp;:[br]$strTheContent ($pieces_count $strInstructions)&nbsp;";
 } else {
     $message   = $strSuccess;
 }

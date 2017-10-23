@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_replace.php,v 2.23 2004/08/21 13:06:26 lem9 Exp $ */
+/* $Id: tbl_replace.php,v 2.23.2.1 2004/11/10 00:41:47 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -220,7 +220,7 @@ foreach ($query AS $query_index => $single_query) {
 
         $insert_id = PMA_DBI_insert_id();
         if ($insert_id != 0) {
-            $last_message .= '<br />'.$strInsertedRowId . '&nbsp;' . $insert_id;
+            $last_message .= '[br]'.$strInsertedRowId . '&nbsp;' . $insert_id;
         }
     } // end if
     PMA_DBI_free_result($result);
@@ -228,7 +228,6 @@ foreach ($query AS $query_index => $single_query) {
 }
 
 if ($total_affected_rows != 0) {
-    //$message .= '<br />' . $total_affected_rows;
     $message .= $total_affected_rows;
 } else {
     $message .= $strModifications;
