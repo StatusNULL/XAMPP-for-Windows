@@ -293,7 +293,7 @@ sub  print_table_colspan_header {
 			  $HTML .= "<i>no value</i>";
 		  } else {
 			  my $elem_esc;
-			  if (($i == 0) || ($row_element eq "<i>no value</i>")) {
+			  if ($row_element eq "<i>no value</i>") {
 				$elem_esc = $row_element;
 			  }  else  {
 				$elem_esc = escapeHTML($row_element);

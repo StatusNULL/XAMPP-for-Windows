@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 # -*- cperl -*-
 #
-# Copyright (c) 2007, 2010, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2007, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ my $cwd = cwd();
 my $basedir;
 
 my $socket  = '/tmp/mysql.sock';
-my $version = '5.5.36';
+my $version = '5.5.39';
 
 sub which
 {
@@ -189,7 +189,7 @@ if ( $^O eq "MSWin32" )
 }
 else
 {
-  my $linkpath   = "-L$pkglibdir";
+  my $linkpath   = "-L$pkglibdir ";
   @lib_opts   = ($linkpath,"-lmysqlclient");
   @lib_r_opts = ($linkpath,"-lmysqlclient_r");
   @lib_e_opts = ($linkpath,"-lmysqld");
@@ -204,7 +204,7 @@ $flags->{embedded_libs} =
   [@ldflags,@lib_e_opts,'','','ws2_32 ','',''];
 
 $flags->{include} = ["-I$pkgincludedir"];
-$flags->{cflags}  = [@{$flags->{include}},split(" ",'/MT /Zi /O2 /Ob1 /D NDEBUG -DDBUG_OFF')];
+$flags->{cflags}  = [@{$flags->{include}},split(" ",'/MT /Z7 /O2 /Ob1 /D NDEBUG -DDBUG_OFF')];
 
 # ----------------------------------------------------------------------
 # Remove some options that a client doesn't have to care about

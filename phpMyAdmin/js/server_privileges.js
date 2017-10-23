@@ -45,19 +45,36 @@ function appendNewUser(new_user_string, new_user_initial, new_user_initial_strin
 
     //Calculate the index for the new row
     var $curr_last_row = $("#usersForm").find('tbody').find('tr:last');
-    var $curr_first_row = $("#usersForm").find('tbody').find('tr:first');
-    var first_row_initial = $curr_first_row.find('label').html().substr(0, 1).toUpperCase();
-    var curr_shown_initial = $curr_last_row.find('label').html().substr(0, 1).toUpperCase();
-    var curr_last_row_index_string = $curr_last_row.find('input:checkbox').attr('id').match(/\d+/)[0];
-    var curr_last_row_index = parseFloat(curr_last_row_index_string);
-    var new_last_row_index = curr_last_row_index + 1;
+    if ($curr_last_row.length) {
+        // at least one tr exists inside the tbody
+        var $curr_first_row = $("#usersForm").find('tbody').find('tr:first');
+        var first_row_initial = $curr_first_row.find('label').html().substr(0, 1).toUpperCase();
+        var curr_shown_initial = $curr_last_row.find('label').html().substr(0, 1).toUpperCase();
+        var curr_last_row_index_string = $curr_last_row.find('input:checkbox').attr('id').match(/\d+/)[0];
+        var curr_last_row_index = parseFloat(curr_last_row_index_string);
+        var new_last_row_index = curr_last_row_index + 1;
+        var is_show_all = (first_row_initial != curr_shown_initial) ? true : false;
+        var $insert_position = $curr_last_row;
+        var dummy_tr_inserted = false;
+    } else {
+        // no tr exists inside the tbody
+        var $tbody = $("#usersForm").find('tbody');
+        // append a dummy tr
+        $tbody.append('<tr></tr>');
+        var dummy_tr_inserted = true;
+        var $insert_position = $tbody.find('tr:first');
+        var is_show_all = true;
+        //todo: the case when the new user's initial does not match
+        //      the currently selected initial
+        var curr_shown_initial = '';
+        var new_last_row_index = 0;
+    }
     var new_last_row_id = 'checkbox_sel_users_' + new_last_row_index;
-    var is_show_all = (first_row_initial != curr_shown_initial) ? true : false;
 
     //Append to the table and set the id/names correctly
     if ((curr_shown_initial == new_user_initial) || is_show_all) {
         $(new_user_string)
-        .insertAfter($curr_last_row)
+        .insertAfter($insert_position)
         .find('input:checkbox')
         .attr('id', new_last_row_id)
         .val(function () {
@@ -68,6 +85,11 @@ function appendNewUser(new_user_string, new_user_initial, new_user_initial_strin
         .find('label')
         .attr('for', new_last_row_id)
         .end();
+    }
+
+    if (dummy_tr_inserted) {
+        // remove the dummy tr
+        $tbody.find('tr:first').remove();
     }
 
     //Let us sort the table alphabetically
@@ -193,6 +215,7 @@ AJAX.registerOnload('server_privileges.js', function () {
             var params = {
                 'ajax_request' : true,
                 'token' : PMA_commonParams.get('token'),
+                'server' : PMA_commonParams.get('server'),
                 'validate_username' : true,
                 'username' : username
             };
@@ -261,6 +284,15 @@ AJAX.registerOnload('server_privileges.js', function () {
      */
     $("#fieldset_delete_user_footer #buttonGo.ajax").live('click', function (event) {
         event.preventDefault();
+
+        $drop_users_db_checkbox = $("#checkbox_drop_users_db");
+        if ($drop_users_db_checkbox.is(':checked')) {
+            var is_confirmed = confirm(PMA_messages.strDropDatabaseStrongWarning + '\n' + $.sprintf(PMA_messages.strDoYouReally, 'DROP DATABASE'));
+            if (! is_confirmed) {
+                // Uncheck the drop users database checkbox
+                $drop_users_db_checkbox.prop('checked', false);
+            }
+        }
 
         PMA_ajaxShowMessage(PMA_messages.strRemovingSelectedUsers);
 
@@ -412,6 +444,7 @@ AJAX.registerOnload('server_privileges.js', function () {
                     PMA_highlightSQL($div);
                     $div = $('#edit_user_dialog');
                     displayPasswordGenerateButton();
+                    addOrUpdateSubmenu();
                     $(checkboxes_sel).trigger("change");
                     PMA_ajaxRemoveMessage($msgbox);
                     PMA_showHints($div);
@@ -567,7 +600,7 @@ AJAX.registerOnload('server_privileges.js', function () {
                         }
                     });
                     PMA_ajaxRemoveMessage($msgbox);
-                    // Attach syntax highlited editor to export dialog
+                    // Attach syntax highlighted editor to export dialog
                     if (typeof CodeMirror != 'undefined') {
                         CodeMirror.fromTextArea(
                             $ajaxDialog.find('textarea')[0],
@@ -623,7 +656,7 @@ AJAX.registerOnload('server_privileges.js', function () {
                     }
                 });
                 PMA_ajaxRemoveMessage($msgbox);
-                // Attach syntax highlited editor to export dialog
+                // Attach syntax highlighted editor to export dialog
                 if (typeof CodeMirror != 'undefined') {
                     CodeMirror.fromTextArea(
                         $ajaxDialog.find('textarea')[0],
@@ -661,27 +694,71 @@ AJAX.registerOnload('server_privileges.js', function () {
                 $("#usersForm").hide("medium").remove();
                 $("#fieldset_add_user").hide("medium").remove();
                 $("#initials_table")
+                    .prop("id", "initials_table_old")
                     .after(data.message).show("medium")
                     .siblings("h2").not(":first").remove();
+                // prevent double initials table
+                $("#initials_table_old").remove();
             } else {
                 PMA_ajaxShowMessage(data.error, false);
             }
         }); // end $.get
     }); // end of the paginate users table
 
-    /*
-     * Additional confirmation dialog after clicking
-     * 'Drop the databases...'
-     */
-    $('#checkbox_drop_users_db').click(function () {
-        var $this_checkbox = $(this);
-        if ($this_checkbox.is(':checked')) {
-            var is_confirmed = confirm(PMA_messages.strDropDatabaseStrongWarning + '\n' + $.sprintf(PMA_messages.strDoYouReally, 'DROP DATABASE'));
-            if (! is_confirmed) {
-                $this_checkbox.prop('checked', false);
-            }
-        }
-    });
-
     displayPasswordGenerateButton();
+
+    /*
+     * Create submenu for simpler interface
+     */
+    var addOrUpdateSubmenu = function () {
+        var $topmenu2 = $("#topmenu2"),
+            $edit_user_dialog = $("#edit_user_dialog"),
+            submenu_label,
+            submenu_link,
+            link_number;
+
+        // if submenu exists yet, remove it first
+        if ($topmenu2.length > 0) {
+            $topmenu2.remove();
+        }
+
+        // construct a submenu from the existing fieldsets
+        $topmenu2 = $("<ul/>").prop("id", "topmenu2");
+
+        $("#edit_user_dialog .submenu-item").each(function () {
+            submenu_label = $(this).find("legend[data-submenu-label]").data("submenu-label");
+
+            submenu_link = $("<a/>")
+            .prop("href", "#")
+            .html(submenu_label);
+
+            $("<li/>")
+            .append(submenu_link)
+            .appendTo($topmenu2);
+        });
+
+        // click handlers for submenu
+        $topmenu2.find("a").click(function (e) {
+            e.preventDefault();
+            // if already active, ignore click
+            if ($(this).hasClass("tabactive")) {
+                return;
+            }
+            $topmenu2.find("a").removeClass("tabactive");
+            $(this).addClass("tabactive");
+
+            // which section to show now?
+            link_number = $topmenu2.find("a").index($(this));
+            // hide all sections but the one to show
+            $("#edit_user_dialog .submenu-item").hide().eq(link_number).show();
+        });
+
+        // make first menu item active
+        // TODO: support URL hash history
+        $topmenu2.find("> :first-child a").addClass("tabactive");
+        $edit_user_dialog.prepend($topmenu2);
+
+        // hide all sections but the first
+        $("#edit_user_dialog .submenu-item").hide().eq(0).show();
+    };
 });
