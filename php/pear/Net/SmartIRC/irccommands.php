@@ -1,9 +1,9 @@
 <?php
 /**
- * $Id: irccommands.php,v 1.1 2003/06/10 21:59:28 meebey Exp $
- * $Revision: 1.1 $
+ * $Id: irccommands.php,v 1.1.2.1 2003/10/10 20:20:58 meebey Exp $
+ * $Revision: 1.1.2.1 $
  * $Author: meebey $
- * $Date: 2003/06/10 21:59:28 $
+ * $Date: 2003/10/10 20:20:58 $
  *
  * Copyright (c) 2002-2003 Mirco "MEEBEY" Bauer <mail@meebey.net> <http://www.meebey.net>
  * 
@@ -370,6 +370,7 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
     function changeNick($newnick, $priority = SMARTIRC_MEDIUM)
     {
         $this->_send('NICK '.$newnick, $priority);
+        $this->_nick = $newnick;
     }
     
     /**

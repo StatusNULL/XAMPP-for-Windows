@@ -14,13 +14,13 @@
 <tr valign=top>
 <td align=right class=navi>
 <img src=img/blank.gif width=145 height=15><br>
-<span class=nh><?=$TEXT['navi-xampp']?> <?include(".version")?><br>[PHP: <?=phpversion() ?>]</span><br>
+<span class=nh>[PHP: <?=phpversion() ?>]</span><br>
 </td></tr>
 <tr><td bgcolor=#fb7922 colspan=1 background="img/strichel.gif" class=white><img src=img/blank.gif width=1 height=1></td></tr>
 <tr valign=top><td align=right class=navi>
 <a name=start id=start class=nh target=content onClick="h(this);" href=start.php><?=$TEXT['navi-welcome']?></a><br>
-<a class=n target=content onClick="h(this);" href=status.php><?=$TEXT['navi-status']?></a><br>
-<a class=n target=content onClick="h(this);" href=security.php><?=$TEXT['navi-security']?></a><br>
+<a class=n target=content onClick="h(this);" href="status.php"><?=$TEXT['navi-status']?></a><br>
+<a class=n target=new onClick="h(this);" href="/security/lang.php<?="?".file_get_contents("lang.tmp")?>"><?=$TEXT['navi-security']?></a><br>
 <a class=n target=content onClick="h(this);" href=manuals.php><?=$TEXT['navi-doc']?></a><br>
 <a class=n target=content onClick="h(this);" href=components.php><?=$TEXT['navi-components']?></a><br>
 <a class=n target=content onClick="h(this);" href=phpinfo.php>phpinfo()</a><br>&nbsp;<br>

@@ -170,6 +170,7 @@ $TEXT['xampp-setup-user']="Benutzer (User):";
 $TEXT['xampp-setup-passwd']="Passwort:";
 $TEXT['xampp-setup-start']="XAMPP Verzeichnis sichern";
 $TEXT['xampp-setup-notok']="<br><br>FEHLER: Der String für den Benutzer sowie für das Passwort muss mindestens 3 und darf höchstens 15 Zeichen haben, und darf KEINE Sonderzeichen wie <öäü (usw.) als auch Leerzeichen enthalten.<br><br>";
+$TEXT['xampp-setup-ok']="<br><br>Das root Passwort wurde erfolgreich geändert. Bitte starten Sie den MySQL Server neu, damit diese Änderung wirksam wird!<br><br>";
 $TEXT['xampp-config-ok']="<br><br>ERFOLG: Das XAMPP Verzeichnis ist nach nun geschützt. Die Daten wurden in folgenden Dateien archiviert:<br>";
 $TEXT['xampp-config-notok']="<br><br>FEHLER: Das System konnte NICHT mit Hilfe der \".htaccess\" und der \"htpasswd.exe\" den Verzeichnisschutz aktivieren bzw. aktualisieren. Unter Umständen ist PHP im \"Safe Modus\".   <br><br>";
 
@@ -179,11 +180,12 @@ $TEXT['xampp-config-notok']="<br><br>FEHLER: Das System konnte NICHT mit Hilfe d
 
 $TEXT['start-head']="Willkommen zu XAMPP für Windows";
 
-$TEXT['start-subhead']="Herzlichen Glückwunsch:<br>XAMPP wurde erfolgreich auf diesem Rechner installiert!";
+$TEXT['start-subhead']="Herzlichen Glückwunsch:<br>XAMPP ist erfolgreich auf diesem Rechner installiert!";
 
 $TEXT['start-text1']="Nun kann es losgehen. :) Als erstes bitte einmal auf der linken Seite auf »Status« klicken. Damit bekommt man einen Überblick was alles schon funktioniert. Ein paar Funktionen werden ausgeschaltet sein. Das ist Absicht so. Es sind Funktionen, die nicht überall funktionieren oder evtl. Probleme bereiten könnten.";
 
-$TEXT['start-text-newest']="<B>Vielen Dank an Carsten Wiedmann  für seine raffinierten Kompilationen. :-)</B>";
+$TEXT['start-text-newest']="<hr><br><I>Die zuständigen Entwickler dieser XAMPP Version für win32 waren<br><UL>
+<LI>Carsten Wiedmann</LI><LI>Kay Vogelgesang</LI></UL></I><br><hr>";
 
 $TEXT['start-text3']="";
 
@@ -206,10 +208,10 @@ $TEXT['manuals-list1']="
 <ul>
 <li><a href=http://httpd.apache.org/docs-2.0/>Apache 2 Dokumentation (in Englisch)</a>
 <li><a href=http://www.php.net/manual/de/>PHP <b>Referenz-</b>Dokumentation (in Deutsch)</a>
-<li><a href=http://www.perldoc.com/perl5.8.0/pod/perl.html>Perl Dokumentation (in Englisch)</a>
+<li><a href=http://www.perl.org/docs.html>Perl Dokumentation (in Englisch)</a>
 <li><a href=http://www.mysql.com/documentation/mysql/bychapter/>MySQL Dokumentation (in Englisch)</a>
-<li><a href=http://php.weblogs.com/ADODB>ADODB (in Englisch)</a>
-<li><a href=http://turck-mmcache.sourceforge.net/>Turck MMCache für PHP (in Englisch)</a>
+<li><a http://phplens.com/lens/adodb/docs-adodb.htm>ADODB</a>
+<li><a href=http://eaccelerator.sourceforge.net/>eAccelerator</a>
 <li><a href=http://www.ros.co.nz/pdf/readme.pdf>pdf class Dokumentation</a>
 </ul>";
 

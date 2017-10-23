@@ -16,7 +16,7 @@
 // | Authors: Alexander Wirtz <alex@pc4p.net>                             |
 // +----------------------------------------------------------------------+
 //
-// $Id: php_sunrise_sunset.php,v 1.2 2004/07/11 21:40:47 eru Exp $
+// $Id: php_sunrise_sunset.php,v 1.3 2004/07/14 11:16:05 eru Exp $
 
 // The sun position algorithm taken from the 'US Naval Observatory's
 // Almanac for Computers', implemented by Ken Bloom <kekabloom@ucdavis.edu>
@@ -27,9 +27,9 @@
 
 
 if(!defined("SUNFUNCS_RET_TIMESTAMP")) {
-    define("SUNFUNCS_RET_TIMESTAMP", 1);
-    define("SUNFUNCS_RET_STRING",    2);
-    define("SUNFUNCS_RET_DOUBLE",    3);
+    define("SUNFUNCS_RET_TIMESTAMP", 0);
+    define("SUNFUNCS_RET_STRING",    1);
+    define("SUNFUNCS_RET_DOUBLE",    2);
 }
 define("SUNFUNCS_DEFAULT_LATITUDE",  31.7667);
 define("SUNFUNCS_DEFAULT_LONGITUDE", 35.2333);

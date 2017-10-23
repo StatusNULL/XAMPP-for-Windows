@@ -42,7 +42,7 @@
 // | Author: Lukas Smith <smith@backendmedia.com>                         |
 // +----------------------------------------------------------------------+
 //
-// $Id: mysql.php,v 1.44.4.3 2004/01/08 13:43:01 lsmith Exp $
+// $Id: mysql.php,v 1.44.4.10 2004/04/19 20:21:51 lsmith Exp $
 //
 
 if(!defined('MDB_MANAGER_MYSQL_INCLUDED'))
@@ -105,18 +105,15 @@ class MDB_Manager_mysql extends MDB_Manager_Common
         {
             return(MDB_OK);
         }
-        $not_supported = false;
+        $not_supported = FALSE;
         for($i=0, $j=count($check); $i<$j; ++$i) {
-            $result = $db->query('SHOW VARIABLES LIKE '.$db->getValue('text', $check[$i]), null, false);
-            if (MDB::isError($result)) {
-                return $db->mysqlRaiseError();
-            }
-            $has = $db->fetchRow($result, MDB_FETCHMODE_ORDERED);
+            $query = 'SHOW VARIABLES LIKE '.$db->getValue('text', $check[$i]);
+            $has = $db->queryRow($query, NULL, MDB_FETCHMODE_ORDERED);
             if (MDB::isError($has)) {
                 return $has;
             }
             if (is_array($has)) {
-                $not_supported = true;
+                $not_supported = TRUE;
                 if ($has[1] == 'YES') {
                     $this->verified_table_types[$table_type] = $db->connection;
                     return(MDB_OK);
@@ -186,10 +183,12 @@ class MDB_Manager_mysql extends MDB_Manager_Common
      *
      * @param object    $db        database object that is extended by this class
      * @param string $name     Name of the database that should be created
-     * @param array $fields Associative array that contains the definition of each field of the new table
-     *                        The indexes of the array entries are the names of the fields of the table an
-     *                        the array entry values are associative arrays like those that are meant to be
-     *                         passed with the field definitions to get[Type]Declaration() functions.
+     * @param array $fields Associative array that contains the definition of
+     *                      each field of the new table. The indexes of the array
+     *                      entries are the names of the fields of the table an
+     *                      the array entry values are associative arrays like
+     *                      those that are meant to be passed with the field
+     *                      definitions to get[Type]Declaration() functions.
      *
      *                        Example
      *                        array(
@@ -215,23 +214,27 @@ class MDB_Manager_mysql extends MDB_Manager_Common
     function createTable(&$db, $name, $fields)
     {
         if (!isset($name) || !strcmp($name, '')) {
-            return($db->raiseError(MDB_ERROR_CANNOT_CREATE, NULL, NULL, 'no valid table name specified'));
+            return($db->raiseError(MDB_ERROR_CANNOT_CREATE, NULL, NULL,
+                'no valid table name specified'));
         }
         if (count($fields) == 0) {
-            return($db->raiseError(MDB_ERROR_CANNOT_CREATE, NULL, NULL, 'no fields specified for table "'.$name.'"'));
+            return($db->raiseError(MDB_ERROR_CANNOT_CREATE, NULL, NULL,
+                'no fields specified for table "'.$name.'"'));
         }
-        if(MDB::isError($verify = $this->_verifyTransactionalTableType($db, $db->default_table_type))) {
+        $verify = $this->_verifyTransactionalTableType($db, $db->default_table_type);
+        if(MDB::isError($verify)) {
             return($verify);
         }
         if (MDB::isError($query_fields = $db->getFieldDeclarationList($fields))) {
             return($db->raiseError(MDB_ERROR_CANNOT_CREATE, NULL, NULL, 'unkown error'));
         }
         if (isset($db->supported['Transactions'])
-            && $db->default_table_type=='BDB')
-        {
+            && $db->default_table_type=='BDB'
+        ) {
             $query_fields .= ', dummy_primary_key INT NOT NULL AUTO_INCREMENT, PRIMARY KEY (dummy_primary_key)';
         }
-        $query = "CREATE TABLE $name ($query_fields)".(strlen($db->default_table_type) ? ' TYPE='.$db->default_table_type : '');
+        $query = "CREATE TABLE $name ($query_fields)".
+            (strlen($db->default_table_type) ? ' TYPE='.$db->default_table_type : '');
 
         return($db->query($query));
     }
@@ -352,7 +355,7 @@ class MDB_Manager_mysql extends MDB_Manager_Common
                         break;
                     default:
                         return($db->raiseError(MDB_ERROR_CANNOT_ALTER, NULL, NULL,
-                            'Alter table: change type "'.Key($changes).'" not yet supported'));
+                            'Alter table: change type "'.key($changes).'" not yet supported'));
                 }
             }
             return(MDB_OK);
@@ -420,7 +423,8 @@ class MDB_Manager_mysql extends MDB_Manager_Common
                         $query .= ',';
                     }
                     $old_field_name = $renamed_fields[Key($renamed_fields)];
-                    $query .= "CHANGE $old_field_name ".$changes['RenamedFields'][$old_field_name]['Declaration'];
+                    $query .= "CHANGE $old_field_name ".
+                        $changes['RenamedFields'][$old_field_name]['Declaration'];
                 }
             }
             return($db->query("ALTER TABLE $name $query"));
@@ -511,16 +515,17 @@ class MDB_Manager_mysql extends MDB_Manager_Common
             $db->freeResult($columns);
             return($columns);
         }
+        if ($db->options['optimize'] != 'portability') {
+            $columns = array_change_key_case($columns);
+        }
         if(!isset($columns['field'])) {
             $db->freeResult($result);
             return($db->raiseError(MDB_ERROR_MANAGER, NULL, NULL,
                 'List table fields: show columns does not return the table field names'));
         }
-        $field_column = $columns['field'];
-        for($fields = array(), $field = 0; !$db->endOfResult($result); ++$field) {
-            $field_name = $db->fetch($result, $field, $field_column);
-            if ($field_name != $db->dummy_primary_key)
-                $fields[] = $field_name;
+        $fields = $db->fetchCol($result, $columns['field']);
+        if (!MDB::isError($fields)) {
+            $fields = array_diff($fields, array($db->dummy_primary_key));
         }
         $db->freeResult($result);
         return($fields);
@@ -552,6 +557,9 @@ class MDB_Manager_mysql extends MDB_Manager_Common
         if(MDB::isError($columns)) {
             $db->freeResult($columns);
             return($columns);
+        }
+        if ($db->options['optimize'] != 'portability') {
+            $columns = array_change_key_case($columns);
         }
         if (!isset($columns[$column = 'field'])
             || !isset($columns[$column = 'type']))
@@ -663,8 +671,8 @@ class MDB_Manager_mysql extends MDB_Manager_Common
                 {
                     $default = $row[$columns['default']];
                 }
-                $definition = array();
-                for($field_choices = array(), $datatype = 0; $datatype < count($type); $datatype++) {
+                $definition = $field_choices = array();
+                for($datatype = 0; $datatype < count($type); $datatype++) {
                     $field_choices[$datatype] = array('type' => $type[$datatype]);
                     if(isset($notnull)) {
                         $field_choices[$datatype]['notnull'] = 1;
@@ -699,12 +707,19 @@ class MDB_Manager_mysql extends MDB_Manager_Common
                     && $row[$columns['key']] == 'PRI')
                 {
                     // check that its not just a unique field
-                    if(MDB::isError($indexes = $db->queryAll("SHOW INDEX FROM $table", NULL, MDB_FETCHMODE_ASSOC))) {
+                    $query = "SHOW INDEX FROM $table";
+                    $indexes = $db->queryAll($query, NULL, MDB_FETCHMODE_ASSOC);
+                    if(MDB::isError($indexes)) {
                         return($indexes);
                     }
                     $is_primary = FALSE;
                     foreach($indexes as $index) {
-                        if ($index['Key_name'] == 'PRIMARY' && $index['Column_name'] == $field_name) {
+                        if ($db->options['optimize'] != 'portability') {
+                            array_change_key_case($index);
+                        }
+                        if ($index['key_name'] == 'PRIMARY'
+                            && $index['column_name'] == $field_name
+                        ) {
                             $is_primary = TRUE;
                             break;
                         }
@@ -769,7 +784,8 @@ class MDB_Manager_mysql extends MDB_Manager_Common
      */
     function createIndex(&$db, $table, $name, $definition)
     {
-        $query = "ALTER TABLE $table ADD ".(isset($definition['unique']) ? 'UNIQUE' : 'INDEX')." $name (";
+        $query = "ALTER TABLE $table ADD ".(isset($definition['unique']) ? 'UNIQUE' : 'INDEX')
+            ." $name (";
         for($field = 0, reset($definition['FIELDS']);
             $field < count($definition['FIELDS']);
             $field++, next($definition['FIELDS']))
@@ -816,7 +832,11 @@ class MDB_Manager_mysql extends MDB_Manager_Common
         if(MDB::isError($result = $db->query("SHOW INDEX FROM $table"))) {
             return($result);
         }
-        $indexes_all = $db->fetchCol($result, 'Key_name');
+        $key_name = 'Key_name';
+        if ($db->options['optimize'] != 'portability') {
+            $key_name = strtolower($key_name);
+        }
+        $indexes_all = $db->fetchCol($result, $key_name);
         for($found = $indexes = array(), $index = 0, $indexes_all_cnt = count($indexes_all);
             $index < $indexes_all_cnt;
             $index++)
@@ -846,28 +866,33 @@ class MDB_Manager_mysql extends MDB_Manager_Common
     function getTableIndexDefinition(&$db, $table, $index_name)
     {
         if($index_name == 'PRIMARY') {
-            return($db->raiseError(MDB_ERROR_MANAGER, NULL, NULL, 'Get table index definition: PRIMARY is an hidden index'));
+            return($db->raiseError(MDB_ERROR_MANAGER, NULL, NULL,
+                'Get table index definition: PRIMARY is an hidden index'));
         }
         if(MDB::isError($result = $db->query("SHOW INDEX FROM $table"))) {
             return($result);
         }
         $definition = array();
         while (is_array($row = $db->fetchInto($result, MDB_FETCHMODE_ASSOC))) {
-            $key_name = $row['Key_name'];
+            if ($db->options['optimize'] != 'portability') {
+                $row = array_change_key_case($row);
+            }
+            $key_name = $row['key_name'];
             if(!strcmp($index_name, $key_name)) {
-                if(!$row['Non_unique']) {
+                if(!$row['non_unique']) {
                     $definition[$index_name]['unique'] = 1;
                 }
-                $column_name = $row['Column_name'];
+                $column_name = $row['column_name'];
                 $definition['FIELDS'][$column_name] = array();
-                if(isset($row['Collation'])) {
-                    $definition['FIELDS'][$column_name]['sorting'] = ($row['Collation'] == 'A' ? 'ascending' : 'descending');
+                if(isset($row['collation'])) {
+                    $definition['FIELDS'][$column_name]['sorting'] = ($row['collation'] == 'A' ? 'ascending' : 'descending');
                 }
             }
         }
         $db->freeResult($result);
         if (!isset($definition['FIELDS'])) {
-            return($db->raiseError(MDB_ERROR_MANAGER, NULL, NULL, 'Get table index definition: it was not specified an existing table index'));
+            return($db->raiseError(MDB_ERROR_MANAGER, NULL, NULL,
+                'Get table index definition: it was not specified an existing table index'));
         }
         return($definition);
     }
@@ -888,14 +913,15 @@ class MDB_Manager_mysql extends MDB_Manager_Common
     {
         $sequence_name = $db->getSequenceName($seq_name);
         $res = $db->query("CREATE TABLE $sequence_name
-            (sequence INT DEFAULT 0 NOT NULL AUTO_INCREMENT, PRIMARY KEY (sequence))");
+            (".$db->options['sequence_col_name']." INT NOT NULL AUTO_INCREMENT, PRIMARY KEY ("
+            .$db->options['sequence_col_name']."))");
         if (MDB::isError($res)) {
             return($res);
         }
         if ($start == 1) {
             return(MDB_OK);
         }
-        $res = $db->query("INSERT INTO $sequence_name (sequence) VALUES (".($start-1).')');
+        $res = $db->query("INSERT INTO $sequence_name (".$db->options['sequence_col_name'].") VALUES (".($start-1).')');
         if (!MDB::isError($res)) {
             return(MDB_OK);
         }

@@ -42,7 +42,7 @@
 // | Author: Lukas Smith <smith@backendmedia.com>                         |
 // +----------------------------------------------------------------------+
 //
-// $Id: Manager.php,v 1.75.4.2 2004/01/08 13:43:02 lsmith Exp $
+// $Id: Manager.php,v 1.75.4.4 2004/03/10 14:42:59 lsmith Exp $
 //
 
 require_once('MDB/Parser.php');
@@ -1820,7 +1820,10 @@ class MDB_Manager extends PEAR
                 return($this->raiseError(MDB_ERROR_NODBSELECTED,
                     NULL, NULL, 'please connect to a RDBMS first'));
             }
-            $this->getDefinitionFromDatabase();
+            $error = $this->getDefinitionFromDatabase();
+            if(MDB::isError($error)) {
+                return($error);
+            }
             $dump_definition = FALSE;
         }
         if(isset($arguments['Output'])) {

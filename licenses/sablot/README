@@ -43,10 +43,10 @@ We offer NO WARRANTY for using Sablotron in any conditions.
 4. Porting
 ========================================
 
-So far Sablotron is tested on Linux (RedHat 5.2, 6.0, 6.1, 6.2, and 7.0), 
-Windows (NT 4.0, 95, 98, 2000), Solaris (2.5.1, 2.6, 7), HP-UX (11.00), 
-FreeBSD (3.4, 4.1), OpenBSD (2.8 beta) and OpenServer (5.0.x). We hope, 
-that it should work on most other Unix systems as well.
+So far Sablotron is tested on Linux (RedHat 5.2, 6.0, 6.1, 6.2, 7.0,
+8.0 and 9), Windows (NT 4.0, 95, 98, 2000), Solaris (2.5.1, 2.6, 7), 
+HP-UX (11.00), FreeBSD (3.4, 4.1), OpenBSD (2.8 beta) and OpenServer
+(5.0.x). We hope, that it should work on most other Unix systems as well.
 
 If you build Sablotron on some other system, please, let us
 know. All porting activities are welcome.

@@ -12,7 +12,7 @@ error_reporting = 2047
  *      DB_Common::getListOf(), DB_Common::getOne(), DB_Common::getRow()
  *
  * @package  DB
- * @version  $Id: 18get.phpt,v 1.7 2004/09/22 22:16:47 danielc Exp $
+ * @version  $Id: 18get.phpt,v 1.9 2005/02/14 23:47:54 danielc Exp $
  * @category Database
  * @author   Daniel Convissor <danielc@analysisandsolutions.com>
  * @internal
@@ -25,7 +25,7 @@ require_once './skipif.inc';
 --FILE--
 <?php
 
-// $Id: 18get.phpt,v 1.7 2004/09/22 22:16:47 danielc Exp $
+// $Id: 18get.phpt,v 1.9 2005/02/14 23:47:54 danielc Exp $
 
 /**
  * Connect to the database and make the <kbd>phptest</kbd> table.
@@ -47,7 +47,7 @@ function pe($o){
     global $dbh;
 
     $dbh->setErrorHandling(PEAR_ERROR_RETURN);
-    $dbh->query('DROP TABLE phptest');
+    drop_table($dbh, 'phptest');
 
     die($o->toString());
 }
@@ -249,12 +249,21 @@ print_r($ret);
 print "\n===================================================\n";
 print 'testing getOne with null value in column: ';
 $dbh->query("INSERT INTO phptest VALUES (9, 'nine', '', NULL)");
-
 $ret =& $dbh->getOne('SELECT d FROM phptest WHERE a = 9');
 if ($ret === '') {
-    print "empty string\n";
+    print "matches expected result\n";
 } else {
-    print 'type=' . gettype($ret) . ", value=$ret\n";
+    if ($dbh->phptype == 'msql') {
+        if (gettype($ret) == 'NULL') {
+            // msql doesn't even return the column.  Joy! :)
+            // http://bugs.php.net/?id=31960
+            print "matches expected result\n";
+        } else {
+            print "WOW, mSQL now returns columns that have NULLS in them\n";
+        }
+    } else {
+        print 'type=' . gettype($ret) . ", value=$ret\n";
+    }
 }
 
 print 'testing getOne with empty string in column: ';
@@ -269,8 +278,8 @@ if ($ret === '') {
 print "\n===================================================\n";
 
 
-$dbh->setErrorHandling(PEAR_ERROR_RETURN);
-$dbh->query('DROP TABLE phptest');
+drop_table($dbh, 'phptest');
+
 
 ?>
 --EXPECT--
@@ -646,7 +655,7 @@ Array
 )
 
 ===================================================
-testing getOne with null value in column: empty string
+testing getOne with null value in column: matches expected result
 testing getOne with empty string in column: empty string
 
 ===================================================

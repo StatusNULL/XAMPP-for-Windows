@@ -164,6 +164,7 @@ $TEXT['xampp-setup-passwd']="Password:";
 $TEXT['xampp-setup-start']="Rendi sicura la directory XAMPP";
 $TEXT['xampp-setup-notok']="<br><br>ERRORE: Il nome utente e la password devono contenere almeno tre caratteri e meno di quindici. Caratteri speciali come <öäü (usw.) e spazi vuoti non sono ammessi!<br><br>";
 $TEXT['xampp-config-ok']="<br><br>SUCCESSO: La directory XAMPP ora è protetta! Tutti i dati personali sono stati salvati nel seguente file:<br>";
+$TEXT['xampp-setup-ok']="<br><br>The root password was successfully changed. Please restart MYSQL for loading these changes!<br><br>";
 $TEXT['xampp-config-notok']="<br><br>ERRORE: Il tuo sistema NON può attivare la protezione della directory con \".htaccess\" e \"htpasswd.exe\". Forse PHP è in esecuzione in \"Safe Mode\". <br><br>";
 
 // ---------------------------------------------------------------------
@@ -199,8 +200,9 @@ $TEXT['manuals-list1']="
 <ul>
 <li><a href=http://httpd.apache.org/docs-2.0/>Documentazione Apache 2</a>
 <li><a href=http://www.php.net/manual/en/>Documentazione PHP <b>reference </b></a>
-<li><a href=http://www.perldoc.com/perl5.8.0/pod/perl.html>Documentazione Perl</a>
+<li><a href=http://www.perl.org/docs.html>Documentazione Perl</a>
 <li><a href=http://www.mysql.com/documentation/mysql/bychapter/>Documentazione MySQL</a>
+<li><a http://phplens.com/lens/adodb/docs-adodb.htm>ADODB</a>
 <li><a href=http://eaccelerator.net/>eAccellerator per PHP</a>
 <li><a href=http://www.ros.co.nz/pdf/readme.pdf>Documentazione classe pdf</a>
 </ul>";

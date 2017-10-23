@@ -42,7 +42,7 @@
 // | Author: Lukas Smith <smith@backendmedia.com>                         |
 // +----------------------------------------------------------------------+
 //
-// $Id: MDB.php,v 1.59.4.4 2004/01/08 13:43:04 lsmith Exp $
+// $Id: MDB.php,v 1.59.4.12 2004/02/28 10:37:54 quipo Exp $
 //
 require_once('PEAR.php');
 
@@ -83,12 +83,13 @@ define('MDB_ERROR_EXTENSION_NOT_FOUND',-25);
 define('MDB_ERROR_NOSUCHDB',           -26);
 define('MDB_ERROR_ACCESS_VIOLATION',   -27);
 define('MDB_ERROR_CANNOT_REPLACE',     -28);
-define('MDB_ERROR_CANNOT_ALTER',       -29);
-define('MDB_ERROR_MANAGER',            -30);
-define('MDB_ERROR_MANAGER_PARSE',      -31);
-define('MDB_ERROR_LOADMODULE',         -32);
-define('MDB_ERROR_INSUFFICIENT_DATA',  -33);
-
+define('MDB_ERROR_CONSTRAINT_NOT_NULL',-29);
+define('MDB_ERROR_DEADLOCK',           -30);
+define('MDB_ERROR_CANNOT_ALTER',       -31);
+define('MDB_ERROR_MANAGER',            -32);
+define('MDB_ERROR_MANAGER_PARSE',      -33);
+define('MDB_ERROR_LOADMODULE',         -34);
+define('MDB_ERROR_INSUFFICIENT_DATA',  -35);
 /**
  * This is a special constant that tells DB the user hasn't specified
  * any particular get mode, so the default should be used.
@@ -180,7 +181,7 @@ $GLOBALS['_MDB_databases'] = array();
  * MDB_Manager  This class handles the xml schema management.
  *
  * @package  MDB
- * @version  $Id: MDB.php,v 1.59.4.4 2004/01/08 13:43:04 lsmith Exp $
+ * @version  $Id: MDB.php,v 1.59.4.12 2004/02/28 10:37:54 quipo Exp $
  * @category Database
  * @author   Lukas Smith <smith@backendmedia.com>
  */
@@ -188,7 +189,7 @@ class MDB
 {
     // }}}
     // {{{ setOptions()
-    
+
     /**
      * set option array in an exiting database object
      *
@@ -222,10 +223,10 @@ class MDB
             $db->captureDebugOutput(TRUE);
         }
     }
-    
+
     // }}}
     // {{{ factory()
-    
+
     /**
      * Create a new DB connection object for the specified database
      * type
@@ -248,17 +249,17 @@ class MDB
     function &factory($type)
     {
         $class_name = "MDB_$type";
-        
+
         @include_once("MDB/${type}.php");
-        
+
         @$db =& new $class_name;
-        
+
         return($db);
     }
-    
+
     // }}}
     // {{{ connect()
-    
+
     /**
      * Create a new MDB connection object and connect to the specified
      * database
@@ -297,7 +298,7 @@ class MDB
                 NULL, NULL, 'no RDBMS driver specified',
                 'MDB_Error', TRUE));
         }
-        
+
         if(is_array($options)
             && isset($options['debug'])
             && $options['debug'] >= 2
@@ -307,19 +308,19 @@ class MDB
         } else {
             include_once($include);
         }
-        
+
         if(!class_exists($class_name)) {
             $error = PEAR::raiseError(NULL, MDB_ERROR_NOT_FOUND, NULL, NULL,
                 'Unable to include the '.$include.' file', 'MDB_Error', TRUE);
             return($error);
         }
-        
+
         @$db =& new $class_name();
-        
+
         $db->setDSN($dsninfo);
-        
+
         MDB::setOptions($db, $options);
-        
+
         if(isset($dsninfo['database'])) {
             $err = $db->connect();
             if (MDB::isError($err)) {
@@ -330,13 +331,13 @@ class MDB
         }
         return($db);
     }
-    
+
     // }}}
     // {{{ connect()
-    
+
     /**
      * Returns a MDB connection with the requested DSN.
-     * A newnew MDB connection object is only created if no object with the 
+     * A newnew MDB connection object is only created if no object with the
      * reuested DSN exists yet.
      *
      * IMPORTANT: In order for MDB to work properly it is necessary that
@@ -397,10 +398,10 @@ class MDB
         $db =& MDB::connect($dsn, $options);
         return $db;
     }
-    
+
     // }}}
     // {{{ loadFile()
-    
+
     /**
      * load a file (like 'Date.php' or 'Manager.php')
      *
@@ -412,10 +413,10 @@ class MDB
     {
         @include_once('MDB/'.$file.'.php');
     }
-    
+
     // }}}
     // {{{ apiVersion()
-    
+
     /**
      * Return the MDB API version
      *
@@ -426,10 +427,10 @@ class MDB
     {
         return(1);
     }
-    
+
     // }}}
     // {{{ isError()
-    
+
     /**
      * Tell whether a result code from a MDB method is an error
      *
@@ -439,12 +440,9 @@ class MDB
      */
     function isError($value)
     {
-        return(is_object($value)
-            && (get_class($value) == 'mdb_error'
-                || is_subclass_of($value, 'mdb_error'))
-        );
+        return is_a($value, 'MDB_Error');
     }
-    
+
     // }}}
     // {{{ isConnection()
     /**
@@ -458,14 +456,12 @@ class MDB
      */
     function isConnection($value)
     {
-        return (is_object($value)
-            && is_subclass_of($value, 'mdb_common')
-        );
+        return is_a($value, 'MDB_Common');
     }
-    
+
     // }}}
     // {{{ isManip()
-    
+
     /**
      * Tell whether a query is a data manipulation query (insert,
      * update or delete) or a data definition query (create, drop,
@@ -484,10 +480,10 @@ class MDB
         }
         return(FALSE);
     }
-    
+
     // }}}
     // {{{ errorMessage()
-    
+
     /**
      * Return a textual error message for a MDB error code
      *
@@ -509,6 +505,7 @@ class MDB
                 MDB_ERROR_CANNOT_DELETE      => 'can not delete',
                 MDB_ERROR_CANNOT_DROP        => 'can not drop',
                 MDB_ERROR_CONSTRAINT         => 'constraint violation',
+                MDB_ERROR_CONSTRAINT_NOT_NULL=> 'null value violates not-null constraint',
                 MDB_ERROR_DIVZERO            => 'division by zero',
                 MDB_ERROR_INVALID            => 'invalid',
                 MDB_ERROR_INVALID_DATE       => 'invalid date or time',
@@ -533,21 +530,22 @@ class MDB
                 MDB_ERROR_MANAGER            => 'MDB_manager error',
                 MDB_ERROR_MANAGER_PARSE      => 'MDB_manager schema parse error',
                 MDB_ERROR_LOADMODULE         => 'Error while including on demand module',
-                MDB_ERROR_TRUNCATED          => 'truncated'
+                MDB_ERROR_TRUNCATED          => 'truncated',
+                MDB_ERROR_DEADLOCK           => 'deadlock detected',
             );
         }
-        
+
         if (MDB::isError($value)) {
             $value = $value->getCode();
         }
-        
+
         return(isset($errorMessages[$value]) ?
            $errorMessages[$value] : $errorMessages[MDB_ERROR]);
     }
-    
+
     // }}}
     // {{{ parseDSN()
-    
+
     /**
      * Parse a data source name
      *
@@ -585,7 +583,7 @@ class MDB
         if (is_array($dsn)) {
             return($dsn);
         }
-        
+
         $parsed = array(
             'phptype'  => FALSE,
             'dbsyntax' => FALSE,
@@ -597,7 +595,7 @@ class MDB
             'socket'   => FALSE,
             'database' => FALSE
         );
-        
+
         // Find phptype and dbsyntax
         if (($pos = strpos($dsn, '://')) !== FALSE) {
             $str = substr($dsn, 0, $pos);
@@ -606,7 +604,7 @@ class MDB
             $str = $dsn;
             $dsn = NULL;
         }
-        
+
         // Get phptype and dbsyntax
         // $str => phptype(dbsyntax)
         if (preg_match('|^(.+?)\((.*?)\)$|', $str, $arr)) {
@@ -616,11 +614,11 @@ class MDB
             $parsed['phptype']  = $str;
             $parsed['dbsyntax'] = $str;
         }
-        
+
         if (empty($dsn)) {
             return($parsed);
         }
-        
+
         // Get (if found): username and password
         // $dsn => username:password@protocol+hostspec/database
         if (($at = strrpos($dsn,'@')) !== FALSE) {
@@ -633,15 +631,15 @@ class MDB
                 $parsed['username'] = rawurldecode($str);
             }
         }
-        
+
         // Find protocol and hostspec
-        
+
         // $dsn => proto(proto_opts)/database
         if (preg_match('|^([^(]+)\((.*?)\)/?(.*?)$|', $dsn, $match)) {
             $proto       = $match[1];
             $proto_opts  = (!empty($match[2])) ? $match[2] : FALSE;
             $dsn         = $match[3];
-        
+
         // $dsn => protocol+hostspec/database (old format)
         } else {
             if (strpos($dsn, '+') !== FALSE) {
@@ -654,7 +652,7 @@ class MDB
                 $dsn = NULL;
             }
         }
-        
+
         // process the different protocol options
         $parsed['protocol'] = (!empty($proto)) ? $proto : 'tcp';
         $proto_opts = rawurldecode($proto_opts);
@@ -668,7 +666,7 @@ class MDB
         } elseif ($parsed['protocol'] == 'unix') {
             $parsed['socket'] = $proto_opts;
         }
-        
+
         // Get dabase if any
         // $dsn => database
         if (!empty($dsn)) {
@@ -692,7 +690,7 @@ class MDB
                 }
             }
         }
-        
+
         return($parsed);
     }
 }
@@ -707,10 +705,10 @@ class MDB
  */
 class MDB_Error extends PEAR_Error
 {
-    
+
     // }}}
     // {{{ constructor
-    
+
     /**
      * MDB_Error constructor.
      *

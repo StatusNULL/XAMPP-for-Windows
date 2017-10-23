@@ -1,25 +1,25 @@
 <?php
-// +----------------------------------------------------------------------+
-// | PEAR :: File :: Passwd                                               |
-// +----------------------------------------------------------------------+
-// | This source file is subject to version 3.0 of the PHP license,       |
-// | that is available at http://www.php.net/license/3_0.txt              |
-// | If you did not receive a copy of the PHP license and are unable      |
-// | to obtain it through the world-wide-web, please send a note to       |
-// | license@php.net so we can mail you a copy immediately.               |
-// +----------------------------------------------------------------------+
-// | Copyright (c) 2003-2004 Michael Wallner <mike@iworks.at>             |
-// +----------------------------------------------------------------------+
-//
-// $Id: Passwd.php,v 1.21 2004/03/16 14:13:27 mike Exp $
+/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
-* Manipulate many kinds of passwd files.
-* 
-* @author       Michael Wallner <mike@php.net>
-* @package      File_Passwd
-* @category     FileSystem
-*/
+ * File::Passwd
+ * 
+ * PHP versions 4 and 5
+ *
+ * LICENSE: This source file is subject to version 3.0 of the PHP license
+ * that is available through the world-wide-web at the following URI:
+ * http://www.php.net/license/3_0.txt.  If you did not receive a copy of
+ * the PHP License and are unable to obtain it through the web, please
+ * send a note to license@php.net so we can mail you a copy immediately.
+ *
+ * @category   FileFormats
+ * @package    File_Passwd
+ * @author     Michael Wallner <mike@php.net>
+ * @copyright  2003-2005 Michael Wallner
+ * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
+ * @version    CVS: $Id: Passwd.php,v 1.25 2005/04/14 15:00:30 mike Exp $
+ * @link       http://pear.php.net/package/File_Passwd
+ */
 
 /**
 * Requires PEAR.
@@ -109,7 +109,7 @@ $GLOBALS['_FILE_PASSWD_64'] =
 * Beside that it offers some encryption methods used by the extensions.
 *
 * @author       Michael Wallner <mike@php.net>
-* @version      $Revision: 1.21 $
+* @version      $Revision: 1.25 $
 * 
 * Usage Example:
 * <code>
@@ -217,9 +217,8 @@ class File_Passwd
                 FILE_PASSWD_E_INVALID_ENC_MODE
             );
         }
-        return '{SHA}' . base64_encode(
-            File_Passwd::_hexbin(sha1($plain))
-        );
+        $hash = PEAR_ZE2 ? sha1($plain, true) : pack('H40', sha1($plain));
+        return '{SHA}' . base64_encode($hash);
 
     }
         
@@ -241,29 +240,34 @@ class File_Passwd
             $salt = substr($salt, 0,8);
         }
         
-        $length     = strlen($plain);
-        $context    = $plain . '$apr1$' . $salt;
-        $binary     = File_Passwd::_hexbin(md5($plain . $salt . $plain));
+        $length  = strlen($plain);
+        $context = $plain . '$apr1$' . $salt;
+        
+        if (PEAR_ZE2) {
+            $binary = md5($plain . $salt . $plain, true);
+        } else {
+            $binary = pack('H32', md5($plain . $salt . $plain));
+        }
         
         for ($i = $length; $i > 0; $i -= 16) {
-            $context .= substr($binary, 0, ($i > 16 ? 16 : $i));
+            $context .= substr($binary, 0, min(16 , $i));
         }
         for ( $i = $length; $i > 0; $i >>= 1) {
             $context .= ($i & 1) ? chr(0) : $plain[0];
         }
         
-        $binary = File_Passwd::_hexbin(md5($context));
+        $binary = PEAR_ZE2 ? md5($context, true) : pack('H32', md5($context));
         
         for($i = 0; $i < 1000; $i++) {
-            $new = ($i & 1) ? $plain : substr($binary, 0,16);
+            $new = ($i & 1) ? $plain : $binary;
             if ($i % 3) {
                 $new .= $salt;
             }
             if ($i % 7) {
                 $new .= $plain;
             }
-            $new .= ($i & 1) ? substr($binary, 0,16) : $plain;
-            $binary = File_Passwd::_hexbin(md5($new));
+            $new .= ($i & 1) ? $binary : $plain;
+            $binary = PEAR_ZE2 ? md5($new, true) : pack('H32', md5($new));
         }
         
         $p = array();

@@ -3,7 +3,7 @@
 // +------------------------------------------------------------------------+
 // | PEAR :: PHPUnit                                                        |
 // +------------------------------------------------------------------------+
-// | Copyright (c) 2002-2003 Sebastian Bergmann <sb@sebastian-bergmann.de>. |
+// | Copyright (c) 2002-2005 Sebastian Bergmann <sb@sebastian-bergmann.de>. |
 // +------------------------------------------------------------------------+
 // | This source file is subject to version 3.00 of the PHP License,        |
 // | that is available at http://www.php.net/license/3_0.txt.               |
@@ -12,16 +12,16 @@
 // | license@php.net so we can mail you a copy immediately.                 |
 // +------------------------------------------------------------------------+
 //
-// $Id: Assert.php,v 1.19 2004/09/28 08:01:48 sebastian Exp $
+// $Id: Assert.php,v 1.25 2005/01/31 04:57:16 sebastian Exp $
 //
 
 /**
  * A set of assert methods.
  *
  * @author      Sebastian Bergmann <sb@sebastian-bergmann.de>
- * @copyright   Copyright &copy; 2002-2004 Sebastian Bergmann <sb@sebastian-bergmann.de>
+ * @copyright   Copyright &copy; 2002-2005 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license     http://www.php.net/license/3_0.txt The PHP License, Version 3.0
- * @category    PHP
+ * @category    Testing
  * @package     PHPUnit
  */
 class PHPUnit_Assert {
@@ -146,39 +146,101 @@ class PHPUnit_Assert {
     }
 
     /**
-    * Asserts that an object isn't null.
+    * Asserts that two variables reference the same object.
+    * This requires the Zend Engine 2 to work.
     *
+    * @param  object
     * @param  object
     * @param  string
     * @access public
+    * @deprecated
     */
-    function assertNotNull($object, $message = '') {
+    function assertSame($expected, $actual, $message = '') {
+        if (!version_compare(phpversion(), '5.0.0', '>=')) {
+            $this->fail('assertSame() only works with PHP >= 5.0.0.');
+        }
+
+        if ((is_object($expected) || is_null($expected)) &&
+            (is_object($actual)   || is_null($actual))) {
+            $message = sprintf(
+              '%sexpected two variables to reference the same object',
+
+              !empty($message) ? $message . ' ' : ''
+            );
+
+            if ($expected !== $actual) {
+                return $this->fail($message);
+            }
+        } else {
+            $this->fail('Unsupported parameter passed to assertSame().');
+        }
+    }
+
+    /**
+    * Asserts that two variables do not reference the same object.
+    * This requires the Zend Engine 2 to work.
+    *
+    * @param  object
+    * @param  object
+    * @param  string
+    * @access public
+    * @deprecated
+    */
+    function assertNotSame($expected, $actual, $message = '') {
+        if (!version_compare(phpversion(), '5.0.0', '>=')) {
+            $this->fail('assertNotSame() only works with PHP >= 5.0.0.');
+        }
+
+        if ((is_object($expected) || is_null($expected)) &&
+            (is_object($actual)   || is_null($actual))) {
+            $message = sprintf(
+              '%sexpected two variables to reference different objects',
+
+              !empty($message) ? $message . ' ' : ''
+            );
+
+            if ($expected === $actual) {
+                return $this->fail($message);
+            }
+        } else {
+            $this->fail('Unsupported parameter passed to assertNotSame().');
+        }
+    }
+
+    /**
+    * Asserts that a variable is not NULL.
+    *
+    * @param  mixed
+    * @param  string
+    * @access public
+    */
+    function assertNotNull($actual, $message = '') {
         $message = sprintf(
           '%sexpected NOT NULL, actual NULL',
 
           !empty($message) ? $message . ' ' : ''
         );
 
-        if ($object === NULL) {
+        if (is_null($actual)) {
             return $this->fail($message);
         }
     }
 
     /**
-    * Asserts that an object is null.
+    * Asserts that a variable is NULL.
     *
-    * @param  object
+    * @param  mixed
     * @param  string
     * @access public
     */
-    function assertNull($object, $message = '') {
+    function assertNull($actual, $message = '') {
         $message = sprintf(
           '%sexpected NULL, actual NOT NULL',
 
           !empty($message) ? $message . ' ' : ''
         );
 
-        if ($object !== NULL) {
+        if (!is_null($actual)) {
             return $this->fail($message);
         }
     }

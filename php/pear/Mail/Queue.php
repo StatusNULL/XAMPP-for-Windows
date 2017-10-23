@@ -1,22 +1,23 @@
 <?php
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 // +----------------------------------------------------------------------+
-// | PHP Version 4                                                        |
+// | PEAR :: Mail :: Queue                                                |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2003 The PHP Group                                |
+// | Copyright (c) 1997-2004 The PHP Group                                |
 // +----------------------------------------------------------------------+
-// | This source file is subject to version 2.0 of the PHP license,       |
+// | This source file is subject to version 3.0 of the PHP license,       |
 // | that is bundled with this package in the file LICENSE, and is        |
 // | available at through the world-wide-web at                           |
-// | http://www.php.net/license/2_02.txt.                                 |
+// | http://www.php.net/license/3_0.txt.                                  |
 // | If you did not receive a copy of the PHP license and are unable to   |
 // | obtain it through the world-wide-web, please send a note to          |
 // | license@php.net so we can mail you a copy immediately.               |
 // +----------------------------------------------------------------------+
 // | Authors: Radek Maciaszek <chief@php.net>                             |
+// |          Lorenzo Alberton <l dot alberton at quipo dot it>           |
 // +----------------------------------------------------------------------+
 //
-// $Id: Queue.php,v 1.13 2004/02/29 09:12:57 quipo Exp $
+// $Id: Queue.php,v 1.15 2004/07/27 08:58:03 quipo Exp $
 
 /**
 * Class for handle mail queue managment.
@@ -97,8 +98,8 @@
 * // end usage example
 * -------------------------------------------------------------------------
 *
-* @version $Revision: 1.13 $
-* $Id: Queue.php,v 1.13 2004/02/29 09:12:57 quipo Exp $
+* @version $Revision: 1.15 $
+* $Id: Queue.php,v 1.15 2004/07/27 08:58:03 quipo Exp $
 * @author Radek Maciaszek <chief@php.net>
 */
 
@@ -149,7 +150,7 @@ require_once 'Mail/mime.php';
  * Mail_Queue - base class for mail queue managment.
  *
  * @author   Radek Maciaszek <wodzu@tonet.pl>
- * @version  $Id: Queue.php,v 1.13 2004/02/29 09:12:57 quipo Exp $
+ * @version  $Id: Queue.php,v 1.15 2004/07/27 08:58:03 quipo Exp $
  * @package  Mail_Queue
  * @access   public
  */
@@ -314,8 +315,9 @@ class Mail_Queue extends PEAR
                 }
             } else {
                 PEAR::raiseError(
-                    MAILQUEUE_ERROR_CANNOT_SEND_MAIL, null, PEAR_ERROR_TRIGGER,
-                    E_USER_NOTICE, 'Error in sending mail: '.$result->getMessage());
+                    'Error in sending mail: '.$result->getMessage(),
+                    MAILQUEUE_ERROR_CANNOT_SEND_MAIL, PEAR_ERROR_TRIGGER,
+                    E_USER_NOTICE);
             }
         }
         return true;
@@ -503,14 +505,6 @@ class Mail_Queue extends PEAR
  */
 class Mail_Queue_Error extends PEAR_Error
 {
-    /**
-     * Prefix for all error messages
-    *
-     * @access private
-     * @var    string
-     */
-    var $error_message_prefix = 'Mail Queue Error: ';
-
     // {{{ constructor
 
     /**
@@ -528,10 +522,10 @@ class Mail_Queue_Error extends PEAR_Error
 
         $debuginfo .= (empty($debuginfo) ? '' : ' - '). 'FILE: '.$file.', LINE: '.$line;
         if (is_int($code)) {
-            $this->PEAR_Error('Mail Queue Error: '.Mail_Queue::errorMessage($code),
+            $this->PEAR_Error('Mail Queue Error: ' . Mail_Queue::errorMessage($code),
                               $code, $mode, $level, $debuginfo);
         } else {
-            $this->PEAR_Error('Mail Queue Error: '.$code, MAILQUEUE_ERROR, $mode,
+            $this->PEAR_Error('Mail Queue Error: ' . $code, MAILQUEUE_ERROR, $mode,
                               $level, $debuginfo);
         }
     }

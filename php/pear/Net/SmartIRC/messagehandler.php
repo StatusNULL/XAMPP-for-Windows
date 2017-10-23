@@ -1,9 +1,9 @@
 <?php
 /**
- * $Id: messagehandler.php,v 1.25.2.2 2003/07/22 17:06:04 meebey Exp $
- * $Revision: 1.25.2.2 $
+ * $Id: messagehandler.php,v 1.25.2.5 2004/09/23 23:24:22 meebey Exp $
+ * $Revision: 1.25.2.5 $
  * $Author: meebey $
- * $Date: 2003/07/22 17:06:04 $
+ * $Date: 2004/09/23 23:24:22 $
  *
  * Copyright (c) 2002-2003 Mirco "MEEBEY" Bauer <mail@meebey.net> <http://www.meebey.net>
  * 
@@ -298,8 +298,8 @@ class Net_SmartIRC_messagehandler extends Net_SmartIRC_irccommands
     function _event_rpl_whoreply(&$ircdata)
     {
         if ($this->_channelsyncing == true) {
+            $nick = $ircdata->rawmessageex[7];
             if ($ircdata->channel == '*') {
-                $nick = $ircdata->rawmessageex[7];
                 // we got who info without channel info, so we need to search the user
                 // on all channels and update him
                 foreach ($this->_channels as $channel) {
@@ -309,6 +309,10 @@ class Net_SmartIRC_messagehandler extends Net_SmartIRC_irccommands
                     }
                 }
             } else {
+                if (!$this->isJoined($ircdata->channel, $nick)) {
+                    return;
+                }
+                                
                 $channel = &$this->_channels[strtolower($ircdata->channel)];
                 
                 $user = &new Net_SmartIRC_channeluser();
@@ -356,7 +360,7 @@ class Net_SmartIRC_messagehandler extends Net_SmartIRC_irccommands
         if ($this->_channelsyncing == true) {
             $channel = &$this->_channels[strtolower($ircdata->channel)];
             
-            $userarray = explode(' ', substr($ircdata->message, 0, -1));
+            $userarray = explode(' ', rtrim($ircdata->message));
             $userarraycount = count($userarray);
             for ($i = 0; $i < $userarraycount; $i++) {
                 $user = &new Net_SmartIRC_channeluser();

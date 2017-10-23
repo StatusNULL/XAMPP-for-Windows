@@ -36,20 +36,38 @@ $port="2000";
 
 $sieve_script_name1='test script1';
 // The script
-$sieve_script1="require \"fileinto\";\n\rif header :contains \"From:\" \"@cnba.uba.ar\" \n\r{fileinto \"INBOX.Test1\";}\r\nelse \r\n{fileinto \"INBOX\";}";
+$sieve_script1="require \"fileinto\";\n\rif header :contains \"From\" \"@cnba.uba.ar\" \n\r{fileinto \"INBOX.Test1\";}\r\nelse \r\n{fileinto \"INBOX\";}";
 
 
 $sieve_script_name2='test script2';
-$sieve_script2="require \"fileinto\";\n\rif header :contains \"From:\" \"@cnba.uba.ar\" \n\r{fileinto \"INBOX.Test\";}\r\nelse \r\n{fileinto \"INBOX\";}";
+$sieve_script2="require \"fileinto\";\n\rif header :contains \"From\" \"@cnba.uba.ar\" \n\r{fileinto \"INBOX.Test\";}\r\nelse \r\n{fileinto \"INBOX\";}";
 
 
+$sieve_script1="require \"vacation\";\nvacation\n:days 7\n:addresses [\"matthew@de-construct.com\"]\n:subject \"This is a test\"\n\"I'm on my holiday!\nsadfafs\";";
 
 
 //$sieve=new Net_Sieve($user, $passwd, $host , $port , 'PLAIN');
 //$sieve=new Net_Sieve($user, $passwd, $host , $port, 'DIGEST-MD5' );
-$sieve=new Net_Sieve($user, $passwd, $host , $port);
+//$sieve=new Net_Sieve($user, $passwd, $host , $port);
+$sieve=new Net_Sieve();
 
-//$sieve->setDebug(true);
+$sieve->setDebug(true);
+
+if(PEAR::isError($error = $sieve->connect($host , $port) ) ){
+    echo "  there was an error trying to connect to the server. The error is: " . $error->getMessage() . "\n" ;
+    exit();
+}
+
+
+
+//if(PEAR::isError($error = $sieve->login($user, $passwd  , 'PLAIN' , '', false ) ) ){
+if(PEAR::isError($error = $sieve->login($user, $passwd  , null , '', false ) ) ){
+    echo "  there was an error trying to connect to the server. The error is: " . $error->getMessage()  . "\n";
+    exit();
+}
+
+
+
 
 
 // I list the scripts that I Have installed
@@ -57,14 +75,12 @@ echo "These are the scripts that I have in the server:\n";
 print_r($sieve->listScripts());
 echo "\n";
 
-//exit();
 
-
-echo "I remove script 1 ($sieve_script_name1)......";
+echo "I remove script 1 ($sieve_script_name1)......\n";
 if( !PEAR::isError($error = $sieve->removeScript($sieve_script_name1) ) ){
     echo "  script '$sieve_script_name1' removed ok!\n";
 }else{
-    echo "  there was an error trying to remove the script '$sieve_script_name1'. The error is: " . $error->getMessage() ;
+    echo "  there was an error trying to remove the script '$sieve_script_name1'. The error is: " . $error->getMessage()  . "\n";
 }
 echo "\n";
 
@@ -72,13 +88,14 @@ echo "\n";
 
 // I try to delete again de same script, the method must fail
 
-echo "I remove script 1 ($sieve_script_name1)......";
+echo "I remove script 1 ($sieve_script_name1)......\n";
 if( !PEAR::isError($error = $sieve->removeScript($sieve_script_name1) ) ){
     echo "  script '$sieve_script_name1' removed ok!\n";
 }else{
     echo "  there was an error trying to remove the script '$sieve_script_name1'. The error is: " . $error->getMessage() . "\n" ;
 }
 echo "\n";
+
 
 
 
@@ -95,7 +112,7 @@ echo "\n";
 
 
 
-echo "I install the script '$sieve_script_name1' and mark it active.....";
+echo "I install the script '$sieve_script_name1' and mark it active.....\n";
 if(!PEAR::isError( $error = $sieve->installScript($sieve_script_name1, $sieve_script1,true))){
     echo "  script '$sieve_script_name1' installed ok!\n";
 }else{
@@ -104,7 +121,17 @@ if(!PEAR::isError( $error = $sieve->installScript($sieve_script_name1, $sieve_sc
 echo "\n";
 
 
-echo "I install the script '$sieve_script_name2' but it is not marked as active.....";
+echo "This is the script I just installed.....\n";
+if(!PEAR::isError( $error = $sieve->getScript($sieve_script_name1 ))){
+    echo "  script '$sieve_script_name1':\n$error\n";
+}else{
+    echo "  there was an error trying to install the script '$sieve_script_name1'. The error is: " . $error->getMessage() . "\n" ;
+}
+
+
+
+
+echo "I install the script '$sieve_script_name2' but it is not marked as active.....\n";
 if(!PEAR::isError( $error = $sieve->installScript($sieve_script_name2, $sieve_script2))){
     echo "  script '$sieve_script_name2' installed ok!\n";
 }else{
@@ -113,7 +140,7 @@ if(!PEAR::isError( $error = $sieve->installScript($sieve_script_name2, $sieve_sc
 echo "\n";
 
 
-echo "Now set script 2 as active...";
+echo "Now set script 2 as active...\n";
 if(!PEAR::isError($error = $sieve->setActive($sieve_script_name2))){
     echo "  script '$sieve_script_name2' marked as active ok!\n";
 }else{
@@ -121,7 +148,7 @@ if(!PEAR::isError($error = $sieve->setActive($sieve_script_name2))){
 }
 echo "\n";
 
-echo "Now get the active script....";
+echo "Now get the active script....\n";
 if( !PEAR::isError($error = $script= $sieve->getActive() ) ){
     echo "the script marked as active is: $script\n";
 }else{

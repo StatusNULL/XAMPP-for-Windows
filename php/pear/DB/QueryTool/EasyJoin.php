@@ -1,40 +1,48 @@
 <?php
-// +----------------------------------------------------------------------+
-// | PHP Version 4                                                        |
-// +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2003 The PHP Group                                |
-// +----------------------------------------------------------------------+
-// | This source file is subject to version 2.02 of the PHP license,      |
-// | that is bundled with this package in the file LICENSE, and is        |
-// | available at through the world-wide-web at                           |
-// | http://www.php.net/license/2_02.txt.                                 |
-// | If you did not receive a copy of the PHP license and are unable to   |
-// | obtain it through the world-wide-web, please send a note to          |
-// | license@php.net so we can mail you a copy immediately.               |
-// +----------------------------------------------------------------------+
-// | Author:  Wolfram Kriesing, Paolo Panto, vision:produktion <wk@visionp.de>
-// +----------------------------------------------------------------------+
-//
-// $Id: EasyJoin.php,v 1.6 2004/04/06 12:25:42 quipo Exp $
-//
+/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
+
 /**
- * Load DB_QueryTool_Query class
+ * Contains the DB_QueryTool_EasyJoin class
+ *
+ * PHP versions 4 and 5
+ *
+ * LICENSE: This source file is subject to version 3.0 of the PHP license
+ * that is available through the world-wide-web at the following URI:
+ * http://www.php.net/license/3_0.txt.  If you did not receive a copy of
+ * the PHP License and are unable to obtain it through the web, please
+ * send a note to license@php.net so we can mail you a copy immediately.
+ *
+ * @category   Database
+ * @package    DB_QueryTool
+ * @author     Wolfram Kriesing <wk@visionp.de>
+ * @author     Paolo Panto <wk@visionp.de>
+ * @copyright  2003-2005 Wolfram Kriesing, Paolo Panto
+ * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
+ * @version    CVS: $Id: EasyJoin.php,v 1.9 2005/02/27 17:15:05 quipo Exp $
+ * @link       http://pear.php.net/package/DB_QueryTool
+ */
+
+/**
+ * require the DB_QueryTool_Query class
  */
 require_once 'DB/QueryTool/Query.php';
 
 /**
+ * DB_QueryTool_EasyJoin class
  *
+ * @category   Database
  * @package    DB_QueryTool
- * @version    2002/09/03
- * @access     public
- * @author     Wolfram Kriesing <wolfram@kriesing.de>
+ * @author     Wolfram Kriesing <wk@visionp.de>
+ * @copyright  2003-2005 Wolfram Kriesing
+ * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
+ * @link       http://pear.php.net/package/DB_QueryTool
  */
 class DB_QueryTool_EasyJoin extends DB_QueryTool_Query
 {
     // {{{ class vars
 
     /**
-     * this is the regular expression that shall be used to find a table's shortName
+     * This is the regular expression that shall be used to find a table's shortName
      * in a column name, the string found by using this regular expression will be removed
      * from the column name and it will be checked if it is a table name
      * i.e. the default '/_id$/' would find the table name 'user' from the column name 'user_id'
@@ -44,7 +52,7 @@ class DB_QueryTool_EasyJoin extends DB_QueryTool_Query
     var $_tableNamePreg = '/_id$/';
 
     /**
-     * this is to find the column name that is refered by it, so the default find
+     * This is to find the column name that is referred by it, so the default find
      * from 'user_id' the column 'id' which will be used to refer to the 'user' table
      *
      * @var string regexp
@@ -68,14 +76,16 @@ class DB_QueryTool_EasyJoin extends DB_QueryTool_Query
     // {{{ autoJoin()
 
     /**
-     * join the tables given, using the column names, to find out how to join the tables
-     * this is, if table1 has a column names table2_id this method will join
-     * WHERE table1.table2_id=table2.id
-     * all joins made here are only concatenated via AND
+     * Join the given tables, using the column names, to find out how to join the tables;
+     * i.e., if table1 has a column named &quot;table2_id&quot;, this method will join
+     * &quot;WHERE table1.table2_id=table2.id&quot;.
+     * All joins made here are only concatenated via AND.
+     * @param array $tables
      */
     function autoJoin($tables)
     {
-// FIXXME if $tables is empty autoJoin all available tables that have a relation to $this->table, starting to search in $this->table
+// FIXXME if $tables is empty autoJoin all available tables that have a relation
+// to $this->table, starting to search in $this->table
         settype($tables, 'array');
         // add this->table to the tables array, so we go thru the current table first
         $tables = array_merge(array($this->table), $tables);
@@ -94,9 +104,9 @@ class DB_QueryTool_EasyJoin extends DB_QueryTool_Query
         foreach ($tables as $aTable) {   // go through $this->table and all the given tables
             if ($metadata = $this->metadata($aTable))
             foreach ($metadata as $aCol => $x) {   // go through each row to check which might be related to $aTable
-                $possibleTableShortName = preg_replace($this->_tableNamePreg, '' , $aCol);
-                $possibleColumnName = preg_replace($this->_columnNamePreg, '' , $aCol);
-//print "$aTable.$aCol .... possibleTableShortName=$possibleTableShortName .... possibleColumnName=$possibleColumnName<br>";
+                $possibleTableShortName = preg_replace($this->_tableNamePreg,  '' , $aCol);
+                $possibleColumnName     = preg_replace($this->_columnNamePreg, '' , $aCol);
+//print "$aTable.$aCol .... possibleTableShortName=$possibleTableShortName .... possibleColumnName=$possibleColumnName<br />";
                 if (isset($shortNameIndexed[$possibleTableShortName])) {
                     // are the tables given in the tableSpec?
                     if (!$shortNameIndexed[$possibleTableShortName]['name'] ||
@@ -105,30 +115,19 @@ class DB_QueryTool_EasyJoin extends DB_QueryTool_Query
                         $this->_errorLog("autoJoin-ERROR: '$aTable' is not given in the tableSpec!<br />");
                     } else {
                         // do only join different table.col combination,
-                        // we shoul not join stuff like 'question.question=question.question' this would be quite stupid, but it used to be :-(
-                        if ($shortNameIndexed[$possibleTableShortName]['name'].$possibleColumnName != $aTable.$aCol) {
-                            $joinTables[] = $nameIndexed[$aTable]['name'];
-                            $joinTables[] = $shortNameIndexed[$possibleTableShortName]['name'];
-                            $joinConditions[] = $shortNameIndexed[$possibleTableShortName]['name'].".$possibleColumnName=$aTable.$aCol";
+                        // we should not join stuff like 'question.question=question.question'
+                        // this would be quite stupid, but it used to be :-(
+                        if ($shortNameIndexed[$possibleTableShortName]['name'] != $aTable ||
+                            $possibleColumnName != $aCol
+                        ) {
+                            $where = $shortNameIndexed[$possibleTableShortName]['name'].".$possibleColumnName=$aTable.$aCol";
+                            $this->addJoin($nameIndexed[$aTable]['name'],                      $where);
+                            $this->addJoin($shortNameIndexed[$possibleTableShortName]['name'], $where);
                         }
                     }
                 }
             }
         }
-
-        if (sizeof($joinTables) && sizeof($joinConditions)) {
-            $joinTables = array_unique($joinTables);
-            foreach ($joinTables as $key => $val) {
-                if ($val == $this->table) {
-                    unset($joinTables[$key]);
-                }
-            }
-//FIXXME set tables only when they are not already in the join!!!!!
-
-//print_r($joinTables); echo '$this->addJoin('.implode(' AND ',$joinConditions).');<br />';
-            $this->addJoin($joinTables, implode(' AND ', $joinConditions));
-        }
-//print '<br /><br /><br />';
     }
 
     // }}}

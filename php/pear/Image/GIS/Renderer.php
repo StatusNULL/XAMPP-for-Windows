@@ -13,17 +13,22 @@
 // | license@php.net so we can mail you a copy immediately.                 |
 // +------------------------------------------------------------------------+
 //
-// $Id: Renderer.php,v 1.9 2004/01/01 10:31:37 sebastian Exp $
+// $Id: Renderer.php,v 1.14 2004/07/25 13:56:29 sebastian Exp $
 //
 
 require_once 'Image/Color.php';
 
 /**
-* Renderer Base Class.
-*
-* @version  $Revision: 1.9 $
-* @since    Image_GIS 1.0.0
-*/
+ * Renderer Base Class.
+ *
+ * @author      Jan Kneschke <jan@kneschke.de>
+ * @author      Sebastian Bergmann <sb@sebastian-bergmann.de>
+ * @copyright   Copyright &copy; 2002-2004 Jan Kneschke <jan@kneschke.de> and Sebastian Bergmann <sb@sebastian-bergmann.de>
+ * @license     http://www.php.net/license/3_0.txt The PHP License, Version 3.0
+ * @category    Image
+ * @package     Image_GIS
+ * @abstract
+ */
 class Image_GIS_Renderer {
     /**
     * Set to TRUE to enable debugging.
@@ -191,21 +196,18 @@ class Image_GIS_Renderer {
     */
     function render($lineSets) {
         if ($this->min == false || $this->max == false) {
-            $this->min = array(
-              'x' => 0,
-              'y' => 0
-            );
-
-            $this->max = array(
-              'x' => 0,
-              'y' => 0
-            );
-
             foreach ($lineSets as $lineSet) {
-                $this->min['x'] = min($this->min['x'], $lineSet->min['x']);
-                $this->min['y'] = min($this->min['y'], $lineSet->min['y']);
-                $this->max['x'] = max($this->max['x'], $lineSet->max['x']);
-                $this->max['y'] = max($this->max['y'], $lineSet->max['y']);
+                if ($this->min == false) {
+                    $this->min['x'] = $lineSet->min['x'];
+                    $this->min['y'] = $lineSet->min['y'];
+                    $this->max['x'] = $lineSet->max['x'];
+                    $this->max['y'] = $lineSet->max['y'];
+                } else {
+                    $this->min['x'] = min($this->min['x'], $lineSet->min['x']);
+                    $this->min['y'] = min($this->min['y'], $lineSet->min['y']);
+                    $this->max['x'] = max($this->max['x'], $lineSet->max['x']);
+                    $this->max['y'] = max($this->max['y'], $lineSet->max['y']);
+                }
             }
         }
 

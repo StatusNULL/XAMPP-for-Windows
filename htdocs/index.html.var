@@ -3,7 +3,7 @@ Content-language: ca
 Content-type: text/html
 
 URI: index.html.cz.iso8859-2
-Content-language: cz
+Content-language: cs
 Content-type: text/html;charset=ISO-8859-2
 
 URI: index.html.de
@@ -110,14 +110,14 @@ URI: index.html.ru.utf8
 Content-language: ru
 Content-type: text/html;charset=UTF-8
 
-URI: index.html.se
+URI: index.html.sv
 Content-language: sv
 Content-type: text/html
 
-URI: index.html.tw
-Content-language: zh-tw
-Content-type: text/html
+URI: index.html.zh-cn.gb2312
+Content-language: zh-CN
+Content-type: text/html;charset=GB2312
 
-URI: index.html.tw.Big5
-Content-language: tw, zh-tw
+URI: index.html.zh-tw.big5
+Content-language: tw, zh-TW
 Content-type: text/html;charset=Big5

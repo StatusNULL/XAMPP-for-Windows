@@ -16,8 +16,13 @@
 // | Author:  Alan Knowles <alan@akbkhome.com>
 // +----------------------------------------------------------------------+
 //
-// $Id: createTables.php,v 1.19 2004/02/10 07:34:51 alan_k Exp $
+// $Id: createTables.php,v 1.23 2005/05/04 14:13:57 alan_k Exp $
 //
+
+// since this version doesnt use overload, 
+// and I assume anyone using custom generators should add this..
+
+define('DB_DATAOBJECT_NO_OVERLOAD',1);
 
 require_once 'DB/DataObject/Generator.php';
 
@@ -32,11 +37,14 @@ if (!@$_SERVER['argv'][1]) {
 }
 
 $config = parse_ini_file($_SERVER['argv'][1], true);
+foreach($config as $class=>$values) {
+    $options = &PEAR::getStaticProperty($class,'options');
+    $options = $values;
+}
+
 
 $options = &PEAR::getStaticProperty('DB_DataObject','options');
-$options = $config['DB_DataObject'];
-
-if (!$options) {
+if (empty($options)) {
     PEAR::raiseError("\nERROR: could not read ini file\n\n", null, PEAR_ERROR_DIE);
     exit;
 }

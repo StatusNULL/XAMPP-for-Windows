@@ -1,8 +1,8 @@
 <?php
 // +----------------------------------------------------------------------+
-// | PHP Version 4                                                        |
+// | PEAR :: HTML :: Progress                                             |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2003 The PHP Group                                |
+// | Copyright (c) 1997-2004 The PHP Group                                |
 // +----------------------------------------------------------------------+
 // | This source file is subject to version 3.0 of the PHP license,       |
 // | that is bundled with this package in the file LICENSE, and is        |
@@ -15,27 +15,27 @@
 // | Author: Laurent Laville <pear@laurent-laville.org>                   |
 // +----------------------------------------------------------------------+
 //
-// $Id: UI.php,v 1.1 2003/11/15 18:27:09 thesaur Exp $
+// $Id: UI.php,v 1.7 2004/09/06 15:12:48 farell Exp $
 
 /**
  * The HTML_Progress_UI class provides a basic look and feel 
  * implementation of a progress bar.
  *
- * @version    1.0
+ * @version    1.2.0
  * @author     Laurent Laville <pear@laurent-laville.org>
  * @access     public
- * @category   HTML
  * @package    HTML_Progress
+ * @subpackage Progress_UI
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
  * @todo       better aligment renders when auto-size progress is false
  */
 
-require_once ('HTML/Common.php');
+require_once 'HTML/Common.php';
 
 class HTML_Progress_UI extends HTML_Common
 {
     /**
-     * Whether the progress bar is horizontal or vertical.
+     * Whether the progress bar is horizontal, vertical, polygonal or circle.
      * The default is horizontal.
      *
      * @var        integer
@@ -58,6 +58,9 @@ class HTML_Progress_UI extends HTML_Common
      *     <li>with Progress Bar Vertical, 
      *              natural way is : down to up
      *        <br />reverse way is : up to down
+     *     <li>with Progress Circle or Polygonal, 
+     *              natural way is : clockwise
+     *        <br />reverse way is : anticlockwise
      *   </ul>
      * </ul>
      *
@@ -79,6 +82,36 @@ class HTML_Progress_UI extends HTML_Common
     var $_cellCount;
 
     /**
+     * The cell coordinates for a progress polygonal shape.
+     *
+     * @var        array
+     * @since      1.2.0
+     * @access     private
+     * @see        getCellCoordinates(), setCellCoordinates()
+     */
+    var $_coordinates;
+
+    /**
+     * The width of grid in cell-size of the polygonal shape.
+     *
+     * @var        integer
+     * @since      1.2.0
+     * @access     private
+     * @see        getCellCoordinates(), setCellCoordinates()
+     */
+    var $_xgrid;
+
+    /**
+     * The height of grid in cell-size of the polygonal shape.
+     *
+     * @var        integer
+     * @since      1.2.0
+     * @access     private
+     * @see        getCellCoordinates(), setCellCoordinates()
+     */
+    var $_ygrid;
+
+    /**
      * The progress bar's structure 
      *
      * <ul>
@@ -94,6 +127,7 @@ class HTML_Progress_UI extends HTML_Common
      *     <li>since 0.6 : 'color'          =  foreground color
      *     <li>since 0.6 : 'font-size'      =  font size
      *     <li>since 0.6 : 'font-family'    =  font family
+     *     <li>since 1.2 : 'background-color' = background color
      *     </ul>
      * <li>['border']
      *     <ul>
@@ -141,15 +175,6 @@ class HTML_Progress_UI extends HTML_Common
      */
     var $_script;
 
-    /**
-     * Package name used by Error_Raise functions
-     *
-     * @var        string
-     * @since      1.0
-     * @access     private
-     */
-    var $_package;
-
 
     /**
      * The progress bar's UI model class constructor
@@ -167,14 +192,19 @@ class HTML_Progress_UI extends HTML_Common
      *   $html = new HTML_Progress_UI($cell);
      *   </code>
      *
+     * @param      int       $cell          (optional) Cell count
+     *
      * @since      1.0
      * @access     public
      * @throws     HTML_PROGRESS_ERROR_INVALID_INPUT
      */
     function HTML_Progress_UI()
     {
-        $this->_package = 'HTML_Progress_UI';
-        Error_Raise::initialize($this->_package, array('HTML_Progress', '_getErrorMessage'));
+        // if you've not yet created an instance of html_progress
+        if (!$GLOBALS['_HTML_PROGRESS_CALLBACK_ERRORHANDLER']) {
+            // init default error handling system,
+            HTML_Progress::_initErrorHandler();
+        }
 
         $args = func_get_args();
 
@@ -182,18 +212,18 @@ class HTML_Progress_UI extends HTML_Common
          case 1:
             /*   int cell  */
             if (!is_int($args[0])) {
-                return Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
+                return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
                     array('var' => '$cell',
                           'was' => $args[0],
                           'expected' => 'integer',
-                          'paramnum' => 1), PEAR_ERROR_TRIGGER);
+                          'paramnum' => 1));
 
             } elseif ($args[0] < 1) {
-                return Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT, 'error',
+                return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'error',
                     array('var' => '$cell',
                           'was' => $args[0],
                           'expected' => 'greater or equal 1',
-                          'paramnum' => 1), PEAR_ERROR_TRIGGER);
+                          'paramnum' => 1));
             }
             $this->_cellCount = $args[0];
             break;
@@ -215,6 +245,7 @@ class HTML_Progress_UI extends HTML_Common
                     'font-family' => "Courier, Verdana",
                     'font-size' => 8,
                     'color' => "#000000",
+                    'background-color' => "#FFFFFF",
                     'width' => 15,
                     'height' => 20,
                     'spacing' => 2
@@ -256,6 +287,7 @@ class HTML_Progress_UI extends HTML_Common
      * @since      1.0
      * @access     public
      * @see        setOrientation()
+     * @tutorial   ui.getorientation.pkg
      */
     function getOrientation()
     {
@@ -274,24 +306,29 @@ class HTML_Progress_UI extends HTML_Common
      * @access     public
      * @throws     HTML_PROGRESS_ERROR_INVALID_INPUT
      * @see        getOrientation()
+     * @tutorial   ui.setorientation.pkg
      */
     function setOrientation($orient)
     {
         if (!is_int($orient)) {
-            return Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
+            return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$orient',
                       'was' => gettype($orient),
                       'expected' => 'integer',
-                      'paramnum' => 1), PEAR_ERROR_TRIGGER);
+                      'paramnum' => 1));
 
         } elseif (($orient != HTML_PROGRESS_BAR_HORIZONTAL) && 
-                  ($orient != HTML_PROGRESS_BAR_VERTICAL)) {
-            return Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT, 'error',
+                  ($orient != HTML_PROGRESS_BAR_VERTICAL) &&
+                  ($orient != HTML_PROGRESS_POLYGONAL) &&
+                  ($orient != HTML_PROGRESS_CIRCLE)) {
+            return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'error',
                 array('var' => '$orient',
                       'was' => $orient,
                       'expected' => HTML_PROGRESS_BAR_HORIZONTAL.' | '.
-                                    HTML_PROGRESS_BAR_VERTICAL,
-                      'paramnum' => 1), PEAR_ERROR_TRIGGER);
+                                    HTML_PROGRESS_BAR_VERTICAL.' | '.
+                                    HTML_PROGRESS_POLYGONAL.' | '.
+                                    HTML_PROGRESS_CIRCLE,
+                      'paramnum' => 1));
         }
 
         $previous = $this->_orientation;    // gets previous orientation
@@ -321,6 +358,7 @@ class HTML_Progress_UI extends HTML_Common
      * @since      1.0
      * @access     public
      * @see        setFillWay()
+     * @tutorial   ui.getfillway.pkg
      */
     function getFillWay()
     {
@@ -338,22 +376,23 @@ class HTML_Progress_UI extends HTML_Common
      * @access     public
      * @throws     HTML_PROGRESS_ERROR_INVALID_INPUT
      * @see        getFillWay()
+     * @tutorial   ui.setfillway.pkg
      */
     function setFillWay($way)
     {
         if (!is_string($way)) {
-            return Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
+            return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$way',
                       'was' => gettype($way),
                       'expected' => 'string',
-                      'paramnum' => 1), PEAR_ERROR_TRIGGER);
+                      'paramnum' => 1));
 
         } elseif ((strtolower($way) != 'natural') && (strtolower($way) != 'reverse')) {
-            return Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT, 'error',
+            return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'error',
                 array('var' => '$way',
                       'was' => $way,
                       'expected' => 'natural | reverse',
-                      'paramnum' => 1), PEAR_ERROR_TRIGGER);
+                      'paramnum' => 1));
         }
         $this->_fillWay = strtolower($way);
     }
@@ -365,6 +404,7 @@ class HTML_Progress_UI extends HTML_Common
      * @since      1.0
      * @access     public
      * @see        setCellCount()
+     * @tutorial   ui.getcellcount.pkg
      */
     function getCellCount()
     {
@@ -381,23 +421,23 @@ class HTML_Progress_UI extends HTML_Common
      * @access     public
      * @throws     HTML_PROGRESS_ERROR_INVALID_INPUT
      * @see        getCellCount()
-     * @tutorial   beginner.pkg#look-and-feel.cell-style
+     * @tutorial   ui.setcellcount.pkg
      */
     function setCellCount($cells)
     {
         if (!is_int($cells)) {
-            return Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
+            return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$cells',
                       'was' => gettype($cells),
                       'expected' => 'integer',
-                      'paramnum' => 1), PEAR_ERROR_TRIGGER);
+                      'paramnum' => 1));
 
         } elseif ($cells < 1) {
-            return Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT, 'error',
+            return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'error',
                 array('var' => '$cells',
                       'was' => $cells,
                       'expected' => 'greater or equal 1',
-                      'paramnum' => 1), PEAR_ERROR_TRIGGER);
+                      'paramnum' => 1));
         }
         $this->_cellCount = $cells;
 
@@ -414,11 +454,12 @@ class HTML_Progress_UI extends HTML_Common
      * @access     public
      * @throws     HTML_PROGRESS_ERROR_INVALID_INPUT
      * @see        setCellAttributes()
+     * @tutorial   ui.getcellattributes.pkg
      */
     function getCellAttributes($asString = false)
     {
         if (!is_bool($asString)) {
-            return Error_Raise::exception($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT,
+            return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$asString',
                       'was' => gettype($asString),
                       'expected' => 'boolean',
@@ -449,6 +490,7 @@ class HTML_Progress_UI extends HTML_Common
      *     <li>font-family    = Courier, Verdana
      *     <li>font-size      = lowest value from cell width, cell height, and font size
      *     <li>color          = #000000
+     *     <li>background-color = #FFFFFF (added for progress circle shape on release 1.2.0)
      *     <li>Horizontal Bar :
      *         <ul>
      *         <li>width      = 15
@@ -469,32 +511,32 @@ class HTML_Progress_UI extends HTML_Common
      * @since      1.0
      * @access     public
      * @throws     HTML_PROGRESS_ERROR_INVALID_INPUT
-     * @see        getCellAttributes()
-     * @tutorial   beginner.pkg#look-and-feel.cell-style
+     * @see        getCellAttributes(), getCellCount()
+     * @tutorial   ui.setcellattributes.pkg
      */
     function setCellAttributes($attributes, $cell = null)
     {
         if (!is_null($cell)) {
             if (!is_int($cell)) {
-                return Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
+                return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
                     array('var' => '$cell',
                           'was' => gettype($cell),
                           'expected' => 'integer',
-                          'paramnum' => 1), PEAR_ERROR_TRIGGER);
+                          'paramnum' => 2));
 
             } elseif ($cell < 0) {
-                return Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT, 'error',
+                return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'error',
                     array('var' => '$cell',
                           'was' => $cell,
                           'expected' => 'positive',
-                          'paramnum' => 1), PEAR_ERROR_TRIGGER);
+                          'paramnum' => 2));
 
-            } elseif ($cell >= $this->getCellCount()) {
-                return Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT, 'error',
+            } elseif ($cell > $this->getCellCount()) {
+                return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'error',
                     array('var' => '$cell',
                           'was' => $cell,
-                          'expected' => 'less than '.$this->getCellCount(),
-                          'paramnum' => 1), PEAR_ERROR_TRIGGER);
+                          'expected' => 'less or equal '.$this->getCellCount(),
+                          'paramnum' => 2));
             }
 
             $this->_updateAttrArray($this->_progress['cell'][$cell], $this->_parseAttributes($attributes));
@@ -514,6 +556,107 @@ class HTML_Progress_UI extends HTML_Common
     }
 
     /**
+     * Returns the coordinates of each cell for a polygonal progress shape.
+     *
+     * @return     array                    list of cell coordinates
+     * @since      1.2.0
+     * @access     public
+     * @see        setCellCoordinates()
+     */
+    function getCellCoordinates()
+    {
+        return isset($this->_coordinates) ? $this->_coordinates : array();
+    }
+
+    /**
+     * Set the coordinates of each cell for a polygonal progress shape.
+     *
+     * @param      integer   $xgrid     The grid width in cell size
+     * @param      integer   $ygrid     The grid height in cell size
+     * @param      array     $coord     (optional) Coordinates (x,y) in the grid, of each cell
+     *
+     * @return     void
+     * @since      1.2.0
+     * @access     public
+     * @see        getCellCoordinates()
+     */
+    function setCellCoordinates($xgrid, $ygrid, $coord = array())
+    {
+        if (!is_int($xgrid)) {
+            return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
+                array('var' => '$xgrid',
+                      'was' => gettype($xgrid),
+                      'expected' => 'integer',
+                      'paramnum' => 1));
+
+        } elseif ($xgrid < 3) {
+            return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'error',
+                array('var' => '$xgrid',
+                      'was' => $xgrid,
+                      'expected' => 'greater than 2',
+                      'paramnum' => 1));
+
+        } elseif (!is_int($ygrid)) {
+            return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
+                array('var' => '$ygrid',
+                      'was' => gettype($ygrid),
+                      'expected' => 'integer',
+                      'paramnum' => 2));
+
+        } elseif ($ygrid < 3) {
+            return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'error',
+                array('var' => '$ygrid',
+                      'was' => $ygrid,
+                      'expected' => 'greater than 2',
+                      'paramnum' => 2));
+
+        } elseif (!is_array($coord)) {
+            return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
+                array('var' => '$coord',
+                      'was' => gettype($coord),
+                      'expected' => 'array',
+                      'paramnum' => 3));
+        }
+        
+        if (count($coord) == 0) {
+            // Computes all coordinates of a standard polygon (square or rectangle)
+            $coord = $this->_computeCoordinates($xgrid, $ygrid);
+        } else {
+            foreach ($coord as $id => $pos) {
+                if (!is_array($pos)) {
+                    return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
+                        array('var' => '$coord[,$pos]',
+                              'was' => gettype($pos),
+                              'expected' => 'array',
+                              'paramnum' => 3));
+                }
+                if ($pos[0] >= $ygrid) {
+                    return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'error',
+                        array('var' => '$pos[0]',
+                              'was' => $pos[0],
+                              'expected' => 'coordinate less than grid height',
+                              'paramnum' => 3));
+                }
+                if ($pos[1] >= $xgrid) {
+                    return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'error',
+                        array('var' => '$pos[1]',
+                              'was' => $pos[1],
+                              'expected' => 'coordinate less than grid width',
+                              'paramnum' => 3));
+                }
+            }
+        }
+        $this->_coordinates = $coord;
+        $this->_xgrid = $xgrid;
+        $this->_ygrid = $ygrid;
+        
+        // auto-compute cell count
+        $this->_cellCount = count($coord);
+
+        $this->_updateProgressSize();   // updates the new size of progress bar
+    }
+
+    /**
      * Returns the progress bar's border attributes. Assoc array (defaut) or string.
      *
      * @param      bool      $asString      (optional) whether to return the attributes as string 
@@ -523,11 +666,12 @@ class HTML_Progress_UI extends HTML_Common
      * @access     public
      * @throws     HTML_PROGRESS_ERROR_INVALID_INPUT
      * @see        setBorderAttributes()
+     * @tutorial   ui.getborderattributes.pkg
      */
     function getBorderAttributes($asString = false)
     {
         if (!is_bool($asString)) {
-            return Error_Raise::exception($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT,
+            return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$asString',
                       'was' => gettype($asString),
                       'expected' => 'boolean',
@@ -559,9 +703,8 @@ class HTML_Progress_UI extends HTML_Common
      * @return     void
      * @since      1.0
      * @access     public
-     * @see        getBorderAttributes()
-     * @tutorial   beginner.pkg#look-and-feel.border-style
-     * @example    bluesand.php             A thin solid border to a horizontal progress bar
+     * @see        getBorderAttributes(), HTML_Progress::setBorderPainted()
+     * @tutorial   ui.setborderattributes.pkg
      */
     function setBorderAttributes($attributes)
     {
@@ -580,11 +723,12 @@ class HTML_Progress_UI extends HTML_Common
      * @access     public
      * @throws     HTML_PROGRESS_ERROR_INVALID_INPUT
      * @see        setStringAttributes()
+     * @tutorial   ui.getstringattributes.pkg
      */
     function getStringAttributes($asString = false)
     {
         if (!is_bool($asString)) {
-            return Error_Raise::exception($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT,
+            return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$asString',
                       'was' => gettype($asString),
                       'expected' => 'boolean',
@@ -627,8 +771,8 @@ class HTML_Progress_UI extends HTML_Common
      * @return     void
      * @since      1.0
      * @access     public
-     * @see        getStringAttributes()
-     * @tutorial   beginner.pkg#look-and-feel.string-style
+     * @see        getStringAttributes(), HTML_Progress::setStringPainted()
+     * @tutorial   ui.setstringattributes.pkg
      */
     function setStringAttributes($attributes)
     {
@@ -645,11 +789,12 @@ class HTML_Progress_UI extends HTML_Common
      * @access     public
      * @throws     HTML_PROGRESS_ERROR_INVALID_INPUT
      * @see        setProgressAttributes()
+     * @tutorial   ui.getprogressattributes.pkg
      */
     function getProgressAttributes($asString = false)
     {
         if (!is_bool($asString)) {
-            return Error_Raise::exception($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT,
+            return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$asString',
                       'was' => gettype($asString),
                       'expected' => 'boolean',
@@ -691,7 +836,7 @@ class HTML_Progress_UI extends HTML_Common
      * @since      1.0
      * @access     public
      * @see        getProgressAttributes()
-     * @tutorial   beginner.pkg#look-and-feel.progress-style
+     * @tutorial   ui.setprogressattributes.pkg
      */
     function setProgressAttributes($attributes)
     {
@@ -705,6 +850,7 @@ class HTML_Progress_UI extends HTML_Common
      * @since      0.5
      * @access     public
      * @see        setScript()
+     * @tutorial   ui.getscript.pkg
      * @author     Stefan Neufeind <pear.neufeind@speedpartner.de> Contributor.
      *             See details on thanks section of README file.
      * @author     Christian Wenz <wenz@php.net> Helper.
@@ -724,39 +870,54 @@ var cellCount = %cellCount%;
 
 function setprogress(pIdent, pValue, pString, pDeterminate)
 {
-        if (isDom)
-            prog = document.getElementById(pIdent+'%installationProgress%');
-        if (isIE)
-            prog = document.all[pIdent+'%installationProgress%'];
-        if (isNS4)
-            prog = document.layers[pIdent+'%installationProgress%'];
-	if (prog != null) 
-	    prog.innerHTML = pString;
-
-        if (pValue == pDeterminate) {
-	    for (i=0; i < cellCount; i++) {
-                showCell(i, pIdent, "hidden");	
-            }
+    if (isDom) {
+        prog = document.getElementById(pIdent+'%installationProgress%');
+    } else if (isIE) {
+        prog = document.all[pIdent+'%installationProgress%'];
+    } else if (isNS4) {
+        prog = document.layers[pIdent+'%installationProgress%'];
+    }
+    if (prog != null) {
+        prog.innerHTML = pString;
+    }
+    if (pValue == pDeterminate) {
+        for (i=0; i < cellCount; i++) {
+            showCell(i, pIdent, "hidden");	
         }
-        if ((pDeterminate > 0) && (pValue > 0)) {
-            i = (pValue-1) % cellCount;
+    }
+    if ((pDeterminate > 0) && (pValue > 0)) {
+        i = (pValue-1) % cellCount;
+        showCell(i, pIdent, "visible");	
+    } else {
+        for (i=pValue-1; i >=0; i--) {
             showCell(i, pIdent, "visible");	
-        } else {
-            for (i=pValue-1; i >=0; i--) {
-                showCell(i, pIdent, "visible");	
-            }
-	}
+        }
+    }
+}
+
+function setVisibility(pElement, pVisibility)
+{
+    if (isDom) {
+        document.getElementById(pElement).style.visibility = pVisibility;
+    } else if (isIE) {
+        document.all[pElement].style.visibility = pVisibility;
+    } else if (isNS4) {
+        document.layers[pElement].style.visibility = pVisibility;
+    }
 }
 
 function showCell(pCell, pIdent, pVisibility)
 {
-	if (isDom)
-	    document.getElementById(pIdent+'%progressCell%'+pCell+'A').style.visibility = pVisibility;
-	if (isIE)
-	    document.all[pIdent+'%progressCell%'+pCell+'A'].style.visibility = pVisibility;
-	if (isNS4)
-	    document.layers[pIdent+'%progressCell%'+pCell+'A'].style.visibility = pVisibility;
+    setVisibility(pIdent+'%progressCell%'+pCell+'A', pVisibility);
+}
 
+function hideProgress(pIdent)
+{
+    setVisibility(pIdent+'progress', 'hidden');
+
+    for (i=0; i < cellCount; i++) {
+        showCell(i, pIdent, "hidden");	
+    }
 }
 
 JS;
@@ -780,23 +941,24 @@ JS;
      * @access     public
      * @throws     HTML_PROGRESS_ERROR_INVALID_INPUT
      * @see        getScript()
+     * @tutorial   ui.setscript.pkg
      */
     function setScript($url)
     {
         if (!is_null($url)) {
             if (!is_string($url)) {
-                Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
+                return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
                     array('var' => '$url',
                           'was' => gettype($url),
                           'expected' => 'string',
-                          'paramnum' => 1), PEAR_ERROR_TRIGGER);
+                          'paramnum' => 1));
 
             } elseif (!is_file($url) || $url == '.' || $url == '..') {
-                Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT, 'error',
+                return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'error',
                     array('var' => '$url',
                           'was' => $url.' file does not exists',
                           'expected' => 'javascript file exists',
-                          'paramnum' => 1), PEAR_ERROR_TRIGGER);
+                          'paramnum' => 1));
             }
         }
 
@@ -814,12 +976,13 @@ JS;
      * @return     object                   HTML_CSS instance
      * @since      0.2
      * @access     public
+     * @tutorial   ui.getstyle.pkg
      * @author     Stefan Neufeind <pear.neufeind@speedpartner.de> Contributor.
      *             See details on thanks section of README file.
      */
     function &getStyle()
     {
-        include_once ('HTML/CSS.php');
+        include_once 'HTML/CSS.php';
         
         $progressAttr = $this->getProgressAttributes();
         $borderAttr = $this->getBorderAttributes();
@@ -845,6 +1008,7 @@ JS;
         if (isset($stringAttr['height'])) {
             $css->setStyle('.'.$stringAttr['id'], 'height', $stringAttr['height'].'px');
         }
+        
         $css->setStyle('.'.$stringAttr['id'], 'text-align', $stringAttr['align']);
         $css->setStyle('.'.$stringAttr['id'], 'font-family', $stringAttr['font-family']);
         $css->setStyle('.'.$stringAttr['id'], 'font-size', $stringAttr['font-size'].'px');
@@ -864,8 +1028,10 @@ JS;
         }
         $css->setSameStyle('.'.$cellAttr['class'].'A', '.'.$cellAttr['class'].'I');
 
-        $css->setStyle('.'.$cellAttr['class'].'I', 'background-color', $cellAttr['inactive-color']);
-        $css->setStyle('.'.$cellAttr['class'].'A', 'background-color', $cellAttr['active-color']);
+        if ($orient !== HTML_PROGRESS_CIRCLE) {
+            $css->setStyle('.'.$cellAttr['class'].'I', 'background-color', $cellAttr['inactive-color']);
+            $css->setStyle('.'.$cellAttr['class'].'A', 'background-color', $cellAttr['active-color']);
+        }
         $css->setStyle('.'.$cellAttr['class'].'A', 'visibility', 'hidden');
 
         if (isset($cellAttr['background-image'])) {
@@ -873,7 +1039,93 @@ JS;
             $css->setStyle('.'.$cellAttr['class'].'A', 'background-repeat', 'no-repeat');
         }
         
+        if ($orient == HTML_PROGRESS_CIRCLE) {
+            $css->setStyle('.'.$cellAttr['class'].'I', 'background-image', 'url("'.$cellAttr[0]['background-image'].'")');
+            $css->setStyle('.'.$cellAttr['class'].'I', 'background-repeat', 'no-repeat');
+        }
+
         return $css;
+    }
+
+    /**
+     * Draw all circle segment pictures 
+     *
+     * @param      string    $dir           (optional) Directory where pictures should be created
+     * @param      string    $fileMask      (optional) sprintf format for pictures filename
+     *
+     * @return     array
+     * @since      1.2.0RC1
+     * @access     public
+     * @throws     HTML_PROGRESS_ERROR_INVALID_INPUT
+     */
+    function drawCircleSegments($dir = '.', $fileMask = 'c%s.png')
+    {
+        if (!is_string($dir)) {
+            return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
+                array('var' => '$dir',
+                      'was' => gettype($dir),
+                      'expected' => 'string',
+                      'paramnum' => 1));
+
+        } elseif (!is_string($fileMask)) {
+            return HTML_Progress::raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
+                array('var' => '$fileMask',
+                      'was' => gettype($fileMask),
+                      'expected' => 'string',
+                      'paramnum' => 2));
+        }
+
+        include_once 'Image/Color.php';
+
+        $cellAttr  = $this->getCellAttributes();
+        $cellCount = $this->getCellCount();
+        $w = $cellAttr['width'];
+        $h = $cellAttr['height'];
+        $s = $cellAttr['spacing'];
+        $c = intval(360 / $cellCount);
+        $cx = floor($w / 2);
+        if (fmod($w,2) == 0) {
+            $cx = $cx - 0.5;
+        }
+        $cy = floor($h / 2);
+        if (fmod($h,2) == 0) {
+            $cy = $cy - 0.5;
+        }
+            
+        $image = imagecreate($w, $h);
+
+        $bg     = Image_Color::allocateColor($image,$cellAttr['background-color']);
+        $colorA = Image_Color::allocateColor($image,$cellAttr['active-color']);
+        $colorI = Image_Color::allocateColor($image,$cellAttr['inactive-color']);
+
+        imagefilledarc($image, $cx, $cy, $w, $h, 0, 360, $colorI, IMG_ARC_EDGED);
+        $filename = $dir . DIRECTORY_SEPARATOR . sprintf($fileMask,0);
+        imagepng($image, $filename);
+        $this->setCellAttributes(array('background-image' => $filename),0);
+
+        for ($i=0; $i<$cellCount; $i++) {
+            if ($this->getFillWay() == 'natural') {
+                $sA = $i*$c;
+                $eA = ($i+1)*$c;
+                $sI = ($i+1)*$c;
+                $eI = 360;
+            } else {
+                $sA = 360-(($i+1)*$c);
+                $eA = 360-($i*$c);
+                $sI = 0;
+                $eI = 360-(($i+1)*$c);
+            }
+            if ($s > 0) {
+                imagefilledarc($image, $cx, $cy, $w, $h, 0, $sA, $colorI, IMG_ARC_EDGED);
+            }
+            imagefilledarc($image, $cx, $cy, $w, $h, $sA, $eA, $colorA, IMG_ARC_EDGED);
+            imagefilledarc($image, $cx, $cy, $w, $h, $sI, $eI, $colorI, IMG_ARC_EDGED);
+            $filename = $dir . DIRECTORY_SEPARATOR . sprintf($fileMask,$i+1);
+            imagepng($image, $filename);
+
+            $this->setCellAttributes(array('background-image' => $filename),$i+1);
+        }
+        imagedestroy($image);
     }
 
     /**
@@ -907,10 +1159,56 @@ JS;
             $w  = $cell_width + (2 * $cell_spacing);
             $h  = ($cell_count * ($cell_height + $cell_spacing)) + $cell_spacing;
         } 
+        if ($this->getOrientation() == HTML_PROGRESS_POLYGONAL) {
+            $w  = $cell_width * $this->_xgrid;
+            $h  = $cell_height * $this->_ygrid;
+        }
+        if ($this->getOrientation() == HTML_PROGRESS_CIRCLE) {
+            $w  = $cell_width;
+            $h  = $cell_height;
+        }
 
         $attr = array ('width' => $w, 'height' => $h);
 
         $this->_updateAttrArray($this->_progress['progress'], $attr);
+    }
+
+    /**
+     * Computes all coordinates of a standard polygon (square or rectangle).
+     *
+     * @param      integer   $w             Polygon width
+     * @param      integer   $h             Polygon height
+     *
+     * @return     array
+     * @since      1.2.0
+     * @access     private
+     * @see        setCellCoordinates()
+     */
+    function _computeCoordinates($w, $h) 
+    {
+        $coord = array();
+
+        for ($y=0; $y<$h; $y++) {
+            if ($y == 0) {
+                // creates top side line 
+                for ($x=0; $x<$w; $x++) {
+                    $coord[] = array($y, $x);
+                }
+            } elseif ($y == ($h-1)) {
+                // creates bottom side line
+                for ($x=($w-1); $x>0; $x--) {
+                    $coord[] = array($y, $x);
+                }
+                // creates left side line
+                for ($i=($h-1); $i>0; $i--) {
+                    $coord[] = array($i, 0);
+                }
+            } else {
+                // creates right side line
+                $coord[] = array($y, $w - 1);
+            }
+        }
+        return $coord;
     }
 }
 

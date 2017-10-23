@@ -1,5 +1,5 @@
 <?php
-/* $Id: mysql_charsets.lib.php,v 2.28.2.1 2005/05/05 16:29:28 lem9 Exp $ */
+/* $Id: mysql_charsets.lib.php,v 2.29 2005/05/05 16:33:17 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 if (PMA_MYSQL_INT_VERSION >= 40100){

@@ -16,20 +16,20 @@
 // | Authors: Davey Shafik <davey@pixelated-dreams.com>                   |
 // +----------------------------------------------------------------------+
 //
-// $Id: Info.php,v 1.18 2003/12/23 04:46:55 davey Exp $
+// $Id: Info.php,v 1.19 2005/01/03 17:33:43 davey Exp $
 
 require_once 'PEAR/Remote.php';
 require_once 'PEAR/Registry.php';
 
 /**
- * @desc PEAR_Info generate phpinfo() style PEAR information
+ * PEAR_Info generate phpinfo() style PEAR information
  */
 
 class PEAR_Info
 {
 
     /**
-     * @desc PEAR_Info Constructor
+     * PEAR_Info Constructor
      * @param pear_dir string[optional]
      * @return bool
      * @access public
@@ -113,7 +113,7 @@ class PEAR_Info
     }
 
     /**
-     * @desc Set PEAR http_proxy for remote calls
+     * Set PEAR http_proxy for remote calls
      * @param proxy string
      * @return bool
      * @access public
@@ -126,7 +126,7 @@ class PEAR_Info
     }
 
     /**
-     * @desc Retrieve and format PEAR Packages info
+     * Retrieve and format PEAR Packages info
      * @return void
      * @access private
      */
@@ -150,7 +150,7 @@ class PEAR_Info
         $packages = '';
         foreach ($available as $name) {
             $installed = $this->reg->packageInfo($name);
-                if (strlen($installed['package']) > 1) {
+            if (strlen($installed['package']) > 1) {
                 if (!isset($old_index)) {
                     $old_index = '';
                 }
@@ -198,9 +198,6 @@ class PEAR_Info
             <tr class="v">
                 <td class="e">
                     Information
-                </td>
-                <td>
-                    <a href="http://pear.php.net/' .trim(strtolower($installed['package'])). '">http://pear.php.net/' .trim(strtolower($installed['package'])). '</a>
                 </td>
             </tr>';
             if ($latest != FALSE) {
@@ -250,7 +247,7 @@ class PEAR_Info
     }
 
     /**
-     * @desc Retrieves and formats the PEAR Config data
+     * Retrieves and formats the PEAR Config data
      * @return void
      * @access private
      */
@@ -279,7 +276,7 @@ class PEAR_Info
     }
 
     /**
-     * @desc Retrieves and formats the PEAR Credits
+     * Retrieves and formats the PEAR Credits
      * @return void
      * @access private
      */
@@ -358,12 +355,13 @@ class PEAR_Info
     }
 
     /**
-     * @desc outputs the PEAR logo
+     * outputs the PEAR logo
      * @return void
      * @access public
      */
 
-    function pearImage() {
+    function pearImage()
+    {
         $pear_image = 'R0lGODlhaAAyAMT/AMDAwP3+/TWaAvD47Pj89vz++zebBDmcBj6fDEekFluvKmu3PvX68ujz4XvBS8LgrNXqxeHw1ZnPaa/dgvv9+cLqj8LmltD2msnuls';
         $pear_image .= '3xmszwmf7+/f///wAAAAAAAAAAACH5BAEAAAAALAAAAABoADIAQAX/ICCOZGmeaKqubOtWWjwJphLLgH1XUu//C1Jisfj9YLEKQnSY3GaixWQqQTkYHM4';
         $pear_image .= 'AMulNLJFC9pEwIW/odKU8cqTfsWoTTtcomU4ZjbR4ZP+AgYKCG0EiZ1AuiossEhwEXRMEg5SVWQ6MmZqKWD0QlqCUEHubpaYlExwRPRZioZZVp7KzKQoS';
@@ -382,13 +380,36 @@ class PEAR_Info
     }
 
     /**
-     * @desc Shows PEAR_Info output
+     * Shows PEAR_Info output
      * @return void
      * @access public
      */
 
-    function show() {
+    function show()
+    {
         echo $this->info;
+    }
+    
+    /**
+     * Check if a package is installed
+     */
+     
+    function packageInstalled($package_name, $version = null, $pear_user_config = null)
+    {        
+        if(is_null($pear_user_config)) {
+            $config = new PEAR_Config();
+        } else {
+            $config = new PEAR_Config($pear_user_config);
+        }
+        
+        $reg = new PEAR_Registry($config->get('php_dir'));
+        
+        if (is_null($version)) {
+            return $reg->packageExists($package_name);
+        } else {        
+            $installed = $reg->packageInfo($package_name);
+            return version_compare($version, $installed['version'], '<=');
+        }
     }
 }
 

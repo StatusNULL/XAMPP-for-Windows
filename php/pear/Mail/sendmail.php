@@ -16,33 +16,31 @@
 // | Author: Chuck Hagenbuch <chuck@horde.org>                            |
 // +----------------------------------------------------------------------+
 
-require_once 'Mail.php';
-
 /**
  * Sendmail implementation of the PEAR Mail:: interface.
  * @access public
  * @package Mail
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.10 $
  */
 class Mail_sendmail extends Mail {
-    
+
 	/**
      * The location of the sendmail or sendmail wrapper binary on the
      * filesystem.
      * @var string
      */
     var $sendmail_path = '/usr/sbin/sendmail';
-    
+
 	/**
      * Any extra command-line parameters to pass to the sendmail or
      * sendmail wrapper binary.
      * @var string
      */
     var $sendmail_args = '';
-    
+
 	/**
      * Constructor.
-     * 
+     *
      * Instantiates a new Mail_sendmail:: object based on the parameters
      * passed in. It looks for the following parameters:
      *     sendmail_path    The location of the sendmail binary on the
@@ -57,7 +55,7 @@ class Mail_sendmail extends Mail {
      * @param array $params Hash containing any parameters different from the
      *              defaults.
      * @access public
-     */	
+     */
     function Mail_sendmail($params)
     {
         if (isset($params['sendmail_path'])) $this->sendmail_path = $params['sendmail_path'];
@@ -70,11 +68,11 @@ class Mail_sendmail extends Mail {
          */
         $this->sep = (strstr(PHP_OS, 'WIN')) ? "\r\n" : "\n";
     }
-    
+
 	/**
      * Implements Mail::send() function using the sendmail
      * command-line binary.
-     * 
+     *
      * @param mixed $recipients Either a comma-seperated list of recipients
      *              (RFC822 compliant), or an array of recipients,
      *              each RFC822 valid. This may contain recipients not
@@ -95,39 +93,53 @@ class Mail_sendmail extends Mail {
      *               containing a descriptive error message on
      *               failure.
      * @access public
-     */	
+     */
     function send($recipients, $headers, $body)
     {
-        $recipients = escapeShellCmd(implode(' ', $this->parseRecipients($recipients)));
-        
-        list($from, $text_headers) = $this->prepareHeaders($headers);
+        $recipients = $this->parseRecipients($recipients);
+        if (PEAR::isError($recipients)) {
+            return $recipients;
+        }
+        $recipients = escapeShellCmd(implode(' ', $recipients));
+
+        $headerElements = $this->prepareHeaders($headers);
+        if (PEAR::isError($headerElements)) {
+            return $headerElements;
+        }
+        list($from, $text_headers) = $headerElements;
+
         if (!isset($from)) {
-            return new PEAR_Error('No from address given.');
+            return PEAR::raiseError('No from address given.');
         } elseif (strstr($from, ' ') ||
                   strstr($from, ';') ||
                   strstr($from, '&') ||
                   strstr($from, '`')) {
-            return new PEAR_Error('From address specified with dangerous characters.');
+            return PEAR::raiseError('From address specified with dangerous characters.');
         }
-        
+
         $result = 0;
-        if (@is_executable($this->sendmail_path)) {
+        if (@is_file($this->sendmail_path)) {
             $from = escapeShellCmd($from);
             $mail = popen($this->sendmail_path . (!empty($this->sendmail_args) ? ' ' . $this->sendmail_args : '') . " -f$from -- $recipients", 'w');
             fputs($mail, $text_headers);
             fputs($mail, $this->sep);  // newline to end the headers section
             fputs($mail, $body);
-            $result = pclose($mail) >> 8 & 0xFF; // need to shift the pclose result to get the exit code
+            $result = pclose($mail);
+            if (version_compare(phpversion(), '4.2.3') == -1) {
+                // With older php versions, we need to shift the
+                // pclose result to get the exit code.
+                $result = $result >> 8 & 0xFF;
+            }
         } else {
-            return new PEAR_Error('sendmail [' . $this->sendmail_path . '] not executable');
+            return PEAR::raiseError('sendmail [' . $this->sendmail_path . '] is not a valid file');
         }
-        
+
         if ($result != 0) {
-            return new PEAR_Error('sendmail returned error code ' . $result);
+            return PEAR::raiseError('sendmail returned error code ' . $result,
+                                    $result);
         }
-        
+
         return true;
     }
-    
+
 }
-?>

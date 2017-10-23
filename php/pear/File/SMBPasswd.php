@@ -30,7 +30,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 This code cannot simply be copied and put under the GNU Public License or 
 any other GPL-like (LGPL, GPL2) License.
 
-    $Id: SMBPasswd.php,v 1.2 2004/03/25 15:50:38 mbretter Exp $
+    $Id: SMBPasswd.php,v 1.3 2004/09/14 16:08:45 mbretter Exp $
 */
 
 require_once 'PEAR.php';
@@ -180,7 +180,7 @@ class File_SMBPasswd extends PEAR {
      * @return mixed returns PEAR_Error, if the user already exists
      * @access public
      */
-    function addAccountEncrypted($user, $userid, $lmhash = '', $nthash = '', $comment = '', $flags = '[U           ]') 
+    function addAccountEncrypted($user, $userid, $lmhash = '', $nthash = '', $comment = '', $flags = '[U          ]') 
     {
         if (empty($lmhash)) $lmhash = str_repeat('X', 32);
         if (empty($nthash)) $nthash = str_repeat('X', 32);
@@ -213,7 +213,7 @@ class File_SMBPasswd extends PEAR {
      * @return mixed returns PEAR_Error, if the user already exists
      * @access public
      */
-    function addAccount($user, $userid, $pass, $comment = '', $flags = '[U           ]') 
+    function addAccount($user, $userid, $pass, $comment = '', $flags = '[U          ]') 
     {
         if (empty($pass)) {
             return $this->addAccountEncrypted($user, $userid, '', '', $comment, $flags) ;
@@ -221,8 +221,8 @@ class File_SMBPasswd extends PEAR {
             return $this->addAccountEncrypted(
                         $user, 
                         $userid, 
-                        strtoupper(bin2hex($this->cryptEngine->ntPasswordHash($pass))), 
                         strtoupper(bin2hex($this->cryptEngine->lmPasswordHash($pass))),
+                        strtoupper(bin2hex($this->cryptEngine->ntPasswordHash($pass))), 
                         $comment,
                         $flags);
         }
@@ -242,7 +242,7 @@ class File_SMBPasswd extends PEAR {
      */
     function addUser($user, $userid, $pass, $comment = '')
     {
-        return $this->addAccount($user, $userid, $pass, $comment, '[U           ]');
+        return $this->addAccount($user, $userid, $pass, $comment, '[U          ]');
     }
 
     /**
@@ -257,7 +257,7 @@ class File_SMBPasswd extends PEAR {
      */
     function addMachine($machine, $userid, $comment = '')
     {
-        return $this->addAccount($machine . '$', $userid, $machine, $comment, '[W           ]');
+        return $this->addAccount($machine . '$', $userid, $machine, $comment, '[W          ]');
     }
     
     /**
@@ -318,8 +318,8 @@ class File_SMBPasswd extends PEAR {
             return $this->modAccountEncrypted(
                         $user, 
                         $userid, 
-                        strtoupper(bin2hex($this->cryptEngine->ntPasswordHash($pass))), 
                         strtoupper(bin2hex($this->cryptEngine->lmPasswordHash($pass))),
+                        strtoupper(bin2hex($this->cryptEngine->ntPasswordHash($pass))), 
                         $comment, 
                         $flags);
         }

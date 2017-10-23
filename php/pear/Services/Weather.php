@@ -16,7 +16,7 @@
 // | Authors: Alexander Wirtz <alex@pc4p.net>                             |
 // +----------------------------------------------------------------------+
 //
-// $Id: Weather.php,v 1.31 2004/05/04 13:47:41 eru Exp $
+// $Id: Weather.php,v 1.32 2005/07/18 08:49:41 eru Exp $
 
 /**
 * @package      Services_Weather
@@ -228,7 +228,8 @@ class Services_Weather {
         }
         $message .= ": ".Services_Weather::_errorMessage($code);
 
-        return PEAR::raiseError($message, $code, PEAR_ERROR_RETURN, E_USER_NOTICE, "Services_Weather_Error", null, false);
+        $error = PEAR::raiseError($message, $code, PEAR_ERROR_RETURN, E_USER_NOTICE, "Services_Weather_Error", null, false);
+        return $error;
     }
     // }}}
 }

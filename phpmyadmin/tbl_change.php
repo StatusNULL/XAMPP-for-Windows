@@ -1,7 +1,6 @@
 <?php
-/* $Id: tbl_change.php,v 2.46 2005/02/04 13:56:13 nijel Exp $ */
+/* $Id: tbl_change.php,v 2.48.2.1 2005/06/30 17:26:06 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
-error_reporting(E_ALL);
 
 /**
  * Get the variables sent or posted to this script and displays the header
@@ -236,7 +235,7 @@ foreach ($loop_array AS $vrowcount => $vrow) {
 
     $vresult = (isset($result) && is_array($result) && isset($result[$vrowcount]) ? $result[$vrowcount] : $result);
     if ($insert_mode && $vrowcount > 0) {
-        echo '<input type="checkbox" checked="checked" name="insert_ignore_' . $vrowcount . '" id="insert_ignore_check_' . $vrowcount . '">';
+        echo '<input type="checkbox" checked="checked" name="insert_ignore_' . $vrowcount . '" id="insert_ignore_check_' . $vrowcount . '" />';
         echo '<label for="insert_ignore_check_' . $vrowcount . '">' . $strIgnore . '</label><br />' . "\n";
     }
 ?>
@@ -631,7 +630,7 @@ foreach ($loop_array AS $vrowcount => $vrow) {
                         echo ' checked="checked"';
                     }
                     echo 'tabindex="' . ($tabindex + $tabindex_for_value) . '" />';
-                    echo '<label for="field_' . ($tabindex + $tabindex_for_value) . '_3_' . $j . '">' . htmlspecialchars($enum_atom) . '</label>' . "\n";
+                    echo '<label for="field_' . $idindex . '_3_' . $j . '">' . htmlspecialchars($enum_atom) . '</label>' . "\n";
                 } // end for
 
             } // end else

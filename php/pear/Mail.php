@@ -16,7 +16,7 @@
 // | Author: Chuck Hagenbuch <chuck@horde.org>                            |
 // +----------------------------------------------------------------------+
 //
-// $Id: Mail.php,v 1.6 2003/06/26 07:05:36 jon Exp $
+// $Id: Mail.php,v 1.11 2005/06/26 23:37:18 jon Exp $
 
 require_once 'PEAR.php';
 
@@ -26,7 +26,7 @@ require_once 'PEAR.php';
  * useful in multiple mailer backends.
  *
  * @access public
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.11 $
  * @package Mail
  */
 class Mail
@@ -46,16 +46,18 @@ class Mail
      * @return object Mail a instance of the driver class or if fails a PEAR Error
      * @access public
      */
-    function factory($driver, $params = array())
+    function &factory($driver, $params = array())
     {
         $driver = strtolower($driver);
         @include_once 'Mail/' . $driver . '.php';
         $class = 'Mail_' . $driver;
         if (class_exists($class)) {
-            return new $class($params);
+            $mailer = &new $class($params);
         } else {
-            return PEAR::raiseError('Unable to find class for driver ' . $driver);
+            $mailer = PEAR::raiseError('Unable to find class for driver ' . $driver);
         }
+
+        return $mailer;
     }
 
     /**
@@ -128,11 +130,14 @@ class Mail
         $from = null;
 
         foreach ($headers as $key => $value) {
-            if ($key === 'From') {
+            if (strcasecmp($key, 'From') === 0) {
                 include_once 'Mail/RFC822.php';
+                $parser = &new Mail_RFC822();
+                $addresses = $parser->parseAddressList($value, 'localhost', false);
+                if (PEAR::isError($addresses)) {
+                    return $addresses;
+                }
 
-                $addresses = Mail_RFC822::parseAddressList($value, 'localhost',
-                                                           false);
                 $from = $addresses[0]->mailbox . '@' . $addresses[0]->host;
 
                 // Reject envelope From: addresses with spaces.
@@ -141,12 +146,26 @@ class Mail
                 }
 
                 $lines[] = $key . ': ' . $value;
-            } elseif ($key === 'Received') {
+            } elseif (strcasecmp($key, 'Received') === 0) {
+                $received = array();
+                if (is_array($value)) {
+                    foreach ($value as $line) {
+                        $received[] = $key . ': ' . $line;
+                    }
+                }
+                else {
+                    $received[] = $key . ': ' . $value;
+                }
                 // Put Received: headers at the top.  Spam detectors often
                 // flag messages with Received: headers after the Subject:
                 // as spam.
-                array_unshift($lines, $key . ': ' . $value);
+                $lines = array_merge($received, $lines);
             } else {
+                // If $value is an array (i.e., a list of addresses), convert
+                // it to a comma-delimited string of its elements (addresses).
+                if (is_array($value)) {
+                    $value = implode(', ', $value);
+                }
                 $lines[] = $key . ': ' . $value;
             }
         }
@@ -191,4 +210,3 @@ class Mail
     }
 
 }
-?>

@@ -5,7 +5,7 @@
  * 
  * @author Alexey Borzov <avb@php.net>
  * 
- * $Id: Sigma_api_testcase.php,v 1.6 2004/04/14 09:41:53 avb Exp $
+ * $Id: Sigma_api_testcase.php,v 1.7 2004/10/20 10:52:15 avb Exp $
  */
 
 class Sigma_api_TestCase extends PHPUnit_TestCase
@@ -385,6 +385,15 @@ class Sigma_api_TestCase extends PHPUnit_TestCase
         $this->tpl->parse('block');
         $this->tpl->clearVariables();
         $this->assertEquals('a:', $this->_stripWhitespace($this->tpl->get()));
+    }
+
+    function testCallbackParametersQuoting()
+    {
+        $this->tpl->setTemplate(
+            '|func_fake(\' foo \')|func_fake( foo )|func_fake(<a href="javascript:foo(bar,baz)">foo</a>)' .
+            '|func_fake("O\'really")|func_fake(\'\\\\O\\\'really\\\\\')|func_fake("\\\\O\\"really\\\\")|'
+        );
+        $this->assertEquals('| foo |foo|<a href="javascript:foo(bar,baz)">foo</a>|O\'really|\\O\'really\\|\\O"really\\|', $this->tpl->get());
     }
 }
 

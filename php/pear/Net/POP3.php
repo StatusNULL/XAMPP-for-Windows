@@ -33,7 +33,7 @@
 // | Co-Author: Damian Fernandez Sosa <damlists@cnba.uba.ar>               |
 // +-----------------------------------------------------------------------+
 //
-// $Id: POP3.php,v 1.1.1.1 2004/08/27 02:21:36 damian Exp $
+// $Id: POP3.php,v 1.2 2004/12/05 16:34:39 damian Exp $
 
 require_once('Net/Socket.php');
 
@@ -196,8 +196,8 @@ class Net_POP3 {
     * Also looks for the timestamp in the greeting
     * needed for APOP authentication
     *
-    * @param  $host Hostname/IP address to connect to
-    * @param  $port Port to use to connect to on host
+    * @param  string $host Hostname/IP address to connect to
+    * @param  string $port Port to use to connect to on host
     * @return bool  Success/Failure
     */
     function connect($host = 'localhost', $port = 110)
@@ -242,9 +242,10 @@ class Net_POP3 {
     * Performs the login procedure. If there is a timestamp
     * stored, APOP will be tried first, then basic USER/PASS.
     *
-    * @param  $user Username to use
-    * @param  $pass Password to use
-    * @param  $apop Whether to try APOP first
+    * @param  string $user Username to use
+    * @param  string $pass Password to use
+    * @param  mixed $apop Whether to try APOP first, if used as string you can select the auth methd to use ( $pop3->login('validlogin', 'validpass', "CRAM-MD5");
+    *          Valid methods are: 'DIGEST-MD5','CRAM-MD5','LOGIN','PLAIN','APOP','USER' 
     * @return mixed  true on Success/ PEAR_ERROR on error
     */
     function login($user, $pass, $apop = true)
@@ -275,10 +276,13 @@ class Net_POP3 {
     {
 
         if(!PEAR::isError($data = $this->_sendCmd('CAPA'))){
-        $data = $this->_getMultiline();
+            $data = $this->_getMultiline();
+        }else {
+            // CAPA command not supported, reset data var
+            //  to avoid Notice errors of preg_split on an object
+            $data = '';
         }
         $data = preg_split('/\r?\n/', $data, -1, PREG_SPLIT_NO_EMPTY);
-
 
         for ($i = 0; $i < count($data); $i++) {
 
@@ -334,7 +338,12 @@ class Net_POP3 {
        if( isset($this->_capability['sasl']) ){
            $serverMethods=$this->_capability['sasl'];
        }else{
-            $serverMethods=array('APOP','USER');
+            $serverMethods=array('USER');
+            // Check for timestamp before attempting APOP
+            if ($this->_timestamp != null)
+            {
+                $serverMethods[] = 'APOP';
+            }
        }
 
         if($userMethod !== null && $userMethod !== true ){
@@ -402,8 +411,8 @@ class Net_POP3 {
             case 'APOP':
                 $result = $this->_cmdApop( $uid , $pwd );
                 // if APOP fails fallback to USER auth
-                if($result===false){
-                echo "APOP FAILED!!!\n";
+                if( PEAR::isError( $result ) ){
+                    //echo "APOP FAILED!!!\n";
                     $result=$this->_authUSER( $uid , $pwd );
                 }
                 break;
@@ -501,7 +510,7 @@ class Net_POP3 {
         }
 
 
-        if ( PEAR::isError( $ret = $this->_send(sprintf('"%s"', base64_encode($user))) ) ) {
+        if ( PEAR::isError( $ret = $this->_send(sprintf('%s', base64_encode($user))) ) ) {
             return $ret;
         }
 
@@ -512,14 +521,14 @@ class Net_POP3 {
             return $ret;
         }
 
-        if ( PEAR::isError( $ret = $this->_send(sprintf('"%s"', base64_encode($pass))) ) ) {
+        if ( PEAR::isError( $ret = $this->_send(sprintf('%s', base64_encode($pass))) ) ) {
             return $ret;
         }
 
         if ( PEAR::isError( $challenge = $this->_recvLn() ) ) {
             return $challenge;
         }
-        return $this->_checkResponse($ret);
+        return $this->_checkResponse($challenge);
     }
 
 
@@ -678,7 +687,7 @@ class Net_POP3 {
     /*
     * Returns the raw headers of the specified message.
     *
-    * @param  $msg_id Message number
+    * @param  integer $msg_id Message number
     * @return mixed   Either raw headers or false on error
     */
     function getRawHeaders($msg_id)
@@ -697,7 +706,7 @@ class Net_POP3 {
     * having the same names, eg Received:, the array value will be
     * an indexed array of all the header values.
     *
-    * @param  $msg_id Message number
+    * @param  integer $msg_id Message number
     * @return mixed   Either array of headers or false on error
     */
     function getParsedHeaders($msg_id)
@@ -729,7 +738,7 @@ class Net_POP3 {
     /*
     * Returns the body of the message with given message number.
     *
-    * @param  $msg_id Message number
+    * @param  integer $msg_id Message number
     * @return mixed   Either message body or false on error
     */
     function getBody($msg_id)
@@ -745,7 +754,7 @@ class Net_POP3 {
     /*
     * Returns the entire message with given message number.
     *
-    * @param  $msg_id Message number
+    * @param  integer $msg_id Message number
     * @return mixed   Either entire message or false on error
     */
     function getMsg($msg_id)
@@ -799,7 +808,7 @@ class Net_POP3 {
     * Marks a message for deletion. Only will be deleted if the
     * disconnect() method is called.
     *
-    * @param  $msg_id Message to delete
+    * @param  integer $msg_id Message to delete
     * @return bool Success/Failure
     */
     function deleteMsg($msg_id)
@@ -815,21 +824,25 @@ class Net_POP3 {
     * Combination of LIST/UIDL commands, returns an array
     * of data
     *
-    * @param  $msg_id Optional message number
+    * @param  integer $msg_id Optional message number
     * @return mixed Array of data or false on error
     */
     function getListing($msg_id = null)
     {
+    
         if ($this->_state == NET_POP3_STATE_TRANSACTION) {
             if (!isset($msg_id)){
+            
+                $list=array();
                 if ($list = $this->_cmdList()) {
                     if ($uidl = $this->_cmdUidl()) {
                         foreach ($uidl as $i => $value) {
                             $list[$i]['uidl'] = $value['uidl'];
                         }
                     }
-
                     return $list;
+                }else{
+                    return array();
                 }
             } else {
                 if ($list = $this->_cmdList($msg_id) AND $uidl = $this->_cmdUidl($msg_id)) {
@@ -844,7 +857,7 @@ class Net_POP3 {
     /*
     * Sends the USER command
     *
-    * @param  $user Username to send
+    * @param  string $user Username to send
     * @return bool  Success/Failure
     */
     function _cmdUser($user)
@@ -859,7 +872,7 @@ class Net_POP3 {
     /*
     * Sends the PASS command
     *
-    * @param  $pass Password to send
+    * @param  string $pass Password to send
     * @return bool  Success/Failure
     */
     function _cmdPass($pass)
@@ -895,30 +908,37 @@ class Net_POP3 {
     /*
     * Sends the LIST command
     *
-    * @param  $msg_id Optional message number
+    * @param  integer $msg_id Optional message number
     * @return mixed   Indexed array of msg_id/msg size or
     *                 false on error
     */
     function _cmdList($msg_id = null)
     {
+        $return=array();
         if ($this->_state == NET_POP3_STATE_TRANSACTION) {
             if (!isset($msg_id)) {
                 if(!PEAR::isError($data = $this->_sendCmd('LIST') )){
                     $data = $this->_getMultiline();
-                    $data = explode("\r\n", $data);
+                    $data = explode("\r\n", $data);                    
                     foreach ($data as $line) {
-                        sscanf($line, '%s %s', $msg_id, $size);
-                        $return[] = array('msg_id' => $msg_id, 'size' => $size);
+                        if($line !=''){
+                            sscanf($line, '%s %s', $msg_id, $size);
+                            $return[] = array('msg_id' => $msg_id, 'size' => $size);
+                        }
                     }
                     return $return;
                 }
             } else {
                 if(!PEAR::isError($data = $this->_sendCmd('LIST ' . $msg_id))){
-                    sscanf($data, '+OK %d %d', $msg_id, $size);
-                    return array('msg_id' => $msg_id, 'size' => $size);
+                    if($data!=''){
+                        sscanf($data, '+OK %d %d', $msg_id, $size);
+                        return array('msg_id' => $msg_id, 'size' => $size);
+                    }
+                    return array();
                 }
             }
         }
+        
 
         return false;
     }
@@ -927,7 +947,7 @@ class Net_POP3 {
     /*
     * Sends the RETR command
     *
-    * @param  $msg_id The message number to retrieve
+    * @param  integer $msg_id The message number to retrieve
     * @return mixed   The message or false on error
     */
     function _cmdRetr($msg_id)
@@ -946,7 +966,7 @@ class Net_POP3 {
     /*
     * Sends the DELE command
     *
-    * @param  $msg_id Message number to mark as deleted
+    * @param  integer $msg_id Message number to mark as deleted
     * @return bool Success/Failure
     */
     function _cmdDele($msg_id)
@@ -1009,8 +1029,8 @@ class Net_POP3 {
     /*
     * Sends the TOP command
     *
-    * @param  $msg_id    Message number
-    * @param  $num_lines Number of lines to retrieve
+    * @param  integer  $msg_id    Message number
+    * @param  integer  $num_lines Number of lines to retrieve
     * @return mixed Message data or false on error
     */
     function _cmdTop($msg_id, $num_lines)
@@ -1028,7 +1048,7 @@ class Net_POP3 {
     /*
     * Sends the UIDL command
     *
-    * @param  $msg_id Message number
+    * @param  integer $msg_id Message number
     * @return mixed indexed array of msg_id/uidl or false on error
     */
     function _cmdUidl($msg_id = null)
@@ -1070,19 +1090,24 @@ class Net_POP3 {
     * if good returns the reponse, other wise
     * returns false.
     *
-    * @param  $cmd  Command to send (\r\n will be appended)
+    * @param  string $cmd  Command to send (\r\n will be appended)
     * @return mixed First line of response if successful, otherwise false
     */
     function _sendCmd($cmd)
     {
-        $result = $this->_send($cmd);
-
-        if (!PEAR::isError($result) AND $result) {
-            $data = $this->_recvLn();
-            if (!PEAR::isError($data) AND strtoupper(substr($data, 0, 3)) == '+OK') {
-                return $data;
-            }
+        if (PEAR::isError($result = $this->_send($cmd) )){
+            return $result ;
         }
+
+        if (PEAR::isError($data = $this->_recvLn() )){
+            return $data;
+        }
+        
+        if ( strtoupper(substr($data, 0, 3)) == '+OK') {
+            return $data;
+        }
+        
+        
         return $this->_raiseError($data);
     }
 
@@ -1110,6 +1135,7 @@ class Net_POP3 {
    /**
     * Sets the bebug state
     *
+    * @param  bool $debug 
     * @access public
     * @return void
     */
@@ -1169,6 +1195,7 @@ class Net_POP3 {
      /**
      * Checks de server Response
      *
+     * @param  string $response the response
      * @return  mixed   true on success or a PEAR_Error object on failure.
      *
      * @access  private

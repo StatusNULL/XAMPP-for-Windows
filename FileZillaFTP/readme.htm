@@ -1,5 +1,5 @@
-<p align="center"><b><u>FileZilla Server version 0.9.8 beta</u></b></p>
-<p align="center">Copyright 2001-2004<br>
+<p align="center"><b><u>FileZilla Server version 0.9.8c beta</u></b></p>
+<p align="center">Copyright 2001-2005<br>
 by <a href="mailto:Tim.Kosse@gmx.de">Tim Kosse</a><a href="http://sourceforge.net/projects/filezilla/"><br>
 http://sourceforge.net/projects/filezilla/</a></p>
 <p align="left"><u><b>Features:</b></u></p>
@@ -67,9 +67,30 @@ as restoring it to normal size.</p>
   </tr>
 </table>
 <p align="left"><b><u>Version History:</u></b></p>
+<p><b>Version 0.9.8c</b></p>
+<blockquote>
+  <u>Fixed bugs:</u>
+  <ul>
+    <li>Sometimes file downloads aborted prematurely leading to incomplete files.</li>
+    <li>Don't send MODE Z in FEAT response if MODE Z has been disabled.</li>
+  </ul>
+</blockquote>    
+<p><b>Version 0.9.8b</b></p>
+<blockquote>
+  <u>New features:</u>
+  <ul>
+    <li>Added option to set socket buffer size, increased default buffer sizes</li>
+  </ul>
+  <u>Fixed bugs:</u>
+  <ul>
+    <li>Wildcards in argument to LIST command were not handled properly</li>
+    <li>Use proper reply code for AUTH SSL and AUTH TLS commands</li>
+  </ul>
+</blockquote>
 <p><b>Version 0.9.8</b></p>
 <blockquote>
   <u>New features:</u>
+  <ul>
     <li>Service and Admin interface can be installed separately in the installer</li>
   </ul>
   <u>Fixed bugs:</u>

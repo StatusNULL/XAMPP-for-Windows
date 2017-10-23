@@ -1,8 +1,8 @@
 <?php
 // +----------------------------------------------------------------------+
-// | PHP Version 4                                                        |
+// | PEAR :: HTML :: Progress                                             |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2003 The PHP Group                                |
+// | Copyright (c) 1997-2004 The PHP Group                                |
 // +----------------------------------------------------------------------+
 // | This source file is subject to version 3.0 of the PHP license,       |
 // | that is bundled with this package in the file LICENSE, and is        |
@@ -15,18 +15,18 @@
 // | Author: Laurent Laville <pear@laurent-laville.org>                   |
 // +----------------------------------------------------------------------+
 //
-// $Id: observer.php,v 1.1 2003/11/15 18:27:09 thesaur Exp $
+// $Id: observer.php,v 1.3 2004/07/03 14:48:15 farell Exp $
 
 /**
  * The HTML_Progress_Observer implements the observer pattern
  * for watching progress bar activity and taking actions
  * on exceptional events.
  *
- * @version    1.0
+ * @version    1.2.0
  * @author     Laurent Laville <pear@laurent-laville.org>
  * @access     public
- * @category   HTML
  * @package    HTML_Progress
+ * @subpackage Progress_Observer
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
  */
 

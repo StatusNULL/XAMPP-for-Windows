@@ -1,28 +1,58 @@
-a:13:{s:8:"provides";a:0:{}s:8:"filelist";a:14:{s:11:"PHPUnit.php";a:4:{s:4:"role";s:3:"php";s:14:"baseinstalldir";s:1:"/";s:6:"md5sum";s:32:"a9515753e2a9bbe17aebe708ff76eec9";s:12:"installed_as";s:42:"C:\xarelease149\xampp\php\pear\PHPUnit.php";}s:20:"PHPUnit/GUI/HTML.php";a:3:{s:4:"role";s:3:"php";s:6:"md5sum";s:32:"fed5d25b638c3e75b1216ddc665fe5a2";s:12:"installed_as";s:51:"C:\xarelease149\xampp\php\pear\PHPUnit\GUI\HTML.php";}s:20:"PHPUnit/GUI/HTML.tpl";a:3:{s:4:"role";s:3:"php";s:6:"md5sum";s:32:"5c7ca5bf8904fd3fd011337813d1ef1a";s:12:"installed_as";s:51:"C:\xarelease149\xampp\php\pear\PHPUnit\GUI\HTML.tpl";}s:30:"PHPUnit/GUI/SetupDecorator.php";a:3:{s:4:"role";s:3:"php";s:6:"md5sum";s:32:"3f5bc3cfb275623f1ad24a6d6bd25fa2";s:12:"installed_as";s:61:"C:\xarelease149\xampp\php\pear\PHPUnit\GUI\SetupDecorator.php";}s:18:"PHPUnit/Assert.php";a:3:{s:4:"role";s:3:"php";s:6:"md5sum";s:32:"b8fbf31651da67c5716b8bdd9589c433";s:12:"installed_as";s:49:"C:\xarelease149\xampp\php\pear\PHPUnit\Assert.php";}s:24:"PHPUnit/RepeatedTest.php";a:3:{s:4:"role";s:3:"php";s:6:"md5sum";s:32:"697cf9905edab57659c334b9b7fd1baa";s:12:"installed_as";s:55:"C:\xarelease149\xampp\php\pear\PHPUnit\RepeatedTest.php";}s:20:"PHPUnit/Skeleton.php";a:3:{s:4:"role";s:3:"php";s:6:"md5sum";s:32:"9b18353ec5b68b40a3e130a138c85576";s:12:"installed_as";s:51:"C:\xarelease149\xampp\php\pear\PHPUnit\Skeleton.php";}s:20:"PHPUnit/TestCase.php";a:3:{s:4:"role";s:3:"php";s:6:"md5sum";s:32:"5aa302cd5f77439947a1e077e5e41e9b";s:12:"installed_as";s:51:"C:\xarelease149\xampp\php\pear\PHPUnit\TestCase.php";}s:25:"PHPUnit/TestDecorator.php";a:3:{s:4:"role";s:3:"php";s:6:"md5sum";s:32:"ada2b895392d28ac6527f0576870baca";s:12:"installed_as";s:56:"C:\xarelease149\xampp\php\pear\PHPUnit\TestDecorator.php";}s:23:"PHPUnit/TestFailure.php";a:3:{s:4:"role";s:3:"php";s:6:"md5sum";s:32:"f15f9a49d294c23f651f0c8a93d03f3e";s:12:"installed_as";s:54:"C:\xarelease149\xampp\php\pear\PHPUnit\TestFailure.php";}s:24:"PHPUnit/TestListener.php";a:3:{s:4:"role";s:3:"php";s:6:"md5sum";s:32:"06d667b80867554ed67eb61c6a85aa31";s:12:"installed_as";s:55:"C:\xarelease149\xampp\php\pear\PHPUnit\TestListener.php";}s:22:"PHPUnit/TestResult.php";a:3:{s:4:"role";s:3:"php";s:6:"md5sum";s:32:"f580b0e2f6a0a823b986c65470912841";s:12:"installed_as";s:53:"C:\xarelease149\xampp\php\pear\PHPUnit\TestResult.php";}s:21:"PHPUnit/TestSuite.php";a:3:{s:4:"role";s:3:"php";s:6:"md5sum";s:32:"1fd0cfd02197cc7f848133636761ab1f";s:12:"installed_as";s:52:"C:\xarelease149\xampp\php\pear\PHPUnit\TestSuite.php";}s:7:"dirtree";a:3:{s:30:"C:\xarelease149\xampp\php\pear";b:1;s:42:"C:\xarelease149\xampp\php\pear\PHPUnit\GUI";b:1;s:38:"C:\xarelease149\xampp\php\pear\PHPUnit";b:1;}}s:7:"package";s:7:"PHPUnit";s:7:"summary";s:44:"Regression testing framework for unit tests.";s:11:"description";s:97:"PHPUnit is a regression testing framework used by the developer who implements unit tests in PHP.";s:11:"maintainers";a:1:{i:0;a:4:{s:6:"handle";s:9:"sebastian";s:4:"name";s:18:"Sebastian Bergmann";s:5:"email";s:24:"sb@sebastian-bergmann.de";s:4:"role";s:4:"lead";}}s:7:"version";s:5:"1.1.0";s:12:"release_date";s:10:"2004-09-29";s:15:"release_license";s:11:"PHP License";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:594:"+ Added PHPUnit_Skeleton class for creating a PHPUnit_TestCase skeleton file. (Patch by Scott Mattocks <scott@crisscott.com>)
-
-+ Added PHPUnit_Assert::assertContains() and PHPUnit_Assert::assertNotContains() methods to assert that an array contains (or not contains) a given object or string or that a string contains (or not contains) a given substring.
-
-+ Added PHPUnit_Assert::assertNotRegexp() to assert that a string does not match a given regular expression.
-
-- Removed PHPUnit_Assert::assertSame() and PHPUnit_Assert::assertNotSame() since these assertion methods do not work with PHP 4.";s:9:"changelog";a:11:{i:0;a:4:{s:7:"version";s:5:"1.0.2";s:12:"release_date";s:10:"2004-09-21";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:57:"* Added/fixed phpDocumentor code documentation.
+a:13:{s:8:"provides";a:0:{}s:8:"filelist";a:15:{s:11:"PHPUnit.php";a:4:{s:4:"role";s:3:"php";s:14:"baseinstalldir";s:1:"/";s:6:"md5sum";s:32:"5488043b7a6387fddd81e17a21f830ef";s:12:"installed_as";s:27:"\xampp\php\pear\PHPUnit.php";}s:19:"PHPUnit/GUI/Gtk.php";a:3:{s:4:"role";s:3:"php";s:6:"md5sum";s:32:"5851a03772edcb21eb6fe5b45190da20";s:12:"installed_as";s:35:"\xampp\php\pear\PHPUnit\GUI\Gtk.php";}s:20:"PHPUnit/GUI/HTML.php";a:3:{s:4:"role";s:3:"php";s:6:"md5sum";s:32:"fa838ef5db2b541c6491164c3ea47077";s:12:"installed_as";s:36:"\xampp\php\pear\PHPUnit\GUI\HTML.php";}s:20:"PHPUnit/GUI/HTML.tpl";a:3:{s:4:"role";s:3:"php";s:6:"md5sum";s:32:"222a8fef6537f8fb1653f68f1b1d6a28";s:12:"installed_as";s:36:"\xampp\php\pear\PHPUnit\GUI\HTML.tpl";}s:30:"PHPUnit/GUI/SetupDecorator.php";a:3:{s:4:"role";s:3:"php";s:6:"md5sum";s:32:"8f82a97cc65ff80dced33a75fca0bc3d";s:12:"installed_as";s:46:"\xampp\php\pear\PHPUnit\GUI\SetupDecorator.php";}s:18:"PHPUnit/Assert.php";a:3:{s:4:"role";s:3:"php";s:6:"md5sum";s:32:"23c0b3e2ecb4195e149c7a7b0e575cdf";s:12:"installed_as";s:34:"\xampp\php\pear\PHPUnit\Assert.php";}s:24:"PHPUnit/RepeatedTest.php";a:3:{s:4:"role";s:3:"php";s:6:"md5sum";s:32:"e21e528ba2fdbf0f1e8b04cd36c477f0";s:12:"installed_as";s:40:"\xampp\php\pear\PHPUnit\RepeatedTest.php";}s:20:"PHPUnit/Skeleton.php";a:3:{s:4:"role";s:3:"php";s:6:"md5sum";s:32:"2a425b3f6e42680e0926627d17413d59";s:12:"installed_as";s:36:"\xampp\php\pear\PHPUnit\Skeleton.php";}s:20:"PHPUnit/TestCase.php";a:3:{s:4:"role";s:3:"php";s:6:"md5sum";s:32:"7cc66f04974a60461bfb1ef03b2d23c4";s:12:"installed_as";s:36:"\xampp\php\pear\PHPUnit\TestCase.php";}s:25:"PHPUnit/TestDecorator.php";a:3:{s:4:"role";s:3:"php";s:6:"md5sum";s:32:"061dcb2cfc8ef9b17ac09032906e8beb";s:12:"installed_as";s:41:"\xampp\php\pear\PHPUnit\TestDecorator.php";}s:23:"PHPUnit/TestFailure.php";a:3:{s:4:"role";s:3:"php";s:6:"md5sum";s:32:"74e1f1d35ff640598182ff86bed75142";s:12:"installed_as";s:39:"\xampp\php\pear\PHPUnit\TestFailure.php";}s:24:"PHPUnit/TestListener.php";a:3:{s:4:"role";s:3:"php";s:6:"md5sum";s:32:"e334f9dbad5478edb6da17714b9fa3ab";s:12:"installed_as";s:40:"\xampp\php\pear\PHPUnit\TestListener.php";}s:22:"PHPUnit/TestResult.php";a:3:{s:4:"role";s:3:"php";s:6:"md5sum";s:32:"9ca95d9252f8395def72fc3a9c68e73e";s:12:"installed_as";s:38:"\xampp\php\pear\PHPUnit\TestResult.php";}s:21:"PHPUnit/TestSuite.php";a:3:{s:4:"role";s:3:"php";s:6:"md5sum";s:32:"20fccede54695a140ebad7f7289cb465";s:12:"installed_as";s:37:"\xampp\php\pear\PHPUnit\TestSuite.php";}s:7:"dirtree";a:3:{s:15:"\xampp\php\pear";b:1;s:27:"\xampp\php\pear\PHPUnit\GUI";b:1;s:23:"\xampp\php\pear\PHPUnit";b:1;}}s:7:"package";s:7:"PHPUnit";s:7:"summary";s:44:"Regression testing framework for unit tests.";s:11:"description";s:140:"PHPUnit is a regression testing framework used by the developer who implements unit tests in PHP. This is the version to be used with PHP 4.";s:11:"maintainers";a:1:{i:0;a:4:{s:6:"handle";s:9:"sebastian";s:4:"name";s:18:"Sebastian Bergmann";s:5:"email";s:24:"sb@sebastian-bergmann.de";s:4:"role";s:4:"lead";}}s:7:"version";s:5:"1.2.3";s:12:"release_date";s:10:"2005-05-14";s:15:"release_license";s:11:"PHP License";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:16:"Fixed bug #4342.";s:9:"changelog";a:16:{i:0;a:4:{s:7:"version";s:5:"1.2.2";s:12:"release_date";s:10:"2005-01-31";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:28:"* Fixed bug #3332.
 
       
 
-";}i:1;a:4:{s:7:"version";s:5:"1.0.1";s:12:"release_date";s:10:"2004-04-17";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:180:"* Fixed a bug that let the HTML GUI fail for expected and/or actual results with newline characters. (Patch by Thiemo Maettig <thiemo.maettig@gmx.de>)
+";}i:1;a:4:{s:7:"version";s:5:"1.2.1";s:12:"release_date";s:10:"2005-01-28";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:248:"* Relaxed PHPUnit_Assert::assertNotNull() and PHPUnit_Assert::assertNull() to work on non-objects.
+
+* Fixed an issue in PHPUnit_GUI_SetupDecorator related to Windows' directory separators. (Patch by Lorenzo Alberton <l.alberton@quipo.it>)
+
+      
+
+";}i:2;a:4:{s:7:"version";s:5:"1.2.0";s:12:"release_date";s:10:"2005-01-19";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:679:"+ Added Gtk-based frontend. (Patch by Scott Mattocks <scott@crisscott.com>)
+
++ Re-Added PHPUnit_Assert::assertSame() and PHPUnit_Assert::assertNotSame() to make the PEAR QA team happy. These methods only work with PHP >= 5.0.0.
+
+* PHPUnit_Assert::assertSame(), PHPUnit_Assert::assertNotSame(), PHPUnit_Assert::assertNotNull(), and PHPUnit_Assert::assertNull() are now stricter than before and only work on objects. This was always the documented behaviour.
+
+* Fixed a bug in the PHPUnit_GUI_SetupDecorator::_getFiles() method. (Patch by Michael Schmidt <michael.schmidt@object-it.de>)
+
+* Fixed bug #3127: PHPUnit_GUI_HTML and $_REQUEST. (Patch by cricket@djcricket.com)
+
+      
+
+";}i:3;a:4:{s:7:"version";s:5:"1.1.1";s:12:"release_date";s:10:"2004-11-05";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:28:"* Fixed bug #2701.
+
+      
+
+";}i:4;a:4:{s:7:"version";s:5:"1.1.0";s:12:"release_date";s:10:"2004-09-29";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:593:"+ Added PHPUnit_Skeleton class for creating a PHPUnit_TestCase skeleton file. (Patch by Scott Mattocks <scott@crisscott.com>)
+
++ Added PHPUnit_Assert::assertContains() and PHPUnit_Assert::assertNotContains() methods to assert that an array contains (or not contains) a given value or that a string contains (or not contains) a given substring.
+
++ Added PHPUnit_Assert::assertNotRegexp() to assert that a string does not match a given regular expression.
+
+- Removed PHPUnit_Assert::assertSame() and PHPUnit_Assert::assertNotSame() since these assertion methods do not work with PHP 4.
+
+      
+
+";}i:5;a:4:{s:7:"version";s:5:"1.0.2";s:12:"release_date";s:10:"2004-09-21";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:57:"* Added/fixed phpDocumentor code documentation.
+
+      
+
+";}i:6;a:4:{s:7:"version";s:5:"1.0.1";s:12:"release_date";s:10:"2004-04-17";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:180:"* Fixed a bug that let the HTML GUI fail for expected and/or actual results with newline characters. (Patch by Thiemo Maettig <thiemo.maettig@gmx.de>)
 
 * Fixed bug #1169.
 
       
 
-";}i:2;a:4:{s:7:"version";s:5:"1.0.0";s:12:"release_date";s:10:"2004-03-15";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:54:"* No functional changes since PHPUnit-0.6.2.
+";}i:7;a:4:{s:7:"version";s:5:"1.0.0";s:12:"release_date";s:10:"2004-03-15";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:54:"* No functional changes since PHPUnit-0.6.2.
 
       
 
-";}i:3;a:3:{s:7:"version";s:5:"0.6.2";s:12:"release_date";s:10:"2003-06-21";s:13:"release_notes";s:47:"* Fixed PHPUnit_Assert::assertType().
+";}i:8;a:3:{s:7:"version";s:5:"0.6.2";s:12:"release_date";s:10:"2003-06-21";s:13:"release_notes";s:47:"* Fixed PHPUnit_Assert::assertType().
 
       
 
-";}i:4;a:3:{s:7:"version";s:5:"0.6.1";s:12:"release_date";s:10:"2003-05-15";s:13:"release_notes";s:151:"+ Added assertType() assertion method.
+";}i:9;a:3:{s:7:"version";s:5:"0.6.1";s:12:"release_date";s:10:"2003-05-15";s:13:"release_notes";s:151:"+ Added assertType() assertion method.
 
 * Fixed parse error in GUI/HTML.php that occured with PHP 5.
 
@@ -30,7 +60,7 @@ a:13:{s:8:"provides";a:0:{}s:8:"filelist";a:14:{s:11:"PHPUnit.php";a:4:{s:4:"rol
 
       
 
-";}i:5;a:3:{s:7:"version";s:3:"0.6";s:12:"release_date";s:10:"2003-04-25";s:13:"release_notes";s:603:"* Fixed bug that caused the constructor detection in PHPUnit_TestSuite to fail with upper-case class names.
+";}i:10;a:3:{s:7:"version";s:3:"0.6";s:12:"release_date";s:10:"2003-04-25";s:13:"release_notes";s:603:"* Fixed bug that caused the constructor detection in PHPUnit_TestSuite to fail with upper-case class names.
 
 * Fixed bug with multiple assertions per Test Case.
 
@@ -44,7 +74,7 @@ a:13:{s:8:"provides";a:0:{}s:8:"filelist";a:14:{s:11:"PHPUnit.php";a:4:{s:4:"rol
 
       
 
-";}i:6;a:3:{s:7:"version";s:3:"0.5";s:12:"release_date";s:10:"2003-03-26";s:13:"release_notes";s:350:"+ Added new HTML GUI. (Patch by Wolfram Kriesing <wolfram@kriesing.de>.)
+";}i:11;a:3:{s:7:"version";s:3:"0.5";s:12:"release_date";s:10:"2003-03-26";s:13:"release_notes";s:350:"+ Added new HTML GUI. (Patch by Wolfram Kriesing <wolfram@kriesing.de>.)
 
 + Added "loosely typed" mode to assertEquals() that can be turned on/off using setLooselyTyped(). When activated, array elements are cast to strings before comparison.
 
@@ -54,13 +84,13 @@ a:13:{s:8:"provides";a:0:{}s:8:"filelist";a:14:{s:11:"PHPUnit.php";a:4:{s:4:"rol
 
       
 
-";}i:7;a:3:{s:7:"version";s:3:"0.4";s:12:"release_date";s:10:"2002-09-25";s:13:"release_notes";s:187:"+ Added PHPUnit_Assert::assertFalse() and PHPUnit_Assert::assertNotSame(). JUnit introduced those two convenience methods in the JUnit 3.8 release.
+";}i:12;a:3:{s:7:"version";s:3:"0.4";s:12:"release_date";s:10:"2002-09-25";s:13:"release_notes";s:187:"+ Added PHPUnit_Assert::assertFalse() and PHPUnit_Assert::assertNotSame(). JUnit introduced those two convenience methods in the JUnit 3.8 release.
 
 * Fixed directory structure.
 
       
 
-";}i:8;a:3:{s:7:"version";s:3:"0.3";s:12:"release_date";s:10:"2002-07-12";s:13:"release_notes";s:295:"* Added PHPUnit_TestDecorator and PHPUnit_RepeatedTest.
+";}i:13;a:3:{s:7:"version";s:3:"0.3";s:12:"release_date";s:10:"2002-07-12";s:13:"release_notes";s:295:"* Added PHPUnit_TestDecorator and PHPUnit_RepeatedTest.
 
 * Implemented PHPUnit_TestResult::addListener() and PHPUnit_TestResult::removeListener().
 
@@ -70,14 +100,14 @@ a:13:{s:8:"provides";a:0:{}s:8:"filelist";a:14:{s:11:"PHPUnit.php";a:4:{s:4:"rol
 
       
 
-";}i:9;a:3:{s:7:"version";s:3:"0.2";s:12:"release_date";s:10:"2002-07-11";s:13:"release_notes";s:186:"* Added Array support to PHPUnit_Assert::equals(). (Patch by Wolfram Kriesing <wolfram@kriesing.de>)
+";}i:14;a:3:{s:7:"version";s:3:"0.2";s:12:"release_date";s:10:"2002-07-11";s:13:"release_notes";s:186:"* Added Array support to PHPUnit_Assert::equals(). (Patch by Wolfram Kriesing <wolfram@kriesing.de>)
 
 * Added PHPUnit_Assert::assertRegExp(). (Patch by M@rms <marms@marms.com>)
 
       
 
-";}i:10;a:3:{s:7:"version";s:3:"0.1";s:12:"release_date";s:10:"2002-04-06";s:13:"release_notes";s:24:"First release.
+";}i:15;a:3:{s:7:"version";s:3:"0.1";s:12:"release_date";s:10:"2002-04-06";s:13:"release_notes";s:24:"First release.
 
       
 
-";}}s:13:"_lastmodified";i:1096629246;}
+";}}s:13:"_lastmodified";i:1120732674;}

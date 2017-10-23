@@ -42,7 +42,7 @@
 // | Author: Paul Cooper <pgc@ucecom.com>                                 |
 // +----------------------------------------------------------------------+
 //
-// $Id: clitest.php,v 1.8.4.3 2004/01/08 13:43:00 lsmith Exp $
+// $Id: clitest.php,v 1.8.4.4 2004/02/25 17:21:59 lsmith Exp $
 
 /*
  This is a small test suite for MDB using PHPUnit
@@ -115,6 +115,7 @@ if (!is_array($testmethods)) {
 foreach ($dbarray as $db) {
     $dsn = $db['dsn'];
     $options = $db['options'];
+    $options['optimize'] = 'portability';
 
     $display_dsn = $dsn['phptype'] . "://" . $dsn['username'] . ":" . $dsn['password'] . "@" . $dsn['hostspec'] . "/" . $database;
     echo "=== Start test of $display_dsn ===\n";

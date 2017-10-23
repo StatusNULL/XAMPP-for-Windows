@@ -5,7 +5,7 @@
  * @author Bertrand Mansion <bmansion@mamasam.com>
  * @author Thomas Schulz <ths@4bconsult.de>
  *
- * $Id: SmartyStatic_example.php,v 1.2 2003/05/15 19:31:54 avb Exp $ 
+ * $Id: SmartyStatic_example.php,v 1.4 2004/10/15 20:31:00 ths Exp $
  */
 
 require_once 'HTML/QuickForm.php';
@@ -35,7 +35,7 @@ $form->addElement('header', 'personal', 'Personal Information');
 
 $form->addElement('hidden', 'ihidTest', 'hiddenField');
 $form->addElement('text', 'email', 'Your email:');
-$form->addElement('password', 'pass', 'Your password:', 'size=10');
+$form->addElement('password', 'pass', array('Your password:', 'note'=>'Please, choose a 8-10 characters password.'), 'size=10');
 $name['last'] = &HTML_QuickForm::createElement('text', 'first', 'First', 'size=10');
 $name['first'] = &HTML_QuickForm::createElement('text', 'last', 'Last', 'size=10');
 $form->addGroup($name, 'name', 'Name:', ',&nbsp;');
@@ -78,7 +78,7 @@ $form->addElement('submit', 'submit', 'Register');
 
 $form->addRule('email', 'Email address is required', 'required');
 $form->addGroupRule('name', 'Name is required', 'required');
-$form->addRule('pass', 'Password must be between 8 to 10 characters', 'rangelength', '8,10');
+$form->addRule('pass', 'Password must be between 8 to 10 characters', 'rangelength', array(8, 10));
 $form->addRule('country', 'Country is a required field', 'required');
 $form->addGroupRule('destination', 'Please check at least two boxes', 'required', null, 2);
 $form->addGroupRule('phone', 'Please fill all phone fields', 'required');
@@ -101,7 +101,7 @@ $tpl =& new Smarty;
 $tpl->template_dir = './templates';
 $tpl->compile_dir  = './templates';
 
-$renderer =& new HTML_QuickForm_Renderer_ArraySmarty($tpl);
+$renderer =& new HTML_QuickForm_Renderer_ArraySmarty($tpl, true);
 
 $renderer->setRequiredTemplate(
    '{if $error}

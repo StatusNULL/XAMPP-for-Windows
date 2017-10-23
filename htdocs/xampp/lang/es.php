@@ -168,6 +168,7 @@ $TEXT['xampp-setup-user']="User:";
 $TEXT['xampp-setup-passwd']="Password:";
 $TEXT['xampp-setup-start']="Make safe the XAMPP directory";
 $TEXT['xampp-setup-notok']="<br><br>ERROR: The string for the user name and password must have at least three  characters and not more then 15 characters. Special characters like <öäü (usw.) and empty characters are not allowed!<br><br>";
+$TEXT['xampp-setup-ok']="<br><br>The root password was successfully changed. Please restart MYSQL for loading these changes!<br><br>";
 $TEXT['xampp-config-ok']="<br><br>SUCCESS: The XAMPP directory is protected now! All personal data was safed in the following file:<br>";
 $TEXT['xampp-config-notok']="<br><br>ERROR: Your system could NOT activate the directory protection with the \".htaccess\" and the \"htpasswd.exe\". Perhaps PHP is in the \"Safe Mode\". <br><br>";
 
@@ -205,10 +206,10 @@ $TEXT['manuals-list1']="
 <ul>
 <li><a href=http://httpd.apache.org/docs-2.0/>Apache 2 Dokumentation (en Inglés)</a>
 <li><a href=http://www.php.net/manual/de/>PHP <b>Referenz-</b>Dokumentation (en Alemán)</a>
-<li><a href=http://www.perldoc.com/perl5.8.0/pod/perl.html>Perl Dokumentation (en Inglés)</a>
+<li><a href=http://www.perl.org/docs.html>Perl Dokumentation (en Inglés)</a>
 <li><a href=http://www.mysql.com/documentation/mysql/bychapter/>MySQL Dokumentation (en Inglés)</a>
-<li><a href=http://php.weblogs.com/ADODB>ADODB (en Inglés)</a>
-<li><a href=http://turck-mmcache.sourceforge.net/>Turck MMCache para PHP (en Inglés)</a>
+<li><a http://phplens.com/lens/adodb/docs-adodb.htm>ADODB</a>
+<li><a href=http://eaccelerator.sourceforge.net/>eAccelerator</a>
 <li><a href=http://www.ros.co.nz/pdf/readme.pdf>pdf class Dokumentation</a>
 </ul>";
 

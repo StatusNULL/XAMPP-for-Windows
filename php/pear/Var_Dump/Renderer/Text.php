@@ -13,10 +13,10 @@
 // | obtain it through the world-wide-web, please send a note to          |
 // | license@php.net so we can mail you a copy immediately.               |
 // +----------------------------------------------------------------------+
-// | Authors: Frederic Poeydomenge <frederic.poeydomenge@free.fr>         |
+// | Authors: Frederic Poeydomenge <fpoeydomenge at free dot fr>          |
 // +----------------------------------------------------------------------+
 //
-// $Id:
+// $Id$
 
 require_once 'Var_Dump/Renderer/Common.php';
 
@@ -27,7 +27,7 @@ require_once 'Var_Dump/Renderer/Common.php';
  *
  * @package Var_Dump
  * @category PHP
- * @author Frederic Poeydomenge <frederic.poeydomenge@free.fr>
+ * @author Frederic Poeydomenge <fpoeydomenge at free dot fr>
  */
 
 class Var_Dump_Renderer_Text extends Var_Dump_Renderer_Common
@@ -35,6 +35,8 @@ class Var_Dump_Renderer_Text extends Var_Dump_Renderer_Common
 
     /**
      * Default configuration options.
+     *
+     * Valid configuration options are :
      *     show_container  : bool,    Show the root Element or not
      *     show_eol        : string,  String to insert before a newline, or false
      *     mode            : string,  Can be one of the following displaying modes
@@ -58,6 +60,7 @@ class Var_Dump_Renderer_Text extends Var_Dump_Renderer_Common
      *     after_type      : string,  Text to insert after a type
      *     before_value    : string,  Text to insert before a value
      *     after_value     : string,  Text to insert after a value
+     *
      * @var    array
      * @access public
      */
@@ -86,6 +89,7 @@ class Var_Dump_Renderer_Text extends Var_Dump_Renderer_Common
 
     /**
      * Class constructor.
+     *
      * @param array $options Parameters for the rendering.
      * @access public
      */
@@ -96,6 +100,7 @@ class Var_Dump_Renderer_Text extends Var_Dump_Renderer_Common
 
     /**
      * Returns the string representation of a variable.
+     *
      * @return string The string representation of the variable.
      * @access public
      */
@@ -109,7 +114,7 @@ class Var_Dump_Renderer_Text extends Var_Dump_Renderer_Common
         for ($c = 0 ; $c < $counter ; $c++) {
             switch ($this->family[$c]) {
                 case VAR_DUMP_START_GROUP :
-                    if(!empty($parent)) {
+                    if (! empty($parent)) {
                         $offset = end($stackOffset)
                             + $this->keyLen[end($parent)]
                             + $this->_len($this->options['operator']);
@@ -144,7 +149,7 @@ class Var_Dump_Renderer_Text extends Var_Dump_Renderer_Common
                         if ($this->options['mode'] == 'wide') {
                             $offset += end($stackOffset);
                         }
-                        if(!$this->options['show_container']) {
+                        if (! $this->options['show_container']) {
                             $offset -= $this->options['offset'];
                         }
                         $txt .= str_repeat(' ', $offset);
@@ -199,7 +204,8 @@ class Var_Dump_Renderer_Text extends Var_Dump_Renderer_Common
 
     /**
      * Returns the lenght of the shift (string without tags).
-     * @param  string $string The string.
+     *
+     * @param string $string The string.
      * @return integer Length of the shift.
      * @access private
      */
@@ -214,6 +220,7 @@ class Var_Dump_Renderer_Text extends Var_Dump_Renderer_Common
 
     /**
      * Returns the operator symbol.
+     *
      * @return string The operator symbol.
      * @access private
      */
@@ -231,6 +238,7 @@ class Var_Dump_Renderer_Text extends Var_Dump_Renderer_Common
 
     /**
      * Returns the key of the element.
+     *
      * @param integer $c Index of the element.
      * @return string The key of the element.
      * @access private
@@ -238,18 +246,19 @@ class Var_Dump_Renderer_Text extends Var_Dump_Renderer_Common
     function _getStartElement($c)
     {
         $comp = ($this->family[$c] == VAR_DUMP_START_ELEMENT_NUM) ? 'num' : 'str';
-        $txt = $this->options['before_'.$comp.'_key'];
+        $txt = $this->options['before_' . $comp . '_key'];
         if ($this->options['is_html']) {
             $txt .= htmlspecialchars($this->value[$c]);
         } else {
             $txt .= $this->value[$c];
         }
-        $txt .= $this->options['after_'.$comp.'_key'];
+        $txt .= $this->options['after_' . $comp . '_key'];
         return $txt;
     }
 
     /**
      * Returns the value of the element.
+     *
      * @param integer $c Index of the element.
      * @return string The value of the element.
      * @access private
@@ -263,7 +272,7 @@ class Var_Dump_Renderer_Text extends Var_Dump_Renderer_Common
             $txt .= $this->type[$c];
         }
         $txt .= $this->options['after_type'];
-        if (!is_null($this->value[$c])) {
+        if (! is_null($this->value[$c])) {
             $txt .= ' ' . $this->options['before_value'];
             if ($this->options['is_html']) {
                 $string = htmlspecialchars($this->value[$c]);

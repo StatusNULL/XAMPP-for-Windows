@@ -1,6 +1,6 @@
 <?php
 //
-//  $Id: GetCount.php,v 1.2 2004/03/25 19:39:17 quipo Exp $
+//  $Id: GetCount.php,v 1.3 2005/01/27 22:21:52 quipo Exp $
 //
 
 class tests_GetCount extends tests_UnitTest
@@ -61,6 +61,16 @@ class tests_GetCount extends tests_UnitTest
         $this->user->setGroup('name');
         $this->user->setWhere("name='xxx'");
         $this->assertEquals(0,$this->user->getCount(),'setWhere and setGroup should have resulted in one');
+    }
+
+    function test_getCountWithOffset()
+    {
+        $this->_setup(6);
+        $this->user->setLimit(0, 5);
+        $this->assertEquals(6, $this->user->getCount(),'setLimit and setGroup should have resulted in one');
+
+        $this->user->setLimit(5, 5);
+        $this->assertEquals(6, $this->user->getCount(),'setLimit and setGroup should have resulted in one');
     }
 
 }

@@ -7,6 +7,7 @@ error_reporting = 2047
 --FILE--
 <?php
 require_once './connect.inc';
+require_once './droptable.inc';
 
 
 /**
@@ -23,7 +24,7 @@ function pe($o) {
     global $dbh;
 
     $dbh->setErrorHandling(PEAR_ERROR_RETURN);
-    $dbh->query('DROP TABLE pearquote');
+    drop_table($dbh, 'pearquote');
 
     die($o->toString());
 }
@@ -31,7 +32,7 @@ function pe($o) {
 // DBMS boolean column type simulation...
 $boolean_col_type = array(
     'dbase'  => 'Logical',
-    'fbase'  => 'BOOLEAN',
+    'fbsql'  => 'BOOLEAN',
     'ibase'  => 'SMALLINT',
     'ifx'    => 'SMALLINT',
     'msql'   => 'INTEGER',
@@ -79,11 +80,12 @@ switch ($type) {
         $identifier = '';
         break;
     case 'msql':
-        $decimal = 'DECIMAL(3,1)';
+        $decimal = 'REAL';
         $null = '';
         $chr  = 'CHAR(8)';
-        $identifier = 'q\ut] "dn[t';
+        $identifier = '';
         break;
+    case 'fbsql':
     case 'oci8':
         $decimal = 'DECIMAL(3,1)';
         $null = '';
@@ -98,10 +100,19 @@ switch ($type) {
 }
 
 $dbh->setErrorHandling(PEAR_ERROR_RETURN);
-$dbh->query('DROP TABLE pearquote');
+drop_table($dbh, 'pearquote');
 
 
 if ($identifier) {
+    switch ($dbh->phptype) {
+        case 'sybase':
+            $res = $dbh->query('set quoted_identifier on');
+            if (DB::isError($res) ) {
+                pe($res);
+            }
+            break;
+        default:
+    }
     $create = $dbh->query("
         CREATE TABLE pearquote (
           n $decimal $null,
@@ -118,13 +129,13 @@ if ($identifier) {
     $info = $dbh->tableInfo('pearquote');
     if (DB::isError($info) ) {
         if ($info->code == DB_ERROR_NOT_CAPABLE) {
-            print "Creation of the delimited identifier worked.\n";
+            print "Got outcome expected from delimited identifier.\n";
         } else {
             print "tableInfo() failed.\n";
         }
     } else {
         if ($identifier == $info[2]['name']) {
-            print "Creation of the delimited identifier worked.\n";
+            print "Got outcome expected from delimited identifier.\n";
             // print "COLUMN NAME IS: {$info[2]['name']}\n";
         } else {
             print "Expected column name: '$identifier' ... ";
@@ -135,13 +146,13 @@ if ($identifier) {
 } else {
     $dbh->query("
         CREATE TABLE pearquote (
-          n DECIMAL(3,1) $null,
+          n $decimal $null,
           s $chr $null,
-          plainidentifier DECIMAL(3,1) $null,
+          plainidentifier $decimal $null,
           b {$boolean_col_type[$dbh->phptype]} $null
         )
     ");
-    print "{$dbh->dsn['phptype']} does not handle delimited identifiers.\n";
+    print "Got outcome expected from delimited identifier.\n";
 }
 
 
@@ -252,11 +263,11 @@ if (count($diff) > 0) {
 
 
 $dbh->setErrorHandling(PEAR_ERROR_RETURN);
-$dbh->query('DROP TABLE pearquote');
+drop_table($dbh, 'pearquote');
 
 ?>
 --EXPECT--
-Creation of the delimited identifier worked.
+Got outcome expected from delimited identifier.
 String escape test: OK
 Number escape test: OK
 Boolean escape test: OK

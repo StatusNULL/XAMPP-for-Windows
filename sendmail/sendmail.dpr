@@ -9,6 +9,15 @@ program sendmail;
 
   requires indy 9 or higher
 
+  version 14
+    - errors output to STDERR
+    - fixes for delphi 7 compilation
+    - added 'connecting to..' debug logging
+    - reworked error and debug log format
+
+  version 13
+    - added fix to work around invalid multiple header instances
+
   version 12
     - added cc and bcc support
 
@@ -82,11 +91,81 @@ program sendmail;
 {$APPTYPE CONSOLE}
 
 uses
-  Windows, Classes, SysUtils, Registry, IniFiles, IDSmtp, IDPOP3, IdMessage, IdEmailAddress, IdLogFile, IdGlobal;
+  Windows, Classes, SysUtils, Registry, IniFiles,
+  IDSmtp, IDPOP3, IdMessage, IdEmailAddress, IdLogFile, IdGlobal, IdResourceStrings;
 
 // ---------------------------------------------------------------------------
 
-procedure writeToLog(const logFilename, logMessage: string);
+function buildLogLine(data, prefix: string) : string;
+// ensure the output of error and debug logs are in the same format, regardless of source
+begin
+
+  data := StringReplace(data, EOL, RSLogEOL, [rfReplaceAll]);
+  data := StringReplace(data, CR, RSLogCR, [rfReplaceAll]);
+  data := StringReplace(data, LF, RSLogLF, [rfReplaceAll]);
+
+  result := FormatDateTime('yy/mm/dd hh:nn:ss', now) + ' ';
+  if (prefix <> '') then
+    result := result + prefix + ' ';
+  result := result + data + EOL;
+end;
+
+// ---------------------------------------------------------------------------
+
+type
+
+  // TidLogFile using buildLogLine function
+
+  TlogFile = class(TidLogFile)
+  protected
+    procedure LogReceivedData(const AText: string; const AData: string); override;
+    procedure LogSentData(const AText: string; const AData: string); override;
+    procedure LogStatus(const AText: string); override;
+  public
+    procedure LogWriteString(const AText: string); override;
+  end;
+
+// ---------------------------------------------------------------------------
+
+procedure TlogFile.LogReceivedData(const AText: string; const AData: string);
+begin
+  // ignore AText as it contains the date/time
+  LogWriteString(buildLogLine(Adata, '<<'));
+end;
+
+// ---------------------------------------------------------------------------
+
+procedure TlogFile.LogSentData(const AText: string; const AData: string);
+begin
+  // ignore AText as it contains the date/time
+  LogWriteString(buildLogLine(Adata, '>>'));
+end;
+
+// ---------------------------------------------------------------------------
+
+procedure TlogFile.LogStatus(const AText: string);
+begin
+  LogWriteString(buildLogLine(AText, '**'));
+end;
+
+// ---------------------------------------------------------------------------
+
+procedure TlogFile.LogWriteString(const AText: string);
+begin
+  // protected --> public
+  inherited;
+end;
+
+// ---------------------------------------------------------------------------
+
+var
+  errorLogFile: string;
+  debugLogFile: string;
+  debug       : TlogFile;
+
+// ---------------------------------------------------------------------------
+
+procedure writeToLog(const logFilename, logMessage: string; const prefix: string = '');
 var
   f: TextFile;
 begin
@@ -101,13 +180,32 @@ begin
     else
       Append(f);
 
-    writeln(f, '[' + DateTimeToStr(Now) + '] ' + stringReplace(logMessage, #13#10, ' ', [rfReplaceAll]));
+    write(f, buildLogLine(logMessage, prefix));
     closeFile(f);
 
   except
     on e:Exception do
-      writeln('sendmail: error writing to ' + logFilename + ': ' + logMessage);
+      writeln(ErrOutput, 'sendmail: Error writing to ' + logFilename + ': ' + logMessage);
   end;
+end;
+
+// ---------------------------------------------------------------------------
+
+procedure debugLog(const logMessage: string);
+begin
+  if (debug <> nil) and (debug.Active) then
+    debug.LogWriteString(buildLogLine(logMessage, '**'))
+  else
+    writeToLog(debugLogFile, logMessage, '**');
+end;
+
+// ---------------------------------------------------------------------------
+
+procedure errorLog(const logMessage: string);
+begin
+  if (errorLogFile <> '') then
+    writeToLog(errorLogFile, logMessage, ':');
+  debugLog(logMessage);
 end;
 
 // ---------------------------------------------------------------------------
@@ -122,13 +220,96 @@ end;
 
 // ---------------------------------------------------------------------------
 
+function joinMultiple(const messageContent: string; fieldName: string): string;
+// the rfc says that some fields are only allowed once in a message header
+// for example, to, from, subject
+// this function joins multiple instances of the specified field into a single comma seperated line
+var
+  sl    : TstringList;
+  i     : integer;
+  s     : string;
+  n     : integer;
+  count : integer;
+  values: TstringList;
+begin
+
+  fieldName := LowerCase(fieldName);
+  sl := TStringList.Create;
+  values := TStringList.Create;
+  try
+
+    sl.text := messageContent;
+    result := '';
+
+    // only modify the header if there's more than one instance of the field
+
+    count := 0;
+    for i := 0 to sl.count - 1 do
+    begin
+      s := sl[i];
+      if (s = '') then
+        break;
+      n := pos(':', s);
+      if (n = 0) then
+        break;
+      if (lowerCase(copy(s, 1, n - 1)) = fieldName) then
+        inc(count);
+    end;
+
+    if (count <= 1) then
+    begin
+      result := messageContent;
+      exit;
+    end;
+
+    // more than on instance of the field, combine into single entry, ignore fields with empty values
+
+    while (sl.count > 0) do
+    begin
+      s := sl[0];
+      if (s = '') then
+        break;
+      n := pos(':', s);
+      if (n = 0) then
+        break;
+
+      if (lowerCase(copy(s, 1, n - 1)) = fieldName) then
+      begin
+        s := trim(copy(s, n + 1, length(s)));
+        if (s <> '') then
+          values.Add(s);
+      end
+      else
+        result := result + s + #13#10;
+
+      sl.Delete(0);
+    end;
+
+    if (values.count <> 0) then
+    begin
+      s := UpCaseFirst(fieldName) + ': ';
+      for i := 0 to values.count - 1 do
+        s := s + values[i] + ', ';
+      setLength(s, length(s) - 2);
+      result := result + s + #13#10;
+    end;
+
+    result := result + sl.Text;
+
+  finally
+    values.Free;
+    sl.free;
+  end;
+
+end;
+
+// ---------------------------------------------------------------------------
+
 var
 
   smtpServer    : string;
   defaultDomain : string;
   messageContent: string;
-  errorLogFile  : string;
-  debugLogFile  : string;
   authUsername  : string;
   authPassword  : string;
   forceSender   : string;
@@ -136,17 +317,16 @@ var
   pop3username  : string;
   pop3password  : string;
 
-  registry: TRegistry;
-  iniFile : TIniFile;
-  idPop3  : TIdPop3;
-  idSmtp  : TIdSmtp;
+  reg : TRegistry;
+  ini : TIniFile;
+  pop3: TIdPop3;
+  smtp: TIdSmtp;
 
   i     : integer;
   s     : string;
   found : boolean;
   ss    : TStringStream;
   msg   : TIdMessage;
-  debug : TIdLogFile;
   sl    : TStringList;
   header: boolean;
 
@@ -164,45 +344,45 @@ begin
 
   if (not found) then
   begin
-    writeln('sendmail requires -t parameter');
+    writeln(ErrOutput, 'sendmail requires -t parameter');
     halt(1);
   end;
 
   // read default domain from registry
 
-  registry := TRegistry.Create;
+  reg := TRegistry.Create;
   try
-    registry.RootKey := HKEY_LOCAL_MACHINE;
-    if (registry.OpenKeyReadOnly('\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters')) then
-      defaultDomain := registry.ReadString('Domain');
+    reg.RootKey := HKEY_LOCAL_MACHINE;
+    if (reg.OpenKeyReadOnly('\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters')) then
+      defaultDomain := reg.ReadString('Domain');
   finally
-    registry.Free;
+    reg.Free;
   end;
 
   // read ini
 
-  iniFile := TIniFile.Create(ChangeFileExt(ParamStr(0), '.ini'));
+  ini := TIniFile.Create(ChangeFileExt(ParamStr(0), '.ini'));
   try
 
-    smtpServer    := iniFile.ReadString('sendmail', 'smtp_server',    'mail.mydomain.com');
-    defaultDomain := iniFile.ReadString('sendmail', 'default_domain', defaultDomain);
-    errorLogFile  := iniFile.ReadString('sendmail', 'error_logfile',  '');
-    debugLogFile  := iniFile.ReadString('sendmail', 'debug_logfile',  '');
-    authUsername  := iniFile.ReadString('sendmail', 'auth_username',  '');
-    authPassword  := iniFile.ReadString('sendmail', 'auth_password',  '');
-    forceSender   := iniFile.ReadString('sendmail', 'force_sender',   '');
-    pop3server    := iniFile.ReadString('sendmail', 'pop3_server',    '');
-    pop3username  := iniFile.ReadString('sendmail', 'pop3_username',  '');
-    pop3password  := iniFile.ReadString('sendmail', 'pop3_password',  '');
+    smtpServer    := ini.ReadString('sendmail', 'smtp_server',    'mail.mydomain.com');
+    defaultDomain := ini.ReadString('sendmail', 'default_domain', defaultDomain);
+    errorLogFile  := ini.ReadString('sendmail', 'error_logfile',  '');
+    debugLogFile  := ini.ReadString('sendmail', 'debug_logfile',  '');
+    authUsername  := ini.ReadString('sendmail', 'auth_username',  '');
+    authPassword  := ini.ReadString('sendmail', 'auth_password',  '');
+    forceSender   := ini.ReadString('sendmail', 'force_sender',   '');
+    pop3server    := ini.ReadString('sendmail', 'pop3_server',    '');
+    pop3username  := ini.ReadString('sendmail', 'pop3_username',  '');
+    pop3password  := ini.ReadString('sendmail', 'pop3_password',  '');
 
     if (smtpServer = 'mail.mydomain.com') or (defaultDomain = 'mydomain.com') then
     begin
-      writeln('you must configure the smtp_server and default_domain in ' + iniFile.fileName);
+      writeln(ErrOutput, 'You must configure the smtp_server and default_domain in ' + ini.fileName);
       halt(1);
     end;
 
   finally
-    iniFile.Free;
+    ini.Free;
   end;
 
   if (errorLogFile <> '') and (ExtractFilePath(errorLogFile) = '') then
@@ -220,17 +400,31 @@ begin
     messageContent := messageContent + s + #13#10;
   end;
 
+  // make sure message is CRLF delimited
+
+  if (pos(#10, messageContent) = 0) then
+    messageContent := stringReplace(messageContent, #13, #13#10, [rfReplaceAll]);
+
   if (debugLogFile <> '') then
   begin
+    debugLog('--- MESSAGE BEGIN ---');
     sl := TStringList.Create;
     try
       sl.Text := messageContent;
       for i := 0 to sl.Count - 1 do
-        writeToLog(debugLogFile, sl[i]);
+        debugLog(sl[i]);
     finally
       sl.Free;
     end;
+    debugLog('--- MESSAGE END ---');
   end;
+
+  // fix multiple to, cc, bcc and subject fields
+
+  messageContent := joinMultiple(messageContent, 'to');
+  messageContent := joinMultiple(messageContent, 'cc');
+  messageContent := joinMultiple(messageContent, 'bcc');
+  messageContent := joinMultiple(messageContent, 'subject');
 
   // deliver message
 
@@ -246,18 +440,23 @@ begin
       // load message
 
       msg := TIdMessage.Create(nil);
-      msg.LoadFromStream(ss);
+      try
+        msg.LoadFromStream(ss);
+      except
+        on e:exception do
+          raise exception.create('Failed to read email message: ' + e.message);
+      end;
 
       // check for from and to
 
       if (forceSender = '') and (Msg.From.Address = '') then
-        raise Exception.Create('email is missing sender''s address');
+        raise Exception.Create('Message is missing sender''s address');
       if (Msg.Recipients.Count = 0) and (Msg.CCList.Count = 0) and (Msg.BccList.Count = 0) then
-        raise Exception.Create('email is missing recipient''s address');
+        raise Exception.Create('Message is missing recipient''s address');
 
       if (debugLogFile <> '') then
       begin
-        debug          := TIdLogFile.Create(nil);
+        debug          := TlogFile.Create(nil);
         debug.FileName := debugLogFile;
         debug.Active   := True;
       end
@@ -269,79 +468,87 @@ begin
 
         // pop3 before smtp auth
 
-        idPop3 := TIdPOP3.Create(nil);
+        debugLog('Authenticating with POP3 server');
+
+        pop3 := TIdPOP3.Create(nil);
         try
           if (debug <> nil) then
-            idPop3.Intercept := debug;
-          idPop3.Host        := pop3server;
-          idPop3.Username    := pop3username;
-          idPop3.Password    := pop3password;
-          idPop3.Connect(10 * 1000);
-          idPop3.Disconnect;
+            pop3.Intercept := debug;
+          pop3.Host        := pop3server;
+          pop3.Username    := pop3username;
+          pop3.Password    := pop3password;
+          pop3.Connect(10 * 1000);
+          pop3.Disconnect;
         finally
-          idPop3.free;
+          pop3.free;
         end;
 
       end;
 
-      idSmtp := TIdSMTP.Create(nil);
+      smtp := TIdSMTP.Create(nil);
       try
 
         if (debug <> nil) then
-          idSmtp.Intercept := debug;
+          smtp.Intercept := debug;
 
         // set host, port
 
         i := pos(':', smtpServer);
         if (i = 0) then
         begin
-          idSmtp.host := smtpServer;
-          idSmtp.port := 25;
+          smtp.host := smtpServer;
+          smtp.port := 25;
         end
         else
         begin
-          idSmtp.host := copy(smtpServer, 1, i - 1);
-          idSmtp.port := strToIntDef(copy(smtpServer, i + 1, length(smtpServer)), 25);
+          smtp.host := copy(smtpServer, 1, i - 1);
+          smtp.port := strToIntDef(copy(smtpServer, i + 1, length(smtpServer)), 25);
         end;
 
         // connect to server
 
-        idSmtp.Connect(10 * 1000);
+        debugLog('Connecting to ' + smtp.Host + ':' + intToStr(smtp.Port));
+
+        smtp.Connect(10 * 1000);
 
         // authentication
 
         if (authUsername <> '') then
         begin
-          idSmtp.AuthenticationType := atLogin;
-          idSmtp.Username := authUsername;
-          idSmtp.Password := authPassword;
-          idSmtp.Authenticate;
+
+          debugLog('Authenticating as ' + authUsername);
+
+          smtp.AuthenticationType := atLogin;
+          smtp.Username := authUsername;
+          smtp.Password := authPassword;
+          smtp.Authenticate;
+          
         end;
 
         // sender and recipients
 
         if (forceSender = '') then
-          idSmtp.SendCmd('MAIL FROM: <' + appendDomain(Msg.From.Address, defaultDomain) + '>', [250])
+          smtp.SendCmd('MAIL FROM: <' + appendDomain(Msg.From.Address, defaultDomain) + '>', [250])
         else
-          idSmtp.SendCmd('MAIL FROM: <' + appendDomain(forceSender, defaultDomain) + '>', [250]);
+          smtp.SendCmd('MAIL FROM: <' + appendDomain(forceSender, defaultDomain) + '>', [250]);
 
         for i := 0 to msg.Recipients.Count - 1 do
-          idSmtp.SendCmd('RCPT TO: <' + appendDomain(Msg.Recipients[i].Address, defaultDomain) + '>', [250]);
+          smtp.SendCmd('RCPT TO: <' + appendDomain(Msg.Recipients[i].Address, defaultDomain) + '>', [250]);
 
         for i := 0 to msg.ccList.Count - 1 do
-          idSmtp.SendCmd('RCPT TO: <' + appendDomain(Msg.ccList[i].Address, defaultDomain) + '>', [250]);
+          smtp.SendCmd('RCPT TO: <' + appendDomain(Msg.ccList[i].Address, defaultDomain) + '>', [250]);
 
         for i := 0 to msg.BccList.Count - 1 do
-          idSmtp.SendCmd('RCPT TO: <' + appendDomain(Msg.BccList[i].Address, defaultDomain) + '>', [250]);
+          smtp.SendCmd('RCPT TO: <' + appendDomain(Msg.BccList[i].Address, defaultDomain) + '>', [250]);
 
         // start message content
 
-        idSmtp.SendCmd('DATA', [354]);
+        smtp.SendCmd('DATA', [354]);
 
         // add date header if missing
 
         if (Msg.Headers.Values['date'] = '') then
-          idSmtp.writeln('Date: ' + DateTimeToInternetStr(Now));
+          smtp.writeln('Date: ' + DateTimeToInternetStr(Now));
 
         // send message line by line
 
@@ -357,7 +564,7 @@ begin
               header := false;
             if (header) and (LowerCase(copy(sl[i], 1, 5)) = 'bcc: ') then
               continue;
-            idSmtp.writeln(sl[i]);
+            smtp.writeln(sl[i]);
           end;
         finally
           sl.Free;
@@ -365,11 +572,15 @@ begin
 
         // done
 
-        idSmtp.SendCmd('.', [250]);
-        idSmtp.SendCmd('QUIT');
+        smtp.SendCmd('.', [250]);
+        smtp.SendCmd('QUIT');
 
       finally
-        idSmtp.Free;
+
+        if (smtp.Connected) then
+          debugLog('Disconnecting from ' + smtp.Host + ':' + intToStr(smtp.Port));
+          
+        smtp.Free;
       end;
 
     finally
@@ -380,15 +591,8 @@ begin
   except
     on e:Exception do
     begin
-
-      writeln('sendmail: error during delivery: ' + e.message);
-
-      if (errorLogFile <> '') then
-        writeToLog(errorLogFile, e.Message);
-
-      if (debugLogFile <> '') then
-        writeToLog(debugLogFile, e.Message);
-
+      writeln(ErrOutput, 'sendmail: Error during delivery: ' + e.message);
+      errorLog(e.Message);
       halt(1);
     end;
   end;

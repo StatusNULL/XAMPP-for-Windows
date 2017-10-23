@@ -1,5 +1,5 @@
 <?php
-/* $Id: spanish-utf-8.inc.php,v 2.78.2.2 2005/04/16 11:23:59 lem9 Exp $ */
+/* $Id: spanish-utf-8.inc.php,v 2.83 2005/06/12 10:10:10 swix Exp $ */
 
 $charset = 'utf-8';
 $allow_recoding = TRUE;
@@ -130,7 +130,6 @@ $strCharsetOfFile = 'Juego de caracteres del archivo:';
 $strCharsets = 'Juegos de caracteres'; 
 $strCharsetsAndCollations = 'Juego de caracteres y sus cotejamientos (collations)'; 
 $strCheckAll = 'Revisar todos/as';
-$strCheckOverhead = 'Revise el residuo a depurar';
 $strCheckOverhead = 'Revise las tablas con residuo a depurar (overhead)';
 $strCheckPrivs = 'Revise los privilegios';
 $strCheckPrivsLong = 'Revise los privilegios para la base de datos &quot;%s&quot;.';
@@ -738,7 +737,6 @@ $strTransformation_text_plain__formatted = 'Mantiene el formato original del cam
 $strTransformation_text_plain__imagelink = 'Muestra una imagen y un enlace, el campo contiene el nombre del archivo; la primera opción es un prefijo como "http://dominio.com/", la segunda opción es el ancho en píxeles, el tercero es el alto.';
 $strTransformation_text_plain__link = 'Muestra un enlace, el campo contiene el nombre del archivo; la primera opción es un prefijo como "http://dominio.com/", la segunda opción es un título para el enlace.';
 $strTransformation_text_plain__substr = 'Muestra una parte de una cadena de caracteres. La primera opción es el número de caracteres a pasar por alto desde el principio de la cadena de caracteres (Predeterminado: 0). La segunda opción es el número de caracteres a mostrar (Predeterminado: hasta el final de la cadena de caracteres). La tercera opción es la cadena de caracteres a adjuntar y/o anteponer cuando haya truncamiento (Predeterminado: "...").';
-$strTransformation_text_plain__substr = 'Solamente muestra una parte de la cadena de caracteres. La primera opción es un offset para definir en dónde empieza el output de su texto (Predeterminado 0). La segunda opción es un offset para definir cuánto texto es retornado. Si está vacío, regresa todo el texto restante. La tercera opción define cuáles chars se adjuntarán al output cuando se regrese un substring (Predeterminado: ...) .';
 $strTransformation_text_plain__unformatted = 'Muestra el código HTML como entidades HTML. No se muestra formato HTML.';
 $strTruncateQueries = 'Trunque las consultas que ya se han mostrado';
 $strTurkish = 'Turco';
@@ -801,4 +799,20 @@ $strYes = 'Sí';
 $strZeroRemovesTheLimit = 'Nota: si cambia los parámetros de estas opciones a 0 (cero), remueve el límite.';
 $strZip = '"comprimido con zip"';
 
+// To translate:
+
+$strPrivDescAlterDb = 'Allows altering the structure of existing tables as well as changing the default charset and collation of databases.';  //to translate
+$strPrivDescAlterRoutine = 'Allows altering and dropping stored routines.';  //to translate
+$strPrivDescCreateRoutine = 'Allows creating stored routines.';  //to translate
+$strPrivDescCreateUser = 'Allows creating, dropping and renaming unser accounts.';  //to translate
+$strPrivDescCreateView = 'Allows creating new views.';  //to translate
+$strPrivDescExecute5 = 'Allows executing stored routines.';  //to translate
+$strPrivDescShowView = 'Allows performing SHOW CREATE VIEW queries.';  //to translate
+
+$strRoutines = 'Routines';  //to translate
+
+$strCreateDatabaseBeforeCopying = 'CREATE DATABASE before copying';  //to translate
+$strGeneratePassword = 'Generate Password';  //to translate
+$strGenerate = 'Generate';  //to translate
+$strCopy = 'Copy';  //to translate
 ?>

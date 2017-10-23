@@ -1,6 +1,8 @@
-<?Php
+<?php
+/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 // +-----------------------------------------------------------------------+
-// | Copyright (c) 2002  Richard Heyes                                     |
+// | Copyright (c) 2002-2003  Richard Heyes                                |
+// | Copyright (c) 2003-2005  The PHP Group                                |
 // | All rights reserved.                                                  |
 // |                                                                       |
 // | Redistribution and use in source and binary forms, with or without    |
@@ -60,17 +62,36 @@ require_once 'PEAR.php';
 * print_r($structure);
 *
 * TODO:
-*  - Implement further content types, eg. multipart/parallel,
-*    perhaps even message/partial.
+*  o Implement multipart/appledouble
+*  o UTF8: ???
+
+		> 4. We have also found a solution for decoding the UTF-8 
+		> headers. Therefore I made the following function:
+		> 
+		> function decode_utf8($txt) {
+		> $trans=array("Å&#8216;"=>"Ãµ","Å±"=>"Ã»","Å"=>"Ã&#8226;","Å°"
+		=>"Ã&#8250;");
+		> $txt=strtr($txt,$trans);
+		> return(utf8_decode($txt));
+		> }
+		> 
+		> And I have inserted the following line to the class:
+		> 
+		> if (strtolower($charset)=="utf-8") $text=decode_utf8($text);
+		> 
+		> ... before the following one in the "_decodeHeader" function:
+		> 
+		> $input = str_replace($encoded, $text, $input);
+		> 
+		> This way from now on it can easily decode the UTF-8 headers too.
+
 *
 * @author  Richard Heyes <richard@phpguru.org>
-* @version $Revision: 1.34 $
+* @version $Revision: 1.46 $
 * @package Mail
 */
-
 class Mail_mimeDecode extends PEAR
 {
-
     /**
      * The raw email to decode
      * @var    string
@@ -115,14 +136,6 @@ class Mail_mimeDecode extends PEAR
     var $_decode_headers;
 
     /**
-    * If invoked from a class, $this will be set. This has problematic
-    * connotations for calling decode() statically. Hence this variable
-    * is used to determine if we are indeed being called statically or
-    * via an object.
-    */
-    var $mailMimeDecode;
-
-    /**
      * Constructor.
      *
      * Sets up the object, initialise the variables, and splits and
@@ -140,8 +153,6 @@ class Mail_mimeDecode extends PEAR
         $this->_body           = $body;
         $this->_decode_bodies  = false;
         $this->_include_bodies = true;
-        
-        $this->mailMimeDecode  = true;
     }
 
     /**
@@ -163,22 +174,28 @@ class Mail_mimeDecode extends PEAR
      */
     function decode($params = null)
     {
+        // determine if this method has been called statically
+        $isStatic = !(isset($this) && get_class($this) == __CLASS__);
 
-        // Have we been called statically? If so, create an object and pass details to that.
-        if (!isset($this->mailMimeDecode) AND isset($params['input'])) {
+        // Have we been called statically?
+	// If so, create an object and pass details to that.
+        if ($isStatic AND isset($params['input'])) {
 
             $obj = new Mail_mimeDecode($params['input']);
             $structure = $obj->decode($params);
 
         // Called statically but no input
-        } elseif (!isset($this->mailMimeDecode)) {
+        } elseif ($isStatic) {
             return PEAR::raiseError('Called statically and no input given');
 
         // Called via an object
         } else {
-            $this->_include_bodies = isset($params['include_bodies'])  ? $params['include_bodies']  : false;
-            $this->_decode_bodies  = isset($params['decode_bodies'])   ? $params['decode_bodies']   : false;
-            $this->_decode_headers = isset($params['decode_headers'])  ? $params['decode_headers']  : false;
+            $this->_include_bodies = isset($params['include_bodies']) ?
+	                             $params['include_bodies'] : false;
+            $this->_decode_bodies  = isset($params['decode_bodies']) ?
+	                             $params['decode_bodies']  : false;
+            $this->_decode_headers = isset($params['decode_headers']) ?
+	                             $params['decode_headers'] : false;
 
             $structure = $this->_decode($this->_header, $this->_body);
             if ($structure === false) {
@@ -202,6 +219,7 @@ class Mail_mimeDecode extends PEAR
     function _decode($headers, $body, $default_ctype = 'text/plain')
     {
         $return = new stdClass;
+        $return->headers = array();
         $headers = $this->_parseHeaders($headers);
 
         foreach ($headers as $value) {
@@ -237,7 +255,7 @@ class Mail_mimeDecode extends PEAR
                     }
                     break;
 
-                case 'content-disposition';
+                case 'content-disposition':
                     $content_disposition = $this->_parseHeaderValue($headers[$key]['value']);
                     $return->disposition   = $content_disposition['value'];
                     if (isset($content_disposition['other'])) {
@@ -291,7 +309,9 @@ class Mail_mimeDecode extends PEAR
 
                 case 'message/rfc822':
                     $obj = &new Mail_mimeDecode($body);
-                    $return->parts[] = $obj->decode(array('include_bodies' => $this->_include_bodies));
+                    $return->parts[] = $obj->decode(array('include_bodies' => $this->_include_bodies,
+					                                      'decode_bodies'  => $this->_decode_bodies,
+														  'decode_headers' => $this->_decode_headers));
                     unset($obj);
                     break;
 
@@ -429,13 +449,22 @@ class Mail_mimeDecode extends PEAR
             if (strlen($input) > 0) {
 
                 // This splits on a semi-colon, if there's no preceeding backslash
-                // Can't handle if it's in double quotes however. (Of course anyone
-                // sending that needs a good slap).
-                $parameters = preg_split('/\s*(?<!\\\\);\s*/i', $input);
+                // Now works with quoted values; had to glue the \; breaks in PHP
+                // the regex is already bordering on incomprehensible
+                $splitRegex = '/([^;\'"]*[\'"]([^\'"]*([^\'"]*)*)[\'"][^;\'"]*|([^;]+))(;|$)/';
+                preg_match_all($splitRegex, $input, $matches);
+                $parameters = array();
+                for ($i=0; $i<count($matches[0]); $i++) {
+                    $param = $matches[0][$i];
+                    while (substr($param, -2) == '\;') {
+                        $param .= $matches[0][++$i];
+                    }
+                    $parameters[] = $param;
+                }
 
                 for ($i = 0; $i < count($parameters); $i++) {
-                    $param_name  = substr($parameters[$i], 0, $pos = strpos($parameters[$i], '='));
-                    $param_value = substr($parameters[$i], $pos + 1);
+                    $param_name  = trim(substr($parameters[$i], 0, $pos = strpos($parameters[$i], '=')), "'\";\t\\ ");
+                    $param_value = trim(str_replace('\;', ';', substr($parameters[$i], $pos + 1)), "'\";\t\\ ");
                     if ($param_value[0] == '"') {
                         $param_value = substr($param_value, 1, -1);
                     }
@@ -460,9 +489,18 @@ class Mail_mimeDecode extends PEAR
      */
     function _boundarySplit($input, $boundary)
     {
-        $tmp = explode('--'.$boundary, $input);
+        $parts = array();
 
-        for ($i=1; $i<count($tmp)-1; $i++) {
+        $bs_possible = substr($boundary, 2, -2);
+        $bs_check = '\"' . $bs_possible . '\"';
+
+        if ($boundary == $bs_check) {
+            $boundary = $bs_possible;
+        }
+
+        $tmp = explode('--' . $boundary, $input);
+
+        for ($i = 1; $i < count($tmp) - 1; $i++) {
             $parts[] = $tmp[$i];
         }
 
@@ -522,7 +560,7 @@ class Mail_mimeDecode extends PEAR
      */
     function _decodeBody($input, $encoding = '7bit')
     {
-        switch ($encoding) {
+        switch (strtolower($encoding)) {
             case '7bit':
                 return $input;
                 break;
@@ -679,14 +717,6 @@ class Mail_mimeDecode extends PEAR
         $to = substr($to,1);
         return array($to,$header,$this->_body);
     } 
-
-
-
-
-
-
-
-
 
     /**
      * Returns a xml copy of the output of

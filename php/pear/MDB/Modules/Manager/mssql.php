@@ -42,7 +42,7 @@
 // | Author: Frank M. Kromann <frank@kromann.info                         |
 // +----------------------------------------------------------------------+
 //
-// $Id: mssql.php,v 1.4.4.3 2004/01/08 13:43:01 lsmith Exp $
+// $Id: mssql.php,v 1.4.4.8 2004/04/10 08:02:31 lsmith Exp $
 //
 
 if(!defined('MDB_MANAGER_MSSQL_INCLUDED'))
@@ -199,8 +199,8 @@ class MDB_Manager_mssql extends MDB_Manager_Common
         if ($check) {
             for ($change = 0, reset($changes);
                 $change < count($changes);
-                next($changes), $change++)
-            {
+                next($changes), $change++
+            ) {
                 switch (key($changes)) {
                     case "AddedFields":
                         break;
@@ -218,8 +218,8 @@ class MDB_Manager_mssql extends MDB_Manager_Common
             if (isset($changes[$change = 'RemovedFields'])
                 || isset($changes[$change = 'name'])
                 || isset($changes[$change = 'RenamedFields'])
-                || isset($changes[$change = 'ChangedFields']))
-            {
+                || isset($changes[$change = 'ChangedFields'])
+            ) {
                 return($db->raiseError(MDB_ERROR_CANNOT_ALTER, NULL, NULL,
                     'Alter table: change type "'.$change.'" is not supported by the server"'));
             }
@@ -234,7 +234,7 @@ class MDB_Manager_mssql extends MDB_Manager_Common
                     $field < count($fields);
                     next($fields), $field++)
                 {
-                    if(strcmp($query, '')) {
+                    if (strcmp($query, '')) {
                         $query.= ', ';
                     }
                     $query.= $fields[key($fields)]['Declaration'];
@@ -242,6 +242,216 @@ class MDB_Manager_mssql extends MDB_Manager_Common
             }
             return(strcmp($query, '') ? $db->query("ALTER TABLE $name $query") : MDB_OK);
         }
+    }
+
+    // }}}
+    // {{{ listTables()
+
+    /**
+     * list all tables in the current database
+     *
+     * @param object    $db        database object that is extended by this class
+     * @return mixed data array on success, a MDB error on failure
+     * @access public
+     **/
+    function listTables(&$db)
+    {
+        $query = 'EXECUTE sp_tables @table_type = "\'TABLE\'"';
+        $table_names = $db->queryCol($query, null, 2);
+        if (MDB::isError($table_names)) {
+            return($table_names);
+        }
+        $tables = array();
+        for ($i = 0, $j = count($table_names); $i <$j; ++$i) {
+            if (!$this->_isSequenceName($db, $table_names[$i])) {
+                $tables[] = $table_names[$i];
+            }
+        }
+        return($tables);
+    }
+
+    // }}}
+    // {{{ listTableFields()
+
+    /**
+     * list all fields in a tables in the current database
+     *
+     * @param object    $db        database object that is extended by this class
+     * @param string $table name of table that should be used in method
+     * @return mixed data array on success, a MDB error on failure
+     * @access public
+     */
+    function listTableFields(&$db, $table)
+    {
+        $result = $db->query("SELECT * FROM $table");
+        if( MDB::isError($result)) {
+            return($result);
+        }
+        $columns = $db->getColumnNames($result);
+        if (MDB::isError($columns)) {
+            $db->freeResult($columns);
+            return $columns;
+        }
+        return(array_flip($columns));
+    }
+
+    // }}}
+    // {{{ getTableFieldDefinition()
+
+    /**
+     * get the stucture of a field into an array; this method is still alpha quality!
+     *
+     * @param object    $db        database object that is extended by this class
+     * @param string    $table         name of table that should be used in method
+     * @param string    $field_name     name of field that should be used in method
+     * @return mixed data array on success, a MDB error on failure
+     * @access public
+     */
+    function getTableFieldDefinition(&$db, $table, $field_name)
+    {
+        $columns = $db->queryRow("EXEC sp_columns @table_name='$table',
+                   @column_name='$field_name'", NULL, MDB_FETCHMODE_ASSOC );
+        if (MDB::isError($columns)) {
+            return($columns);
+        }
+        if ($db->options['optimize'] != 'portability') {
+            array_change_key_case($columns);
+        }
+        if (!isset($columns[$column = 'column_name'])
+            || !isset($columns[$column = 'type_name'])
+        ) {
+            return($db->raiseError(MDB_ERROR_MANAGER, NULL, NULL,
+                'Get table field definition: no result, please check table '.
+                $table.' and field '.$field_name.' are correct'));
+        }
+        $field_column = $columns['column_name'];
+        $type_column = $columns['type_name'];
+        $db_type = strtolower($type_column);
+        if (strpos($type_column, ' ') !== FALSE) {
+            $db_type = strtok($db_type, ' ');
+        }
+        $length = $columns['precision'];
+        $decimal = $columns['scale'];
+        $type = array();
+        switch ($db_type) {
+            case 'bigint':
+            case 'int':
+            case 'smallint':
+            case 'tinyint':
+                $type[0] = 'integer';
+                if ($length == '1') {
+                    $type[1] = 'boolean';
+                }
+                break;
+            case 'bit':
+                $type[0] = 'integer';
+                $type[1] = 'boolean';
+                break;
+            case 'decimal':
+            case 'numeric':
+                $type[0] = 'decimal';
+                break;
+            case 'money':
+            case 'smallmoney':
+                $type[0] = 'decimal';
+                $type[1] = 'float';
+                break;
+            case 'float':
+            case 'real':
+                $type[0] = 'float';
+                break;
+            case 'datetime':
+            case 'smalldatetime':
+                $type[0] = 'timestamp';
+                break;
+            case 'char':
+            case 'varchar':
+            case 'nchar':
+            case 'nvarchar':
+                $type[0] = 'text';
+                if ($length == '1') {
+                    $type[1] = 'boolean';
+                }
+                break;
+            case 'text':
+            case 'ntext':
+                $type[0] = 'clob';
+                $type[1] = 'text';
+                break;
+            case 'binary':
+            case 'varbinary':
+            case 'image':
+                $type[0] = 'blob';
+                break;
+            case 'timestamp':
+                $type[0] = 'blob';
+                break;
+            default:
+                return($db->raiseError(MDB_ERROR_MANAGER, NULL, NULL,
+                    'List table fields: unknown database attribute type'));
+        }
+        unset($notnull);
+        if ($columns['nullable'] == 0) {
+            $notnull = 1;
+        }
+        unset($default);
+        if (isset($columns['column_def']) && ($columns['column_def'] != NULL)) {
+            if (($type[0] = 'integer') OR ($type[0] = 'boolean')) {
+                $columns['column_def'] = str_replace( '(', '', $columns['column_def'] );
+                $columns['column_def'] = str_replace( ')', '', $columns['column_def'] );
+            }
+            $default = $columns['column_def'];
+        }
+        $definition = array();
+        for ($field_choices = array(), $datatype = 0; $datatype < count($type); $datatype++) {
+            $field_choices[$datatype] = array('type' => $type[$datatype]);
+            if (isset($notnull)) {
+                $field_choices[$datatype]['notnull'] = 1;
+            }
+            if (isset($default)) {
+                $field_choices[$datatype]['default'] = $default;
+            }
+            if ($type[$datatype] != 'boolean'
+                && $type[$datatype] != 'time'
+                && $type[$datatype] != 'date'
+                && $type[$datatype] != 'timestamp'
+            ) {
+                if (strlen($length)) {
+                    $field_choices[$datatype]['length'] = $length;
+                }
+            }
+        }
+        $definition[0] = $field_choices;
+        if (strpos($type_column, 'identity') !== FALSE) {
+            $implicit_sequence = array();
+            $implicit_sequence['on'] = array();
+            $implicit_sequence['on']['table'] = $table;
+            $implicit_sequence['on']['field'] = $field_name;
+            $definition[1]['name'] = $table.'_'.$field_name;
+            $definition[1]['definition'] = $implicit_sequence;
+        }
+        if (MDB::isError($indexes = $db->queryAll("EXEC sp_pkeys @table_name='$table'"
+                , NULL, MDB_FETCHMODE_ASSOC)))
+        {
+            return $indexes;
+        }
+        if ($indexes != NULL) {
+            $is_primary = FALSE;
+            foreach ($indexes as $index) {
+                if ($index['column_name'] == $field_name) {
+                    $is_primary = TRUE;
+                    break;
+                }
+            }
+            if ($is_primary) {
+                $implicit_index = array();
+                $implicit_index['unique'] = 1;
+                $implicit_index['FIELDS'][$field_name] = '';
+                $definition[2]['name'] = $field_name;
+                $definition[2]['definition'] = $implicit_index;
+            }
+        }
+        return($definition);
     }
 
     // }}}
@@ -259,7 +469,8 @@ class MDB_Manager_mssql extends MDB_Manager_Common
     function createSequence(&$db, $seq_name, $start)
     {
         $sequence_name = $db->getSequenceName($seq_name);
-        return($db->query("CREATE TABLE $sequence_name (sequence INT NOT NULL IDENTITY($start,1) PRIMARY KEY CLUSTERED)"));
+        $query = "CREATE TABLE $sequence_name (".$db->options['sequence_col_name']." INT NOT NULL IDENTITY($start,1) PRIMARY KEY CLUSTERED)";
+        return($db->query($query));
     }
 
     // }}}
@@ -280,5 +491,5 @@ class MDB_Manager_mssql extends MDB_Manager_Common
     }
 }
 
-}
+};
 ?>

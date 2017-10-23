@@ -41,7 +41,7 @@
 // | Author: Paul Cooper <pgc@ucecom.com>                                 |
 // +----------------------------------------------------------------------+
 //
-// $Id: test.php,v 1.19.4.2 2004/01/08 13:43:00 lsmith Exp $
+// $Id: test.php,v 1.19.4.5 2004/04/08 17:17:05 lsmith Exp $
 
 /*
  This is a small test suite for MDB using PHPUnit
@@ -70,9 +70,6 @@ function handle_pear_error ($error_obj)
     echo $error_obj->getMessage().': '.$error_obj->getUserinfo();
     print '</pre>';
 }
-
-// you may need to uncomment the line and modify the multiplier as you see fit
-set_time_limit(60*count($dbarray));
 
 MDB::loadFile('Manager');
 MDB::loadFile('Date');
@@ -103,6 +100,7 @@ if (!is_array($testmethods)) {
 foreach ($dbarray as $db) {
     $dsn = $db['dsn'];
     $options = $db['options'];
+    $options['optimize'] = 'portability';
 
     $display_dsn = $dsn['phptype'] . "://" . $dsn['username'] . ":" . $dsn['password'] . "@" . $dsn['hostspec'] . "/" . $database;
     echo "<div class=\"test\">\n";
@@ -111,7 +109,7 @@ foreach ($dbarray as $db) {
     $suite = new PHPUnit_TestSuite();
 
     foreach ($testcases as $testcase) {
-        if (is_array($testmethods[$testcase])) {
+        if (isset($testmethods[$testcase]) && is_array($testmethods[$testcase])) {
             $methods = array_keys($testmethods[$testcase]);
             foreach ($methods as $method) {
                 $suite->addTest(new $testcase($method));

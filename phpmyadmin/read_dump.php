@@ -1,5 +1,5 @@
 <?php
-/* $Id: read_dump.php,v 2.33 2005/01/27 14:49:29 nijel Exp $ */
+/* $Id: read_dump.php,v 2.34 2005/05/08 12:58:27 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -417,7 +417,12 @@ if (!empty($id_bookmark) && $action_bookmark == 2) {
     $message   = $strSuccess;
 }
 // Loads to target script
-if ($goto == 'db_details.php' || $goto == 'tbl_properties.php') {
+if ($goto == 'db_details.php' || $goto == 'tbl_properties.php' || $goto == 'tbl_properties_structure.php') {
+
+// maybe we should do this instead:
+//if (strpos(' ' . $goto, 'db_details') == 1 || strpos(' ' . $goto, 'tbl_properties') == 1) {
+// but I'm not sure
+
     $js_to_run = 'functions.js';
 }
 if ($goto != 'main.php') {

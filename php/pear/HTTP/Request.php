@@ -32,7 +32,7 @@
 // | Author: Richard Heyes <richard@phpguru.org>                           |
 // +-----------------------------------------------------------------------+
 //
-// $Id: Request.php,v 1.33 2003/10/26 10:28:28 avb Exp $
+// $Id: Request.php,v 1.41 2004/12/10 14:42:57 avb Exp $
 //
 // HTTP_Request Class
 //
@@ -43,8 +43,9 @@
 // echo $a->getResponseBody();
 //
 
-require_once('Net/Socket.php');
-require_once('Net/URL.php');
+require_once 'PEAR.php';
+require_once 'Net/Socket.php';
+require_once 'Net/URL.php';
 
 define('HTTP_REQUEST_METHOD_GET',     'GET',     true);
 define('HTTP_REQUEST_METHOD_HEAD',    'HEAD',    true);
@@ -60,8 +61,8 @@ define('HTTP_REQUEST_HTTP_VER_1_1', '1.1', true);
 class HTTP_Request {
 
     /**
-    * Full url
-    * @var string
+    * Instance of Net_URL
+    * @var object Net_URL
     */
     var $_url;
 
@@ -97,7 +98,7 @@ class HTTP_Request {
 
     /**
     * Socket object
-    * @var object
+    * @var object Net_Socket
     */
     var $_sock;
     
@@ -139,13 +140,13 @@ class HTTP_Request {
 
     /**
     * Connection timeout.
-    * @var integer
+    * @var float
     */
     var $_timeout;
     
     /**
     * HTTP_Response object
-    * @var object
+    * @var object HTTP_Response
     */
     var $_response;
     
@@ -185,28 +186,44 @@ class HTTP_Request {
     */
     var $_saveBody = true;
 
+   /**
+    * Timeout for reading from socket (array(seconds, microseconds))
+    * @var array
+    */
+    var $_readTimeout = null;
+
+   /**
+    * Options to pass to Net_Socket::connect. See stream_context_create
+    * @var array
+    */
+    var $_socketOptions = null;
+
     /**
     * Constructor
     *
     * Sets up the object
-    * @param $url The url to fetch/access
-    * @param $params Associative array of parameters which can be:
-    *                  method         - Method to use, GET, POST etc
-    *                  http           - HTTP Version to use, 1.0 or 1.1
-    *                  user           - Basic Auth username
-    *                  pass           - Basic Auth password
-    *                  proxy_host     - Proxy server host
-    *                  proxy_port     - Proxy server port
-    *                  proxy_user     - Proxy auth username
-    *                  proxy_pass     - Proxy auth password
-    *                  timeout        - Connection timeout in seconds.
-    *                  allowRedirects - Whether to follow redirects or not
-    *                  maxRedirects   - Max number of redirects to follow
-    *                  useBrackets    - Whether to append [] to array variable names
-    *                  saveBody       - Whether to save response body in response object property
+    * @param    string  The url to fetch/access
+    * @param    array   Associative array of parameters which can have the following keys:
+    * <ul>
+    *   <li>method         - Method to use, GET, POST etc (string)</li>
+    *   <li>http           - HTTP Version to use, 1.0 or 1.1 (string)</li>
+    *   <li>user           - Basic Auth username (string)</li>
+    *   <li>pass           - Basic Auth password (string)</li>
+    *   <li>proxy_host     - Proxy server host (string)</li>
+    *   <li>proxy_port     - Proxy server port (integer)</li>
+    *   <li>proxy_user     - Proxy auth username (string)</li>
+    *   <li>proxy_pass     - Proxy auth password (string)</li>
+    *   <li>timeout        - Connection timeout in seconds (float)</li>
+    *   <li>allowRedirects - Whether to follow redirects or not (bool)</li>
+    *   <li>maxRedirects   - Max number of redirects to follow (integer)</li>
+    *   <li>useBrackets    - Whether to append [] to array variable names (bool)</li>
+    *   <li>saveBody       - Whether to save response body in response object property (bool)</li>
+    *   <li>readTimeout    - Timeout for reading / writing data over the socket (array (seconds, microseconds))</li>
+    *   <li>socketOptions  - Options to pass to Net_Socket object (array)</li>
+    * </ul>
     * @access public
     */
-    function HTTP_Request($url, $params = array())
+    function HTTP_Request($url = '', $params = array())
     {
         $this->_sock           = &new Net_Socket();
         $this->_method         =  HTTP_REQUEST_METHOD_GET;
@@ -233,13 +250,12 @@ class HTTP_Request {
             $this->{'_' . $key} = $value;
         }
 
-        $this->setURL($url);
+        if (!empty($url)) {
+            $this->setURL($url);
+        }
 
         // Default useragent
         $this->addHeader('User-Agent', 'PEAR HTTP_Request class ( http://pear.php.net/ )');
-
-        // Default Content-Type
-        $this->addHeader('Content-Type', 'application/x-www-form-urlencoded');
 
         // Make sure keepalives dont knobble us
         $this->addHeader('Connection', 'close');
@@ -250,7 +266,10 @@ class HTTP_Request {
         }
 
         // Use gzip encoding if possible
-        if (HTTP_REQUEST_HTTP_VER_1_1 == $this->_http && extension_loaded('zlib')) {
+        // Avoid gzip encoding if using multibyte functions (see #1781)
+        if (HTTP_REQUEST_HTTP_VER_1_1 == $this->_http && extension_loaded('zlib') &&
+            0 == (2 & ini_get('mbstring.func_overload'))) {
+
             $this->addHeader('Accept-Encoding', 'gzip');
         }
     }
@@ -304,12 +323,10 @@ class HTTP_Request {
     {
         $this->_url = &new Net_URL($url, $this->_useBrackets);
 
-        // If port is 80 and protocol is https, assume port 443 is to be used
-        // This does mean you can't send an https request to port 80 without
-        // some fudge. (mmm...)
-        if (strcasecmp($this->_url->protocol, 'https') == 0 AND $this->_url->port == 80) {
-            $this->_url->port = 443;
+        if (!empty($this->_url->user) || !empty($this->_url->pass)) {
+            $this->setBasicAuth($this->_url->user, $this->_url->pass);
         }
+
         if (HTTP_REQUEST_HTTP_VER_1_1 == $this->_http) {
             $this->addHeader('Host', $this->_generateHostHeader());
         }
@@ -435,7 +452,28 @@ class HTTP_Request {
         if ($preencoded) {
             $this->_postData[$name] = $value;
         } else {
-            $this->_postData[$name] = is_array($value)? array_map('urlencode', $value): urlencode($value);
+            $this->_postData[$name] = $this->_arrayMapRecursive('urlencode', $value);
+        }
+    }
+
+   /**
+    * Recursively applies the callback function to the value
+    * 
+    * @param    mixed   Callback function
+    * @param    mixed   Value to process
+    * @access   private
+    * @return   mixed   Processed value
+    */
+    function _arrayMapRecursive($callback, $value)
+    {
+        if (!is_array($value)) {
+            return call_user_func($callback, $value);
+        } else {
+            $map = array();
+            foreach ($value as $k => $v) {
+                $map[$k] = $this->_arrayMapRecursive($callback, $v);
+            }
+            return $map;
         }
     }
 
@@ -445,26 +483,26 @@ class HTTP_Request {
     * This also changes content-type to 'multipart/form-data' for proper upload
     * 
     * @access public
-    * @param  string    variable name
+    * @param  string    name of file-upload field
     * @param  mixed     file name(s)
     * @param  mixed     content-type(s) of file(s) being uploaded
     * @return bool      true on success
     * @throws PEAR_Error
     */
-    function addFile($name, $filename, $contentType = 'application/octet-stream')
+    function addFile($inputName, $fileName, $contentType = 'application/octet-stream')
     {
-        if (!is_array($filename) && !is_readable($filename)) {
-            return PEAR::raiseError("File '{$filename}' is not readable");
-        } elseif (is_array($filename)) {
-            foreach ($filename as $name) {
+        if (!is_array($fileName) && !is_readable($fileName)) {
+            return PEAR::raiseError("File '{$fileName}' is not readable");
+        } elseif (is_array($fileName)) {
+            foreach ($fileName as $name) {
                 if (!is_readable($name)) {
                     return PEAR::raiseError("File '{$name}' is not readable");
                 }
             }
         }
         $this->addHeader('Content-Type', 'multipart/form-data');
-        $this->_postFiles[$name] = array(
-            'name' => $filename,
+        $this->_postFiles[$inputName] = array(
+            'name' => $fileName,
             'type' => $contentType
         );
         return true;
@@ -505,7 +543,7 @@ class HTTP_Request {
     function addCookie($name, $value)
     {
         $cookies = isset($this->_requestHeaders['Cookie']) ? $this->_requestHeaders['Cookie']. '; ' : '';
-        $this->addHeader('Cookie', $cookies . urlencode($name) . '=' . urlencode($value));
+        $this->addHeader('Cookie', $cookies . $name . '=' . $value);
     }
     
     /**
@@ -531,6 +569,10 @@ class HTTP_Request {
     */
     function sendRequest($saveBody = true)
     {
+        if (!is_a($this->_url, 'Net_URL')) {
+            return PEAR::raiseError('No URL given.');
+        }
+
         $host = isset($this->_proxy_host) ? $this->_proxy_host : $this->_url->host;
         $port = isset($this->_proxy_port) ? $this->_proxy_port : $this->_url->port;
 
@@ -545,10 +587,13 @@ class HTTP_Request {
 
         // If this is a second request, we may get away without
         // re-connecting if they're on the same server
-        if (   PEAR::isError($err = $this->_sock->connect($host, $port, null, $this->_timeout))
-            OR PEAR::isError($err = $this->_sock->write($this->_buildRequest())) ) {
+        if (PEAR::isError($err = $this->_sock->connect($host, $port, null, $this->_timeout, $this->_socketOptions)) ||
+            PEAR::isError($err = $this->_sock->write($this->_buildRequest()))) {
 
-           return $err;
+            return $err;
+        }
+        if (!empty($this->_readTimeout)) {
+            $this->_sock->setTimeout($this->_readTimeout[0], $this->_readTimeout[1]);
         }
 
         $this->_notify('sentRequest');
@@ -606,7 +651,9 @@ class HTTP_Request {
         } elseif ($this->_allowRedirects AND $this->_redirects > $this->_maxRedirects) {
             return PEAR::raiseError('Too many redirects');
         }
-        
+
+        $this->_sock->disconnect();
+
         return true;
     }
 
@@ -614,7 +661,7 @@ class HTTP_Request {
     * Returns the response code
     *
     * @access public
-    * @return int
+    * @return mixed     Response code, false if not set
     */
     function getResponseCode()
     {
@@ -625,13 +672,14 @@ class HTTP_Request {
     * Returns either the named header or all if no name given
     *
     * @access public
-    * @param string     The header name to return
-    * @return mixed     either the value of $headername or an array of all header values
+    * @param string     The header name to return, do not set to get all headers
+    * @return mixed     either the value of $headername (false if header is not present)
+    *                   or an array of all headers
     */
     function getResponseHeader($headername = null)
     {
         if (!isset($headername)) {
-            return $this->_response->_headers;
+            return isset($this->_response->_headers)? $this->_response->_headers: array();
         } else {
             return isset($this->_response->_headers[$headername]) ? $this->_response->_headers[$headername] : false;
         }
@@ -641,7 +689,7 @@ class HTTP_Request {
     * Returns the body of the response
     *
     * @access public
-    * @return string
+    * @return mixed     response body, false if not set
     */
     function getResponseBody()
     {
@@ -652,7 +700,7 @@ class HTTP_Request {
     * Returns cookies set in response
     * 
     * @access public
-    * @return array
+    * @return mixed     array of response cookies, false if none are present
     */
     function getResponseCookies()
     {
@@ -667,7 +715,10 @@ class HTTP_Request {
     */
     function _buildRequest()
     {
+        $separator = ini_get('arg_separator.output');
+        ini_set('arg_separator.output', '&');
         $querystring = ($querystring = $this->_url->getQueryString()) ? '?' . $querystring : '';
+        ini_set('arg_separator.output', $separator);
 
         $host = isset($this->_proxy_host) ? $this->_url->protocol . '://' . $this->_url->host : '';
         $port = (isset($this->_proxy_host) AND $this->_url->port != 80) ? ':' . $this->_url->port : '';
@@ -676,9 +727,16 @@ class HTTP_Request {
 
         $request = $this->_method . ' ' . $url . ' HTTP/' . $this->_http . "\r\n";
 
-        if ('multipart/form-data' == $this->_requestHeaders['Content-Type']) {
-            $boundary = 'HTTP_Request_' . md5(uniqid('request') . microtime());
-            $this->addHeader('Content-Type', 'multipart/form-data; boundary=' . $boundary);
+        if (HTTP_REQUEST_METHOD_POST != $this->_method && HTTP_REQUEST_METHOD_PUT != $this->_method) {
+            $this->removeHeader('Content-Type');
+        } else {
+            if (empty($this->_requestHeaders['Content-Type'])) {
+                // Add default content-type
+                $this->addHeader('Content-Type', 'application/x-www-form-urlencoded');
+            } elseif ('multipart/form-data' == $this->_requestHeaders['Content-Type']) {
+                $boundary = 'HTTP_Request_' . md5(uniqid('request') . microtime());
+                $this->addHeader('Content-Type', 'multipart/form-data; boundary=' . $boundary);
+            }
         }
 
         // Request Headers
@@ -688,22 +746,29 @@ class HTTP_Request {
             }
         }
 
+        // No post data or wrong method, so simply add a final CRLF
+        if ((HTTP_REQUEST_METHOD_POST != $this->_method && HTTP_REQUEST_METHOD_PUT != $this->_method) ||
+            (empty($this->_postData) && empty($this->_postFiles))) {
+
+            $request .= "\r\n";
         // Post data if it's an array
-        if ((!empty($this->_postData) && is_array($this->_postData)) || !empty($this->_postFiles)) {
+        } elseif ((!empty($this->_postData) && is_array($this->_postData)) || !empty($this->_postFiles)) {
+            // "normal" POST request
+            if (!isset($boundary)) {
+                $postdata = implode('&', array_map(
+                    create_function('$a', 'return $a[0] . \'=\' . $a[1];'), 
+                    $this->_flattenArray('', $this->_postData)
+                ));
+
             // multipart request, probably with file uploads
-            if (isset($boundary)) {
+            } else {
                 $postdata = '';
-                foreach ($this->_postData as $name => $value) {
-                    if (is_array($value)) {
-                        foreach ($value as $k => $v) {
-                            $postdata .= '--' . $boundary . "\r\n";
-                            $postdata .= 'Content-Disposition: form-data; name="' . $name . ($this->_useBrackets? '[' . $k . ']': '') . '"';
-                            $postdata .= "\r\n\r\n" . urldecode($v) . "\r\n";
-                        }
-                    } else {
+                if (!empty($this->_postData)) {
+                    $flatData = $this->_flattenArray('', $this->_postData);
+                    foreach ($flatData as $item) {
                         $postdata .= '--' . $boundary . "\r\n";
-                        $postdata .= 'Content-Disposition: form-data; name="' . $name . '"';
-                        $postdata .= "\r\n\r\n" . urldecode($value) . "\r\n";
+                        $postdata .= 'Content-Disposition: form-data; name="' . $item[0] . '"';
+                        $postdata .= "\r\n\r\n" . urldecode($item[1]) . "\r\n";
                     }
                 }
                 foreach ($this->_postFiles as $name => $value) {
@@ -727,18 +792,6 @@ class HTTP_Request {
                     }
                 }
                 $postdata .= '--' . $boundary . "\r\n";
-            } else {
-                foreach($this->_postData as $name => $value) {
-                    if (is_array($value)) {
-                        foreach ($value as $k => $v) {
-                            $postdata[] = $this->_useBrackets? sprintf('%s[%s]=%s', $name, $k, $v): $name . '=' . $v;
-                        }
-                    } else {
-                        $postdata[] = $name . '=' . $value;
-                    }
-                }
-    
-                $postdata = implode('&', $postdata);
             }
             $request .= 'Content-Length: ' . strlen($postdata) . "\r\n\r\n";
             $request .= $postdata;
@@ -747,13 +800,37 @@ class HTTP_Request {
         } elseif(!empty($this->_postData)) {
             $request .= 'Content-Length: ' . strlen($this->_postData) . "\r\n\r\n";
             $request .= $this->_postData;
-
-        // No post data, so simply add a final CRLF
-        } else {
-            $request .= "\r\n";
         }
         
         return $request;
+    }
+
+   /**
+    * Helper function to change the (probably multidimensional) associative array
+    * into the simple one.
+    *
+    * @param    string  name for item
+    * @param    mixed   item's values
+    * @return   array   array with the following items: array('item name', 'item value');
+    */
+    function _flattenArray($name, $values)
+    {
+        if (!is_array($values)) {
+            return array(array($name, $values));
+        } else {
+            $ret = array();
+            foreach ($values as $k => $v) {
+                if (empty($name)) {
+                    $newName = $k;
+                } elseif ($this->_useBrackets) {
+                    $newName = $name . '[' . $k . ']';
+                } else {
+                    $newName = $name;
+                }
+                $ret = array_merge($ret, $this->_flattenArray($newName, $v));
+            }
+            return $ret;
+        }
     }
 
 
@@ -983,24 +1060,30 @@ class HTTP_Response
 
         // Only a name=value pair
         if (!strpos($headervalue, ';')) {
-            list($cookie['name'], $cookie['value']) = array_map('trim', explode('=', $headervalue));
-            $cookie['name']  = urldecode($cookie['name']);
-            $cookie['value'] = urldecode($cookie['value']);
+            $pos = strpos($headervalue, '=');
+            $cookie['name']  = trim(substr($headervalue, 0, $pos));
+            $cookie['value'] = trim(substr($headervalue, $pos + 1));
 
         // Some optional parameters are supplied
         } else {
             $elements = explode(';', $headervalue);
-            list($cookie['name'], $cookie['value']) = array_map('trim', explode('=', $elements[0]));
-            $cookie['name']  = urldecode($cookie['name']);
-            $cookie['value'] = urldecode($cookie['value']);
+            $pos = strpos($elements[0], '=');
+            $cookie['name']  = trim(substr($elements[0], 0, $pos));
+            $cookie['value'] = trim(substr($elements[0], $pos + 1));
 
-            for ($i = 1; $i < count($elements);$i++) {
-                list ($elName, $elValue) = array_map('trim', explode('=', $elements[$i]));
+            for ($i = 1; $i < count($elements); $i++) {
+                if (false === strpos($elements[$i], '=')) {
+                    $elName  = trim($elements[$i]);
+                    $elValue = null;
+                } else {
+                    list ($elName, $elValue) = array_map('trim', explode('=', $elements[$i]));
+                }
+                $elName = strtolower($elName);
                 if ('secure' == $elName) {
                     $cookie['secure'] = true;
                 } elseif ('expires' == $elName) {
                     $cookie['expires'] = str_replace('"', '', $elValue);
-                } elseif ('path' == $elName OR 'domain' == $elName) {
+                } elseif ('path' == $elName || 'domain' == $elName) {
                     $cookie[$elName] = urldecode($elValue);
                 } else {
                     $cookie[$elName] = $elValue;
@@ -1029,6 +1112,8 @@ class HTTP_Response
                     $this->_sock->readAll(); // make this an eof()
                     return '';
                 }
+            } elseif ($this->_sock->eof()) {
+                return '';
             }
         }
         $data = $this->_sock->read($this->_chunkLength);

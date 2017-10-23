@@ -4457,7 +4457,7 @@ class Converter
      */
     function getConverterDir()
     {
-        return str_replace('\\', '/', "C:\xampp\php\pear\data/PhpDocumentor/phpDocumentor/Converters/") . $this->outputformat . "/" . $this->name;
+        return str_replace('\\', '/', "\xampp\php\pear\data/PhpDocumentor/phpDocumentor/Converters/") . $this->outputformat . "/" . $this->name;
         return str_replace('\\','/',$GLOBALS['_phpDocumentor_install_dir']) ."/phpDocumentor/Converters/" . $this->outputformat . "/" . $this->name;
     }
     

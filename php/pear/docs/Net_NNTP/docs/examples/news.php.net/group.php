@@ -14,10 +14,10 @@
 // | license@php.net so we can mail you a copy immediately.               |
 // +----------------------------------------------------------------------+
 // | Authors: Alexander Merz <alexmerz@php.net>                           |
-// |                                                                      |
+// |          Heino H. Gehlsen <heino@gehlsen.dk>                         |
 // +----------------------------------------------------------------------+
 //
-// $Id: group.php,v 1.1.4.1 2004/07/01 16:56:35 heino Exp $
+// $Id: group.php,v 1.2 2005/01/08 20:03:30 heino Exp $
 ?>
 <html>
 <head>
@@ -25,9 +25,9 @@
 </head>
 <body>
 <?php
-require_once "Net/NNTP.php";
+require_once "Net/NNTP/Client.php";
 
-$nntp = new Net_NNTP;
+$nntp = new Net_NNTP_Client();
 
 $ret = $nntp->connect("news.php.net");
 if( PEAR::isError($ret)) {

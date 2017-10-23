@@ -18,7 +18,7 @@
 // |          Thomas Schulz <ths@4bconsult.de>                            |
 // +----------------------------------------------------------------------+
 //
-// $Id: ArraySmarty.php,v 1.8 2004/02/14 11:01:51 ths Exp $
+// $Id: ArraySmarty.php,v 1.9 2004/10/15 20:00:48 ths Exp $
 
 require_once 'HTML/QuickForm/Renderer/Array.php';
 
@@ -110,11 +110,13 @@ class HTML_QuickForm_Renderer_ArraySmarty extends HTML_QuickForm_Renderer_Array
    /**
     * Constructor
     *
+    * @param  object  reference to the Smarty template engine instance
+    * @param  bool    true: render an array of labels to many labels, $key 0 to 'label' and the oterh to "label_$key"
     * @access public
     */
-    function HTML_QuickForm_Renderer_ArraySmarty(&$tpl)
+    function HTML_QuickForm_Renderer_ArraySmarty(&$tpl, $staticLabels = false)
     {
-        $this->HTML_QuickForm_Renderer_Array(true);
+        $this->HTML_QuickForm_Renderer_Array(true, $staticLabels);
         $this->_tpl =& $tpl;
     } // end constructor
 

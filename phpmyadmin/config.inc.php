@@ -1,5 +1,5 @@
 <?php
-/* $Id: config.inc.php,v 2.41 2004/09/23 10:10:37 rabus Exp $ */
+/* $Id: config.inc.php,v 2.53 2005/06/07 16:44:39 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -55,7 +55,8 @@ $cfg['PmaNoRelation_DisableWarning']  = FALSE;
 /**
  * The 'cookie' auth_type uses blowfish algorithm to encrypt the password. If
  * at least one server configuration uses 'cookie' auth_type, enter here a
- * passphrase that will be used by blowfish.
+ * passphrase that will be used by blowfish. The maximum length seems to be 46
+ * characters.
  */
 $cfg['blowfish_secret'] = 'xampp';
 
@@ -117,6 +118,7 @@ $cfg['Servers'][$i]['history']       = 'PMA_history';          // table to store
 $cfg['Servers'][$i]['verbose_check'] = TRUE;        // set to FALSE if you know that your pma_* tables
                                                     // are up to date. This prevents compatibility
                                                     // checks and thereby increases performance.
+$cfg['Servers'][$i]['AllowRoot']     = TRUE;        // whether to allow root login
 $cfg['Servers'][$i]['AllowDeny']['order']           // Host authentication order, leave blank to not use
                                      = '';
 $cfg['Servers'][$i]['AllowDeny']['rules']           // Host authentication rules, leave blank for defaults
@@ -146,6 +148,7 @@ $cfg['Servers'][$i]['pdf_pages']       = ''; // 'pma_pdf_pages'
 $cfg['Servers'][$i]['column_info']     = ''; // 'pma_column_info'
 $cfg['Servers'][$i]['history']         = ''; // 'pma_history'
 $cfg['Servers'][$i]['verbose_check']   = TRUE;
+$cfg['Servers'][$i]['AllowRoot']       = TRUE;
 $cfg['Servers'][$i]['AllowDeny']['order']
                                        = '';
 $cfg['Servers'][$i]['AllowDeny']['rules']
@@ -174,6 +177,8 @@ $cfg['Servers'][$i]['pdf_pages']       = ''; // 'pma_pdf_pages'
 $cfg['Servers'][$i]['column_info']     = ''; // 'pma_column_info'
 $cfg['Servers'][$i]['history']         = ''; // 'pma_history'
 $cfg['Servers'][$i]['verbose_check']   = TRUE;
+$cfg['Servers'][$i]['AllowRoot']       = TRUE;
+
 $cfg['Servers'][$i]['AllowDeny']['order']
                                        = '';
 $cfg['Servers'][$i]['AllowDeny']['rules']
@@ -292,6 +297,7 @@ $cfg['DefaultTabDatabase']    = 'db_details_structure.php';
                                    // 'db_details_structure.php' = tables list
                                    // 'db_details.php' = sql form
                                    // 'db_search.php' = search query
+                                   // 'db_operations.php' = operations on database
 $cfg['DefaultTabTable']       = 'tbl_properties_structure.php';
                                    // Possible values:
                                    // 'tbl_properties_structure.php' = fields list
@@ -303,13 +309,21 @@ $cfg['DefaultTabTable']       = 'tbl_properties_structure.php';
  * Export defaults
  */
 
-$cfg['Export']['format']                    = 'sql';  // sql/latex/excel/csv/xml/xls
+$cfg['Export']['format']                    = 'sql';  // sql/latex/excel/csv/xml/xls/htmlexcel/htmlword
 $cfg['Export']['compression']               = 'none'; // none/zip/gzip/bzip2
 
 $cfg['Export']['asfile']                    = FALSE;
 $cfg['Export']['onserver']                  = FALSE;
 $cfg['Export']['onserver_overwrite']        = FALSE;
 $cfg['Export']['remember_file_template']    = TRUE;
+
+$cfg['Export']['htmlexcel_columns']         = FALSE;
+$cfg['Export']['htmlexcel_null']            = 'NULL';
+
+$cfg['Export']['htmlword_structure']        = TRUE;
+$cfg['Export']['htmlword_data']             = TRUE;
+$cfg['Export']['htmlword_columns']          = FALSE;
+$cfg['Export']['htmlword_null']             = 'NULL';
 
 $cfg['Export']['xls_columns']               = FALSE;
 $cfg['Export']['xls_null']                  = 'NULL';
@@ -337,6 +351,7 @@ $cfg['Export']['latex_structure_label']     = 'tab:__TABLE__-structure';
 
 $cfg['Export']['sql_structure']             = TRUE;
 $cfg['Export']['sql_data']                  = TRUE;
+$cfg['Export']['sql_compat']                = 'NONE';
 $cfg['Export']['sql_disable_fk']            = FALSE;
 $cfg['Export']['sql_use_transaction']       = FALSE;
 $cfg['Export']['sql_drop_database']         = FALSE;
@@ -386,11 +401,11 @@ $cfg['PDFDefaultPageSize']  = 'A4';
  * Language and charset conversion settings
  */
 // Default language to use, if not browser-defined or user-defined
-$cfg['DefaultLang'] = 'en-iso-8859-1';
+$cfg['DefaultLang'] = 'en-utf-8';
 
 // Force: always use this language - must be defined in
 //        libraries/select_lang.lib.php
-// $cfg['Lang']     = 'en-iso-8859-1';
+// $cfg['Lang']     = 'en-utf-8';
 
 // Default charset to use for recoding of MySQL queries, does not take
 // any effect when charsets recoding is switched off by
@@ -531,7 +546,7 @@ $cfg['SetHttpHostTitle']    = '';              // if ShowHttpHostTitle=true, ple
                                              // or an other string, wich should be shown in browsers window title.
                                              // If not set (or empty), the PMA will get your real Host-Adress.
 
-$cfg['ErrorIconic']          = TRUE;    // show some icons for warnings, errors and informations (true|false)?
+$cfg['ErrorIconic']          = TRUE;    // show some icons for warning, error and information messages (true|false)?
 $cfg['MainPageIconic']       = TRUE;    // show icons in list on main page, on right panel top menu (server db table)  and on menu tabs (true|false)?
 $cfg['ReplaceHelpImg']       = TRUE;    // show help button instead of strDocumentation (true|false)?
 
@@ -540,7 +555,7 @@ $cfg['ThemePath']           = './themes';    // using themes manager please set 
                                              // else leave empty
 $cfg['ThemeManager']        = TRUE;          // if you want to use selectable themes and if ThemesPath not empty
                                              // set it to true, else set it to false (default is false);
-$cfg['ThemeDefault']        = 'original';         // set up default theme, if ThemePath not empty
+$cfg['ThemeDefault']        = 'xampp';         // set up default theme, if ThemePath not empty
                                              // you can set up here an valid path to themes or 'original' for
                                              // the original pma-theme
 
@@ -655,6 +670,9 @@ $cfg['ColumnTypes'] = array(
 );
 
 // Attributes
+// Note: the "ON UPDATE CURRENT_TIMESTAMP" attribute is added dynamically 
+// for MySQL >= 4.1.2, in tbl_properties.inc.php
+
 $cfg['AttributeTypes'] = array(
    '',
    'BINARY',
@@ -760,6 +778,7 @@ if ($cfg['ShowFunctionFields']) {
             'ENCRYPT',
             'RAND',
             'LAST_INSERT_ID',
+            'UNIX_TIMESTAMP',
             'COUNT',
             'AVG',
             'SUM'
@@ -822,5 +841,5 @@ set_magic_quotes_runtime(0);
 /**
  * File Revision - do not change either!
  */
-$cfg['FileRevision'] = '$Revision: 2.41 $';
+$cfg['FileRevision'] = '$Revision: 2.53 $';
 ?>

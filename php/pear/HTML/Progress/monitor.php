@@ -1,6 +1,6 @@
 <?php
 // +----------------------------------------------------------------------+
-// | PHP Version 4                                                        |
+// | PEAR :: HTML :: Progress                                             |
 // +----------------------------------------------------------------------+
 // | Copyright (c) 1997-2004 The PHP Group                                |
 // +----------------------------------------------------------------------+
@@ -15,23 +15,22 @@
 // | Author: Laurent Laville <pear@laurent-laville.org>                   |
 // +----------------------------------------------------------------------+
 //
-// $Id: monitor.php,v 1.2 2004/02/10 11:46:52 farell Exp $
-
-require_once ('HTML/Progress/Error/Raise.php');
-require_once ('HTML/Progress.php');
-require_once ('HTML/QuickForm.php');
+// $Id: monitor.php,v 1.6 2004/08/10 22:21:45 farell Exp $
 
 /**
  * The HTML_Progress_Monitor class allow an easy way to display progress
  * in a dialog. The user can cancel the task.
  *
- * @version    1.1
+ * @version    1.2.0
  * @author     Laurent Laville <pear@laurent-laville.org>
  * @access     public
- * @category   HTML
  * @package    HTML_Progress
+ * @subpackage Progress_Observer
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
  */
+
+require_once 'HTML/Progress.php';
+require_once 'HTML/QuickForm.php';
 
 class HTML_Progress_Monitor
 {
@@ -57,18 +56,6 @@ class HTML_Progress_Monitor
     /**#@-*/
     
     /**
-     * Delay in milisecond before each progress cells display.
-     * 1000 ms === sleep(1)
-     * <strong>usleep()</strong> function does not run on Windows platform.
-     *
-     * @var        integer
-     * @since      1.1
-     * @access     private
-     * @see        setAnimSpeed()
-     */
-    var $_anim_speed = 0;
-
-    /**
      * The progress object renders into this monitor.
      *
      * @var        object
@@ -87,14 +74,12 @@ class HTML_Progress_Monitor
     var $_form;
 
     /**
-     * User callback, is in the format:
-     * * $_callback = array('classname', 'functionname');
-     * If the callback is not a method, then its just
-     * * $_callback = 'functionname';
+     * Callback, either function name or array(&$object, 'method')
      *
      * @var        mixed
      * @since      1.1
      * @access     private
+     * @see        setProgressHandler()
      */
     var $_callback = null;
 
@@ -123,29 +108,30 @@ class HTML_Progress_Monitor
      *
      * @param      string    $formName      (optional) Name of monitor dialog box (QuickForm)
      * @param      array     $attributes    (optional) List of renderer options
+     * @param      array     $errorPrefs    (optional) Hash of params to configure error handler
      *
      * @since      1.0
      * @access     public
      * @throws     HTML_PROGRESS_ERROR_INVALID_INPUT
      */
-    function HTML_Progress_Monitor($formName = 'ProgressMonitor', $attributes = array())
+    function HTML_Progress_Monitor($formName = 'ProgressMonitor', $attributes = array(), $errorPrefs = array())
     {
-        $this->_package = 'HTML_Progress_Monitor';
-        Error_Raise::initialize($this->_package, array('HTML_Progress', '_getErrorMessage'));
+        $bar = new HTML_Progress($errorPrefs);
+        $this->_progress = $bar;
 
         if (!is_string($formName)) {
-            return Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
+            return $this->_progress->raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$formName',
                       'was' => gettype($formName),
                       'expected' => 'string',
-                      'paramnum' => 1), PEAR_ERROR_TRIGGER);
+                      'paramnum' => 1));
 
         } elseif (!is_array($attributes)) {
-            return Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
+            return $this->_progress->raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$attributes',
                       'was' => gettype($attributes),
                       'expected' => 'array',
-                      'paramnum' => 2), PEAR_ERROR_TRIGGER);
+                      'paramnum' => 2));
         }
 
         $this->_id = md5(microtime());
@@ -172,50 +158,10 @@ class HTML_Progress_Monitor
         $this->_form->addGroup($buttons, 'buttons', '', '&nbsp;', false);
       
         // default embedded progress element with look-and-feel
-        $bar = new HTML_Progress();
         $this->setProgressElement($bar);
 
         $str =& $this->_form->getElement('progressStatus');
         $str->setText('<div id="status" class="progressStatus">&nbsp;</div>');
-    }
-
-    /**
-     * Set the sleep delay in milisecond before each progress cells display.
-     *
-     * @param      integer   $delay         Delay in milisecond.
-     *
-     * @return     void
-     * @since      1.1
-     * @access     public
-     * @throws     HTML_PROGRESS_ERROR_INVALID_INPUT
-     */
-    function setAnimSpeed($delay)
-    {
-        if (!is_int($delay)) {
-            return Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
-                array('var' => '$delay',
-                      'was' => gettype($delay),
-                      'expected' => 'integer',
-                      'paramnum' => 1), PEAR_ERROR_TRIGGER);
-
-        } elseif ($delay < 0) {
-            return Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT, 'error',
-                array('var' => '$delay',
-                      'was' => $delay,
-                      'expected' => 'greater than zero',
-                      'paramnum' => 1), PEAR_ERROR_TRIGGER);
-
-        } elseif ($delay > 1000) {
-            return Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT, 'error',
-                array('var' => '$delay',
-                      'was' => $delay,
-                      'expected' => 'less or equal 1000',
-                      'paramnum' => 1), PEAR_ERROR_TRIGGER);
-        }
-        $this->_anim_speed = $delay;
-        
-        // reflect changes on the observer copy
-        $this->_progress->addListener($this);
     }
 
     /**
@@ -227,26 +173,22 @@ class HTML_Progress_Monitor
      * @since      1.0
      * @access     public
      * @throws     HTML_PROGRESS_ERROR_INVALID_INPUT
-     * @see        callProgressHandler()
+     * @see        HTML_Progress::process()
      */
     function notify($event)
     {
         if (!is_array($event)) {
-            return Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
+            return $this->_progress->raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$event',
                       'was' => gettype($event),
                       'expected' => 'array',
-                      'paramnum' => 1), PEAR_ERROR_TRIGGER);
+                      'paramnum' => 1));
         }
         $log = strtolower($event['log']);
         if ($log == 'incvalue') {
 
-            if (!is_null($this->_callback)) {
-                $this->callProgressHandler($event['value'], $this);
-            }
             $this->_progress->display();
-            // sleep a bit ...
-            for ($i=0; $i<($this->_anim_speed*1000); $i++) { }
+            $this->callProgressHandler($event['value']);
                  
             if ($this->_progress->getPercentComplete() == 1) {
                 if ($this->_progress->isIndeterminate()) {
@@ -264,49 +206,22 @@ class HTML_Progress_Monitor
     /**
      * Sets a user-defined progress handler function.
      *
-     * @param      callback  $handler       Name of function or a class-method.
+     * @param      mixed     $handler       Name of function or a class-method.
      *
      * @return     void
      * @since      1.1
      * @access     public
-     * @throws     HTML_PROGRESS_ERROR_INVALID_INPUT
      * @throws     HTML_PROGRESS_ERROR_INVALID_CALLBACK
-     * @see        callProgressHandler()
+     * @see        HTML_Progress::setProgressHandler()
      */
     function setProgressHandler($handler)
     {
-        if (is_array($handler) && count($handler) == 2) {
-            list($className, $methodName) = $handler;
-            if (class_exists($className)) {
-                $obj = new $className();
-                if (!method_exists($obj, $methodName)) {
-                    return Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_CALLBACK, 'error',
-                        array('var' => '$handler[1]',
-                              'element' => 'Class-Method',
-                              'was' => $methodName,
-                              'paramnum' => 1), PEAR_ERROR_TRIGGER);
-                }
-            } else {
-                return Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_CALLBACK, 'error',
-                    array('var' => '$handler[0]',
-                          'element' => 'Class',
-                          'was' => $className,
-                          'paramnum' => 1), PEAR_ERROR_TRIGGER);
-            }
-        } elseif (is_string($handler)) {
-            if (!function_exists($handler)) {
-                return Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_CALLBACK, 'error',
-                    array('var' => '$handler',
-                          'element' => 'Function',
-                          'was' => $handler,
-                          'paramnum' => 1), PEAR_ERROR_TRIGGER);
-            }
-        } else {
-            return Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
+        if (!is_callable($handler)) {
+            return $this->raiseError(HTML_PROGRESS_ERROR_INVALID_CALLBACK, 'warning',
                 array('var' => '$handler',
-                      'was' => gettype($handler),
-                      'expected' => 'array(class,method) | string(function)',
-                      'paramnum' => 1), PEAR_ERROR_TRIGGER);
+                      'element' => 'valid Class-Method/Function',
+                      'was' => 'element',
+                      'paramnum' => 1));
         }
         $this->_callback = $handler;
 
@@ -318,39 +233,18 @@ class HTML_Progress_Monitor
      * Calls a user-defined progress handler function.
      *
      * @param      integer   $arg           Current value of the progress bar.
-     * @param      object    $monitor       Reference to this monitor.
      *
-     * @return     mixed
+     * @return     void
      * @since      1.1
      * @access     public
-     * @throws     HTML_PROGRESS_ERROR_INVALID_INPUT
      * @see        setProgressHandler(), notify()
      */
-    function callProgressHandler($arg, &$monitor)
+    function callProgressHandler($arg)
     {
-        if (!is_int($arg)) {
-            return Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
-                array('var' => '$arg',
-                      'was' => gettype($arg),
-                      'expected' => 'integer',
-                      'paramnum' => 1), PEAR_ERROR_TRIGGER);
-
-        } elseif (!is_object($monitor)) {
-            return Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
-                array('var' => '$monitor',
-                      'was' => gettype($monitor),
-                      'expected' => 'HTML_Progress_Monitor object',
-                      'paramnum' => 2), PEAR_ERROR_TRIGGER);
-        }
-        
         if (is_null($this->_callback)) {
-            return true;                         // no callback yet defined
-        } elseif (is_array($this->_callback)) {
-            list($className, $methodName) = $this->_callback;
-            $obj = new $className();
-            return call_user_func(array(&$obj, $methodName), $arg, $monitor);
+            $this->_progress->sleep();
         } else {
-            return call_user_func($this->_callback, $arg, $monitor);
+            call_user_func($this->_callback, $arg, &$this);
         }
     }
 
@@ -408,11 +302,11 @@ class HTML_Progress_Monitor
     function setProgressElement($bar)
     {
         if (!is_a($bar, 'HTML_Progress')) {
-            return Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
+            return $this->_progress->raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$bar',
                       'was' => gettype($bar),
                       'expected' => 'HTML_Progress object',
-                      'paramnum' => 1), PEAR_ERROR_TRIGGER);
+                      'paramnum' => 1));
         }
         $this->_progress = $bar;
         $this->_progress->addListener($this);
@@ -459,15 +353,18 @@ class HTML_Progress_Monitor
         $js = "
 function setStatus(pString)
 {
-        if (isDom)
-            prog = document.getElementById('status');
-        if (isIE)
-            prog = document.all['status'];
-        if (isNS4)
-            prog = document.layers['status'];
-	if (prog != null) 
-	    prog.innerHTML = pString;
-}";
+    if (isDom) {
+        prog = document.getElementById('status');
+    } else if (isIE) {
+        prog = document.all['status'];
+    } else if (isNS4) {
+        prog = document.layers['status'];
+    }
+    if (prog != null)  {
+	prog.innerHTML = pString;
+    }
+}
+";
         return $this->_progress->getScript() . $js;
     }
 
@@ -495,11 +392,11 @@ function setStatus(pString)
     function accept(&$renderer)
     {
         if (!is_a($renderer, 'HTML_QuickForm_Renderer')) {
-            return Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
+            return $this->_progress->raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$renderer',
                       'was' => gettype($renderer),
                       'expected' => 'HTML_QuickForm_Renderer object',
-                      'paramnum' => 1), PEAR_ERROR_TRIGGER);
+                      'paramnum' => 1));
         }
         $this->_form->accept($renderer);
     }
@@ -527,18 +424,18 @@ function setStatus(pString)
     function setCaption($caption = '&nbsp;', $args = array() )
     {
         if (!is_string($caption)) {
-            return Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
+            return $this->_progress->raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$caption',
                       'was' => gettype($caption),
                       'expected' => 'string',
-                      'paramnum' => 1), PEAR_ERROR_TRIGGER);
+                      'paramnum' => 1));
 
         } elseif (!is_array($args)) {
-            return Error_Raise::raise($this->_package, HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
+            return $this->_progress->raiseError(HTML_PROGRESS_ERROR_INVALID_INPUT, 'exception',
                 array('var' => '$args',
                       'was' => gettype($args),
                       'expected' => 'array',
-                      'paramnum' => 2), PEAR_ERROR_TRIGGER);
+                      'paramnum' => 2));
         }
 
         foreach($args as $name => $value) {

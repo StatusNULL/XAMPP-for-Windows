@@ -29,10 +29,15 @@
 
 	if($PHP_AUTH_USER)
 		$up="$PHP_AUTH_USER:$PHP_AUTH_PW@";
-	$b="$prot://$up".$GLOBALS['SERVER_NAME'];
+		if ('localhost' == strtolower($GLOBALS['SERVER_NAME'])) { // Fix by Wiedmann
+			$server = '127.0.0.1';
+		} else {
+			$server = $GLOBALS['SERVER_NAME'];
+		}
+	$b="$prot://$up".$server;
 	if($GLOBALS['SERVER_PORT']!=80)
 	{
-		$b="$prot://$up".$GLOBALS['SERVER_NAME'].".:".$GLOBALS['SERVER_PORT'];
+		$b="$prot://$up".$server.":".$GLOBALS['SERVER_PORT']; // Fix by Wiedmann
 	}
 	function line($text,$status,$link="")
 	{
@@ -109,8 +114,8 @@
 	
 	
 	
-	if ((file_exists("$partwampp\htdocs\python\default.py")) && (file_exists("$partwampp\apache\conf\python.conf")))
-	{ $a=@file("$b/python/default.py"); $python=$a[0]; line($TEXT['status-python'],$python);}
+	if ((file_exists("$partwampp\htdocs\python\\xa.py")) && (file_exists("$partwampp\apache\conf\python.conf")))
+	{ $a=@file("$b/python/xa.py"); $python=$a[0]; line($TEXT['status-python'],$python);}
 	
 	if ((file_exists("$partwampp\htdocs\modperl\perl.pl")) && (file_exists("$partwampp\apache\conf\perl.conf")))
 	{ $a=@file("$b/modperl/perl.pl"); $perl=$a[0]; line($TEXT['status-perl'],$perl);}

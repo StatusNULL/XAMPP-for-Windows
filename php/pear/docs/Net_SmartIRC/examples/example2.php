@@ -1,9 +1,9 @@
-<?php
+s<?php
 /**
- * $Id: example2.php,v 1.3 2003/01/16 22:30:23 meebey Exp $
- * $Revision: 1.3 $
+ * $Id: example2.php,v 1.3.2.1 2004/12/20 15:54:51 meebey Exp $
+ * $Revision: 1.3.2.1 $
  * $Author: meebey $
- * $Date: 2003/01/16 22:30:23 $
+ * $Date: 2004/12/20 15:54:51 $
  *
  * Copyright (c) 2002-2003 Mirco "MEEBEY" Bauer <mail@meebey.net> <http://www.meebey.net>
  * 
@@ -25,7 +25,7 @@
  */
 // ---EXAMPLE OF HOW TO USE Net_SmartIRC---
 // this code shows how you could show on your homepage how many users are in a specific channel
-include_once('../SmartIRC.php');
+include_once('Net/SmartIRC.php');
 
 $irc = &new Net_SmartIRC();
 $irc->startBenchmark();
@@ -34,20 +34,24 @@ $irc->setUseSockets(TRUE);
 $irc->setBenchmark(TRUE);
 $irc->connect('irc.freenet.de', 6667);
 $irc->login('Net_SmartIRC', 'Net_SmartIRC Client '.SMARTIRC_VERSION.' (example2.php)', 0, 'Net_SmartIRC');
-$irc->getList('#debian.de');
-$resultar = $irc->listenFor(SMARTIRC_TYPE_LIST);
+$irc->getList('#php');
+// BUG! (see: http://pear.php.net/bugs/bug.php?id=2309)
+// can't fix listenFor() because of backwards compatibity issues, it needs to return an array of ircdata objects
+// instead of just ircdata->message array
+// So we use objListenFor() here, which is available in >= 0.5.6
+//$resultar = $irc->listenFor(SMARTIRC_TYPE_LIST);
+$resultar = $irc->objListenFor(SMARTIRC_TYPE_LIST);
 $irc->disconnect();
 $irc->stopBenchmark();
 
 if (is_array($resultar)) {
-    $resultex = explode(' ', $resultar[0]);
-    $count = $resultex[1];
+    $count = $resultar[0]->rawmessageex[4];
     ?>
-        <B>On our IRC Channel #debian.de are <? echo $count; ?> Users</B>
-    <?
+        <B>On the #php IRC Channel are <? echo $count; ?> Users</B>
+    <?php
 } else {
     ?>
         <B>An error occured, please check the specified server and settings<B>
-    <?
+    <?php
 }
 ?>

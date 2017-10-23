@@ -11,7 +11,7 @@ error_reporting = 2047
  * @see      DB_common::query()
  * 
  * @package  DB
- * @version  $Id: 17query.phpt,v 1.9 2004/09/22 22:16:47 danielc Exp $
+ * @version  $Id: 17query.phpt,v 1.13 2005/02/16 13:54:52 danielc Exp $
  * @category Database
  * @author   Daniel Convissor <danielc@analysisandsolutions.com>
  * @internal
@@ -24,7 +24,7 @@ require_once './skipif.inc';
 --FILE--
 <?php
 
-// $Id: 17query.phpt,v 1.9 2004/09/22 22:16:47 danielc Exp $
+// $Id: 17query.phpt,v 1.13 2005/02/16 13:54:52 danielc Exp $
 
 /**
  * Connect to the database and make the phptest table.
@@ -46,7 +46,7 @@ function pe($o) {
     global $dbh;
 
     $dbh->setErrorHandling(PEAR_ERROR_RETURN);
-    $dbh->query('DROP TABLE phptest');
+    drop_table($dbh, 'phptest');
 
     die($o->toString());
 }
@@ -58,22 +58,23 @@ $dbh->setFetchMode(DB_FETCHMODE_ASSOC);
 
 
 $res =& $dbh->query('DELETE FROM phptest WHERE a = 17');
-print 'delete: ' . ($res === DB_OK ? 'okay' : 'error') . "\n";
+print '1) delete: ' . ($res === DB_OK ? 'okay' : 'error') . "\n";
 
 $res =& $dbh->query("INSERT INTO phptest (a, b, c) VALUES (17, 'one', 'One')");
-print 'insert: ' . ($res === DB_OK ? 'okay' : 'error') . "\n";
+print '2) insert: ' . ($res === DB_OK ? 'okay' : 'error') . "\n";
 
 $res =& $dbh->query('INSERT INTO phptest (a, b, c) VALUES (?, ?, ?)', array(17, 'two', 'Two'));
-print 'insert: ' . ($res === DB_OK ? 'okay' : 'error') . "\n";
+print '3) insert: ' . ($res === DB_OK ? 'okay' : 'error') . "\n";
 
 
 $res =& $dbh->query('SELECT a, b FROM phptest WHERE a = 17');
 $row = $res->fetchRow();
-print "a = {$row['a']}, b = {$row['b']}\n";
+print "4) a = {$row['a']}, b = {$row['b']}\n";
+$res->free();  // keep fbsql happy.
 
 $res =& $dbh->query('SELECT a, b FROM phptest WHERE c = ?', array('Two'));
 $row = $res->fetchRow();
-print "a = {$row['a']}, b = {$row['b']}\n";
+print "5) a = {$row['a']}, b = {$row['b']}\n";
 
 
 $array = array(
@@ -82,34 +83,58 @@ $array = array(
     'baz' => null,
 );
 $res =& $dbh->query('INSERT INTO phptest (a, b, d) VALUES (?, ?, ?)', $array);
-print 'insert: ' . ($res === DB_OK ? 'okay' : 'error') . "\n";
+print '6) insert: ' . ($res === DB_OK ? 'okay' : 'error') . "\n";
 
 $res =& $dbh->query('SELECT a, b, d FROM phptest WHERE a = ?', 11);
 $row = $res->fetchRow();
-print "a = {$row['a']}, b = {$row['b']}, d = ";
-$type = gettype($row['d']);
-if ($type == 'NULL' || $row['d'] == '') {
-    print "NULL\n";
+print "7) a = {$row['a']}, b = {$row['b']}, d = ";
+if ($dbh->phptype == 'msql') {
+    if (array_key_exists('d', $row)) {
+        $type = gettype($row['d']);
+        if ($type == 'NULL' || $row['d'] == '') {
+            print "got expected value\n";
+        } else {
+            print "ERR: expected d's type to be NULL but it's $type and the value is ";
+            print $row['d'] . "\n";
+        }
+    } else {
+        // http://bugs.php.net/?id=31960
+        print "Prior to PHP 4.3.11 or 5.0.4, PHP's msql extension silently"
+              . " dropped columns with null values. You need to upgrade.\n";
+    }
 } else {
-    print "ERR: expected d's type to be NULL but it's $type and the value is ";
-    print $row['d'] . "\n";
+    $type = gettype($row['d']);
+    if ($type == 'NULL' || $row['d'] == '') {
+        print "got expected value\n";
+    } else {
+        print "ERR: expected d's type to be NULL but it's $type and the value is ";
+        print $row['d'] . "\n";
+    }
 }
 
 
 $res =& $dbh->query('DELETE FROM phptest WHERE a = ?', array(17));
-print 'delete: ' . ($res === DB_OK ? 'okay' : 'error') . "\n";
+print '8) delete: ' . ($res === DB_OK ? 'okay' : 'error') . "\n";
+
+$res =& $dbh->query('DELETE FROM phptest WHERE a = ?', array(0));
+print '9) delete with array(0) as param: ' . ($res === DB_OK ? 'okay' : 'error') . "\n";
+
+$res =& $dbh->query('DELETE FROM phptest WHERE a = ?', 0);
+print '10) delete with 0 as param: ' . ($res === DB_OK ? 'okay' : 'error') . "\n";
 
 
 $dbh->setErrorHandling(PEAR_ERROR_RETURN);
-$dbh->query('DROP TABLE phptest');
+drop_table($dbh, 'phptest');
 
 ?>
 --EXPECT--
-delete: okay
-insert: okay
-insert: okay
-a = 17, b = one
-a = 17, b = two
-insert: okay
-a = 11, b = three, d = NULL
-delete: okay
+1) delete: okay
+2) insert: okay
+3) insert: okay
+4) a = 17, b = one
+5) a = 17, b = two
+6) insert: okay
+7) a = 11, b = three, d = got expected value
+8) delete: okay
+9) delete with array(0) as param: okay
+10) delete with 0 as param: okay

@@ -1,23 +1,22 @@
 <?php
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
 // +----------------------------------------------------------------------+
-// | PEAR :: Mail :: Queue :: MDB Container                                       |
+// | PEAR :: Mail :: Queue :: MDB Container                               |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2003 The PHP Group                                |
+// | Copyright (c) 1997-2004 The PHP Group                                |
 // +----------------------------------------------------------------------+
-// | This source file is subject to version 2.0 of the PHP license,       |
+// | This source file is subject to version 3.0 of the PHP license,       |
 // | that is bundled with this package in the file LICENSE, and is        |
 // | available at through the world-wide-web at                           |
-// | http://www.php.net/license/2_02.txt.                                 |
+// | http://www.php.net/license/3_0.txt.                                  |
 // | If you did not receive a copy of the PHP license and are unable to   |
 // | obtain it through the world-wide-web, please send a note to          |
 // | license@php.net so we can mail you a copy immediately.               |
 // +----------------------------------------------------------------------+
-// | Note: This is a MDB-oriented rewrite of Queue/Container/db.php       |
-// +----------------------------------------------------------------------+
 // | Author: Lorenzo Alberton <l.alberton at quipo.it>                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: mdb.php,v 1.9 2004/02/29 09:19:14 quipo Exp $
+// $Id: mdb.php,v 1.13 2004/08/17 14:30:53 quipo Exp $
 
 /**
  * Storage driver for fetching mail queue data from a PEAR::MDB database
@@ -26,7 +25,7 @@
  * by the PEAR MDB abstraction layer.
  *
  * @author   Lorenzo Alberton <l.alberton at quipo.it>
- * @version  $Id: mdb.php,v 1.9 2004/02/29 09:19:14 quipo Exp $
+ * @version  $Id: mdb.php,v 1.13 2004/08/17 14:30:53 quipo Exp $
  * @package  Mail_Queue
  */
 require_once 'MDB.php';
@@ -210,11 +209,7 @@ class Mail_Queue_Container_mdb extends Mail_Queue_Container
                 .' WHERE sent_time IS NULL AND try_sent < '. $this->try
                 .' AND time_to_send < '.$this->db->getTimestampValue(date("Y-m-d H:i:s"))
                 .' ORDER BY time_to_send';
-        if ($this->limit != MAILQUEUE_ALL) {
-            $res = $this->db->limitQuery($query, null, $this->offset, $this->limit);
-        } else {
-            $res = $this->db->query($query);
-        }
+        $res = $this->db->limitQuery($query, null, $this->offset, $this->limit);
 
         if (MDB::isError($res)) {
             return new Mail_Queue_Error(MAILQUEUE_ERROR_QUERY_FAILED,
@@ -310,23 +305,6 @@ class Mail_Queue_Container_mdb extends Mail_Queue_Container
             }
 
         }
-/*
-        $this->_last_item++;
-        $this->queue_data[$this->_last_item] = new Mail_Queue_Body(
-            $id,
-            date('d-m-y G:i:s'),
-            $time_to_send,
-            null,
-            $id_user,
-            $ip,
-            $sender,
-            $recipient,
-            unserialize($headers),
-            unserialize($body),
-            $delete_after_send,
-            0
-        );
-*/
         return $id;
     }
 
@@ -347,7 +325,7 @@ class Mail_Queue_Container_mdb extends Mail_Queue_Container
                 $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__,
                 'Expected: Mail_Queue_Body class');
         }
-        $count = $mail->try();
+        $count = $mail->_try();
         $query = 'UPDATE ' . $this->mail_table
                 .' SET try_sent = ' . $this->db->getIntegerValue($count)
                 .' WHERE id = '     . $this->db->getIntegerValue($mail->getId());
@@ -405,6 +383,23 @@ class Mail_Queue_Container_mdb extends Mail_Queue_Container
      */
     function getMailById($id)
     {
+        $query = 'SELECT * FROM ' . $this->mail_table
+                .' WHERE id = '   . $this->db->getTextValue($id);
+        $res = $this->db->query($query);
+        if (MDB::isError($res)) {
+            return new Mail_Queue_Error(MAILQUEUE_ERROR_QUERY_FAILED,
+                $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__,
+                'MDB: query failed - "'.$query.'" - '.$res->getMessage());
+        }
+        $row = $this->db->fetchRow($res, MDB_FETCHMODE_ASSOC);
+        if (!is_array($row)) {
+            return new Mail_Queue_Error(MAILQUEUE_ERROR_QUERY_FAILED,
+                $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__,
+                'MDB: query failed - "'.$query.'" - '.$res->getMessage());
+        }
+/*
+//DISABLED (using a standard query, without LOBs special management:
+//it does not work with pgsql (there's probably a problem in the MDB pgsql driver)
         $query = 'SELECT id, create_time, time_to_send, sent_time'
                 .', id_user, ip, sender, recipient, delete_after_send'
                 .', try_sent FROM ' . $this->mail_table
@@ -435,7 +430,7 @@ class Mail_Queue_Container_mdb extends Mail_Queue_Container
                     //no rows returned
                     $row[$field] = '';
                 } else {
-                    $clob = $this->db->fetchClob($res,0,$field);
+                    $clob = $this->db->fetchClob($res, 0, $field);
                     if (MDB::isError($clob)) {
                         return new Mail_Queue_Error(MAILQUEUE_ERROR_QUERY_FAILED,
                             $this->pearErrorMode, E_USER_ERROR, __FILE__, __LINE__,
@@ -457,7 +452,7 @@ class Mail_Queue_Container_mdb extends Mail_Queue_Container
                 }
             }
         }
-
+*/
         return new Mail_Queue_Body(
             $row['id'],
             $row['create_time'],

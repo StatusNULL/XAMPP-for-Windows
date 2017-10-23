@@ -14,10 +14,10 @@
 // | license@php.net so we can mail you a copy immediately.               |
 // +----------------------------------------------------------------------+
 // | Authors: Alexander Merz <alexmerz@php.net>                           |
-// |                                                                      |
+// |          Heino H. Gehlsen <heino@gehlsen.dk>                         |
 // +----------------------------------------------------------------------+
 //
-// $Id: read.php,v 1.1.4.1 2004/07/01 16:56:35 heino Exp $
+// $Id: read.php,v 1.2.2.1 2005/01/13 20:38:06 heino Exp $
 ?>
 <html>
 <head>
@@ -26,9 +26,9 @@
 <body>
 <h1>Message</h1>
 <?php
-require_once "Net/NNTP.php";
+require_once "Net/NNTP/Client.php";
 
-$nntp = new Net_NNTP;
+$nntp = new Net_NNTP_Client();
 
 $ret = $nntp->connect("news.php.net");
 if( PEAR::isError($ret)) {
@@ -40,15 +40,18 @@ if( PEAR::isError($ret)) {
         if(PEAR::isError($msgdata)) {
             echo '<font color="red">'.$msgdata->getMessage().'</font><br>' ;        
         } else {
-            $msgheader = $nntp->splitHeaders($_GET['msgid']);
-            echo '<h2>Headers:</h2>';
-            foreach( $msgheader as $headername => $headercontent) {
-                echo '<b>'.$headername.'</b>:&nbsp;'.$headercontent."<br>";
+            $header = $nntp->getHeaderRaw($_GET['msgid']);
+            echo '<hr>';
+            echo '<h2>Header</h2>';
+            echo '<pre>';
+            foreach( $header as $line) {
+                echo $line.'<br>';
             }              
-            echo "<hr>";
+            echo '</pre>';
+            echo '<hr>';
             echo '<h2>Body</h2>';
             echo '<form><textarea wrap="off" cols="79", rows="25">'.
-                    $nntp->getBody($_GET['msgid']).
+                    $nntp->getBodyRaw($_GET['msgid'], true).
                 '</textarea></form>';           
         }        
     } else {

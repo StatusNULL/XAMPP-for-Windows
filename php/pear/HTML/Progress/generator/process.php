@@ -1,6 +1,6 @@
 <?php
 // +----------------------------------------------------------------------+
-// | PHP Version 4                                                        |
+// | PEAR :: HTML :: Progress                                             |
 // +----------------------------------------------------------------------+
 // | Copyright (c) 1997-2004 The PHP Group                                |
 // +----------------------------------------------------------------------+
@@ -15,17 +15,17 @@
 // | Author: Laurent Laville <pear@laurent-laville.org>                   |
 // +----------------------------------------------------------------------+
 //
-// $Id: process.php,v 1.1 2004/02/13 15:38:08 farell Exp $
+// $Id: process.php,v 1.4 2004/10/16 12:15:32 farell Exp $
 
 /**
  * The ActionProcess class provides final step of ProgressBar creation.
  * Manage php/css source-code save and cancel action.
  *
- * @version    1.1
+ * @version    1.2.0
  * @author     Laurent Laville <pear@laurent-laville.org>
  * @access     public
- * @category   HTML
  * @package    HTML_Progress
+ * @subpackage Progress_UI
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
  */
 
@@ -44,15 +44,20 @@ class ActionProcess extends HTML_QuickForm_Action
             // what kind of source code is requested  
             $code = $page->exportValue('phpcss');
             $bar = $page->controller->createProgressBar();
+
+            $lineEnd = OS_WINDOWS ? "\r\n" : "\n";
             
             if (isset($code['C'])) {
-                $this->exportOutput($bar->getStyle());
+                $strCSS  = '<style type="text/css">'.$lineEnd;
+                $strCSS .= '<!--'.$lineEnd;
+                $strCSS .= $bar->getStyle() . $lineEnd;
+                $strCSS .= '// -->'.$lineEnd;
+                $strCSS .= '</style>'.$lineEnd;
+                $this->exportOutput($strCSS);
             }
 
             if (isset($code['P'])) {
                 $structure = $bar->toArray();
-
-                $lineEnd = OS_WINDOWS ? "\r\n" : "\n";
                 
                 $strPHP  = '<?php'.$lineEnd;
                 $strPHP .= 'require_once \'HTML/Progress.php\';'.$lineEnd.$lineEnd;
@@ -111,18 +116,21 @@ class ActionProcess extends HTML_QuickForm_Action
                 $strPHP .= $this->_attributesArray('$ui->setStringAttributes(', $structure['ui']['string']);
                 $strPHP .= $lineEnd.$lineEnd;
 
-                $strPHP .= '// code below is only for run demo; its not ncecessary to create progress bar'.$lineEnd;
-                $strPHP .= 'echo \'<style type="text/css">\'.$progress->getStyle().\'</style>\';'.$lineEnd;
-                $strPHP .= 'echo \'<script type="text/javascript">\'.$progress->getScript().\'</script>\';'.$lineEnd;
+                $strPHP .= '// code below is only for run demo; its not nececessary to create progress bar'.$lineEnd;
+                if (!isset($code['C'])) {
+                    $strPHP .= 'echo "<style type=\"text/css\">\n";'.$lineEnd;
+                    $strPHP .= 'echo "<!--\n";'.$lineEnd;
+                    $strPHP .= 'echo $progress->getStyle();'.$lineEnd;
+                    $strPHP .= 'echo "// -->\n";'.$lineEnd;
+                    $strPHP .= 'echo "</style>\n";'.$lineEnd;
+                }
+                $strPHP .= 'echo "<script type=\"text/javascript\">\n";'.$lineEnd;
+                $strPHP .= 'echo "<!--\n";'.$lineEnd;
+                $strPHP .= 'echo $progress->getScript();'.$lineEnd;
+                $strPHP .= 'echo "//-->\n";'.$lineEnd;
+                $strPHP .= 'echo "</script>\n";'.$lineEnd;
                 $strPHP .= 'echo $progress->toHtml();'.$lineEnd;
-                $strPHP .= 'do {'.$lineEnd;
-                $strPHP .= '    $progress->display();'.$lineEnd;
-                $strPHP .= '    if ($progress->getPercentComplete() == 1) {'.$lineEnd;
-                $strPHP .= '        break;'.$lineEnd;
-                $strPHP .= '    }'.$lineEnd;
-                $strPHP .= '    $progress->incValue();'.$lineEnd;
-                $strPHP .= '} while(1);'.$lineEnd;
-
+                $strPHP .= '$progress->run();'.$lineEnd;
                 $strPHP .= '?>';
                 $this->exportOutput($strPHP);
             }

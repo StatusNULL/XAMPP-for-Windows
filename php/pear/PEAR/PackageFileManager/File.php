@@ -16,7 +16,7 @@
 // | Web           http://www.phpdoc.org                                    |
 // | Mirror        http://phpdocu.sourceforge.net/                          |
 // +------------------------------------------------------------------------+
-// $Id: File.php,v 1.18 2004/04/27 04:53:53 cellog Exp $
+// $Id: File.php,v 1.21 2005/03/28 06:37:35 cellog Exp $
 //
 /**
  * Retrieve the files from a directory listing
@@ -81,6 +81,10 @@ class PEAR_PackageFileManager_File {
         $ignore = $this->_options['ignore'];
         // implicitly ignore packagefile
         $ignore[] = $this->_options['packagefile'];
+        if ($this->_options['packagefile'] == 'package.xml') {
+            // ignore auto-generated package2.xml from PEAR 1.4.0
+            $ignore[] = 'package2.xml';
+        }
         $include = $this->_options['include'];
         $this->ignore = array(false, false);
         $this->_setupIgnore($ignore, 1);
@@ -122,6 +126,9 @@ class PEAR_PackageFileManager_File {
         }
 
         $tempstruc = $struc;
+        if (!isset($tempstruc['/'])) {
+            $tempstruc['/'] = array();
+        }
         $struc = array('/' => $tempstruc['/']);
         $bv = 0;
         foreach($tempstruc as $key => $ind) {
@@ -221,7 +228,9 @@ class PEAR_PackageFileManager_File {
      */
     function _checkIgnore($file, $path, $return = 1)
     {
-        $path = realpath($path);
+        if (file_exists($path)) {
+            $path = realpath($path);
+        }
         if (is_array($this->ignore[$return])) {
             foreach($this->ignore[$return] as $match) {
                 // match is an array if the ignore parameter was a /path/to/pattern

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Creates the <kbd>phptest</kbd> table.
+ * Creates the <kbd>phptest</kbd> table
  *
  * Tries to drop the table first, in case it already exists.
  *
@@ -27,19 +27,45 @@
  *    SELECT * FROM phptest WHERE RTRIM(b) = ?
  * </samp>
  *
- * @package  DB
- * @version $Id: mktable.inc,v 1.14 2004/04/29 23:20:24 danielc Exp $
- * @category Database
- * @internal
+ * PHP versions 4 and 5
+ *
+ * LICENSE: This source file is subject to version 3.0 of the PHP license
+ * that is available through the world-wide-web at the following URI:
+ * http://www.php.net/license/3_0.txt.  If you did not receive a copy of
+ * the PHP License and are unable to obtain it through the web, please
+ * send a note to license@php.net so we can mail you a copy immediately.
+ *
+ * @category   Database
+ * @package    DB
+ * @author     Daniel Convissor <danielc@php.net>
+ * @copyright  1997-2005 The PHP Group
+ * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
+ * @version    $Id: mktable.inc,v 1.19 2005/02/14 23:33:20 danielc Exp $
+ * @link       http://pear.php.net/package/DB
  */
 
 /**
- * Establishes the DB object and connects to the database.
+ * Establishes the DB object and connects to the database
  */
 require_once './connect.inc';
 
+/**
+ * Get the drop_table() function
+ */
+require_once './droptable.inc';
+
+/**
+ * The error handler for the drop table procedure
+ *
+ * Prints out an error message and dies.
+ */
+function debug_die($o){
+    die($o->toString());
+}
+
+
 $dbh->setErrorHandling(PEAR_ERROR_RETURN);
-$dbh->query("DROP TABLE phptest");
+drop_table($dbh, 'phptest');
 
 //$dbh->setErrorHandling(PEAR_ERROR_TRIGGER);
 $dbh->setErrorHandling(PEAR_ERROR_CALLBACK, 'debug_die');
@@ -71,13 +97,27 @@ switch ($type) {
         $default = "DEFAULT 'def' NOT NULL";
         $tabletype = '';
         break;
-    case 'msql':
+    case 'fbsql':
+        $null = '';
+        $chrc = 'CHAR(255)';
+        $chrd = 'CHAR(20)';
+        $default = "DEFAULT 'def' NOT NULL";
+        $date_literal = ' DATE ';
+        $tabletype = '';
+        break;
     case 'ifx':
         // doing this for ifx to keep certain versions happy
         $null = '';
         $chrc = 'CHAR(255)';
         $chrd = 'CHAR(20)';
         $default = "DEFAULT 'def' NOT NULL";
+        $tabletype = '';
+        break;
+    case 'msql':
+        $null = '';
+        $chrc = 'CHAR(255)';
+        $chrd = 'CHAR(20)';
+        $default = '';
         $tabletype = '';
         break;
     case 'mysql':
@@ -100,19 +140,22 @@ switch ($type) {
         $tabletype = '';
 }
 
-
-$test_mktable_query = "
-    CREATE TABLE phptest (
-      a INTEGER $null,
-      b CHAR(40) $default,
-      c $chrc $null,
-      d $chrd $null) $tabletype
-";
+switch ($dbh->phptype) {
+    case 'dbase':
+        // file exists or was created in DB_dbase::connect()
+        break;
+    default:
+        $test_mktable_query = "
+            CREATE TABLE phptest (
+              a INTEGER $null,
+              b CHAR(40) $default,
+              c $chrc $null,
+              d $chrd $null) $tabletype
+        ";
+}
 
 
 $dbh->query($test_mktable_query);
 $dbh->query("INSERT INTO phptest VALUES(42, 'bing', 'This is a test', '1999-11-21')");
 
 $dbh->setErrorHandling(PEAR_ERROR_RETURN);
-
-?>

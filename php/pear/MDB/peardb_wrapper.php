@@ -42,7 +42,7 @@
 // | Author: Lukas Smith <smith@backendmedia.com>                         |
 // +----------------------------------------------------------------------+
 //
-// $Id: peardb_wrapper.php,v 1.32.4.1 2004/01/08 13:43:02 lsmith Exp $
+// $Id: peardb_wrapper.php,v 1.32.4.2 2004/04/08 17:19:01 lsmith Exp $
 //
 
 /*
@@ -297,7 +297,7 @@ class MDB_PEAR_PROXY
     function MDB_PEAR_PROXY($MDB_object)
     {
         $this->MDB_object = $MDB_object;
-        $this->MDB_object->sequence_prefix = '_seq_';
+        $this->MDB_object->option['sequence_col_name'] = 'id';
     }
 
     function connect($dsninfo, $persistent = FALSE)

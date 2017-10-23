@@ -15,7 +15,7 @@
 // | Author: Bertrand Mansion <bmansion@mamasam.com>                      |
 // +----------------------------------------------------------------------+
 //
-// $Id: IniCommented.php,v 1.16 2003/11/29 10:44:39 mansion Exp $
+// $Id: IniCommented.php,v 1.19 2004/11/23 04:57:55 ryansking Exp $
 
 /**
 * Config parser for PHP .ini files with comments
@@ -69,7 +69,7 @@ class Config_Container_IniCommented {
             } elseif (preg_match('/^\s*$/', $line)) {
                 // a blank line
                 $currentSection->createBlank();
-            } elseif (preg_match('/^\s*([a-zA-Z0-9_\-\.]*)\s*=\s*(.*)\s*$/', $line, $match)) {
+			} elseif (preg_match('/^\s*([a-zA-Z0-9_\-\.\s]*)\s*=\s*(.*)\s*$/', $line, $match)) {
                 // a directive
                 
                 $values = $this->_quoteAndCommaParser($match[2]);
@@ -80,7 +80,7 @@ class Config_Container_IniCommented {
                 if (count($values)) {
                     foreach($values as $value) {
                         if ($value[0] == 'normal') {
-                            $currentSection->createDirective($match[1], $value[1]);
+                            $currentSection->createDirective(trim($match[1]), $value[1]);
                         }
                         if ($value[0] == 'comment') {
                             $currentSection->createComment(substr($value[1], 1));
@@ -137,17 +137,20 @@ class Config_Container_IniCommented {
         
         // state stack
         $stack = array();
+
         // return information
         $return = array();
         $returnpos = 0;
         $returntype = 'normal';
+
         // initialize
         array_push($stack, 'normal');
         $pos = 0; // position in $text
+
         do {
             $char = $text{$pos};
             $state = $this->_getQACEvent($stack);
-            
+
             if ($tokens[$state]) {
                 if (in_array($char, $tokens[$state])) {
                     switch($events[$state][$char]) {
@@ -157,9 +160,9 @@ class Config_Container_IniCommented {
                                 !empty($return[$returnpos][1])) {
                                 return PEAR::raiseError("invalid ini syntax, quotes cannot follow text '$text'",
                                                         null, PEAR_ERROR_RETURN);
-                                }
-                            if ($returnpos >= 0) {
-                            // trim any unnecessary whitespace in earlier entries
+                            }
+                            if ($returnpos >= 0 && isset($return[$returnpos])) {
+                                // trim any unnecessary whitespace in earlier entries
                                 $return[$returnpos][1] = trim($return[$returnpos][1]);
                             } else {
                                 $returnpos++;
@@ -279,7 +282,7 @@ class Config_Container_IniCommented {
                         $childrenCount[$obj->name]++;
                     } else {
                         $childrenCount[$obj->name] = 0;
-                        $commaString[$obj->name] = $obj->name.'=';
+                        $commaString[$obj->name] = $obj->name.' = ';
                     }
                     if ($childrenCount[$obj->name] == $count-1) {
                         // Clean the static for future calls to toString
@@ -290,7 +293,7 @@ class Config_Container_IniCommented {
                         $commaString[$obj->name] .= $content.', ';
                     }
                 } else {
-                    $string = $obj->name.'='.$content."\n";
+                    $string = $obj->name.' = '.$content."\n";
                 }
                 break;
             case 'section':

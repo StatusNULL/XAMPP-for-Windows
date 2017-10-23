@@ -14,10 +14,10 @@
 // | license@php.net so we can mail you a copy immediately.               |
 // +----------------------------------------------------------------------+
 // | Authors: Alexander Merz <alexmerz@php.net>                           |
-// |                                                                      |
+// |          Heino H. Gehlsen <heino@gehlsen.dk>                         |
 // +----------------------------------------------------------------------+
 //
-// $Id: index.php,v 1.1.4.1 2004/07/01 16:56:35 heino Exp $
+// $Id: index.php,v 1.2.2.1 2005/01/30 15:44:44 heino Exp $
 ?>
 <html>
 <head>
@@ -25,9 +25,9 @@
 </head>
 <body>
 <?php
-require_once "Net/NNTP.php";
+require_once "Net/NNTP/Client.php";
 
-$nntp = new Net_NNTP;
+$nntp = new Net_NNTP_Client();
 
 $ret = $nntp->connect("news.php.net");
 if( PEAR::isError($ret)) {
@@ -36,13 +36,14 @@ if( PEAR::isError($ret)) {
 } else {
     echo "<h1>Avaible groups</h1>";    
     $groups = $nntp->getGroups();
+    $descriptions = $nntp->getDescriptions();
     foreach($groups as $group) {
         echo '<a href="group.php?group='.urlencode($group['group']).
-            '&writable='.urlencode($group['posting_allowed']).'">'.
+            '&writable='.urlencode($group['posting']).'">'.
             $group['group'].'</a>' ;
         $msgcount = $group['last']-$group['first']; 
         echo '&nbsp;('.$msgcount.' messages)<br>';
-        echo $group['desc'].'<br><br>';
+        echo $descriptions[$group['group']].'<br><br>';
     }
     $nntp->quit();
 }    

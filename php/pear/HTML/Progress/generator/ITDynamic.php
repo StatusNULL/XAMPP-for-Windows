@@ -1,6 +1,6 @@
 <?php
 // +----------------------------------------------------------------------+
-// | PHP Version 4                                                        |
+// | PEAR :: HTML :: Progress                                             |
 // +----------------------------------------------------------------------+
 // | Copyright (c) 1997-2004 The PHP Group                                |
 // +----------------------------------------------------------------------+
@@ -15,24 +15,24 @@
 // | Author: Laurent Laville <pear@laurent-laville.org>                   |
 // +----------------------------------------------------------------------+
 //
-// $Id: ITDynamic.php,v 1.1 2004/02/13 15:36:55 farell Exp $
-
-require_once 'HTML/QuickForm/Renderer/ITDynamic.php';
-// can use either HTML_Template_Sigma or HTML_Template_ITX
-require_once 'HTML/Template/ITX.php';
-//require_once 'HTML/Template/Sigma.php';
+// $Id: ITDynamic.php,v 1.3 2004/07/03 14:48:31 farell Exp $
 
 /**
  * The ActionDisplay class provides a ITDynamic form rendering
  * with template engine IT[x] family.
  *
- * @version    1.1
+ * @version    1.2.0
  * @author     Laurent Laville <pear@laurent-laville.org>
  * @access     public
- * @category   HTML
  * @package    HTML_Progress
+ * @subpackage Progress_UI
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
  */
+
+require_once 'HTML/QuickForm/Renderer/ITDynamic.php';
+// can use either HTML_Template_Sigma or HTML_Template_ITX
+require_once 'HTML/Template/ITX.php';
+//require_once 'HTML/Template/Sigma.php';
 
 class ActionDisplay extends HTML_QuickForm_Action_Display
 {

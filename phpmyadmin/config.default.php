@@ -1,5 +1,5 @@
 <?php
-/* $Id: config.inc.php,v 2.52 2005/03/16 17:22:08 lem9 Exp $ */
+/* $Id: config.inc.php,v 2.53 2005/06/07 16:44:39 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -309,7 +309,7 @@ $cfg['DefaultTabTable']       = 'tbl_properties_structure.php';
  * Export defaults
  */
 
-$cfg['Export']['format']                    = 'sql';  // sql/latex/excel/csv/xml/xls/hmtlexcel/htmlword
+$cfg['Export']['format']                    = 'sql';  // sql/latex/excel/csv/xml/xls/htmlexcel/htmlword
 $cfg['Export']['compression']               = 'none'; // none/zip/gzip/bzip2
 
 $cfg['Export']['asfile']                    = FALSE;
@@ -841,5 +841,5 @@ set_magic_quotes_runtime(0);
 /**
  * File Revision - do not change either!
  */
-$cfg['FileRevision'] = '$Revision: 2.52 $';
+$cfg['FileRevision'] = '$Revision: 2.53 $';
 ?>

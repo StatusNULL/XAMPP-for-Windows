@@ -1,6 +1,6 @@
 <?php
 // +----------------------------------------------------------------------+
-// | PHP Version 4                                                        |
+// | PEAR :: HTML :: Progress                                             |
 // +----------------------------------------------------------------------+
 // | Copyright (c) 1997-2004 The PHP Group                                |
 // +----------------------------------------------------------------------+
@@ -15,23 +15,23 @@
 // | Author: Laurent Laville <pear@laurent-laville.org>                   |
 // +----------------------------------------------------------------------+
 //
-// $Id: SmartyDynamic.php,v 1.1 2004/02/13 15:36:55 farell Exp $
-
-require_once 'HTML/QuickForm/Renderer/Array.php';
-// fix this if your Smarty is somewhere else
-require_once 'Smarty.class.php';
+// $Id: SmartyDynamic.php,v 1.3 2004/07/03 14:48:31 farell Exp $
 
 /**
  * The ActionDisplay class provides a dynamic form rendering
  * with Smarty template engine.
  *
- * @version    1.1
+ * @version    1.2.0
  * @author     Laurent Laville <pear@laurent-laville.org>
  * @access     public
- * @category   HTML
  * @package    HTML_Progress
+ * @subpackage Progress_UI
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
  */
+
+require_once 'HTML/QuickForm/Renderer/Array.php';
+// fix this if your Smarty is somewhere else
+require_once 'Smarty.class.php';
 
 class ActionDisplay extends HTML_QuickForm_Action_Display
 {

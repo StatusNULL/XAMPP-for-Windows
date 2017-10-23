@@ -1,9 +1,8 @@
 <?php
-
 /**
  * HTML output for PHPUnit suite tests.
  * 
- * @version    $Id: testsuite.php,v 1.1 2003/11/15 18:27:11 thesaur Exp $
+ * @version    $Id: testsuite.php,v 1.5 2004/08/12 17:04:19 farell Exp $
  * @author     Laurent Laville <pear@laurent-laville.org>
  * @package    HTML_Progress
  */
@@ -45,24 +44,36 @@ $title = 'PhpUnit test run, HTML_Progress class';
 <h2>Tests</h2>
 	<?php
 	$testcases = array(
-   	    'HTML_Progress_TestCase_DM',
-    	    'HTML_Progress_TestCase_UI_setOrientation',
-    	    'HTML_Progress_TestCase_UI_setFillWay',
-    	    'HTML_Progress_TestCase_UI_setCellCount',
-    	    'HTML_Progress_TestCase_UI_setCellAttributes',
-    	    'HTML_Progress_TestCase_UI_setScript',
-    	    'HTML_Progress_TestCase_setIndeterminate',
-            'HTML_Progress_TestCase_setBorderPainted',
-            'HTML_Progress_TestCase_setStringPainted',
-            'HTML_Progress_TestCase_getString',
-            'HTML_Progress_TestCase_getDM',
-            'HTML_Progress_TestCase_setDM',
-            'HTML_Progress_TestCase_getUI',
-            'HTML_Progress_TestCase_setUI',
             'HTML_Progress_TestCase_addListener',
-            'HTML_Progress_TestCase_removeListener'
+   	    'HTML_Progress_TestCase_DM_new',
+   	    'HTML_Progress_TestCase_DM_setIncrement',
+   	    'HTML_Progress_TestCase_DM_setMaximum',
+   	    'HTML_Progress_TestCase_DM_setMinimum',
+   	    'HTML_Progress_TestCase_DM_setValue',
+            'HTML_Progress_TestCase_getDM',
+            'HTML_Progress_TestCase_getString',
+            'HTML_Progress_TestCase_getUI',
+            'HTML_Progress_TestCase_removeListener',
+            'HTML_Progress_TestCase_setAnimSpeed',
+            'HTML_Progress_TestCase_setBorderPainted',
+            'HTML_Progress_TestCase_setDM',  	    
+    	    'HTML_Progress_TestCase_setIndeterminate',
+            'HTML_Progress_TestCase_setModel',
+            'HTML_Progress_TestCase_setString',
+            'HTML_Progress_TestCase_setStringPainted',
+            'HTML_Progress_TestCase_setUI',
+    	    'HTML_Progress_TestCase_UI_getBorderAttributes',
+    	    'HTML_Progress_TestCase_UI_getCellAttributes',
+    	    'HTML_Progress_TestCase_UI_getProgressAttributes',
+    	    'HTML_Progress_TestCase_UI_getStringAttributes',
+   	    'HTML_Progress_TestCase_UI_new',
+    	    'HTML_Progress_TestCase_UI_setCellAttributes',
+    	    'HTML_Progress_TestCase_UI_setCellCoordinates',
+    	    'HTML_Progress_TestCase_UI_setCellCount',
+    	    'HTML_Progress_TestCase_UI_setFillWay',
+    	    'HTML_Progress_TestCase_UI_setOrientation',
+    	    'HTML_Progress_TestCase_UI_setScript',
 	);
-
 	
 	$suite = new PHPUnit_TestSuite();
 

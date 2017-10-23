@@ -13,51 +13,56 @@
 // | license@php.net so we can mail you a copy immediately.                    |
 // +---------------------------------------------------------------------------+
 //
-// $Id: Anchor.php,v 1.12 2004/01/01 10:31:55 sebastian Exp $
+// $Id: Anchor.php,v 1.18 2004/11/20 07:35:07 sebastian Exp $
 //
 
 require_once 'XML/Transformer/Namespace.php';
 require_once 'XML/Util.php';
 
-/**
-* Handler for the Anchor Namespace.
-*
-* This namespace maintains an anchor database, a database of
-* named links. These links can be referenced using the iref
-* tag within this namespace.
-*
-* This allows for a central storage of links, changing links
-* need only be changed in one locations. Designers can reference
-* the link through the symbolic name.
-*
-* Example:
-*
-* ...
-*   $n = XML_Transformer_Namespace_Anchor;
-*   $t->overloadNamespace("a", $n);
-*
-*   $n->setDatabase(
-*         array(
-*           "pear" => array(
-*             "href"  => "http://pear.php.net",
-*             "title" => "PEAR Homepage"
-*           )
-*         )
-*   );
-* ?>
-* <p>The <a:iref iref="pear">PEAR Homepage</a:iref> is now online.</p>
-*
-*
-* Output:
-* <p>The <a href="http://www.pear.net" title="PEAR Homepage">PEAR
-* Homepage</a> is now online.</p>
-*
-*
-* @author  Sebastian Bergmann <sb@sebastian-bergmann.de>
-* @author  Kristian Köhntopp <kris@koehntopp.de>
-* @version $Revision: 1.12 $
-* @access  public
-*/
+ /**
+ * Handler for the Anchor Namespace.
+ *
+ * This namespace maintains an anchor database, a database of
+ * named links. These links can be referenced using the iref
+ * tag within this namespace.
+ *
+ * This allows for a central storage of links, changing links
+ * need only be changed in one locations. Designers can reference
+ * the link through the symbolic name.
+ *
+ * Example:
+ *
+ * <code>
+ * <?php
+ * $n = XML_Transformer_Namespace_Anchor;
+ * $t->overloadNamespace("anchor", $n);
+ *
+ * $n->setDatabase(
+ *       array(
+ *         "pear" => array(
+ *           "href"  => "http://pear.php.net",
+ *           "title" => "PEAR Homepage"
+ *         )
+ *       )
+ * );
+ * ?>
+ * <p>The <anchor:iref iref="pear">PEAR Homepage</anchor:iref> is now online.</p>
+ * </code>
+ *
+ * Output:
+ *
+ * <code>
+ * <p>The <a href="http://www.pear.net" title="PEAR Homepage">PEAR
+ * Homepage</a> is now online.</p>
+ * </code>
+ *
+ * @author      Sebastian Bergmann <sb@sebastian-bergmann.de>
+ * @author      Kristian Köhntopp <kris@koehntopp.de>
+ * @copyright   Copyright &copy; 2002-2004 Sebastian Bergmann <sb@sebastian-bergmann.de> and Kristian Köhntopp <kris@koehntopp.de>
+ * @license     http://www.php.net/license/3_0.txt The PHP License, Version 3.0
+ * @category    XML
+ * @package     XML_Transformer
+ */
 class XML_Transformer_Namespace_Anchor extends XML_Transformer_Namespace {
     // {{{ Members
 
@@ -65,7 +70,7 @@ class XML_Transformer_Namespace_Anchor extends XML_Transformer_Namespace {
     * @var    boolean
     * @access public
     */
-    var $defaultNamespacePrefix = 'a';
+    var $defaultNamespacePrefix = 'anchor';
 
     /**
     * @var    array
@@ -91,7 +96,7 @@ class XML_Transformer_Namespace_Anchor extends XML_Transformer_Namespace {
     function setDatabase($db) {
         $this->_anchorDatabase = $db;
 
-        return true;
+        return TRUE;
     }
 
     // }}}
@@ -121,7 +126,7 @@ class XML_Transformer_Namespace_Anchor extends XML_Transformer_Namespace {
     function addItem($item, $attr) {
         $this->_anchorDatabase[$item] = $attr;
 
-        return true;
+        return TRUE;
     }
 
     // }}}
@@ -136,11 +141,11 @@ class XML_Transformer_Namespace_Anchor extends XML_Transformer_Namespace {
     */
     function dropItem($item) {
         if (!isset($this->_anchorDatabase[$item]))
-            return false;
+            return FALSE;
 
         unset($this->_anchorDatabase[$item]);
 
-        return true;
+        return TRUE;
     }
 
     // }}}
@@ -155,7 +160,7 @@ class XML_Transformer_Namespace_Anchor extends XML_Transformer_Namespace {
     */
     function getItem($item) {
         if (!isset($this->_anchorDatabase[$item])) {
-            return false;
+            return FALSE;
         }
 
         return $this->_anchorDatabase[$item];

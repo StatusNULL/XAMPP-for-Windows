@@ -13,10 +13,10 @@
 // | obtain it through the world-wide-web, please send a note to          | 
 // | license@php.net so we can mail you a copy immediately.               | 
 // +----------------------------------------------------------------------+ 
-// | Authors: Paul M. Jones <pjones@ciaweb.net>                           | 
+// | Authors: Paul M. Jones <pmjones@php.net>                             | 
 // +----------------------------------------------------------------------+ 
 // 
-// $Id: Contact_Vcard_Build.php,v 1.2 2004/02/02 19:09:32 pmjones Exp $ 
+// $Id: Contact_Vcard_Build.php,v 1.2 2005/05/28 14:49:56 pmjones Exp $ 
 
 /**
 * 
@@ -35,11 +35,11 @@
 * 
 * "Get" returns the full vCard line for a single iteration.
 * 
-* @author Paul M. Jones <pjones@ciaweb.net>
+* @author Paul M. Jones <pmjones@php.net>
 * 
 * @package Contact_Vcard
 * 
-* @version 1.1
+* @version @package_version@
 * 
 */
 
@@ -167,6 +167,10 @@ class Contact_Vcard_Build extends PEAR {
             
         } else {
         
+            // escape colons not led by a backslash
+            $regex = '(?<!\\\\)(\:)';
+            $text = preg_replace("/$regex/i", "\\:", $text);
+            
             // escape semicolons not led by a backslash
             $regex = '(?<!\\\\)(\;)';
             $text = preg_replace("/$regex/i", "\\;", $text);

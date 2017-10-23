@@ -16,7 +16,7 @@
 // | Authors: Alexander Wirtz <alex@pc4p.net>                             |
 // +----------------------------------------------------------------------+
 //
-// $Id: Ejse.php,v 1.14 2004/05/01 12:49:26 eru Exp $
+// $Id: Ejse.php,v 1.15 2004/09/03 15:50:34 eru Exp $
 
 /**
 * @package      Services_Weather
@@ -273,13 +273,16 @@ class Services_Weather_Ejse extends Services_Weather_Common {
             );
         }
 
-        preg_match("/(\w+) (\d+), (\d+), at (\d+:\d+ \wM) [^\(]+(\(([^\)]+)\))?/", $this->_weather->LastUpdated, $update);
-        if (isset($update[5])) {
-            $timestring = $update[6];
+        if (preg_match("/(\w+) (\d+), (\d+), at (\d+:\d+ \wM) [^\(]+(\(([^\)]+)\))?/", $this->_weather->LastUpdated, $update)) {
+            if (isset($update[5])) {
+                $timestring = $update[6];
+            } else {
+                $timestring = $update[2]." ".$update[1]." ".$update[3]." ".$update[4]." EST";
+            }
+            $weatherReturn["update"]            = gmdate(trim($this->_dateFormat." ".$this->_timeFormat), strtotime($timestring));
         } else {
-            $timestring = $update[2]." ".$update[1]." ".$update[3]." ".$update[4]." EST";
+            $weatherReturn["update"]            = "";
         }
-        $weatherReturn["update"]            = gmdate(trim($this->_dateFormat." ".$this->_timeFormat), strtotime($timestring));
         $weatherReturn["updateRaw"]			= $this->_weather->LastUpdated;
         $weatherReturn["station"]           = $this->_weather->ReportedAt;
         $weatherReturn["conditionIcon"]     = $this->_weather->IconIndex;

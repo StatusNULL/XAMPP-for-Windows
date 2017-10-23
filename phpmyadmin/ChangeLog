@@ -2,51 +2,329 @@
 phpMyAdmin - Changelog
 ----------------------
 
-$Id: ChangeLog,v 2.1032.2.16 2005/05/05 17:03:41 lem9 Exp $
+$Id: ChangeLog,v 2.1112.2.14 2005/07/04 21:47:07 lem9 Exp $
 $Source: /cvsroot/phpmyadmin/phpMyAdmin/ChangeLog,v $
+
+2005-07-04 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_properties_table_info.php: bug #1231917, commands out of sync
+
+2005-07-03 Marc Delisle  <lem9@users.sourceforge.net>
+    * Documentation.html: link in doc, thanks to Cedric Corazza
+    ### 2.6.3 released
+
+2005-07-02 Marc Delisle  <lem9@users.sourceforge.net>
+    * db_operations.php: bug #1230224, db rename and old pmadb information
+
+2005-07-01 Marc Delisle  <lem9@users.sourceforge.net>
+    * Documentation.html: patch #1229673, improvement to big-file-import
+      instructions, thanks to Isaac Bennetch - ibennetch
+
+2005-06-30 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/hungarian update, thanks to Mih·ly MÈsz·ros <necronix@freemail.hu>
+    * lang/japanese: updated, thanks to Tadashi Jokagi (elf2000)
+    * lang/catalan update, thanks to Xavier Navarro (xavin).
+    * lang/lithuanian: Updated, thanks to Vilius Simonaitis - maumas98
+    * lang/danish: Updated, thanks to AlleyKat - dk_alleykat.
+    * lang/swedish: Updated, thanks to Bj√∂rn T. Hallberg (bth).
+
+2005-06-29 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_properties_table_info.php: bug #1228862, creating a table under
+      MySQL 5.x with wrong table type
+
+2005-06-28 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_properties_operations.php: bug #1225635,
+      cannot change table's collation under MySQL 5.0.4
+
+2005-06-24 Michal ƒ.iha≈.  <michal@cihar.com>
+    * tbl_change.php, tbl_properties_links.php, libraries/export/sql.php:
+      Remove error reporting.
+    * lang/sync_lang.sh: Fix belarusian name.
+
+2005-06-24 Marc Delisle  <lem9@users.sourceforge.net>
+    * db_operations.php: problem renaming a db
+
+2005-06-24 Alexander M. Turek  <me@derrabus.de>
+    * lang/german-*.inc.php: Updates.
+    * db_operations.php: Cleaning up Marc's code... ;-p
+
+2005-06-23 Michal ƒ.iha≈.  <michal@cihar.com>
+    * lang/czech: Update.
+
+2005-06-22 Alexander M. Turek  <me@derrabus.de>
+    * tbl_properties_structure.php: Undefined index.
+
+2005-06-22 Garvin Hicking  <pma@supergarv.de>
+    * server_databases.php: Bug #1225315, wrong message displayed
+      when no databases were dropped.
+    * tbl_properties.inc.php: Patch #1225452, JS error for
+      getting the value of a select field in certain browsers.
+
+2005-06-19 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/chinese_traditional: Updates, thanks to Siu Sun
+    * lang/italian: Updates, thanks to Pietro Danesi
+    * lang/finnish: update, thanks to Jouni Kahkonen
+    * lang/norwegian: Update, thanks to Sven-Erik Andersen
+    * lang/mongolian update, thanks to Bayarsaikhan Enkhtaivan
+    * lang/danish: Updated, thanks to AlleyKat - dk_alleykat.
+    * lang/swedish: Updated, thanks to Bj√∂rn T. Hallberg (bth).
+
+2005-06-18 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/sqlparser.lib.php: bug 1221602, undefined variable when trying
+      to use a reserved word as an identifier
+    * db_operations.php, libraries/database_interface.lib.php:
+      bug #1221359, Copying a db containing a MERGE table
+
+2005-06-12 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_properties.inc.php: visually bind the Add x fields dialog to its 
+      submit button
+    * db_operations.php: bug #1215688, Copying database does not preserve 
+      default charset and collation
+    ### 2.6.3-rc1 released
+
+2005-06-12 Olivier Mueller <om@omnis.ch>
+    * lang/*, server_privileges.php: added strings for RFE #1197482: 
+      $strGeneratePassword, $strGenerate and $strCopy
+
+2005-06-11 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_properties_export.php: bug #1169791, exporting results from queries
+      with limit keyword
+    * lang/mongolian* update, thanks to Bayarsaikhan Enkhtaivan 
+    * lang/finnish: update, thanks to Jouni Kahkonen
+    * lang/norwegian: Update, thanks to Sven-Erik Andersen
+    * lang/galician: Updates, thanks to Xos√© Calvo.
+    * lang/belarusian, libraries/select_lang.lib.php:
+      belarusian is now belarusian_cyrillic; added belarusian_latin,
+      thanks to Jaska Zedlik
+
+2005-06-08 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/common.lib.php: bug #1216901, missing backquotes on the Browse
+      feature in case of duplicate entry
+
+2005-06-07 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/tatarish*: updates, thanks to Albert Fazl√≠
+    * config.inc.php: bug #1215950, typo in comment
+
+2005-06-06 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/tatarish*, /sync_lang.sh, libraries/select_lang.lib.php,
+      translators.html: renamed "tatar" to "tatarish" (tatar is
+      a different language and this translation is really tatarish)
+    * lang/mongolian*, libraries/select_lang.lib.php,
+      translators.html, Documentation.html, README:
+      new language (mongolian), thanks to Bayarsaikhan Enkhtaivan 
+
+2005-06-05 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/functions.js: bug #1207405, invalid SQL when creating
+      table with zero fields
+    * sql.php: bug #1204951, left frame browse icon alt tag 
+      not updated on emptying table
+
+2005-06-05 Michal ƒåiha≈ô  <michal@cihar.com>
+    * lang/czech: Update.
+
+2005-06-04 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/chinese_traditional: Updates, thanks to Siu Sun.
+    * lang/finnish: update, thanks to Jouni Kahkonen
+    * lang/norwegian: Update, thanks to Sven-Erik Andersen
+    * db_details_structure.php: optional message $strNumberOfFields,
+      will use $strFields if not defined
+    * db_operations.php, lang/*: bug #1212997, db copy should not
+      always perform CREATE DATABASE
+
+2005-06-03 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/tatar*, /sync_lang.sh, libraries/select_lang.lib.php,
+      translators.html, Documentation.html, README:
+      new language (tatar), thanks to Albert Fazl√≠
+
+2005-06-01 Marc Delisle  <lem9@users.sourceforge.net>
+    * Documentation.html: bug #1213761, hint about Hardened PHP
+      and the Missing parameters problem, thanks to Klaus Dorninger
+
+2005-05-31 Marc Delisle  <lem9@users.sourceforge.net>
+    * db_details_structure.php: patch 1209863, XHTML validity,
+      thanks to Ryan Schmidt
+
+2005-05-29 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_change.php: bug #1184325, Label IDs mismatch for ENUM type,
+      thanks to Ryan Schmidt
+    * footer.inc.php: bug #1209891, db list not refreshed when the left
+      frame is positionned on a db, then a manual DROP DATABASE it done
+      on another db
+    * db_operations.php, footer.inc.php: bug #1170227, copying a db does not
+      refresh the queryframe
+
+2005-05-27 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_properties.inc.php: bug #1205940, current timestamp checkbox
+      when field type changes
+
+2005-05-26 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_create.php: bug #1207406, undefined index from PMA_setComment()
+    * sql.php: bug #1204913, left frame update on manual table rename
+
+2005-05-25 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_properties.inc.php: bug #1207404, undefined variables
+
+2005-05-24 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/common.lib.php: bug #1207395, undefined theme_generation
+      and theme_version, thanks to Ryan Schmidt
+    * tbl_properties_operations.php: bug #1207212, changing table type
+      under MySQL 5.0.4
+
+2005-05-22 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/charset_conversion.lib.php: diacritics wrongly converted
+      in Browse mode under MySQL 4.1.x if AllowAnywhereRecoding set to TRUE
+    * tbl_properties_structure.php, tbl_properties.inc.php,
+      libraries/sqlparser.lib.php: bug #1163595, NULL detection of TIMESTAMP
+    * many files: bug #1193250, XHTML compliance, thanks to Ryan Schmidt
+    * themes/[darkblue_orange|original]/css/theme_print.css.php:
+      spelling error Hevetica -> Helvetica, thanks to Castorius and
+      Isaac Bennetch - ibennetch
+
+2005-05-19 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_select.php: bug #1204235, searching on a VARBINARY field
+
+2005-05-18 Marc Delisle  <lem9@users.sourceforge.net>
+    * export.php: bug #1193442, 8 extra spaces at end of export area,
+      thanks to Ryan Schmidt
+    * db_details_structure.php: bug #1193430, zero_rows parameter
+      not url-encoded, thanks to Ryan Schmidt
+
+2005-05-17 Marc Delisle  <lem9@users.sourceforge.net>
+    * server_privileges.php, libraries/server_privileges.js:
+      make the password generator work also on user account editing
+
+2005-05-17 Olivier Mueller <om@omnis.ch>
+    * server_privileges.php, libraries/server_privileges.js: RFE #1197482,
+      password generator on user creation.  RFC: ok like that?  TODO: add strings.
+
+2005-05-15 Marc Delisle  <lem9@users.sourceforge.net>
+    * sql.php, libraries/sqlparser.lib.php: bug #1120434, comment at the end
+      of query is applied to appended LIMIT as well
+
+2005-05-13 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_printview.php: bug #1178760, header not sent when displaying
+      print view of multi tables, thanks to Hrvoje Novosel - interghost
+    * libraries/functions.js: Patch #1191447, hand pointer on mouseover and
+      mousedown, thanks to Ken Stanley - eclipsboi
+
+2005-05-11 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_properties.inc.php: bug #1069012, table collation forgotten
+      when adding fields
+    * libraries/storage_engines.lib.php: bug 1180119, undefined variable when
+      showing the details of a storage engine under MySQL 4.0.x
+
+2005-05-10 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/sqlparser.lib.php: bug #1198156, undefined variable
+      when exporting without enclosing with backquotes
+
+2005-05-08 Marc Delisle  <lem9@users.sourceforge.net>
+    * db_details_links.php: patch #1196806, add a Privileges tab
+      in db view, thanks to Herman van Rink - helmo
+    * server_privileges.php: add a back link to the db on which
+      we are checking privileges
+    * Documentation.html: FAQ 3.13 about the MySQL API having problem dealing
+      with USE followed with a db name containing an hyphen
+    * read_dump.php: bug #1189664, js error when 2 queries submitted at once
+
+2005-05-08 Olivier Mueller <om@omnis.ch>
+    * scripts/upgrade.pl: new script to let unix admins upgrade phpMyadmin
+      with one command and 5 seconds. To be improved, but is working fine
+      here (tm).  Based on: http://www.phpmyadmin.net/latest.txt
+    * server_privileges.php: always display the "Add a new user" link
+      on the User overview page (no more need to click on [show all] or
+      an initial before)
 
 2005-05-05 Marc Delisle  <lem9@users.sourceforge.net>
     * libraries/mysql_charsets.lib.php: bug #1186983, missing character
       sets and collations (temporary workaround)
     * lang/swedish: Updated, thanks to Bj√∂rn T. Hallberg (bth).
-    ### 2.6.2-pl1 released
+
+2005-05-04 Marc Delisle  <lem9@users.sourceforge.net>
+    * Documentation.html: improvement about PmaAbsoluteUri,
+      thanks to Isaac Bennetch - ibennetch
 
 2005-05-03 Marc Delisle  <lem9@users.sourceforge.net>
     * libraries/common.lib.php: bug #1185152, setting collation for a field,
       thanks to Ryan Schmidt - ryandesign
 
 2005-05-02 Marc Delisle  <lem9@users.sourceforge.net>
+    * export.php: bug #1123284, avoid double compression when
+      zlib.output_compression is On, thanks to unclef at users.sourceforge.net
     * libraries/common.lib.php: bug #1193223, undefined index htmlexcel_null,
       thanks to Ryan Schmidt - ryandesign
+
+2005-05-01 Marc Delisle  <lem9@users.sourceforge.net>
+    * server_status.php: bug #1193225, missing </ul>
+    * tbl_properties.inc.php: bug #1193353, js error on creating table
+
+2005-04-30 Marc Delisle  <lem9@users.sourceforge.net>
+    * db_operations.php, libraries/tbl_move_copy.php:
+      bug #1192468, bookmarks copied too many times
+
+2005-04-27 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/finnish: update, thanks to Jouni Kahkonen
+    * lang/russian: update, thanks to lobovich
+    * libraries/sqlparser.lib.php: bug #1179887, ordering by count(*)
 
 2005-04-26 Marc Delisle  <lem9@users.sourceforge.net>
     * tbl_properties_structure.php, tbl_properties.inc.php:
       bug #1190092, wrong detection of NULL fields with MySQL 5.0.x
+    * lang/finnish: big update, thanks to Jouni Kahkonen
+
+2005-04-25 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/sqlparser*: bug #1185173. A query using the Storage
+      table name and an alias, returned no result. I changed the
+      parser to add a list of "forbidden" reserved words, as listed
+      in the MySQL manual (reserved words). Those are not allowed
+      as a table/column name, but others (like Storage) are allowed.
+      Now the query works. TODO: do not pretty print in color,
+      in this case
+    * libraries/common.lib.php: bug #1179241, wrong escaping of
+      apostrophe in generated PHP code
+
+2005-04-25 Michal ƒåiha≈ô  <michal@cihar.com>
+    * lang/czech: Update.
+    * lang/english: Fix typo.
+
+2005-04-24 Marc Delisle  <lem9@users.sourceforge.net>
+    * left.php, queryframe.php: bug #1168784, please respect the db order
+      given in only_db
 
 2005-04-16 Marc Delisle  <lem9@users.sourceforge.net>
-    * lang/chinese_simplified: Updates, thanks to mysf at etang.com 
+    * lang/chinese_simplified: Updates, thanks to mysf at etang.com
     * lang/serbian: Updated, thanks to Mihailo Stefanovic (mikis).
     * lang/danish: Updated, thanks to AlleyKat - dk_alleykat.
     * lang/spanish: Updated, thanks to Daniel Hinostroza (hinostroza).
+    * lang/galician: Updates, thanks to Xos√© Calvo.
     * new language: belarusian, thanks to Jaska Zedlik <jz53 at zedlik.com>
     * tbl_properties_export.php: bug #1180860, error going from Export
       to Insert tab
     ### 2.6.2 released
-    
+
 2005-04-14 Marc Delisle  <lem9@users.sourceforge.net>
     * db_details_structure.php: Search icon centering
 
 2005-04-13 Marc Delisle  <lem9@users.sourceforge.net>
     * tbl_alter.php: undefined $field_comments
 
+2005-04-10 Alexander M. Turek  <me@derrabus.de>
+    * lang/*.inc.php: New messages for MySQL 5.0 privileges.
+
 2005-04-10 Marc Delisle  <lem9@users.sourceforge.net>
     * lang/bulgarian:  Updated, thanks to Stanislav Yordanov (stanprog).
     * server_privileges.php: bug #1179969, problem editing a user's profile
       (and there was a problem also with the detection of
        an already existing user)
-  
+
+2005-04-09 Alexander M. Turek  <me@derrabus.de>
+    * libraries/sqlparser.data.php: Added keyword ROUTINE.
+
 2005-04-08 Marc Delisle  <lem9@users.sourceforge.net>
     * lang/catalan update, thanks to Xavier Navarro (xavin).
+
+2005-04-07 Alexander M. Turek  <me@derrabus.de>
+    * libraries/select_lang.lib.php, lang/english-iso-8859-15.inc.php:
+      en-iso-8859-15.
+    * lang/*.inc.php: New messages for MySQL 5.0 privileges.
 
 2005-04-07 Marc Delisle  <lem9@users.sourceforge.net>
     * tbl_properties.inc.php, tbl_alter.php: bug #1176896, undefined variable
@@ -58,17 +336,17 @@ $Source: /cvsroot/phpmyadmin/phpMyAdmin/ChangeLog,v $
 
 2005-04-01 Marc Delisle  <lem9@users.sourceforge.net>
     * tbl_addfield.php: TIMESTAMP options support
-    * libraries/common.lib.php: DEFAULT CURRENT_TIMESTAMP is only 
+    * libraries/common.lib.php: DEFAULT CURRENT_TIMESTAMP is only
       for TIMESTAMP (bug when changing from a TIMESTAMP to a non-TIMESTAMP type)    * (same): bug #1163595, problem 4: a TIMESTAMP must be explicitely
       set to NULL to have the NULL attribute
-    * libraries/tbl_move_copy.php: bug #1168996, error copying InnoDB table 
+    * libraries/tbl_move_copy.php: bug #1168996, error copying InnoDB table
       with FK constraints to a table in the same db
 
 2005-03-31 Alexander M. Turek  <me@derrabus.de>
     * left.php: Undefined offset (Bug #1174045).
 
 2005-03-31 Marc Delisle  <lem9@users.sourceforge.net>
-    * Documentation.html: added FAQ 5.17 about problem with 
+    * Documentation.html: added FAQ 5.17 about problem with
       Firefox when the Tabbrowser Extensions plugin is installed
     * tbl_properties.inc.php: TIMESTAMP options improved looks, thanks to Garvin
     * tbl_properties.inc.php: TIMESTAMP default CURRENT_TIMESTAMP checkbox
@@ -214,7 +492,7 @@ $Source: /cvsroot/phpmyadmin/phpMyAdmin/ChangeLog,v $
     * libraries/relation.lib.php: db comments broken
     * libraries/dbi/*.php, lang/*: new $strSocketProblem message
     * db_details.php, tbl_query_box.php, libraries/bookmark.lib.php:
-      bookmark improvement, 
+      bookmark improvement,
       based on patch #1034161 by Ryan Schmidt - ryandesign:
       sort bookmarks by label, remove the number before each bookmark
       in the drop-down choice. For this I had to change some logic in the

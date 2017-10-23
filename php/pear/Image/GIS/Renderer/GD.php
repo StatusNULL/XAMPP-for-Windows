@@ -13,17 +13,21 @@
 // | license@php.net so we can mail you a copy immediately.                 |
 // +------------------------------------------------------------------------+
 //
-// $Id: GD.php,v 1.4 2004/01/01 10:31:39 sebastian Exp $
+// $Id: GD.php,v 1.7 2004/04/17 10:21:26 sebastian Exp $
 //
 
 require_once 'Image/GIS/Renderer.php';
 
 /**
-* GD Renderer.
-*
-* @version  $Revision: 1.4 $
-* @since    Image_GIS 1.0.0
-*/
+ * GD Renderer.
+ *
+ * @author      Jan Kneschke <jan@kneschke.de>
+ * @author      Sebastian Bergmann <sb@sebastian-bergmann.de>
+ * @copyright   Copyright &copy; 2002-2004 Jan Kneschke <jan@kneschke.de> and Sebastian Bergmann <sb@sebastian-bergmann.de>
+ * @license     http://www.php.net/license/3_0.txt The PHP License, Version 3.0
+ * @category    Image
+ * @package     Image_GIS
+ */
 class Image_GIS_Renderer_GD extends Image_GIS_Renderer {
     /**
     * GD Image Palette.

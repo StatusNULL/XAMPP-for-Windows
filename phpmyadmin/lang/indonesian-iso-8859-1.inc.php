@@ -1,5 +1,5 @@
 <?php
-/* $Id: indonesian-iso-8859-1.inc.php,v 2.74 2005/03/30 19:22:52 lem9 Exp $ */
+/* $Id: indonesian-iso-8859-1.inc.php,v 2.78 2005/06/12 10:09:59 swix Exp $ */
 
 $charset = 'iso-8859-1';
 $text_dir = 'ltr'; // ('ltr' for left to right, 'rtl' for right to left)
@@ -807,4 +807,16 @@ $strSocketProblem = '(or the local MySQL server\'s socket is not correctly confi
 
 $strWriteRequests = 'Write requests';  //to translate
 
+$strPrivDescCreateView = 'Allows creating new views.';  //to translate
+$strPrivDescAlterDb = 'Allows altering the structure of existing tables as well as changing the default charset and collation of databases.';  //to translate
+$strPrivDescCreateUser = 'Allows creating, dropping and renaming unser accounts.';  //to translate
+$strPrivDescCreateRoutine = 'Allows creating stored routines.';  //to translate
+$strPrivDescAlterRoutine = 'Allows altering and dropping stored routines.';  //to translate
+$strRoutines = 'Routines';  //to translate
+$strPrivDescShowView = 'Allows performing SHOW CREATE VIEW queries.';  //to translate
+$strPrivDescExecute5 = 'Allows executing stored routines.';  //to translate
+$strCreateDatabaseBeforeCopying = 'CREATE DATABASE before copying';  //to translate
+$strGeneratePassword = 'Generate Password';  //to translate
+$strGenerate = 'Generate';  //to translate
+$strCopy = 'Copy';  //to translate
 ?>

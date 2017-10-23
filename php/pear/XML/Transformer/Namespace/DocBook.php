@@ -13,143 +13,119 @@
 // | license@php.net so we can mail you a copy immediately.                    |
 // +---------------------------------------------------------------------------+
 //
-// $Id: DocBook.php,v 1.24 2004/01/01 10:31:55 sebastian Exp $
+// $Id: DocBook.php,v 1.28 2004/11/19 07:18:57 sebastian Exp $
 //
 
 require_once 'XML/Transformer/Namespace.php';
 require_once 'XML/Util.php';
 
 /**
-* DocBook Namespace Handler.
-*
-* This namespace handler provides transformations to render a subset of
-* the popular DocBook/XML markup (http://www.docbook.org/) into HTML.
-*
-* Transformations for the following DocBook tags are implemented:
-*
-*   * <artheader>
-*
-*   * <article>
-*
-*   * <author>
-*
-*   * <book>
-*
-*   * <chapter>
-*
-*   * <emphasis>
-*
-*   * <example>
-*
-*   * <figure>
-*
-*   * <filename>
-*
-*   * <firstname>
-*
-*   * <function>
-*
-*   * <graphic>
-*
-*   * <itemizedlist>
-*
-*   * <listitem>
-*
-*   * <orderedlist>
-*
-*   * <para>
-*
-*   * <programlisting>
-*
-*   * <section>
-*
-*   * <surname>
-*
-*   * <title>
-*
-*   * <ulink>
-*
-*   * <xref>
-*
-* Example
-*
-*   <?php
-*   require_once 'XML/Transformer/Driver/OutputBuffer.php';
-*   $t = new XML_Transformer_Driver_OutputBuffer(
-*     array(
-*       'autoload' => 'DocBook'
-*     )
-*   );
-*   ?>
-*   <article>
-*     <artheader>
-*       <title>
-*         An Article
-*       </title>
-*       <author>
-*         <firstname>
-*           Sebastian
-*         </firstname>
-*         <surname>
-*           Bergmann
-*         </surname>
-*       </author>
-*     </artheader>
-*
-*     <section id="foo">
-*       <title>
-*         Section One
-*       </title>
-*     </section>
-*
-*     <section id="bar">
-*       <title>
-*         Section Two
-*       </title>
-*
-*       <para>
-*         <xref linkend="foo" />
-*       </para>
-*     </section>
-*   </article>
-*
-* Output
-*
-*   <html>
-*     <head>
-*       <title>
-*         Sebastian Bergmann: An Article
-*       </title>
-*     </head>
-*     <body>
-*       <h1 class="title">
-*         Sebastian Bergmann: An Article
-*       </h1>
-*       <div class="section">
-*         <a id="foo"></a>
-*         <h2 class="title">
-*           1. Section One
-*         </h2>
-*       </div>
-*       <div class="section">
-*         <a id="bar"></a>
-*         <h2 class="title">
-*           2. Section Two
-*         </h2>
-*         <p>
-*           <a href="#foo">
-*             1. Section One
-*           </a>
-*         </p>
-*       </div>
-*     </body>
-*   </html>
-*
-* @author  Sebastian Bergmann <sb@sebastian-bergmann.de>
-* @author  Kristian Köhntopp <kris@koehntopp.de>
-* @version $Revision: 1.24 $
-* @access  public
-*/
+ * DocBook Namespace Handler.
+ *
+ * This namespace handler provides transformations to render a subset of
+ * the popular DocBook/XML markup (http://www.docbook.org/) into HTML.
+ *
+ * Transformations for the following DocBook tags are implemented:
+ *
+ *   - <artheader>
+ *   - <article>
+ *   - <author>
+ *   - <book>
+ *   - <chapter>
+ *   - <emphasis>
+ *   - <example>
+ *   - <figure>
+ *   - <filename>
+ *   - <firstname>
+ *   - <function>
+ *   - <graphic>
+ *   - <itemizedlist>
+ *   - <listitem>
+ *   - <orderedlist>
+ *   - <para>
+ *   - <programlisting>
+ *   - <section>
+ *   - <surname>
+ *   - <title>
+ *   - <ulink>
+ *   - <xref>
+ *
+ * Example
+ *
+ * <code>
+ * <?php
+ * require_once 'XML/Transformer/Driver/OutputBuffer.php';
+ * $t = new XML_Transformer_Driver_OutputBuffer(
+ *   array(
+ *     'autoload' => 'DocBook'
+ *   )
+ * );
+ * ?>
+ * <article>
+ *   <artheader>
+ *     <title>An Article</title>
+ *
+ *     <author>
+ *       <firstname>Sebastian</firstname>
+ *       <surname>Bergmann</surname>
+ *     </author>
+ *   </artheader>
+ *
+ *   <section id="foo">
+ *     <title>Section One</title>
+ *   </section>
+ *
+ *   <section id="bar">
+ *     <title>Section Two</title>
+ *
+ *     <para>
+ *       <xref linkend="foo" />
+ *     </para>
+ *   </section>
+ * </article>
+ * </code>
+ *
+ * Output
+ *
+ * <code>
+ * <html>
+ *   <head>
+ *     <title>
+ *       Sebastian Bergmann: An Article
+ *     </title>
+ *   </head>
+ *   <body>
+ *     <h1 class="title">
+ *       Sebastian Bergmann: An Article
+ *     </h1>
+ *     <div class="section">
+ *       <a id="foo"></a>
+ *       <h2 class="title">
+ *         1. Section One
+ *       </h2>
+ *     </div>
+ *     <div class="section">
+ *       <a id="bar"></a>
+ *       <h2 class="title">
+ *         2. Section Two
+ *       </h2>
+ *       <p>
+ *         <a href="#foo">
+ *           1. Section One
+ *         </a>
+ *       </p>
+ *     </div>
+ *   </body>
+ * </html>
+ * </code>
+ *
+ * @author      Sebastian Bergmann <sb@sebastian-bergmann.de>
+ * @author      Kristian Köhntopp <kris@koehntopp.de>
+ * @copyright   Copyright &copy; 2002-2004 Sebastian Bergmann <sb@sebastian-bergmann.de> and Kristian Köhntopp <kris@koehntopp.de>
+ * @license     http://www.php.net/license/3_0.txt The PHP License, Version 3.0
+ * @category    XML
+ * @package     XML_Transformer
+ */
 class XML_Transformer_Namespace_DocBook extends XML_Transformer_Namespace {
     // {{{ Members
 
@@ -163,7 +139,7 @@ class XML_Transformer_Namespace_DocBook extends XML_Transformer_Namespace {
     * @var    boolean
     * @access public
     */
-    var $secondPassRequired = true;
+    var $secondPassRequired = TRUE;
 
     /**
     * @var    string
@@ -236,7 +212,7 @@ class XML_Transformer_Namespace_DocBook extends XML_Transformer_Namespace {
     * @var    array
     * @access private
     */
-    var $_secondPass = false;
+    var $_secondPass = FALSE;
 
     /**
     * @var    array
@@ -304,7 +280,7 @@ class XML_Transformer_Namespace_DocBook extends XML_Transformer_Namespace {
 
             return array(
               $cdata,
-              false
+              FALSE
             );
         }
     }
@@ -587,7 +563,7 @@ class XML_Transformer_Namespace_DocBook extends XML_Transformer_Namespace {
     function end_function($cdata) {
         return array(
           trim($cdata) . '</b></code>',
-          false
+          FALSE
         );
     }
 
@@ -758,7 +734,7 @@ class XML_Transformer_Namespace_DocBook extends XML_Transformer_Namespace {
                     ' ',
                     highlight_string($cdata, 1)
                   ),
-                  false
+                  FALSE
                 );
             }
             break;
@@ -766,7 +742,7 @@ class XML_Transformer_Namespace_DocBook extends XML_Transformer_Namespace {
             default: {
                 $cdata = array(
                   $cdata . '</code>',
-                  false
+                  FALSE
                 );
             }
         }
@@ -960,7 +936,7 @@ class XML_Transformer_Namespace_DocBook extends XML_Transformer_Namespace {
 
         return array(
           $cdata,
-          false
+          FALSE
         );
     }
 
@@ -1011,7 +987,7 @@ class XML_Transformer_Namespace_DocBook extends XML_Transformer_Namespace {
         if (!$this->_secondPass) {
             $this->_endSection($type);
 
-            $this->_secondPass = true;
+            $this->_secondPass = TRUE;
 
             $cdata = sprintf(
               '%s</%s>',
@@ -1025,7 +1001,7 @@ class XML_Transformer_Namespace_DocBook extends XML_Transformer_Namespace {
 
         return array(
           $cdata,
-          false
+          FALSE
         );
     }
 

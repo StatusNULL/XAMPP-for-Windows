@@ -2,7 +2,7 @@
 /**
  * several examples for the methods of XML_Util
  *
- * $Id: example.php,v 1.10 2004/06/27 18:17:39 schst Exp $
+ * $Id: example.php,v 1.12 2004/12/23 13:22:00 schst Exp $
  *
  * @author      Stephan Schmidt
  * @package     XML_Util
@@ -18,6 +18,13 @@
     */
     print "replace XML entities:<br>\n";
     print XML_Util::replaceEntities("This string contains < & >.");
+    print "\n<br><br>\n";
+
+    /**
+    * reversing XML entities
+    */
+    print "replace XML entities:<br>\n";
+    print XML_Util::reverseEntities("This string contains &lt; &amp; &gt;.");
     print "\n<br><br>\n";
 
     /**
@@ -171,6 +178,19 @@
 
     print "creating a tag with CData section:<br>\n";
     print htmlentities(XML_Util::createTagFromArray($tag, XML_UTIL_CDATA_SECTION));
+    print "\n<br><br>\n";
+
+    /**
+    * creating an XML tag with a CData Section
+    */
+    $tag = array(
+                  "qname"        => "foo",
+                  "attributes"   => array( "key" => "value", "argh" => "tütü" ),
+                  "content"      => "Also XHTML-tags can be created and HTML entities can be replaced Ä ä Ü ö <>."
+                );
+
+    print "creating a tag with HTML entities:<br>\n";
+    print htmlentities(XML_Util::createTagFromArray($tag, XML_UTIL_ENTITIES_HTML));
     print "\n<br><br>\n";
 
     /**

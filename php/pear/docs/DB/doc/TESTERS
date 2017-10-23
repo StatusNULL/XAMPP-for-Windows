@@ -2,7 +2,7 @@
 HOW TO TEST PEAR DB
 ===================
 
-$Id: TESTERS,v 1.19 2004/04/30 02:45:16 danielc Exp $
+$Id: TESTERS,v 1.20 2005/02/16 06:33:12 danielc Exp $
 
 
 INTRODUCTION
@@ -146,9 +146,9 @@ Kevin Henrikson               -   -   -   -   -   -   -   -   X   -   -   -   -
 Stig Bakken                   -   -   -   -   -   -   X   -   -   -   X   -   -
 Chuck Hagenbuch               -   -   -   -   -   X   -   -   -   -   -   -   -
 Ludovico Magnocavallo         -   -   X   -   -   -   -   -   -   -   -   -   -
-Daniel Convissor              -   -   X   -   -   X   X   X   X   X²  X   X   X
+Daniel Convissor              X   X   X   -   X   X   X   X   X   X²  X   X   X
 
-MISSING TESTERS               -   X   -   -   X   -   -   -   -   -   -   -   -
+MISSING TESTERS               -   -   -   -   -   -   -   -   -   -   -   -   -
 
 Comments:
 

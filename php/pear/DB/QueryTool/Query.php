@@ -1,34 +1,47 @@
 <?php
-// +----------------------------------------------------------------------+
-// | PHP Version 4                                                        |
-// +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2003 The PHP Group                                |
-// +----------------------------------------------------------------------+
-// | This source file is subject to version 2.02 of the PHP license,      |
-// | that is bundled with this package in the file LICENSE, and is        |
-// | available at through the world-wide-web at                           |
-// | http://www.php.net/license/2_02.txt.                                 |
-// | If you did not receive a copy of the PHP license and are unable to   |
-// | obtain it through the world-wide-web, please send a note to          |
-// | license@php.net so we can mail you a copy immediately.               |
-// +----------------------------------------------------------------------+
-// | Author:  Wolfram Kriesing, Paolo Panto, vision:produktion <wk@visionp.de>
-// +----------------------------------------------------------------------+
-//
-// $Id: Query.php,v 1.47 2004/05/02 15:34:52 quipo Exp $
-//
+/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
+/**
+ * Contains the DB_QueryTool_Query class
+ *
+ * PHP versions 4 and 5
+ *
+ * LICENSE: This source file is subject to version 3.0 of the PHP license
+ * that is available through the world-wide-web at the following URI:
+ * http://www.php.net/license/3_0.txt.  If you did not receive a copy of
+ * the PHP License and are unable to obtain it through the web, please
+ * send a note to license@php.net so we can mail you a copy immediately.
+ *
+ * @category   Database
+ * @package    DB_QueryTool
+ * @author     Wolfram Kriesing <wk@visionp.de>
+ * @author     Paolo Panto <wk@visionp.de>
+ * @author     Lorenzo Alberton <l dot alberton at quipo dot it>
+ * @copyright  2003-2005 Wolfram Kriesing, Paolo Panto, Lorenzo Alberton
+ * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
+ * @version    CVS: $Id: Query.php,v 1.57 2005/02/27 19:13:19 quipo Exp $
+ * @link       http://pear.php.net/package/DB_QueryTool
+ */
+
+/**
+ * require the PEAR and DB classes
+ */
 require_once 'PEAR.php';
 require_once 'DB.php';
 
-
 /**
- * this class should be extended
+ * DB_QueryTool_Query class
  *
+ * This class should be extended
+ *
+ * @category   Database
  * @package    DB_QueryTool
- * @version    2002/04/02
- * @access     public
  * @author     Wolfram Kriesing <wk@visionp.de>
+ * @author     Paolo Panto <wk@visionp.de>
+ * @author     Lorenzo Alberton <l dot alberton at quipo dot it>
+ * @copyright  2003-2005 Wolfram Kriesing, Paolo Panto, Lorenzo Alberton
+ * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
+ * @link       http://pear.php.net/package/DB_QueryTool
  */
 class DB_QueryTool_Query
 {
@@ -50,7 +63,7 @@ class DB_QueryTool_Query
     var $sequenceName = null;
 
     /**
-     * @var object  the db-object, a PEAR::Db-object instance
+     * @var object  the db-object, a PEAR::DB instance
      */
     var $db = null;
 
@@ -243,15 +256,19 @@ class DB_QueryTool_Query
             $autoConnect = true;
         } else {
             $autoConnect = $options['autoConnect'];
+            unset($options['autoConnect']);
         }
         if (isset($options['errorCallback'])) {
             $this->setErrorCallback($options['errorCallback']);
+            unset($options['errorCallback']);
         }
         if (isset($options['errorSetCallback'])) {
             $this->setErrorSetCallback($options['errorSetCallback']);
+            unset($options['errorSetCallback']);
         }
         if (isset($options['errorLogCallback'])) {
             $this->setErrorLogCallback($options['errorLogCallback']);
+            unset($options['errorLogCallback']);
         }
         if ($autoConnect && $dsn) {
             $this->connect($dsn, $options);
@@ -271,7 +288,11 @@ class DB_QueryTool_Query
      */
     function connect($dsn, $options=array())
     {
-        $res = $this->db = DB::connect($dsn, $options);
+        if (is_object($dsn)) {
+            $res = $this->db =& $dsn;
+        } else {
+            $res = $this->db = DB::connect($dsn, $options);
+        }
         if (DB::isError($res)) {
 // FIXXME what shall we do here?
             $this->_errorLog($res->getUserInfo());
@@ -319,9 +340,9 @@ class DB_QueryTool_Query
      * @version    2002/03/05
      * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
-     * @param      integer the id of the element to retreive
+     * @param      integer the id of the element to retrieve
      * @param      string  if this is given only one row shall be returned, directly, not an array
-     * @return     mixed   (1) an array of the retreived data
+     * @return     mixed   (1) an array of the retrieved data
      *                     (2) if the second parameter is given and its only one column,
      *                         only this column's data will be returned
      *                     (3) false in case of failure
@@ -408,7 +429,7 @@ class DB_QueryTool_Query
      *      $ids = $table->getCol();
      * OR
      *      $ids = $table->getCol('id');
-     * so ids will ba an array with all the id's
+     * so ids will be an array with all the id's
      *
      * @version    2003/02/25
      * @access     public
@@ -472,10 +493,10 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
         $query['order'] = '';   // order is not of importance and might freak up the special group-handling up there, since the order-col is not be known
 /*# FIXXME use the following line, but watch out, then it has to be used in every method, or this
 # value will be used always, simply try calling getCount and getAll afterwards, getAll will return the count :-)
-# if getAll doenst use setSelect!!!
+# if getAll doesn't use setSelect!!!
 */
         //$this->setSelect('count(*)');
-        $queryString = $this->_buildSelectQuery($query);
+        $queryString = $this->_buildSelectQuery($query, true);
 
         return ($res = $this->execute($queryString, 'getOne')) ? $res : 0;
     }
@@ -655,7 +676,6 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
         if (!sizeof($data)) {
             return false;
         }
-
         // the inserted ids which will be returned or if no primaryCol is given
         // we return true by default
         $retIds = $this->primaryCol ? array() : true;
@@ -694,7 +714,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @param      mixed   integer/string - the value of the column that shall be removed
-     *                       array   - multiple columns that shall be matched, the second parameter will be ommited
+     *                       array   - multiple columns that shall be matched, the second parameter will be ignored
      * @param      string  the column to match the data against, only if $data is not an array
      * @return     boolean
      */
@@ -885,7 +905,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     }
 
     // }}}
-    // {{{ addWhere()
+    // {{{ addWhereSearch()
 
     /**
      * add a where-like clause which works like a search for the given string
@@ -903,8 +923,8 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      */
     function addWhereSearch($column, $string, $condition='AND')
     {
-        // if the column doesnt contain a tablename use the current table name in case it is a defined column
-        // to prevent ambigious rows
+        // if the column doesn't contain a tablename use the current table name
+        // in case it is a defined column to prevent ambiguous rows
         if (strpos($column, '.') === false) {
             $meta = $this->metadata();
             if (isset($meta[$column])) {
@@ -1008,7 +1028,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
 
     /**
      * Extend the current having clause. This is very useful, when you are building
-     * this clause from different places and dont want to overwrite the currently
+     * this clause from different places and don't want to overwrite the currently
      * set having clause, but extend it.
      *
      * @param string this is a having clause, i.e. 'column' or 'table.column' or 'MAX(column)'
@@ -1050,15 +1070,12 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
             $this->_join[$joinType] = array();
             return;
         }
-
-        settype($table, 'array');
-        $this->_join[$joinType]['table'] = $table;
 /* this causes problems if we use the order-by, since it doenst know the name to order it by ... :-)
         // replace the table names with the internal name used for the join
         // this way we can also join one table multiple times if it will be implemented one day
-        $this->_join['where'] = preg_replace('/'.$table.'/','j1',$where);
+        $this->_join[$table] = preg_replace('/'.$table.'/','j1',$where);
 */
-        $this->_join[$joinType]['where'] = $where;
+        $this->_join[$joinType][$table] = $where;
     }
 
     // }}}
@@ -1093,13 +1110,9 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     {
         // init value, to prevent E_ALL-warning
         if (!isset($this->_join[$type]) || !$this->_join[$type]) {
-            $this->_join[$type] = array('table' => array(), 'where' => '');
+            $this->_join[$type] = array();
         }
-        $this->_join[$type]['table'] = array_merge($this->_join[$type]['table'], $table);
-        if (!is_array($this->_join[$type]['where'])) {
-            settype($this->_join[$type]['where'], 'array');
-        }
-        $this->_join[$type]['where'][] = $where;
+        $this->_join[$type][$table] = $where;
     }
 
     // }}}
@@ -1128,33 +1141,34 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     /**
      * gets the join-condition
      *
-     * @version    2002/06/10
-     * @access     public
-     * @author     Wolfram Kriesing <wk@visionp.de>
-     * @return     array   gets the join parameters
+     * @access public
+     * @param  string  [null|''|'table'|'tables'|'right'|'left']
+     * @return array   gets the join parameters
      */
     function getJoin($what=null)
     {
         // if the user requests all the join data or if the join is empty, return it
         if (is_null($what) || empty($this->_join)) {
-            $ret = $this->_join;
+            return $this->_join;
         }
 
+        $ret = array();
         switch (strtolower($what)) {
             case 'table':
             case 'tables':
-                $ret = array();
                 foreach ($this->_join as $aJoin) {
-                    if (isset($aJoin['table']) && sizeof($aJoin['table'])) {
-                        $ret = array_merge($ret, $aJoin['table']);
+                    if (count($aJoin)) {
+                        $ret = array_merge($ret, array_keys($aJoin));
                     }
                 }
                 break;
             case 'right':   // return right-join data only
             case 'left':    // return left join data only
+                if (count($this->_join[$what])) {
+                    $ret = array_merge($ret, $this->_join[$what]);
+                }
                 break;
         }
-
         return $ret;
     }
 
@@ -1175,23 +1189,21 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      *       addJoin(table2,'<where clause2>')
      *       // results in ...  FROM $this->table,table2 LEFT JOIN table ON <where clause1> WHERE <where clause2>
      *
-     * @version    2002/07/22
      * @access     public
-     * @author     Wolfram Kriesing <wk@visionp.de>
      * @param      string the table to be joined
      * @param      string the where clause for the join
      * @param      string the join type
      */
     function addJoin($table, $where, $type='default')
     {
-        settype($table, 'array');
-
+        if ($table == $this->table) {
+            return;  //skip. Self joins are not supported.
+        }
         // init value, to prevent E_ALL-warning
         if (!isset($this->_join[$type]) || !$this->_join[$type]) {
-            $this->_join[$type] = array('table' => array(), 'where' => '');
+            $this->_join[$type] = array();
         }
-        $this->_join[$type]['table'] = array_merge($this->_join[$type]['table'], $table);
-        $this->_join[$type]['where'] .= trim($this->_join[$type]['where']) ? ' AND '.$where : $where;
+        $this->_join[$type][$table] = $where;
     }
 
     // }}}
@@ -1442,13 +1454,12 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
                 // if the current column exists, check the length too, not to write content that is too long
                 // prevent DB-errors here
                 // do only check the data length if this field is given
-// FIXXME use PEAR-defined field for 'DATA_LENGTH'
-                if (isset($meta[$colName]['DATA_LENGTH']) &&
-                    ($oldLength=strlen($newData[$colName])) > $meta[$colName]['DATA_LENGTH']) {
-
+                if (isset($meta[$colName]['len']) && ($meta[$colName]['len'] != -1) &&
+                    ($oldLength=strlen($newData[$colName])) > $meta[$colName]['len']
+                ) {
                     $this->_errorLog("_checkColumns, had to trim column '$colName' from $oldLength to ".
                                         $meta[$colName]['DATA_LENGTH'].' characters.', __LINE__);
-                    $newData[$colName] = substr($newData[$colName], 0, $meta[$colName]['DATA_LENGTH']);
+                    $newData[$colName] = substr($newData[$colName], 0, $meta[$colName]['len']);
                 }
             }
         }
@@ -1535,6 +1546,9 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
                 $res[$key]['name'] = $val['COLUMN_NAME'];
             }
         } else {
+            if (!is_object($this->db)) {
+                return false;
+            }
             $res = $this->db->tableinfo($table);
             if (DB::isError($res)) {
                 $this->_errorSet($res->getUserInfo());
@@ -1562,61 +1576,50 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     /**
      * build the from string
      *
-     * @version    2002/07/11
-     * @access     public
-     * @author     Wolfram Kriesing <wk@visionp.de>
-     * @return     string  the string added behind FROM
+     * @access     private
+     * @return     string  the string added after FROM
      */
     function _buildFrom()
     {
         $from = $this->table;
+        $join = $this->getJoin();
 
-        if ($join = $this->getJoin()) {  // is join set?
-            // handle the standard join thingy
-            if (@$join['default']) {
-                $from .= ','.implode(',',$join['default']['table']);
-            }
+        if (!$join) {  // no join set
+            return $from;
+        }
+        // handle the standard join thingy
+        if (isset($join['default']) && count($join['default'])) {
+            $from .= ','.implode(',',array_keys($join['default']));
+        }
 
-            // if we also have a left join, add the 'LEFT JOIN table ON condition'
-            // use isset to prevent E_ALL warnings
-            $joinType = isset($join['left']) && $join['left'] ? 'left' :
-                        (isset($join['right']) && $join['right'] ? 'right' : false);
-// this class can only handle one kind of join at a time ... how stupid :-)
-
-            if ($joinType) { // do we have any of the above checked join-types?
-                $joinExpr = ' '.strtoupper($joinType).' JOIN ';
-                $tables = $join[$joinType]['table'];
-                settype($tables,'array');
-                $wheres = $join[$joinType]['where'];
-                settype($wheres,'array');
-                foreach ($wheres as $k => $where) {
-                    $from .= $joinExpr.$tables[$k];
+        // handle left/right joins
+        foreach (array('left', 'right') as $joinType) {
+            if (isset($join[$joinType]) && count($join[$joinType])) {
+                foreach($join[$joinType] as $table => $condition) {
                     // replace the _TABLENAME_COLUMNNAME by TABLENAME.COLUMNNAME
                     // since oracle doesnt work with the _TABLENAME_COLUMNNAME which i think is strange
-    // FIXXME i think this should become deprecated since the setWhere should not be used like this: '_table_column' but 'table.column'
-                    $regExp = '/_('.implode('|', $join[$joinType]['table']).')_([^\s]+)/';
-                    $where = preg_replace($regExp, '$1.$2', $where);
+// FIXXME i think this should become deprecated since the setWhere should not be used like this: '_table_column' but 'table.column'
+                    $regExp = '/_('.$table.')_([^\s]+)/';
+                    $where = preg_replace($regExp, '$1.$2', $condition);
 
                     // add the table name before any column that has no table prefix
-                    // since this might cause "unambigious column" errors
+                    // since this might cause "unambiguous column" errors
                     if ($meta = $this->metadata()) {
                         foreach ($meta as $aCol=>$x) {
                             // this covers the LIKE,IN stuff: 'name LIKE "%you%"'  'id IN (2,3,4,5)'
-                            $where = preg_replace('/\s'.$aCol.'\s/', " {$this->table}.$aCol ", $where);
+                            $condition = preg_replace('/\s'.$aCol.'\s/', " {$this->table}.$aCol ", $condition);
                             // replace also the column names which are behind a '='
                             // and do this also if the aCol is at the end of the where clause
                             // that's what the $ is for
-                            $where = preg_replace('/=\s*'.$aCol.'(\s|$)/', "={$this->table}.$aCol ", $where);
+                            $condition = preg_replace('/=\s*'.$aCol.'(\s|$)/', "={$this->table}.$aCol ", $condition);
                             // replace if colName is first and possibly also if at the beginning of the where-string
-                            $where = preg_replace('/(^\s*|\s+)'.$aCol.'\s*=/', "$1{$this->table}.$aCol=", $where);
+                            $condition = preg_replace('/(^\s*|\s+)'.$aCol.'\s*=/', "$1{$this->table}.$aCol=", $condition);
                         }
                     }
-
-                    $from .= ' ON '.$where;
+                    $from .= ' '.strtoupper($joinType).' JOIN '.$table.' ON '.$condition;
                 }
             }
         }
-
         return $from;
     }
 
@@ -1731,8 +1734,13 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
                         // put " around them to enable use of reserved words, i.e. SELECT table.option as option FROM...
                         // and 'option' actually is a reserved word, at least in mysql
                         // put double quotes around them, since pgsql doesnt work with single quotes
+                        // but don't do this for ibase because it doesn't work!
                         if ($aTable == $this->table) {
-                            $cols[$aTable][] = $this->table.".$colName AS \"$colName\"";
+                            if ($this->db->phptype == 'ibase') {
+                                $cols[$aTable][] = $this->table. '.' .$colName . ' AS '. $colName;
+                            } else {
+                                $cols[$aTable][] = $this->table. '.' .$colName . ' AS "'. $colName .'"';
+                            }
                         } else {
                             $cols[$aTable][] = "$aTable.$colName AS \"_".$this->getTableShortName($aTable)."_$colName\"";
                         }
@@ -1803,35 +1811,36 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     // {{{ _buildWhere()
 
     /**
+     * Build WHERE clause
      *
-     *
-     * @version    2002/07/11
-     * @access     public
-     * @author     Wolfram Kriesing <wk@visionp.de>
-     * @param      string where clause
-     * @return
+     * @param  string $where WHERE clause
+     * @return string $where WHERE clause after processing
+     * @access private
      */
     function _buildWhere($where='')
     {
-        if ($this->getWhere()) {
+        $where = trim($where);
+        $originalWhere = $this->getWhere();
+        if ($originalWhere) {
             if (!empty($where)) {
-                $where = $this->getWhere().' AND '.$where;
+                $where = $originalWhere.' AND '.$where;
             } else {
-                $where = $this->getWhere();
+                $where = $originalWhere;
             }
         }
+        $where = trim($where);
 
         if ($join = $this->getJoin()) {     // is join set?
             // only those where conditions in the default-join have to be added here
             // left-join conditions are added behind 'ON', the '_buildJoin()' does that
-            if (@strlen($join['default']['where']) > 0) {
+            if (isset($join['default']) && count($join['default'])) {
                 // we have to add this join-where clause here
                 // since at least in mysql a query like: select * from tableX JOIN tableY ON ...
                 // doesnt work, may be that's even SQL-standard...
-                if (trim($where)) {
-                    $where = $join['default']['where'].' AND '.$where;
+                if (!empty($where)) {
+                    $where = implode(' AND ', $join['default']).' AND '.$where;
                 } else {
-                    $where = $join['default']['where'];
+                    $where = implode(' AND ', $join['default']);
                 }
             }
             // replace the _TABLENAME_COLUMNNAME by TABLENAME.COLUMNNAME
@@ -1936,9 +1945,10 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @param      array   this array contains the elements of the query,
      *                       indexed by their key, which are: 'select','from','where', etc.
+     * @param      boolean whether this method is called via getCount() or not.
      * @return
      */
-    function _buildSelectQuery($query=array())
+    function _buildSelectQuery($query=array(), $isCalledViaGetCount = false)
     {
 /*FIXXXME finish this
         $cacheKey = md5(serialize(????));
@@ -1968,12 +1978,12 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
                                 isset($query['from']) ? $query['from'] : $this->_buildFrom(),
                                 $where,
                                 $group,
-                                $order,
-                                $having
+                                $having,
+                                $order
                                 );
         // $query['limit'] has preference!
         $limit = isset($query['limit']) ? $query['limit'] : $this->_limit;
-        if (@$limit[1]) {    // is there a count set?
+        if (!$isCalledViaGetCount && @$limit[1]) {    // is there a count set?
             $queryString=$this->db->modifyLimitQuery($queryString,$limit[0],$limit[1]);
             if (DB::isError($queryString)) {
                 $this->_errorSet('DB_QueryTool::db::modifyLimitQuery failed '.$queryString->getMessage());
@@ -2372,8 +2382,9 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
 
         $logOrSet = ucfirst($logOrSet);
         $callback = &PEAR::getStaticProperty('DB_QueryTool','_error'.$logOrSet.'Callback');
-        if ($callback)
-            call_user_func($callback, $msg);
+        //var_dump($callback);
+        //if ($callback)
+        //    call_user_func($callback, $msg);
 //        else
 //          ?????
 

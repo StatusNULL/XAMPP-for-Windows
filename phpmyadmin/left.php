@@ -1,5 +1,5 @@
 <?php
-/* $Id: left.php,v 2.43 2005/03/31 22:28:04 rabus Exp $ */
+/* $Id: left.php,v 2.44 2005/04/24 21:41:13 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -433,8 +433,10 @@ if ($num_dbs > 1) {
 
     $selected_db = 0;
 
-    // natural order for db list
-    if ($cfg['NaturalOrder'] && $num_dbs > 0) {
+    // natural order for db list; but do not sort if user asked
+    // for a specific order with the 'only_db' mechanism
+
+    if (!is_array($cfg['Server']['only_db']) && $cfg['NaturalOrder'] && $num_dbs > 0) {
         $dblist_temp = $dblist;
         natsort($dblist_temp);
         $i = 0;

@@ -13,10 +13,10 @@
 // | obtain it through the world-wide-web, please send a note to          |
 // | license@php.net so we can mail you a copy immediately.               |
 // +----------------------------------------------------------------------+
-// | Authors: Frederic Poeydomenge <frederic.poeydomenge@free.fr>         |
+// | Authors: Frederic Poeydomenge <fpoeydomenge at free dot fr>          |
 // +----------------------------------------------------------------------+
 //
-// $Id:
+// $Id$
 
 require_once 'Var_Dump/Renderer/Table.php';
 
@@ -30,7 +30,7 @@ require_once 'Var_Dump/Renderer/Table.php';
  *
  * @package Var_Dump
  * @category PHP
- * @author Frederic Poeydomenge <frederic.poeydomenge@free.fr>
+ * @author Frederic Poeydomenge <fpoeydomenge at free dot fr>
  */
 
 class Var_Dump_Renderer_HTML4_Table extends Var_Dump_Renderer_Table
@@ -38,6 +38,7 @@ class Var_Dump_Renderer_HTML4_Table extends Var_Dump_Renderer_Table
 
     /**
      * Class constructor.
+     *
      * @param array $options Parameters for the rendering.
      * @access public
      */

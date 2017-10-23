@@ -1,14 +1,6 @@
 <?php
-/* $Id: tbl_properties_links.php,v 2.11 2005/02/06 22:19:50 rabus Exp $ */
+/* $Id: tbl_properties_links.php,v 2.11.4.1 2005/06/30 17:27:22 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
-
-
-/**
- * Sets error reporting level
- */
-// (removed to avoid path disclosure, not sure about why this was here)
-// error_reporting(E_ALL);
-
 
 // Check parameters
 

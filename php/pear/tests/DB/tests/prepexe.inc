@@ -1,5 +1,27 @@
 <?php
 
+/**
+ * Tests the drivers' prepare and execute methods
+ *
+ * Executed by driver/06prepexec.phpt
+ *
+ * PHP versions 4 and 5
+ *
+ * LICENSE: This source file is subject to version 3.0 of the PHP license
+ * that is available through the world-wide-web at the following URI:
+ * http://www.php.net/license/3_0.txt.  If you did not receive a copy of
+ * the PHP License and are unable to obtain it through the web, please
+ * send a note to license@php.net so we can mail you a copy immediately.
+ *
+ * @category   Database
+ * @package    DB
+ * @author     Daniel Convissor <danielc@php.net>
+ * @copyright  1997-2005 The PHP Group
+ * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
+ * @version    $Id: prepexe.inc,v 1.25 2005/02/16 13:54:51 danielc Exp $
+ * @link       http://pear.php.net/package/DB
+ */
+
 $tmpfile = tempnam("/tmp", "phptmp");
 register_shutdown_function("my_shutdown");
 $fp = fopen($tmpfile, "w");
@@ -9,7 +31,7 @@ fclose($fp);
 
 
 /**
- * Local error callback handler.
+ * Local error callback handler
  *
  * Prints out an error message and kills the process.
  *
@@ -39,18 +61,28 @@ if (($res = $dbh->execute($sth1, array(72))) === DB_OK) {
 } else {
     print "sth1 failed\n";
 }
+
 print 'sth2: ! and ? as params, passing as array... ';
 if (($res = $dbh->execute($sth2, array(72, "that's right"))) === DB_OK) {
     print "sth2 executed\n";
 } else {
     print "sth2 failed\n";
 }
+
 print 'sth3: ?, ! and & as params, passing as array... ';
-if (($res = $dbh->execute($sth3, array(72, "'it''s good'", $tmpfile))) === DB_OK) {
+switch ($dbh->phptype) {
+    case 'msql':
+        $res = $dbh->execute($sth3, array(72, "'it\\'s good'", $tmpfile));
+        break;
+    default:
+        $res = $dbh->execute($sth3, array(72, "'it''s good'", $tmpfile));
+}
+if ($res === DB_OK) {
     print "sth3 executed\n";
 } else {
     print "sth3 failed\n";
 }
+
 print 'sth4: no params... ';
 if (($res = $dbh->execute($sth4)) === DB_OK) {
     print "sth4 executed\n";
@@ -93,7 +125,6 @@ echo "\n";
 
 // 4) SELECTs tests
 echo "\n------------4------------\n";
-
 $sth1 = $dbh->prepare("SELECT * FROM phptest WHERE a = ? ORDER BY b");
 print_4($sth1, 72);
 print_4($sth1, 71);
@@ -118,10 +149,36 @@ print 'insert: ' . ($res === DB_OK ? 'okay' : 'error') . "\n";
 $sth6 = $dbh->prepare('SELECT a, b, d FROM phptest WHERE a = ?');
 $res = $dbh->execute($sth6, array(11));
 $row = $res->fetchRow(DB_FETCHMODE_ASSOC);
-print "a = {$row['a']}, b = {$row['b']}, d = " . gettype($row['d']) . "\n";
+print "a = {$row['a']}, b = {$row['b']}, d = ";
+if ($dbh->phptype == 'msql') {
+    if (array_key_exists('d', $row)) {
+        $type = gettype($row['d']);
+        if ($type == 'NULL' || $row['d'] == '') {
+            print "got expected outcome\n";
+        } else {
+            $type = gettype($row['d']);
+            print "UN-expected outcome: $type\n";
+        }
+    } else {
+        // http://bugs.php.net/?id=31960
+        print "Prior to PHP 4.3.11 or 5.0.4, PHP's msql extension silently"
+              . " dropped columns with null values. You need to upgrade.\n";
+    }
+} else {
+    $type = gettype($row['d']);
+    if ($type == 'string') {
+        print "got expected outcome\n";
+    } else {
+        print "UN-expected outcome: $type\n";
+    }
+}
 
-
-
+/**
+ * Automatically free the prepared statements and results when the script
+ * terminates
+ *
+ * @return void
+ */
 function my_shutdown() {
     global $tmpfile, $dbh, $sth1, $sth2, $sth3, $sth4, $sth5, $sth6, $res;
 
@@ -142,11 +199,16 @@ function my_shutdown() {
     }
 
     $dbh->setErrorHandling(PEAR_ERROR_RETURN);
-    $dbh->query('DROP TABLE phptest');
+    drop_table($dbh, 'phptest');
 
     unlink($tmpfile);
 }
 
+/**
+ * Print out the data in test table
+ *
+ * @return void
+ */
 function print_results() {
     global $dbh;
     print "results:\n";
@@ -161,6 +223,14 @@ function print_results() {
     }
 }
 
+/**
+ * Execute the prepared statement and print out the data in the result
+ *
+ * @param resource     $sth   the statement handle to process
+ * @param string|array $bind  the data that will replace the placeholders
+ *
+ * @return void
+ */
 function print_4($sth, $bind) {
     global $dbh;
     $res = $dbh->execute($sth, $bind);
@@ -169,5 +239,3 @@ function print_4($sth, $bind) {
     }
     echo "~~\n";
 }
-
-?>

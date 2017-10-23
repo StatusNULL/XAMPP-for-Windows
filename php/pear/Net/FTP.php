@@ -1,23 +1,30 @@
 <?php
-// +----------------------------------------------------------------------+
-// | Net_FTP Version 1.3                                                  |
-// +----------------------------------------------------------------------+
-// | Copyright (c) 2001-2004 Tobias Schlitt                               |
-// +----------------------------------------------------------------------+
-// | This source file is subject to version 3.0 of the PHP license,       |
-// | that is available at through the world-wide-web at                   |
-// | http://www.php.net/license/3_0.txt.                                  |
-// | If you did not receive a copy of the PHP license and are unable to   |
-// | obtain it through the world-wide-web, please send a note to          |
-// | license@php.net so we can mail you a copy immediately.               |
-// +----------------------------------------------------------------------+
-// | Authors:       Tobias Schlitt <toby@php.net>                         |
-// +----------------------------------------------------------------------+
-//
-// $Id: FTP.php,v 1.32 2004/09/22 17:38:26 toby Exp $
+/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
+
+/**
+ * Net_FTP main file.
+ *
+ * This file must be included to use the Net_FTP package.
+ *
+ * PHP versions 4 and 5
+ *
+ * LICENSE: This source file is subject to version 3.0 of the PHP license
+ * that is available through the world-wide-web at the following URI:
+ * http://www.php.net/license/3_0.txt.  If you did not receive a copy of
+ * the PHP License and are unable to obtain it through the web, please
+ * send a note to license@php.net so we can mail you a copy immediately.
+ *
+ * @category   Networking
+ * @package    FTP
+ * @author     Tobias Schlitt <toby@php.net>
+ * @copyright  1997-2005 The PHP Group
+ * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
+ * @version    CVS: $Id: FTP.php,v 1.42 2005/03/31 20:07:58 toby Exp $
+ * @link       http://pear.php.net/package/Net_FTP
+ * @since      File available since Release 0.0.1
+ */
 
 require_once 'PEAR.php';
-
 
 /**
  * Option to let the ls() method return only files.
@@ -447,7 +454,6 @@ define('NET_FTP_ERR_USERNAMENOSTRING', -33);
  */
 define('NET_FTP_ERR_PASSWORDNOSTRING', -33);
 
-
 /**
  * Class for comfortable FTP-communication
  *
@@ -455,12 +461,16 @@ define('NET_FTP_ERR_PASSWORDNOSTRING', -33);
  * enabled by the PHP-FTP-extension and further functionalities, like recursive-deletion,
  * -up- and -download. Another feature is to create directories recursively.
  *
- * @since     PHP 4.2.3
- * @author    Tobias Schlitt <toby@php.net>
- * @see       http://www.schlitt.info
  * @license   http://www.php.net/license/3_0.txt  PHP License 3.0
+ * @category  Networking
+ * @package   FTP
+ * @author    Tobias Schlitt <toby@php.net>
+ * @copyright 1997-2005 The PHP Group
+ * @version   Release: 1.3.1
+ * @link      http://pear.php.net/package/Net_FTP
+ * @since     0.0.1
+ * @access    public
  */
-
 class Net_FTP extends PEAR 
 {
     /**
@@ -559,7 +569,7 @@ class Net_FTP extends PEAR
     
     var $_ls_match = array(
         'unix'    => array(
-            'pattern' => '/(?:(d)|.)([rwxt-]+)\s+(\w+)\s+(\w+)\s+(\w+)\s+(\w+)\s+(\S+\s+\S+\s+\S+)\s+(.+)/',
+            'pattern' => '/(?:(d)|.)([rwxt-]+)\s+(\w+)\s+([\w\d]+)\s+([\w\d]+)\s+(\w+)\s+(\S+\s+\S+\s+\S+)\s+(.+)/',
             'map'     => array('name'=>8,'size'=>6,'rights'=>2,'user'=>4,'group'=>5,
                               'files_inside'=>3,'date'=>7,'is_dir'=>1)
         ),
@@ -752,6 +762,15 @@ class Net_FTP extends PEAR
     function mkdir($dir, $recursive = false)
     {
         $dir = $this->_construct_path($dir);
+        $savedir = $this->pwd();
+        $this->pushErrorHandling(PEAR_ERROR_RETURN);
+        $e = $this->cd($dir);
+        $this->popErrorHandling();
+        if ($e === true) {
+            $this->cd($savedir);
+            return true;
+        }
+        $this->cd($savedir);
         if ($recursive === false){
             $res = @ftp_mkdir($this->_handle, $dir);
             if (!$res) {
@@ -760,19 +779,14 @@ class Net_FTP extends PEAR
                 return true;
             }
         } else {
-            $pos = 0;
             if(strpos($dir, '/') === false) {
                 return $this->mkdir($dir,false);
             }
-            $elements = array();
-            while (false !== ($pos = strpos($dir, '/', $pos + 1))){
-                $elements[] = substr($dir, 0, $pos);
-            }
-            foreach ($elements as $element){
-                $res = $this->mkdir($element, false);
-                if($res !== true) {
-                    return $res;
-                }
+            $pos = 0;
+            $res = $this->mkdir(dirname($dir), true);
+            $res = $this->mkdir($dir, false);
+            if ($res !== true) {
+                return $res;
             }
             return true;
         }
@@ -1802,7 +1816,7 @@ class Net_FTP extends PEAR
     
     function _check_dir($path)
     {
-        if (substr($path, (strlen($path) - 1), 1) == "/") {
+        if (!empty($path) && substr($path, (strlen($path) - 1), 1) == "/") {
             return true;
         } else {
             return false;
@@ -1820,17 +1834,15 @@ class Net_FTP extends PEAR
     
     function _rm_file($file)
     {
-        if (substr($file, 0, 1) == "/") {
-            $res = @ftp_delete($this->_handle, $file);
-        } else {
+        if (substr($file, 0, 1) != "/") {
             $actual_dir = @ftp_pwd($this->_handle);
             if (substr($actual_dir, (strlen($actual_dir) - 2), 1) != "/") {
                 $actual_dir .= "/";
             }
             $file = $actual_dir.$file;
-            $res = @ftp_delete($this->_handle, $file);
         }
-
+        $res = @ftp_delete($this->_handle, $file);
+        
         if (!$res) {
             return $this->raiseError("Could not delete file '$file'.", NET_FTP_ERR_DELETEFILE_FAILED);
         } else {
@@ -1891,7 +1903,7 @@ class Net_FTP extends PEAR
             }
         }
         $res = $this->_rm_dir($dir);
-        if (!$res) {
+        if (PEAR::isError($res)) {
             return $res;
         } else {
             return true;
@@ -1931,8 +1943,10 @@ class Net_FTP extends PEAR
     
     function _ls_dirs($dir)
     {
-        $list["dirs"] = array();
         $list = $this->_list_and_parse($dir);
+        if (PEAR::isError($list)) {
+            return $list;
+        }
         return $list["dirs"];
     }
 
@@ -1947,8 +1961,8 @@ class Net_FTP extends PEAR
     function _ls_files($dir)
     {
         $list = $this->_list_and_parse($dir);
-        if (!is_array($list["files"])) {
-            $list["files"] = array();
+        if (PEAR::isError($list)) {
+            return $list;
         }
         return $list["files"];
     }
@@ -1969,13 +1983,17 @@ class Net_FTP extends PEAR
         $dirs_list = array();
         $files_list = array();
         $dir_list = @ftp_rawlist($this->_handle, $dir);
-        if ($dir_list === false) {
+        if (!is_array($dir_list)) {
             return PEAR::raiseError('Could not get raw directory listing.', NET_FTP_ERR_RAWDIRLIST_FAILED);
         }
-        if (!isset($this->_matcher)) {
-	        $this->_matcher = $this->_determine_os_match($dir_list);
+        // Handle empty directories
+        if (count($dir_list) == 0) {
+            return array('dirs' => $dirs_list, 'files' => $files_list);
+        }
+        if (!isset($this->_matcher) || PEAR::isError($this->_matcher)) {
+            $this->_matcher = $this->_determine_os_match($dir_list);
             if (PEAR::isError($this->_matcher)) {
-	            return $this->_matcher;
+                return $this->_matcher;
             }
         }
         foreach ($dir_list as $entry) {
@@ -1996,8 +2014,8 @@ class Net_FTP extends PEAR
         }
         @usort($dirs_list, array("Net_FTP", "_nat_sort"));
         @usort($files_list, array("Net_FTP", "_nat_sort"));
-        $res["dirs"] = $dirs_list;
-        $res["files"] = $files_list;
+        $res["dirs"] = (is_array($dirs_list)) ? $dirs_list : array();
+        $res["files"] = (is_array($files_list)) ? $files_list : array();
         return $res;
     }
     
@@ -2013,13 +2031,13 @@ class Net_FTP extends PEAR
      */
     
     function _determine_os_match(&$dir_list) {
-	foreach ($dir_list as $entry) {
-	    foreach ($this->_ls_match as $os => $match) {
-	        if (preg_match($match['pattern'], $entry)) {
+    foreach ($dir_list as $entry) {
+        foreach ($this->_ls_match as $os => $match) {
+            if (preg_match($match['pattern'], $entry)) {
                     return $match;
                 }
             }
-	}
+    }
         $error = 'The list style of your server seems not to be supported. Please email a "$ftp->ls(NET_FTP_RAWLIST);" output plus info on the server to the maintainer of this package to get it supported! Thanks for your help!';
         return PEAR::raiseError($error, NET_FTP_ERR_DIRLIST_UNSUPPORTED);
     }

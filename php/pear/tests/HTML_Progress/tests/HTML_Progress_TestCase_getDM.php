@@ -3,7 +3,7 @@
 /**
  * API getDM Unit tests for HTML_Progress class.
  * 
- * @version    $Id: HTML_Progress_TestCase_getDM.php,v 1.1 2003/11/15 18:27:11 thesaur Exp $
+ * @version    $Id: HTML_Progress_TestCase_getDM.php,v 1.5 2004/11/01 16:51:17 farell Exp $
  * @author     Laurent Laville <pear@laurent-laville.org>
  * @package    HTML_Progress
  */
@@ -25,11 +25,9 @@ class HTML_Progress_TestCase_getDM extends PHPUnit_TestCase
     function setUp()
     {
         error_reporting(E_ALL);
-        $this->errorThrown = false;
-        set_error_handler(array(&$this, 'errorHandler'));
 
-        $this->progress = new HTML_Progress();
-        Error_Raise::setContextGrabber($this->progress->_package, array('Error_Util', '_getFileLine'));
+        $logger['push_callback'] = array(&$this, '_pushCallback'); // don't die when an exception is thrown
+        $this->progress = new HTML_Progress($logger);
     }
 
     function tearDown()
@@ -44,19 +42,34 @@ class HTML_Progress_TestCase_getDM extends PHPUnit_TestCase
 
     function _methodExists($name) 
     {
-        if (in_array(strtolower($name), get_class_methods($this->progress))) {
+        if (substr(PHP_VERSION,0,1) < '5') {
+            $n = strtolower($name);
+        } else {
+            $n = $name;
+        }
+        if (in_array($n, get_class_methods($this->progress))) {
             return true;
         }
         $this->assertTrue(false, 'method '. $name . ' not implemented in ' . get_class($this->progress));
         return false;
     }
 
-    function errorHandler($errno, $errstr, $errfile, $errline) {
-        //die("$errstr in $errfile at line $errline");
-        $this->errorThrown = true;
-        $this->assertTrue(false, $errstr);
+    function _pushCallback($err)
+    {
+        // don't die if the error is an exception (as default callback)
+        return HTML_PROGRESS_ERRORSTACK_PUSH;
     }
-   
+
+    function _getResult()
+    {
+        if ($this->progress->hasErrors()) {
+            $err = $this->progress->getError();
+            $this->assertTrue(false, $err['message']);
+        } else {
+            $this->assertTrue(true);
+	}
+    }
+
     /**
      * TestCases for method getDM.
      *
@@ -68,7 +81,7 @@ class HTML_Progress_TestCase_getDM extends PHPUnit_TestCase
         }
         $dm =& $this->progress->getDM();
 
-        $this->assertSame($this, $dm, 'Wrong dataModel instance;');
+        $this->assertEquals($this, $dm, 'Wrong DM instance;');
     }
 
     function test_getDM()
@@ -78,8 +91,7 @@ class HTML_Progress_TestCase_getDM extends PHPUnit_TestCase
         }
         $dm =& $this->progress->getDM();
 
-        $this->assertSame($this->progress->_DM, $dm);
+        $this->assertEquals($this->progress->_DM, $dm);
     }
 }
-
 ?>

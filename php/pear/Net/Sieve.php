@@ -343,14 +343,21 @@ class Net_Sieve
             return $res;
         }
 
-        if(PEAR::isError($res = $this->_doCmd() )) {
+
+        $this->_state = NET_SIEVE_STATE_AUTHORISATION;
+        if (PEAR::isError($res = $this->_doCmd())) {
+            return $res;
+        }
+        /*
+        if(PEAR::isError($res = $this->_cmdCapability() )) {
             $msg='Failed to connect, server said: ' . $res->getMessage();
             $code=2;
             return $this->_raiseError($msg,$code);
         }
+*/
         // Get logon greeting/capability and parse
         $this->_parseCapability($res);
-        $this->_state = NET_SIEVE_STATE_AUTHORISATION;
+
         return true;
     }
 
@@ -358,29 +365,28 @@ class Net_Sieve
     * Logs into server.
     *
     * @access public
-    * @param  string $user      Login username
-    * @param  string $pass      Login password
-    * @param  string $logintype Type of login method to use
-    * @param  string $euser     Effective UID (perform on behalf of $euser)
-    * @return mixed             True on success, PEAR_Error otherwise
+    * @param  string  $user          Login username
+    * @param  string  $pass          Login password
+    * @param  string  $logintype     Type of login method to use
+    * @param  string  $euser         Effective UID (perform on behalf of $euser)
+    * @param  boolean $bypassAuth    dont perform auth 
+    * @return mixed                  True on success, PEAR_Error otherwise
     */
-    function login($user, $pass, $logintype = null , $euser = '')
+    function login($user, $pass, $logintype = null , $euser = '', $bypassAuth=false)
     {
         if (NET_SIEVE_STATE_AUTHORISATION != $this->_state) {
             $msg='Not currently in AUTHORISATION state';
             $code=1;
             return $this->_raiseError($msg,$code);
-//          return PEAR::raiseError('Not currently in AUTHORISATION state');
         }
 
-        if(PEAR::isError($res=$this->_cmdAuthenticate($user , $pass , $logintype, $euser ) ) ){
-            return $res;
+
+        
+        if( $bypassAuth === false ){
+            if(PEAR::isError($res=$this->_cmdAuthenticate($user , $pass , $logintype, $euser ) ) ){
+                return $res;
+            }
         }
-/*
-        if (PEAR::isError($res = $this->_doCmd() )) {
-            return $res;
-        }
-*/
         $this->_state = NET_SIEVE_STATE_TRANSACTION;
         return true;
     }
@@ -429,7 +435,7 @@ class Net_Sieve
         if (PEAR::isError($res = $this->_doCmd() )) {
             return $res;
         }
-        return $res;
+        return $result;
     }
 
 
@@ -500,21 +506,20 @@ class Net_Sieve
      */
     function _authCRAM_MD5($uid, $pwd, $euser)
     {
-    /*
-        if ( PEAR::isError($error = $this->_sendCmd( 'AUTHENTICATE "CRAM-MD5"' ) ) ) {
-            $this->_error=$error;
-            return $error;
-        }
-    */
 
         if ( PEAR::isError( $challenge = $this->_doCmd( 'AUTHENTICATE "CRAM-MD5"' ) ) ) {
             $this->_error=challenge ;
             return challenge ;
         }
-        $challenge = base64_decode( $challenge );
+        $challenge=trim($challenge);
+        $challenge = base64_decode( trim($challenge) );
         $cram = &Auth_SASL::factory('crammd5');
-        $auth_str = base64_encode( $cram->getResponse( $uid , $pwd , $challenge ) );
-        if ( PEAR::isError($error = $this->_sendStringResponse( $auth_str ) ) ) {
+        if ( PEAR::isError($resp=$cram->getResponse( $uid , $pwd , $challenge ) ) ) {
+            $this->_error=$resp;
+            return $resp;
+        }
+        $auth_str = base64_encode( $resp );
+        if ( PEAR::isError($error = $this->_sendStringResponse( $auth_str  ) ) ) {
             $this->_error=$error;
             return $error;
         }
@@ -536,12 +541,6 @@ class Net_Sieve
      */
     function _authDigest_MD5($uid, $pwd, $euser)
     {
-        /*
-        if ( PEAR::isError($error = $this->_sendCmd( 'AUTHENTICATE "DIGEST-MD5"' ) ) ) {
-            $this->_error=$error;
-            return $error;
-        }
-        */
 
         if ( PEAR::isError( $challenge = $this->_doCmd('AUTHENTICATE "DIGEST-MD5"') ) ) {
             $this->_error=challenge ;
@@ -549,42 +548,46 @@ class Net_Sieve
         }
         $challenge = base64_decode( $challenge );
         $digest = &Auth_SASL::factory('digestmd5');
-        $auth_str = base64_encode($digest->getResponse($uid, $pwd, $challenge, "localhost", "sieve" , $euser));
+        
+        
+        if(PEAR::isError($param=$digest->getResponse($uid, $pwd, $challenge, "localhost", "sieve" , $euser) )) {
+            return $param;
+        }
+        $auth_str = base64_encode($param);
 
         if ( PEAR::isError($error = $this->_sendStringResponse( $auth_str  ) ) ) {
             $this->_error=$error;
             return $error;
         }
 
-///*
+
 
         if ( PEAR::isError( $challenge = $this->_doCmd() ) ) {
             $this->_error=$challenge ;
             return $challenge ;
         }
 
-	if( strtoupper(substr($challenge,0,2))== 'OK' ){
-		return true;
-	}
-	
-//echo "CHALL:$challenge\n";
-//*/
-	/*
-         * We don't use the protocol's third step because SIEVE doesn't allow
-         * subsequent authentication, so we just silently ignore it.
-         */
+        if( strtoupper(substr($challenge,0,2))== 'OK' ){
+                return true;
+        }
+        
 
-///*	
+        /*
+        * We don't use the protocol's third step because SIEVE doesn't allow
+        * subsequent authentication, so we just silently ignore it.
+        */
+
+
         if ( PEAR::isError($error = $this->_sendStringResponse( '' ) ) ) {
             $this->_error=$error;
             return $error;
         }
 
-	if (PEAR::isError($res = $this->_doCmd() )) {
+        if (PEAR::isError($res = $this->_doCmd() )) {
             return $res;
         }
 
-//*/	
+
     }
 
 
@@ -603,7 +606,6 @@ class Net_Sieve
             $msg='Not currently in AUTHORISATION state';
             $code=1;
             return $this->_raiseError($msg,$code);
-            //return PEAR::raiseError('Not currently in TRANSACTION state');
         }
         if (PEAR::isError($res = $this->_doCmd(sprintf('DELETESCRIPT "%s"', $scriptname) ) )) {
             return $res;
@@ -624,7 +626,6 @@ class Net_Sieve
             $msg='Not currently in AUTHORISATION state';
             $code=1;
             return $this->_raiseError($msg,$code);
-            //return PEAR::raiseError('Not currently in TRANSACTION state');
         }
 
         if (PEAR::isError($res = $this->_doCmd(sprintf('GETSCRIPT "%s"', $scriptname) ) ) ) {
@@ -648,7 +649,6 @@ class Net_Sieve
             $msg='Not currently in AUTHORISATION state';
             $code=1;
             return $this->_raiseError($msg,$code);
-            //return PEAR::raiseError('Not currently in TRANSACTION state');
         }
 
         if (PEAR::isError($res = $this->_doCmd(sprintf('SETACTIVE "%s"', $scriptname) ) ) ) {
@@ -673,7 +673,6 @@ class Net_Sieve
             $msg='Not currently in AUTHORISATION state';
             $code=1;
             return $this->_raiseError($msg,$code);
-            //return PEAR::raiseError('Not currently in TRANSACTION state');
         }
 
         $scripts = array();
@@ -712,7 +711,6 @@ class Net_Sieve
             $msg='Not currently in TRANSACTION state';
             $code=1;
             return $this->_raiseError($msg,$code);
-            //return PEAR::raiseError('Not currently in TRANSACTION state');
         }
 
         if (PEAR::isError($res = $this->_doCmd(sprintf("PUTSCRIPT \"%s\" {%d+}\r\n%s", $scriptname, strlen($scriptdata),$scriptdata ) ))) {
@@ -756,13 +754,12 @@ class Net_Sieve
     */
     function _cmdCapability()
     {
-        if (NET_SIEVE_STATE_TRANSACTION != $this->_state) {
-            $msg='Not currently in TRANSACTION state';
+        if (NET_SIEVE_STATE_DISCONNECTED === $this->_state) {
+            $msg='Not currently connected';
             $code=1;
             return $this->_raiseError($msg,$code);
-            //return PEAR::raiseError('Not currently in TRANSACTION state');
         }
-
+        
         if (PEAR::isError($res = $this->_doCmd('CAPABILITY'))) {
             return $res;
         }
@@ -785,7 +782,6 @@ class Net_Sieve
             $msg='Not currently in TRANSACTION state';
             $code=1;
             return $this->_raiseError($msg,$code);
-            //return PEAR::raiseError('Not currently in TRANSACTION state');
         }
 
         if (PEAR::isError($res = $this->_doCmd(sprintf('HAVESPACE "%s" %s', $scriptname, $quota) ) ) ) {
@@ -946,9 +942,11 @@ class Net_Sieve
                             return $this->_raiseError($msg,$code);
                             //return PEAR::raiseError("Can't handle bye, The error was= " . $error->getMessage() );
                         }
-                        if (preg_match('/^bye \(referral "([^"]+)/i', $line, $matches)) {
+                        //if (preg_match('/^bye \(referral "([^"]+)/i', $line, $matches)) {
+                        if (preg_match('/^bye \(referral "(sieve:\/\/)?([^"]+)/i', $line, $matches)) {
                             // Check for referral, then follow it.  Otherwise, carp an error.
-                            $this->_data['host'] = $matches[1];
+                            //$this->_data['host'] = $matches[1];
+                            $this->_data['host'] = $matches[2];
                             if (PEAR::isError($error = $this->_handleConnectAndLogin() ) ){
                                 $msg="Can't follow referral to " . $this->_data['host'] . ", The error was= " . $error->getMessage() ;
                                 $code=5;
@@ -968,7 +966,8 @@ class Net_Sieve
                         //return PEAR::raiseError(trim($response . $line));
                     } elseif (preg_match('/^{([0-9]+)\+?}/i', $line, $matches)) {
                         // Matches String Responses.
-                        $line = str_replace("\r\n", ' ', $this->_sock->read($matches[1] + 2 ));
+                        //$line = str_replace("\r\n", ' ', $this->_sock->read($matches[1] + 2 ));
+                        $line = $this->_sock->read($matches[1] + 2 );
                         if($this->_debug){
                             echo "S:$line\n";
                         }

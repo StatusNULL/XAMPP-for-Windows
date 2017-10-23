@@ -18,18 +18,9 @@
 // |          Martin Jansen <mj@php.net>                                  |
 // +----------------------------------------------------------------------+
 //
-// $Id: Installer.php,v 1.148 2004/02/29 15:58:17 avsm Exp $
+// $Id: Installer.php,v 1.150.2.2 2005/02/17 17:47:55 cellog Exp $
 
-require_once 'PEAR/Common.php';
-require_once 'PEAR/Registry.php';
-require_once 'PEAR/Dependency.php';
 require_once 'PEAR/Downloader.php';
-require_once 'System.php';
-
-define('PEAR_INSTALLER_OK',       1);
-define('PEAR_INSTALLER_FAILED',   0);
-define('PEAR_INSTALLER_SKIPPED', -1);
-define('PEAR_INSTALLER_ERROR_NO_PREF_STATE', 2);
 
 /**
  * Administration class used to install PEAR packages and maintain the
@@ -174,7 +165,14 @@ class PEAR_Installer extends PEAR_Downloader
                 include_once "OS/Guess.php";
                 $os = new OS_Guess();
             }
-            if (!$os->matchSignature($atts['platform'])) {
+            if (strlen($atts['platform']) && $atts['platform']{0} == '!') {
+                $negate = true;
+                $platform = substr($atts['platform'], 1);
+            } else {
+                $negate = false;
+                $platform = $atts['platform'];
+            }
+            if ((bool) $os->matchSignature($platform) === $negate) {
                 $this->log(3, "skipped $file (meant for $atts[platform], we are ".$os->getSignature().")");
                 return PEAR_INSTALLER_SKIPPED;
             }
@@ -799,21 +797,43 @@ class PEAR_Installer extends PEAR_Downloader
                 $this->log(1, "\nBuild process completed successfully");
                 foreach ($built as $ext) {
                     $bn = basename($ext['file']);
-                    list($_ext_name, ) = explode('.', $bn);
-                    if (extension_loaded($_ext_name)) {
-                        $this->raiseError("Extension '$_ext_name' already loaded. Please unload it ".
-                                          "in your php.ini file prior to install or upgrade it.");
+                    list($_ext_name, $_ext_suff) = explode('.', $bn);
+                    if ($_ext_suff == '.so' || $_ext_suff == '.dll') {
+                        if (extension_loaded($_ext_name)) {
+                            $this->raiseError("Extension '$_ext_name' already loaded. " .
+                                              'Please unload it in your php.ini file ' .
+                                              'prior to install or upgrade');
+                        }
+                        $role = 'ext';
+                    } else {
+                        $role = 'src';
                     }
-                    $dest = $this->config->get('ext_dir') . DIRECTORY_SEPARATOR . $bn;
-                    $this->log(1, "Installing '$bn' at ext_dir ($dest)");
-                    $this->log(3, "+ cp $ext[file] ext_dir ($dest)");
+                    $dest = $ext['dest'];
+                    $this->log(1, "Installing '$ext[file]'");
                     $copyto = $this->_prependPath($dest, $this->installroot);
-                    if (!@copy($ext['file'], $copyto)) {
-                        $this->rollbackFileTransaction();
-                        return $this->raiseError("failed to copy $bn to $copyto");
+                    $copydir = dirname($copyto);
+                    if (!@is_dir($copydir)) {
+                        if (!$this->mkDirHier($copydir)) {
+                            return $this->raiseError("failed to mkdir $copydir",
+                                PEAR_INSTALLER_FAILED);
+                        }
+                        $this->log(3, "+ mkdir $copydir");
                     }
+                    if (!@copy($ext['file'], $copyto)) {
+                        return $this->raiseError("failed to write $copyto", PEAR_INSTALLER_FAILED);
+                    }
+                    $this->log(3, "+ cp $ext[file] $copyto");
+                    if (!OS_WINDOWS) {
+                        $mode = 0666 & ~(int)octdec($this->config->get('umask'));
+                        $this->addFileOperation('chmod', array($mode, $copyto));
+                        if (!@chmod($copyto, $mode)) {
+                            $this->log(0, "failed to change mode of $copyto");
+                        }
+                    }
+                    $this->addFileOperation('rename', array($ext['file'], $copyto));
+
                     $pkginfo['filelist'][$bn] = array(
-                        'role' => 'ext',
+                        'role' => $role,
                         'installed_as' => $dest,
                         'php_api' => $ext['php_api'],
                         'zend_mod_api' => $ext['zend_mod_api'],

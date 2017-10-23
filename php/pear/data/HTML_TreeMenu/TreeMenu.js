@@ -1,5 +1,5 @@
 // +-----------------------------------------------------------------------+
-// | Copyright (c) 2002-2003, Richard Heyes, Harald Radi                        |
+// | Copyright (c) 2002-2005, Richard Heyes, Harald Radi                   |
 // | All rights reserved.                                                  |
 // |                                                                       |
 // | Redistribution and use in source and binary forms, with or without    |
@@ -32,7 +32,7 @@
 // |         Harald Radi <harald.radi@nme.at>                              |
 // +-----------------------------------------------------------------------+
 //
-// $Id: TreeMenu.js,v 1.18 2003/12/20 13:33:09 richard Exp $
+// $Id: TreeMenu.js,v 1.21 2005/03/02 02:39:26 richard Exp $
 
 /**
 * Function to create copies of objects which are
@@ -388,7 +388,7 @@ function arrayCopy(input)
 		} else if (document.getElementById(layerID)) {
 			return document.getElementById(layerID);
 	
-		} else if (document.all(layerID)) {
+		} else if (document.all && document.all(layerID)) {
 			return document.all(layerID);
 		}
 	}
@@ -683,7 +683,7 @@ function arrayCopy(input)
     var is_ie4up  = (is_ie && (is_major >= 4));
 	
 	var is_opera  = (agt.indexOf("opera") != -1);
-	var is_opera7 = is_opera && (agt.indexOf("opera 7") != -1);
+	var is_opera7 = (is_opera && is_major >= 7) || agt.indexOf("opera 7") != -1;
 
 	// Patch from Harald Fielker
     if (agt.indexOf('konqueror') != -1) {

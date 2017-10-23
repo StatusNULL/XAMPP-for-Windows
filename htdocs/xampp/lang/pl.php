@@ -1,30 +1,31 @@
 <?
+// Translation for the Windows version of XAMPP by Violetta Marczyk <viki@vstudio.pl>
 // ---------------------------------------------------------------------
 // GLOBAL
 // ---------------------------------------------------------------------
 
-$TEXT['global-xampp']="XAMPP for Windows";
+$TEXT['global-xampp']="XAMPP dla Linux";
 
 // ---------------------------------------------------------------------
 // NAVIGATION
 // ---------------------------------------------------------------------
 
-$TEXT['navi-xampp']="XAMPP 1.4.5";
-$TEXT['navi-welcome']="Witaj";
-$TEXT['navi-status']="Status";
-$TEXT['navi-security']="Bezpieczeństwo";
+$TEXT['navi-xampp']="XAMPP";
+$TEXT['navi-welcome']="Witamy";
+$TEXT['navi-status']="Stan";
+$TEXT['navi-security']="Bezpiecze&#324;stwo";
 $TEXT['navi-doc']="Dokumentacja";
 $TEXT['navi-components']="Komponenty";
-$TEXT['navi-about']="O XAMPPie";
+$TEXT['navi-about']="Info o XAMPP";
 
-$TEXT['navi-demos']="Dema";
-$TEXT['navi-cdcol']="Kolekcja Płyt CD";
-$TEXT['navi-bio']="Biorytmy";
-$TEXT['navi-guest']="Księga Go?ci";
+$TEXT['navi-demos']="Przyk&#322;ady";
+$TEXT['navi-cdcol']="Kolekcja CD";
+$TEXT['navi-bio']="Biorytm";
+$TEXT['navi-guest']="Ksi&#281;ga Go&#347;ci";
 $TEXT['navi-perlenv']="MiniPerl";
-$TEXT['navi-iart']="Błyskawiczna Grafika";
-$TEXT['navi-iart2']="Grafika Flash";
-$TEXT['navi-phonebook']="Księga Telefoniczna";
+$TEXT['navi-iart']="Instant Art";
+$TEXT['navi-iart2']="Flash Art";
+$TEXT['navi-phonebook']="Ksi&#261;&#380;ka telefoniczna";
 $TEXT['navi-perlasp']="Perl:ASP";
 $TEXT['navi-pear']="PEAR:Excel_Writer";
 $TEXT['navi-adodb']="ADOdb";
@@ -33,35 +34,34 @@ $TEXT['navi-python']="Python";
 $TEXT['navi-jsp']="Java";
 $TEXT['navi-phpswitch']="PHP Switch";
 
-$TEXT['navi-tools']="Narzędzia";
+$TEXT['navi-tools']="Narz&#281;dzia";
 $TEXT['navi-phpmyadmin']="phpMyAdmin";
 $TEXT['navi-webalizer']="Webalizer";
 $TEXT['navi-mercury']="Mercury Mail";
 $TEXT['navi-filezilla']="FileZilla FTP";
 $TEXT['navi-jpgraph']="JpGraph";
+$TEXT['navi-phpsqliteadmin']="phpSQLiteAdmin";
 
-$TEXT['navi-specialguest']="Current Guest";
-$TEXT['navi-guest1']="FCKeditor";
 
-$TEXT['navi-languages']="Języki";
-$TEXT['navi-english']="Angielski";
-$TEXT['navi-german']="Niemiecki";
+$TEXT['navi-languages']="Languages";
+$TEXT['navi-english']="English";
+$TEXT['navi-german']="Deutsch";
 $TEXT['navi-french']="Francais";
 $TEXT['navi-dutch']="Nederlands";
-$TEXT['navi-spanish']="Spanish";
 $TEXT['navi-polish']="Polski";
-$TEXT['navi-spanish']="Espa�ol";
-$TEXT['navi-norwegian']="Norsk";
 $TEXT['navi-italian']="Italiano";
+$TEXT['navi-norwegian']="Norsk";
+$TEXT['navi-spanish']="Espa�ol";
 $TEXT['navi-chinese']="&#20013;&#25991;";
+
 
 // ---------------------------------------------------------------------
 // STATUS
 // ---------------------------------------------------------------------
 
-$TEXT['status-head']="XAMPP Status";
-$TEXT['status-text1']="Ta strona pokazuje co obecnie działa a co nie.";
-$TEXT['status-text2']="Niektóre zmiany w konfiguracji mog dawać fałszywy negatywny efekt. Przy SSL (https://localhost) raporty te nie działaj!";
+$TEXT['status-head']="Stan XAMPP";
+$TEXT['status-text1']="Na tej stronie mo&#380;esz znale&#378;&#263; wszystkie informacje o us&#322;ugach, zar&oacute;wno tych uruchomionych i dzia&#322;aj&#261;cych jak i tych nieaktywnych.";
+$TEXT['status-text2']="Pewne zmiany w konfiguracji mog&#261; czasem powodowa&#263; niepoprawne wy&#347;wietlanie stanu aktywno&#347;ci w raporcie. Z us&#322;ug&#261; SSL (https://localhost) wszystkie te raporty nie dzia&#322;aj&#261;!";
 
 $TEXT['status-mysql']="Baza danych MySQL";
 $TEXT['status-ssl']="HTTPS (SSL)";
@@ -70,129 +70,78 @@ $TEXT['status-perl']="Perl z mod_perl";
 $TEXT['status-cgi']="Common Gateway Interface (CGI)";
 $TEXT['status-ssi']="Server Side Includes (SSI)";
 $TEXT['status-python']="Python z mod_python";
-$TEXT['status-mmcache']="PHP rozszerzenie Turck MMCache";
-$TEXT['status-mmcache-url']="http://www.apachefriends.org/faq-wampp-en.html#mmcache";
-$TEXT['status-smtp']="SMTP Serwer";
-$TEXT['status-ftp']="FTP Serwer";
-$TEXT['status-tomcat']="Tomcat Service";
-$TEXT['status-named']="Domain Name Service (DNS)";
-$TEXT['status-oci8']="PHP rozszerzenie OCI8/Oracle";
+$TEXT['status-mmcache']="PHP extension �eAccelerator�";
+$TEXT['status-mmcache-url']="http://www.apachefriends.org/faq-lampp-en.html#mmcache";
+$TEXT['status-smtp']="Us&#322;uga SMTP";
+$TEXT['status-ftp']="Us&#322;uga FTP";
+$TEXT['status-tomcat']="Us&#322;uga Tomcat";
+$TEXT['status-named']="Serwer nazw (DNS)";
+$TEXT['status-oci8']="PHP extension �OCI8/Oracle�";
 $TEXT['status-oci8-url']="http://www.apachefriends.org/faq-lampp-en.html#oci8";
 
 $TEXT['status-lookfaq']="zobacz FAQ";
-$TEXT['status-ok']="WŁźCZONE";
-$TEXT['status-nok']="WYŁźCZONE";
+$TEXT['status-ok']="AKTYWNY";
+$TEXT['status-nok']="NIEAKTYWNY";
 
 $TEXT['status-tab1']="Komponent";
-$TEXT['status-tab2']="Status";
-$TEXT['status-tab3']="Wskazówka";
+$TEXT['status-tab2']="Stan";
+$TEXT['status-tab3']="Informacje";
 
 // ---------------------------------------------------------------------
 // SECURITY
 // ---------------------------------------------------------------------
 
-$TEXT['security-head']="Bezpieczeństwo XAMPPa";
-$TEXT['security-text1']="Ta strona informuje o poziomie bezpieczeństwa XAMPPa (proszę czytać tekst pod tabel) <I>Sorry, no polish translation for this section available, so switching to english.</I>";
-$TEXT['security-text2']="The green marked points are secure; the red marked points are definitively unsecure and the yellow marked points couldn't be checked (for example because the sofware to check isn't running).<p>To fix the problems for mysql, phpmyadmin and the xampp directory simply use</B><p>=> <A HREF=xamppsecurity.php><B>http://localhost/xampp/xamppsecurity.php</B></A> <= &nbsp;&nbsp;[allowed only for localhost]<br>&nbsp;<br>&nbsp;<br>
-Some other important notes:<UL>
-	<LI>All these test are made ONLY for host \"localhost\" (127.0.0.1).</LI>
-	<LI><I><B>For FileZilla FTP und Mercury Mail, you must fix all security problems by yourself! Sorry. </B></I></LI>
-	<LI>If your computer is not online or blocked by a firewall, your servers are SECURE against outside attacks.</LI>
-	<LI>If servers are not running, these servers are although SECURE!</LI></UL>";
-$TEXT['security-text3']="<B>Please consider this: 
-With more XAMPP security some examples will NOT execute error free. If you use PHP in \"safe mode\" for example some functions of this security frontend will not working anymore. Often even more security means less functionality at the same time.</B>";
-$TEXT['security-text4']="The XAMPP default ports:";
+$TEXT['security-head']="Bezpiecze&#324;stwo XAMPP";
+$TEXT['security-text1']="Na tej stronie znajduj&#261; si&#281; informacje og&oacute;lne o stanie bezpiecze&#324;stwa twojej instalacji XAMPP. (Ci&#261;g dalszy tekstu znajduje si&#281; pod tabelk&#261;.)";
+$TEXT['security-text2']="Punkty zaznaczone na zielono s&#261; zabezpieczone; punkty czerwone oznaczaj&#261; brak zabezpieczenia, a punkty &#380;�&#322;te nie mog&#322;y zosta&#263; sprawdzone (na przyk&#322;ad dlatego, &#380;e us&#322;uga nie jest uruchomiona).<p>To fix or close all these matters simply call<p><b>/opt/lampp/lampp security</b><p>This will start an interactive program.";
 
-$TEXT['security-ok']="SECURE";
-$TEXT['security-nok']="UNSECURE";
-$TEXT['security-noidea']="UNKNOWN";
+$TEXT['security-ok']="BEZPIECZNY";
+$TEXT['security-nok']="NIEBEZPIECZNY";
+$TEXT['security-noidea']="NIEZNANY";
 
-$TEXT['security-tab1']="Subject";
-$TEXT['security-tab2']="Status";
+$TEXT['security-tab1']="Temat";
+$TEXT['security-tab2']="Stan";
 
-$TEXT['security-checkapache-nok']="These XAMPP pages are accessible by network for everyone";
-$TEXT['security-checkapache-ok']="These XAMPP pages are no longer accessible by network for everyone";
-$TEXT['security-checkapache-text']="Every XAMPP demo page you are right now looking at is accessible for everyone over network. Everyone who knows your IP address can see these pages.";
+$TEXT['security-checkapache-nok']="Te strony XAMPP dost&#281;pne z sieci dla ka&#380;dego";
+$TEXT['security-checkapache-ok']="Te strony XAMPP ju&#380; nie s&#261; dost&#281;pne z sieci dla ka&#380;dego";
+$TEXT['security-checkapache-text']="Ka&#380;da strona demo XAMPP na kt�r&#261; w&#322;a&#347;nie patrzysz jest dost&#281;pna dla ka&#380;dego w sieci. Ka&#380;dy kto zna Tw�j adres IP mo&#380;e je zobaczy&#263;.";
 
-$TEXT['security-checkmysqlport-nok']="MySQL is accessible by the network";
-$TEXT['security-checkmysqlport-ok']="MySQL is no longer accessible over the network";
-$TEXT['security-checkmysqlport-text']="This is a potential or at least theoretical security leak. And if you're mad about security you should disable the network interface of MySQL.";
+$TEXT['security-checkmysqlport-nok']="MySQL jest dost&#281;pny z sieci";
+$TEXT['security-checkmysqlport-ok']="MySQL ju&#380; nie jest dost&#281;pny z sieci";
+$TEXT['security-checkmysqlport-text']="To potencjalnie i teoretycznie dziura w zabezpieczeniach. Je&#347;li nie wiesz wiele o zabezpieczeniach powniene&#347; zdeaktywowa&#263; dost&#281;p do MySQL z interferjs�w sieciowych.";
 
-$TEXT['security-checkpmamysqluser-nok']="The phpMyAdmin user pma has no password";
-$TEXT['security-checkpmamysqluser-ok']="The phpMyAdmin user pma has no longer no password";
-$TEXT['security-checkpmamysqluser-text']="phpMyAdmin saves your preferences in an extra MySQL database. To access this data phpMyAdmin uses the special user pma. This user has in the default installation no password set and to avoid any security problems you should give him a passwort.";
+$TEXT['security-checkpmamysqluser-nok']="U&#380;ytkownik pma w phpMyAdmin nie ma has&#322;a";
+$TEXT['security-checkpmamysqluser-ok']="U&#380;ytkownik pma w phpMyAdmin ju&#380; ma has&#322;o";
+$TEXT['security-checkpmamysqluser-text']="phpMyAdmin zapisuje Twoje ustawienia w bazie danych MySQL. W celu dost&#281;pu do tych danych phpMyAdmin stosuje specjalnego u&#380;ytkownika pma. Ten u&#380;ytkownik nie ma has&#322;a w standardowej instalacji, wi&#281;c w celu unikni&#281;cia ewentualnych problem�w powiniene&#347; ustawi&#263; dla niego has&#322;o dost&#281;pu.";
 
-$TEXT['security-checkmysql-nok']="The MySQL admin user root has NO password";
-$TEXT['security-checkmysql-ok']="The MySQL admin user root has no longer no password";
-$TEXT['security-checkmysql-text']="Every local user on Linux box can access your MySQL database with administrator rights. You should set a password.";
+$TEXT['security-checkmysql-nok']="U&#380;ytkownik root w MySQL nie ma has&#322;a";
+$TEXT['security-checkmysql-ok']="U&#380;ytkownik root w MySQL ju&#380; ma has&#322;o";
+$TEXT['security-checkmysql-text']="Ka&#380;dy lokalny u&#380;ytkownik w Linuxie ma dost&#281;p do Twojej bazy danych MySQL z prawami administratora. powinienie&#347; ustawi&#263; has&#322;o dost&#281;pu.";
 
-$TEXT['security-pop-nok']="The test user (newuser) for Mercury Mail server (POP3) have an old password (wampp)";
-$TEXT['security-pop-ok']="The test user \"newuser\" for the POP3 server (Mercury Mail?) does not exists anymore or have a new password";
-$TEXT['security-pop-out']="A POP3 server like Mercury Mail is not running or is blocked by a firewall!";
-$TEXT['security-pop-notload']="<I>The necessary IMAP extension for this secure test is not loading (php.ini)!</I><br>";
-$TEXT['security-pop-text']="Please check and perhaps edit all users and passwords in the the Mercury Mail server configuration!";
-
-$TEXT['security-checkftppassword-nok']="The FileZilla FTP password is still 'wampp'";
-$TEXT['security-checkftppassword-ok']="The FileZilla FTP password was changed";
-$TEXT['security-checkftppassword-out']="A FTP server is not running  or is blocked by a firewall!";
-$TEXT['security-checkftppassword-text']="If the FileZilla FTP server was started, the default user 'newuser' with password 'wampp' can upload and change files for your XAMPP webserver. So if you enabled FileZilla FTP you should set a new password for user 'newuser'.";
-
-$TEXT['security-phpmyadmin-nok']="PhpMyAdmin is free accessible by network";
-$TEXT['security-phpmyadmin-ok']="PhpMyAdmin password login is enabled.";
-$TEXT['security-phpmyadmin-out']="PhpMyAdmin: Could not find the 'config.inc.php' ...";
-$TEXT['security-phpmyadmin-text']="PhpMyAdmin is accessible by network without password. The configuration 'httpd' or 'cookie' in the \"config.inc.php\" can help.";
-
-$TEXT['security-checkphp-nok']="PHP is NOT running in \"safe mode\"";
-$TEXT['security-checkphp-ok']="PHP is running in \"safe mode\"";
-$TEXT['security-checkphp-out']="Unable to control the setting of PHP!";
-$TEXT['security-checkphp-text']="If do you want to offer PHP executions for outside persons, please think about a \"safe mode\" configuration. But for standalone developer we recommend NOT the \"safe mode\" configuration because some important functions will not working then. <A HREF=\"http://www.php.net/features.safe-mode\" target=\"_new\"><font size=1>More Info</font></A>";
-
-// ---------------------------------------------------------------------
-// SECURITY SETUP
-// ---------------------------------------------------------------------
-
-$TEXT['mysql-security-head']="Security console MySQL & XAMPP directory protection";
-$TEXT['mysql-rootsetup-head']="MYSQL SECTION: \"ROOT\" PASSWORD";
-$TEXT['mysql-rootsetup-text1']="";
-$TEXT['mysql-rootsetup-notrunning']="The MySQL server is not running or is blocked by a firewall! Please check this problem first ...";
-$TEXT['mysql-rootsetup-passwdnotok']="The new password is identical with the repeat password. Please enter both passwords for new!";
-$TEXT['mysql-rootsetup-passwdnull']="Zero passwords ('') will not accepted!";
-$TEXT['mysql-rootsetup-passwdsuccess']="SUCCESS: The password for the SuperUser 'root' was set or updated!
-But note: The initialization of the new password for \"root\" needs a RESTART OF MYSQL !!!! The data with the new password was safed in the following file:";
-$TEXT['mysql-rootsetup-passwdnosuccess']="ERROR: The root password is perhaps wrong. MySQL decline the login with these current root password.";
-$TEXT['mysql-rootsetup-passwdold']="Current passwort:";
-$TEXT['mysql-rootsetup-passwd']="New password:";
-$TEXT['mysql-rootsetup-passwdrepeat']="Repeat the new password:";
-$TEXT['mysql-rootsetup-passwdchange']="Password changing";
-$TEXT['mysql-rootsetup-phpmyadmin']="PhpMyAdmin authentification:";
-
-$TEXT['xampp-setup-head']="XAMPP DIRECTORY PROTECTION (.htaccess)";
-$TEXT['xampp-setup-user']="User:";
-$TEXT['xampp-setup-passwd']="Password:";
-$TEXT['xampp-setup-start']="Make safe the XAMPP directory";
-$TEXT['xampp-setup-notok']="<br><br>ERROR: The string for the user name and password must have at least three  characters and not more then 15 characters. Special characters like <��� (usw.) and empty characters are not allowed!<br><br>";
-$TEXT['xampp-config-ok']="<br><br>SUCCESS: The XAMPP directory is protected now! All personal data was safed in the following file:<br>";
-$TEXT['xampp-config-notok']="<br><br>ERROR: Your system could NOT activate the directory protection with the \".htaccess\" and the \"htpasswd.exe\". Perhaps PHP is in the \"Safe Mode\".<br><br>";
+$TEXT['security-checkftppassword-nok']="Has&#322;o dla u&#380;ytkownika nobody w FTP to nadal 'lampp'";
+$TEXT['security-checkftppassword-ok']="Has&#322;o dla u&#380;ytkownika nobody w FTP juz nie jest 'lampp'";
+$TEXT['security-checkftppassword-text']="Stosuj&#261;c standardowe has&#322;o na u&#380;ytkownika nobody w FTP, ka&#380;dy mo&#380;e wysy&#322;a&#263; lub zmienia&#263; pliki na Twoim serwerze XAMPP. Je&#380;eli uruchomione zosta&#322;o ProFTPD, has&#322;o dla u&#380;ytkownika nobody powinno zosta&#263; zmienione.";
 
 // ---------------------------------------------------------------------
 // START
 // ---------------------------------------------------------------------
 
-$TEXT['start-head']="Witaj w XAMPP dla Windowsa";
+$TEXT['start-head']="Witamy w XAMPP dla Linux";
 
-$TEXT['start-subhead']="Gratulacje!<BR>XAMPP poprawinie zainstalowany.";
+$TEXT['start-subhead']="Gratulacje:<br>XAMPP zosta&#322; pomy&#347;lnie zainstalowany w tym systemie!";
 
-$TEXT['start-text1']="Możesz już korzystać z Apache i reszty jego kumpli. Zanim to zrobisz możesz sprawdzić co działa klikajc w link <B>Status</b> obok.";
+$TEXT['start-text1']="Teraz mo&#380;esz zacz&#261;&#263; u&#380;ywa&#263; Apache i Co. Po pierwsze sprawd&#378; �Stan� z lewej strony w nawigacji, aby si&#281; upewni&#263;, &#380;e wszystko pracuje poprawnie.";
 
-$TEXT['start-text2']="Uwaga, XAMPP w wersji 1.4 jest przystosowany do zarzdzania pakietami. XAMPP posiada pakiety: <UL><LI>XAMPP pakiet bazowy</LI><LI>XAMPP Perl</LI><LI>XAMPP Python<LI></LI>XAMPP Utility addon (więcej narzędzi, lecz nieaktywnych)</LI><LI>XAMPP Server addon (więcej opcji serwerowych, lecz nieaktywnych)</LI><LI>XAMPP Inne dodatki (nieaktywne)</LI></UL>";
 
-$TEXT['start-text3']="Dla normalnej inicjalizacji dodatku odpal 1 raz na 1 dodatek plik \"setup_xampp.bat\". Dla dodatków instalacyjnych musisz mieć instalacyjn wersję XAMPPa! W innych przypadkach XAMPP zip może być.";
+$TEXT['start-text2']="";
 
-$TEXT['start-text4']="Dla wsparcia OpenSSL proszę używać testu certyfikatu z <a href='https://127.0.0.1' target='_top'>https://127.0.0.1</a> lub <a href='https://localhost' target='_top'>https://localhost</a>";
+$TEXT['start-text3']="";
 
-$TEXT['start-text5']="I najważniejsze - podziękowania dla Carsten, Nemesis, KriS, Boppy, Pc-Dummy i wielu innym, którzy pomagaj rozwijać XAMPPa!<BR><BR>Polskie miniwsparcie w <a href=\"http://www.cms.rk.edu.pl\" target=\"_blank\">Bibliotece CMS Riklaunima</a>.";
+$TEXT['start-text4']="";
 
-$TEXT['start-text6']="Powodzenia, Kay Vogelgesang + Kai 'Oswald' Seidler";
+$TEXT['start-text5']="";
+
+$TEXT['start-text6']="Powodzenia, Kai \"Oswald\" Seidler + Kay Vogelgesang";
 
 // ---------------------------------------------------------------------
 // MANUALS
@@ -200,129 +149,127 @@ $TEXT['start-text6']="Powodzenia, Kay Vogelgesang + Kai 'Oswald' Seidler";
 
 $TEXT['manuals-head']="Dokumentacja online";
 
-$TEXT['manuals-text1']="XAMPP łczy ze sob wiele programów. Oto ich lista i odno?niki do dokumentacji.";
+$TEXT['manuals-text1']="XAMPP to po&#322;&#261;czenie wielu r�&#380;nych aplikacji w jednym pakiecie. Oto lista standardowej dokumentacji i referencji nawa&#380;niejszych program�w.";
 
 
 $TEXT['manuals-list1']="
 <ul>
-<li><a href=http://httpd.apache.org/docs-2.0/>Apache 2</a>
-<li><a href=http://www.php.net/manual/pl/>PHP</a>
-<li><a href=http://www.perldoc.com/perl5.8.0/pod/perl.html>Perl</a>
-<li><a href=http://www.mysql.com/documentation/mysql/bychapter/>MySQL</a>
-<li><a href=http://php.weblogs.com/ADODB>ADODB</a>
-<li><a href=http://turck-mmcache.sourceforge.net/>Turck MMCache dla PHP</a>
-<li><a href=http://www.ros.co.nz/pdf/readme.pdf>klasa pdf</a>
+<li><a href=http://httpd.apache.org/docs-2.0/>Dokumentacja Apache 2</a>
+<li><a href=http://www.php.net/manual/en/>Dokumentacja PHP</a>
+<li><a href=http://www.perldoc.com/perl5.8.0/pod/perl.html>Dokumentacja Perl</a>
+<li><a href=http://www.mysql.com/documentation/mysql/bychapter/>Dokumentacja MySQL</a>
+<li><a href=http://www.ros.co.nz/pdf/readme.pdf>Dokumentacja pdf class</a>
 </ul>";
 
-$TEXT['manuals-text2']="Oto mała lista tutoriali Apache i strona Apache Friends:";
+$TEXT['manuals-text2']="Oraz kr�tka lista tutoriali i strona z dokumentacja Apache Friends:";
 
 $TEXT['manuals-list2']="
 <ul>
-<li><a href=http://www.apachefriends.org/faq-en.html>Strona Apache Friends</a>
-<li><a href=http://www.freewebmasterhelp.com/tutorials/php>Tutorial PHP</a> autorstwa Davida Gowansa
-<li><a href=http://www.davesite.com/webstation/html/>HTML - Tutorial dla pocztkujcych</a> by Dave Kristula
-<li><a href=http://www.comp.leeds.ac.uk/Perl/start.html>Tutorial Perla</a> by Nik Silver
+<li><a href=http://www.apachefriends.org/faq-en.html>Dokumentacja Apache Friends</a>
+<li><a href=http://www.freewebmasterhelp.com/tutorials/php>PHP Tutorial</a> - autor David Gowans
+<li><a href=http://www.davesite.com/webstation/html/>HTML - Interaktywny Tutorial Dla Pocz&#261;tkuj&#261;cych</a> - autor Dave Kristula
+<li><a href=http://www.comp.leeds.ac.uk/Perl/start.html>Perl Tutorial</a> - autor Nik Silver
 </ul>";
 
-$TEXT['manuals-text3']="<LI><B>Strony Polskie</b><BR><LI><a href=http://www.cms.rk.edu.pl>Biblioteka CMS</a> - PHP, CMSy i nie tylko<LI><A href=http://www.polhost.net>polhostn.net</a> - PHP i Skrypty<LI><A href=http://www.post-nuke.pl>postnuke.pl</a> - Wsparcie postnuke<LI><a href=http://www.php.pl>php.pl</a> - Polska strona o PHP";
+$TEXT['manuals-text3']="Powodzenia i mi&#322;ej zabawy! :)";
 
 // ---------------------------------------------------------------------
 // COMPONENTS
 // ---------------------------------------------------------------------
 
-$TEXT['components-head']="Komponenty XAMPPa";
+$TEXT['components-head']="Komponenty XAMPP";
 
-$TEXT['components-text1']="XAMPP łczy ze sob wiele programów, oto ich lista.";
+$TEXT['components-text1']="XAMPP &#322;&#261;czy w sobie wiele r�&#380;nych aplikacji. Oto lista ich wszystkich.";
 
-$TEXT['components-text2']="Wyrazy uznania dla twórców tych programów.";
+$TEXT['components-text2']="Podzi&#281;kowania dla developer�w tego oprogramowania.";
 
-$TEXT['components-text3']="W katalogu <b>\\xampp\licenses</b> znajdziesz licencje tych programów.";
+$TEXT['components-text3']="W katalogu <b>\(mini)xampp\licenses</b> znajduj&#261; si&#281; licencje wszystkich program�w.";
 
 // ---------------------------------------------------------------------
 // CD COLLECTION DEMO
 // ---------------------------------------------------------------------
 
-$TEXT['cds-head']="Kolekcja płyt CD (Przykład klasy PHP+MySQL+PDF)";
+$TEXT['cds-head']="Kolekcja CD (Przyk&#322;ad na PHP+MySQL+PDF Class)";
 
-$TEXT['cds-text1']="Prosty program CD.";
+$TEXT['cds-text1']="Bardzo prosty skrypt CD.";
 
-$TEXT['cds-text2']="Lista CD jako <a href='$PHP_SELF?action=getpdf'>Dokument PDF</a>.";
+$TEXT['cds-text2']="Lista CD wygenerowana jako <a href='$PHP_SELF?action=getpdf'>dokument PDF</a>.";
 
-$TEXT['cds-error']="Nie można połczyć się z baz danych!<br>Czy MySQL chodzi, czy nie zmieniłe? hasła?";
-$TEXT['cds-head1']="Moje CDs";
+$TEXT['cds-error']="Brak po&#322;&#261;czenia z baz&#261; danych!<br>Sprawd&#378; czy MySQL jest uruchomiony, oraz czy has&#322;o nie zosta&#322;o zmienione.";
+$TEXT['cds-head1']="M&oacute;j katalog p&#322;yt CD";
 $TEXT['cds-attrib1']="Wykonawca";
-$TEXT['cds-attrib2']="Tytuł";
+$TEXT['cds-attrib2']="Tytu&#322;";
 $TEXT['cds-attrib3']="Rok";
-$TEXT['cds-attrib4']="Komenda";
-$TEXT['cds-sure']="Jeste? pewien?";
+$TEXT['cds-attrib4']="Polecenie";
+$TEXT['cds-sure']="Na pewno?";
 $TEXT['cds-head2']="Dodaj CD";
-$TEXT['cds-button1']="Kasuj CD";
-$TEXT['cds-button2']="Dodaj CD";
+$TEXT['cds-button1']="USU&#323; CD";
+$TEXT['cds-button2']="DODAJ CD";
 
 // ---------------------------------------------------------------------
 // BIORHYTHM DEMO
 // ---------------------------------------------------------------------
 
-$TEXT['bio-head']="Biorytmy (przykład zastosowania PHP+GD)";
+$TEXT['bio-head']="Biorytm (Przyk&#322;ad na PHP+GD)";
 
-$TEXT['bio-by']="przez";
-$TEXT['bio-ask']="Wprowad? datę urodzenia";
+$TEXT['bio-by']="autor:";
+$TEXT['bio-ask']="Prosz&#281; wpisa&#263; dat&#281; urodzenia:";
 $TEXT['bio-ok']="OK";
 $TEXT['bio-error1']="Data";
-$TEXT['bio-error2']="jest błędna";
+$TEXT['bio-error2']="jest niepoprawna";
 
-$TEXT['bio-birthday']="data urodzenia";
-$TEXT['bio-today']="Dzi?";
-$TEXT['bio-intellectual']="Intelekt";
-$TEXT['bio-emotional']="Emocje";
-$TEXT['bio-physical']="Kondycja";
+$TEXT['bio-birthday']="Urodziny";
+$TEXT['bio-today']="Dzi�";
+$TEXT['bio-intellectual']="Intelektualny";
+$TEXT['bio-emotional']="Emocjonalny";
+$TEXT['bio-physical']="Fizyczny";
 
 // ---------------------------------------------------------------------
 // INSTANT ART DEMO
 // ---------------------------------------------------------------------
 
-$TEXT['iart-head']="Błyskawiczna Grafika (Zastosowanie PHP+GD+FreeType)";
-$TEXT['iart-text1']="Czcionka AnkeCalligraph autorstwa <a class=blue target=extern href=\"http://www.anke-art.de/\">Anke Arnold</a>";
+$TEXT['iart-head']="Instant Art (Przyk&#322;ad na PHP+GD+FreeType)";
+$TEXT['iart-text1']="Czcionka �AnkeCalligraph� wykonana przez <a class=blue target=extern href=\"http://www.anke-art.de/\">Anke Arnold</a>";
 $TEXT['iart-ok']="OK";
 
 // ---------------------------------------------------------------------
 // FLASH ART DEMO
 // ---------------------------------------------------------------------
 
-$TEXT['flash-head']="Grafika Flash (Zastosowanie PHP+MING)";
-$TEXT['flash-text1']="MING dla Windows32 nie jest jeszcze gotowy.<br>Szczegóły: <a class=blue target=extern href=\"http://www.opaque.net/wiki/index.php?Ming\">Ming - an SWF output library and PHP module</a>";
+$TEXT['flash-head']="Flash Art (Przyk&#322;ad na PHP+MING)";
+$TEXT['flash-text1']="Projekt MING dla win32 ju&#380; nie istnieje, nie zosta&#322; nigdy uko&#324;czony.<br>Prosz&#281; przeczyta&#263;: <a class=blue target=extern href=\"http://ming.sourceforge.net/install.html/\">Ming - an SWF output library and PHP module</a>";
 $TEXT['flash-ok']="OK";
 
 // ---------------------------------------------------------------------
 // PHONE BOOK DEMO
 // ---------------------------------------------------------------------
 
-$TEXT['phonebook-head']="Księga telefonów (Przykład zastosowania PHP+SQLite)";
+$TEXT['phonebook-head']="Ksi&#261;&#380;ka telefoniczna (Przyk&#322;ad na PHP+SQLite)";
 
-$TEXT['phonebook-text1']="Prosty skrypt, lecz wykorzystujcy najnowsze rozwizania.";
+$TEXT['phonebook-text1']="Bardzo prosty skrypt ksi&#261;&#380;ki telefonicznej. Ale dzia&#322;a przy pomocy nowoczesnej technologi: SQLite, baza danych SQL bez serwera.";
 
-$TEXT['phonebook-error']="Nie można otworzyć bazy danych!";
-$TEXT['phonebook-head1']="Moje numery telefonów";
+$TEXT['phonebook-error']="Nie mo&#380;na otworzy&#263; bazy danych!";
+$TEXT['phonebook-head1']="Moje numery telefon&oacute;w";
 $TEXT['phonebook-attrib1']="Nazwisko";
-$TEXT['phonebook-attrib2']="Imię";
+$TEXT['phonebook-attrib2']="Imi&#281;";
 $TEXT['phonebook-attrib3']="Numer telefonu";
-$TEXT['phonebook-attrib4']="Komenda";
-$TEXT['phonebook-sure']="Jeste? pewien?";
+$TEXT['phonebook-attrib4']="Polecenie";
+$TEXT['phonebook-sure']="Na pewno?";
 $TEXT['phonebook-head2']="Dodaj wpis";
-$TEXT['phonebook-button1']="Kasuj";
-$TEXT['phonebook-button2']="Dodaj";
+$TEXT['phonebook-button1']="USU&#323;";
+$TEXT['phonebook-button2']="DODAJ";
 
 // ---------------------------------------------------------------------
 // ABOUT
 // ---------------------------------------------------------------------
 
-$TEXT['about-head']="O XAMPPie";
+$TEXT['about-head']="Info o XAMPP";
 
-$TEXT['about-subhead1']="Cele i założenia";
+$TEXT['about-subhead1']="Pomys&#322; i realizacja";
 
-$TEXT['about-subhead2']="Szata graficzna";
+$TEXT['about-subhead2']="Projekt graficzny";
 
-$TEXT['about-subhead3']="Współpraca";
+$TEXT['about-subhead3']="Wsp�&#322;praca";
 
 $TEXT['about-subhead4']="Kontakt";
 
@@ -330,77 +277,77 @@ $TEXT['about-subhead4']="Kontakt";
 // CODE
 // ---------------------------------------------------------------------
 
-$TEXT['srccode-in']="Kod ?ródłowy tutaj";
+$TEXT['srccode-in']="Zobacz &#378;r&oacute;d&#322;o tutaj";
 
 // ---------------------------------------------------------------------
 // MERCURY
 // ---------------------------------------------------------------------
 
-$TEXT['mail-head']="Wysyłanie maili za pomoc Mercury Mail na serwerach SMTP i POP3";
-$TEXT['mail-hinweise']="Notki odnosnie wykorzystywania tego programu!";
+$TEXT['mail-head']="Poczta z Mercury Mail - serwer SMTP i POP3";
+$TEXT['mail-hinweise']="Kilka istotnych informacji stosowanych w Mercury!";
 $TEXT['mail-adress']="Nadawca:";
-$TEXT['mail-adressat']="Adresat:";
-$TEXT['mail-cc']="CC:";
+$TEXT['mail-adressat']="Odbiorca:";
+$TEXT['mail-cc']="Kopia:";
 $TEXT['mail-subject']="Temat:";
-$TEXT['mail-message']="Wiadomo?ć:";
-$TEXT['mail-sendnow']="Wiadomo?ć jest wysyłana ...";
-$TEXT['mail-sendok']="Wiadomo?ć wysłana pomy?lnie!";
-$TEXT['mail-sendnotok']="Błd! Nie udało się wysłać poprawnie wiadomo?ć!";
-$TEXT['mail-help1']="Notki:<br><br>";
+$TEXT['mail-message']="Wiadomo&#347;&#263;:";
+$TEXT['mail-sendnow']="Wiadomo&#347;&#263; jest wysy&#322;ana ...";
+$TEXT['mail-sendok']="Wiadomo&#347;&#263; zosta&#322;a pomy&#347;lnie wys&#322;ana!";
+$TEXT['mail-sendnotok']="B&#322;&#261;d! Wiadomo&#347;&#263; nie zosta&#322;a wys&#322;ana!";
+$TEXT['mail-help1']="Informacje pomocne przy u&#380;ywaniu Mercury:<br><br>";
 $TEXT['mail-help2']="<UL>
-<LI>Mercury potrzebuje zewnętrznego połczenia przy starcie;</LI>
-<LI>przy starcie Mercury definiuje Domain Name Service (DNS) automatycznie, jako nazwę serwera twojego dostawcy;</LI>
-<LI>Dla użytkowników gateway servers: Proszę ustawić DNS poprzez TCP/IP (poprzez InterNic z IP 198.41.0.4);</LI>
-<LI>Plik konfiguracyjny Mercury to MERCURY.INI;</LI>
-<LI>dla testów możesz wysłać email do postmaster@localhost lub admin@localhost i poszukać tych wiadomo?ci w katalogach: xampp.../mailserver/MAIL/postmaster lub (...)/admin;</LI>
-<LI>jeden testowy użytkownik \"newuser\" (newuser@localhost) z hasłem = wampp;</LI>
-<LI>spam i podobne s zabronione w Mercury!;</LI> 
+<LI>Mercury wymaga po&#322;&#261;czenia z internetem przy uruchomieniu;</LI>
+<LI>przy starcie, Mercury ustala domen&#281; (DNS) automatycznie od providera;</LI>
+<LI>Dla wszystkich u&#380;ytkowni�w za firewall'em: Prosz&#281; ustawi&#263; DNS przez TCP/IP (np. przez TPSA z numerem IP 198.168.0.4);</LI>
+<LI>plik konfiguracyjny Mercury to MERCURY.INI;</LI>
+<LI>aby sprawdzi&#263; konfiguracj&#281;, prosz&#281; przes&#322;a&#263; wiadomo&#347;&#263; do postmaster@localhost lub admin@localhost i sprawdzi&#263; wiadomo&#347;ci w folderach: xampp.../mailserver/MAIL/postmaster lub (...)/admin;</LI>
+<LI>test u&#380;ytkownika o nazwie \"newuser\" (newuser@localhost) z has&#322;em = wampp;</LI>
+<LI>spam i wszelkie inne negatywne zachowania s&#261; ca&#322;kowicie zabrionione z Mercury!;</LI> 
 </UL>";
 $TEXT['mail-url']="<a href=\"http://www.pmail.com/overviews/ovw_mercury.htm\" target=\"_top\">http://www.pmail.com/overviews/ovw_mercury.htm</a>";
 // ---------------------------------------------------------------------
 // FileZilla FTP 
 // ---------------------------------------------------------------------
 
-$TEXT['filezilla-head']="Serwer FileZilla FTP";
-$TEXT['filezilla-install']="Apache nie jest serwerem FTP ... ale FileZilla FTP jest.";
-$TEXT['filezilla-install2']="W głównym katalogu XAMPPa uruchom \"filezilla_setup.bat\" by skonfigurować serwer. Uwaga: Dla Windows NT, 2000 i XP Professional, FileZilla musi zostać zainstalowana jako service.";
-$TEXT['filezilla-install3']="Konfigurowanie \"FileZilla FTP\". W tym celu użyj interfejsu FileZilla \"FileZilla Server Interface.exe\". W przykładzie ustawieni s dwaj użytkownicy:<br><br>
-A: Domy?lny użytkownik \"newuser\", hasło \"wampp\". Główny katalog xampp\htdocs.<br> 
-B: Anonimowy użytkownik \"anonymous\", bez hasła. Główny katalog xampp\anonymous.<br><br>
-Domy?lnym interfejsem jest adres loopback - 127.0.0.1.";
-$TEXT['filezilla-install4']="Serwer FTP jest wyłczany za pomoc \"FileZillaFTP_stop.bat\". Dla FileZilla jako service użyj \"FileZillaServer.exe\" bezpo?rednio. Wtedy możesz skonfigurować wszystkie opcje startowe.";
+$TEXT['filezilla-head']="Serwer FTP FileZilla";
+$TEXT['filezilla-install']="Apache <U>nie</U> jest a Serwerem FTP ... jednak jest nim FileZilla FTP. Please consider the following references.";
+$TEXT['filezilla-install2']="W katalogu g&#322;�wnym xampp'a, nale&#380;y uruchomi&#263; \"filezilla_setup.bat\" w celu konfiguracji. Uwaga: w Windows NT, 2000 oraz XP Professional, FileZilla musi by&#263; uruchamiana jako us&#322;uga serwisowa.";
+$TEXT['filezilla-install3']="Konfiguracja \"FileZilla FTP\". W tym celu, prosz&#281; uruchomi&#263; Interfejs FileZilla z \"FileZilla Server Interface.exe\". Przyk&#322;ad dw�ch u&#380;ytkownik�w:<br><br>
+A: u&#380;ytkownik standardowy \"newuser\", has&#322;o \"wampp\". Katalog domowy to xampp\htdocs.<br> 
+B: u&#380;ytkownik anonimowy \"anonymous\", bez has&#322;a. Katalog domowy to xampp\anonymous.<br><br>
+Standardowy interfejs sieciowy to adres 127.0.0.1.";
+$TEXT['filezilla-install4']="Sewer FTP wy&#322;&#261;cza si&#281; przez \"FileZillaFTP_stop.bat\". Aby FileZilla FTP startowa&#322;o jako us&#322;uga serwisowa, prosz&#281; u&#380;y&#263; \"FileZillaServer.exe\" bezpo&#347;rednio. Nast&#281;pnie, mo&#380;na skonfigurowa&#263; wszystkie opcje startowe.";
 $TEXT['filezilla-url']="<br><br><a href=\"http://filezilla.sourceforge.net\" target=\"_top\">http://filezilla.sourceforge.net</a>";
 
 // ---------------------------------------------------------------------
 // PEAR
 // ---------------------------------------------------------------------
 
-$TEXT['pear-head']="Eksport do Excela za pomoc PEAR (PHP)";
-$TEXT['pear-text']="Krótki <a class=blue target=extern href=\"http://www.contentmanager.de/magazin/artikel_310-print_excel_export_mit_pear.html\">Manual</A> po niemiecku autorstwa Björna Schottea.";
-$TEXT['pear-cell']="Warto?ć komórki";
+$TEXT['pear-head']="Eksport do Excell'a z PEAR (PHP)";
+$TEXT['pear-text']="Kr�tka <a class=blue target=extern href=\"http://www.contentmanager.de/magazin/artikel_310-print_excel_export_mit_pear.html\">Pomoc</A> autorstwa Bj�rn Schotte z <a class=blue target=extern href=\"http://www.thinkphp.de/\">ThinkPHP</A> (tylko w j&#281;zyku niemieckim)";
+$TEXT['pear-cell']="Zawarto&#347;&#263; wiersza";
 
 // ---------------------------------------------------------------------
 // JPGRAPH
 // ---------------------------------------------------------------------
 
-$TEXT['jpgraph-head']="JpGraph - Biblioteka graficzna dla PHP";
+$TEXT['jpgraph-head']="JpGraph - Bilbioteka Graficzna dla PHP";
 $TEXT['jpgraph-url']="<br><br><a href=\"http://www.aditus.nu/jpgraph/\" target=\"_top\">http://www.aditus.nu/jpgraph/</a>";
 
 // ---------------------------------------------------------------------
 // ADODB
 // ---------------------------------------------------------------------
 
-$TEXT['ADOdb-head']="ADOdb - Dostęp do baz danych (PHP)";
-$TEXT['ADOdb-text']="ADOdb wspiera MySQL, PostgreSQL, Interbase, Firebird, Informix, Oracle, MS SQL 7, Foxpro, Access, ADO, Sybase, FrontBase, DB2, SAP DB, SQLite i pochodne ODBC. Obsługa Sybase, Informix, FrontBase i PostgreSQL została zaimplementowana przez fanów projektu. Znajdziesz je w \(mini)xampp\php\pear\adodb.";
-$TEXT['ADOdb-example']="Przykład:";
-$TEXT['ADOdb-dbserver']="Server bay danych (MySQL, Oracle ..?)";
-$TEXT['ADOdb-host']="Host (nazwa lub IP)";
-$TEXT['ADOdb-user']="Użytkownik ";
-$TEXT['ADOdb-password']="Hasło";
-$TEXT['ADOdb-database']="Obecna baza na serwerze";
-$TEXT['ADOdb-table']="Zaznaczone tabele";
-$TEXT['ADOdb-nottable']="<p><B>Tabela nie znaleziona!</B>";
-$TEXT['ADOdb-notdbserver']="<p><B>Driver do tej bazy nie istnieje!</B>";
+$TEXT['ADOdb-head']="ADOdb - Another DB access (PHP)";
+$TEXT['ADOdb-text']="ADOdb jest skr�tem od Active Data Objects Data Base. Aktualnie wspierane s&#261; MySQL, PostgreSQL, Interbase, Firebird, Informix, Oracle, MS SQL 7, Foxpro, Access, ADO, Sybase, FrontBase, DB2, SAP DB, SQLite i generic ODBC. Sterowniki do Sybase, Informix, FrontBase i PostgreSQL znajduj&#261; si&#281; w dystrybucjach. Znajduj&#261; si&#281; tutaj \(mini)xampp\php\pear\adodb.";
+$TEXT['ADOdb-example']="Na przyk&#322;ad:";
+$TEXT['ADOdb-dbserver']="Serwer baz danych (MySQL, Oracle ..?)";
+$TEXT['ADOdb-host']="Host serwera DB (nazwa lub IP)";
+$TEXT['ADOdb-user']="Login ";
+$TEXT['ADOdb-password']="Has&#322;o";
+$TEXT['ADOdb-database']="Aktualna baza znajduje si&#281; na tym serwerze";
+$TEXT['ADOdb-table']="Wybrana tabela z bazy danych";
+$TEXT['ADOdb-nottable']="<p><B>Tabela nieznaleziona!</B>";
+$TEXT['ADOdb-notdbserver']="<p><B>Sterowniki do tej bazy danych nie istniej&#261; lub przypuszczanie jest to sterownik ODBC, ADO albo OLEDB!</B>";
 
 
 // ---------------------------------------------------------------------
@@ -409,33 +356,39 @@ $TEXT['ADOdb-notdbserver']="<p><B>Driver do tej bazy nie istnieje!</B>";
 
 $TEXT['info-package']="Pakiet";
 $TEXT['info-pages']="Strony";
-$TEXT['info-extension']="Rozszerzenie";
-$TEXT['info-module']="Moduł Apache";
+$TEXT['info-extension']="Rozszerzenia";
+$TEXT['info-module']="Modu&#322; Apache";
 $TEXT['info-description']="Opis";
-$TEXT['info-signature']="Sygnatura";
-$TEXT['info-docdir']="Document root";
-$TEXT['info-port']="Domy?lny port";
-$TEXT['info-service']="Services";
-$TEXT['info-examples']="Przykłady";
+$TEXT['info-signature']="Sygnaturka";
+$TEXT['info-docdir']="Katalog root";
+$TEXT['info-port']="Standartowy port";
+$TEXT['info-service']="Us&#322;ugi";
+$TEXT['info-examples']="Przyk&#322;ady";
 $TEXT['info-conf']="Pliki konfiguracyjne";
-$TEXT['info-requires']="Wymaga";
-$TEXT['info-alternative']="Alternatywa";
-$TEXT['info-tomcatwarn']="Uwaga, Tomcat nie działa na porcie 8080.";
-$TEXT['info-tomcatok']="OK! Tomcat działa na porcie 8080.";
-$TEXT['info-tryjava']="Przykład Javy (JSP) z Apache MOD_JK.";
-$TEXT['info-nococoon']="Uwaga, Tomcat nie działa na porcie 8080, nie można zainstalować cocoon!";
-$TEXT['info-okcocoon']="Tomcat działa na porcie 8080! By zainstalować \"Cocoon\" kliknij tutaj ...";
-
-// ONLY ENGLISH LANGUAGE SECTION
+$TEXT['info-requires']="Wymagania";
+$TEXT['info-alternative']="Warianty";
+$TEXT['info-tomcatwarn']="Uwaga! Tomcat nie zosta&#322; uruchomiony na porcie 8080.";
+$TEXT['info-tomcatok']="OK! Tomcat zosta&#322; uruchomiony na porcie 8080.";
+$TEXT['info-tryjava']="The java example (JSP) with Apache MOD_JK.";
+$TEXT['info-nococoon']="Uwaga! Tomcat nie zosta&#322; uruchomiony na porcie 8080. Instalacja nie jest mo&#380;liwa
+\"Cocoon\" dop�ki serwer Tomcat nie zostanie uruchomiony!";
+$TEXT['info-okcocoon']="Ok! Serwer Tomcat dzia&#322;a poprawnie. Instalacja mo&#380;e potrwa&#263; kilka minut! Aby zainstalowa&#263; \"Cocoon\" kliknij tutaj ...";
 
 // ---------------------------------------------------------------------
-// Guest
+// PHP Switch
 // ---------------------------------------------------------------------
 
-$TEXT['guest1-name']="Current Guest in this release: <i>FCKeditor</i>";
-$TEXT['guest1-text1']="A very nice HMTL ONLINE editor with much more JavaScript. Optimized for the IE. But do not function with the Mozilla FireFox.";
-$TEXT['guest1-text2']="FCKeditor Homepage: <a href=\"http://www.fckeditor.net\" target=\"_new\">www.fckeditor.net</a>. Note: The Arial font do NOT function here, but i do not know why!"; 
-$TEXT['guest1-text3']="<a href=\"guest-FCKeditor/fckedit-dynpage.php\" target=\"_new\">The example page written with the FCKeditor.</A>"; 
+$TEXT['switch-head']="PHP Switch 1.0 win32 dla XAMPP";
+$TEXT['switch-phpversion']="<i><b>Aktualnie w tym XAMPP jest ";
+$TEXT['switch-whatis']="<B>Po co jest PHP switch?</B><br>Apachefriends PHP Switch dla XAMPP prze&#322;&#261;cza pomi&#281;dzy wersjami PHP 4 do wersji 5 I (!) spowrotem. Wi&#281;c mo&#380;esz testowa&#263; swoje skrypty w PHP 4 lub PHP 5.<p>";
+$TEXT['switch-find']="<B>Gdzie jest PHP Switch?</B><br>PHP Switch dla XAMPP uruchomi plik PHP (z katalogu instalacyjnego XAMPP) o nazwie \"php-switch.php\". Powieniene&#347; u&#380;ywa&#263; tego pliku wykonywalnego w celu uruchamiania: ";
+$TEXT['switch-care']="<B>Co mo&#380;e by&#263; trudnego?</B><br>PHP Switch nie zmieni wersji PHP, je&#347;li a) Apache HTTPD jest uruchomione i/lub b) plik \".phpversion\" w katalogu instalacyjnym nie istnieje lub jest uszkodzony. W \".phpversion\", zosta&#322;o wpisane, &#380;e aktualn&#261; wersj&#261; PHP w XAMPP jest ju&#380; np \"4\" lub \"5\". Prosz&#281; zacz&#261;&#263; od \"wy&#322;&#261;czenia\" serwera Apache HTTPD i NAST�PNIE uruchomienia  \"php-switch.bat\".<p>";
+$TEXT['switch-where4']="<B>A p�&#378;niej! Gdzie s&#261; moje (stare) pliki konfiguracyjne?</B><br><br>Dla PHP 4:<br>";
+$TEXT['switch-where5']="<br><br>Dla PHP 5:<br>";
+$TEXT['switch-make1']="<B>Co ze zmianami w konfigach?</B><br><br>Instniej&#261;! Dla PHP4 lub PHP5 w<br>";
+$TEXT['switch-make2']="<br><br> .. zabezpieczenia dla PHP4 ...<br>";
+$TEXT['switch-make3']="<br><br> .. zabezpieczenia dla PHP5 ...<br>";
+$TEXT['switch-make4']="<br><br>Te pliki wracaja po prze&#322;&#261;czeniu PHP!!<p>";
+$TEXT['switch-not']="<B>Moje PHP jest okay I i go NIE \"prze&#322;&#261;cz&#281;\" !!!</B><br>Super! Teraz o tym zapomnijcie ... ;-)<br>";
+
 ?>
-
-

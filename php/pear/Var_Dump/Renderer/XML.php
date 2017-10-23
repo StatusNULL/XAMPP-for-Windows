@@ -13,10 +13,10 @@
 // | obtain it through the world-wide-web, please send a note to          |
 // | license@php.net so we can mail you a copy immediately.               |
 // +----------------------------------------------------------------------+
-// | Authors: Frederic Poeydomenge <frederic.poeydomenge@free.fr>         |
+// | Authors: Frederic Poeydomenge <fpoeydomenge at free dot fr>          |
 // +----------------------------------------------------------------------+
 //
-// $Id:
+// $Id$
 
 require_once 'Var_Dump/Renderer/Common.php';
 
@@ -28,7 +28,7 @@ require_once 'Var_Dump/Renderer/Common.php';
  *
  * @package Var_Dump
  * @category PHP
- * @author Frederic Poeydomenge <frederic.poeydomenge@free.fr>
+ * @author Frederic Poeydomenge <fpoeydomenge at free dot fr>
  */
 
 class Var_Dump_Renderer_XML extends Var_Dump_Renderer_Common
@@ -36,6 +36,7 @@ class Var_Dump_Renderer_XML extends Var_Dump_Renderer_Common
 
     /**
      * Class constructor.
+     *
      * @param array $options Parameters for the rendering.
      * @access public
      */
@@ -46,6 +47,7 @@ class Var_Dump_Renderer_XML extends Var_Dump_Renderer_Common
 
     /**
      * Returns the string representation of a variable
+     *
      * @return string The string representation of the variable.
      * @access public
      */
@@ -60,6 +62,7 @@ class Var_Dump_Renderer_XML extends Var_Dump_Renderer_Common
 
     /**
      * Returns the string representation of a single variable
+     *
      * @return string The string representation of a single variable.
      * @access private
      */
@@ -74,6 +77,7 @@ class Var_Dump_Renderer_XML extends Var_Dump_Renderer_Common
 
     /**
      * Returns the string representation of a multiple variable
+     *
      * @return string The string representation of a multiple variable.
      * @access private
      */
@@ -130,6 +134,7 @@ class Var_Dump_Renderer_XML extends Var_Dump_Renderer_Common
 
     /**
      * Returns a spacer string to prefix the line
+     *
      * @param integer $depth Depth level.
      * @return string Spacer string
      * @access private

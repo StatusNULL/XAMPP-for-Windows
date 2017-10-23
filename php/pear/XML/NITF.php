@@ -16,7 +16,7 @@
 // | Authors: Patrick O'Lone <polone@townnews.com>                        |
 // +----------------------------------------------------------------------+
 //
-// NITF.php,v 1.2 2003/05/29 19:02:08 polone Exp
+// NITF.php,v 1.4 2005/01/17 23:46:32 polone Exp
 
 require_once('XML/Parser.php');
 
@@ -32,7 +32,7 @@ require_once('XML/Parser.php');
 * Note that not all elements of this standard are not supported.
 *
 * @author Patrick O'Lone <polone@townnews.com>
-* @version 1.2
+* @version 1.4
 * @package XML
 */
 class XML_NITF extends XML_Parser
@@ -298,7 +298,7 @@ class XML_NITF extends XML_Parser
         } else {
 
            $aMediaRefs = array();
-           foreach($this->m_aMedia as $aMediaElement) {
+           foreach($this->m_aMedia as $aMediaElem) {
 
               if (isset($aMediaElem[$sProperty])) {
 
@@ -513,6 +513,13 @@ class XML_NITF extends XML_Parser
            case 'DOC-ID':
               $this->m_kDocData['doc-id'] = $kAttrib['ID-STRING'];
               break;
+			  
+			// NITF 3.0 extension - added per request by Lars Schenk
+			// (info@lars-schenk.de). Document urgency status information.
+			
+			case 'URGENCY':
+				$this->m_kDocData['urgency'] = $kAttrib['ED-URG'];
+				break; 
 
            // The list of keywords or phrases are just added to the array of
            // keywords.

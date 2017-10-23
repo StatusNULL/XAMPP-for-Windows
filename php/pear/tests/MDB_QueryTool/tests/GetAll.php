@@ -1,6 +1,6 @@
 <?php
 //
-//  $Id: GetAll.php,v 1.1 2003/06/09 19:48:19 quipo Exp $
+//  $Id: GetAll.php,v 1.2 2004/04/28 00:00:13 quipo Exp $
 //
 
 class tests_GetAll extends tests_UnitTest
@@ -60,6 +60,13 @@ class tests_GetAll extends tests_UnitTest
         $this->_setup();
         $this->_setup();
         $this->assertEquals(8,sizeof($this->user->getAll(0,0)));
+    }
+
+    function test_getAllWhereSearchEmpty()
+    {
+        $this->_setup();
+        $this->user->addWhereSearch('name', 'some other name');
+        $this->assertFalse($this->user->getAll());
     }
 }
 

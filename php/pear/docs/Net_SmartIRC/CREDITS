@@ -1,8 +1,8 @@
 /**
- * $Id: CREDITS,v 1.3 2003/07/09 01:47:32 meebey Exp $
- * $Revision: 1.3 $
+ * $Id: CREDITS,v 1.3.2.1 2004/06/28 19:05:29 meebey Exp $
+ * $Revision: 1.3.2.1 $
  * $Author: meebey $
- * $Date: 2003/07/09 01:47:32 $
+ * $Date: 2004/06/28 19:05:29 $
  */
 
 This is the creditslist for SmartIRC
@@ -50,3 +50,7 @@ S: Germany
 N: Jani Taskinen
 E: sniper@php.net
 D: fixed several bugs
+
+N: Anatoly Techtonik
+E: techtonik@users.sourceforge.net
+D: load socket extension patch (sf.net patch #911993)

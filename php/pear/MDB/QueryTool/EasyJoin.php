@@ -1,48 +1,44 @@
 <?php
-// +----------------------------------------------------------------------+
-// | PHP Version 4                                                        |
-// +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2003 The PHP Group                                |
-// +----------------------------------------------------------------------+
-// | This source file is subject to version 2.02 of the PHP license,      |
-// | that is bundled with this package in the file LICENSE, and is        |
-// | available at through the world-wide-web at                           |
-// | http://www.php.net/license/2_02.txt.                                 |
-// | If you did not receive a copy of the PHP license and are unable to   |
-// | obtain it through the world-wide-web, please send a note to          |
-// | license@php.net so we can mail you a copy immediately.               |
-// +----------------------------------------------------------------------+
-// | Author: Lorenzo Alberton <l.alberton at quipo.it>                    |
-// +----------------------------------------------------------------------+
-//
-// $Id: EasyJoin.php,v 1.6 2004/03/18 10:25:20 quipo Exp $
-//
-// This is just a port of DB_QueryTool, originally written by
-// Wolfram Kriesing and Paolo Panto, vision:produktion <wk@visionp.de>
-// All the praises go to them :)
-//
+/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
+
 /**
- * Load MDB_QueryTool_Query class
+ * Contains the MDB_QueryTool_EasyJoin class
+ *
+ * PHP versions 4 and 5
+ *
+ * LICENSE: This source file is subject to version 3.0 of the PHP license
+ * that is available through the world-wide-web at the following URI:
+ * http://www.php.net/license/3_0.txt.  If you did not receive a copy of
+ * the PHP License and are unable to obtain it through the web, please
+ * send a note to license@php.net so we can mail you a copy immediately.
+ *
+ * @category   Database
+ * @package    MDB_QueryTool
+ * @author     Lorenzo Alberton <l dot alberton at quipo dot it>
+ * @copyright  2003-2005 Lorenzo Alberton
+ * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
+ * @version    CVS: $Id: EasyJoin.php,v 1.10 2005/02/25 16:37:57 quipo Exp $
+ * @link       http://pear.php.net/package/MDB_QueryTool
+ */
+
+/**
+ * require the MDB_QueryTool_Query class
  */
 require_once 'MDB/QueryTool/Query.php';
 
 /**
+ * MDB_QueryTool_EasyJoin class
  *
- *   @package    MDB_QueryTool
- *   @author     Lorenzo Alberton <l.alberton@quipo.it>
- *   @access     public
+ * @category   Database
+ * @package    MDB_QueryTool
+ * @author     Lorenzo Alberton <l dot alberton at quipo dot it>
+ * @copyright  2003-2005 Lorenzo Alberton
+ * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
+ * @link       http://pear.php.net/package/MDB_QueryTool
  */
 class MDB_QueryTool_EasyJoin extends MDB_QueryTool_Query
 {
-    /**
-     * call parent constructor
-     * @param mixed $dsn DSN string, DSN array or MDB object
-     * @param array $options
-     */
-    function __construct($dsn=false, $options=array())
-    {
-        parent::MDB_QueryTool_Query($dsn, $options);
-    }
+    // {{{ class vars
 
     /**
      * this is the regular expression that shall be used to find a table's
@@ -60,6 +56,22 @@ class MDB_QueryTool_EasyJoin extends MDB_QueryTool_Query
      */
     var $_columnNamePreg = '/^.*_/';
 
+    // }}}
+    // {{{ __construct()
+
+    /**
+     * call parent constructor
+     * @param mixed $dsn DSN string, DSN array or MDB object
+     * @param array $options
+     */
+    function __construct($dsn=false, $options=array())
+    {
+        parent::MDB_QueryTool_Query($dsn, $options);
+    }
+
+    // }}}
+    // {{{ autoJoin()
+
     /**
      * join the tables given, using the column names, to find out how to join
      * the tables this is, if table1 has a column names table2_id this method
@@ -68,7 +80,8 @@ class MDB_QueryTool_EasyJoin extends MDB_QueryTool_Query
      */
     function autoJoin($tables)
     {
-// FIXXME if $tables is empty autoJoin all available tables that have a relation to $this->table, starting to search in $this->table
+// FIXXME if $tables is empty, autoJoin all available tables that have a relation
+// to $this->table, starting to search in $this->table
         settype($tables, 'array');
         // add this->table to the tables array, so we go thru the current table first
         $tables = array_merge(array($this->table), $tables);
@@ -78,22 +91,22 @@ class MDB_QueryTool_EasyJoin extends MDB_QueryTool_Query
 
 //print_r($shortNameIndexed);
 //print_r($tables);        print '<br /> <br />';
-        if(sizeof($shortNameIndexed) != sizeof($tables)) {
+        if (sizeof($shortNameIndexed) != sizeof($tables)) {
             $this->_errorLog('autoJoin-ERROR: not all the tables are in the tableSpec!<br />');
         }
         $joinTables     = array();
         $joinConditions = array();
-        foreach($tables as $aTable) {
+        foreach ($tables as $aTable) {
             // go through $this->table and all the given tables
-            if($metadata = $this->metadata($aTable)) {
-                foreach($metadata as $aCol => $x) {
+            if ($metadata = $this->metadata($aTable)) {
+                foreach ($metadata as $aCol => $x) {
                     // go through each row to check which might be related to $aTable
-                    $possibleTableShortName = preg_replace($this->_tableNamePreg, '', $aCol);
-                    $possibleColumnName = preg_replace($this->_columnNamePreg, '', $aCol);
+                    $possibleTableShortName = preg_replace($this->_tableNamePreg,  '', $aCol);
+                    $possibleColumnName     = preg_replace($this->_columnNamePreg, '', $aCol);
 //print "$aTable.$aCol .... possibleTableShortName=$possibleTableShortName .... possibleColumnName=$possibleColumnName<br />";
-                    if(!empty($shortNameIndexed[$possibleTableShortName])) {
+                    if (!empty($shortNameIndexed[$possibleTableShortName])) {
                         // are the tables given in the tableSpec?
-                        if(!$shortNameIndexed[$possibleTableShortName]['name'] ||
+                        if (!$shortNameIndexed[$possibleTableShortName]['name'] ||
                            !$nameIndexed[$aTable]['name'])
                         {
                             // its an error of the developer, so log the error, dont show it to the end user
@@ -101,30 +114,20 @@ class MDB_QueryTool_EasyJoin extends MDB_QueryTool_Query
                         } else {
                             // do only join different table.col combination,
                             // we should not join stuff like 'question.question=question.question' this would be quite stupid, but it used to be :-(
-                            if ($shortNameIndexed[$possibleTableShortName]['name'].$possibleColumnName!=$aTable.$aCol) {
-                                $joinTables[]     = $nameIndexed[$aTable]['name'];
-                                $joinTables[]     = $shortNameIndexed[$possibleTableShortName]['name'];
-                                $joinConditions[] = $shortNameIndexed[$possibleTableShortName]['name'].".$possibleColumnName=$aTable.$aCol";
+                            if ($shortNameIndexed[$possibleTableShortName]['name'] != $aTable ||
+                                $possibleColumnName != $aCol
+                            ) {
+                                $where = $shortNameIndexed[$possibleTableShortName]['name'].".$possibleColumnName=$aTable.$aCol";
+                                $this->addJoin($nameIndexed[$aTable]['name'],                      $where);
+                                $this->addJoin($shortNameIndexed[$possibleTableShortName]['name'], $where);
                             }
                         }
                     }
                 }
             }
         }
-
-        if(sizeof($joinTables) && sizeof($joinConditions)) {
-            $joinTables = array_unique($joinTables);
-            foreach($joinTables as $key => $val) {
-                if($val == $this->table) {
-                    unset($joinTables[$key]);
-                }
-            }
-//FIXXME set tables only when they are not already in the join!!!!!
-//print_r($joinTables); echo '$this->addJoin('.implode(' AND ',$joinConditions).');<br />';
-            $this->addJoin($joinTables,implode(' AND ', $joinConditions));
-        }
-//print '<br /> <br /> <br />';
     }
 
+    // }}}
 }
 ?>

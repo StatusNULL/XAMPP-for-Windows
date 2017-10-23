@@ -1,24 +1,25 @@
 <?php
-// +----------------------------------------------------------------------+
-// | PEAR :: File :: Passwd :: Common                                     |
-// +----------------------------------------------------------------------+
-// | This source file is subject to version 3.0 of the PHP license,       |
-// | that is available at http://www.php.net/license/3_0.txt              |
-// | If you did not receive a copy of the PHP license and are unable      |
-// | to obtain it through the world-wide-web, please send a note to       |
-// | license@php.net so we can mail you a copy immediately.               |
-// +----------------------------------------------------------------------+
-// | Copyright (c) 2003-2004 Michael Wallner <mike@iworks.at>             |
-// +----------------------------------------------------------------------+
-//
-// $Id: Common.php,v 1.12 2004/06/07 19:19:47 mike Exp $
+/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
-* Baseclass for File_Passwd_* classes.
-* 
-* @author   Michael Wallner <mike@php.net>
-* @package  File_Passwd
-*/
+ * File::Passwd::Common
+ * 
+ * PHP versions 4 and 5
+ *
+ * LICENSE: This source file is subject to version 3.0 of the PHP license
+ * that is available through the world-wide-web at the following URI:
+ * http://www.php.net/license/3_0.txt.  If you did not receive a copy of
+ * the PHP License and are unable to obtain it through the web, please
+ * send a note to license@php.net so we can mail you a copy immediately.
+ *
+ * @category   FileFormats
+ * @package    File_Passwd
+ * @author     Michael Wallner <mike@php.net>
+ * @copyright  2003-2005 Michael Wallner
+ * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
+ * @version    CVS: $Id: Common.php,v 1.18 2005/03/30 18:33:33 mike Exp $
+ * @link       http://pear.php.net/package/File_Passwd
+ */
 
 /**
 * Requires System
@@ -44,7 +45,7 @@ require_once 'File/Passwd.php';
 * 
 * @author   Michael Wallner <mike@php.net>
 * @package  File_Passwd
-* @version  $Revision: 1.12 $
+* @version  $Revision: 1.18 $
 * @access   protected
 * @internal extend this class for your File_Passwd_* class
 */
@@ -144,9 +145,9 @@ class File_Passwd_Common
     */
     function &_open($mode, $file = null)
     {
-        $file   = realpath( is_null($file) ? $this->_file : $file );
-        $dir    = dirname($file);
-        $lock   = strstr($mode, 'r') ? LOCK_SH : LOCK_EX;
+        isset($file) or $file = $this->_file;
+        $dir  = dirname($file);
+        $lock = strstr($mode, 'r') ? LOCK_SH : LOCK_EX;
         if (!is_dir($dir) && !System::mkDir('-p -m 0755 ' . $dir)) {
             return PEAR::raiseError(
                 sprintf(FILE_PASSWD_E_DIR_NOT_CREATED_STR, $dir),
@@ -220,11 +221,9 @@ class File_Passwd_Common
         }
         $this->_contents = array();
         while ($line = fgets($fh)) {
-            $line = trim(preg_replace('/^(\S*.*)#.*$/', '\\1', $line));
-            if (empty($line)) {
-                continue;
+            if (!preg_match('/^\s*#/', $line) && $line = trim($line)) {
+                $this->_contents[] = $line;
             }
-            $this->_contents[] = $line;
         }
         $e = $this->_close($fh);
         if (PEAR::isError($e)) {
@@ -353,22 +352,25 @@ class File_Passwd_Common
     *                       false if <var>$id</var> wasn't found or PEAR_Error
     * @param    string      $file   path to passwd file
     * @param    string      $id     user_id to search for
+    * @param    string      $sep    field separator
     */
-    function _auth($file, $id)
+    function _auth($file, $id, $sep = ':')
     {
         $file = realpath($file);
         if (!is_file($file)) {
             return PEAR::raiseError("File '$file' couldn't be found.", 0);
         }
-    	$fh = &File_Passwd_Common::_open('r', $file);
+        $fh = &File_Passwd_Common::_open('r', $file);
         if (PEAR::isError($fh)) {
             return $fh;
         }
+        $cmp = $id . $sep;
+        $len = strlen($cmp);
         while ($line = fgets($fh)) {
-        	if (strstr($line, $id)) {
-        	    File_Passwd_Common::_close($fh);
+            if (!strncmp($line, $cmp, $len)) {
+                File_Passwd_Common::_close($fh);
                 return trim($line);
-        	}
+            }
         }
         $e = File_Passwd_Common::_close($fh);
         if (PEAR::isError($e)) {

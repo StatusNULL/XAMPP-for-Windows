@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_move_copy.php,v 1.4 2005/04/01 21:56:01 lem9 Exp $ */
+/* $Id: tbl_move_copy.php,v 1.5 2005/04/30 12:01:48 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -328,12 +328,8 @@ function PMA_table_move_copy($source_db, $source_table, $target_db, $target_tabl
                 } // end while
             }
 
-            if ($source_db != $target_db) {
-                $get_fields = array('user','label','query');
-                $where_fields = array('dbase' => $source_db);
-                $new_fields = array('dbase' => $target_db);
-                PMA_duplicate_table_info('bookmarkwork', 'bookmark', $get_fields, $where_fields, $new_fields);
-            }
+            // duplicating the bookmarks must not be done here, but
+            // just once per db
 
             $get_fields = array('display_field');
             $where_fields = array('db_name' => $source_db, 'table_name' => $source_table);

@@ -4,7 +4,7 @@
 // +----------------------------------------------------------------------+
 // | PHP Version 4                                                        |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2002 The PHP Group                                |
+// | Copyright (c) 1997-2005 The PHP Group                                |
 // +----------------------------------------------------------------------+
 // | This source file is subject to version 2.0 of the PHP license,       |
 // | that is bundled with this package in the file LICENSE, and is        |
@@ -14,11 +14,11 @@
 // | obtain it through the world-wide-web, please send a note to          |
 // | license@php.net so we can mail you a copy immediately.               |
 // +----------------------------------------------------------------------+
-// | Author:          Ondrej Jombik <nepto@pobox.sk>                      |
+// | Author:          Ondrej Jombik <nepto@platon.sk>                     |
 // | Original author: Gavin Brown <gavin.brown@uk.com>                    |
 // +----------------------------------------------------------------------+
 //
-// $Id: Ident.php,v 1.1 2002/10/03 20:40:42 nepto Exp $
+// $Id: Ident.php,v 1.7 2005/03/07 11:23:26 nepto Exp $
 //
 // Identification Protocol implementation
 //
@@ -64,9 +64,9 @@ define('NET_IDENT_STATUS_ERROR',          2);
  *       echo "user: $user, operating system: $os_type\n";
  *   ?>
  *
- * @author      Ondrej Jombik <nepto@pobox.sk>
+ * @author      Ondrej Jombik <nepto@platon.sk>
  * @package     Net_Ident
- * @version     1.0
+ * @version     1.1.0
  * @access      public
  */
 class Net_Ident
@@ -246,7 +246,7 @@ class Net_Ident
 
         $this->_status = NET_IDENT_STATUS_OK;
         $this->_data['rawdata'] = $line;
-        $this->_parseIdentReponse($line);
+        $this->_parseIdentResponse($line);
 
         return $line;
     }
@@ -310,22 +310,20 @@ class Net_Ident
      *                  false otherwise
      * @access  private
      */
-    function _parseIdentReponse($string)
+    function _parseIdentResponse($string)
     {
-        list(, $response)           = explode(':', $string, 2);
-        list($resp_type, $add_info) = explode(':', trim($response), 2);
-        if (trim($resp_type) == 'USERID') {
-            list($os_type, $username) = explode(':', trim($add_info), 2);
-            $this->_data['username']  = trim($username);
-            $this->_data['os_type']   = trim($os_type);
+        $this->_data['username'] = false;
+        $this->_data['os_type']  = false;
+        $array = explode(':', $string, 4);
+        if (count($array) > 1 && ! strcasecmp(trim($array[1]), 'USERID')) {
+            isset($array[2]) && $this->_data['os_type']  = trim($array[2]);
+            isset($array[3]) && $this->_data['username'] = trim($array[3]);
             return true;
-        } elseif (trim($resp_type) == 'ERROR') {
-            $this->_error = trim($add_info);
+        } elseif (count($array) > 1 && ! strcasecmp(trim($array[1]), 'ERROR')) {
+            isset($array[2]) && $this->_error = trim($array[2]);
         } else {
             $this->_error = 'Invalid ident server response';
         }
-        $this->_data['username'] = false;
-        $this->_data['os_type']  = false;
         return false;
     }
 }

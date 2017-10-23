@@ -16,7 +16,7 @@
  *
  *
  * @author   Maciej Szczytowski <admin@e-rower.pl>
- * @version  1.1
+ * @version  1.1.1
  * @package  math
  * @access   public
  */
@@ -364,7 +364,7 @@ class Math_Rpn
                     array_push($this->_input_array, $temp_value);
                     $temp_value = null;
                 }
-            } elseif (($temp_value == null) && (!array_key_exists($temp_operator,$this->_operation) || !array_key_exists(2,$this->_operation[$temp_operator]) || $this->_operation[$temp_operator][2]>0) && ($this->_input[$i] == '-')) {
+            } elseif (($temp_value == null) && $temp_operator != ')' && (!array_key_exists($temp_operator,$this->_operation) || !array_key_exists(2,$this->_operation[$temp_operator]) || $this->_operation[$temp_operator][2]>0) && ($this->_input[$i] == '-')) {
                 if ($temp_operator != null) {
                     array_push($this->_input_array, $temp_operator);
                     $temp_operator = null;

@@ -1,5 +1,5 @@
 <?php
-/* $Id: queryframe.php,v 2.21 2005/02/17 17:43:57 lem9 Exp $ */
+/* $Id: queryframe.php,v 2.22 2005/04/24 21:41:13 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -310,8 +310,12 @@ if ($num_dbs > 1) {
         $db_name    = '';
         $selected_db = 0;
 
-        // natural order for db list
-        if ($cfg['NaturalOrder'] && $num_dbs > 0) {
+        // natural order for db list; but do not sort if user asked
+        // for a specific order with the 'only_db' mechanism
+
+        // TODO: merge this logic with the one in left.php
+
+        if (!is_array($cfg['Server']['only_db']) && $cfg['NaturalOrder'] && $num_dbs > 0) {
             $dblist_temp = $dblist;
             natsort($dblist_temp);
             $i = 0;

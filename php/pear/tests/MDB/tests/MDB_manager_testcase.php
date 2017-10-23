@@ -41,7 +41,7 @@
 // | Author: Paul Cooper <pgc@ucecom.com>                                 |
 // +----------------------------------------------------------------------+
 //
-// $Id: MDB_manager_testcase.php,v 1.9.4.3 2004/01/08 13:43:00 lsmith Exp $
+// $Id: MDB_manager_testcase.php,v 1.9.4.4 2004/02/23 20:08:02 quipo Exp $
 
 class MDB_Manager_TestCase extends PHPUnit_TestCase {
     //contains the dsn of the database we are testing
@@ -116,7 +116,7 @@ class MDB_Manager_TestCase extends PHPUnit_TestCase {
 
     function methodExists(&$class, $name) {
         if (is_object($class)
-            && array_key_exists(strtolower($name), array_flip(get_class_methods($class)))
+            && array_key_exists(strtolower($name), array_change_key_case(array_flip(get_class_methods($class))))
         ) {
             return true;
         }

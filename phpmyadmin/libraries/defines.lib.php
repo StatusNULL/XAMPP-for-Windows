@@ -1,5 +1,5 @@
 <?php
-/* $Id: defines.lib.php,v 2.33.2.2 2005/04/16 17:36:22 lem9 Exp $ */
+/* $Id: defines.lib.php,v 2.35.2.2 2005/07/04 21:49:50 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -20,7 +20,7 @@
  */
 // phpMyAdmin release
 if (!defined('PMA_VERSION')) {
-    define('PMA_VERSION', '2.6.2-pl1');
+    define('PMA_VERSION', '2.6.3-pl1');
 }
 
 if (!defined('PMA_THEME_VERSION')) {

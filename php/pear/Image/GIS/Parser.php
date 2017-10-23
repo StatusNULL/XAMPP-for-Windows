@@ -13,18 +13,21 @@
 // | license@php.net so we can mail you a copy immediately.                 |
 // +------------------------------------------------------------------------+
 //
-// $Id: Parser.php,v 1.10 2004/01/01 10:31:37 sebastian Exp $
+// $Id: Parser.php,v 1.13 2004/04/17 10:21:24 sebastian Exp $
 //
 
 require_once 'Cache/Lite.php';
 require_once 'Image/GIS/LineSet.php';
 
 /**
-* Parser Base Class.
-*
-* @version  $Revision: 1.10 $
-* @since    Image_GIS 1.0.0
-*/
+ * Parser Base Class.
+ *
+ * @author      Sebastian Bergmann <sb@sebastian-bergmann.de>
+ * @copyright   Copyright &copy; 2002-2004 Jan Kneschke <jan@kneschke.de> and Sebastian Bergmann <sb@sebastian-bergmann.de>
+ * @license     http://www.php.net/license/3_0.txt The PHP License, Version 3.0
+ * @category    Image
+ * @package     Image_GIS
+ */
 class Image_GIS_Parser {
     /**
     * Cache.

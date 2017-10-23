@@ -13,20 +13,22 @@
 // | license@php.net so we can mail you a copy immediately.                    |
 // +---------------------------------------------------------------------------+
 //
-// $Id: Cache.php,v 1.6 2004/01/01 10:31:54 sebastian Exp $
+// $Id: Cache.php,v 1.10 2004/11/19 07:18:57 sebastian Exp $
 //
 
 require_once 'Cache/Lite.php';
 require_once 'XML/Transformer.php';
 
-/**
-* Caching Transformer.
-*
-* @author  Sebastian Bergmann <sb@sebastian-bergmann.de>
-* @author  Kristian Köhntopp <kris@koehntopp.de>
-* @version $Revision: 1.6 $
-* @access  public
-*/
+ /**
+ * Caching Transformer.
+ *
+ * @author      Sebastian Bergmann <sb@sebastian-bergmann.de>
+ * @author      Kristian Köhntopp <kris@koehntopp.de>
+ * @copyright   Copyright &copy; 2002-2004 Sebastian Bergmann <sb@sebastian-bergmann.de> and Kristian Köhntopp <kris@koehntopp.de>
+ * @license     http://www.php.net/license/3_0.txt The PHP License, Version 3.0
+ * @category    XML
+ * @package     XML_Transformer
+ */
 class XML_Transformer_Driver_Cache extends XML_Transformer {
     // {{{ Members
 
@@ -34,7 +36,7 @@ class XML_Transformer_Driver_Cache extends XML_Transformer {
     * @var    object
     * @access private
     */
-    var $_cache = false;
+    var $_cache = FALSE;
 
     // }}}
     // {{{ function XML_Transformer_Driver_Cache($parameters = array())
@@ -67,7 +69,7 @@ class XML_Transformer_Driver_Cache extends XML_Transformer {
 
         $cachedResult = $this->_cache->get($cacheID, 'XML_Transformer');
 
-        if ($cachedResult !== false) {
+        if ($cachedResult !== FALSE) {
             return $cachedResult;
         }
 

@@ -1,30 +1,28 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
-// +----------------------------------------------------------------------+
-// | PHP Version 4                                                        |
-// +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2002 The PHP Group                                |
-// +----------------------------------------------------------------------+
-// | This source file is subject to version 2.02 of the PHP license,      |
-// | that is bundled with this package in the file LICENSE, and is        |
-// | available at through the world-wide-web at                           |
-// | http://www.php.net/license/2_02.txt.                                 |
-// | If you did not receive a copy of the PHP license and are unable to   |
-// | obtain it through the world-wide-web, please send a note to          |
-// | license@php.net so we can mail you a copy immediately.               |
-// +----------------------------------------------------------------------+
-// | Authors:  Alan Knowles <alan@akbkhome.com>                           |
-// +----------------------------------------------------------------------+
-//
-// $Id: Cast.php,v 1.6 2004/06/05 02:32:34 alan_k Exp $
-//
-//  Prototype Castable Object.. for DataObject queries
-//
-
+/**
+ * Prototype Castable Object.. for DataObject queries
+ *
+ * Storage for Data that may be cast into a variety of formats.
+ *
+ * PHP versions 4 and 5
+ *
+ * LICENSE: This source file is subject to version 3.0 of the PHP license
+ * that is available through the world-wide-web at the following URI:
+ * http://www.php.net/license/3_0.txt.  If you did not receive a copy of
+ * the PHP License and are unable to obtain it through the web, please
+ * send a note to license@php.net so we can mail you a copy immediately.
+ *
+ * @category   Database
+ * @package    DB_DataObject
+ * @author     Alan Knowles <alan@akbkhome.com>
+ * @copyright  1997-2005 The PHP Group
+ * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
+ * @version    CVS: $Id: Cast.php,v 1.15 2005/07/07 05:30:53 alan_k Exp $
+ * @link       http://pear.php.net/package/DB_DataObject
+ */
+  
 /**
 *  
-* @abstract Storage for Data that may be cast into a variety of formats.
-* 
 * Common usages:
 *   // blobs
 *   $data = DB_DataObject_Cast::blob($somefile);
@@ -53,7 +51,7 @@
 *
 *
 *
-* @version    $Id: Cast.php,v 1.6 2004/06/05 02:32:34 alan_k Exp $
+
 */ 
 class DB_DataObject_Cast {
         
@@ -137,7 +135,8 @@ class DB_DataObject_Cast {
     * @access   public 
     */
   
-    function sql($value) {
+    function sql($value) 
+    {
         $r = new DB_DataObject_Cast;
         $r->type = 'sql';
         $r->value = $value;
@@ -149,7 +148,7 @@ class DB_DataObject_Cast {
     * Date Constructor
     *
     * create a Cast object from some string (not binary)
-    * 
+    * NO VALIDATION DONE, although some crappy re-calcing done!
     * 
     * @param   vargs... accepts
     *       dd/mm
@@ -165,7 +164,8 @@ class DB_DataObject_Cast {
     * @access   public 
     */
   
-    function date() {  
+    function date() 
+    {  
         $args = func_get_args();
         switch(count($args)) {
             case 0: // no args = today!
@@ -178,6 +178,7 @@ class DB_DataObject_Cast {
                 } else {
                     $bits = explode('-',$args[0]);
                 }
+                break;
             default: // 2 or more..
                 $bits = $args;
         }
@@ -207,19 +208,150 @@ class DB_DataObject_Cast {
         return $r;
     }
     
+   
+
+    /**
+    * Data For time representation ** does not handle timezones!!
+    *
+    * @var int  hour/minute/second
+    * @access public
+    */
+    var $hour;
+    var $minute;
+    var $second;
+
+    
+    /**
+    * DateTime Constructor
+    *
+    * create a Cast object from a Date/Time
+    * Maybe should accept a Date object.!
+    * NO VALIDATION DONE, although some crappy re-calcing done!
+    * 
+    * @param   vargs... accepts
+    *              noargs (now)
+    *              yyyy-mm-dd HH:MM:SS (Iso)
+    *              array(yyyy,mm,dd,HH,MM,SS) 
+    *
+    *
+    * @return   object DB_DataObject_Cast
+    * @access   public 
+    * @author   therion 5 at hotmail
+    */
+    
+    function dateTime()
+    {
+        $args = func_get_args();
+        switch(count($args)) {
+            case 0: // no args = now!
+                $datetime = date('Y-m-d G:i:s', mktime());
+            
+            case 1:
+                // continue on from 0 args.
+                if (!isset($datetime)) {
+                    $datetime = $args[0];
+                }
+                
+                $parts =  explode(' ', $datetime);
+                $bits = explode('-', $parts[0]);
+                $bits = array_merge($bits, explode(':', $parts[1]));
+                break;
+                
+            default: // 2 or more..
+                $bits = $args;
+                
+        }
+
+        if (count($bits) != 6) {
+            // PEAR ERROR?
+            return false;
+        }
+        
+        $r = DB_DataObject_Cast::date($bits[0], $bits[1], $bits[2]);
+        if (!$r) {
+            return $r; // pass thru error (False) - doesnt happen at present!
+        }
+        // change the type!
+        $r->type = 'datetime';
+        
+        // should we mathematically sort this out.. 
+        // (or just assume that no-one's dumb enough to enter 26:90:90 as a time!
+        $r->hour = $bits[3];
+        $r->minute = $bits[4];
+        $r->second = $bits[5];
+        return $r;
+
+    }
+
+
+
+    /**
+    * time Constructor
+    *
+    * create a Cast object from a Date/Time
+    * Maybe should accept a Date object.!
+    * NO VALIDATION DONE, and no-recalcing done!
+    *
+    * @param   vargs... accepts
+    *              noargs (now)
+    *              HH:MM:SS (Iso)
+    *              array(HH,MM,SS)    
+    *
+    *
+    * @return   object DB_DataObject_Cast
+    * @access   public 
+    * @author   therion 5 at hotmail
+    */
+    function time()
+    {
+        $args = func_get_args();
+        switch (count($args)) {
+            case 0: // no args = now!
+                $time = date('G:i:s', mktime());
+                
+            case 1:
+                // continue on from 0 args.
+                if (!isset($time)) {
+                    $time = $args[0];
+                }
+                $bits =  explode(':', $time);
+                break;
+                
+            default: // 2 or more..
+                $bits = $args;
+                
+        }
+        
+        if (count($bits) != 3) {
+            return false;
+        }
+        
+        // now take data from bits into object fields
+        $r = new DB_DataObject_Cast;
+        $r->type = 'time';
+        $r->hour = $bits[0];
+        $r->minute = $bits[1];
+        $r->second = $bits[2];
+        return $r;
+
+    }
+
+  
+  
     /**
     * get the string to use in the SQL statement for this...
     *
     * 
     * @param   int      $to Type (DB_DATAOBJECT_*
-    * @param   string  $db    (eg. mysql|mssql.....)
+    * @param   object   $db DB Connection Object
     * 
     *
     * @return   string 
     * @access   public
     */
   
-    function toString($to=false,$db='mysql') {
+    function toString($to=false,$db) 
+    {
         // if $this->type is not set, we are in serious trouble!!!!
         // values for to:
         $method = 'toStringFrom'.$this->type;
@@ -231,13 +363,14 @@ class DB_DataObject_Cast {
     *   ** Suppots only blob->postgres::bytea
     *
     * @param   int      $to Type (DB_DATAOBJECT_*
-    * @param   string  $db    (eg. mysql|mssql.....)
+    * @param   object   $db DB Connection Object
     * 
     *
     * @return   string 
     * @access   public
     */
-    function toStringFromBlob($to,$db) {
+    function toStringFromBlob($to,$db) 
+    {
         // first weed out invalid casts..
         // in blobs can only be cast to blobs.!
         
@@ -247,12 +380,21 @@ class DB_DataObject_Cast {
             return PEAR::raiseError('Invalid Cast from a DB_DataObject_Cast::blob to something other than a blob!');
         }
         
-        switch ($db) {
+        switch ($db->dsn["phptype"]) {
             case 'pgsql':
                 return "'".pg_escape_bytea($this->value)."'::bytea";
+                
+            case 'mysql':
+                return "'".mysql_real_escape_string($this->value,$db->connection)."'";
             
+            case 'mysqli':
+                // this is funny - the parameter order is reversed ;)
+                return "'".mysqli_real_escape_string($db->connection, $this->value)."'";
+             
+            
+                 
             default:
-                return PEAR::raiseError("DB_DataObject_Cast cant handle blobs for Database:$db Yet");
+                return PEAR::raiseError("DB_DataObject_Cast cant handle blobs for Database:{$db->dsn['phptype']} Yet");
         }
     
     }
@@ -263,13 +405,14 @@ class DB_DataObject_Cast {
     * 
     *
     * @param   int      $to Type (DB_DATAOBJECT_*
-    * @param   string  $db    (eg. mysql|mssql.....)
+    * @param   object   $db DB Connection Object
     * 
     *
     * @return   string 
     * @access   public
     */
-    function toStringFromString($to,$db) {
+    function toStringFromString($to,$db) 
+    {
         // first weed out invalid casts..
         // in blobs can only be cast to blobs.!
         
@@ -281,12 +424,20 @@ class DB_DataObject_Cast {
                 ' (why not just use native features)');
         }
         
-        switch ($db) {
+        switch ($db->dsn['phptype']) {
             case 'pgsql':
                 return "'".pg_escape_string($this->value)."'::bytea";
             
+            case 'mysql':
+                return "'".mysql_real_escape_string($this->value,$db->connection)."'";
+            
+            
+            case 'mysqli':
+                return "'".mysqli_real_escape_string($db->connection, $this->value)."'";
+
+            
             default:
-                return PEAR::raiseError("DB_DataObject_Cast cant handle blobs for Database:$db Yet");
+                return PEAR::raiseError("DB_DataObject_Cast cant handle blobs for Database:{$db->dsn['phptype']} Yet");
         }
     
     }
@@ -298,13 +449,14 @@ class DB_DataObject_Cast {
     * 
     *
     * @param   int      $to Type (DB_DATAOBJECT_*
-    * @param   string  $db    (eg. mysql|mssql.....)
+    * @param   object   $db DB Connection Object
     * 
     *
     * @return   string 
     * @access   public
     */
-    function toStringFromDate($to,$db) {
+    function toStringFromDate($to,$db) 
+    {
         // first weed out invalid casts..
         // in blobs can only be cast to blobs.!
          // perhaps we should support TEXT fields???
@@ -317,19 +469,73 @@ class DB_DataObject_Cast {
         return "'{$this->year}-{$this->month}-{$this->day}'";
     }
     
-   
+    /**
+    * get the string to use in the SQL statement for a datetime
+    *   
+    * 
+    *
+    * @param   int     $to Type (DB_DATAOBJECT_*
+    * @param   object   $db DB Connection Object
+    * 
+    *
+    * @return   string 
+    * @access   public
+    * @author   therion 5 at hotmail
+    */
     
+    function toStringFromDateTime($to,$db) 
+    {
+        // first weed out invalid casts..
+        // in blobs can only be cast to blobs.!
+        // perhaps we should support TEXT fields???
+        if (($to !== false) && 
+            !($to & (DB_DATAOBJECT_DATE + DB_DATAOBJECT_TIME))) {
+            return PEAR::raiseError('Invalid Cast from a ' .
+                ' DB_DataObject_Cast::dateTime to something other than a datetime!' .
+                ' (try using native features)');
+        }
+        return "'{$this->year}-{$this->month}-{$this->day} {$this->hour}:{$this->minute}:{$this->second}'";
+    }
+
+    /**
+    * get the string to use in the SQL statement for a time
+    *   
+    * 
+    *
+    * @param   int     $to Type (DB_DATAOBJECT_*
+    * @param   object   $db DB Connection Object
+    * 
+    *
+    * @return   string 
+    * @access   public
+    * @author   therion 5 at hotmail
+    */
+
+    function toStringFromTime($to,$db) 
+    {
+        // first weed out invalid casts..
+        // in blobs can only be cast to blobs.!
+        // perhaps we should support TEXT fields???
+        if (($to !== false) && !($to & DB_DATAOBJECT_TIME)) {
+            return PEAR::raiseError('Invalid Cast from a' . 
+                ' DB_DataObject_Cast::time to something other than a time!'.
+                ' (try using native features)');
+        }
+        return "'{$this->hour}:{$this->minute}:{$this->second}'";
+    }
+  
     /**
     * get the string to use in the SQL statement for a raw sql statement.
     *
     * @param   int      $to Type (DB_DATAOBJECT_*
-    * @param   string  $db    (eg. mysql|mssql.....)
+    * @param   object   $db DB Connection Object
     * 
     *
     * @return   string 
     * @access   public
     */
-    function toStringFromSql($to,$db) {
+    function toStringFromSql($to,$db) 
+    {
         return $this->value; 
     }
     

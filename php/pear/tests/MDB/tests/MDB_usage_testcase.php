@@ -41,7 +41,7 @@
 // | Author: Paul Cooper <pgc@ucecom.com>                                 |
 // +----------------------------------------------------------------------+
 //
-// $Id: MDB_usage_testcase.php,v 1.28.4.8 2004/01/08 13:43:00 lsmith Exp $
+// $Id: MDB_usage_testcase.php,v 1.28.4.13 2004/03/31 16:01:56 lsmith Exp $
 
 class MDB_Usage_TestCase extends PHPUnit_TestCase {
     //contains the dsn of the database we are testing
@@ -106,7 +106,7 @@ class MDB_Usage_TestCase extends PHPUnit_TestCase {
     }
 
     function methodExists($name) {
-        if (array_key_exists(strtolower($name), array_flip(get_class_methods($this->db)))) {
+        if (array_key_exists(strtolower($name), array_change_key_case(array_flip(get_class_methods($this->db))))) {
             return true;
         }
         $this->assertTrue(false, 'method '. $name.' not implemented in '.get_class($this->db));
@@ -148,7 +148,7 @@ class MDB_Usage_TestCase extends PHPUnit_TestCase {
             }
             $value = $row[$i];
             $field = $this->fields[$i];
-            $this->assertEquals($value, $data[$field], "the value retrieved for field \"$field\" ($value) using type $type doesn't match what was stored ($data[$field]).", $delta);
+            $this->assertEquals($data[$field], $value, "the value retrieved for field \"$field\" ($value) using type $type doesn't match what was stored ($data[$field]).", $delta);
         }
     }
 
@@ -429,7 +429,7 @@ class MDB_Usage_TestCase extends PHPUnit_TestCase {
             $value = $this->db->fetch($result, 0, 'user_name');
             $this->db->freeResult($result);
 
-            $this->assertEquals(rtrim($value), $test_strings[$string], "the value retrieved for field \"user_name\" (\"$value\") doesn't match what was stored (".$test_strings[$string].')');
+            $this->assertEquals($test_strings[$string], rtrim($value), "the value retrieved for field \"user_name\" (\"$value\") doesn't match what was stored (".$test_strings[$string].')');
 
         }
     }
@@ -502,10 +502,10 @@ class MDB_Usage_TestCase extends PHPUnit_TestCase {
 
             $result_rows = $this->db->numRows($result);
 
-            $this->assertTrue(($result_rows <= $rows), 'expected a result of no more than $rows but the returned number of rows is $result_rows');
+            $this->assertTrue(($result_rows <= $rows), "expected a result of no more than $rows but the returned number of rows is $result_rows");
 
             for ($row = 0; $row < $result_rows; $row++) {
-                $this->assertTrue(!$this->db->endOfResult($result), 'The query result seem to have reached the end of result at row $row that is before $result_rows as expected');
+                $this->assertTrue(!$this->db->endOfResult($result), "The query result seem to have reached the end of result at row $row that is before $result_rows as expected");
 
                 $this->verifyFetchedValues($result, $row, $data[$row + $start_row]);
 
@@ -558,6 +558,28 @@ class MDB_Usage_TestCase extends PHPUnit_TestCase {
 
         $result = $this->db->dropSequence($sequence_name);
 
+        if (MDB::isError($result)) {
+            $this->assertTrue(false, "Error dropping sequence $sequence_name : ".$result->getMessage());
+        }
+
+        // Test currId()
+        $sequence_name = 'test_currid';
+
+        $next = $this->db->nextId($sequence_name);
+        $curr = $this->db->currId($sequence_name);
+
+        if (MDB::isError($curr)) {
+            $this->assertTrue(false, "Error getting the current value of sequence $sequence_name : ".$curr->getMessage());
+        } else {
+            if ($next != $curr) {
+                if ($next+1 == $curr) {
+                    $this->assertTrue(false, "Warning: currId() is using nextId() instead of a native implementation");
+                } else {
+                    $this->assertEquals($next, $curr, "return value if currId() does not match the previous call to nextId()");
+                }
+            }
+        }
+        $result = $this->db->dropSequence($sequence_name);
         if (MDB::isError($result)) {
             $this->assertTrue(false, "Error dropping sequence $sequence_name : ".$result->getMessage());
         }
@@ -1070,6 +1092,30 @@ class MDB_Usage_TestCase extends PHPUnit_TestCase {
 
         $this->db->freeResult($result);
     }
-}
 
+    /**
+     * test tableInfo()
+     */
+    function testTableInfo()
+    {
+        if (!$this->methodExists('tableInfo')) {
+            return;
+        }
+
+        $table_info = $this->db->tableInfo('users');
+        if (MDB::isError($table_info)) {
+            $this->assertTrue(false, 'Error in tableInfo(): '.$table_info->getMessage());
+        } else {
+
+            $this->assertEquals(count($this->fields), count($table_info), 'The number of fields retrieved ('.count($table_info).') is different from the expected one ('.count($this->fields).')');
+            foreach ($table_info as $field_info) {
+                $this->assertEquals($field_info['table'], 'users', "the table name is not correct (expected: 'users'; actual: $field_info[table])");
+                if (!in_array(strtolower($field_info['name']), $this->fields)) {
+                    $this->assertTrue(false, 'Field names do not match ('.$field_info['name'].' not recognized');
+                }
+                //add check on types...
+            }
+        }
+    }
+}
 ?>

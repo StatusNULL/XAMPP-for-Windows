@@ -1,28 +1,27 @@
-  ApacheFriends XAMPP (basic package) version 1.4.14
+  ApacheFriends XAMPP (basic package) version 1.4.15
 
   + Apache 2.0.54
-  + MySQL 4.1.12
-  + PHP 5.0.4 + PHP 4.3.11 + PEAR
-  + eAccelerator 0.9.3
+  + MySQL 4.1.13
+  + PHP 5.0.4 + PHP 4.4.0 + PEAR
+  + eAccelerator 0.9.3 (PHP5) / 0.9.4-dev(PHP4)
   + PHP-Switch win32 1.0 (von Apachefriends, man nehme die "php-switch.bat") 
-  + XAMPP Control Version 1.0 from www.nat32.com	
+  + XAMPP Control Version 2.1 from www.nat32.com	
   + XAMPP Security 1.0	
   + SQLite 2.8.15
-  + OpenSSL 0.9.7g
-  + phpMyAdmin 2.6.2-pl1
-  + ADODB 4.63
+  + OpenSSL 0.9.8
+  + phpMyAdmin 2.6.3-pl1
+  + ADODB 4.65
   + Mercury Mail Transport System for Win32 and NetWare Systems v4.01a
-  + FileZilla FTP Server 0.9.8a
+  + FileZilla FTP Server 0.9.8c
   + Webalizer 2.01-10
-  + Zend Optimizer 2.5.7
-
+  + Zend Optimizer 2.5.10a
  
 * System Vorrausetzungen:
   
   + 64 MB RAM (recommended)
   + 160 MB free Fixed Disk 
   + Windows 98, ME, XP Home
-  + Windows NT, 2000, XP Professional (Recommended)
+  + Windows NT, 2000, XP (Recommended)
 
 
 SCHNELLINSTALLATION:
@@ -87,7 +86,7 @@ Password: xampp
 
 ---------------------------------------------------------------
 NUR FÜR NT SYSTEME
-(NT4 | windows 2000 | windows xp professional)
+(NT4 | windows 2000 | windows xp)
 
 \...\xampp\apache\apache_installservice.bat =
 ==> Installiert des Apache 2 als Dienst
@@ -103,6 +102,31 @@ NUR FÜR NT SYSTEME
 
 ==> Nach allen Dienst(de)installationen, system neustarten! 
 ---------------------------------------------------------------
+
+DAS THEMA SICHERHEIT
+
+Wie schon an anderer Stelle erwähnt ist XAMPP nicht für den Produktionseinsatz gedacht, 
+sondern nur für Entwickler in Entwicklungsumgebungen. Das hat zur Folge, dass XAMPP 
+absichtlich nicht restriktiv sondern im Gegenteil sehr offen vorkonfiguriert ist. Für 
+einen Entwickler ist das ideal, da er so keine Grenzen vom System vorgeschrieben bekommt. 
+Für einen Produktionseinsatz ist das allerdings überhaupt nicht geeignet.Hier eine Liste, 
+der Dinge, die an XAMPP absichtlich(!) unsicher sind:
+
+Der MySQL-Administrator (root) hat kein Passwort. 
+Der MySQL-Daemon ist übers Netzwerk erreichbar. 
+phpMyAdmin ist übers Netzwerk erreichbar. 
+In dem XAMPP-Demo-Seiten (die man unter http://localhost findet) gibt es den Punkt "Sicherheitscheck". 
+Dort kann man sich den aktuellen Sicherheitszustand seiner XAMPP-Installation anzeigen lassen.
+
+Will man XAMPP in einem Netzwerk betreiben, so dass der XAMPP-Server auch von anderen 
+erreichbar ist, dann sollte man unbedingt den folgende URL aufrufen, mit dem man 
+diese Unsicherheiten einschränken kann: 
+
+http://localhost/xampp/xamppsecurity.php 
+
+Hier kann das root Passwort für MySQL + phpMyAdmin und auch ein Verzeichnisschutz für die 
+XAMPP-Seiten eingerichtet werden. 
+
 
 Apache Hinweise:
 
@@ -133,13 +157,13 @@ benutzen!
 
 2) Um den MySQL Daemon von diesem Paket mit "innodb" für bessere Performance zu
 nutzen, editiert bitte die "my" bzw."my.cnf" im /xampp/mysql/bin Verzeichnis
-bzw. als Dienst die C:\my.cnf unter NT/2000. Dort akiviert ihr dann die Zeile
+bzw. als Dienst die C:\my.cnf unter NT/2000/XP. Dort akiviert ihr dann die Zeile
 "innodb_data_file_path=ibdata1:30M". Achtung, "innodb" kann ich derzeit nicht
-für 95/98/ME/XP Home empfehlen, da es hier immmer wieder zu blockierenden 
-Systemen kam. Also nur NT/2000/XP Professional !  
+für 95/98/ME empfehlen, da es hier immmer wieder zu blockierenden 
+Systemen kam. Also nur NT/2000/XP!  
 
-Wer MySQL als Dienst unter NT/2000/XP Professional benutzen möchte, muss 
-unebdingt (!) vorher die "my" bzw."my.cnf unter c:\ (also c:\my.cnf) 
+Wer MySQL als Dienst unter NT/2000/XP benutzen möchte, muss 
+unbedingt (!) vorher die "my" bzw."my.cnf unter c:\ (also c:\my.cnf) 
 implementieren. Danach die "mysql_installservice.bat" im mysql-Ordner 
 aktivieren.  		 	
 
@@ -151,7 +175,7 @@ Ein Passwort für "root" könnt ihr über den mysqladmin in der Eingabforderung
 setzen. Z.B: 
     [Laufwerk:]\xampp\mysql\bin\mysqladmin -u root password geheim
 Wichtig: Nach dem einsetzen eines neuen Passwortes für root muss auch 
-PHPMyAdmin informiert werden! Das geschieht über die Datei "config.inc.php"
+phpMyAdmin informiert werden! Das geschieht über die Datei "config.inc.php"
 zu finden als \xampp\phpmyadmin\config.inc.php. Dort also folgenden 
 Zeilen editieren:  
    
@@ -159,7 +183,7 @@ Zeilen editieren:
     $cfg['Servers'][$i]['auth_type']       = 'http';   // HTTP Authentifzierung
 
 So wird zuerst das 'root' Passwort vom MySQL Server abgefragt, bevor
-PHPMyAdmin zugreifen darf.  	
+phpMyAdmin zugreifen darf.  	
     
 ---------------------------------------------------------------	
     

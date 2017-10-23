@@ -4,7 +4,7 @@
 # Script to create a Windows src package
 #
 
-version=4.1.11
+version=4.1.13
 export version
 CP="cp -p"
 
@@ -158,7 +158,7 @@ vreplace()
 {
   for arg do
     unix_to_dos $arg
-    cat $arg | sed -e 's!@''VERSION''@!4.1.11!' > $arg.tmp
+    cat $arg | sed -e 's!@''VERSION''@!4.1.13!' > $arg.tmp
     rm -f $arg
     mv $arg.tmp $arg
   done
@@ -289,9 +289,7 @@ cd $SOURCE
 for i in COPYING ChangeLog README EXCEPTIONS-CLIENT\
          INSTALL-SOURCE INSTALL-WIN \
          INSTALL-WIN-SOURCE \
-         Docs/manual_toc.html  Docs/manual.html \
-         Docs/manual.txt Docs/mysqld_error.txt \
-         Docs/INSTALL-BINARY Docs/internals.texi
+         Docs/INSTALL-BINARY
 do
   print_debug "Copying file '$i'"
   if [ -f $i ]
@@ -359,6 +357,9 @@ if [ -d $BASE/SSL/SCCS ]
 then
   find $BASE/ -type d -name SCCS -printf " \"%p\"" | xargs rm -r -f
 fi
+find $BASE/ -type d -name .deps -printf " \"%p\"" | xargs rm -r -f
+find $BASE/ -type d -name .libs -printf " \"%p\"" | xargs rm -r -f
+rm -r -f "$BASE/mysql-test/var"
 
 #
 # Initialize the initial data directory

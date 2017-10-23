@@ -16,7 +16,7 @@
 // | Authors: Alexander Wirtz <alex@pc4p.net>                             |
 // +----------------------------------------------------------------------+
 //
-// $Id: Metar.php,v 1.65 2004/07/11 21:45:41 eru Exp $
+// $Id: Metar.php,v 1.66 2004/08/06 08:24:27 eru Exp $
 
 /**
 * @package      Services_Weather
@@ -484,7 +484,7 @@ class Services_Weather_Metar extends Services_Weather_Common
                                 } else {
                                     $pointer["visQualifier"] = "BEYOND";
                                     $visibility = $this->convertDistance(10, "km", "sm");
-                                    $pointer["clouds"] = array("amount" => "Clear below", "height" => 5000);
+                                    $pointer["clouds"] = array(array("amount" => "Clear below", "height" => 5000));
                                     $pointer["condition"] = "no significant weather";
                                 }
                                 $pointer["visibility"] = $visibility;
@@ -961,7 +961,7 @@ class Services_Weather_Metar extends Services_Weather_Common
                                 } else {
                                     $pointer["visQualifier"] = "BEYOND";
                                     $visibility = $this->convertDistance(10, "km", "sm");
-                                    $pointer["clouds"] = array("amount" => "none", "height" => "below 5000ft");
+                                    $pointer["clouds"] = array(array("amount" => "Clear below", "height" => 5000));
                                     $pointer["condition"] = "no significant weather";
                                 }
                                 if (isset($probability)) {

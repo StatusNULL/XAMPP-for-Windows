@@ -1,9 +1,8 @@
 <?php
-
 /**
  * API setOrientation Unit tests for HTML_Progress_UI class.
  * 
- * @version    $Id: HTML_Progress_TestCase_UI_setOrientation.php,v 1.1 2003/11/15 18:27:11 thesaur Exp $
+ * @version    $Id: HTML_Progress_TestCase_UI_setOrientation.php,v 1.4 2004/08/10 22:18:05 farell Exp $
  * @author     Laurent Laville <pear@laurent-laville.org>
  * @package    HTML_Progress
  */
@@ -11,10 +10,11 @@
 class HTML_Progress_TestCase_UI_setOrientation extends PHPUnit_TestCase
 {
     /**
-     * HTML_Progress_UI instance
+     * HTML_Progress instance
      *
      * @var        object
      */
+    var $progress;
     var $ui;
 
     function HTML_Progress_TestCase_UI_setOrientation($name)
@@ -24,17 +24,16 @@ class HTML_Progress_TestCase_UI_setOrientation extends PHPUnit_TestCase
 
     function setUp()
     {
-        error_reporting(E_ALL);
-        $this->errorThrown = false;
-        set_error_handler(array(&$this, 'errorHandler'));
+        error_reporting(E_ALL & ~E_NOTICE);
 
-        $this->ui = new HTML_Progress_UI();
-        Error_Raise::setContextGrabber($this->ui->_package, array('Error_Util', '_getFileLine'));
+        $logger['push_callback'] = array(&$this, '_pushCallback'); // don't die when an exception is thrown
+        $this->progress = new HTML_Progress($logger);
+        $this->ui =& $this->progress->getUI();
     }
 
     function tearDown()
     {
-        unset($this->ui);
+        unset($this->progress);
     }
 
     function _stripWhitespace($str)
@@ -44,17 +43,32 @@ class HTML_Progress_TestCase_UI_setOrientation extends PHPUnit_TestCase
 
     function _methodExists($name) 
     {
-        if (in_array(strtolower($name), get_class_methods($this->ui))) {
+        if (substr(PHP_VERSION,0,1) < '5') {
+            $n = strtolower($name);
+        } else {
+            $n = $name;
+        }
+        if (in_array($n, get_class_methods($this->ui))) {
             return true;
         }
         $this->assertTrue(false, 'method '. $name . ' not implemented in ' . get_class($this->ui));
         return false;
     }
 
-    function errorHandler($errno, $errstr, $errfile, $errline) {
-        //die("$errstr in $errfile at line $errline");
-        $this->errorThrown = true;
-        $this->assertTrue(false, $errstr);
+    function _pushCallback($err)
+    {
+        // don't die if the error is an exception (as default callback)
+        return HTML_PROGRESS_ERRORSTACK_PUSH;
+    }
+
+    function _getResult()
+    {
+        if ($this->progress->hasErrors()) {
+            $err = $this->progress->getError();
+            $this->assertTrue(false, $err['message']);
+        } else {
+            $this->assertTrue(true);
+	}
     }
    
     /**
@@ -67,6 +81,7 @@ class HTML_Progress_TestCase_UI_setOrientation extends PHPUnit_TestCase
             return;
         }
         $this->ui->setOrientation('');
+        $this->_getResult();
     }
 
     function test_setOrientation_fail_invalid_value()
@@ -75,6 +90,7 @@ class HTML_Progress_TestCase_UI_setOrientation extends PHPUnit_TestCase
             return;
         }
         $this->ui->setOrientation(0);
+        $this->_getResult();
     }
 
     function test_setOrientation_vertical_valid_width()
@@ -127,9 +143,7 @@ class HTML_Progress_TestCase_UI_setOrientation extends PHPUnit_TestCase
             return;
         }
         $this->ui->setOrientation(HTML_PROGRESS_BAR_VERTICAL);
-
-        $this->assertFalse($this->errorThrown, 'error thrown');
+        $this->_getResult();
     }
 }
-
 ?>

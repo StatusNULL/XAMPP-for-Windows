@@ -15,7 +15,7 @@
 // | Authors: Bertrand Mansion <bmansion@mamasam.com>                     |
 // +----------------------------------------------------------------------+
 //
-// $Id: PHPArray.php,v 1.21 2003/11/29 11:05:34 mansion Exp $
+// $Id: PHPArray.php,v 1.23 2005/02/10 06:02:40 ryansking Exp $
 
 /**
 * Config parser for common PHP configuration array
@@ -106,12 +106,28 @@ class Config_Container_PHPArray {
                     $container->setContent($value);
                     break;
                 default:
-                    if (is_array($value)) {
+/*                    if (is_array($value)) {
                         $section =& $container->createSection($key);
                         $this->_parseArray($value, $section);
                     } else {
                         $container->createDirective($key, $value);
+                    }*/
+
+                    if (is_array($value)) {
+                        if (is_integer(key($value))) {
+                            foreach ($value as $nestedValue) {
+                                $section =& $container->createSection($key);
+                                $this->_parseArray($nestedValue, $section);
+                            }
+                        } else {
+
+                            $section =& $container->createSection($key);
+                            $this->_parseArray($value, $section);
+                        }
+                    } else {
+                        $container->createDirective($key, $value);
                     }
+                                                                                                                                                                
             }
         }
     } // end func _parseArray
@@ -143,14 +159,14 @@ class Config_Container_PHPArray {
                     $string .= $parentString."['#']";
                     foreach ($attributes as $attr => $val) {
                         $attrString .= $parentString."['@']"
-                                    ."['".$attr."'] = '".$val."';\n";
+                                    ."['".$attr."'] = '".addslashes($val)."';\n";
                     }
                 } else {
                     $string .= $parentString;
                 }
                 $string .= ' = ';
                 if (is_string($obj->content)) {
-                    $string .= "'".$obj->content."'";
+                    $string .= "'".addslashes($obj->content)."'";
                 } elseif (is_int($obj->content) || is_float($obj->content)) {
                     $string .= $obj->content;
                 } elseif (is_bool($obj->content)) {
@@ -166,7 +182,7 @@ class Config_Container_PHPArray {
                     $parentString = $this->_getParentString($obj);
                     foreach ($attributes as $attr => $val) {
                         $attrString .= $parentString."['@']"
-                                    ."['".$attr."'] = '".$val."';\n";
+                                    ."['".$attr."'] = '".addslashes($val)."';\n";
                     }
                 }
                 $string .= $attrString;

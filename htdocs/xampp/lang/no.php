@@ -164,6 +164,7 @@ $TEXT['xampp-setup-bruker']="bruker:";
 $TEXT['xampp-setup-passwd']="Passord:";
 $TEXT['xampp-setup-start']="Gjø XAMPP katalogen sikker";
 $TEXT['xampp-setup-notok']="<br><br>ERROR: Linjen for brukernavn og passord må ha minst tre bokstaver/tegn og ikke mer enn 15. Spesielle bokstaver/tegn som <öäü (usw.) og tomme rom er ikke lov!<br><br>";
+$TEXT['xampp-setup-ok']="<br><br>The root password was successfully changed. Please restart MYSQL for loading these changes!<br><br>";
 $TEXT['xampp-config-ok']="<br><br>SUCCESS: The XAMPP directory is protected now! All personal data was safed in the following file:<br>";
 $TEXT['xampp-config-notok']="<br><br>ERROR: Ditt system kunne IKKE aktivere katalog gjenoppretelse beskyttelse med filen \".htaccess\" og \"htpasswd.exe\". Kanskje PHP er i \"Safe Mode\". <br><br>";
 
@@ -200,9 +201,9 @@ $TEXT['manuals-list1']="
 <ul>
 <li><a href=http://httpd.apache.org/docs-2.0/>Apache 2 dokumentasjon</a>
 <li><a href=http://www.php.net/manual/en/>PHP <b>referenz </b>dokumentasjon</a>
-<li><a href=http://www.perldoc.com/perl5.8.0/pod/perl.html>Perl dokumentasjon</a>
+<li><a href=http://www.perl.org/docs.html>Perl dokumentasjon</a>
 <li><a href=http://www.mysql.com/documentation/mysql/bychapter/>MySQL dokumentasjon</a>
-<li><a href=http://php.weblogs.com/ADODB>ADODB</a>
+<li><a http://phplens.com/lens/adodb/docs-adodb.htm>ADODB</a>
 <li><a href=http://eaccelerator.net/>eAccelerator for PHP</a>
 <li><a href=http://www.ros.co.nz/pdf/readme.pdf>pdf class dokumentasjon</a>
 </ul>";

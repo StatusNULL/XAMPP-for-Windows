@@ -1,9 +1,9 @@
 <?php
 /**
- * $Header: /repository/pear/Log/Log.php,v 1.45 2004/01/19 08:02:38 jon Exp $
+ * $Header: /repository/pear/Log/Log.php,v 1.46 2004/09/09 02:42:22 jon Exp $
  * $Horde: horde/lib/Log.php,v 1.15 2000/06/29 23:39:45 jon Exp $
  *
- * @version $Revision: 1.45 $
+ * @version $Revision: 1.46 $
  * @package Log
  */
 
@@ -391,7 +391,11 @@ class Log
                 $message = print_r($message, true);
             }
         } else if (is_array($message)) {
-            $message = print_r($message, true);
+            if (isset($message['message'])) {
+                $message = $message['message'];
+            } else {
+                $message = print_r($message, true);
+            }
         }
 
         /* Otherwise, we assume the message is a string. */

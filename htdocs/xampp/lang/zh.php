@@ -170,6 +170,7 @@ $TEXT['xampp-setup-user']="ÓÃ»§:";
 $TEXT['xampp-setup-passwd']="ÃÜÂë:";
 $TEXT['xampp-setup-start']="±£»¤XAMPPÎÄ¼ş¼Ğ";
 $TEXT['xampp-setup-notok']="<br><br>´íÎó: ÓÃ»§ÃûÒÔ¼°ÃÜÂë³¤¶ÈÎª3¸ö×Ö·ûµ½15¸ö×Ö·û.ÌØÊâ×Ö·û, Æ©Èç <öäü (usw.) ÒÔ¼°¿Õ×Ö·û¶¼²»ÔÊĞí!<br><br>";
+$TEXT['xampp-setup-ok']="<br><br>The root password was successfully changed. Please restart MYSQL for loading these changes!<br><br>";
 $TEXT['xampp-config-ok']="<br><br>³É¹¦: XAMPPÄ¿Â¼ÒÑÊÜµ½±£»¤! ËùÓĞµÄ¸öÈËÊı¾İAll personal data was safed in the following file:<br>";
 $TEXT['xampp-config-notok']="<br><br>´íÎó: ÄúµÄÏµÍ³²»ÄÜÍ¨¹ı \".htaccess\" ÒÔ¼° \"htpasswd.exe\" À´¼¤»îÄ¿Â¼±£»¤. Ò²ĞíÄúµÄ PHP ÔËĞĞÓë \"°²È«Ä£Ê½(Safe Mode)ÏÂ\". <br><br>";
 
@@ -206,10 +207,10 @@ $TEXT['manuals-list1']="
 <ul>
 <li><a href=http://httpd.apache.org/docs-2.0/>Apache 2 documentation</a>
 <li><a href=http://www.php.net/manual/en/>PHP <b>referenz </b>documentation</a>
-<li><a href=http://www.perldoc.com/perl5.8.0/pod/perl.html>Perl documentation</a>
+<li><a href=http://www.perl.org/docs.html>Perl documentation</a>
 <li><a href=http://www.mysql.com/documentation/mysql/bychapter/>MySQL documentation</a>
-<li><a href=http://php.weblogs.com/ADODB>ADODB</a>
-<li><a href=http://turck-mmcache.sourceforge.net/>Turck MMCache for PHP</a>
+<li><a http://phplens.com/lens/adodb/docs-adodb.htm>ADODB</a>
+<li><a href=http://eaccelerator.sourceforge.net/>eAccelerator</a>
 <li><a href=http://www.ros.co.nz/pdf/readme.pdf>pdf class documentation</a>
 </ul>";
 

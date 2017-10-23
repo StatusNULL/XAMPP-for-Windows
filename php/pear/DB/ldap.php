@@ -25,9 +25,10 @@
 // - Aaron Spencer Hawley <aaron dot hawley at uvm dot edu>
 //   fix to use port number if present in DB_ldap->connect()
 //
-// $Id: ldap.php,v 1.21 2004/05/20 21:52:05 ludoo Exp $
+// $Id: ldap.php,v 1.22 2005/06/16 19:17:54 ludoo Exp $
 //
 
+require_once 'DB.php';
 require_once 'DB/common.php';
 
 define("DB_ERROR_BIND_FAILED",     -26);
@@ -393,19 +394,14 @@ class DB_ldap extends DB_common
      */
     function connect($dsninfo, $persistent = false)
     {
-        if (!DB::assertExtension('ldap'))
+        if (!PEAR::loadExtension('ldap'))
             return $this->raiseError(DB_ERROR_EXTENSION_NOT_FOUND);
 
         $this->dsn = $dsninfo;
         $user   = $dsninfo['username'];
         $pw     = $dsninfo['password'];
-        if (($colon_pos = strpos($dsninfo['hostspec'], ':')) !== false) {
-            $host = substr($dsninfo['hostspec'], 0, $colon_pos);
-            $port = substr($dsninfo['hostspec'], $colon_pos + 1);
-        } else {
-            $host = $dsninfo['hostspec'];
-            $port = null;
-        }
+        $host 	= $dsninfo['hostspec'];
+        $port 	= $dsninfo['port'];
         $this->base = $dsninfo['database'];
         $this->d_base = $this->base;
 

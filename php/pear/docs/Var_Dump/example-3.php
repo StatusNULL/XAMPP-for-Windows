@@ -12,7 +12,7 @@ echo '<h1>example3.php : factory approach</h1>';
  * method, as the display method is inacurate in this case.
  *
  */
- 
+
 // Initialise the HTML4 Table rendering (see Var_Dump/Renderer/HTML4_Table.php)
 $myVarDump = & Var_Dump::factory(
     array(
@@ -42,9 +42,9 @@ $myVarDump = & Var_Dump::factory(
 
 echo '<h2>Array</h2>';
 
-$fileHandler=tmpfile();
-$linkedArray=array('John', 'Jack', 'Bill');
-$array=array(
+$fileHandler = tmpfile();
+$linkedArray = array('John', 'Jack', 'Bill');
+$array = array(
     'key-1' => 'The quick brown fox jumped over the lazy dog',
     'key-2' => 234,
     'key-3' => array(
@@ -62,18 +62,18 @@ echo $myVarDump->toString($array);
 
 echo '<h2>Object (Recursive)</h2>';
 
-class parent {
-    function parent() {
+class c_parent {
+    function c_parent() {
         $this->myChild = new child($this);
-        $this->myName = 'parent';
+        $this->myName = 'c_parent';
     }
 }
 class child {
-    function child(&$parent) {
-        $this->myParent =& $parent;
+    function child(& $c_parent) {
+        $this->myParent = & $c_parent;
     }
 }
-$recursiveObject=new parent();
+$recursiveObject = new c_parent();
 echo $myVarDump->toString($recursiveObject);
 
 /*
@@ -83,8 +83,8 @@ echo $myVarDump->toString($recursiveObject);
 echo '<h2>Object (Classic)</h2>';
 
 class test {
-    var $foo=0;
-    var $bar="";
+    var $foo = 0;
+    var $bar = '';
     function get_foo() {
         return $this->foo;
     }
@@ -92,9 +92,9 @@ class test {
         return $this->bar;
     }
 }
-$object=new test();
-$object->foo=753;
-$object->bar="357";
+$object = new test();
+$object->foo = 753;
+$object->bar = '357';
 echo $myVarDump->toString($object);
 
 /*

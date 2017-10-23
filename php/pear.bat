@@ -1,9 +1,9 @@
 @ECHO OFF
 
 REM ----------------------------------------------------------------------
-REM PHP version 4.0
+REM PHP version 5
 REM ----------------------------------------------------------------------
-REM Copyright (c) 1997-2002 The PHP Group
+REM Copyright (c) 1997-2004 The PHP Group
 REM ----------------------------------------------------------------------
 REM  This source file is subject to version 3.0 of the PHP license, 
 REM  that is bundled with this package in the file LICENSE, and is
@@ -16,7 +16,7 @@ REM ----------------------------------------------------------------------
 REM  Authors:     Alexander Merz (alexmerz@php.net)
 REM ----------------------------------------------------------------------
 REM
-REM  $Id: pear.bat,v 1.17 2003/08/29 21:21:27 cellog Exp $
+REM  Last updated 3/13/2004 ($Id$ is not replaced if the file is binary)
 
 REM change this lines to match the paths of your system
 REM -------------------
@@ -25,13 +25,23 @@ REM -------------------
 :: Check PEAR global ENV, set them if they do not exist
 IF "%PHP_PEAR_INSTALL_DIR%"=="" SET "PHP_PEAR_INSTALL_DIR=\xampp\php\pear"
 IF "%PHP_PEAR_BIN_DIR%"=="" SET "PHP_PEAR_BIN_DIR=\xampp\php"
-IF "%PHP_PEAR_PHP_BIN%"=="" SET "PHP_PEAR_PHP_BIN=\xampp\php\phpcli.exe"
- 
+IF "%PHP_PEAR_PHP_BIN%"=="" SET "PHP_PEAR_PHP_BIN=%PHP_PEAR_BIN_DIR%\php.exe"
+IF "%PHP_PEAR_SYSCONF_DIR%"=="" SET "PHP_PEAR_SYSCONF_DIR=%PHP_PEAR_BIN_DIR%"
+IF "%PHP_PEAR_EXTENSION_DIR%"=="" SET "PHP_PEAR_EXTENSION_DIR=%PHP_PEAR_BIN_DIR%\ext"
+IF "%PHP_PEAR_DOC_DIR%"=="" SET "PHP_PEAR_DOC_DIR=%PHP_PEAR_INSTALL_DIR%\docs"
+IF "%PHP_PEAR_DATA_DIR%"=="" SET "PHP_PEAR_DATA_DIR=%PHP_PEAR_INSTALL_DIR%\data"
+IF "%PHP_PEAR_TEST_DIR%"=="" SET "PHP_PEAR_TEST_DIR=%PHP_PEAR_INSTALL_DIR%\tests"
+IF "%PHP_PEAR_CACHE_DIR%"=="" SET "PHP_PEAR_CACHE_DIR=\xampp\tmp"
+
 :: Check Folders and files
 IF NOT EXIST "%PHP_PEAR_INSTALL_DIR%" GOTO PEAR_INSTALL_ERROR
 IF NOT EXIST "%PHP_PEAR_INSTALL_DIR%\pearcmd.php" GOTO PEAR_INSTALL_ERROR2
 IF NOT EXIST "%PHP_PEAR_BIN_DIR%" GOTO PEAR_BIN_ERROR
 IF NOT EXIST "%PHP_PEAR_PHP_BIN%" GOTO PEAR_PHPBIN_ERROR
+attrib +r %PHP_PEAR_BIN_DIR%\pear.bat >nul 2<&1
+attrib -h %PHP_PEAR_INSTALL_DIR%\.filemap >nul 2<&1
+attrib -h %PHP_PEAR_INSTALL_DIR%\.lock >nul 2<&1
+
 :: launch pearcmd
 GOTO RUN
 :PEAR_INSTALL_ERROR
@@ -64,6 +74,7 @@ ECHO The current value is:
 ECHO %PHP_PEAR_PHP_BIN%
 GOTO END
 :RUN
-"%PHP_PEAR_PHP_BIN%" -C -d output_buffering=1 -d include_path="%PHP_PEAR_INSTALL_DIR%" -f "%PHP_PEAR_INSTALL_DIR%\pearcmd.php" -- %1 %2 %3 %4 %5 %6 %7 %8 %9
+"%PHP_PEAR_PHP_BIN%" -C -d output_buffering=1 -f "%PHP_PEAR_INSTALL_DIR%\pearcmd.php" -- %1 %2 %3 %4 %5 %6 %7 %8 %9
 :END
+attrib -r %PHP_PEAR_BIN_DIR%\pear.bat >nul 2<&1
 @ECHO ON

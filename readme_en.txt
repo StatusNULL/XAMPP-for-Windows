@@ -1,27 +1,27 @@
-  ApacheFriends XAMPP (basic package) version 1.4.13
+  ApacheFriends XAMPP (basic package) version 1.4.15
 
   + Apache 2.0.54
-  + MySQL 4.1.12
-  + PHP 5.0.4 + PHP 4.3.11 + PEAR
-  + eAccelerator 0.9.3
+  + MySQL 4.1.13
+  + PHP 5.0.4 + PHP 4.4.0 + PEAR
+  + eAccelerator 0.9.3(PHP5) / 0.9.4-dev(PHP4)
   + PHP-Switch win32 1.0 
-  + XAMPP Control Version 1.0 from www.nat32.com	
+  + XAMPP Control Version 2.1 from www.nat32.com	
   + XAMPP Security 1.0	
   + SQLite 2.8.15
-  + OpenSSL 0.9.7g
-  + phpMyAdmin 2.6.2-pl1
-  + ADODB 4.63
+  + OpenSSL 0.9.8
+  + phpMyAdmin 2.6.3-pl1
+  + ADODB 4.65
   + Mercury Mail Transport System for Win32 and NetWare Systems v4.01a
-  + FileZilla FTP Server 0.9.8a
+  + FileZilla FTP Server 0.9.8c
   + Webalizer 2.01-10
-  + Zend Optimizer 2.5.7
+  + Zend Optimizer 2.5.10a
  
 * System Requirements:
  
   + 64 MB RAM (recommended)
   + 160 MB free Fixed Disk 
   + Windows 98, ME, XP Home
-  + Windows NT, 2000, XP Professional (Recommended)
+  + Windows NT, 2000, XP (Recommended)
 
 QUICK INSTALLATION:
 
@@ -83,7 +83,7 @@ password: xampp
 
 ---------------------------------------------------------------
 ONLY FOR NT SYSTEMS
-(NT4 | windows 2000 | windows xp professional)
+(NT4 | windows 2000 | windows xp)
 
 \...\xampp\apache\apache_installservice.bat =
 ==> Install Apache 2 as service   
@@ -99,6 +99,25 @@ ONLY FOR NT SYSTEMS
 
 ==> After all Service (un)installations, better restart system!
 ----------------------------------------------------------------
+
+A matter of security (A MUST READ!)
+
+As mentioned before, XAMPP is not meant for production use but only for developers 
+in a development environment. The way XAMPP is configured is to be open as possible 
+and allowing the developer anything he/she wants. For development environments this 
+is great but in a production environment it could be fatal. Here a list of missing security 
+in XAMPP:
+
+The MySQL administrator (root) has no password.
+The MySQL daemon is accessible via network.
+phpMyAdmin is accessible via network.
+Examples are accessible via network.
+
+To fix most of the security weaknesses simply call the following URL:
+
+http://127.0.0.1/xampp/xamppsecurity.php
+
+The root password for MySQL + phpMyAdmin and also a XAMPP directory protection can being established here.
 
 
 Apache Notes:
@@ -134,11 +153,11 @@ MYSQL NOTES:
 
 (2) To use the MySQL Daemon with "innodb" for better performance, 
     please edit the "my" (or "my.cnf") file in the /xampp/mysql/bin 
-    directory or for services the c:\my.cnf for windows NT/2000. 
+    directory or for services the c:\my.cnf for windows NT/2000/XP. 
     In there, activate the "innodb_data_file_path=ibdata1:30M"
-    statement. Attention, "innodb" is not recommended for 95/98/ME/XP Home.
+    statement. Attention, "innodb" is not recommended for 95/98/ME.
     
-    To use MySQL as Service for NT/2000/XP Professional, simply copy the "my" 
+    To use MySQL as Service for NT/2000/XP, simply copy the "my" 
     / "my.cnf" file to C:\my, or C:\my.cnf. Please note that this 
     file has to be placed in C:\ (root), other locations are not permitted. Then
     execute the "mysql_installservice.bat" in the mysql folder. 	
@@ -152,7 +171,7 @@ MYSQL NOTES:
     To set the passwort "secret" for the user "root", type the following:
     C:\xampp\mysql\bin\mysqladmin -u root password secret
     
-    After changing the password you'll have to reconfigure PHPMyAdmin to use the
+    After changing the password you'll have to reconfigure phpMyAdmin to use the
     new password, otherwise it won't be able to access the databases. To do that,
     open the file config.inc.php in \xampp\phpmyadmin\ and edit the
     following lines:    
@@ -160,7 +179,7 @@ MYSQL NOTES:
     $cfg['Servers'][$i]['user']            = 'root';   // MySQL user
     $cfg['Servers'][$i]['auth_type']       = 'http';   // HTTP authentificate
 
-    So first the 'root' password is queried by the MySQL server, before PHPMyAdmin 
+    So first the 'root' password is queried by the MySQL server, before phpMyAdmin 
     may access.
   	    	
 ---------------------------------------------------------------    

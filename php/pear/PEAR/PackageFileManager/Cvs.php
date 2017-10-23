@@ -16,7 +16,7 @@
 // | Web           http://www.phpdoc.org                                    |
 // | Mirror        http://phpdocu.sourceforge.net/                          |
 // +------------------------------------------------------------------------+
-// $Id: Cvs.php,v 1.8 2004/02/07 06:33:31 cellog Exp $
+// $Id: Cvs.php,v 1.9 2005/03/25 22:37:15 cellog Exp $
 //
 /**
  * @package PEAR_PackageFileManager
@@ -88,7 +88,7 @@ class PEAR_PackageFileManager_CVS extends PEAR_PackageFileManager_File {
     function _readCVSEntries($entries)
     {
         $ret = array();
-        $ignore = array_merge($this->_options['ignore'], $this->_cvsIgnore);
+        $ignore = array_merge((array) $this->_options['ignore'], $this->_cvsIgnore);
         // implicitly ignore packagefile
         $ignore[] = $this->_options['packagefile'];
         $include = $this->_options['include'];

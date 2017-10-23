@@ -2,7 +2,7 @@
 /**
  * example for XML_Parser_Simple
  *
- * $Id: xml_parser_simple1.php,v 1.2 2004/05/24 21:42:33 schst Exp $
+ * $Id: xml_parser_simple1.php,v 1.3 2004/05/28 16:09:48 schst Exp $
  *
  * @author      Stephan Schmidt <schst@php-tools.net>
  * @package     XML_Parser

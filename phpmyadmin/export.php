@@ -1,5 +1,5 @@
 <?php
-/* $Id: export.php,v 2.22 2005/03/06 21:10:53 nijel Exp $ */
+/* $Id: export.php,v 2.24 2005/05/18 10:28:24 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -248,9 +248,13 @@ if ($asfile) {
         $mime_type = 'application/x-bzip2';
     } else if (isset($compression) && $compression == 'gzip') {
         $filename  .= '.gz';
-        // needed to avoid recompression by server modules like mod_gzip:
-        $content_encoding = 'x-gzip';
-        $mime_type = 'application/x-gzip';
+        // Needed to avoid recompression by server modules like mod_gzip.
+        // It seems necessary to check about zlib.output_compression
+        // to avoid compressing twice
+        if (!@ini_get('zlib.output_compression')) {
+            $content_encoding = 'x-gzip';
+            $mime_type = 'application/x-gzip';
+        }
     } else if (isset($compression) && $compression == 'zip') {
         $filename  .= '.zip';
         $mime_type = 'application/zip';
@@ -564,7 +568,7 @@ else {
      * Close the html tags and add the footers in dump is displayed on screen
      */
     //echo '    </pre>' . "\n";
-    echo '        </textarea>' . "\n"
+    echo '</textarea>' . "\n"
        . '    </form>' . "\n";
     echo '</div>' . "\n";
     echo "\n";

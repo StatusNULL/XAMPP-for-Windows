@@ -1,5 +1,5 @@
 <?php
-/* $Id: chinese_simplified-utf-8.inc.php,v 2.35.2.1 2005/04/16 10:17:40 lem9 Exp $ */
+/* $Id: chinese_simplified-utf-8.inc.php,v 2.40 2005/06/12 10:09:57 swix Exp $ */
 
 /**
  * Last translation by: Funda Wang <fundawang@en2china.com>
@@ -805,8 +805,16 @@ $strMyISAMSortBufferSizeDesc = 'The buffer that is allocated when sorting MyISAM
 $strNoDetailsForEngine = 'There is no detailed status information available for this storage engine.';  //to translate
 
 $strPagesToBeFlushed = 'Pages to be flushed';  //to translate
+$strPrivDescAlterDb = 'Allows altering the structure of existing tables as well as changing the default charset and collation of databases.';  //to translate
+$strPrivDescAlterRoutine = 'Allows altering and dropping stored routines.';  //to translate
+$strPrivDescCreateRoutine = 'Allows creating stored routines.';  //to translate
+$strPrivDescCreateUser = 'Allows creating, dropping and renaming unser accounts.';  //to translate
+$strPrivDescCreateView = 'Allows creating new views.';  //to translate
+$strPrivDescExecute5 = 'Allows executing stored routines.';  //to translate
+$strPrivDescShowView = 'Allows performing SHOW CREATE VIEW queries.';  //to translate
 
 $strReadRequests = 'Read requests';  //to translate
+$strRoutines = 'Routines';  //to translate
 
 $strSocketProblem = '(or the local MySQL server\'s socket is not correctly configured)';  //to translate
 $strStorageEngine = 'Storage Engine';  //to translate
@@ -818,4 +826,8 @@ $strViewHasBeenDropped = 'View %s has been dropped';  //to translate
 
 $strWriteRequests = 'Write requests';  //to translate
 
+$strCreateDatabaseBeforeCopying = 'CREATE DATABASE before copying';  //to translate
+$strGeneratePassword = 'Generate Password';  //to translate
+$strGenerate = 'Generate';  //to translate
+$strCopy = 'Copy';  //to translate
 ?>

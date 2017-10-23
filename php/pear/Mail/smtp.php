@@ -17,14 +17,12 @@
 // |          Jon Parise <jon@php.net>                                    |
 // +----------------------------------------------------------------------+
 
-require_once 'Mail.php';
-
 /**
  * SMTP implementation of the PEAR Mail:: interface. Requires the PEAR
  * Net_SMTP:: class.
  * @access public
  * @package Mail
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.20 $
  */
 class Mail_smtp extends Mail {
 
@@ -74,6 +72,28 @@ class Mail_smtp extends Mail {
     var $localhost = 'localhost';
 
     /**
+     * SMTP connection timeout value.  NULL indicates no timeout.
+     *
+     * @var integer
+     */
+    var $timeout = null;
+
+    /**
+     * Whether to use VERP or not. If not a boolean, the string value
+     * will be used as the VERP separators.
+     *
+     * @var mixed boolean or string
+     */
+    var $verp = false;
+
+    /**
+     * Turn on Net_SMTP debugging?
+     *
+     * @var boolean $debug
+     */
+    var $debug = false;
+
+    /**
      * Constructor.
      *
      * Instantiates a new Mail_smtp:: object based on the parameters
@@ -84,6 +104,9 @@ class Mail_smtp extends Mail {
      *     username    The username to use for SMTP auth. No default.
      *     password    The password to use for SMTP auth. No default.
      *     localhost   The local hostname / domain. Defaults to localhost.
+     *     timeout     The SMTP connection timeout. Defaults to none.
+     *     verp        Whether to use VERP or not. Defaults to false.
+     *     debug       Activate SMTP debug mode? Defaults to false.
      *
      * If a parameter is present in the $params array, it replaces the
      * default.
@@ -100,6 +123,9 @@ class Mail_smtp extends Mail {
         if (isset($params['username'])) $this->username = $params['username'];
         if (isset($params['password'])) $this->password = $params['password'];
         if (isset($params['localhost'])) $this->localhost = $params['localhost'];
+        if (isset($params['timeout'])) $this->timeout = $params['timeout'];
+        if (isset($params['verp'])) $this->verp = $params['verp'];
+        if (isset($params['debug'])) $this->debug = (boolean)$params['debug'];
     }
 
     /**
@@ -130,13 +156,17 @@ class Mail_smtp extends Mail {
     {
         include_once 'Net/SMTP.php';
 
-        if (!($smtp = new Net_SMTP($this->host, $this->port, $this->localhost))) {
-            return new PEAR_Error('unable to instantiate Net_SMTP object');
+        if (!($smtp = &new Net_SMTP($this->host, $this->port, $this->localhost))) {
+            return PEAR::raiseError('unable to instantiate Net_SMTP object');
         }
 
-        if (PEAR::isError($smtp->connect())) {
-            return new PEAR_Error('unable to connect to smtp server ' .
-                                  $this->host . ':' . $this->port);
+        if ($this->debug) {
+            $smtp->setDebug(true);
+        }
+
+        if (PEAR::isError($smtp->connect($this->timeout))) {
+            return PEAR::raiseError('unable to connect to smtp server ' .
+                                    $this->host . ':' . $this->port);
         }
 
         if ($this->auth) {
@@ -144,44 +174,50 @@ class Mail_smtp extends Mail {
 
             if (PEAR::isError($smtp->auth($this->username, $this->password,
                               $method))) {
-                return new PEAR_Error('unable to authenticate to smtp server');
+                return PEAR::raiseError('unable to authenticate to smtp server');
             }
         }
 
-        list($from, $text_headers) = $this->prepareHeaders($headers);
+        $headerElements = $this->prepareHeaders($headers);
+        if (PEAR::isError($headerElements)) {
+            return $headerElements;
+        }
+        list($from, $text_headers) = $headerElements;
 
-        /*
-         * Since few MTAs are going to allow this header to be forged unless
-         * it's in the MAIL FROM: exchange, we'll use Return-Path instead of
-         * From: if it's set.
-         */
+        /* Since few MTAs are going to allow this header to be forged
+         * unless it's in the MAIL FROM: exchange, we'll use
+         * Return-Path instead of From: if it's set. */
         if (!empty($headers['Return-Path'])) {
             $from = $headers['Return-Path'];
         }
 
         if (!isset($from)) {
-            return new PEAR_Error('No from address given');
+            return PEAR::raiseError('No from address given');
         }
 
-        if (PEAR::isError($smtp->mailFrom($from))) {
-            return new PEAR_Error('unable to set sender to [' . $from . ']');
+        $args['verp'] = $this->verp;
+        if (PEAR::isError($smtp->mailFrom($from, $args))) {
+            return PEAR::raiseError('unable to set sender to [' . $from . ']');
         }
 
         $recipients = $this->parseRecipients($recipients);
-        foreach($recipients as $recipient) {
+        if (PEAR::isError($recipients)) {
+            return $recipients;
+        }
+
+        foreach ($recipients as $recipient) {
             if (PEAR::isError($res = $smtp->rcptTo($recipient))) {
-                return new PEAR_Error('unable to add recipient [' .
-                                      $recipient . ']: ' . $res->getMessage());
+                return PEAR::raiseError('unable to add recipient [' .
+                                        $recipient . ']: ' . $res->getMessage());
             }
         }
 
         if (PEAR::isError($smtp->data($text_headers . "\r\n" . $body))) {
-            return new PEAR_Error('unable to send data');
+            return PEAR::raiseError('unable to send data');
         }
 
         $smtp->disconnect();
         return true;
     }
-}
 
-?>
+}

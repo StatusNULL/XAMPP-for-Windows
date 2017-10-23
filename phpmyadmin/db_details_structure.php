@@ -1,5 +1,5 @@
 <?php
-/* $Id: db_details_structure.php,v 2.48.2.1 2005/04/14 14:42:51 lem9 Exp $ */
+/* $Id: db_details_structure.php,v 2.52 2005/06/04 13:00:12 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 require_once('./libraries/grab_globals.lib.php');
@@ -323,7 +323,7 @@ else {
             echo $titles['NoDrop'];
         } else {
             ?>
-                    <a href="sql.php?<?php echo $tbl_url_query; ?>&amp;reload=1&amp;purge=1&amp;sql_query=<?php echo urlencode($drop_query); ?>&amp;zero_rows=<?php echo $drop_message; ?>"
+                    <a href="sql.php?<?php echo $tbl_url_query; ?>&amp;reload=1&amp;purge=1&amp;sql_query=<?php echo urlencode($drop_query); ?>&amp;zero_rows=<?php echo urlencode($drop_message); ?>"
                         onclick="return confirmLink(this, '<?php echo PMA_jsFormat($drop_query, FALSE); ?>')">
                         <?php echo $titles['Drop']; ?></a>
             <?php
@@ -631,9 +631,9 @@ if ($num_tables > 0) {
     <?php
 } // end if
 ?>
-<table border="0" cellpadding="2" cellspacing="0">
     <!-- Create a new table -->
-        <form method="post" action="tbl_create.php" onsubmit="return (emptyFormElements(this, 'table') && checkFormElementInRange(this, 'num_fields', 1))">
+<form method="post" action="tbl_create.php" onsubmit="return (emptyFormElements(this, 'table') && checkFormElementInRange(this, 'num_fields', 1))">
+     <table border="0" cellpadding="2" cellspacing="0">
      <tr>
      <td class="tblHeaders" colspan="3" nowrap="nowrap"><?php
         echo PMA_generate_common_hidden_inputs($db);
@@ -652,7 +652,10 @@ echo '     <td nowrap="nowrap">';
 echo '             ' . '<input type="text" name="table" maxlength="64" size="30" class="textfield" />';
 echo '     </td><td>&nbsp;</td></tr>';
 echo '     <tr bgcolor="'.$cfg['BgcolorOne'].'"><td nowrap="nowrap">';
-echo '             ' . $strFields . ':&nbsp;' . "\n";
+if (!isset($strNumberOfFields)) {
+    $strNumberOfFields = $strFields;
+}
+echo '             ' . $strNumberOfFields . ':&nbsp;' . "\n";
 echo '     </td>';
 echo '     <td nowrap="nowrap">';
 echo '             ' . '<input type="text" name="num_fields" size="2" class="textfield" />' . "\n";
@@ -660,7 +663,8 @@ echo '     </td>';
 echo '     <td align="right">';
 echo '             ' . '&nbsp;<input type="submit" value="' . $strGo . '" />' . "\n";
 echo '     </td> </tr>';
-echo '        </form>';
+echo '     </table>';
+echo '</form>';
 
 /**
  * Displays the footer

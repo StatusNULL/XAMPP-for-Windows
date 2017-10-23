@@ -1,5 +1,5 @@
 <?php
-/* $Id: german-iso-8859-1.inc.php,v 2.84 2005/03/30 22:26:12 rabus Exp $ */
+/* $Id: german-iso-8859-1.inc.php,v 2.90.2.1 2005/06/30 17:24:36 lem9 Exp $ */
 
 /**
  * For suggestions concerning this file please contact
@@ -157,11 +157,13 @@ $strConstraintsForDumped = 'Constraints der exportierten Tabellen';
 $strConstraintsForTable = 'Constraints der Tabelle';
 $strCookiesRequired = 'Ab diesem Punkt müssen Cookies aktiviert sein.';
 $strCopyDatabaseOK = 'Datenbank %s wurde nach %s kopiert';
+$strCopy = 'Kopieren';
 $strCopyTable = 'Kopiere Tabelle nach (Datenbank<b>.</b>Tabellenname):';
 $strCopyTableOK = 'Tabelle %s wurde nach %s kopiert.';
 $strCopyTableSameNames = 'Tabelle kann nicht mit gleichem Namen kopiert werden!';
 $strCouldNotKill = 'phpMyAdmin konnte den Prozess %s nicht abbrechen. Er wurde wahrscheinlich bereits geschlossen.';
 $strCreate = 'Anlegen';
+$strCreateDatabaseBeforeCopying = 'Vor dem Kopieren CREATE DATABASE ausführen.';
 $strCreateIndex = 'Index über&nbsp;%s&nbsp;Spalten anlegen';
 $strCreateIndexTopic = 'Neuen Index anlegen';
 $strCreateNewDatabase = 'Neue Datenbank anlegen';
@@ -291,6 +293,8 @@ $strFunction = 'Funktion';
 
 $strGenBy = 'Erstellt von';
 $strGeneralRelationFeat = 'Allgemeine Verknüpfungsfunktionen';
+$strGenerate = 'Generieren';
+$strGeneratePassword = 'Passwort generieren';
 $strGenTime = 'Erstellungszeit';
 $strGeorgian = 'Georgisch';
 $strGerman = 'Deutsch';
@@ -803,4 +807,17 @@ $strYes = 'Ja';
 $strZeroRemovesTheLimit = 'Anmerkung: Der Wert 0 (null) entfernt die Beschränkung.';
 $strZip = 'Zip-komprimiert';
 
+// To translate:
+
+$strPrivDescAlterDb = 'Allows altering the structure of existing tables as well as changing the default charset and collation of databases.';  //to translate
+$strPrivDescAlterRoutine = 'Allows altering and dropping stored routines.';  //to translate
+$strPrivDescCreateRoutine = 'Allows creating stored routines.';  //to translate
+$strPrivDescCreateUser = 'Allows creating, dropping and renaming unser accounts.';  //to translate
+$strPrivDescCreateView = 'Allows creating new views.';  //to translate
+$strPrivDescExecute5 = 'Allows executing stored routines.';  //to translate
+$strPrivDescShowView = 'Allows performing SHOW CREATE VIEW queries.';  //to translate
+
+$strRoutines = 'Routines';  //to translate
+
+$strTransformation_application_octetstream__hex = 'Displays hexadecimal representation of data.';  //to translate
 ?>

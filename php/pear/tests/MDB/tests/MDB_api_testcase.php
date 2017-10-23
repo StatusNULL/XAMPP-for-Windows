@@ -41,7 +41,7 @@
 // | Author: Paul Cooper <pgc@ucecom.com>                                 |
 // +----------------------------------------------------------------------+
 //
-// $Id: MDB_api_testcase.php,v 1.13.4.6 2004/01/08 13:43:00 lsmith Exp $
+// $Id: MDB_api_testcase.php,v 1.13.4.7 2004/02/23 20:08:02 quipo Exp $
 
 class MDB_Api_TestCase extends PHPUnit_TestCase {
     //contains the dsn of the database we are testing
@@ -105,7 +105,7 @@ class MDB_Api_TestCase extends PHPUnit_TestCase {
     }
 
     function methodExists($name) {
-        if (array_key_exists(strtolower($name), array_flip(get_class_methods($this->db)))) {
+        if (array_key_exists(strtolower($name), array_change_key_case(array_flip(get_class_methods($this->db))))) {
             return true;
         }
         $this->assertTrue(false, 'method '. $name.' not implemented in '.get_class($this->db));

@@ -1,32 +1,41 @@
 <?php
 
 /* 
-#### Installer PHP  1.4 RC2  #### 
-#### Author: Kay Vogelgesang for www.apachefriends.org 2004 ####  
+#### Author: Kay Vogelgesang & Carsten Wiedmann for www.apachefriends.org 2005 ####  
 */    
 
 print "\r\n  ########################################################################\n
-  # ApacheFriends XAMPP PHP Switch win32 Version 1.0                     #\r\n
+  # ApacheFriends XAMPP PHP Switch win32 Version 1.1                     #\r\n
   #----------------------------------------------------------------------#\r\n
-  # Copyright (c) 2002-2004 Apachefriends                                #\r\n
+  # Copyright (c) 2002-2005 Apachefriends                                #\r\n
   #----------------------------------------------------------------------#\r\n
   # Authors: Kay Vogelgesang <kvo@apachefriends.org>                     #\r\n
-  #          Oswald Kai Seidler <oswald@apachefriends.org>               #\r\n
+  #          Carsten Wiedmann <webmaster@wiedmann-online.de>             #\r\n
   ########################################################################\r\n\r\n"; 
 
-$host="127.0.0.1";
-$timeout="1";
-if (($handle = @fsockopen($host, 80, $errno, $errstr, $timeout)) == true)
-{
-@fclose($handle);
-echo "   The Apache is running! Please stop the Apache before make this procedure!\r\n";
-echo "   Der Apache laeuft gerade! Bitte den Apache fuer diese Prozedur stoppen!\r\n";
-echo "   PHP Switch exit ...\r\n\r\n";
-exit();
-}
-else
-{
-@fclose($handle);
+ini_set('default_socket_timeout', '3'); // Fix by Wiedmann
+if (false !== ($handle = @fopen('http://127.0.0.1/', 'r'))) {
+	fclose($handle);
+	echo '   The Apache is running! Please stop the Apache before make this procedure!'."\n";
+	echo '   Der Apache laeuft gerade! Bitte den Apache fuer diese Prozedur stoppen!'."\n";
+	echo '   PHP Switch exit ...'."\n\n";
+	exit;
+} else {
+	unset($handle);
+
+//$host="127.0.0.1";
+//$timeout="1";
+//if (($handle = @fsockopen($host, 80, $errno, $errstr, $timeout)) == true)
+//{
+//@fclose($handle);
+//echo "   The Apache is running! Please stop the Apache before make this procedure!\r\n";
+//echo "   Der Apache laeuft gerade! Bitte den Apache fuer diese Prozedur stoppen!\r\n";
+//echo "   PHP Switch exit ...\r\n\r\n";
+//exit();
+//}
+//else
+//{
+//@fclose($handle);
 
 /// Where I stand? ///
 $curdir = getcwd();
@@ -182,12 +191,27 @@ if (file_exists($httpconf))
 		}
 
 
-if (file_exists($httpconf4)) 
+if (file_exists($httpconf)) // Fix by Wiedmann
 		{
-		echo "  Copy the $httpconf4 to $httpconf ... ";
-		copy($httpconf4,$httpconf);
-		echo "done!\r\n\r\n";
+		echo '  Change PHP settings in '.$httpconf.' ... ';
+		$httpconfcontent = file_get_contents($httpconf);
+		$httpconfcontent = strtr($httpconfcontent,
+		array(
+			'php5_module' => 'php4_module',
+			'php5ts.dll' => 'php4ts.dll',
+			'php5apache2.dll' => 'php4apache2.dll',
+			'/php/php-cgi.exe' => '/php/php.exe',
+			strtr($php5dir.'\\', '\\', '/') => strtr($php4dir.'\\', '\\', '/')
+			));
+		file_put_contents($httpconf, $httpconfcontent);
+		echo 'done!'."\n\n";
 		}
+//if (file_exists($httpconf4)) 
+//		{
+//		echo "  Copy the $httpconf4 to $httpconf ... ";
+//		copy($httpconf4,$httpconf);
+//		echo "done!\r\n\r\n";
+//		}
 
 
 echo "  Copy now all php4 dlls to $apachebin\r\n\r\n";
@@ -195,11 +219,11 @@ echo "  Copy now all php4 dlls to $apachebin\r\n\r\n";
 $dh= opendir($php4dir);
 while($file = readdir ($dh))
 {
-if (eregi ("\.dll", $file))
+if (eregi ("(\.dll|\.jar)", $file)) // Fix by Wiedmann
 {
 $php4file=$partwampp."\php\php4\\".$file;
 $phpcpfile=$partwampp."\apache\bin\\".$file;
-if (file_exists($php4file)) 
+if (file_exists($phpcpfile)) 
 		{
 		copy($php4file,$phpcpfile);
 		echo "$php4file => $phpcpfile\r\n";
@@ -209,12 +233,12 @@ if (file_exists($php4file))
 closedir($dh);
 
 
-if (file_exists($php4exe)) 
-		{
-		echo "\r\n  Copy the $php4exe as $phpexe ... ";
-		copy($php4exe,$phpexe);
-		echo "done!\r\n";
-		}
+//if (file_exists($php4exe)) 
+//		{
+//		echo "\r\n  Copy the $php4exe as $phpexe ... ";
+//		copy($php4exe,$phpexe);
+//		echo "done!\r\n";
+//		}
 
 echo "  Write the new PHP main version in $phpversionfileroot\r\n";  
 	$datei = fopen($phpversionfileroot,'w');
@@ -258,13 +282,27 @@ if (file_exists($httpconf))
 		echo "done!\r\n\r\n";
 		}
 
-
-if (file_exists($httpconf5)) 
+if (file_exists($httpconf)) // Fix by Wiedmann
 		{
-		echo "  Copy the $httpconf5 to $httpconf ... ";
-		copy($httpconf5,$httpconf);
-		echo "done!\r\n\r\n";
+		echo '  Change PHP settings in '.$httpconf.' ... ';
+		$httpconfcontent = file_get_contents($httpconf);
+		$httpconfcontent = strtr($httpconfcontent,
+		array(
+			'php4_module' => 'php5_module',
+			'php4ts.dll' => 'php5ts.dll',
+			'php4apache2.dll' => 'php5apache2.dll',
+			'/php/php.exe' => '/php/php-cgi.exe',
+			strtr($php4dir.'\\', '\\', '/') => strtr($php5dir.'\\', '\\', '/')
+			));
+		file_put_contents($httpconf, $httpconfcontent);
+		echo 'done!'."\n\n";
 		}
+//if (file_exists($httpconf5)) 
+//		{
+//		echo "  Copy the $httpconf5 to $httpconf ... ";
+//		copy($httpconf5,$httpconf);
+//		echo "done!\r\n\r\n";
+//		}
 
 
 echo "  Copy now all php5 dlls to $apachebin\r\n\r\n";
@@ -272,11 +310,11 @@ echo "  Copy now all php5 dlls to $apachebin\r\n\r\n";
 $dh= opendir($php5dir);
 while($file = readdir ($dh))
 {
-if (eregi ("\.dll", $file))
+if (eregi ("(\.dll|\.jar)", $file)) // Fix by Wiedmann
 {
 $php5file=$partwampp."\php\\".$file;
 $phpcpfile=$partwampp."\apache\bin\\".$file;
-if (file_exists($php5file)) 
+if (file_exists($phpcpfile)) 
 		{
 		copy($php5file,$phpcpfile);
 		echo "$php5file => $phpcpfile\r\n";
@@ -286,12 +324,12 @@ if (file_exists($php5file))
 closedir($dh);
 
 
-if (file_exists($php5exe)) 
-		{
-		echo "\r\n  Copy the $php5exe as $phpexe ... ";
-		copy($php5exe,$phpexe);
-		echo "done!\r\n";
-		}
+//if (file_exists($php5exe)) 
+//		{
+//		echo "\r\n  Copy the $php5exe as $phpexe ... ";
+//		copy($php5exe,$phpexe);
+//		echo "done!\r\n";
+//		}
 
 echo "  Write the new PHP main version in $phpversionfileroot\r\n";  
 	$datei = fopen($phpversionfileroot,'w');

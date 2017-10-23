@@ -6,7 +6,7 @@
 * @version     2.0
 */
 
-// $Id: ITStatic_example.php,v 1.3 2003/09/09 10:46:51 avb Exp $
+// $Id: ITStatic_example.php,v 1.4 2004/10/02 09:54:41 ths Exp $
 
 require_once('HTML/QuickForm.php');
 require_once('HTML/QuickForm/Renderer/ITStatic.php');
@@ -78,7 +78,7 @@ $form->addElement('submit', 'submit', 'Register');
 
 $form->addRule('email', 'Email address is required', 'required');
 $form->addGroupRule('name', 'Name is required', 'required');
-$form->addRule('pass', 'Password must be between 8 to 10 characters', 'rangelength', '8,10');
+$form->addRule('pass', 'Password must be between 8 to 10 characters', 'rangelength', array(8, 10));
 $form->addRule('country', 'Country is a required field', 'required');
 $form->addGroupRule('destination', 'Please check at least two boxes', 'required', null, 2);
 $form->addGroupRule('phone', 'Please fill all phone fields', 'required');

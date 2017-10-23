@@ -3,7 +3,7 @@
 /* +----------------------------------------------------------------------+
  * | PHP Version 4                                                        |
  * +----------------------------------------------------------------------+
- * | Copyright (c) 1997-2003 The PHP Group                                |
+ * | Copyright (c) 1997-2004 The PHP Group                                |
  * +----------------------------------------------------------------------+
  * | This source file is subject to version 2.02 of the PHP license,      |
  * | that is bundled with this package in the file LICENSE, and is        |
@@ -16,7 +16,7 @@
  * | Authors: Jon Parise <jon@php.net>                                    |
  * +----------------------------------------------------------------------+
  *
- * $Id: FSM.php,v 1.8 2003/10/03 07:52:11 jon Exp $
+ * $Id: FSM.php,v 1.13 2005/01/08 22:43:25 jon Exp $
  */
 
 /**
@@ -26,9 +26,16 @@
  * payload, therefore effectively making the machine a Push-Down Automata
  * (a finite state machine with memory).
  *
+ * This code is based on Noah Spurrier's Finite State Machine (FSM) submission
+ * to the Python Cookbook:
+ *
+ *      http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/146262
+ *
  * @author  Jon Parise <jon@php.net>
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.13 $
  * @package FSM
+ *
+ * @example rpn.php     A Reverse Polish Notation (RPN) calculator.
  */
 class FSM
 {
@@ -62,7 +69,7 @@ class FSM
      * Maps (inputSymbol, currentState) --> (action, nextState).
      *
      * @var array
-     * @see $_inputState, $_currentState
+     * @see $_initialState, $_currentState
      * @access private
      */
     var $_transitions = array();
@@ -106,13 +113,11 @@ class FSM
 
     /**
      * This method resets the FSM by setting the current state back to the
-     * initial state (set by the constructor).  The current input symbol is
-     * also reset to NULL.
+     * initial state (set by the constructor).
      */
     function reset()
     {
         $this->_currentState = $this->_initialState;
-        $this->_inputSymbol = null;
     }
 
     /**
@@ -188,7 +193,7 @@ class FSM
      */
     function setDefaultTransition($nextState, $action)
     {
-        if (empty($nextState)) {
+        if (is_null($nextState)) {
             $this->_defaultTransition = null;
             return;
         }
@@ -215,9 +220,9 @@ class FSM
     {
         $state = $this->_currentState;
 
-        if (array_key_exists("$symbol,$state", $this->_transitions)) {
+        if (!empty($this->_transitions["$symbol,$state"])) {
             return $this->_transitions["$symbol,$state"];
-        } elseif (array_key_exists($state, $this->_transitionsAny)) {
+        } elseif (!empty($this->_transitionsAny[$state])) {
             return $this->_transitionsAny[$state];
         } else {
             return $this->_defaultTransition;

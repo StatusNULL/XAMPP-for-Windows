@@ -176,6 +176,7 @@ $TEXT['xampp-setup-passwd']="Wachtwoord:";
 $TEXT['xampp-setup-start']="Beveilig de volgende XAMPP directory:";
 $TEXT['xampp-setup-notok']="<br><br>FOUT: Gebruikersnaam en/of wachtwoord moeten uit tenminste drie en niet meer dan 15 karakters bestaan. Speciale karakters zoals <צהü (enz.) en spaties zijn niet toegestaan!<br><br>";
 $TEXT['xampp-config-ok']="<br><br>GELUKT: De XAMPP directory is nu beveiligd! Alle persoonlijke gegevens zijn opgeslagen in het volgende bestand:<br>";
+$TEXT['xampp-setup-ok']="<br><br>The root password was successfully changed. Please restart MYSQL for loading these changes!<br><br>";
 $TEXT['xampp-config-notok']="<br><br>FOUT: Het systeem kon de directory-beveiliging NIET activeren met \".htaccess\" en \"htpasswd.exe\". Mogelijk draait PHP in de \"Safe Mode\".<br><br>";
 
 
@@ -210,10 +211,12 @@ $TEXT['manuals-list1']="
 <ul>
 <li><a href=http://httpd.apache.org/docs-2.0/>Apache 2 documentatie</a>
 <li><a href=http://www.php.net/manual/en/>PHP <b>referenz </b>documentatie</a>
-<li><a href=http://www.perldoc.com/perl5.8.0/pod/perl.html>Perl documentatie</a>
+<li><a href=http://www.perl.org/docs.html>Perl documentatie</a>
 <li><a href=http://www.mysql.com/documentation/mysql/bychapter/>MySQL documentatie</a>
+<li><a http://phplens.com/lens/adodb/docs-adodb.htm>ADODB</a>
 <li><a href=http://proftpd.linux.co.uk/localsite/Userguide/linked/userguide.html>ProFTPD gebruikershandleiding</a>
 <li><a href=http://www.ros.co.nz/pdf/readme.pdf>pdf class documentatie</a>
+<li><a href=http://eaccelerator.sourceforge.net/>eAccelerator</a>
 </ul>";
 
 $TEXT['manuals-text2']="En een lijstje van tutorials en de pagina met de Apache Friends documentatie:";

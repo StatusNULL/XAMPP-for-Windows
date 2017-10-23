@@ -15,7 +15,7 @@ pre {
 <body bgcolor="#ffffff" text="black">
 
 <h2>ADOdb Library for PHP</h2>
-<p>V4.63 17 May 2005 (c) 2000-2005 John Lim (jlim#natsoft.com)</p>
+<p>V4.65 22 July 2005 (c) 2000-2005 John Lim (jlim#natsoft.com)</p>
 <p><font size="1">This software is dual licensed using BSD-Style and LGPL. This 
   means you can use it in compiled proprietary and commercial products.</font></p>
   
@@ -288,7 +288,7 @@ Legal options are:
 </td></tr><tr><td>MySQLi</td><td>
 	'port', 'socket', 'clientflags'
 </td></tr><tr><td>Oci8</td><td>
- 'nls_date_format'
+ 'nls_date_format','charset'
 </td></tr></tbody></table>
 </p><p>
 For all drivers, when the options <i>persist</i> or <i>persistent</i> are set,  a persistent connection is forced.
@@ -403,7 +403,9 @@ newer versions of the Oracle, eg. 9i and 10g.</p>
 <p>or</p>
 <pre> 	$conn-&gt;PConnect('myTNS', 'scott', 'tiger');</pre>
 <p>c. Host Address and SID</p>
-<pre>	$conn-&gt;Connect('192.168.0.1', 'scott', 'tiger', 'SID');</pre>
+<pre>
+	$conn->connectSID = true;
+	$conn-&gt;Connect('192.168.0.1', 'scott', 'tiger', 'SID');</pre>
 <p>d. Host Address and Service Name</p>
 <pre>	$conn-&gt;Connect('192.168.0.1', 'scott', 'tiger', 'servicename');</pre>
 <p>e. Oracle connection string:
@@ -2034,11 +2036,11 @@ row3: Rose, Flower </font></p>
 <p><font><b>GetRow<a name="getrow"></a>($sql,$inputarr=false)</b></font></p>
 <p><font>Executes the SQL and returns the first row as an array. The recordset and remaining 
   rows are discarded for you automatically. If an error occurs, false is returned.</font></p>
-<p><font><b>GetAll<a name="getall"></a>($sql)</b></font></p>
+<p><font><b>GetAll<a name="getall"></a>($sql,$inputarr=false)</b></font></p>
 
-<p><font>Executes the SQL and returns the all the rows as a 2-dimensional 
+<p>Executes the SQL and returns the all the rows as a 2-dimensional 
   array. The recordset is discarded for you automatically. If an error occurs, 
-  false is returned.</font></p>
+  false is returned. <i>GetArray</i> is a synonym for <i>GetAll</i>.</p>
  <p><b>GetCol<a name="getcol"></a>($sql,$inputarr=false,$trim=false)</b></p>
 
 <p><font>Executes the SQL and returns all elements of the first column as a 
@@ -2810,7 +2812,30 @@ of MySQL.</font></p>
   PHP</a>. </font></p>
 
 <h2><font>Change Log<a name="Changes"></a><a name="changes"></a><a name="changelog"></a></font></h2>
-<p><a name="4.63"></a><b>4.63  ?? Apr 2005</b>
+<p><a name="4.65"></a><b>4.65 ??  2005</b>
+<p>Reverted 'X' in mssql datadict to 'TEXT' to be compat with mssql driver. However now you can 
+set $datadict->typeX = 'varchar(4000)' or 'TEXT' or 'CLOB' for mssql and oci8 drivers. 
+<p>Added charset support when using DSN for Oracle.
+<p>_adodb_getmenu did not use fieldcount() to get number of fields. Fixed.
+<p>MetaForeignKeys() for mysql/mysqli contributed by Juan Carlos Gonzalez.
+<p>MetaDatabases() now correctly returns an array for mysqli driver. Thx Cristian MARIN.
+<p>CompleteTrans(false) did not return false. Fixed. Thx to JMF.
+<p>AutoExecute() did not work with Oracle. Fixed. Thx José Moreira.
+<p>MetaType() added to connection object.
+<p>More PHP 4.4 reference return fixes.
+
+<p><a name="4.64"></a><b>4.64 20 June 2005</b>
+<p>In datadict, if the default field value is set to '', then it is not applied when the field is created. Fixed by Eugenio.
+<p>MetaPrimaryKeys for postgres did not work because of true/false change in 4.63. Fixed.
+<p>Tested ocifetchstatement in oci8. Rejected at the end.
+<p>Added port to dsn handling. Supported in postgres, mysql, mysqli,ldap.
+<p>Added  'w' and 'l' to mysqli SQLDate().
+<p>Fixed error handling in ldap _connect() to be more consistent. Also added ErrorMsg() handling to ldap.
+<p>Added support for union in _adodb_getcount, adodb-lib.inc.php for postgres and oci8.
+<p>rs2html() did not work with null dates properly.
+<p>PHP 4.4 reference return fixes.
+
+<p><a name="4.63"></a><b>4.63  18 May 2005</b>
 <p>Added $nrows<0 check to mysqli's SelectLimit().
 <p>Added OptimizeTable() and OptimizeTables() in adodb-perf.inc.php. By Markus Staab.
 <p>PostgreSQL inconsistencies fixed. true and false set to TRUE and FALSE, and boolean type in datadict-postgres.inc.php set

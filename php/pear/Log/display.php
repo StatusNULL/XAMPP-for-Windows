@@ -1,8 +1,8 @@
 <?php
 /**
- * $Header: /repository/pear/Log/Log/display.php,v 1.5 2004/01/19 08:02:40 jon Exp $
+ * $Header: /repository/pear/Log/Log/display.php,v 1.6 2004/11/27 21:46:50 jon Exp $
  *
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  * @package Log
  */
 
@@ -95,7 +95,7 @@ class Log_display extends Log
         /* Build and output the complete log line. */
         echo $this->_error_prepend .
              '<b>' . ucfirst($this->priorityToString($priority)) . '</b>: '.
-             htmlspecialchars($message) .
+             nl2br(htmlspecialchars($message)) .
              $this->_error_append . "<br />\n";
 
         /* Notify observers about this log message. */

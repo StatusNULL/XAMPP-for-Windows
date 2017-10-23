@@ -13,10 +13,10 @@
 // | obtain it through the world-wide-web, please send a note to          |
 // | license@php.net so we can mail you a copy immediately.               |
 // +----------------------------------------------------------------------+
-// | Authors: Frederic Poeydomenge <frederic.poeydomenge@free.fr>         |
+// | Authors: Frederic Poeydomenge <fpoeydomenge at free dot fr>          |
 // +----------------------------------------------------------------------+
 //
-// $Id:
+// $Id$
 
 require_once 'Var_Dump/Renderer/Text.php';
 
@@ -30,7 +30,7 @@ require_once 'Var_Dump/Renderer/Text.php';
  *
  * @package Var_Dump
  * @category PHP
- * @author Frederic Poeydomenge <frederic.poeydomenge@free.fr>
+ * @author Frederic Poeydomenge <fpoeydomenge at free dot fr>
  */
 
 class Var_Dump_Renderer_HTML4_Text extends Var_Dump_Renderer_Text
@@ -38,6 +38,7 @@ class Var_Dump_Renderer_HTML4_Text extends Var_Dump_Renderer_Text
 
     /**
      * Class constructor.
+     *
      * @param array $options Parameters for the rendering.
      * @access public
      */

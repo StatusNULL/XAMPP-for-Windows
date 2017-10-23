@@ -42,7 +42,7 @@
 // | Author: Lukas Smith <smith@backendmedia.com>                         |
 // +----------------------------------------------------------------------+
 //
-// $Id: reverse_engineer_xml_schema.php,v 1.17.4.2 2004/01/08 13:43:02 lsmith Exp $
+// $Id: reverse_engineer_xml_schema.php,v 1.17.4.3 2004/03/10 14:43:28 lsmith Exp $
 //
 
 /**
@@ -94,11 +94,6 @@ echo ('
                     default:
                         $dump_what = MDB_MANAGER_DUMP_ALL;
                         break;
-                }
-                if (class_exists('Var_Dump')) {
-                    Var_Dump::display($manager->updateDatabase($_REQUEST['file']));
-                } else {
-                    var_dump($manager->updateDatabase($_REQUEST['file']));
                 }
                 $dump_config = array(
                     'Output_Mode' => 'file',

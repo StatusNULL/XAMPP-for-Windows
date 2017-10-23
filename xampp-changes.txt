@@ -1,10 +1,11 @@
-
-12 Jun 2005, XAMPP 1.4.14
-
-- Update eAccelerator 0.9.3
-- Update Apache HTTPD 2.0.54
-- Update MySQL 4.1.12
-- Update OpenSSL 0.9.7g
-- Update ADODB 4.63
-- Update FileZilla FTP Server 0.9.8a
-- Update phpMyAdmin 2.6.2-pl1
+29 Jul 2005, XAMPP 1.4.15
+- Update MySQL 4.1.13
+- Update PHP 4.4.0
+- Update eAccelerator 4.4.0-0.9.4dev
+- Update Zend Optimizer 2.5.10a
+- Update OpenSSL 0.9.8
+- Update ADODB 4.65
+- Update FileZilla FTP Server 0.9.8c
+- Update phpMyAdmin 2.6.3-pl1
+- Update sendmail v14
+- add xampp-portcheck (wiedmann)

@@ -42,7 +42,7 @@
 // | Author: Lukas Smith <smith@backendmedia.com>                         |
 // +----------------------------------------------------------------------+
 //
-// $Id: Common.php,v 1.33.4.1 2004/01/08 13:43:01 lsmith Exp $
+// $Id: Common.php,v 1.33.4.2 2004/03/09 15:43:40 lsmith Exp $
 //
 
 if(!defined('MDB_MANAGER_COMMON_INCLUDED'))

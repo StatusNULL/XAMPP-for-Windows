@@ -1,14 +1,14 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US">
-<!-- $Id: Documentation.html,v 2.123.2.3 2005/04/16 17:36:54 lem9 Exp $ -->
+<!-- $Id: Documentation.html,v 2.131.2.4 2005/07/04 21:50:18 lem9 Exp $ -->
 <!--
     vim: expandtab ts=4 sw=4 sts=4 tw=78
 -->
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-    <title>phpMyAdmin 2.6.2-pl1 - Documentation</title>
+    <title>phpMyAdmin 2.6.3-pl1 - Documentation</title>
     <link rel="stylesheet" type="text/css" href="docs.css" />
 </head>
 
@@ -31,7 +31,7 @@
 <hr noshade="noshade" width="100%" />
 </div>
 
-<h1>phpMyAdmin 2.6.2-pl1 Documentation</h1>
+<h1>phpMyAdmin 2.6.3-pl1 Documentation</h1>
 
 
 <!-- TOP MENU -->
@@ -51,7 +51,7 @@
     </li>
     <li>
         Documentation version:
-        <i>$Id: Documentation.html,v 2.123.2.3 2005/04/16 17:36:54 lem9 Exp $</i>
+        <i>$Id: Documentation.html,v 2.131.2.4 2005/07/04 21:50:18 lem9 Exp $</i>
     </li>
 </ul>
 
@@ -121,7 +121,7 @@
     <li>support mysqli, the improved MySQL extension <a href="#faqmysqlversions">(see FAQ 1.17)</a></li>
     <li>
         communicate in
-        <a href="./translators.html">48 different languages</a>
+        <a href="./translators.html">50 different languages</a>
     </li>
 </ul>
 
@@ -158,14 +158,14 @@
          <tt>tar -xzvf phpMyAdmin_x.x.x.tar.gz</tt> in your webserver's
          document root. If you don't have direct access to your document root,
          put the files in a directory on your local machine, and, after step 3,
-         transfer the directory on your web server using, for example, ftp.</li>    <li> Ensure that all the scripts have the appropriate owner (if PHP is
+         transfer the directory on your web server using, for example, ftp.</li>
+    <li> Ensure that all the scripts have the appropriate owner (if PHP is
          running in safe mode, having some scripts with an owner different
          from the owner of other scripts will be a
          problem). See <a href="#faq4_2">FAQ 4.2</a> for suggestions.</li>
-    <li> Open the file config.inc.php in your favorite editor and change
+    <li> Open the file <tt>config.inc.php</tt> in your favorite editor and change
          the values for host, user, password and authentication mode to fit
          your environment. Here, &quot;host&quot; means the MySQL server.
-         Also insert the correct value for <tt>$cfg['PmaAbsoluteUri']</tt>.
          Have a look at
          <a href="#config">Configuration section</a> for an
          explanation of all values. Please also read the remaining of this
@@ -1627,6 +1627,8 @@ Defaults to FALSE (drop-down). <br />
         Please note that if PHP is running in safe mode, this directory must
         be owned by the same user as the owner of the phpMyAdmin scripts.
         <br /><br />
+        See also <a href="#faq1_16">FAQ 1.16</a> for alternatives.
+        <br /><br />
     </dd>
 
     <dt><b>$cfg['docSQLDir'] </b>string</dt>
@@ -2455,21 +2457,34 @@ To create a new, empty mimetype please see libraries/transformations/template_ge
     were named <tt>user</tt> and <tt>password</tt>. Please modify your field
     names to align with current standards.
 </p>
-<h4>
+<h4><a name="faq1_16"></a>
     [1.16] I cannot upload big dump files (memory, http or timeout problems).
 </h4>
 <p>
     The first things to check (or ask your host provider to check) are the
     values of <tt>upload_max_filesize</tt>, <tt>memory_limit</tt> and
     <tt>post_max_size</tt> in the <i>php.ini</i> configuration file.
-    <br />
     All of these three settings limit the maximum size of data that can be
     submitted and handled by PHP. One user also said that post_max_size
     and memory_limit need to be larger than upload_max_filesize.
-    <br />
-    If you get a timeout problem, look at the <tt>$cfg['UploadDir']</tt>
-    feature.
+    <br /> <br />
+    There exist several workarounds if your upload is too big or your
+    hosting provider is unwilling to change the settings:
 </p>
+<ul>
+    <li>Look at the <tt>$cfg['UploadDir']</tt> feature. This allows one to
+    upload a file to the server via scp, ftp, or your favorite file transfer
+    method. PhpMyAdmin is then able to import the files from the temporary
+    directory. More information is available in the <a href="#config">Configuration
+    section</a> of this document.</li>
+    <li>Using a utility (such as <a href="http://www.ozerov.de/bigdump.php">
+    BigDump</a>) to split the files before uploading. We cannot support this
+    or any third party applications, but are aware of users having success
+    with it.</li>
+    <li>If you have shell (command line) access, use MySQL to import the files
+    directly. You can do this by issuing the &quot;source&quot; command from
+    within MySQL: <tt>source <i>filename.sql</i></tt>.</li>
+</ul>
 
 <a name="faqmysqlversions"></a>
 <h4>
@@ -2887,6 +2902,12 @@ To create a new, empty mimetype please see libraries/transformations/template_ge
         <a href="http://bugs.php.net/bug.php?id=31134">
         http://bugs.php.net/bug.php?id=31134</a>.
         </li>
+        <li>
+        If you are using Hardened PHP with the ini directive <tt>varfilter.max_request_variables</tt>
+        set to the default (200) or another low value, you could get this
+        error if your table has a high number of columns. Adjust this setting
+        accordingly. (Thanks to Klaus Dorninger for the hint).
+        </li>
     </ul>
 
 <a name="faqlimitations"></a><br />
@@ -3034,6 +3055,16 @@ To create a new, empty mimetype please see libraries/transformations/template_ge
     The number of records in queries containing COUNT and GROUP BY is
     not correctly calculated. Also, sorting results of a query like
     &quot;SELECT * from table GROUP BY&quot; ... is problematic.
+</p>
+<h4>
+    [3.13] I get an error when entering <tt>USE</tt> followed by a db name
+    containing an hyphen. 
+</h4>
+<p>
+    The tests I have made with current MySQL 4.1.11 API shows that the
+    API does not accept this syntax for the USE command. Enclosing the
+    db name with backquotes works. For further confusion, no backquotes
+    are needed with command-line mysql.
 </p>
 
 <a name="faqmultiuser"></a><br />

@@ -1,14 +1,14 @@
 <?php
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 // +----------------------------------------------------------------------+
-// | PHP Version 4                                                        |
+// | PEAR :: Mail :: Queue :: Body                                        |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2003 The PHP Group                                |
+// | Copyright (c) 1997-2004 The PHP Group                                |
 // +----------------------------------------------------------------------+
-// | This source file is subject to version 2.0 of the PHP license,       |
+// | This source file is subject to version 3.0 of the PHP license,       |
 // | that is bundled with this package in the file LICENSE, and is        |
 // | available at through the world-wide-web at                           |
-// | http://www.php.net/license/2_02.txt.                                 |
+// | http://www.php.net/license/3_0.txt.                                  |
 // | If you did not receive a copy of the PHP license and are unable to   |
 // | obtain it through the world-wide-web, please send a note to          |
 // | license@php.net so we can mail you a copy immediately.               |
@@ -16,12 +16,12 @@
 // | Authors: Radek Maciaszek <chief@php.net>                             |
 // +----------------------------------------------------------------------+
 //
-// $Id: Body.php,v 1.7 2004/02/29 09:13:32 quipo Exp $
+// $Id: Body.php,v 1.9 2004/08/17 14:30:52 quipo Exp $
 
 /**
 * Class contains mail data.
 *
-* @version  $Revision: 1.7 $
+* @version  $Revision: 1.9 $
 * @author   Radek Maciaszek <chief@php.net>
 */
 
@@ -29,7 +29,7 @@
 * Mail_Queue_Body contains mail data
 *
 * @author   Radek Maciaszek <wodzu@pomocprawna.info>
-* @version  $Revision: 1.7 $
+* @version  $Revision: 1.9 $
 * @package  Mail_Queue
 * @access   public
 */
@@ -322,12 +322,12 @@ class Mail_Queue_Body {
     /**
      * Increase and return try_sent
      *
-     * Mail_Queue_Body::try()
+     * Mail_Queue_Body::_try()
      *
      * @return integer  How many times mail was sent
      * @access public
      **/
-    function try()
+    function _try()
     {
         return ++$this->try_sent;
     }

@@ -1,12 +1,12 @@
 <?php
-/* $Id: db_operations.php,v 2.6 2005/03/09 15:36:49 lem9 Exp $ */
+/* $Id: db_operations.php,v 2.10.2.2 2005/07/02 12:11:16 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 require_once('./libraries/grab_globals.lib.php');
 require_once('./libraries/common.lib.php');
 require_once('./libraries/mysql_charsets.lib.php');
 /**
- * Rename database
+ * Rename database or Copy database
  */
 if (isset($db) &&
     ((isset($db_rename) && $db_rename == 'true') ||
@@ -14,23 +14,71 @@ if (isset($db) &&
 
     require_once('./libraries/tbl_move_copy.php');
 
-    if (isset($db_rename) && $db_rename == 'true') $move = TRUE;
-    else $move = FALSE;
+    $force_queryframe_reload = TRUE;
+
+    if (isset($db_rename) && $db_rename == 'true') {
+        $move = TRUE;
+    } else {
+        $move = FALSE;
+    }
 
     if (!isset($newname) || empty($newname)) {
         $message = $strDatabaseEmpty;
     } else {
-        $local_query = 'CREATE DATABASE ' . PMA_backquote($newname) . ';';
-        $sql_query = $local_query;
-        PMA_DBI_query($local_query);
-        $tables = PMA_DBI_get_tables($db);
-        foreach ($tables as $table) {
+        if ($move ||
+           (isset($create_database_before_copying) && $create_database_before_copying)) {
+            $local_query = 'CREATE DATABASE ' . PMA_backquote($newname);
+            if (isset($db_collation)) {
+                $local_query .= ' DEFAULT' . PMA_generateCharsetQueryPart($db_collation);
+            }
+            $local_query .= ';';
+            $sql_query = $local_query;
+            PMA_DBI_query($local_query);
+        }
+
+        $tables_full = PMA_DBI_get_tables_full($db);
+        foreach ($tables_full as $table => $tmp) {
             $back = $sql_query;
             $sql_query = '';
-            PMA_table_move_copy($db, $table, $newname, $table, isset($what) ? $what : 'data', $move);
+
+            // value of $what for this table only
+            $this_what = $what;
+
+            if (!isset($tables_full[$table]['Engine'])) {
+                $tables_full[$table]['Engine'] = $tables_full[$table]['Type'];
+            }
+            // do not copy the data from a Merge table
+            // note: on the calling FORM, 'data' means 'structure and data'
+            if ($tables_full[$table]['Engine'] == 'MRG_MyISAM') {
+                if ($this_what == 'data') {
+                    $this_what = 'structure';
+                }
+                if ($this_what == 'dataonly') {
+                    $this_what = 'nocopy';
+                }
+            }
+
+            if ($this_what != 'nocopy') {
+                PMA_table_move_copy($db, $table, $newname, $table, isset($this_what) ? $this_what : 'data', $move);
+            }
+
             $sql_query = $back . $sql_query;
         }
+        unset($table);
+
+        // Duplicate the bookmarks for this db (done once for each db)
+        if ($db != $newname) {
+            $get_fields = array('user','label','query');
+            $where_fields = array('dbase' => $db);
+            $new_fields = array('dbase' => $newname);
+            PMA_duplicate_table_info('bookmarkwork', 'bookmark', $get_fields, $where_fields, $new_fields);
+        }
+
         if ($move) {
+            // cleanup pmadb stuff for this db
+            require_once('./libraries/relation_cleanup.lib.php');
+            PMA_relationsCleanupDatabase($db);
+
             $local_query = 'DROP DATABASE ' . PMA_backquote($db) . ';';
             $sql_query .= "\n" . $local_query;
             PMA_DBI_query($local_query);
@@ -156,6 +204,7 @@ if ($cfgRelation['commwork']) {
         <form method="post" action="db_operations.php"
             onsubmit="return emptyFormElements(this, 'newname')">
                                         <tr bgcolor="<?php echo $cfg['BgcolorOne']; ?>"><td colspan="2"><?php
+          echo '<input type="hidden" name="what" value="data" />';
           echo '<input type="hidden" name="db_rename" value="true" />'
              . PMA_generate_common_hidden_inputs($db);
           ?><input type="text" name="newname" size="30" class="textfield" value="" /></td>
@@ -172,8 +221,12 @@ if ($cfgRelation['commwork']) {
           ?></td></tr>
         <form method="post" action="db_operations.php"
             onsubmit="return emptyFormElements(this, 'newname')">
-                                        <tr bgcolor="<?php echo $cfg['BgcolorOne']; ?>"><td colspan="3"><?php
-          echo '<input type="hidden" name="db_copy" value="true" />'
+        <tr bgcolor="<?php echo $cfg['BgcolorOne']; ?>"><td colspan="3">
+<?php
+          if (isset($db_collation)) {
+              echo '<input type="hidden" name="db_collation" value="' . $db_collation .'" />' . "\n";
+          }
+          echo '<input type="hidden" name="db_copy" value="true" />' . "\n"
              . PMA_generate_common_hidden_inputs($db);
           ?><input type="text" name="newname" size="30" class="textfield" value="" /></td>
         </tr><tr>
@@ -182,6 +235,7 @@ if ($cfgRelation['commwork']) {
                 <input type="radio" name="what" value="data" id="radio_copy_data" checked="checked" style="vertical-align: middle" /><label for="radio_copy_data"><?php echo $strStrucData; ?></label>&nbsp;&nbsp;<br />
                 <input type="radio" name="what" value="dataonly" id="radio_copy_dataonly" style="vertical-align: middle" /><label for="radio_copy_dataonly"><?php echo $strDataOnly; ?></label>&nbsp;&nbsp;<br />
 
+                <input type="checkbox" name="create_database_before_copying" value="1" id="checkbox_create_database_before_copying" style="vertical-align: middle" checked="checked" /><label for="checkbox_create_database_before_copying"><?php echo $strCreateDatabaseBeforeCopying; ?></label><br />
                 <input type="checkbox" name="auto_increment" value="1" id="checkbox_auto_increment" style="vertical-align: middle" /><label for="checkbox_auto_increment"><?php echo $strAddAutoIncrement; ?></label><br />
                 <input type="checkbox" name="constraints" value="1" id="checkbox_constraints" style="vertical-align: middle" /><label for="checkbox_constraints"><?php echo $strAddConstraints; ?></label><br />
                 <?php

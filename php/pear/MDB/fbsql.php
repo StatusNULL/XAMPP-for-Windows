@@ -42,7 +42,7 @@
 // | Author: Lukas Smith <smith@dybnet.de>                                |
 // +----------------------------------------------------------------------+
 //
-// $Id: fbsql.php,v 1.16.4.10 2004/01/08 13:43:02 lsmith Exp $
+// $Id: fbsql.php,v 1.16.4.16 2004/04/08 17:19:00 lsmith Exp $
 //
 
 require_once('MDB/Common.php');
@@ -95,7 +95,7 @@ class MDB_fbsql extends MDB_Common
         $this->supported['AffectedRows'] = 1;
         $this->supported['Summaryfunctions'] = 1;
         $this->supported['OrderByText'] = 1;
-        $this->supported['CurrId'] = 1;
+        $this->supported['CurrId'] = 0;
         $this->supported['SelectRowRanges'] = 1;
         $this->supported['LOBs'] = 1;
         $this->supported['Replace'] = 1;
@@ -134,7 +134,7 @@ class MDB_fbsql extends MDB_Common
      */
     function errorNative()
     {
-        return fbsql_errno($this->connection);
+        return @fbsql_errno($this->connection);
     }
 
     // }}}
@@ -146,16 +146,27 @@ class MDB_fbsql extends MDB_Common
      * that checks for native error msgs.
      *
      * @param integer $errno error code
+     * @param string  $message userinfo message
      * @return object a PEAR error object
      * @access public
      * @see PEAR_Error
      */
-    function fbsqlRaiseError($errno = NULL)
+    function fbsqlRaiseError($errno = NULL, $message = NULL)
     {
         if ($errno == NULL) {
-            $errno = $this->errorCode(fbsql_errno($this->connection));
+            if ($this->connection) {
+                $errno = @fbsql_errno($this->connection);
+            } else {
+                $errno = @fbsql_errno();
+            }
         }
-        return($this->raiseError($errno, NULL, NULL, NULL, @fbsql_error($this->connection)));
+        if ($this->connection) {
+            $error = @fbsql_errno($this->connection);
+        } else {
+            $error = @fbsql_error();
+        }
+        return($this->raiseError($this->errorCode($errno), NULL, NULL,
+            $message, $error));
     }
 
     // }}}
@@ -280,7 +291,7 @@ class MDB_fbsql extends MDB_Common
             {
                 return(MDB_OK);
             }
-            fbsql_close($this->connection);
+            @fbsql_close($this->connection);
             $this->connection = 0;
             $this->affected_rows = -1;
         }
@@ -306,8 +317,8 @@ class MDB_fbsql extends MDB_Common
         }
 
         if (isset($this->supported['Transactions']) && !$this->auto_commit) {
-            if (!fbsql_query('SET AUTOCOMMIT FALSE;', $this->connection)) {
-                fbsql_close($this->connection);
+            if (!@fbsql_query('SET AUTOCOMMIT FALSE;', $this->connection)) {
+                @fbsql_close($this->connection);
                 $this->connection = 0;
                 $this->affected_rows = -1;
                 return($this->raiseError());
@@ -336,7 +347,7 @@ class MDB_fbsql extends MDB_Common
             if (isset($this->supported['Transactions']) && !$this->auto_commit) {
                 $result = $this->autoCommit(TRUE);
             }
-            fbsql_close($this->connection);
+            @fbsql_close($this->connection);
             $this->connection = 0;
             $this->affected_rows = -1;
             if (isset($result) && MDB::isError($result)) {
@@ -383,19 +394,20 @@ class MDB_fbsql extends MDB_Common
         }
 
         if ($this->database_name != '') {
-            if(!fbsql_select_db($this->database_name, $this->connection)) {
+            if(!@fbsql_select_db($this->database_name, $this->connection)) {
                 return($this->fbsqlRaiseError());
             }
         }
 
         // Add ; to the end of the query. This is required by FrontBase
         $query .= ';';
-        if ($result = fbsql_query($query, $this->connection)) {
+        if ($result = @fbsql_query($query, $this->connection)) {
             if ($ismanip) {
-                $this->affected_rows = fbsql_affected_rows($this->connection);
+                $this->affected_rows = @fbsql_affected_rows($this->connection);
                 return(MDB_OK);
             } else {
-                $this->highest_fetched_row[$result] = -1;
+                $result_value = intval($result);
+                $this->highest_fetched_row[$result_value] = -1;
                 if ($types != NULL) {
                     if (!is_array($types)) {
                         $types = array($types);
@@ -439,9 +451,13 @@ class MDB_fbsql extends MDB_Common
         }
         if (!isset($this->columns[$result_value])) {
             $this->columns[$result_value] = array();
-            $columns = fbsql_num_fields($result);
+            $columns = @fbsql_num_fields($result);
             for($column = 0; $column < $columns; $column++) {
-                $this->columns[$result_value][strtolower(fbsql_field_name($result, $column))] = $column;
+                $field_name = @fbsql_field_name($result, $column);
+                if ($this->options['optimize'] == 'portability') {
+                    $field_name = strtolower($field_name);
+                }
+                $this->columns[$result_value][$field_name] = $column;
             }
         }
         return($this->columns[$result_value]);
@@ -464,7 +480,7 @@ class MDB_fbsql extends MDB_Common
             return($this->raiseError(MDB_ERROR_INVALID, NULL, NULL,
                 'numCols: it was specified an inexisting result set'));
         }
-        return(fbsql_num_fields($result));
+        return(@fbsql_num_fields($result));
     }
 
     // }}}
@@ -479,11 +495,12 @@ class MDB_fbsql extends MDB_Common
     */
     function endOfResult($result)
     {
-        if (!isset($this->highest_fetched_row[$result])) {
+        $result_value = intval($result);
+        if (!isset($this->highest_fetched_row[$result_value])) {
             return($this->raiseError(MDB_ERROR, NULL, NULL,
                 'End of result: attempted to check the end of an unknown result'));
         }
-        return($this->highest_fetched_row[$result] >= $this->numRows($result)-1);
+        return($this->highest_fetched_row[$result_value] >= $this->numRows($result)-1);
     }
 
     // }}}
@@ -500,7 +517,9 @@ class MDB_fbsql extends MDB_Common
     */
     function fetch($result, $row, $field)
     {
-        $this->highest_fetched_row[$result] = max($this->highest_fetched_row[$result], $row);
+        $result_value = intval($result);
+        $this->highest_fetched_row[$result_value] =
+            max($this->highest_fetched_row[$result_value], $row);
         if (is_string($field)) {
             if (intval($field) != $field) {
                 $field = strtoupper($field);
@@ -512,7 +531,7 @@ class MDB_fbsql extends MDB_Common
         }
         $res = @fbsql_result($result, $row, $field);
         if ($res === FALSE && $res != NULL) {
-            return($this->fbsqlRaiseError($errno));
+            return($this->fbsqlRaiseError());
         }
         return($res);
     }
@@ -595,7 +614,7 @@ class MDB_fbsql extends MDB_Common
     */
     function numRows($result)
     {
-        return(fbsql_num_rows($result));
+        return(@fbsql_num_rows($result));
     }
 
     // }}}
@@ -610,16 +629,17 @@ class MDB_fbsql extends MDB_Common
      */
     function freeResult($result)
     {
-        if(isset($this->highest_fetched_row[$result])) {
-            unset($this->highest_fetched_row[$result]);
+        $result_value = intval($result);
+        if(isset($this->highest_fetched_row[$result_value])) {
+            unset($this->highest_fetched_row[$result_value]);
         }
-        if(isset($this->columns[$result])) {
-            unset($this->columns[$result]);
+        if(isset($this->columns[$result_value])) {
+            unset($this->columns[$result_value]);
         }
-        if(isset($this->result_types[$result])) {
-            unset($this->result_types[$result]);
+        if(isset($this->result_types[$result_value])) {
+            unset($this->result_types[$result_value]);
         }
-        return(fbsql_free_result($result));
+        return(@fbsql_free_result($result));
     }
 
     // }}}
@@ -657,7 +677,9 @@ class MDB_fbsql extends MDB_Common
             $this->warnings[] = "unsigned integer field \"$name\" is being
                 declared as signed integer";
         }
-        return("$name INT".(isset($field["default"]) ? " DEFAULT ".$field["default"] : "").(isset($field["notnull"]) ? " NOT NULL" : ""));
+        return("$name INT".(isset($field["default"])
+            ? " DEFAULT ".$field["default"]
+            : "").(isset($field["notnull"]) ? " NOT NULL" : ""));
     }
 
     // }}}
@@ -689,7 +711,11 @@ class MDB_fbsql extends MDB_Common
      */
     function getTextDeclaration($name, $field)
     {
-        return((isset($field["length"]) ? "$name VARCHAR (".$field["length"].")" : "$name VARCHAR($this->max_text_length)").(isset($field["default"]) ? " DEFAULT ".$this->GetTextValue($field["default"]) : "").(isset($field["notnull"]) ? " NOT NULL" : ""));
+        return((isset($field["length"])
+            ? "$name VARCHAR (".$field["length"].")"
+            : "$name VARCHAR(".$this->max_text_length.")").(isset($field["default"])
+                ? " DEFAULT ".$this->GetTextValue($field["default"])
+                : "").(isset($field["notnull"]) ? " NOT NULL" : ""));
     }
 
     // }}}
@@ -780,7 +806,9 @@ class MDB_fbsql extends MDB_Common
      */
     function getBooleanDeclaration($name, $field)
     {
-        return("$name BOOLEAN" . (isset($field['default']) ? ' DEFAULT ' . $this->getBooleanValue($field['default']) : '') . (isset($field['notnull']) ? ' NOT NULL' : ''));
+        return("$name BOOLEAN" . (isset($field['default'])
+            ? ' DEFAULT ' . $this->getBooleanValue($field['default'])
+            : '') . (isset($field['notnull']) ? ' NOT NULL' : ''));
     }
 
     // }}}
@@ -961,7 +989,8 @@ class MDB_fbsql extends MDB_Common
     {
         $value = "'";
         while(!$this->endOfLob($clob)) {
-            if (MDB::isError($result = $this->readLob($clob, $data, $this->options['lob_buffer_length']))) {
+            $result = $this->readLob($clob, $data, $this->options['lob_buffer_length']);
+            if (MDB::isError($result)) {
                 return($result);
             }
             $value .= $this->_quote($data);
@@ -1005,7 +1034,8 @@ class MDB_fbsql extends MDB_Common
     {
         $value = "'";
         while(!$this->endOfLob($blob)) {
-            if (MDB::isError($result = $this->readLob($blob, $data, $this->options['lob_buffer_length']))) {
+            $result = $this->readLob($blob, $data, $this->options['lob_buffer_length']);
+            if (MDB::isError($result)) {
                 return($result);
             }
             $value .= addslashes($data);
@@ -1130,7 +1160,9 @@ class MDB_fbsql extends MDB_Common
      */
     function getDecimalValue($value)
     {
-        return(($value === NULL) ? 'NULL' : strval(round(doubleval($value)*$this->decimal_factor)));
+        return(($value === NULL)
+            ? 'NULL'
+            : strval(round(doubleval($value)*$this->decimal_factor)));
     }
 
     // }}}
@@ -1151,7 +1183,7 @@ class MDB_fbsql extends MDB_Common
     {
         $sequence_name = $this->getSequenceName($seq_name);
         $this->expectError(MDB_ERROR_NOSUCHTABLE);
-        $result = $this->query("INSERT INTO $sequence_name (dummy) VALUES (1)");
+        $result = $this->query("INSERT INTO $sequence_name VALUES (NULL)");
         $this->popExpect();
         if ($ondemand && MDB::isError($result) &&
             $result->getCode() == MDB_ERROR_NOSUCHTABLE)
@@ -1168,33 +1200,12 @@ class MDB_fbsql extends MDB_Common
                 return(1);
             }
         }
-        $value = intval(fbsql_insert_id());
-        $res = $this->query("DELETE FROM $sequence_name WHERE sequence < $value");
+        $value = intval(@fbsql_insert_id());
+        $res = $this->query("DELETE FROM $sequence_name WHERE ".$this->options['sequence_col_name']." < $value");
         if (MDB::isError($res)) {
             $this->warnings[] = 'Next ID: could not delete previous sequence table values';
         }
         return($value);
-    }
-
-    // }}}
-    // {{{ currId()
-
-    /**
-     * returns the current id of a sequence
-     *
-     * @param string  $seq_name name of the sequence
-     * @return mixed MDB_Error or id
-     * @access public
-     */
-    function currId($seq_name)
-    {
-        $sequence_name = $this->getSequenceName($seq_name);
-        $result = $this->query("SELECT MAX(sequence) FROM $sequence_name", 'integer');
-        if (MDB::isError($result)) {
-            return($result);
-        }
-
-        return($this->fetchOne($result));
     }
 
     // }}}
@@ -1211,13 +1222,15 @@ class MDB_fbsql extends MDB_Common
      */
     function fetchInto($result, $fetchmode = MDB_FETCHMODE_DEFAULT, $rownum = NULL)
     {
+        $result_value = intval($result);
         if ($rownum == NULL) {
-            ++$this->highest_fetched_row[$result];
+            ++$this->highest_fetched_row[$result_value];
         } else {
             if (!@fbsql_data_seek($result, $rownum)) {
                 return(NULL);
             }
-            $this->highest_fetched_row[$result] = max($this->highest_fetched_row[$result], $rownum);
+            $this->highest_fetched_row[$result_value] =
+                max($this->highest_fetched_row[$result_value], $rownum);
         }
         if ($fetchmode == MDB_FETCHMODE_DEFAULT) {
             $fetchmode = $this->fetchmode;
@@ -1236,7 +1249,7 @@ class MDB_fbsql extends MDB_Common
             }
             return(NULL);
         }
-        if (isset($this->result_types[$result])) {
+        if (isset($this->result_types[$result_value])) {
             $row = $this->convertResultRow($result, $row);
         }
         return($row);
@@ -1254,7 +1267,7 @@ class MDB_fbsql extends MDB_Common
      */
     function nextResult($result)
     {
-        return(fbsql_next_result($result));
+        return(@fbsql_next_result($result));
     }
 
     // }}}

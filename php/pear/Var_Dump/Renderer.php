@@ -13,12 +13,11 @@
 // | obtain it through the world-wide-web, please send a note to          |
 // | license@php.net so we can mail you a copy immediately.               |
 // +----------------------------------------------------------------------+
-// | Authors: Frederic Poeydomenge <frederic.poeydomenge@free.fr>         |
+// | Authors: Frederic Poeydomenge <fpoeydomenge at free dot fr>          |
 // +----------------------------------------------------------------------+
 //
-// $Id:
+// $Id$
 
-require_once 'PEAR.php';
 require_once 'Var_Dump/Renderer/Common.php';
 
 /**
@@ -26,7 +25,7 @@ require_once 'Var_Dump/Renderer/Common.php';
  *
  * @package Var_Dump
  * @category PHP
- * @author Frederic Poeydomenge <frederic.poeydomenge@free.fr>
+ * @author Frederic Poeydomenge <fpoeydomenge at free dot fr>
  */
 
 class Var_Dump_Renderer
@@ -34,8 +33,9 @@ class Var_Dump_Renderer
 
     /**
      * Attempt to return a concrete Var_Dump_Renderer instance.
-     * @param string $mode    Name of the renderer.
-     * @param array  $options Parameters for the rendering.
+     *
+     * @param string $mode Name of the renderer.
+     * @param array $options Parameters for the rendering.
      * @access public
      */
     function & factory($mode, $options)
@@ -45,7 +45,9 @@ class Var_Dump_Renderer
         if (class_exists($className)) {
             $obj = & new $className($options);
         } else {
-            return PEAR::raiseError('Var_Dump: renderer "' . $mode . '" not found', TRUE);
+            include_once 'PEAR.php';
+            PEAR::raiseError('Var_Dump: renderer "' . $mode . '" not found', TRUE);
+            return NULL;
         }
         return $obj;
     }

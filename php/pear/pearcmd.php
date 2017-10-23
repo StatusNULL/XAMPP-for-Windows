@@ -18,7 +18,7 @@
 // |                                                                      |
 // +----------------------------------------------------------------------+
 //
-// $Id: pearcmd.php,v 1.10 2004/03/13 17:37:23 cellog Exp $
+// $Id: pearcmd.php,v 1.13.2.2 2004/12/30 05:43:18 cellog Exp $
 
 ob_end_clean();
 /**
@@ -29,7 +29,7 @@ if ('\xampp\php\pear' != '@'.'include_path'.'@') {
 }
 ini_set('allow_url_fopen', true);
 if (!ini_get('safe_mode')) {
-    set_time_limit(0);
+    @set_time_limit(0);
 }
 ob_implicit_flush(true);
 ini_set('track_errors', true);
@@ -37,7 +37,7 @@ ini_set('html_errors', false);
 ini_set('magic_quotes_runtime', false);
 set_error_handler('error_handler');
 
-$pear_package_version = "1.3.1";
+$pear_package_version = "1.3.5";
 
 require_once 'PEAR.php';
 require_once 'PEAR/Config.php';
@@ -50,8 +50,12 @@ $all_commands = PEAR_Command::getCommands();
 $argv = Console_Getopt::readPHPArgv();
 /* $progname = basename($argv[0]); */
 $progname = 'pear';
-array_shift($argv);
-$options = Console_Getopt::getopt2($argv, "c:C:d:D:Gh?sSqu:vV");
+if (in_array('getopt2', get_class_methods('Console_Getopt'))) {
+    array_shift($argv);
+    $options = Console_Getopt::getopt2($argv, "c:C:d:D:Gh?sSqu:vV");
+} else {
+    $options = Console_Getopt::getopt($argv, "c:C:d:D:Gh?sSqu:vV");
+}
 if (PEAR::isError($options)) {
     usage($options);
 }
@@ -71,6 +75,11 @@ if ($progname == 'gpear' || $progname == 'pear-gtk') {
 PEAR_Command::setFrontendType($fetype);
 $ui = &PEAR_Command::getFrontendObject();
 PEAR::setErrorHandling(PEAR_ERROR_CALLBACK, array($ui, "displayFatalError"));
+if (ini_get('safe_mode')) {
+    $ui->outputData('WARNING: running in safe mode requires that all files created ' .
+        'be the same uid as the current script.  PHP reports this script is uid: ' .
+        @getmyuid() . ', and current user is: ' . @get_current_user());
+}
 
 $pear_user_config = '';
 $pear_system_config = '';
@@ -158,8 +167,13 @@ if ($fetype == 'Gtk') {
 
     $short_args = $long_args = null;
     PEAR_Command::getGetoptArgs($command, $short_args, $long_args);
-    array_shift($options[1]);
-    if (PEAR::isError($tmp = Console_Getopt::getopt2($options[1], $short_args, $long_args))) {
+    if (in_array('getopt2', get_class_methods('Console_Getopt'))) {
+        array_shift($options[1]);
+        $tmp = Console_Getopt::getopt2($options[1], $short_args, $long_args);
+    } else {
+        $tmp = Console_Getopt::getopt($options[1], $short_args, $long_args);
+    }
+    if (PEAR::isError($tmp)) {
         break;
     }
     list($tmpopt, $params) = $tmp;
@@ -203,9 +217,6 @@ function usage($error = null, $helpsubject = null)
         $put = cmdHelp($helpsubject);
     } else {
         $put =
-            "Usage: $progname [options] command [command-options] <parameters>\n".
-            "Type \"$progname help options\" to list all options.\n".
-            "Type \"$progname help <command>\" to get the help for the specified command.\n".
             "Commands:\n";
         $maxlen = max(array_map("strlen", $all_commands));
         $formatstr = "%-{$maxlen}s  %s\n";
@@ -213,6 +224,11 @@ function usage($error = null, $helpsubject = null)
         foreach ($all_commands as $cmd => $class) {
             $put .= sprintf($formatstr, $cmd, PEAR_Command::getDescription($cmd));
         }
+        $put .=
+            "Usage: $progname [options] command [command-options] <parameters>\n".
+            "Type \"$progname help options\" to list all options.\n".
+            "Type \"$progname help shortcuts\" to list all command shortcuts.\n".
+            "Type \"$progname help <command>\" to get the help for the specified command.";
     }
     fputs($stderr, "$put\n");
     fclose($stderr);
@@ -261,7 +277,7 @@ function cmdHelp($command)
             return "$progname $command [options] $help[0]\n$help[1]";
         }
     }
-    return "No such command";
+    return "Command '$command' is not valid, try 'pear help'";
 }
 
 // }}}

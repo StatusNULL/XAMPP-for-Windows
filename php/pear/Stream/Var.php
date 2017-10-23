@@ -17,7 +17,7 @@
 // |          partly based on an exmple by Wez Furlong                    |
 // +----------------------------------------------------------------------+
 //
-//    $Id$
+//    $Id: Var.php,v 1.3 2004/10/31 14:52:18 schst Exp $
 
 /**
  * stream is readable
@@ -143,8 +143,9 @@ class Stream_Var {
                 break;
         }
 
-        if (!$status)
+        if (!$status) {
             return  false;
+        }
         
         if (!is_scalar($this->_pointer)) {
             return false;
@@ -159,7 +160,7 @@ class Stream_Var {
             $this->stream_seek(0, SEEK_END);
         }
 
-        if ($mode{1} == '+') {
+        if (strlen($mode) > 1 && $mode{1} == '+') {
             $this->_mode = $this->_mode | STREAM_VAR_READABLE | STREAM_VAR_WRITEABLE;
         }
 
@@ -195,8 +196,8 @@ class Stream_Var {
     */
     function stream_close()
     {
-        $this->_pos     = 0;
-        $this->_open    = false;
+        $this->_pos  = 0;
+        $this->_open = false;
     }
 
    /**
@@ -306,7 +307,7 @@ class Stream_Var {
     function stream_stat()
     {
         $stat = array(
-                      "size" => strlen($this->_pointer)
+                      'size' => strlen($this->_pointer)
                     );
         return $stat;
     }
@@ -324,8 +325,12 @@ class Stream_Var {
     {
         $url = parse_url($path);
 
-        $scope   = $url["host"];
-        $varpath = substr($url["path"], 1);
+        $scope   = $url['host'];
+        if (isset($url['path'])) {
+            $varpath = substr($url['path'], 1);
+        } else {
+            $varpath = '';
+        }
         
         if (!$status = $this->_setPointer($scope, $varpath))
             return  false;

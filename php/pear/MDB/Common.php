@@ -42,7 +42,7 @@
 // | Author: Lukas Smith <smith@backendmedia.com>                         |
 // +----------------------------------------------------------------------+
 //
-// $Id: Common.php,v 1.114.4.11 2004/01/08 13:43:02 lsmith Exp $
+// $Id: Common.php,v 1.114.4.22 2004/04/08 19:11:58 lsmith Exp $
 
 /**
  * @package MDB
@@ -141,6 +141,7 @@ class MDB_Common extends PEAR
             'lob_buffer_length' => 8192,
             'log_line_break' => "\n",
             'seqname_format' => '%s_seq',
+            'sequence_col_name' => 'sequence',
             'includelob' => FALSE,
             'includemanager' => FALSE,
             'UseTransactions' => FALSE,
@@ -305,15 +306,15 @@ class MDB_Common extends PEAR
     }
 
     // }}}
-    // {{{ _toString()
+    // {{{ __toString()
 
     /**
      * String conversation
      *
      * @return string
-     * @access private
+     * @access public
      */
-    function _toString()
+    function __toString()
     {
         $info = get_class($this);
         $info .= ': (phptype = ' . $this->phptype . ', dbsyntax = ' . $this->dbsyntax . ')';
@@ -392,7 +393,13 @@ class MDB_Common extends PEAR
     {
         // The error is yet a MDB error object
         if (is_object($code)) {
-            $err = PEAR::raiseError($code, NULL, NULL, NULL, NULL, NULL, TRUE);
+            // because we the static PEAR::raiseError, our global
+            // handler should be used if it is set
+            if ($mode === null && !empty($this->_default_error_mode)) {
+                $mode    = $this->_default_error_mode;
+                $options = $this->_default_error_options;
+            }
+            $err = PEAR::raiseError($code, NULL, $mode, $options, NULL, NULL, TRUE);
             return($err);
         }
 
@@ -401,7 +408,7 @@ class MDB_Common extends PEAR
         }
 
         if ($nativecode) {
-            $userinfo .= " [nativecode = $nativecode]";
+            $userinfo .= ' [nativecode=' . trim($nativecode) . ']';
         }
 
         $err = PEAR::raiseError(NULL, $code, $mode, $options, $userinfo, 'MDB_Error', TRUE);
@@ -634,6 +641,50 @@ class MDB_Common extends PEAR
             $text = str_replace($this->escape_quotes, $this->escape_quotes . $this->escape_quotes, $text);
         }
         return str_replace("'", $this->escape_quotes . "'", $text);
+    }
+
+    // }}}
+    // {{{ quoteIdentifier()
+
+    /**
+     * Quote a string so it can be safely used as a table or column name
+     *
+     * Delimiting style depends on which database driver is being used.
+     *
+     * NOTE: just because you CAN use delimited identifiers doesn't mean
+     * you SHOULD use them.  In general, they end up causing way more
+     * problems than they solve.
+     *
+     * Portability is broken by using the following characters inside
+     * delimited identifiers:
+     *   + backtick (<kbd>`</kbd>) -- due to MySQL
+     *   + double quote (<kbd>"</kbd>) -- due to Oracle
+     *   + brackets (<kbd>[</kbd> or <kbd>]</kbd>) -- due to Access
+     *
+     * Delimited identifiers are known to generally work correctly under
+     * the following drivers:
+     *   + mssql
+     *   + mysql
+     *   + mysqli
+     *   + oci8
+     *   + odbc(access)
+     *   + odbc(db2)
+     *   + pgsql
+     *   + sqlite
+     *   + sybase
+     *
+     * InterBase doesn't seem to be able to use delimited identifiers
+     * via PHP 4.  They work fine under PHP 5.
+     *
+     * @param string $str  identifier name to be quoted
+     *
+     * @return string  quoted identifier string
+     *
+     * @access public
+     */
+    function quoteIdentifier($str)
+    {
+        return '"' . str_replace('"', '""', $str) . '"';
     }
 
     // }}}
@@ -2403,7 +2454,8 @@ class MDB_Common extends PEAR
      */
     function setResultTypes($result, $types)
     {
-        if (isset($this->result_types[$result])) {
+        $result_value = intval($result);
+        if (isset($this->result_types[$result_value])) {
             return($this->raiseError(MDB_ERROR_INVALID, NULL, NULL,
                 'Set result types: attempted to redefine the types of the columns of a result set'));
         }
@@ -2432,10 +2484,10 @@ class MDB_Common extends PEAR
                 return($this->raiseError(MDB_ERROR_UNSUPPORTED, NULL, NULL,
                     'Set result types: ' . $types[$column] . ' is not a supported column type'));
             }
-            $this->result_types[$result][$column] = $valid_types[$types[$column]];
+            $this->result_types[$result_value][$column] = $valid_types[$types[$column]];
         }
         while ($column < $columns) {
-            $this->result_types[$result][$column] = MDB_TYPE_TEXT;
+            $this->result_types[$result_value][$column] = MDB_TYPE_TEXT;
             $column++;
         }
         return(MDB_OK);
@@ -2809,16 +2861,17 @@ class MDB_Common extends PEAR
      */
     function convertResultRow($result, $row)
     {
-        if (isset($this->result_types[$result])) {
+        $result_value = intval($result);
+        if (isset($this->result_types[$result_value])) {
             $current_column = -1;
             foreach($row as $key => $column) {
                 ++$current_column;
-                if (!isset($this->result_types[$result][$current_column])
+                if (!isset($this->result_types[$result_value][$current_column])
                    ||!isset($column)
                 ) {
                     continue;
                 }
-                switch ($type = $this->result_types[$result][$current_column]) {
+                switch ($type = $this->result_types[$result_value][$current_column]) {
                     case MDB_TYPE_TEXT:
                     case MDB_TYPE_BLOB:
                     case MDB_TYPE_CLOB:
@@ -3562,7 +3615,7 @@ class MDB_Common extends PEAR
             sequence value, the sequence value was incremented';
         $this->expectError(MDB_ERROR_NOT_CAPABLE);
         $id = $this->nextId($seq_name);
-        $this->popExpectError(MDB_ERROR_NOT_CAPABLE);
+        $this->popExpect(MDB_ERROR_NOT_CAPABLE);
         if (MDB::isError($id)) {
             if ($id->getCode() == MDB_ERROR_NOT_CAPABLE) {
                 return($this->raiseError(MDB_ERROR_NOT_CAPABLE, NULL, NULL,
@@ -3587,21 +3640,18 @@ class MDB_Common extends PEAR
      */
     function fetchInto($result, $fetchmode = MDB_FETCHMODE_DEFAULT, $rownum = NULL)
     {
-        if (MDB::isError($result)) {
-            return($this->raiseError(MDB_ERROR_NEED_MORE_DATA, NULL, NULL,
-                'Fetch field: it was not specified a valid result set'));
-        }
+        $result_value = intval($result);
         if (MDB::isError($this->endOfResult($result))) {
             $this->freeResult($result);
             $result = $this->raiseError(MDB_ERROR_NEED_MORE_DATA, NULL, NULL,
                 'Fetch field: result set is empty');
         }
         if ($rownum == NULL) {
-            ++$this->highest_fetched_row[$result];
-            $rownum = $this->highest_fetched_row[$result];
+            ++$this->highest_fetched_row[$result_value];
+            $rownum = $this->highest_fetched_row[$result_value];
         } else {
-            $this->highest_fetched_row[$result] =
-                max($this->highest_fetched_row[$result], $row);
+            $this->highest_fetched_row[$result_value] =
+                max($this->highest_fetched_row[$result_value], $row);
         }
         if ($fetchmode == MDB_FETCHMODE_DEFAULT) {
             $fetchmode = $this->fetchmode;
@@ -3640,7 +3690,7 @@ class MDB_Common extends PEAR
                 $row = array_change_key_case($row, CASE_LOWER);
             }
         }
-        if (isset($this->result_types[$result])) {
+        if (isset($this->result_types[$result_value])) {
             $row = $this->convertResultRow($result, $row);
         }
         return($row);
@@ -3706,15 +3756,12 @@ class MDB_Common extends PEAR
         $column = array();
         $row = $this->fetchInto($result, $fetchmode);
         if (is_array($row)) {
-            if (isset($row[$colnum])) {
-                $column[] = $row[$colnum];
-                while (is_array($row = $this->fetchInto($result, $fetchmode))) {
-                    $column[] = $row[$colnum];
-                }
-            } else {
-                $this->freeResult($result);
+            if (!array_key_exists($colnum, $row)) {
                 return($this->raiseError(MDB_ERROR_TRUNCATED));
             }
+            do {
+                $column[] = $row[$colnum];
+            } while (is_array($row = $this->fetchInto($result, $fetchmode)));
         }
         if (!$this->options['autofree']) {
             $this->freeResult($result);
@@ -3814,7 +3861,6 @@ class MDB_Common extends PEAR
         if ($type != NULL) {
             $type = array($type);
         }
-        $this->setSelectedRowRange(0, 1);
         $result = $this->query($query, $type);
         if (MDB::isError($result)) {
             return($result);
@@ -3841,7 +3887,6 @@ class MDB_Common extends PEAR
      */
     function queryRow($query, $types = NULL, $fetchmode = MDB_FETCHMODE_DEFAULT)
     {
-        $this->setSelectedRowRange(0, 1);
         $result = $this->query($query, $types);
         if (MDB::isError($result)) {
             return($result);
@@ -3935,7 +3980,6 @@ class MDB_Common extends PEAR
             $type = array($type);
         }
         settype($params, 'array');
-        $this->setSelectedRowRange(0, 1);
         if (count($params) > 0) {
             $prepared_query = $this->prepareQuery($query);
             if (MDB::isError($prepared_query)) {
@@ -3987,7 +4031,6 @@ class MDB_Common extends PEAR
     function getRow($query, $types = NULL, $params = array(), $param_types = NULL, $fetchmode = MDB_FETCHMODE_DEFAULT)
     {
         settype($params, 'array');
-        $this->setSelectedRowRange(0, 1);
         if (count($params) > 0) {
             $prepared_query = $this->prepareQuery($query);
             if (MDB::isError($prepared_query)) {
@@ -4502,20 +4545,4 @@ class MDB_Common extends PEAR
         }
     }
 };
-
-// Used by many drivers
-if (!function_exists('array_change_key_case')) {
-    define('CASE_UPPER', 1);
-    define('CASE_LOWER', 0);
-    function &array_change_key_case(&$array, $case)
-    {
-        $casefunc = ($case == CASE_LOWER) ? 'strtolower' : 'strtoupper';
-        $ret = array();
-        foreach ($array as $key => $value) {
-            $ret[$casefunc($key)] = $value;
-        }
-        return($ret);
-    }
-}
-
 ?>

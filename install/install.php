@@ -1,17 +1,17 @@
 <?php
 
 /* 
-#### Installer PHP  1.4 RC2  #### 
-#### Author: Kay Vogelgesang for www.apachefriends.org 2004 ####  
+#### Installer PHP  1.4.1 #### 
+#### Author: Kay Vogelgesang & Carsten Wiedmann for www.apachefriends.org 2005 ####  
 */    
 
 print "\r\n  ########################################################################\n
-  # ApacheFriends XAMPP setup win32 Version 1.4                          #\r\n
+  # ApacheFriends XAMPP setup win32 Version 1.4.1                        #\r\n
   #----------------------------------------------------------------------#\r\n
-  # Copyright (c) 2002-2004 Apachefriends                                #\r\n
+  # Copyright (c) 2002-2005 Apachefriends                                #\r\n
   #----------------------------------------------------------------------#\r\n
   # Authors: Kay Vogelgesang <kvo@apachefriends.org>                     #\r\n
-  #          Oswald Kai Seidler <oswald@apachefriends.org>               #\r\n
+  #          Carsten Wiedmann <webmaster@wiedmann-online.de>             #\r\n
   ########################################################################\r\n\r\n"; 
 
 /// Where I stand? ///
@@ -160,7 +160,9 @@ if (file_exists($updatesysroot))
             { 
                 for($z=0;$z<$i+1;$z++) 
                 { 
-					if (eregi($update,$newzeile[$z]))
+					if (0 === strpos(trim(strtolower($newzeile[$z])), trim(strtolower($update)))) // Fix by Wiedmann PHP4
+//					if (0 === stripos(trim($newzeile[$z]), trim($update))) // Fix by Wiedmann PHP5
+//					if (eregi($update,$newzeile[$z]))
 					{
 						list ($left, $right) = split ('=', $newzeile[$z]);
 						// $right = eregi_replace (" ","",$right);
@@ -254,6 +256,8 @@ if ($xamppinstaller=="newinstall")
 	/// First initialization only main packages 
 	if (file_exists("$partwampp\install\\xamppbasic.inc")) 
 		{ include_once("$partwampp\install\\xamppbasic.inc"); }
+	if (file_exists("$partwampp\install\\xamppserver.inc")) // Fix by Wiedmann
+	{ include_once("$partwampp\install\\xamppserver.inc"); }
 
 	}
 	
@@ -278,14 +282,14 @@ $updatemake="nothingtodo";
 	}
 }
 
-$scount=count($slash);
-$bcount=count($backslash);
+$scount=count($slashrootreal);
+$bcount=count($backslashrootreal);
 
 /////////////////// xampp path is changing ///////////////////
 if ($xamppinstaller=="newpath")
 {
 set_time_limit(0);
-define('STDIN',fopen("php://stdin","r"));
+define('NEWSTDIN',fopen("php://stdin","r")); // Fix by Wiedmann
 	while($BS == "0")
 	{
 	echo "\n  Do you want to refresh the XAMPP installation?\n";
@@ -293,7 +297,7 @@ define('STDIN',fopen("php://stdin","r"));
 	echo "  1) Refresh now! (Jetzt aktualisieren!)\n";
 	echo "  x) Exit (Beenden)\n";
 
-		switch(trim(fgets(STDIN,256)))
+		switch(trim(fgets(NEWSTDIN,256))) // Fix by Wiedmann
 		{
 		case 1:
 		$BS = 1;
@@ -312,7 +316,7 @@ define('STDIN',fopen("php://stdin","r"));
 		exit();
 		}
 	}
-fclose(STDIN);
+fclose(NEWSTDIN); // Fix by Wiedmann
 }
 
 /////////////////// You can configure the addon modules for httpd ///////////////////
@@ -559,21 +563,38 @@ else
 }
 }
 $substit="\"".$substit."\"";
-for ($i=1;$i<=$bcount;$i++)
+for ($i=0;$i<=$bcount;$i++)
 {
+// $configname=$backslash[$i];
+// echo "\n$i) ";
+///// 08.08.05 Vogelgesang: For all files with identical file names /////
+if ($backslash[$i]=="")
+	{ $upbackslashrootreal=$backslashrootreal[$i]; }
+else
+	{ 
 
+$configname=$backslash[$i];
+$upbackslashrootreal=$backslashrootreal[$configname].$configname; 
 
+	}
+$backslashawk = eregi_replace ("\\\\","\\\\",$upbackslashrootreal);
+$backslashawk ="\"".$backslashawk;
 
+		$awkconfig=$backslashawk."\"";
+		$awkconfigtemp=$backslashawk."temp\"";
+		$configreal=$upbackslashrootreal;
+		$configtemp=$upbackslashrootreal."temp";
 
-$temp=$backslash[$i];
+// echo "$i) $upbackslashrootreal";
+/* $temp=$backslash[$i];
 $awkconfig=$backslashrootawk[$temp].$backslash[$i]."\"";
 $awkconfigtemp=$backslashrootawk[$temp].$backslash[$i]."temp\"";
 $configreal=$backslashrootreal[$temp].$backslash[$i];
-$configtemp=$backslashrootreal[$temp].$backslash[$i]."temp";
+$configtemp=$backslashrootreal[$temp].$backslash[$i]."temp"; */
 
 
 ///////////// Section SET  NEW configfiles for addons/update OR DELETE /////////////
-$configrealnew=$backslashrootreal[$temp].$backslash[$i].".new";
+$configrealnew=$upbackslashrootreal.".new";
 if (!file_exists($configreal) && file_exists($configrealnew))
 	{ 
 			
@@ -595,7 +616,9 @@ $awkrealm=$awkexe." -v DIR=".$awknewdir." -v CONFIG=".$awkconfig. " -v CONFIGNEW
 
 if (file_exists($awk) && file_exists($awkexe) && file_exists($configreal)) 
 {		
-	shell_exec("$awkrealm");
+	$handle = popen($awkrealm, 'w');
+	pclose($handle);
+//	shell_exec("$awkrealm >nul 2<&1"); // Fix by Wiedmann
 } 
 
 	if (file_exists($configtemp) && file_exists($configreal))
@@ -610,16 +633,33 @@ if (file_exists($awk) && file_exists($awkexe) && file_exists($configreal))
 
 
 $substitslash="\"".$substitslash."\"";
-for ($i=1;$i<=$scount;$i++)
+for ($i=0;$i<=$scount;$i++)
 {
-$temp=$slash[$i];
+///// 08.08.05 Vogelgesang: For all files with identical file names /////
+// $configname=$slash[$i];
+if ($slash[$i]=="")
+	{ $upslashrootreal=$slashrootreal[$i]; }
+else
+	{ 
+$configname=$slash[$i];
+$upslashrootreal=$slashrootreal[$configname].$configname; 
+
+	}
+$slashawk = eregi_replace ("\\\\","\\\\",$upslashrootreal);
+		$slashawk ="\"".$slashawk;
+		$awkconfig=$slashawk."\"";
+		$awkconfigtemp=$slashawk."temp\"";
+		$configreal=$upslashrootreal;
+		$configtemp=$upslashrootreal."temp";
+
+/* $temp=$slash[$i];
 $awkconfig=$slashrootawk[$temp].$slash[$i]."\"";
 $awkconfigtemp=$slashrootawk[$temp].$slash[$i]."temp\"";
 $configreal=$slashrootreal[$temp].$slash[$i];
-$configtemp=$slashrootreal[$temp].$slash[$i]."temp";
+$configtemp=$slashrootreal[$temp].$slash[$i]."temp"; */
 
 ///////////// Section SET  NEW configfiles for addons/update OR DELETE /////////////
-$configrealnew=$slashrootreal[$temp].$slash[$i].".new";
+$configrealnew=$upslashrootreal.".new";
 if (!file_exists($configreal) && file_exists($configrealnew))
 	{ 
 			
@@ -639,7 +679,9 @@ $awkrealm=$awkexe." -v DIR=".$awkslashdir." -v CONFIG=".$awkconfig. " -v CONFIGN
 
 if (file_exists($awk) && file_exists($awkexe) && file_exists($configreal)) 
 {
-	shell_exec("$awkrealm");
+	$handle = popen($awkrealm, 'w');
+	pclose($handle);
+//	shell_exec("$awkrealm >nul 2<&1"); // Fix by Wiedmann
 } 
 
 	if (file_exists($configtemp) && file_exists($configreal))
@@ -691,18 +733,32 @@ if (file_exists($awk) && file_exists($awkexe) && file_exists($configreal))
 	}
 
 ////////// Replace (copy) some newer files ////////////////
-	$phpbin=$partwampp."\apache\bin\php.ini";
-	$phpcgi=$partwampp."\php\php.ini";
-	$workersbin=$partwampp."\\tomcat\\conf\workers.properties";
-	$workersjk=$partwampp."\\tomcat\\conf\jk\workers.properties";
-		if (file_exists($phpbin)) 
-		{
-		copy($phpbin,$phpcgi);
-		}
-		if (file_exists($workersbin)) 
-		{
-		copy($workersbin,$workersjk);
-		}
+	$phpversion = trim(@file_get_contents($partwampp."\\install\\.phpversion")); //Fix by Wiedmann
+	switch ($phpversion) {
+		case 4:
+			$phpbin = $partwampp."\\apache\\bin\\php.ini";
+			$phpcgi = $partwampp."\\php\\php4\\php.ini";
+			@copy($phpbin, $phpcgi);
+			$phpbin = $partwampp."\\php\\php5.ini";
+			$phpcgi = $partwampp."\\php\\php.ini";
+			@copy($phpbin, $phpcgi);
+			break;
+		default:
+			$phpbin = $partwampp."\\apache\\bin\\php.ini";
+			$phpcgi = $partwampp."\\php\\php.ini";
+			@copy($phpbin, $phpcgi);
+			$phpbin = $partwampp."\\php\\php4\\php4.ini";
+			$phpcgi = $partwampp."\\php\\php4\\php.ini";
+			@copy($phpbin, $phpcgi);
+			break;
+	}
+		
+	$workersbin=$partwampp."\\tomcat\\conf\\workers.properties";
+	$workersjk=$partwampp."\\tomcat\\conf\\jk\\workers.properties";
+	if (file_exists($workersbin)) 
+	{
+	copy($workersbin,$workersjk);
+	}
 
 	echo "  DONE!\r\n\r\n";
 echo "\r\n  ##### Have fun with ApacheFriends XAMPP! #####\r\n\r\n\r\n";

@@ -1,5 +1,5 @@
 <?
-	if(@mysql_connect("localhost"))
+	if(@mysql_connect("localhost", "pma", ""))
 	{
 		echo "OK";
 	}

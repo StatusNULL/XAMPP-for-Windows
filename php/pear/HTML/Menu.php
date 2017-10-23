@@ -18,7 +18,7 @@
 // |          Alexey Borzov <avb@php.net>                                 |
 // +----------------------------------------------------------------------+
 //
-// $Id: Menu.php,v 1.10 2004/01/18 17:35:00 avb Exp $
+// $Id: Menu.php,v 1.11 2004/02/21 15:54:09 avb Exp $
 //
 
 // Types of the menu entries, instead of former magic numbers
@@ -35,7 +35,7 @@ define('HTML_MENU_ENTRY_BREADCRUMB',    6); // like activepath, but for 'urhere'
 *
 * Special thanks to the original author: Alex Vorobiev  <sasha@mathforum.com>.
 *
-* @version  $Revision: 1.10 $
+* @version  $Revision: 1.11 $
 * @author   Ulf Wendel <ulf.wendel@phpdoc.de>
 * @author   Alexey Borzov <avb@php.net>
 * @access   public
@@ -459,7 +459,7 @@ class HTML_Menu
             $this->_currentUrl = substr($this->_currentUrl, 0, -1);
         }
 
-        return $this->_urlMap[$this->_currentUrl];
+        return isset($this->_urlMap[$this->_currentUrl])? $this->_urlMap[$this->_currentUrl]: array();
     }
 
 

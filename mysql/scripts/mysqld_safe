@@ -270,7 +270,7 @@ then
   PID=`cat $pid_file`
   if /bin/kill -0 $PID > /dev/null 2> /dev/null
   then
-    if /bin/ps p $PID | grep mysqld > /dev/null
+    if /bin/ps p $PID | grep -v grep | grep mysqld > /dev/null
     then    # The pid contains a mysqld process
       echo "A mysqld process already exists"
       echo "A mysqld process already exists at " `date` >> $err_log

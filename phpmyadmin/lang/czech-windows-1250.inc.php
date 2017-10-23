@@ -1,5 +1,5 @@
 <?php
-/* $Id: czech-windows-1250.inc.php,v 2.92 2005/03/30 19:21:10 lem9 Exp $ */
+/* $Id: czech-windows-1250.inc.php,v 2.98.2.1 2005/06/30 17:22:38 lem9 Exp $ */
 
 /**
  * Czech language file by
@@ -155,10 +155,12 @@ $strConstraintsForDumped = 'Omezení pro exportované tabulky';
 $strConstraintsForTable = 'Omezení pro tabulku';
 $strCookiesRequired = 'Bìhem tohoto kroku musíte mít povoleny cookies.';
 $strCopyDatabaseOK = 'Databáze %s byla zkopírována na %s';
+$strCopy = 'Kopírovat';
 $strCopyTable = 'Kopírovat tabulku do (databáze<b>.</b>tabulka):';
 $strCopyTableOK = 'Tabulka %s byla zkopírována do %s.';
 $strCopyTableSameNames = 'Nelze kopírovat tabulku na sebe samu!';
 $strCouldNotKill = 'phpMyAdminovi se nepodaøilo ukonèit vlákno %s. Pravdìpodobnì jeho bìh již skonèil.';
+$strCreateDatabaseBeforeCopying = 'Vytvoøit databázi pøed kopírováním (CREATE DATABASE)';
 $strCreateIndexTopic = 'Vytvoøit nový index';
 $strCreateIndex = 'Vytvoøit index na&nbsp;%s&nbsp;sloupcích';
 $strCreateNewDatabase = 'Vytvoøit novou databázi';
@@ -289,6 +291,8 @@ $strFunction = 'Funkce';
 
 $strGenBy = 'Vygeneroval';
 $strGeneralRelationFeat = 'Obecné funkce relací';
+$strGeneratePassword = 'Vytvoøit heslo';
+$strGenerate = 'Vytvoøit';
 $strGenTime = 'Vygenerováno';
 $strGeorgian = 'Gruzínština';
 $strGerman = 'Nìmecky';
@@ -461,7 +465,7 @@ $strNoOptions = 'Tento formát nemá žádná nastavení';
 $strNoPassword = 'Žádné heslo';
 $strNoPermission = 'Web server nemá oprávnìní uložit výpis do souboru %s.';
 $strNoPhp = 'Bez PHP kódu';
-$strNoPrivileges = 'Bez oprávnìní';
+$strNoPrivileges = 'Nemáte oprávnìní';
 $strNoQuery = 'Žádný SQL dotaz!';
 $strNoRights = 'Nemáte dostateèná práva na provedení této akce!';
 $strNoRowsSelected = 'Nebyl vybrán žádný øádek';
@@ -524,13 +528,19 @@ $strPrintViewFull = 'Náhled k vytištìní (s&nbsp;kompletními texty)';
 $strPrintView = 'Náhled k vytištìní';
 $strPrint = 'Vytisknout';
 $strPrivDescAllPrivileges = 'Všechna oprávnìní kromì GRANT.';
+$strPrivDescAlterDb = 'Umožòuje mìnit strukturu existujících tabulek a výchozí znakové sady a øazení databází.';
+$strPrivDescAlterRoutine = 'Umožòuje mìnit a rušit uložené procedury.';
 $strPrivDescAlter = 'Umožòuje mìnit strukturu existujících tabulek.';
 $strPrivDescCreateDb = 'Umožòuje vytváøet nové databáze a tabulky.';
+$strPrivDescCreateRoutine = 'Umožòuje vytváøet uložené procedury.';
 $strPrivDescCreateTbl = 'Umožòuje vytváøet nové tabulky.';
 $strPrivDescCreateTmpTable = 'Umožòuje vytváøet doèasné tabulky.';
+$strPrivDescCreateUser = 'Umožòuje vytváøet, rušit a pøejmenovávat úèty uživatelù.';
+$strPrivDescCreateView = 'Umožòuje vytváøet nové pohledy.';
 $strPrivDescDelete = 'Umožòuje mazat data.';
 $strPrivDescDropDb = 'Umožòuje odstranit databáze a tabulky.';
 $strPrivDescDropTbl = 'Umožòuje odstranit tabulky.';
+$strPrivDescExecute5 = 'Umožòuje spouštìt uložené procedury.';
 $strPrivDescExecute = 'Umožòuje spouštìt uložené procedury. V&nbsp;této verzi MySQL se nepoužívá.';
 $strPrivDescFile = 'Umožòuje importovat a exportovat data z/do souborù na serveru.';
 $strPrivDescGrant = 'Umožòuje pøidávat uživatele a oprávnìní bez znovunaèítání tabulek s&nbsp;oprávnìními.';
@@ -548,6 +558,7 @@ $strPrivDescReplClient = 'Umožní uživateli zjistit, kde je hlavní / pomocný serv
 $strPrivDescReplSlave = 'Potøebné pro replikaci pomocných serverù.';
 $strPrivDescSelect = 'Umožòuje vybírat data.';
 $strPrivDescShowDb = 'Umožòuje pøístup k&nbsp;úplnému seznamu databází.';
+$strPrivDescShowView = 'Umožòuje spuštìní dotazu SHOW CREATE VIEW.';
 $strPrivDescShutdown = 'Umožòuje vypnout server.';
 $strPrivDescSuper = 'Umožòuje pøipojení, i když je dosažen maximální poèet pøipojení. Potøebné pro vìtšinu operací pro správu serveru jako nastavování globálních promìnných a zabíjení threadù jiných uživatelù.';
 $strPrivDescUpdate = 'Umožòuje mìnit data.';
@@ -597,6 +608,7 @@ $strRevokeAndDelete = 'Odebrat uživatelùm veškerá oprávnìní a poté je odstranit 
 $strRevokeMessage = 'Byla zrušena práva pro %s';
 $strRevoke = 'Zrušit';
 $strRomanian = 'Rumunština';
+$strRoutines = 'Procedury';
 $strRowLength = 'Délka øádku';
 $strRowsFrom = 'øádkù zaèínající od';
 $strRowSize = ' Velikost øádku ';
@@ -661,6 +673,7 @@ $strSingly = '(po jednom)';
 $strSize = 'Velikost';
 $strSlovak = 'Slovenština';
 $strSlovenian = 'Slovinština';
+$strSocketProblem = '(nebo není spávnì nastaven lokální socket MySQL serveru)';
 $strSortByKey = 'Setøídit podle klíèe';
 $strSort = 'Øadit';
 $strSpaceUsage = 'Využití místa';
@@ -730,6 +743,7 @@ $strTraditionalChinese = 'Tradièní èínština';
 $strTraditionalSpanish = 'Tradièní španìlština';
 $strTraffic = 'Provoz';
 $strTransformation_application_octetstream__download = 'Zobrazí odkaz na stáhnutí dat. První parametr je jméno souboru, druhý jméno sloupce v tabulce obsahující jméno souboru. Pokud zadáte druhý parametr, první musí být prázdný.';
+$strTransformation_application_octetstream__hex = 'Zobrazí data šestnáctkovì.';
 $strTransformation_image_jpeg__inline = 'Zobrazí náhled obrázku s&nbsp;odkazem na obrázek; parametry šíøka a výška v&nbsp;bodech (pomìr stran obrázku zùstane zachován)';
 $strTransformation_image_jpeg__link = 'Zobrazí odkaz na obrázek (napøíklad stáhnutí pole blob).';
 $strTransformation_image_png__inline = 'Viz image/jpeg: inline';
@@ -800,5 +814,4 @@ $strYes = 'Ano';
 $strZeroRemovesTheLimit = 'Poznámka: Nastavení tìchto parametrù na 0 (nulu) odstraní omezení.';
 $strZip = '"zazipováno"';
 
-$strSocketProblem = '(or the local MySQL server\'s socket is not correctly configured)';  //to translate
 ?>

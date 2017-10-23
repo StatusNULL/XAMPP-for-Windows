@@ -1,5 +1,5 @@
 <?php
-/* $Id: server_databases.php,v 2.15 2005/03/30 18:17:40 rabus Exp $ */
+/* $Id: server_databases.php,v 2.15.4.1 2005/06/30 17:12:13 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -80,7 +80,11 @@ if ((!empty($drop_selected_dbs) || isset($query_type)) && ($is_superuser || $cfg
         $submit_mult = 'drop_db' ;
         $err_url = 'server_databases.php?' . PMA_generate_common_url();
         require('./mult_submits.inc.php');
-        $message = sprintf($strDatabasesDropped, count($selected));
+        if ($mult_btn == $strYes) {
+            $message = sprintf($strDatabasesDropped, count($selected));
+        } else {
+            $message = sprintf($strDatabasesDropped, 0);
+        }
         // we need to reload the database list now.
         PMA_availableDatabases();
         $reload = 1;

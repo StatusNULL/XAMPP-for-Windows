@@ -13,18 +13,22 @@
 // | license@php.net so we can mail you a copy immediately.                 |
 // +------------------------------------------------------------------------+
 //
-// $Id: E00.php,v 1.9 2004/01/05 16:21:39 ostborn Exp $
+// $Id: E00.php,v 1.14 2004/07/25 13:56:29 sebastian Exp $
 //
 
 require_once 'Image/GIS/LineSet.php';
 require_once 'Image/GIS/Parser.php';
 
 /**
-* E00 Parser.
-*
-* @version  $Revision: 1.9 $
-* @since    Image_GIS 1.0.0
-*/
+ * E00 Parser.
+ *
+ * @author      Jan Kneschke <jan@kneschke.de>
+ * @author      Sebastian Bergmann <sb@sebastian-bergmann.de>
+ * @copyright   Copyright &copy; 2002-2004 Jan Kneschke <jan@kneschke.de> and Sebastian Bergmann <sb@sebastian-bergmann.de>
+ * @license     http://www.php.net/license/3_0.txt The PHP License, Version 3.0
+ * @category    Image
+ * @package     Image_GIS
+ */
 class Image_GIS_Parser_E00 extends Image_GIS_Parser {
     /**
     * Constructor.
@@ -64,7 +68,7 @@ class Image_GIS_Parser_E00 extends Image_GIS_Parser {
                 }
 
                 else if ($numRecords &&
-                         preg_match("#^[ -]([0-9]\.[0-9]{7}E[-+][0-9]{2})[ -]([0-9]\.[0-9]{7}E[-+][0-9]{2})[ -]([0-9]\.[0-9]{7}E[-+][0-9]{2})[ -]([0-9]\.[0-9]{7}E[-+][0-9]{2})#", $line, $a)) {
+                         preg_match("#^([ -][0-9]\.[0-9]{7}E[-+][0-9]{2})([ -][0-9]\.[0-9]{7}E[-+][0-9]{2})([ -][0-9]\.[0-9]{7}E[-+][0-9]{2})([ -][0-9]\.[0-9]{7}E[-+][0-9]{2})#", $line, $a)) {
                     if ($this->debug) {
                         echo $a[0] . '<br />';
                     }
@@ -85,7 +89,7 @@ class Image_GIS_Parser_E00 extends Image_GIS_Parser {
                 }
 
                 else if ($numRecords &&
-                         preg_match("#^[ -]([0-9]\.[0-9]{7}E[-+][0-9]{2})[ -]([0-9]\.[0-9]{7}E[-+][0-9]{2})#", $line, $a)) {
+                         preg_match("#^([ -][0-9]\.[0-9]{7}E[-+][0-9]{2})([ -][0-9]\.[0-9]{7}E[-+][0-9]{2})#", $line, $a)) {
                     if ($pl['x'] != -1 &&
                         $pl['y'] != -1) {
                         $lineSet->addLine($pl['x'], $pl['y'], $a[1], $a[2]);
@@ -98,12 +102,12 @@ class Image_GIS_Parser_E00 extends Image_GIS_Parser {
                 }
 
                 else if ($ln > 2) {
-		    if ($this->debug) {
-			printf(
-			       'Died at: %s<br />',
-			       $ln
-			       );
-		    }
+                    if ($this->debug) {
+                        printf(
+                          'Died at: %s<br />',
+                          $ln
+                        );
+                    }
 
                     break;
                 }

@@ -1,6 +1,6 @@
 <?php
 // +-----------------------------------------------------------------------+
-// | Copyright (c) 2002  Richard Heyes                                     |
+// | Copyright (c) 2002-2003  Richard Heyes                                     |
 // | All rights reserved.                                                  |
 // |                                                                       |
 // | Redistribution and use in source and binary forms, with or without    |
@@ -87,7 +87,7 @@
 *    re-build the message.
 *
 * @author  Richard Heyes <richard@phpguru.org>
-* @version $Revision: 1.10 $
+* @version $Revision: 1.13 $
 * @package Mail
 */
 
@@ -219,7 +219,7 @@ class Mail_mimePart {
 
         if (!empty($this->_subparts)) {
             srand((double)microtime()*1000000);
-            $boundary = '=_' . md5(uniqid(rand()) . microtime());
+            $boundary = '=_' . md5(rand() . microtime());
             $this->_headers['Content-Type'] .= ';' . MAIL_MIMEPART_CRLF . "\t" . 'boundary="' . $boundary . '"';
 
             // Add body parts to $subparts
@@ -328,6 +328,8 @@ class Mail_mimePart {
                 if (($dec == 32) AND ($i == ($linlen - 1))){    // convert space at eol only
                     $char = '=20';
 
+                } elseif(($dec == 9) AND ($i == ($linlen - 1))) {  // convert tab at eol only
+                    $char = '=09';
                 } elseif($dec == 9) {
                     ; // Do nothing if a tab.
                 } elseif(($dec == 61) OR ($dec < 32 ) OR ($dec > 126)) {

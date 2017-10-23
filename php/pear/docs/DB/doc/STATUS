@@ -1,7 +1,7 @@
 STATUS OF THE PEAR DB PACKAGE
 =============================
 
-$Id: STATUS,v 1.27 2004/04/29 23:26:44 danielc Exp $
+$Id: STATUS,v 1.33 2005/02/22 15:45:36 danielc Exp $
 ------------------------------------------------------------------------
 
 DB Driver Feature Matrix
@@ -18,29 +18,27 @@ Symbols:
 
                     fbsql      ifx      mssql     mysqli     odbc     sqlite
 FEATURE        dbase  |  ibase  |  msql   |  mysql  |   oci8  |  pgsql  |  sybase
-simpleQuery      -    x    T    T    x    T    T    T    T    T    T    T    T
-numCols          x    x    T    x    x    T    T    T    T    T    T    T    T
-numRows          x    x    n    n    x    T    T    T    E    T    T    T    n 
-errorNative      n    x    n    t    n    T    T    T    T    T    T    E    T
-prepare/execute  e    e    T    E    e    E    E    E    T    E    E    E    E
-sequences        -    e    T    E    n    E    E    E    T    E    T    E    E
-affectedRows     n    x    n    T    x    n    T    T    T    T    T    T    T
-fetch modes      x    x    T    T    x    T    T    T    T    T    T    T    T
-fetch row by no  x    x    n    T    x    T    T    T    n    x    T    T    T
-transactions     -    x    T    n    n    T    T    T    T    T    T    -    T
-auto-commit      -    x    x    n    n    n    E    E    x    x    x    -    n
-error mapping    -    x    T    t    -    t    t    t    T    T    E    l    l
-tableInfo        n    x    T    t    n    T    T    t    T    n    T    -    T
+simpleQuery      -    T    T    T    T    T    T    T    T    T    T    T    T
+numCols          x    T    T    T    T    T    T    T    T    T    T    T    T
+numRows          x    T    E    E    T    T    T    T    E    T    T    T    T
+errorNative      n    T    T    T    T    T    T    T    T    T    T    E    T
+prepare/execute  e    E    T    E    E    E    E    E    T    E    E    E    E
+sequences        n    T    T    n    T    T    T    T    T    E    T    E    T
+affectedRows     n    T    E    E    T    T    T    T    T    T    E    T    T
+fetch modes      x    T    T    T    T    T    T    T    T    T    T    T    T
+fetch row by no  x    x    n    n    x    x    x    x    n    x    x    x    x
+transactions     -    T    T    T    n    T    T    T    T    T    T    n    T
+auto-commit      n    T    E    E    n    E    E    E    E    T    E    n    E
+error mapping    -    T    T    T    T    T    T    T    T    T    T    T    T
+tableInfo        x    T    T    t    T    T    T    T    T    T    T    T    T
 
-NOTE: ibase testing done under PHP 5.  ibase under PHP 4 is unstable on Windows.
-
-
-TYPE (getListOf)
-tables           -    x    -    -    -    x    x    x    x    -    x    -    x
-views            -    -    -    -    -    x    n    n    -    -    x    -    x
-users            -    -    -    -    -    -    x    x    -    -    x    -    -
-databases        -    -    -    -    -    -    x    x    -    -    x    -    -
-functions        -    -    -    -    -    -    -    -    -    -    x    -    -
+getListOf() TYPES
+tables           -    T    T    T    T    T    T    T    T    T    T    T    T
+views            -    T    T    -    -    T    -    -    -    T    T    -    T
+users            -    T    T    -    -    -    T    T    -    -    T    -    -
+databases        -    -    -    -    T    -    T    T    -    T    T    -    -
+functions        -    T    -    -    -    -    -    -    -    -    T    -    -
+synonyms         -    -    -    -    -    -    -    -    T    -    -    -    -
 
 
 Test Conformance
@@ -48,26 +46,48 @@ Test Conformance
 Symbols:
     o  =  Test passed
     X  =  Test failed
-    N  =  Test failed due to DBMS not considering something an error
-    E  =  Test failed due to problem with PHP extension
+    L  =  Some portions of the test failed due to limitations in PHP or DBMS
+    n  =  Test returns "not capable"
+    -  =  Not tested
 
                     fbsql      ifx      mssql     mysqli     odbc     sqlite
                dbase  |  ibase  |  msql   |  mysql  |   oci8  |  pgsql  |  sybase
-01connect        -    -    o    o    -    o    o    o    o    o    o    o    o 
-02fetch          -    -    o    o    -    o    o    o    o    o    o    o    o
-03simplequery    -    -    o    o    -    o    o    o    o    o    o    o    o
-04numcols        -    -    o    o    -    o    o    o    o    o    o    o    o
-05sequences      -    -    o    o    -    o    o    o    o    o    o    o    o
-06prepexec       -    -    o    o    -    o    o    o    o    o    o    o    o
-08affectedrows   -    -    X    o    -    o    o    o    o    o    o    o    o
-09numrows        -    -    X    X    -    o    o    o    o    o    o    o    o
-10errormap       -    -    o    N    -    E    N    N    o    o    o    N    E
-11transactions   -    -    o    -    -    o    o    o    o    o    o    -    o
-13limit          -    -    o    o    -    o    o    o    o    o    o    o    o
-14fetchmode_obje -    -    o    o    -    o    o    o    o    o    o    o    o
-15quote          -    -    o    X    -    o    o    o    o    o    o    o    o
-16tableinfo      -    -    o    X    -    o    o    X    o    -    o    -    o
-17query          -    -    X    o    -    o    o    o    o    o    o    o    o
-18get            -    -    X    o    -    o    o    o    o    o    o    o    o
+01connect        o    o    o    o    o    o    o    o    o    o    o    o    o
+02fetch          -    o    o    o    o    o    o    o    o    o    o    o    o
+03simplequery    -    o    o    o    o    o    o    o    o    o    o    o    o
+04numcols        -    o    o    o    o    o    o    o    o    o    o    o    o
+05sequences      -    o    o    o    o    o    o    o    o    o    o    o    o
+06prepexec       -    o    o    o    L    o    o    o    o    o    o    o    o
+08affectedrows   -    o    o    o    o    o    o    o    o    o    o    o    o
+09numrows        -    o    o    o    o    o    o    o    o    o    o    o    o
+10errormap       -    o    o    o    o    o    o    o    o    o    o    o    o
+11transactions   -    o    o    o    n    o    o    o    o    o    o    n    o
+13limit          -    o    o    o    o    o    o    o    o    o    o    o    o
+14fetchmode_obje -    o    o    o    o    o    o    o    o    o    o    o    o
+15quote          -    o    o    o    o    o    o    o    o    o    o    o    o
+16tableinfo      -    o    o    L    o    o    o    o    o    o    o    o    o
+17query          -    o    o    o    o    o    o    o    o    o    o    o    o
+18get            -    o    o    o    o    o    o    o    o    o    o    o    o
+19getlistof      -    o    o    o    o    o    o    o    o    o    o    o    o
 
-NOTE: ibase testing done under PHP 5.  ibase under PHP 4 is unstable on Windows.
+
+DBMS Versions Tested
+--------------------
+dbase   n/a
+fbsql   4.1.6
+ibase   Firebird 1.5.1  (PHP 5 only)
+ifx     7.2 Standard Edtition
+msql    3.6  (PHP snapshots dated 2005-02-18)
+mssql   8.0.760
+mysql   4.0.21
+mysqli  4.1.5  (PHP 5 only)
+oci8    9.2
+odbc    DB2 ESE 8.1 and MS Access 2000
+pgsql   7.4.1 and 8.0.1
+sqlite  PHP 5: extension.  PHP 4: PECL snapshot.
+sybase  ASE 12.5.3
+
+Tests were performed under both of the following PHP versions
+unles otherwise noted:
+    4.3.11-dev dated 2005-02-22
+    5.1.0-dev dated 2005-02-22

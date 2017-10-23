@@ -4,14 +4,14 @@
    Transformations  -  FAQ  -  Developers  -  Credits  -  Translators
    ______________________________________________________________________
 
-                      phpMyAdmin 2.6.2-pl1 Documentation
+                      phpMyAdmin 2.6.3-pl1 Documentation
 
      * SourceForge phpMyAdmin project page   [ http://www.phpmyadmin.net/ ] 
      * Local documents:
           + Version history: ChangeLog
           + General notes: README
           + License: LICENSE
-     * Documentation version: $Id: Documentation.html,v 2.123.2.3 2005/04/16        17:36:54 lem9 Exp $
+     * Documentation version: $Id: Documentation.html,v 2.131.2.4 2005/07/04        21:50:18 lem9 Exp $
 
 Requirements
 
@@ -49,7 +49,7 @@ Introduction
      * transform stored data into any format using a set of predefined funct       ions, like displaying BLOB-data as image or download-link or ...
      * support InnoDB tables and foreign keys (see FAQ 3.6)
      * support mysqli, the improved MySQL extension (see FAQ 1.17)
-     * communicate in 48 different languages
+     * communicate in 50 different languages
 
    (*)  phpMyAdmin can compress (Zip, GZip -RFC 1952- or Bzip2 formats) dump   s and CSV exports if you use PHP4 >= 4.0.4 with Zlib support (--with-zli   b) and/or Bzip2 support (--with-bz2).
 
@@ -69,10 +69,9 @@ Installation
     2. Ensure that all the scripts have the appropriate owner (if PHP is run       ning in safe mode, having some scripts with an owner different from the
        owner of other scripts will be a problem). See FAQ 4.2 for suggestions.
     3. Open the file config.inc.php in your favorite editor and change the v       alues for host, user, password and authentication mode to fit your
-       environment.  Here, "host" means the MySQL server. Also insert the
-       correct value for $cfg['PmaAbsoluteUri']. Have a look at Configuration
-       section  for  an  explanation  of all values. Please also read the
-       remaining  of  this  Installation  section  for  information about
+       environment.  Here,  "host" means the MySQL server. Have a look at
+       Configuration section for an explanation of all values. Please also read
+       the  remaining  of this Installation section for information about
        authentication modes and the linked-tables infrastructure.
     4. It is recommended that you protect the directory in which you install       ed phpMyAdmin (unless it's on a closed intranet, or you wish to use
        HTTP  or  cookie authentication), for example with HTTP-AUTH (in a
@@ -968,6 +967,7 @@ Configuration
           HTTP, or when file uploads are disabled in PHP.
           Please note that if PHP is running in safe mode, this directory must
           be owned by the same user as the owner of the phpMyAdmin scripts.
+          See also FAQ 1.16 for alternatives.
 
    $cfg['docSQLDir'] string
           The name of the directory, where docSQL files can be uploaded for
@@ -1470,9 +1470,16 @@ FAQ - Frequently Asked Questions
 
     [1.16] I cannot upload big dump files (memory, http or timeout problems).
 
-   The first things to check (or ask your host provider to check) are the va   lues of upload_max_filesize, memory_limit and post_max_size in the php.i   ni configuration file.
-   All of these three settings limit the maximum size of data that can be su   bmitted and handled by PHP. One user also said that post_max_size and me   mory_limit need to be larger than upload_max_filesize.
-   If you get a timeout problem, look at the $cfg['UploadDir'] feature.
+   The first things to check (or ask your host provider to check) are the va   lues of upload_max_filesize, memory_limit and post_max_size in the php.i   ni configuration file. All of these three settings limit the maximum siz   e of data that can be submitted and handled by PHP. One user also said t   hat post_max_size and memory_limit need to be larger than upload_max_fil   esize.
+   There exist several workarounds if your upload is too big or your hosting    provider is unwilling to change the settings:
+     * Look at the $cfg['UploadDir'] feature. This allows one to upload a fi       le to the server via scp, ftp, or your favorite file transfer method.
+       PhpMyAdmin  is  then  able  to import the files from the temporary
+       directory. More information is available in the Configuration section of
+       this document.
+     * Using a utility (such as BigDump) to split the files before uploading       . We cannot support this or any third party applications, but are aware
+       of users having success with it.
+     * If you have shell (command line) access, use MySQL to import the file       s directly. You can do this by issuing the "source" command from within
+       MySQL: source filename.sql.
 
     [1.17] Which MySQL versions does phpMyAdmin support?
 
@@ -1668,6 +1675,9 @@ FAQ - Frequently Asked Questions
    Here are a few points to check:
      * In config.inc.php, try to leave the $cfg['PmaAbsoluteUri']directive e       mpty. See also FAQ 4.7.
      * Maybe you have a broken PHP installation or you need to upgrade your       Zend Optimizer. See http://bugs.php.net/bug.php?id=31134.
+     * If you are using Hardened PHP with the ini directive varfilter.max_re       quest_variables set to the default (200) or another low value, you
+       could get this error if your table has a high number of columns. Adjust
+       this setting accordingly. (Thanks to Klaus Dorninger for the hint).
 
   [3. Known limitations]
 
@@ -1742,6 +1752,11 @@ FAQ - Frequently Asked Questions
     [3.12] What are the phpMyAdmin limitations for MySQL 3?
 
    The number of records in queries containing COUNT and GROUP BY is not cor   rectly calculated. Also, sorting results of a query like "SELECT * from   table GROUP BY" ... is problematic.
+
+    [3.13] I get an error when entering USE followed by a db name containing an
+    hyphen.
+
+   The tests I have made with current MySQL 4.1.11 API shows that the API do   es not accept this syntax for the USE command. Enclosing the db name wit   h backquotes works. For further confusion, no backquotes are needed with    command-line mysql.
 
   [4. ISPs, multi-user installations ]
 

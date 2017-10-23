@@ -1,14 +1,14 @@
 <?php
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 // +----------------------------------------------------------------------+
-// | PHP Version 4                                                        |
+// | PEAR :: Mail :: Queue :: Container                                   |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2003 The PHP Group                                |
+// | Copyright (c) 1997-2004 The PHP Group                                |
 // +----------------------------------------------------------------------+
-// | This source file is subject to version 2.0 of the PHP license,       |
+// | This source file is subject to version 3.0 of the PHP license,       |
 // | that is bundled with this package in the file LICENSE, and is        |
 // | available at through the world-wide-web at                           |
-// | http://www.php.net/license/2_02.txt.                                 |
+// | http://www.php.net/license/3_0.txt.                                  |
 // | If you did not receive a copy of the PHP license and are unable to   |
 // | obtain it through the world-wide-web, please send a note to          |
 // | license@php.net so we can mail you a copy immediately.               |
@@ -17,7 +17,7 @@
 // |          Lorenzo Alberton <l dot alberton at quipo dot it>           |
 // +----------------------------------------------------------------------+
 //
-// $Id: Container.php,v 1.5 2004/02/29 09:15:24 quipo Exp $
+// $Id: Container.php,v 1.8 2004/07/18 14:59:15 quipo Exp $
 
 /**
  * File Container.php
@@ -30,7 +30,7 @@ require_once 'Mail/Queue/Body.php';
  * Mail_Queue_Container - base class for MTA queue.
  * Define methods for all storage containers.
  *
- * @version  $Revision: 1.5 $
+ * @version  $Revision: 1.8 $
  * @author   Radek Maciaszek <chief@php.net>
  * @author   Lorenzo Alberton <l dot alberton at quipo dot it>
  * @package  Mail_Queue
@@ -238,36 +238,37 @@ class Mail_Queue_Container
      */
     function preload()
     {
-        //remember buffer offset
-        static $from = 0;
-
         if (!empty($this->queue_data)) {
             return true;
         }
 
-        $bkp = array(
-            'offset' => $this->offset,
-            'limit'  => $this->limit
-        );
+        if (!$this->limit) {
+            return true;   //limit reached
+        }
 
-        //set buffer size and offset
-        $this->offset = $from;
-        $this->limit = $this->buffer_size;
+        $bkp_limit = $this->limit;
+
+        //set buffer size
+        if ($bkp_limit == MAILQUEUE_ALL) {
+            $this->limit = $this->buffer_size;
+        } else {
+            $this->limit = min($this->buffer_size, $this->limit);
+        }
 
         if (Mail_Queue::isError($err = $this->_preload())) {
             return $err;
         }
 
-        //restore options
-        $this->offset = $bkp['offset'];
-        $this->limit  = $bkp['limit'];
+        //restore limit
+        if ($bkp_limit == MAILQUEUE_ALL) {
+            $this->limit = MAILQUEUE_ALL;
+        } else {
+            $this->limit = $bkp_limit - count($this->queue_data);
+        }
 
         //set buffer pointers
         $this->_current_item = 0;
         $this->_last_item = count($this->queue_data)-1;
-
-        //update buffer offset
-        $from += count($this->queue_data);
 
         return true;
     }

@@ -13,52 +13,66 @@
 // | license@php.net so we can mail you a copy immediately.                    |
 // +---------------------------------------------------------------------------+
 //
-// $Id: PHP.php,v 1.14.2.1 2004/02/06 15:41:59 sebastian Exp $
+// $Id: PHP.php,v 1.20 2004/11/20 07:35:07 sebastian Exp $
 //
 
 require_once 'XML/Transformer/Namespace.php';
 
 /**
-* Handler for the PHP Namespace.
-*
-* Example
-*
-*   <?php
-*   require_once 'XML/Transformer_OutputBuffer.php';
-*   require_once 'XML/Transformer/Namespace/PHP.php';
-*
-*   $t = new XML_Transformer_OutputBuffer;
-*   $t->overloadNamespace('php', new XML_Transformer_Namespace_PHP);
-*   $t->start();
-*   ?>
-*   <dl>
-*     <dd>Current time: <php:expr>time()</php:expr></dd>
-*     <php:setvariable name="foo">bar</php:setvariable>
-*     <dd>foo = <php:getvariable name="foo"/></dd>
-*   </dl>
-*
-*   <php:namespace name="my">
-*    <php:define name="tag">
-*     <h1 align="$align">$content</h1>
-*    </php:define>
-*   </php:namespace>
-*
-*   <my:tag align="center">Some Text</my:tag>
-*
-* Output
-*
-*   <dl>
-*     <dd>Current time: 1032158587</dd>
-*     <dd>foo = bar</dd>
-*   </dl>
-*
-*   <h1 align="center">Some Text</h1>
-*
-* @author  Sebastian Bergmann <sb@sebastian-bergmann.de>
-* @author  Kristian Köhntopp <kris@koehntopp.de>
-* @version $Revision: 1.14.2.1 $
-* @access  public
-*/
+ * Handler for the PHP Namespace.
+ *
+ * Example
+ *
+ * <code>
+ * <?php
+ * require_once 'XML/Transformer_OutputBuffer.php';
+ * require_once 'XML/Transformer/Namespace/PHP.php';
+ *
+ * $t = new XML_Transformer_OutputBuffer;
+ * $t->overloadNamespace('php', new XML_Transformer_Namespace_PHP);
+ * $t->start();
+ * ?>
+ * <html>
+ *   <body>
+ *     <dl>
+ *       <dd>Current time: <php:expr>time()</php:expr></dd>
+ *       <php:setvariable name="foo">bar</php:setvariable>
+ *       <dd>foo = <php:getvariable name="foo"/></dd>
+ *     </dl>
+ *
+ *     <php:namespace name="my">
+ *       <php:define name="tag">
+ *         <h1 align="$align">$content</h1>
+ *       </php:define>
+ *     </php:namespace>
+ *
+ *     <my:tag align="center">Some Text</my:tag>
+ *   </body>
+ * </html>
+ * </code>
+ *
+ * Output
+ *
+ * <code>
+ * <html>
+ *   <body>
+ *     <dl>
+ *       <dd>Current time: 1032158587</dd>
+ *       <dd>foo = bar</dd>
+ *     </dl>
+ *
+ *     <h1 align="center">Some Text</h1>
+ *   </body>
+ * </html>
+ * </code>
+ *
+ * @author      Sebastian Bergmann <sb@sebastian-bergmann.de>
+ * @author      Kristian Köhntopp <kris@koehntopp.de>
+ * @copyright   Copyright &copy; 2002-2004 Sebastian Bergmann <sb@sebastian-bergmann.de> and Kristian Köhntopp <kris@koehntopp.de>
+ * @license     http://www.php.net/license/3_0.txt The PHP License, Version 3.0
+ * @category    XML
+ * @package     XML_Transformer
+ */
 class XML_Transformer_Namespace_PHP extends XML_Transformer_Namespace {
     // {{{ Members
 
@@ -84,7 +98,7 @@ class XML_Transformer_Namespace_PHP extends XML_Transformer_Namespace {
     * @var    string
     * @access private
     */
-    var $_inNamespace = false;
+    var $_inNamespace = FALSE;
 
     /**
     * @var    string
@@ -167,7 +181,7 @@ class XML_Transformer_Namespace_PHP extends XML_Transformer_Namespace {
     * @access public
     */
     function start_namespace($attributes) {
-        $this->_inNamespace = true;
+        $this->_inNamespace = TRUE;
         $this->_namespace   = $attributes['name'];
 
         $classname = 'PEAR_XML_TRANSFORMER_NAMESPACE_PHP_' . $this->_namespace;
@@ -197,11 +211,11 @@ class XML_Transformer_Namespace_PHP extends XML_Transformer_Namespace {
         $this->_transformer->overloadNamespace(
           $this->_namespace,
           new $classname,
-          true
+          TRUE
         );
 
         $this->_namespace   = '';
-        $this->_inNamespace = false;
+        $this->_inNamespace = FALSE;
 
         return '';
     }

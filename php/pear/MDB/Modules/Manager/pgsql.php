@@ -42,7 +42,7 @@
 // | Author: Paul Cooper <pgc@ucecom.com>                                 |
 // +----------------------------------------------------------------------+
 //
-// $Id: pgsql.php,v 1.39.4.1 2004/01/08 13:43:01 lsmith Exp $
+// $Id: pgsql.php,v 1.39.4.3 2004/03/09 15:43:40 lsmith Exp $
 
 if(!defined('MDB_MANAGER_PGSQL_INCLUDED'))
 {
@@ -597,7 +597,7 @@ class MDB_Manager_pgsql extends MDB_Manager_common
                                 WHERE (pg_class.relname='$index_name') 
                                 AND (pg_class.oid=pg_index.indexrelid)", NULL, MDB_FETCHMODE_ASSOC);
         if ($row[0]['relname'] != $index_name) {
-            return($db->raiseError(MDB_ERROR_MANAGER, '', '', 'Get table index definition: it was not specified an existing table index'));
+            return($db->raiseError(MDB_ERROR_MANAGER, NULL, NULL, 'Get table index definition: it was not specified an existing table index'));
         }
 
         $columns = $this->listTableFields($db, $table);

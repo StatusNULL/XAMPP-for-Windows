@@ -42,7 +42,7 @@
 // | Author: YOUR NAME <YOUR EMAIL>                                       |
 // +----------------------------------------------------------------------+
 //
-// $Id: skeleton.php,v 1.16.4.1 2004/01/08 13:43:05 lsmith Exp $
+// $Id: skeleton.php,v 1.16.4.2 2004/03/12 16:19:31 lsmith Exp $
 //
 
 // This is just a skeleton MDB driver.
@@ -132,11 +132,12 @@ class MDB_xxx extends MDB_Common
      * that checks for native error msgs.
      *
      * @param integer $errno error code
+     * @param string  $message userinfo message
      * @return object a PEAR error object
      * @access public
      * @see PEAR_Error
      */
-    function xxxRaiseError($errno = NULL)
+    function xxxRaiseError($errno = NULL, $message = NULL)
     {
         // take this method from the corresponding PEAR DB driver: xxxRaiseError()
     }

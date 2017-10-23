@@ -33,13 +33,13 @@
 // | Co-Author: Damian Fernandez Sosa <damlists@cnba.uba.ar>               |
 // +-----------------------------------------------------------------------+
 //
-// $Id: Net_POP3_example.php,v 1.1.1.1 2004/08/27 02:21:36 damian Exp $
+// $Id: Net_POP3_example.php,v 1.2 2004/12/05 16:34:39 damian Exp $
 ?>
 <html>
 <body>
 <?php
 
-include('Net/POP3.php');
+include('./POP3.php');
 
 
 
@@ -58,6 +58,7 @@ $port="110";
 // Create the class
 
 $pop3 =& new Net_POP3();
+
 
 
 //$pop3->setDebug();
@@ -96,6 +97,10 @@ if(PEAR::isError( $ret= $pop3->login($user , $pass , 'CRAM-MD5') )){
 */
 
 
+$a=$pop3->getListing();
+echo "\n";
+print_r($a);
+//exit();
 
 
 // Get the raw headers of message 1

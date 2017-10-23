@@ -13,17 +13,19 @@
 // | license@php.net so we can mail you a copy immediately.                    |
 // +---------------------------------------------------------------------------+
 //
-// $Id: CallbackRegistry.php,v 1.18 2004/01/01 10:31:53 sebastian Exp $
+// $Id: CallbackRegistry.php,v 1.23 2004/11/19 07:35:11 sebastian Exp $
 //
 
-/**
-* Callback Registry.
-*
-* @author  Sebastian Bergmann <sb@sebastian-bergmann.de>
-* @author  Kristian Köhntopp <kris@koehntopp.de>
-* @version $Revision: 1.18 $
-* @access  public
-*/
+ /**
+ * Callback Registry.
+ *
+ * @author      Sebastian Bergmann <sb@sebastian-bergmann.de>
+ * @author      Kristian Köhntopp <kris@koehntopp.de>
+ * @copyright   Copyright &copy; 2002-2004 Sebastian Bergmann <sb@sebastian-bergmann.de> and Kristian Köhntopp <kris@koehntopp.de>
+ * @license     http://www.php.net/license/3_0.txt The PHP License, Version 3.0
+ * @category    XML
+ * @package     XML_Transformer
+ */
 class XML_Transformer_CallbackRegistry {
     // {{{ Members
 
@@ -37,17 +39,17 @@ class XML_Transformer_CallbackRegistry {
     * @var    boolean
     * @access private
     */
-    var $_locked = false;
+    var $_locked = FALSE;
 
     /**
-    * If true, the transformation will continue recursively
+    * If TRUE, the transformation will continue recursively
     * until the XML contains no more overloaded elements.
     * Can be overrided on a per-element basis.
     *
     * @var    boolean
     * @access private
     */
-    var $_recursiveOperation = true;
+    var $_recursiveOperation = TRUE;
 
     // }}}
     // {{{ function XML_Transformer_CallbackRegistry($recursiveOperation)
@@ -60,26 +62,6 @@ class XML_Transformer_CallbackRegistry {
     */
     function XML_Transformer_CallbackRegistry($recursiveOperation) {
         $this->_recursiveOperation = $recursiveOperation;
-    }
-
-    // }}}
-    // {{{ function &getInstance($recursiveOperation)
-
-    /**
-    * Returns an instance of XML_Transformer_CallbackRegistry.
-    *
-    * @param  boolean
-    * @return XML_Transformer_CallbackRegistry
-    * @access public
-    */
-    function &getInstance($recursiveOperation) {
-        static $instance;
-
-        if (!isset($instance)) {
-            $instance = new XML_Transformer_CallbackRegistry($recursiveOperation);
-        }
-
-        return $instance;
     }
 
     // }}}
@@ -125,11 +107,11 @@ class XML_Transformer_CallbackRegistry {
             );
         }
 
-        $this->overloadedNamespaces[$namespacePrefix]['active']             = true;
+        $this->overloadedNamespaces[$namespacePrefix]['active']             = TRUE;
         $this->overloadedNamespaces[$namespacePrefix]['object']             = &$object;
         $this->overloadedNamespaces[$namespacePrefix]['recursiveOperation'] = is_bool($recursiveOperation) ? $recursiveOperation : $this->_recursiveOperation;
 
-        return true;
+        return TRUE;
     }
 
     // }}}
@@ -151,8 +133,8 @@ class XML_Transformer_CallbackRegistry {
     // {{{ function isOverloadedNamespace($namespacePrefix)
 
     /**
-    * Returns true if a given namespace is overloaded,
-    * false otherwise.
+    * Returns TRUE if a given namespace is overloaded,
+    * FALSE otherwise.
     *
     * @param  string
     * @return boolean
@@ -200,12 +182,12 @@ class XML_Transformer_CallbackRegistry {
                 }
             }
 
-            $this->_locked = true;
+            $this->_locked = TRUE;
 
-            return true;
+            return TRUE;
         }
 
-        return false;
+        return FALSE;
     }
 
     // }}}
@@ -221,10 +203,10 @@ class XML_Transformer_CallbackRegistry {
         $namespacePrefixes = array_keys($this->overloadedNamespaces);
 
         foreach ($namespacePrefixes as $namespacePrefix) {
-            $this->overloadedNamespaces[$namespacePrefix]['active'] = true;
+            $this->overloadedNamespaces[$namespacePrefix]['active'] = TRUE;
         }
 
-        $this->_locked = false;
+        $this->_locked = FALSE;
     }
 
     // }}}

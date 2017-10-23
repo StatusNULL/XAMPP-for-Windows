@@ -1,9 +1,9 @@
 <?php
 /**
- * $Id: SmartIRC.php,v 1.54.2.4 2003/07/22 18:02:07 meebey Exp $
- * $Revision: 1.54.2.4 $
+ * $Id: SmartIRC.php,v 1.54.2.14 2005/05/27 23:40:09 meebey Exp $
+ * $Revision: 1.54.2.14 $
  * $Author: meebey $
- * $Date: 2003/07/22 18:02:07 $
+ * $Date: 2005/05/27 23:40:09 $
  *
  * Net_SmartIRC
  * This is a PHP class for communication with IRC networks,
@@ -14,18 +14,18 @@
  * Documenation, a HOWTO and examples are in SmartIRC included.
  *
  * Here you will find a service bot which I am also developing
- * <http://cvs.meebey.net/atbs> and <ttp://cvs.meebey.net/phpbitch>
+ * <http://cvs.meebey.net/atbs> and <http://cvs.meebey.net/phpbitch>
  * Latest versions of Net_SmartIRC you will find on the project homepage
  * or get it through PEAR since SmartIRC is an official PEAR package.
- * See <http://pear.php.net/package-info.php?pacid=146>.
+ * See <http://pear.php.net/Net_SmartIRC>.
  *
  * Official Projet Homepage: <http://sf.net/projects/phpsmartirc>
  *
  * Net_SmartIRC conforms to RFC 2812 (Internet Relay Chat: Client Protocol)
  * 
- * Copyright (c) 2002-2003 Mirco 'meebey' Bauer <mail@meebey.net> <http://www.meebey.net>
+ * Copyright (c) 2002-2003 Mirco 'meebey' Bauer <meebey@meebey.net> <http://www.meebey.net>
  * 
- * Full LGPL License: <http://www.meebey.net/lgpl.txt>
+ * Full LGPL License: <http://www.gnu.org/licenses/lgpl.txt>
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -46,7 +46,7 @@
 include_once('SmartIRC/defines.php');
 include_once('SmartIRC/irccommands.php');
 include_once('SmartIRC/messagehandler.php');
-define('SMARTIRC_VERSION', '0.5.5 ($Revision: 1.54.2.4 $)');
+define('SMARTIRC_VERSION', '1.0.0 ($Revision: 1.54.2.14 $)');
 define('SMARTIRC_VERSIONSTRING', 'Net_SmartIRC '.SMARTIRC_VERSION);
 
 /**
@@ -337,7 +337,7 @@ class Net_SmartIRC_base
      * @access public
      * @return void
      */
-    function Net_SmartIRC()
+    function Net_SmartIRC_base()
     {
         // precheck
         $this->_checkPHPVersion();
@@ -383,8 +383,14 @@ class Net_SmartIRC_base
             } else {
                 $this->log(SMARTIRC_DEBUG_NOTICE, 'WARNING: socket extension not loaded, trying to load it...', __FILE__, __LINE__);
                 
-                if (@dl('socket')) {
-                    $this->log(SMARTIRC_DEBUG_NOTICE, 'WARNING: socket extension succesfull loaded', __FILE__, __LINE__);
+                if (strtoupper(substr(PHP_OS, 0,3) == 'WIN')) {
+                    $load_status = @dl('php_sockets.dll');
+                } else {
+                    $load_status = @dl('sockets.so');
+                }
+ 
+                if ($load_status) {
+                    $this->log(SMARTIRC_DEBUG_NOTICE, 'WARNING: socket extension succesfully loaded', __FILE__, __LINE__);
                     $this->_usesockets = true;
                 } else {
                     $this->log(SMARTIRC_DEBUG_NOTICE, 'WARNING: couldn\'t load the socket extension', __FILE__, __LINE__);
@@ -914,12 +920,6 @@ class Net_SmartIRC_base
             $this->log(SMARTIRC_DEBUG_CHANNELSYNCING, 'DEBUG_CHANNELSYNCING: cleaned channel array', __FILE__, __LINE__);
         }
         
-        if ($this->_usersyncing == true) {
-            // let's clean our user array
-            $this->_users = array();
-            $this->log(SMARTIRC_DEBUG_USERSYNCING, 'DEBUG_USERSYNCING: cleaned user array', __FILE__, __LINE__);
-        }
-        
         if ($this->_logdestination == SMARTIRC_FILE) {
             fclose($this->_logfilefp);
             $this->_logfilefp = null;
@@ -1168,6 +1168,32 @@ class Net_SmartIRC_base
     }
     
     /**
+     * waits for a special message type and puts the answer in $result
+     *
+     * Creates a special actionhandler for that given TYPE and returns the answer.
+     * This will only receive the requested type, immediately quit and disconnect from the IRC server.
+     * Made for showing IRC statistics on your homepage, or other IRC related information.
+     * This special version of listenFor() stores the whole ircdata object, not just the message!
+     *
+     * @param integer $messagetype see in the documentation 'Message Types'
+     * @return array answer from the IRC server for this $messagetype
+     * @access public
+     */
+    function objListenFor($messagetype)
+    {
+        $objlistenfor = &new Net_SmartIRC_objListenFor();
+        $this->registerActionhandler($messagetype, '.*', $objlistenfor, 'handler');
+        $this->listen();
+        $result = $objlistenfor->result;
+        
+        if (isset($objlistenfor)) {
+            unset($objlistenfor);
+        }
+        
+        return $result;
+    }    
+    
+    /**
      * registers a new actionhandler and returns the assigned id
      *
      * Registers an actionhandler in Net_SmartIRC for calling it later.
@@ -1352,7 +1378,6 @@ class Net_SmartIRC_base
     {
         $newnickname = substr($this->_nick, 0, 5).rand(0, 999);
         $this->changeNick($newnickname, SMARTIRC_CRITICAL);
-        $this->_nick = $newnickname;
     }
     
     /**
@@ -1584,8 +1609,11 @@ class Net_SmartIRC_base
                     $messagecode = $lineex[1];
                     $exclamationpos = strpos($from, '!');
                     $atpos = strpos($from, '@');
-                    $colonpos = strpos($line, ':');
-                    
+                    $colonpos = strpos($line, ' :');
+                    if ($colonpos !== false) {
+                        // we want the exact position of ":" not beginning from the space
+                        $colonpos += 1;
+                    }
                     $ircdata->nick = substr($from, 0, $exclamationpos);
                     $ircdata->ident = substr($from, $exclamationpos+1, ($atpos-$exclamationpos)-1);
                     $ircdata->host = substr($from, $atpos+1);
@@ -1773,73 +1801,51 @@ class Net_SmartIRC_base
      */
     function _gettype($line)
     {
-        if (preg_match('/^:.* [0-9]{3} .*$/', $line) == 1) {
+        if (preg_match('/^:[^ ]+? [0-9]{3} .+$/', $line) == 1) {
             $lineex = explode(' ', $line);
             $code = $lineex[1];
                 
             switch ($code) {
                 case SMARTIRC_RPL_WELCOME:
-                    return SMARTIRC_TYPE_LOGIN;
                 case SMARTIRC_RPL_YOURHOST:
-                    return SMARTIRC_TYPE_LOGIN;
                 case SMARTIRC_RPL_CREATED:
-                    return SMARTIRC_TYPE_LOGIN;
                 case SMARTIRC_RPL_MYINFO:
-                    return SMARTIRC_TYPE_LOGIN;
                 case SMARTIRC_RPL_BOUNCE:
                     return SMARTIRC_TYPE_LOGIN;
                 case SMARTIRC_RPL_LUSERCLIENT:
-                    return SMARTIRC_TYPE_INFO;
                 case SMARTIRC_RPL_LUSEROP:
-                    return SMARTIRC_TYPE_INFO;
                 case SMARTIRC_RPL_LUSERUNKNOWN:
-                    return SMARTIRC_TYPE_INFO;
                 case SMARTIRC_RPL_LUSERME:
-                    return SMARTIRC_TYPE_INFO;
                 case SMARTIRC_RPL_LUSERCHANNELS:
                     return SMARTIRC_TYPE_INFO;
                 case SMARTIRC_RPL_MOTDSTART:
-                    return SMARTIRC_TYPE_MOTD;
                 case SMARTIRC_RPL_MOTD:
-                    return SMARTIRC_TYPE_MOTD;
                 case SMARTIRC_RPL_ENDOFMOTD:
                     return SMARTIRC_TYPE_MOTD;
                 case SMARTIRC_RPL_NAMREPLY:
-                    return SMARTIRC_TYPE_NAME;
                 case SMARTIRC_RPL_ENDOFNAMES:
                     return SMARTIRC_TYPE_NAME;
                 case SMARTIRC_RPL_WHOREPLY:
-                    return SMARTIRC_TYPE_WHO;
                 case SMARTIRC_RPL_ENDOFWHO:
                     return SMARTIRC_TYPE_WHO;
                 case SMARTIRC_RPL_LISTSTART:
                     return SMARTIRC_TYPE_NONRELEVANT;
                 case SMARTIRC_RPL_LIST:
-                    return SMARTIRC_TYPE_LIST;
                 case SMARTIRC_RPL_LISTEND:
                     return SMARTIRC_TYPE_LIST;
                 case SMARTIRC_RPL_BANLIST:
-                    return SMARTIRC_TYPE_BANLIST;
                 case SMARTIRC_RPL_ENDOFBANLIST:
                     return SMARTIRC_TYPE_BANLIST;
                 case SMARTIRC_RPL_TOPIC:
                     return SMARTIRC_TYPE_TOPIC;
                 case SMARTIRC_RPL_WHOISUSER:
-                    return SMARTIRC_TYPE_WHOIS;
                 case SMARTIRC_RPL_WHOISSERVER:
-                    return SMARTIRC_TYPE_WHOIS;
                 case SMARTIRC_RPL_WHOISOPERATOR:
-                    return SMARTIRC_TYPE_WHOIS;
                 case SMARTIRC_RPL_WHOISIDLE:
-                    return SMARTIRC_TYPE_WHOIS;
-                case SMARTIRC_RPL_WHOISIDLE:
-                    return SMARTIRC_TYPE_WHOIS;
                 case SMARTIRC_RPL_ENDOFWHOIS:
-                    return SMARTIRC_TYPE_WHOIS;
                 case SMARTIRC_RPL_WHOISCHANNELS:
                     return SMARTIRC_TYPE_WHOIS;
                 case SMARTIRC_RPL_WHOWASUSER:
-                    return SMARTIRC_TYPE_WHOWAS;
                 case SMARTIRC_RPL_ENDOFWHOWAS:
                     return SMARTIRC_TYPE_WHOWAS;
                 case SMARTIRC_RPL_UMODEIS:
@@ -1847,7 +1853,6 @@ class Net_SmartIRC_base
                 case SMARTIRC_RPL_CHANNELMODEIS:
                     return SMARTIRC_TYPE_CHANNELMODE;
                 case SMARTIRC_ERR_NICKNAMEINUSE:
-                    return SMARTIRC_TYPE_ERROR;
                 case SMARTIRC_ERR_NOTREGISTERED:
                     return SMARTIRC_TYPE_ERROR;
                 default:
@@ -1855,31 +1860,31 @@ class Net_SmartIRC_base
             }
         }
         
-        if (preg_match('/^:.* PRIVMSG .* :'.chr(1).'ACTION .*'.chr(1).'$/', $line) == 1) {
+        if (preg_match('/^:.*? PRIVMSG .* :'.chr(1).'ACTION .*'.chr(1).'$/', $line) == 1) {
             return SMARTIRC_TYPE_ACTION;
-        } else if (preg_match('/^:.* PRIVMSG .* :'.chr(1).'.*'.chr(1).'$/', $line) == 1) {
+        } else if (preg_match('/^:.*? PRIVMSG .* :'.chr(1).'.*'.chr(1).'$/', $line) == 1) {
             return SMARTIRC_TYPE_CTCP;
-        } else if (preg_match('/^:.* PRIVMSG (\&|\#|\+|\!).* :.*$/', $line) == 1) {
+        } else if (preg_match('/^:.*? PRIVMSG (\&|\#|\+|\!).* :.*$/', $line) == 1) {
             return SMARTIRC_TYPE_CHANNEL;
-        } else if (preg_match('/^:.* PRIVMSG .*:.*$/', $line) == 1) {
+        } else if (preg_match('/^:.*? PRIVMSG .*:.*$/', $line) == 1) {
             return SMARTIRC_TYPE_QUERY;
-        } else if (preg_match('/^:.* NOTICE .* :.*$/', $line) == 1) {
+        } else if (preg_match('/^:.*? NOTICE .* :.*$/', $line) == 1) {
             return SMARTIRC_TYPE_NOTICE;
-        } else if (preg_match('/^:.* INVITE .* .*$/', $line) == 1) {
+        } else if (preg_match('/^:.*? INVITE .* .*$/', $line) == 1) {
             return SMARTIRC_TYPE_INVITE;
-        } else if (preg_match('/^:.* JOIN .*$/', $line) == 1) {
+        } else if (preg_match('/^:.*? JOIN .*$/', $line) == 1) {
             return SMARTIRC_TYPE_JOIN;
-        } else if (preg_match('/^:.* TOPIC .* :.*$/', $line) == 1) {
+        } else if (preg_match('/^:.*? TOPIC .* :.*$/', $line) == 1) {
             return SMARTIRC_TYPE_TOPICCHANGE;
-        } else if (preg_match('/^:.* NICK .*$/', $line) == 1) {
+        } else if (preg_match('/^:.*? NICK .*$/', $line) == 1) {
             return SMARTIRC_TYPE_NICKCHANGE;
-        } else if (preg_match('/^:.* KICK .* .*$/', $line) == 1) {
+        } else if (preg_match('/^:.*? KICK .* .*$/', $line) == 1) {
             return SMARTIRC_TYPE_KICK;
-        } else if (preg_match('/^:.* PART .*$/', $line) == 1) {
+        } else if (preg_match('/^:.*? PART .*$/', $line) == 1) {
             return SMARTIRC_TYPE_PART;
-        } else if (preg_match('/^:.* MODE .* .*$/', $line) == 1) {
+        } else if (preg_match('/^:.*? MODE .* .*$/', $line) == 1) {
             return SMARTIRC_TYPE_MODECHANGE;
-        } else if (preg_match('/^:.* QUIT :.*$/', $line) == 1) {
+        } else if (preg_match('/^:.*? QUIT :.*$/', $line) == 1) {
             return SMARTIRC_TYPE_QUIT;
         } else {
             $this->log(SMARTIRC_DEBUG_MESSAGETYPES, 'DEBUG_MESSAGETYPES: SMARTIRC_TYPE_UNKNOWN!: "'.$line.'"', __FILE__, __LINE__);
@@ -2189,7 +2194,7 @@ class Net_SmartIRC_base
     // </private methods>
     
     function isError($object) {
-        return (bool)(is_object($object) && (get_class($object) == 'net_smartirc_error'));
+        return (bool)(is_object($object) && (strtolower(get_class($object)) == 'net_smartirc_error'));
     }
     
     function &throwError($message) {
@@ -2500,6 +2505,33 @@ class Net_SmartIRC_listenfor
     {
         $irc->log(SMARTIRC_DEBUG_ACTIONHANDLER, 'DEBUG_ACTIONHANDLER: listenfor handler called', __FILE__, __LINE__);
         $this->result[] = $ircdata->message;
+        $irc->disconnect(true);
+    }
+}
+
+// so we don't break BC!
+/**
+ * @access public
+ */
+class Net_SmartIRC_objListenFor
+{
+    /**
+     * @var array
+     * @access public
+     */
+    var $result = array();
+    
+    /**
+     * stores the received answer into the result array
+     *
+     * @param object $irc
+     * @param object $ircdata
+     * @return void
+     */
+    function handler(&$irc, &$ircdata)
+    {
+        $irc->log(SMARTIRC_DEBUG_ACTIONHANDLER, 'DEBUG_ACTIONHANDLER: objListenFor handler called', __FILE__, __LINE__);
+        $this->result[] = $ircdata;
         $irc->disconnect(true);
     }
 }
