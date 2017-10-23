@@ -1,7 +1,7 @@
 <?php
 /**
- * Copyright (c) 2008, Davey Shafik <davey@php.net>
- *                     Laurent Laville <pear@laurent-laville.org>
+ * Copyright (c) 2008-2009, Davey Shafik <davey@php.net>
+ *                          Laurent Laville <pear@laurent-laville.org>
  *
  * All rights reserved.
  *
@@ -37,13 +37,18 @@
  * @author   Davey Shafik <davey@php.net>
  * @author   Laurent Laville <pear@laurent-laville.org>
  * @license  http://www.opensource.org/licenses/bsd-license.php  BSD
- * @version  CVS: $Id: Parser.php,v 1.12 2008/09/27 09:43:49 farell Exp $
+ * @version  CVS: $Id: Parser.php,v 1.21 2009/01/02 10:18:47 farell Exp $
  * @link     http://pear.php.net/package/PHP_CompatInfo
  * @since    File available since Release 1.8.0b2
  */
 
 require_once 'Event/Dispatcher.php';
 require_once 'File/Find.php';
+
+/**
+ * An array of class init versions and extension
+ */
+require_once 'PHP/CompatInfo/class_array.php';
 
 /**
  * An array of function init versions and extension
@@ -94,7 +99,7 @@ define('PHP_COMPATINFO_EVENT_CODEFINISHED', 'codeFinished');
  * @package  PHP_CompatInfo
  * @author   Laurent Laville <pear@laurent-laville.org>
  * @license  http://www.opensource.org/licenses/bsd-license.php  BSD
- * @version  Release: 1.8.1
+ * @version  Release: 1.9.0
  * @link     http://pear.php.net/package/PHP_CompatInfo
  * @since    Class available since Release 1.8.0b2
  */
@@ -164,6 +169,13 @@ class PHP_CompatInfo_Parser
      * @see    getIgnoredFiles()
      */
     var $ignored_files = array();
+
+    /**
+     * @var array Result of the latest data source parsing
+     * @since  1.9.0b1
+     * @see    parseData()
+     */
+    var $latest_parse = null;
 
     /**
      * Class constructor (ZE1) for PHP4
@@ -323,7 +335,14 @@ class PHP_CompatInfo_Parser
                 }
             }
         }
-        ksort($keys);
+        if ($groupby_vers === true) {
+            foreach ($keys as $vmin => $func) {
+                sort($keys[$vmin]);
+            }
+            ksort($keys);
+        } else {
+            sort($keys);
+        }
 
         if ($include_const === true) {
             $keys = array('functions' => $keys, 'constants' => array());
@@ -477,6 +496,286 @@ class PHP_CompatInfo_Parser
     }
 
     /**
+     * Returns the latest parse data source ignored functions
+     *
+     * Returns the latest parse data source ignored functions list
+     *
+     * @param mixed $file (optional) A specific filename or not (false)
+     *
+     * @access public
+     * @return mixed Null on error or if there were no previous data parsing
+     * @since  version 1.9.0b2 (2008-12-19)
+     */
+    function getIgnoredFunctions($file = false)
+    {
+        if (!is_array($this->latest_parse)) {
+            // no code analysis found
+            $functions = null;
+        } elseif ($file === false) {
+            $functions = $this->latest_parse['ignored_functions'];
+        } elseif (isset($this->latest_parse[$file])) {
+            $functions = $this->latest_parse[$file]['ignored_functions'];
+        } else {
+            $functions = null;
+        }
+
+        return $functions;
+    }
+
+    /**
+     * Returns the latest parse data source ignored extensions
+     *
+     * Returns the latest parse data source ignored extensions list
+     *
+     * @param mixed $file (optional) A specific filename or not (false)
+     *
+     * @access public
+     * @return mixed Null on error or if there were no previous data parsing
+     * @since  version 1.9.0b2 (2008-12-19)
+     */
+    function getIgnoredExtensions($file = false)
+    {
+        if (!is_array($this->latest_parse)) {
+            // no code analysis found
+            $extensions = null;
+        } elseif ($file === false) {
+            $extensions = $this->latest_parse['ignored_extensions'];
+        } elseif (isset($this->latest_parse[$file])) {
+            $extensions = $this->latest_parse[$file]['ignored_extensions'];
+        } else {
+            $extensions = null;
+        }
+
+        return $extensions;
+    }
+
+    /**
+     * Returns the latest parse data source ignored constants
+     *
+     * Returns the latest parse data source ignored constants list
+     *
+     * @param mixed $file (optional) A specific filename or not (false)
+     *
+     * @access public
+     * @return mixed Null on error or if there were no previous data parsing
+     * @since  version 1.9.0b2 (2008-12-19)
+     */
+    function getIgnoredConstants($file = false)
+    {
+        if (!is_array($this->latest_parse)) {
+            // no code analysis found
+            $constants = null;
+        } elseif ($file === false) {
+            $constants = $this->latest_parse['ignored_constants'];
+        } elseif (isset($this->latest_parse[$file])) {
+            $constants = $this->latest_parse[$file]['ignored_constants'];
+        } else {
+            $constants = null;
+        }
+
+        return $constants;
+    }
+
+    /**
+     * Returns the latest parse data source version
+     *
+     * Returns the latest parse data source version, minimum and/or maximum
+     *
+     * @param mixed $file (optional) A specific filename or not (false)
+     * @param bool  $max  (optional) Level with or without contextual data
+     *
+     * @access public
+     * @return mixed Null on error or if there were no previous data parsing
+     * @since  version 1.9.0b1 (2008-11-30)
+     */
+    function getVersion($file = false, $max = false)
+    {
+        $key = ($max === true) ? 'max_version' : 'version';
+
+        if (!is_array($this->latest_parse)) {
+            // no code analysis found
+            $version = null;
+        } elseif ($file === false) {
+            $version = $this->latest_parse[$key];
+        } elseif (isset($this->latest_parse[$file])) {
+            $version = $this->latest_parse[$file][$key];
+        } else {
+            $version = null;
+        }
+
+        return $version;
+    }
+
+    /**
+     * Returns the latest parse data source classes declared
+     *
+     * Returns the latest parse data source classes declared (internal or
+     * end-user defined)
+     *
+     * @param mixed $file (optional) A specific filename or not (false)
+     *
+     * @access public
+     * @return mixed Null on error or if there were no previous data parsing
+     * @since  version 1.9.0b1 (2008-11-30)
+     */
+    function getClasses($file = false)
+    {
+        if (!is_array($this->latest_parse)) {
+            // no code analysis found
+            $classes = null;
+        } elseif ($file === false) {
+            $classes = $this->latest_parse['classes'];
+        } elseif (isset($this->latest_parse[$file])) {
+            $classes = $this->latest_parse[$file]['classes'];
+        } else {
+            $classes = null;
+        }
+
+        return $classes;
+    }
+
+    /**
+     * Returns the latest parse data source functions declared
+     *
+     * Returns the latest parse data source functions declared (internal or
+     * end-user defined)
+     *
+     * @param mixed $file (optional) A specific filename or not (false)
+     *
+     * @access public
+     * @return mixed Null on error or if there were no previous data parsing
+     * @since  version 1.9.0b1 (2008-11-30)
+     */
+    function getFunctions($file = false)
+    {
+        if (!is_array($this->latest_parse)) {
+            // no code analysis found
+            $functions = null;
+        } elseif ($file === false) {
+            $functions = $this->latest_parse['functions'];
+        } elseif (isset($this->latest_parse[$file])) {
+            $functions = $this->latest_parse[$file]['functions'];
+        } else {
+            $functions = null;
+        }
+
+        return $functions;
+    }
+
+    /**
+     * Returns the latest parse data source extensions used
+     *
+     * Returns the latest parse data source extensions used
+     *
+     * @param mixed $file (optional) A specific filename or not (false)
+     *
+     * @access public
+     * @return mixed Null on error or if there were no previous data parsing
+     * @since  version 1.9.0b1 (2008-11-30)
+     */
+    function getExtensions($file = false)
+    {
+        if (!is_array($this->latest_parse)) {
+            // no code analysis found
+            $extensions = null;
+        } elseif ($file === false) {
+            $extensions = $this->latest_parse['extensions'];
+        } elseif (isset($this->latest_parse[$file])) {
+            $extensions = $this->latest_parse[$file]['extensions'];
+        } else {
+            $extensions = null;
+        }
+
+        return $extensions;
+    }
+
+    /**
+     * Returns the latest parse data source constants declared
+     *
+     * Returns the latest parse data source constants declared (internal or
+     * end-user defined)
+     *
+     * @param mixed $file (optional) A specific filename or not (false)
+     *
+     * @access public
+     * @return mixed Null on error or if there were no previous data parsing
+     * @since  version 1.9.0b1 (2008-11-30)
+     */
+    function getConstants($file = false)
+    {
+        if (!is_array($this->latest_parse)) {
+            // no code analysis found
+            $constants = null;
+        } elseif ($file === false) {
+            $constants = $this->latest_parse['constants'];
+        } elseif (isset($this->latest_parse[$file])) {
+            $constants = $this->latest_parse[$file]['constants'];
+        } else {
+            $constants = null;
+        }
+
+        return $constants;
+    }
+
+    /**
+     * Returns the latest parse data source tokens declared
+     *
+     * Returns the latest parse data source PHP5+ tokens declared
+     *
+     * @param mixed $file (optional) A specific filename or not (false)
+     *
+     * @access public
+     * @return mixed Null on error or if there were no previous data parsing
+     * @since  version 1.9.0b1 (2008-11-30)
+     */
+    function getTokens($file = false)
+    {
+        if (!is_array($this->latest_parse)) {
+            // no code analysis found
+        } elseif ($file === false) {
+            $tokens = $this->latest_parse['tokens'];
+        } elseif (isset($this->latest_parse[$file])) {
+            $tokens = $this->latest_parse[$file]['tokens'];
+        } else {
+            $tokens = null;
+        }
+
+        return $tokens;
+    }
+
+    /**
+     * Returns the latest parse data source conditions
+     *
+     * Returns the latest parse data source conditions, with or without
+     * contextual data
+     *
+     * @param mixed $file      (optional) A specific filename or not (false)
+     * @param bool  $levelOnly (optional) Level with or without contextual data
+     *
+     * @access public
+     * @return mixed Null on error or if there were no previous data parsing
+     * @since  version 1.9.0b1 (2008-11-30)
+     */
+    function getConditions($file = false, $levelOnly = false)
+    {
+        if (!is_array($this->latest_parse)) {
+            // no code analysis found
+            $conditions = null;
+        } elseif ($file === false) {
+            $conditions = $this->latest_parse['cond_code'];
+        } elseif (isset($this->latest_parse[$file])) {
+            $conditions = $this->latest_parse[$file]['cond_code'];
+        } else {
+            $conditions = null;
+        }
+
+        if (is_array($conditions) && $levelOnly === true) {
+            $conditions = $conditions[0];
+        }
+        return $conditions;
+    }
+
+    /**
      * Parse a data source
      *
      * Parse a data source with auto detect ability. This data source, may be
@@ -592,6 +891,7 @@ class PHP_CompatInfo_Parser
         // notify all observers that parsing data source is over
         $this->notifyListeners(PHP_COMPATINFO_EVENT_AUDITFINISHED, $parseData);
 
+        $this->latest_parse = $parseData;
         return $parseData;
     }
 
@@ -750,6 +1050,7 @@ class PHP_CompatInfo_Parser
         $latest_version     = $this->latest_version;
         $earliest_version   = $this->earliest_version;
         $all_functions      = array();
+        $classes            = array();
         $functions          = array();
         $extensions         = array();
         $constants          = array();
@@ -800,6 +1101,11 @@ class PHP_CompatInfo_Parser
                 $cmp = version_compare($earliest_version, $file['max_version']);
                 if ($earliest_version == '' || $cmp === 1) {
                     $earliest_version = $file['max_version'];
+                }
+            }
+            foreach ($file['classes'] as $class) {
+                if (!in_array($class, $classes)) {
+                    $classes[] = $class;
                 }
             }
             foreach ($file['functions'] as $func) {
@@ -860,23 +1166,24 @@ class PHP_CompatInfo_Parser
                 unset($file['ignored_constants']);
                 unset($file['max_version']);
                 unset($file['version']);
+                unset($file['classes']);
                 unset($file['functions']);
                 unset($file['extensions']);
                 unset($file['constants']);
                 unset($file['tokens']);
                 unset($file['cond_code']);
 
-                foreach ($file as $version => $functions) {
+                foreach ($file as $version => $file_functions) {
                     // extra information available only when debug mode is on
                     if (isset($all_functions[$version])) {
-                        foreach ($functions as $func) {
+                        foreach ($file_functions as $func) {
                             $k = array_search($func, $all_functions[$version]);
                             if ($k === false) {
                                 $all_functions[$version][] = $func;
                             }
                         }
                     } else {
-                        $all_functions[$version] = $functions;
+                        $all_functions[$version] = $file_functions;
                     }
                 }
             }
@@ -898,6 +1205,9 @@ class PHP_CompatInfo_Parser
         if ($options['debug'] === false) {
             $cond_code = array($cond_code);
         } else {
+            sort($function_exists);
+            sort($extension_loaded);
+            sort($defined);
             $cond_code = array($cond_code, array($function_exists,
                                                  $extension_loaded,
                                                  $defined));
@@ -906,8 +1216,9 @@ class PHP_CompatInfo_Parser
         sort($ignored_functions);
         sort($ignored_extensions);
         sort($ignored_constants);
+        sort($classes);
         sort($functions);
-        sort($extensions);
+        natcasesort($extensions);
         sort($constants);
         sort($tokens);
         $main_info = array('ignored_files'      => $this->getIgnoredFiles(),
@@ -916,8 +1227,9 @@ class PHP_CompatInfo_Parser
                            'ignored_constants'  => $ignored_constants,
                            'max_version'   => $earliest_version,
                            'version'       => $latest_version,
+                           'classes'       => $classes,
                            'functions'     => $functions,
-                           'extensions'    => $extensions,
+                           'extensions'    => array_values($extensions),
                            'constants'     => $constants,
                            'tokens'        => $tokens,
                            'cond_code'     => $cond_code);
@@ -993,6 +1305,7 @@ class PHP_CompatInfo_Parser
     {
         static $akeys;
 
+        $classes            = array();
         $functions          = array();
         $functions_version  = array();
         $latest_version     = $this->latest_version;
@@ -1172,7 +1485,19 @@ class PHP_CompatInfo_Parser
                 }
             }
 
+            // try to detect class instantiation
             if ($this->_isToken($tokens[$i], 'T_STRING')
+                && (isset($tokens[$i-2]))
+                && $this->_isToken($tokens[$i-2], 'T_NEW')) {
+
+                $is_class  = true;
+                $classes[] = $tokens[$i][1];
+            } else {
+                $is_class = false;
+            }
+
+            if ($this->_isToken($tokens[$i], 'T_STRING')
+                && $is_class == false
                 && (isset($tokens[$i+1]))
                 && $this->_isToken($tokens[$i+1], '(')) {
 
@@ -1291,6 +1616,7 @@ class PHP_CompatInfo_Parser
             $i += 1;
         }
 
+        $classes   = array_unique($classes);
         $functions = array_unique($functions);
         if (isset($options['ignore_functions'])) {
             $options['ignore_functions']
@@ -1306,11 +1632,36 @@ class PHP_CompatInfo_Parser
                 = array_unique($options['ignore_functions']);
         }
         if (count($ignore_extensions) > 0) {
-            $ignore_extensions = array_map('strtolower', $ignore_extensions);
             $options['ignore_extensions']
                 = array_merge($options['ignore_extensions'], $ignore_extensions);
             $options['ignore_extensions']
                 = array_unique($options['ignore_extensions']);
+        }
+
+        foreach ($classes as $name) {
+            if (!isset($GLOBALS['_PHP_COMPATINFO_CLASS'][$name])) {
+                continue;  // skip this unknown class
+            }
+            $class = $GLOBALS['_PHP_COMPATINFO_CLASS'][$name];
+            if (PHP_CompatInfo_Parser::_ignore($class['init'], $min_ver, $max_ver)) {
+                continue;  // skip this class version
+            }
+
+            $cmp = version_compare($latest_version, $class['init']);
+            if ($cmp === -1) {
+                $latest_version = $class['init'];
+            }
+            if (array_key_exists('end', $class)) {
+                $cmp = version_compare($earliest_version, $class['end']);
+                if ($earliest_version == '' || $cmp === 1) {
+                    $earliest_version = $class['end'];
+                }
+            }
+
+            if (array_key_exists('ext', $class)) {
+                // this class depends of an extension
+                $extensions[] = $class['ext'];
+            }
         }
 
         foreach ($functions as $name) {
@@ -1321,16 +1672,9 @@ class PHP_CompatInfo_Parser
 
             // retrieve if available the extension name
             if ((isset($func['ext']))
-                && ($func['ext'] != 'ext_standard')
+                && ($func['ext'] != 'standard')
                 && ($func['ext'] != 'zend')) {
-                if ($func['pecl'] === false) {
-                    $extension = substr($func['ext'], 4);
-                    if ($extension{0} == '_') {
-                        $extension = $func['ext'];
-                    }
-                } else {
-                    $extension = $func['ext'];
-                }
+                $extension = $func['ext'];
             } else {
                 $extension = false;
             }
@@ -1357,8 +1701,7 @@ class PHP_CompatInfo_Parser
                 && ($ifm_preg_match === false)) {
 
                 if ($extension && !in_array($extension, $extensions)) {
-                    $extensions[] = substr($func['ext'], 0, 4) == 'ext_'
-                        ? $extension : $func['ext'];
+                    $extensions[] = $extension;
                 }
 
                 // Compare "ignore_extensions_match" free condition
@@ -1398,8 +1741,7 @@ class PHP_CompatInfo_Parser
                 if ($options['debug'] == true) {
                     $functions_version[$func['init']][] = array(
                         'function' => $name,
-                        'extension' => substr($func['ext'], 0, 4) == 'ext_'
-                            ? $extension : $func['ext'],
+                        'extension' => $extension,
                         'pecl' => $func['pecl']
                         );
                 }
@@ -1480,8 +1822,9 @@ class PHP_CompatInfo_Parser
         sort($ignored_functions);
         sort($ignored_extensions);
         sort($ignored_constants);
+        sort($classes);
         sort($functions);
-        sort($extensions);
+        natcasesort($extensions);
         sort($constant_names);
         sort($token_names);
         $main_info = array('ignored_functions'  => $ignored_functions,
@@ -1489,8 +1832,9 @@ class PHP_CompatInfo_Parser
                            'ignored_constants'  => $ignored_constants,
                            'max_version' => $earliest_version,
                            'version'     => $latest_version,
+                           'classes'     => $classes,
                            'functions'   => $functions,
-                           'extensions'  => $extensions,
+                           'extensions'  => array_values($extensions),
                            'constants'   => $constant_names,
                            'tokens'      => $token_names,
                            'cond_code'   => $cond_code);

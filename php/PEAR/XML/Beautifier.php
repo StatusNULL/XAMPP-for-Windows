@@ -42,7 +42,7 @@
  * @author    Stephan Schmidt <schst@php.net>
  * @copyright 2003-2008 Stephan Schmidt <schst@php.net>
  * @license   http://opensource.org/licenses/bsd-license New BSD License
- * @version   CVS: $Id: Beautifier.php,v 1.15 2008/08/24 19:44:14 ashnazg Exp $
+ * @version   CVS: $Id: Beautifier.php 265438 2008-08-24 19:44:14Z ashnazg $
  * @link      http://pear.php.net/package/XML_Beautifier
  */
 
@@ -157,7 +157,7 @@ define('XML_BEAUTIFIER_ERROR_UNKNOWN_RENDERER', 152);
  * @author    Stephan Schmidt <schst@php.net>
  * @copyright 2003-2008 Stephan Schmidt <schst@php.net>
  * @license   http://opensource.org/licenses/bsd-license New BSD License
- * @version   Release: 1.2.0
+ * @version   Release: @package_version@
  * @link      http://pear.php.net/package/XML_Beautifier
  */
 class XML_Beautifier

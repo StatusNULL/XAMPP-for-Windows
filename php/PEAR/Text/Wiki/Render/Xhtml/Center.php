@@ -9,7 +9,7 @@
  * @package    Text_Wiki
  * @author     Paul M. Jones <pmjones@php.net>
  * @license    http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
- * @version    CVS: $Id: Center.php,v 1.8 2007/02/19 08:51:19 mic Exp $
+ * @version    CVS: $Id: Center.php 230212 2007-02-19 08:51:19Z mic $
  * @link       http://pear.php.net/package/Text_Wiki
  */
 

@@ -32,9 +32,9 @@
 --------------------------------------------------------------------------------
 
 
- OpenSSL 0.9.8o 1 Jun 2010
+ OpenSSL 1.0.0e 6 Sep 2011
 
- Copyright (c) 1998-2009 The OpenSSL Project
+ Copyright (c) 1998-2011 The OpenSSL Project
  Copyright (c) 1995-1998 Eric A. Young, Tim J. Hudson
  All rights reserved.
 

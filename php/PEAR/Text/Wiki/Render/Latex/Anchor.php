@@ -4,7 +4,7 @@
 * 
 * This class renders an anchor target name in LaTeX.
 *
-* $Id: Anchor.php,v 1.2 2004/09/25 19:05:13 pmjones Exp $
+* $Id: Anchor.php 169211 2004-09-25 19:05:14Z pmjones $
 * 
 * @author Jeremy Cowgar <jeremy@cowgar.com>
 *

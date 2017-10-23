@@ -91,7 +91,7 @@
 	<li><i><b>Der FileZilla FTP und der Mercury Mail Server müsst ihr selbst absichern !!</b></i></li>
 	<li>Ein Rechner, der nicht von aussen via Internet oder Intranet angreifbar ist<br>(z.B. weil eine Firewall alle wichtigen Ports nach aussen blockt) ist generell SICHER gegen Angriffe von aussen.</li>
 	<li>Ein Server, der gar nicht \"an ist\" und damit läuft ist immer SICHER!</li></ul>";
-	$TEXT['security-text3'] = "<b>Bitte unbedingt beachten: Je mehr Sicherheit der XAMPP hat, desto weniger Beispiele werden fehlerfrei angezeigt. Wer beispielsweise PHP im \"safe mode\" fährt, wird nicht mehr vollständig auf alle Funktionen dieses Security Frondends zugreifen können. Oft bedeutet mehr Sicherheit gleichzeitig weniger Funktionalität.</b>";
+	$TEXT['security-text3'] = "<b>Bitte unbedingt beachten: Je mehr Sicherheit der XAMPP hat, desto weniger Beispiele werden fehlerfrei angezeigt. Wer beispielsweise PHP im \"safe mode\" fährt, wird nicht mehr vollständig auf alle Funktionen dieses Security Frontends zugreifen können. Oft bedeutet mehr Sicherheit gleichzeitig weniger Funktionalität.</b>";
 	$TEXT['security-text4'] = "Die XAMPP Standard Ports:";
 
 	$TEXT['security-ok'] = "SICHER";

@@ -1,6 +1,6 @@
 <?php
 
-// $Id: Function.php,v 1.3 2004/10/08 17:46:47 pmjones Exp $
+// $Id: Function.php 170080 2004-10-08 17:46:47Z pmjones $
 
 class Text_Wiki_Render_Plain_Function extends Text_Wiki_Render {
     

@@ -16,7 +16,7 @@
  * @author    David JEAN LOUIS <izimobil@gmail.com>
  * @copyright 2007 David JEAN LOUIS
  * @license   http://opensource.org/licenses/mit-license.php MIT License 
- * @version   CVS: $Id: Element.php,v 1.4 2008/10/09 10:44:53 izi Exp $
+ * @version   CVS: $Id: Element.php 282427 2009-06-19 10:22:48Z izi $
  * @link      http://pear.php.net/package/Console_CommandLine
  * @since     File available since release 0.1.0
  * @filesource
@@ -30,7 +30,7 @@
  * @author    David JEAN LOUIS <izimobil@gmail.com>
  * @copyright 2007 David JEAN LOUIS
  * @license   http://opensource.org/licenses/mit-license.php MIT License 
- * @version   Release: 1.0.5
+ * @version   Release: 1.1.3
  * @link      http://pear.php.net/package/Console_CommandLine
  * @since     Class available since release 0.1.0
  */
@@ -59,6 +59,35 @@ abstract class Console_CommandLine_Element
      * @var string $description Element description
      */
     public $description;
+
+    /**
+     * Custom errors messages for this element
+     *
+     * This array is of the form:
+     * <code>
+     * <?php
+     * array(
+     *     $messageName => $messageText,
+     *     $messageName => $messageText,
+     *     ...
+     * );
+     * ?>
+     * </code>
+     *
+     * If specified, these messages override the messages provided by the
+     * default message provider. For example:
+     * <code>
+     * <?php
+     * $messages = array(
+     *     'ARGUMENT_REQUIRED' => 'The argument foo is required.',
+     * );
+     * ?>
+     * </code>
+     *
+     * @var array
+     * @see Console_CommandLine_MessageProvider_Default
+     */
+    public $messages = array();
 
     // }}}
     // __construct() {{{

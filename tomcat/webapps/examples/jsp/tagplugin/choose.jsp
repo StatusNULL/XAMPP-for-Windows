@@ -1,4 +1,4 @@
-<!--
+<%--
  Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
   this work for additional information regarding copyright ownership.
@@ -13,7 +13,7 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
--->
+--%>
 <html>
   <head>
     <title>Tag Examples - choose</title>
@@ -40,18 +40,18 @@ FF"></a>
     <c:forEach var="index" begin="0" end="4">
       # ${index}: 
       <c:choose>
-	<c:when test="${index == 1}">
+        <c:when test="${index == 1}">
           One!</br>
-	</c:when>
-	<c:when test="${index == 4}">
+        </c:when>
+        <c:when test="${index == 4}">
           Four!</br>
-	</c:when>
-	<c:when test="${index == 3}">
+        </c:when>
+        <c:when test="${index == 3}">
           Three!</br>
-	</c:when>
-	<c:otherwise>
+        </c:when>
+        <c:otherwise>
           Huh?</br>
-	</c:otherwise>
+        </c:otherwise>
       </c:choose>
     </c:forEach>
   </body>

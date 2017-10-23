@@ -21,7 +21,7 @@
  * @author     Original Author <alejandro.pedraza@dataenlace.com>
  * @copyright  2005 Alejandro Pedraza
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id:$
+ * @version    CVS: $Id: Finance.php 274632 2009-01-26 14:29:28Z clockwerx $
  * @link       http://pear.php.net/Math/Finance
  * @since      File available since Release 1.2.0
  */

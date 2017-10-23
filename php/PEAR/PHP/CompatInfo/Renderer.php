@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2008, Laurent Laville <pear@laurent-laville.org>
+ * Copyright (c) 2008-2009, Laurent Laville <pear@laurent-laville.org>
  *
  * All rights reserved.
  *
@@ -35,7 +35,7 @@
  * @package  PHP_CompatInfo
  * @author   Laurent Laville <pear@laurent-laville.org>
  * @license  http://www.opensource.org/licenses/bsd-license.php  BSD
- * @version  CVS: $Id: Renderer.php,v 1.8 2008/07/22 20:26:19 farell Exp $
+ * @version  CVS: $Id: Renderer.php,v 1.9 2009/01/02 10:18:47 farell Exp $
  * @link     http://pear.php.net/package/PHP_CompatInfo
  * @since    File available since Release 1.8.0b2
  */
@@ -47,7 +47,7 @@
  * @package  PHP_CompatInfo
  * @author   Laurent Laville <pear@laurent-laville.org>
  * @license  http://www.opensource.org/licenses/bsd-license.php  BSD
- * @version  Release: 1.8.1
+ * @version  Release: 1.9.0
  * @link     http://pear.php.net/package/PHP_CompatInfo
  * @since    Class available since Release 1.8.0b2
  * @abstract

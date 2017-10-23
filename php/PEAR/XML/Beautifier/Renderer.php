@@ -42,7 +42,7 @@
  * @author    Stephan Schmidt <schst@php.net>
  * @copyright 2003-2008 Stephan Schmidt <schst@php.net>
  * @license   http://opensource.org/licenses/bsd-license New BSD License
- * @version   CVS: $Id: Renderer.php,v 1.6 2008/08/24 19:44:14 ashnazg Exp $
+ * @version   CVS: $Id: Renderer.php 265438 2008-08-24 19:44:14Z ashnazg $
  * @link      http://pear.php.net/package/XML_Beautifier
  */
 
@@ -54,7 +54,7 @@
  * @author    Stephan Schmidt <schst@php.net>
  * @copyright 2003-2008 Stephan Schmidt <schst@php.net>
  * @license   http://opensource.org/licenses/bsd-license New BSD License
- * @version   Release: 1.2.0
+ * @version   Release: @package_version@
  * @link      http://pear.php.net/package/XML_Beautifier
  */
 class XML_Beautifier_Renderer

@@ -1,7 +1,7 @@
 @echo off
-REM PHP Version 5
+REM PHPUnit
 REM
-REM Copyright (c) 2002-2006, Sebastian Bergmann <sb@sebastian-bergmann.de>.
+REM Copyright (c) 2002-2010, Sebastian Bergmann <sebastian@phpunit.de>.
 REM All rights reserved.
 REM
 REM Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@ REM are met:
 REM
 REM   * Redistributions of source code must retain the above copyright
 REM     notice, this list of conditions and the following disclaimer.
-REM 
+REM
 REM   * Redistributions in binary form must reproduce the above copyright
 REM     notice, this list of conditions and the following disclaimer in
 REM     the documentation and/or other materials provided with the
@@ -33,7 +33,11 @@ REM LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 REM ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 REM POSSIBILITY OF SUCH DAMAGE.
 REM
-REM $Id: pear-phpunit.bat,v 1.3.2.2 2005/12/17 16:04:56 sebastian Exp $
-REM
 
-"\xampp\php\.\php.exe" ".\pear\PHPUnit2\TextUI\TestRunner.php" %*
+if "%PHPBIN%" == "" set PHPBIN=\xampp\php\.\php.exe
+if not exist "%PHPBIN%" if "%PHP_PEAR_PHP_BIN%" neq "" goto USE_PEAR_PATH
+GOTO RUN
+:USE_PEAR_PATH
+set PHPBIN=%PHP_PEAR_PHP_BIN%
+:RUN
+"%PHPBIN%" "\xampp\php\phpunit" %*

@@ -19,7 +19,7 @@
  * @author     Marcelo Subtil Marcal <msmarcal@php.net>
  * @copyright  2005 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Barcode.php,v 1.4 2006/12/13 19:29:30 cweiske Exp $
+ * @version    CVS: $Id: Barcode.php 304741 2010-10-25 09:14:17Z clockwerx $
  * @link       http://pear.php.net/package/Image_Barcode
  */
 

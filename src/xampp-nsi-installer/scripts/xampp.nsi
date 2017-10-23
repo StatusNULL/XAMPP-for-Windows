@@ -9,14 +9,14 @@ SetCompressor /solid lzma
 XPStyle on
 ; HM NIS Edit Wizard helper defines
   !define PRODUCT_NAME "XAMPP"
-  !define PRODUCT_VERSION "1.7.4"
+  !define PRODUCT_VERSION "1.7.5"
   !define PRODUCT_PUBLISHER "Kay Vogelgesang, Kai Oswald Seidler, ApacheFriends"
   !define PRODUCT_WEB_SITE "http://www.apachefriends.org"
 Caption "XAMPP ${PRODUCT_VERSION} win32"
 InstallDirRegKey HKLM "Software\xampp" "Install_Dir"
 ; InstallDirRegKey HKCU "Software\xampp" ""
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile "G:\rel174neu\inWork\xampp-win32-1.7.4-installer.exe"
+OutFile "F:\xampp-dev\xampp-win32-${PRODUCT_VERSION}-VC9-installer.exe"
 ;Vista redirects $SMPROGRAMS to all users without this
 RequestExecutionLevel admin
 BGGradient f87820 FFFFFF FFFFFF
@@ -35,8 +35,8 @@ CheckBitmap "${NSISDIR}\Contrib\Graphics\Checks\classic-cross.bmp"
 
 ; MUI Settings
   !define MUI_ABORTWARNING
-  !define MUI_ICON "G:\release174_neu\NSI\icons\xampp-icon.ico"
-  !define MUI_UNICON "G:\release174_neu\NSI\icons\xampp-icon-uninstall.ico"
+  !define MUI_ICON "C:\xampp\src\xampp-nsi-installer\icons\xampp-icon.ico"
+  !define MUI_UNICON "C:\xampp\src\xampp-nsi-installer\icons\xampp-icon-uninstall.ico"
   !define MUI_WELCOMEPAGE
   !define MUI_CUSTOMPAGECOMMANDS
   !define MUI_COMPONENTSPAGE
@@ -98,26 +98,24 @@ CheckBitmap "${NSISDIR}\Contrib\Graphics\Checks\classic-cross.bmp"
   Var INST_MESS4
   Var MESS_INSTDIR1
   Var MESS_INSTDIR2
-  Var FTP_INSTALL
-  Var MAIL_INSTALL
   Var DB_DEL
   Var NO_DEL
   
 InstallDir "c:\xampp"
-Icon "G:\release174_neu\NSI\icons\xampp-icon.ico"
-UninstallIcon "G:\release174_neu\NSI\icons\xampp-icon-uninstall.ico"
+Icon "C:\xampp\src\xampp-nsi-installer\icons\xampp-icon.ico"
+UninstallIcon "C:\xampp\src\xampp-nsi-installer\icons\xampp-icon-uninstall.ico"
 ShowInstDetails show
 ShowUninstDetails show
 
 Section "XAMPP Files" SEC01
 SetOutPath "$INSTDIR"
 SetOverwrite ifnewer
-File /r "G:\rel174neu\inWork\xampp\*.*"
+File /r "F:\release175\release_rc2\xampp\*.*"
 ExecWait '"$INSTDIR\php\php.exe" -n -d output_buffering=0 "$INSTDIR\install\install.php"' $4
 
 WriteRegStr HKLM "Software\xampp" "Install_Dir" "$INSTDIR"
 WriteRegStr HKLM "Software\xampp" "apache" "2217"
-WriteRegStr HKLM "Software\xampp" "version" "1740"
+WriteRegStr HKLM "Software\xampp" "version" "1750"
 WriteRegStr HKLM "Software\xampp" "apacheservice" "0"
 WriteRegStr HKLM "Software\xampp" "mysqlservice" "0"
 WriteRegStr HKLM "Software\xampp" "tomcatservice" "0"
@@ -227,18 +225,18 @@ Function .onInit
                         GOTO no_de
                         detection_de:
                         StrCmp $R2 "1" IS_UACDE
-                        MessageBox MB_OK "Die Windows Vista Benutzerkontensteuerung (UAC) ist auf Ihrem System deaktiviert (empfohlen!). Bitte beachten Sie, das eine nachträgliche Aktivierung des Benutzerkontenschutz die Funktionalität der XAMPP-Komponenten beeinträchtigen kann."
+                        MessageBox MB_OK "Die Benutzerkontensteuerung unter Windows (UAC) ist auf Ihrem System deaktiviert (empfohlen). Bitte beachten Sie, das eine nachträgliche Aktivierung des Benutzerkontenschutz die Funktionalität der XAMPP-Komponenten beeinträchtigen kann."
                         GOTO ISNO_UACDE
                         IS_UACDE:
-                        MessageBox MB_OK "Wichtige MS Vista Warnung! Aufgrund der aktivierten Benutzerkontensteuerung (UAC) auf Ihrem System sind XAMPP-Komponenten und Funktionen ggf. nur eingeschränkt einsetzbar. Vermeiden Sie in diesem Fall die Installation von XAMPP unter $PROGRAMFILES oder deaktivieren Sie den Benutzerkontensteuerung über msconfig nach diesem Setup."
+                        MessageBox MB_OK "Warnung! Aufgrund der aktivierten Windows Benutzerkontensteuerung (UAC) auf Ihrem System sind XAMPP-Komponenten und Funktionen ggf. nur eingeschränkt einsetzbar. Vermeiden Sie die Installation von XAMPP unter $PROGRAMFILES oder deaktivieren Sie den Benutzerkontensteuerung über msconfig nach diesem Setup."
                         ISNO_UACDE:
                         GOTO no_vista
                         no_de:
                         StrCmp $R2 "1" IS_UACE
-                        MessageBox MB_OK "Windows Vista User Account Control (UAC) is deactivated on your system (recommended!). Please consider: A later activation of UAC can restrict the functionality of XAMPP!"
+                        MessageBox MB_OK "The User Account Control (UAC) is deactivated on your system (recommended). Please note: A later activation of UAC can restrict the functionality of XAMPP."
                         GOTO no_vista
                         IS_UACE:
-                        MessageBox MB_OK "Important MS Vista Note! Because an activated Windows Vista User Account Control (UAC) on your sytem some functions of xampp are possibly restricted. With UAC please avoid to install XAMPP to $PROGRAMFILES (because of not enough write permisssions). Or deactivate UAC (with msconfig) after this Setup."
+                        MessageBox MB_OK "Important! Because an activated User Account Control (UAC) on your sytem some functions of XAMPP are possibly restricted. With UAC please avoid to install XAMPP to $PROGRAMFILES (missing write permisssions). Or deactivate UAC with msconfig after this setup."
                         no_vista:
 FunctionEnd
 
@@ -436,18 +434,21 @@ ExecWait 'cmd /C net stop mysql & "$INSTDIR\mysql\bin\mysqld.exe" --remove mysql
 no_mysql:
 ReadRegStr $4 HKLM "Software\xampp" "filezillaservice"
 StrCmp $4 "0" no_ftpd
-ExecWait '"$INSTDIR\FileZillaFTP\FileZillaServer.exe" /stop' $9
-ExecWait '"$INSTDIR\FileZillaFTP\FileZillaServer.exe" /uninstall' $9
+; Starte: "F:\temp\program files\xampp\FileZillaFTP\FileZillaServer.exe" /stop
+; Starte: "F:\temp\program files\xampp\FileZillaFTP\FileZillaServer.exe" /uninstall
+; net stop "FileZilla Server FTP server"
+ExecWait '"$INSTDIR\FileZillaFTP\FileZillaServer.exe" /stop' $8
+ExecWait '"$INSTDIR\FileZillaFTP\FileZillaServer.exe" /uninstall' $8
 no_ftpd:
 
 ReadRegStr $6 HKLM "Software\xampp" "tomcatservice"
 StrCmp $6 "0" NoJavaAddon
-ReadRegStr $7 HKLM "SYSTEM\CurrentControlSet\Services\Tomcat6" "ImagePath"
-StrCmp $7 "$INSTDIR\tomcat\bin\tomcat6.exe //RS//Tomcat6" Tomcat5Uninstall
+ReadRegStr $7 HKLM "SYSTEM\CurrentControlSet\Services\Tomcat7" "ImagePath"
+StrCmp $7 "$INSTDIR\tomcat\bin\tomcat6.exe //RS//Tomcat7" Tomcat5Uninstall
 Goto Tomcat5Abort
 Tomcat5Uninstall:
-MessageBox MB_OK "Service detected! Uninstall Tomcat 6 as service!"
-ExecWait 'cmd /C net stop Tomcat6 & cd "$INSTDIR\tomcat\bin" & service.bat remove Tomcat6' $9
+MessageBox MB_OK "Service detected! Uninstall Tomcat 7 as service!"
+ExecWait 'cmd /C net stop Tomcat7 & cd "$INSTDIR\tomcat\bin" & service.bat remove Tomcat7' $9
 Tomcat5Abort:
 NoJavaAddon:
 
@@ -519,6 +520,7 @@ Delete "$INSTDIR\xampp_chkdll.exe"
 Delete "$INSTDIR\xampp_service_mercury.exe"
 Delete "$INSTDIR\catalina_start.bat"
 Delete "$INSTDIR\catalina_stop.bat"
+Delete "$INSTDIR\xampp-control-3-beta.exe"
 ;Delete "$INSTDIR\msvcr71.dll"
 
 DeleteRegKey HKLM "Software\xampp"

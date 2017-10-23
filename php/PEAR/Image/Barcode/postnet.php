@@ -19,7 +19,7 @@
  * @author     Josef "Jeff" Sipek <jeffpc@optonline.net>
  * @copyright  2005 Josef "Jeff" Sipek
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: postnet.php,v 1.3 2006/12/13 19:29:30 cweiske Exp $
+ * @version    CVS: $Id: postnet.php 304741 2010-10-25 09:14:17Z clockwerx $
  * @link       http://pear.php.net/package/Image_Barcode
  */
 
@@ -49,7 +49,7 @@ require_once 'Image/Barcode.php';
  * @author     Josef "Jeff" Sipek <jeffpc@optonline.net>
  * @copyright  2005 Josef "Jeff" Sipek
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: postnet.php,v 1.3 2006/12/13 19:29:30 cweiske Exp $
+ * @version    CVS: $Id: postnet.php 304741 2010-10-25 09:14:17Z clockwerx $
  * @link       http://pear.php.net/package/Image_Barcode
  */
 class Image_Barcode_postnet extends Image_Barcode

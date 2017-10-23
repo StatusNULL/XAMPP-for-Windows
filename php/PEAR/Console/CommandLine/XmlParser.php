@@ -16,7 +16,7 @@
  * @author    David JEAN LOUIS <izimobil@gmail.com>
  * @copyright 2007 David JEAN LOUIS
  * @license   http://opensource.org/licenses/mit-license.php MIT License 
- * @version   CVS: $Id: XmlParser.php,v 1.8 2008/10/09 10:44:54 izi Exp $
+ * @version   CVS: $Id: XmlParser.php 282427 2009-06-19 10:22:48Z izi $
  * @link      http://pear.php.net/package/Console_CommandLine
  * @since     File available since release 0.1.0
  * @filesource
@@ -35,7 +35,7 @@ require_once 'Console/CommandLine.php';
  * @author    David JEAN LOUIS <izimobil@gmail.com>
  * @copyright 2007 David JEAN LOUIS
  * @license   http://opensource.org/licenses/mit-license.php MIT License 
- * @version   Release: 1.0.5
+ * @version   Release: 1.1.3
  * @link      http://pear.php.net/package/Console_CommandLine
  * @since     Class available since release 0.1.0
  */
@@ -60,7 +60,8 @@ class Console_CommandLine_XmlParser
         $doc = new DomDocument();
         $doc->load($xmlfile);
         self::validate($doc);
-        $root = $doc->childNodes->item(0);
+        $nodes = $doc->getElementsByTagName('command');
+        $root  = $nodes->item(0);
         return self::_parseCommandNode($root, true);
     }
 
@@ -80,7 +81,8 @@ class Console_CommandLine_XmlParser
         $doc = new DomDocument();
         $doc->loadXml($xmlstr);
         self::validate($doc);
-        $root = $doc->childNodes->item(0);
+        $nodes = $doc->getElementsByTagName('command');
+        $root  = $nodes->item(0);
         return self::_parseCommandNode($root, true);
     }
 
@@ -98,14 +100,14 @@ class Console_CommandLine_XmlParser
      */
     public static function validate($doc) 
     {
-        if (is_dir('C:\php5\pear\data' . DIRECTORY_SEPARATOR . 'Console_CommandLine')) {
-            $rngfile = 'C:\php5\pear\data' . DIRECTORY_SEPARATOR
+        if (is_dir('C:\php\pear\data' . DIRECTORY_SEPARATOR . 'Console_CommandLine')) {
+            $rngfile = 'C:\php\pear\data' . DIRECTORY_SEPARATOR
                 . 'Console_CommandLine' . DIRECTORY_SEPARATOR . 'data' 
                 . DIRECTORY_SEPARATOR . 'xmlschema.rng';
         } else {
             $rngfile = dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' 
-                . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR 
-                . 'xmlschema.rng';
+                . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'data'
+                . DIRECTORY_SEPARATOR . 'xmlschema.rng';
         }
         if (!is_readable($rngfile)) {
             Console_CommandLine::triggerError('invalid_xml_file',
@@ -156,6 +158,18 @@ class Console_CommandLine_XmlParser
             case 'command':
                 $obj->addCommand(self::_parseCommandNode($cNode));
                 break;
+            case 'aliases':
+                if (!$isRootNode) {
+                    foreach ($cNode->childNodes as $subChildNode) {
+                        if ($subChildNode->nodeName == 'alias') {
+                            $obj->aliases[] = trim($subChildNode->nodeValue);
+                        }
+                    }
+                }
+                break;
+            case 'messages':
+                $obj->messages = self::_messages($cNode);
+                break;
             default:
                 break;
             }
@@ -180,14 +194,22 @@ class Console_CommandLine_XmlParser
         $obj = new Console_CommandLine_Option($node->getAttribute('name'));
         foreach ($node->childNodes as $cNode) {
             $cNodeName = $cNode->nodeName;
-            if ($cNodeName == 'choices') {
+            switch ($cNodeName) {
+            case 'choices':
                 foreach ($cNode->childNodes as $subChildNode) {
                     if ($subChildNode->nodeName == 'choice') {
                         $obj->choices[] = trim($subChildNode->nodeValue);
                     }
                 }
-            } elseif (property_exists($obj, $cNodeName)) {
-                $obj->$cNodeName = trim($cNode->nodeValue);
+                break;
+            case 'messages':
+                $obj->messages = self::_messages($cNode);
+                break;
+            default:
+                if (property_exists($obj, $cNodeName)) {
+                    $obj->$cNodeName = trim($cNode->nodeValue);
+                }
+                break;
             }
         }
         if ($obj->action == 'Password') {
@@ -222,6 +244,12 @@ class Console_CommandLine_XmlParser
             case 'multiple':
                 $obj->multiple = self::_bool(trim($cNode->nodeValue));
                 break;
+            case 'optional':
+                $obj->optional = self::_bool(trim($cNode->nodeValue));
+                break;
+            case 'messages':
+                $obj->messages = self::_messages($cNode);
+                break;
             default:
                 break;
             }
@@ -242,6 +270,35 @@ class Console_CommandLine_XmlParser
     private static function _bool($str)
     {
         return in_array((string)$str, array('true', '1', 'on', 'yes'));
+    }
+
+    // }}}
+    // _messages() {{{
+
+    /**
+     * Returns an array of custom messages for the element
+     *
+     * @param DOMNode $node The messages node to process
+     *
+     * @return array an array of messages
+     *
+     * @see Console_CommandLine::$messages
+     * @see Console_CommandLine_Element::$messages
+     */
+    private static function _messages(DOMNode $node)
+    {
+        $messages = array();
+
+        foreach ($node->childNodes as $cNode) {
+            if ($cNode->nodeType == XML_ELEMENT_NODE) {
+                $name  = $cNode->getAttribute('name');
+                $value = trim($cNode->nodeValue);
+
+                $messages[$name] = $value;
+            }
+        }
+
+        return $messages;
     }
 
     // }}}

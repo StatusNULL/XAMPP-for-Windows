@@ -1,4 +1,4 @@
-<!--
+<%--
  Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
   this work for additional information regarding copyright ownership.
@@ -13,7 +13,7 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
--->
+--%>
 <html>
   <head>
     <title>Tag Plugin Examples: if</title>
@@ -39,7 +39,7 @@
 
     <h3>Conditionally execute the body</h3>
     <c:if test="${2>0}">
-	It's true that (2>0)!
+        It's true that (2>0)!
     </c:if>
   </body>
 </html> 

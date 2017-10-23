@@ -50,6 +50,7 @@
 			</tr>  
       
       <?php
+  date_default_timezone_set('UTC');
 	$xopen = fopen(".modell", 'r');
   $xmodell = fread($xopen, filesize(".modell"));
   fclose($xopen);
@@ -112,7 +113,7 @@
 					<?php include "naviguest.inc"; ?>
 			<tr valign="top">
 				<td align="right" class="navi"><br>
-<p class=navi>&copy;2002-2010<br>
+<p class=navi>&copy;2002-<?php echo date("Y"); ?><br>
 <? if(file_get_contents("lang.tmp")=="de") { ?>
 <a target=content href="http://www.apachefriends.org/de/"><img border=0 src="img/apachefriends.gif"></a><p>
 <? } else { ?>

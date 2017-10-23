@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2004-2008, Davey Shafik <davey@php.net>
+ * Copyright (c) 2004-2009, Davey Shafik <davey@php.net>
  *                          Laurent Laville <pear@laurent-laville.org>
  *
  * All rights reserved.
@@ -37,7 +37,7 @@
  * @author   Davey Shafik <davey@php.net>
  * @author   Laurent Laville <pear@laurent-laville.org>
  * @license  http://www.opensource.org/licenses/bsd-license.php  BSD
- * @version  CVS: $Id: Cli.php,v 1.74 2008/07/22 20:26:19 farell Exp $
+ * @version  CVS: $Id: Cli.php,v 1.75 2009/01/02 10:18:47 farell Exp $
  * @link     http://pear.php.net/package/PHP_CompatInfo
  * @since    File available since Release 0.8.0
  */
@@ -62,7 +62,7 @@ require_once 'Console/Getargs.php';
  * @author    Laurent Laville <pear@laurent-laville.org>
  * @copyright 2003 Davey Shafik and Synaptic Media. All Rights Reserved.
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD
- * @version   Release: 1.8.1
+ * @version   Release: 1.9.0
  * @link      http://pear.php.net/package/PHP_CompatInfo
  * @since     Class available since Release 0.8.0
  */
@@ -266,7 +266,7 @@ class PHP_CompatInfo_Cli
         // version
         $V = $args->getValue('V');
         if (isset($V)) {
-            $error = 'PHP_CompatInfo (cli) version 1.8.1'
+            $error = 'PHP_CompatInfo (cli) version 1.9.0'
                    . ' (http://pear.php.net/package/PHP_CompatInfo)';
             echo $error;
             return;

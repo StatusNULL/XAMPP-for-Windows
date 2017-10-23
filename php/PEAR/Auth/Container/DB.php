@@ -18,7 +18,7 @@
  * @author     Adam Ashley <aashley@php.net>
  * @copyright  2001-2006 The PHP Group
  * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
- * @version    CVS: $Id: DB.php,v 1.74 2008/04/04 07:57:02 aashley Exp $
+ * @version    CVS: $Id: DB.php 256753 2008-04-04 07:57:02Z aashley $
  * @link       http://pear.php.net/package/Auth
  */
 
@@ -43,7 +43,7 @@ require_once 'DB.php';
  * @author     Adam Ashley <aashley@php.net>
  * @copyright  2001-2006 The PHP Group
  * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
- * @version    Release: 1.6.1  File: $Revision: 1.74 $
+ * @version    Release: @package_version@  File: $Revision: 256753 $
  * @link       http://pear.php.net/package/Auth
  */
 class Auth_Container_DB extends Auth_Container

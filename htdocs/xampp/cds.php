@@ -1,33 +1,47 @@
-<?
-	if(@$_REQUEST['action']=="getpdf")
-	{
-		mysql_connect("localhost","root","");
-		mysql_select_db("cdcol");
-
-		include ('class.ezpdf.php');
-		$pdf = new Cezpdf();
-		$pdf->selectFont('/opt/lampp/lib/fonts/Helvetica.afm');
-
-		$pdf->ezText('CD Collection',14);
-		$pdf->ezText('© 2002-2009 Kai Seidler, oswald@apachefriends.org, GPL',10);
-		$pdf->ezText('',12);
-
-		$result=mysql_query("SELECT id,titel,interpret,jahr FROM cds ORDER BY interpret;");
-		
-		$i=0;
-		while( $row=mysql_fetch_array($result) )
-		{
-			$data[$i]=array('interpret'=>$row['interpret'],'titel'=>$row['titel'],'jahr'=>$row['jahr']);
-			$i++;
-		}
-
-		$pdf->ezTable($data,"","",array('width'=>500));
-
-		$pdf->ezStream();
-		exit;
-	}
-?>
 <? include("langsettings.php"); ?>
+
+<?
+if (urlencode(@$_REQUEST['action']) == "getpdf") {
+        mysql_connect("localhost", "root", "");
+        mysql_select_db("cdcol");
+
+        include ('fpdf/fpdf.php');
+        $pdf = new FPDF();
+        $pdf->AddPage();
+
+        $pdf->SetFont('Helvetica', '', 14);
+        $pdf->Write(5, 'CD Collection');
+        $pdf->Ln();
+
+        $pdf->SetFontSize(10);
+        $pdf->Write(5, '© 2002/2003 Kai Seidler, oswald@apachefriends.org, GPL');
+        $pdf->Ln();
+
+        $pdf->Ln(5);
+
+
+        $pdf->SetFont('Helvetica', 'B', 10);
+        $pdf->Cell(40 ,7, $TEXT['cds-attrib1'], 1);
+        $pdf->Cell(100 ,7, $TEXT['cds-attrib2'], 1);
+        $pdf->Cell(20 ,7, $TEXT['cds-attrib3'], 1);
+        $pdf->Ln();
+
+        $pdf->SetFont('Helvetica', '', 10);
+
+        $result=mysql_query("SELECT titel,interpret,jahr FROM cds ORDER BY interpret");
+
+        while ($row = mysql_fetch_array($result)) {
+            $pdf->Cell(40, 7, $row['interpret'], 1);
+            $pdf->Cell(100, 7, $row['titel'], 1);
+            $pdf->Cell(20, 7, $row['jahr'], 1);
+            $pdf->Ln();
+        }
+
+        $pdf->Output();
+        exit;
+    }
+?>
+
 <html>
 <head>
 <title>apachefriends.org cd collection</title>

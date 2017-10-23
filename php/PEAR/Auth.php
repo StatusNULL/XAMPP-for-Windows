@@ -18,7 +18,7 @@
  * @author     Adam Ashley <aashley@php.net>
  * @copyright  2001-2006 The PHP Group
  * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
- * @version    CVS: $Id: Auth.php,v 1.123 2008/04/04 03:50:26 aashley Exp $
+ * @version    CVS: $Id: Auth.php 289651 2009-10-15 04:39:07Z aashley $
  * @link       http://pear.php.net/package/Auth
  */
 
@@ -82,7 +82,7 @@ define('AUTH_ADV_CHALLENGE', 3);
  * @author     Adam Ashley <aashley@php.net>
  * @copyright  2001-2006 The PHP Group
  * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
- * @version    Release: 1.6.1  File: $Revision: 1.123 $
+ * @version    Release: @package_version@  File: $Revision: 289651 $
  * @link       http://pear.php.net/package/Auth
  */
 class Auth {
@@ -327,7 +327,7 @@ class Auth {
      *                   driver, you have to pass the dsn string here)
      *
      * @param string    Name of the function that creates the login form
-     * @param boolean   Should the login form be displayed if neccessary?
+     * @param boolean   Should the login form be displayed if necessary?
      * @return void
      */
     function Auth($storageDriver, $options = '', $loginFunction = '', $showLogin = true)
@@ -665,7 +665,7 @@ class Auth {
     // {{{ setShowLogin()
 
     /**
-     * Should the login form be displayed if neccessary?
+     * Should the login form be displayed if necessary?
      *
      * @param  bool    show login form or not
      * @return void
@@ -680,9 +680,9 @@ class Auth {
     // {{{ setAllowLogin()
 
     /**
-     * Should the login form be displayed if neccessary?
+     * Is Login Allowed from this page?
      *
-     * @param  bool    show login form or not
+     * @param  bool    allow login from this page or not
      * @return void
      * @access public
      */

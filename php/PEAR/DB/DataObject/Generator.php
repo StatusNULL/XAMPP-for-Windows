@@ -4,9 +4,9 @@
  *
  * PHP versions 4 and 5
  *
- * LICENSE: This source file is subject to version 3.0 of the PHP license
+ * LICENSE: This source file is subject to version 3.01 of the PHP license
  * that is available through the world-wide-web at the following URI:
- * http://www.php.net/license/3_0.txt.  If you did not receive a copy of
+ * http://www.php.net/license/3_01.txt.  If you did not receive a copy of
  * the PHP License and are unable to obtain it through the web, please
  * send a note to license@php.net so we can mail you a copy immediately.
  *
@@ -14,8 +14,8 @@
  * @package    DB_DataObject
  * @author     Alan Knowles <alan@akbkhome.com>
  * @copyright  1997-2006 The PHP Group
- * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Generator.php,v 1.141 2008/01/30 02:29:39 alan_k Exp $
+ * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
+ * @version    CVS: $Id: Generator.php 298560 2010-04-25 23:01:51Z alan_k $
  * @link       http://pear.php.net/package/DB_DataObject
  */
  
@@ -33,7 +33,7 @@
  /**
  * 
  * Config _$ptions
- * [DB_DataObject_Generator]
+ * [DB_DataObject]
  * ; optional default = DB/DataObject.php
  * extends_location =
  * ; optional default = DB_DataObject
@@ -193,7 +193,11 @@ class DB_DataObject_Generator extends DB_DataObject
             /**
              * set portability and some modules to fetch the informations
              */
-            $__DB->setOption('portability', MDB2_PORTABILITY_ALL ^ MDB2_PORTABILITY_FIX_CASE);
+            $db_options = PEAR::getStaticProperty('MDB2','options');
+            if (empty($db_options)) {
+                $__DB->setOption('portability', MDB2_PORTABILITY_ALL ^ MDB2_PORTABILITY_FIX_CASE);
+            }
+            
             $__DB->loadModule('Manager');
             $__DB->loadModule('Reverse');
         }
@@ -265,12 +269,7 @@ class DB_DataObject_Generator extends DB_DataObject
             } else {
                 $defs =  $__DB->reverse->tableInfo($quotedTable);
                 // rename the length value, so it matches db's return.
-                foreach ($defs as $k => $v) {
-                    if (!isset($defs[$k]['length'])) {
-                        continue;
-                    }
-                    $defs[$k]['len'] = $defs[$k]['length'];
-                }
+                
             }
 
             if (is_a($defs,'PEAR_Error')) {
@@ -286,7 +285,10 @@ class DB_DataObject_Generator extends DB_DataObject
                 if (!is_array($def)) {
                     continue;
                 }
-
+                // rename the length value, so it matches db's return.
+                if (isset($def['length']) && !isset($def['len'])) {
+                    $def['len'] = $def['length'];
+                }
                 $this->_definitions[$table][] = (object) $def;
 
             }
@@ -381,8 +383,8 @@ class DB_DataObject_Generator extends DB_DataObject
             return false;
         }
         $__DB = &$GLOBALS['_DB_DATAOBJECT']['CONNECTIONS'][$this->_database_dsn_md5];
-        if (!in_array($__DB->phptype, array('mysql','mysqli'))) {
-            echo "WARNING: cant handle non-mysql introspection for defaults.";
+        if (!in_array($__DB->phptype, array('mysql', 'mysqli', 'pgsql'))) {
+            echo "WARNING: cant handle non-mysql and pgsql introspection for defaults.";
             return; // cant handle non-mysql introspection for defaults.
         }
 
@@ -390,30 +392,72 @@ class DB_DataObject_Generator extends DB_DataObject
 
         $fk = array();
 
-        foreach($this->tables as $this->table) {
-            $res =& $DB->query('SHOW CREATE TABLE ' . $this->table);
-            if (PEAR::isError($res)) {
-                die($res->getMessage());
-            }
 
-            $text = $res->fetchRow(DB_FETCHMODE_DEFAULT, 0);
-            $treffer = array();
-            // Extract FOREIGN KEYS
-            preg_match_all(
-                "/FOREIGN KEY \(`(\w*)`\) REFERENCES `(\w*)` \(`(\w*)`\)/i", 
-                $text[1], 
-                $treffer, 
-                PREG_SET_ORDER);
+        switch ($DB->phptype) {
 
-            if (count($treffer) < 1) {
-                continue;
-            }
-            for ($i = 0; $i < count($treffer); $i++) {
-                $fk[$this->table][$treffer[$i][1]] = $treffer[$i][2] . ":" . $treffer[$i][3];
-            }
-            
+
+            case 'pgsql':
+                foreach($this->tables as $this->table) {
+                    $quotedTable = !empty($options['quote_identifiers_tableinfo']) ?  $DB->quoteIdentifier($table)  : $this->table;
+                    $res =& $DB->query("SELECT
+                                pg_catalog.pg_get_constraintdef(r.oid, true) AS condef
+                            FROM pg_catalog.pg_constraint r,
+                                 pg_catalog.pg_class c
+                            WHERE c.oid=r.conrelid
+                                  AND r.contype = 'f'
+                                  AND c.relname = '" . $quotedTable . "'");
+                    if (PEAR::isError($res)) {
+                        die($res->getMessage());
+                    }
+
+                    while ($row = $res->fetchRow(DB_FETCHMODE_ASSOC)) {
+                        $treffer = array();
+                        // this only picks up one of these.. see this for why: http://pear.php.net/bugs/bug.php?id=17049
+                        preg_match(
+                            "/FOREIGN KEY \((\w*)\) REFERENCES (\w*)\((\w*)\)/i",
+                            $row['condef'],
+                            $treffer);
+                        if (!count($treffer)) {
+                            continue;
+                        }
+                        $fk[$this->table][$treffer[1]] = $treffer[2] . ":" . $treffer[3];
+                    }
+                }
+                break;
+ 
+ 
+            case 'mysql':
+            case 'mysqli':
+            default: 
+
+                foreach($this->tables as $this->table) {
+                    $quotedTable = !empty($options['quote_identifiers_tableinfo']) ?  $DB->quoteIdentifier($table)  : $this->table;
+                    
+                    $res =& $DB->query('SHOW CREATE TABLE ' . $quotedTable );
+
+                    if (PEAR::isError($res)) {
+                        die($res->getMessage());
+                    }
+
+                    $text = $res->fetchRow(DB_FETCHMODE_DEFAULT, 0);
+                    $treffer = array();
+                    // Extract FOREIGN KEYS
+                    preg_match_all(
+                        "/FOREIGN KEY \(`(\w*)`\) REFERENCES `(\w*)` \(`(\w*)`\)/i", 
+                        $text[1], 
+                        $treffer, 
+                        PREG_SET_ORDER);
+
+                    if (!count($treffer)) {
+                        continue;
+                    }
+                    foreach($treffer as $i=> $tref) {
+                        $fk[$this->table][$tref[1]] = $tref[2] . ":" . $tref[3];
+                    }
+                    
+                }
+
         }
-
         $links_ini = "";
 
         foreach($fk as $table => $details) {
@@ -467,7 +511,7 @@ class DB_DataObject_Generator extends DB_DataObject
     function _generateDefinitionsTable()
     {
         global $_DB_DATAOBJECT;
-        
+        $options = PEAR::getStaticProperty('DB_DataObject','options');
         $defs = $this->_definitions[$this->table];
         $this->_newConfig .= "\n[{$this->table}]\n";
         $keys_out =  "\n[{$this->table}__keys]\n";
@@ -551,6 +595,9 @@ class DB_DataObject_Generator extends DB_DataObject
                 
                 case 'ENUM':
                 case 'SET':         // not really but oh well
+                
+                case 'POINT':       // mysql geometry stuff - not really string - but will do..
+                
                 case 'TIMESTAMPTZ': // postgres
                 case 'BPCHAR':      // postgres
                 case 'INTERVAL':    // postgres (eg. '12 days')
@@ -594,14 +641,18 @@ class DB_DataObject_Generator extends DB_DataObject
                         DB_DATAOBJECT_STR + DB_DATAOBJECT_DATE + DB_DATAOBJECT_TIME;
                     break;    
                     
-                    
-                case 'TINYBLOB':
+                
                 case 'BLOB':       /// these should really be ignored!!!???
+                case 'TINYBLOB':
                 case 'MEDIUMBLOB':
                 case 'LONGBLOB':
+                
+                case 'CLOB': // oracle character lob support
+                
                 case 'BYTEA':   // postgres blob support..
                     $type = DB_DATAOBJECT_STR + DB_DATAOBJECT_BLOB;
                     break;
+                    
                 default:     
                     echo "*****************************************************************\n".
                          "**               WARNING UNKNOWN TYPE                          **\n".
@@ -653,7 +704,9 @@ class DB_DataObject_Generator extends DB_DataObject
             // only use primary key or nextval(), cause the setFrom blocks you setting all key items...
             // if no keys exist fall back to using unique
             //echo "\n{$t->name} => {$t->flags}\n";
-            if (preg_match("/(auto_increment|nextval\()/i",rawurldecode($t->flags)) 
+            $secondary_key_match = isset($options['generator_secondary_key_match']) ? $options['generator_secondary_key_match'] : 'primary|unique';
+            
+            if (preg_match('/(auto_increment|nextval\()/i',rawurldecode($t->flags)) 
                 || (isset($t->autoincrement) && ($t->autoincrement === true))) {
                     
                 // native sequences = 2
@@ -662,7 +715,7 @@ class DB_DataObject_Generator extends DB_DataObject
                 }
                 $ret_keys_primary[$t->name] = 'N';
             
-            } else if (preg_match("/(primary|unique)/i",$t->flags)) {
+            } else if ($secondary_key_match && preg_match('/('.$secondary_key_match.')/i',$t->flags)) {
                 // keys.. = 1
                 $key_type = 'K';
                 if (!preg_match("/(primary)/i",$t->flags)) {
@@ -761,11 +814,9 @@ class DB_DataObject_Generator extends DB_DataObject
         //echo "Generating Class files:        \n";
         $options = &PEAR::getStaticProperty('DB_DataObject','options');
        
-        
-        if ($extends = @$options['extends']) {
-            $this->_extends = $extends;
-            $this->_extendsFile = $options['extends_location'];
-        }
+	$this->_extends = empty($options['extends']) ? $this->_extends : $options['extends'];
+	$this->_extendsFile = empty($options['extends_location']) ? $this->_extendsFile : $options['extends_location'];
+ 
 
         foreach($this->tables as $this->table) {
             $this->table        = trim($this->table);
@@ -800,7 +851,7 @@ class DB_DataObject_Generator extends DB_DataObject
     }
 
     /**
-     * class being extended (can be overridden by [DB_DataObject_Generator] extends=xxxx
+     * class being extended (can be overridden by [DB_DataObject] extends=xxxx
      *
      * @var    string
      * @access private
@@ -849,10 +900,8 @@ class DB_DataObject_Generator extends DB_DataObject
         $body =  "\n    ###START_AUTOCODE\n";
         $body .= "    /* the code below is auto generated do not remove the above tag */\n\n";
         // table
-        $padding = (30 - strlen($this->table));
-        $padding  = ($padding < 2) ? 2 : $padding;
-        
-        $p =  str_repeat(' ',$padding) ;
+
+        $p = str_repeat(' ',max(2, (18 - strlen($this->table)))) ;
         
         $options = &PEAR::getStaticProperty('DB_DataObject','options');
         
@@ -868,10 +917,14 @@ class DB_DataObject_Generator extends DB_DataObject
         // then we should add var $_database = here
         // as database names may not always match.. 
         
+        if (empty($GLOBALS['_DB_DATAOBJECT']['CONFIG'])) {
+            DB_DataObject::_loadConfig();
+        }
+
+         // Only include the $_database property if the omit_database_var is unset or false
         
-            
-        
-        if (isset($options["database_{$this->_database}"])) {
+        if (isset($options["database_{$this->_database}"]) && empty($GLOBALS['_DB_DATAOBJECT']['CONFIG']['generator_omit_database_var'])) {
+            $p = str_repeat(' ',   max(2, (16 - strlen($this->table))));
             $body .= "    {$var} \$_database = '{$this->_database}';  {$p}// database name (used with database_{*} config)\n";
         }
         
@@ -885,6 +938,7 @@ class DB_DataObject_Generator extends DB_DataObject
         // show nice information!
         $connections = array();
         $sets = array();
+
         foreach($defs as $t) {
             if (!strlen(trim($t->name))) {
                 continue;
@@ -900,18 +954,18 @@ class DB_DataObject_Generator extends DB_DataObject
                 continue;
             }
             
+            $p = str_repeat(' ',max(2,  (30 - strlen($t->name))));
+
+            $length = empty($t->len) ? '' : '('.$t->len.')';
+            $body .="    {$var} \${$t->name};  {$p}// {$t->type}$length  {$t->flags}\n";
             
-            $padding = (30 - strlen($t->name));
-            if ($padding < 2) $padding =2;
-            $p =  str_repeat(' ',$padding) ;
-           
-            $body .="    {$var} \${$t->name};  {$p}// {$t->type}({$t->len})  {$t->flags}\n";
-             
             // can not do set as PEAR::DB table info doesnt support it.
             //if (substr($t->Type,0,3) == "set")
             //    $sets[$t->Field] = "array".substr($t->Type,3);
-            $body .= $this->derivedHookVar($t,$padding);
+            $body .= $this->derivedHookVar($t,strlen($p));
         }
+         
+        $body .= $this->derivedHookPostVar($defs);
 
         // THIS IS TOTALLY BORKED old FC creation
         // IT WILL BE REMOVED!!!!! in DataObjects 1.6
@@ -1062,7 +1116,21 @@ class DB_DataObject_Generator extends DB_DataObject
         // It MUST NOT be changed here!!!
         return "";
     }
-
+    /**
+     * hook for after var lines (
+     * called at the end of the output of var line have generated, override to add extra var
+     * lines
+     *
+     * @param array cols containing array of objects with type,len,flags etc. from tableInfo call
+     * @access   public
+     * @return  string added to class eg. functions.
+     */
+    function derivedHookPostVar($t)
+    {
+        // This is so derived generator classes can generate variabels
+        // It MUST NOT be changed here!!!
+        return "";
+    }
     /**
      * hook to add extra page-level (in terms of phpDocumentor) DocBlock
      *
@@ -1124,10 +1192,9 @@ class DB_DataObject_Generator extends DB_DataObject
         $options = &PEAR::getStaticProperty('DB_DataObject','options');
         $class_prefix  = empty($options['class_prefix']) ? '' : $options['class_prefix'];
         
-        if ($extends = @$options['extends']) {
-            $this->_extends = $extends;
-            $this->_extendsFile = $options['extends_location'];
-        }
+        $this->_extends = empty($options['extends']) ? $this->_extends : $options['extends'];
+	$this->_extendsFile = empty($options['extends_location']) ? $this->_extendsFile : $options['extends_location'];
+ 
         $classname = $this->classname = $this->getClassNameFromTableName($this->table);
         
         $out = $this->_generateClassTable();
@@ -1185,7 +1252,7 @@ class DB_DataObject_Generator extends DB_DataObject
             $__DB->loadModule('Manager');
             $__DB->loadModule('Reverse');
         }
-        $quotedTable = !empty($options['quote_identifiers']) ? 
+        $quotedTable = !empty($options['quote_identifiers_tableinfo']) ? 
                 $__DB->quoteIdentifier($table) : $table;
           
         if (!$is_MDB2) {

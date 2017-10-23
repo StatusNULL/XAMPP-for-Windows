@@ -1,5 +1,5 @@
 <html><body><pre>
-&lt;!--
+&lt;%--
  Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
   this work for additional information regarding copyright ownership.
@@ -14,7 +14,7 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
--->
+--%>
 &lt;html>
   &lt;head>
     &lt;title>Tag Plugin Examples: forEach&lt;/title>
@@ -44,15 +44,15 @@ FF">&lt;/a>
     &lt;/c:forEach>
 
     &lt;% Vector v = new Vector();
-	v.add("One"); v.add("Two"); v.add("Three"); v.add("Four");
+        v.add("One"); v.add("Two"); v.add("Three"); v.add("Four");
 
-	pageContext.setAttribute("vector", v);
+        pageContext.setAttribute("vector", v);
     %>
 
     &lt;h3>Iterating over a Vector&lt;/h3>
 
     &lt;c:forEach items="${vector}" var="item" >
-	${item}
+        ${item}
     &lt;/c:forEach>
   &lt;/body>
 &lt;/html> 

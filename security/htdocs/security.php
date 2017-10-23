@@ -1,18 +1,3 @@
-<?php
-	// Requests allowed only from localhosz
-	extract($_POST);
-	extract($_SERVER);
-	$host = "127.0.0.1";
-	$timeout = "1";
-
-	if ($REMOTE_ADDR) {
-		if ($REMOTE_ADDR != $host) {
-			echo "<p><h2> FORBIDDEN FOR CLIENT $REMOTE_ADDR <h2></p>";
-			exit;
-		}
-	}
-?>
-
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 	"http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -31,6 +16,7 @@
 		<i>(Requests allowed from localhost only)</i><br/><br/>
 		<?php echo $TEXT['security-text1']; ?><p>
 
+ 
 		<?php
 			$i = 0;
 
@@ -197,12 +183,19 @@
 
 			line($TEXT['security-phpmyadmin-nok'], $TEXT['security-phpmyadmin-ok'], $TEXT['security-phpmyadmin-text'], $TEXT['security-phpmyadmin-out'], "", "phpmyadmin");
 
-			line($TEXT['security-checkftppassword-nok'], $TEXT['security-checkftppassword-ok'], $TEXT['security-checkftppassword-text'], $TEXT['security-checkftppassword-out'], "", "ftp");
-
-			line($TEXT['security-checkphp-nok'], $TEXT['security-checkphp-ok'], $TEXT['security-checkphp-text'], $TEXT['security-checkphp-out'], "", "php");
+      line($TEXT['security-checkphp-nok'], $TEXT['security-checkphp-ok'], $TEXT['security-checkphp-text'], $TEXT['security-checkphp-out'], "", "php");
+      
+	      $xopen = fopen("..\..\htdocs\\\\\\\\xampp\.modell", 'r');
+        $xmodell = fread($xopen, filesize("..\..\htdocs\\\\\\\\xampp\.modell"));
+        fclose($xopen);
+        //echo "Modell : $xmodell";
+        if ($xmodell == "XAMPP") { 
+			
+      line($TEXT['security-checkftppassword-nok'], $TEXT['security-checkftppassword-ok'], $TEXT['security-checkftppassword-text'], $TEXT['security-checkftppassword-out'], "", "ftp");
 
 			if (extension_loaded("imap")) {
 				line($TEXT['security-pop-nok'], $TEXT['security-pop-ok'], $TEXT['security-pop-text'], $TEXT['security-pop-out'], $TEXT['security-pop-notload'], "pop");
+			}
 			}
 
 			echo "<tr valign='bottom'>";
@@ -214,10 +207,14 @@
 			echo "</table>";
 			echo "<p>";
 		?>
+		
+		<?php if ($xmodell == "XAMPP") { ?>
 		<?php echo $TEXT['security-text2']; ?><p>
 		<?php echo $TEXT['security-text3']; ?><br>&nbsp;<p>
 		<?php echo $TEXT['security-text4']; ?>
-
+    <?php } else { ?>
+    <p> [XAMPP USB LITE]: Make XAMPP more safety then use this => <a href="/security/xamppsecurity.php"><b>http://localhost/security/xamppsecurity.php</b><br /><br /></a>
+    <?php } ?>
 		<p>
 		<table border="0">
 			<tr>

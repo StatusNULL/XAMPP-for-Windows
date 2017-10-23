@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2004-2008, Davey Shafik <davey@php.net>
+ * Copyright (c) 2004-2009, Davey Shafik <davey@php.net>
  *                          Laurent Laville <pear@laurent-laville.org>
  *
  * All rights reserved.
@@ -37,7 +37,7 @@
  * @author   Davey Shafik <davey@php.net>
  * @author   Laurent Laville <pear@laurent-laville.org>
  * @license  http://www.opensource.org/licenses/bsd-license.php  BSD
- * @version  CVS: $Id: CompatInfo.php,v 1.103 2008/07/22 20:27:32 farell Exp $
+ * @version  CVS: $Id: CompatInfo.php,v 1.108 2009/01/02 10:18:47 farell Exp $
  * @link     http://pear.php.net/package/PHP_CompatInfo
  * @since    File available since Release 0.7.0
  */
@@ -55,7 +55,7 @@ require_once 'PHP/CompatInfo/Parser.php';
  * @author    Laurent Laville <pear@laurent-laville.org>
  * @copyright 2003 Davey Shafik and Synaptic Media. All Rights Reserved.
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD
- * @version   Release: 1.8.1
+ * @version   Release: 1.9.0
  * @link      http://pear.php.net/package/PHP_CompatInfo
  * @since     Class available since Release 0.7.0
  */
@@ -305,6 +305,216 @@ class PHP_CompatInfo
     function parseFolder($folder, $options = array())
     {
         return $this->parser->parseData($folder, $options);
+    }
+
+    /**
+     * Returns list of files ignored
+     *
+     * Returns list of files ignored while parsing directories
+     *
+     * @access public
+     * @return array or false on error
+     * @since  version 1.9.0b2 (2008-12-19)
+     */
+    function getIgnoredFiles()
+    {
+        return $this->parser->getIgnoredFiles();
+    }
+
+    /**
+     * Returns the latest parse data source ignored functions
+     *
+     * Returns the latest parse data source ignored functions list
+     *
+     * @param mixed $file (optional) A specific filename or not (false)
+     *
+     * @access public
+     * @return mixed Null on error or if there were no previous data parsing
+     * @since  version 1.9.0b2 (2008-12-19)
+     */
+    function getIgnoredFunctions($file = false)
+    {
+        return $this->parser->getIgnoredFunctions($file);
+    }
+
+    /**
+     * Returns the latest parse data source ignored extensions
+     *
+     * Returns the latest parse data source ignored extensions list
+     *
+     * @param mixed $file (optional) A specific filename or not (false)
+     *
+     * @access public
+     * @return mixed Null on error or if there were no previous data parsing
+     * @since  version 1.9.0b2 (2008-12-19)
+     */
+    function getIgnoredExtensions($file = false)
+    {
+        return $this->parser->getIgnoredExtensions($file);
+    }
+
+    /**
+     * Returns the latest parse data source ignored constants
+     *
+     * Returns the latest parse data source ignored constants list
+     *
+     * @param mixed $file (optional) A specific filename or not (false)
+     *
+     * @access public
+     * @return mixed Null on error or if there were no previous data parsing
+     * @since  version 1.9.0b2 (2008-12-19)
+     */
+    function getIgnoredConstants($file = false)
+    {
+        return $this->parser->getIgnoredConstants($file);
+    }
+
+    /**
+     * Returns the latest parse data source version
+     *
+     * Returns the latest parse data source version, minimum and/or maximum
+     *
+     * @param mixed $file (optional) A specific filename or not (false)
+     * @param bool  $max  (optional) Level with or without contextual data
+     *
+     * @access public
+     * @return mixed Null on error or if there were no previous data parsing
+     * @since  version 1.9.0b1 (2008-11-30)
+     */
+    function getVersion($file = false, $max = false)
+    {
+        return $this->parser->getVersion($file, $max);
+    }
+
+    /**
+     * Returns the latest parse data source classes declared
+     *
+     * Returns the latest parse data source classes declared (internal or
+     * end-user defined)
+     *
+     * @param mixed $file (optional) A specific filename or not (false)
+     *
+     * @access public
+     * @return mixed Null on error or if there were no previous data parsing
+     * @since  version 1.9.0b1 (2008-11-30)
+     */
+    function getClasses($file = false)
+    {
+        return $this->parser->getClasses($file);
+    }
+
+    /**
+     * Returns the latest parse data source functions declared
+     *
+     * Returns the latest parse data source functions declared (internal or
+     * end-user defined)
+     *
+     * @param mixed $file (optional) A specific filename or not (false)
+     *
+     * @access public
+     * @return mixed Null on error or if there were no previous data parsing
+     * @since  version 1.9.0b1 (2008-11-30)
+     */
+    function getFunctions($file = false)
+    {
+        return $this->parser->getFunctions($file);
+    }
+
+    /**
+     * Returns the latest parse data source extensions used
+     *
+     * Returns the latest parse data source extensions used
+     *
+     * @param mixed $file (optional) A specific filename or not (false)
+     *
+     * @access public
+     * @return mixed Null on error or if there were no previous data parsing
+     * @since  version 1.9.0b1 (2008-11-30)
+     */
+    function getExtensions($file = false)
+    {
+        return $this->parser->getExtensions($file);
+    }
+
+    /**
+     * Returns the latest parse data source constants declared
+     *
+     * Returns the latest parse data source constants declared (internal or
+     * end-user defined)
+     *
+     * @param mixed $file (optional) A specific filename or not (false)
+     *
+     * @access public
+     * @return mixed Null on error or if there were no previous data parsing
+     * @since  version 1.9.0b1 (2008-11-30)
+     */
+    function getConstants($file = false)
+    {
+        return $this->parser->getConstants($file);
+    }
+
+    /**
+     * Returns the latest parse data source tokens declared
+     *
+     * Returns the latest parse data source PHP5+ tokens declared
+     *
+     * @param mixed $file (optional) A specific filename or not (false)
+     *
+     * @access public
+     * @return mixed Null on error or if there were no previous data parsing
+     * @since  version 1.9.0b1 (2008-11-30)
+     */
+    function getTokens($file = false)
+    {
+        return $this->parser->getTokens($file);
+    }
+
+    /**
+     * Returns the latest parse data source conditions
+     *
+     * Returns the latest parse data source conditions, with or without
+     * contextual data
+     *
+     * @param mixed $file      (optional) A specific filename or not (false)
+     * @param bool  $levelOnly (optional) Level with or without contextual data
+     *
+     * @access public
+     * @return mixed Null on error or if there were no previous data parsing
+     * @since  version 1.9.0b1 (2008-11-30)
+     */
+    function getConditions($file = false, $levelOnly = false)
+    {
+        return $this->parser->getConditions($file, $levelOnly);
+    }
+
+    /**
+     * Returns the summary of parsing info
+     *
+     * Returns only summary when parsing a directory or multiple data sources
+     *
+     * @access public
+     * @return array
+     * @since  version 1.9.0 (2009-01-19)
+     */
+    function getSummary()
+    {
+        $summary = array('ignored_files'      => $this->getIgnoredFiles(),
+                         'ignored_functions'  => $this->getIgnoredFunctions(),
+                         'ignored_extensions' => $this->getIgnoredExtensions(),
+                         'ignored_constants'  => $this->getIgnoredConstants(),
+                         'max_version'        => $this->getVersion(false, true),
+                         'version'            => $this->getVersion(),
+                         'classes'            => $this->getClasses(),
+                         'functions'          => $this->getFunctions(),
+                         'extensions'         => $this->getExtensions(),
+                         'constants'          => $this->getConstants(),
+                         'tokens'             => $this->getTokens(),
+                         'cond_code'          => $this->getConditions()
+                         );
+        if ($this->parser->options['debug'] == false) {
+            unset($summary['functions']);
+        }
+        return $summary;
     }
 }
 ?>

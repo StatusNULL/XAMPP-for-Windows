@@ -9,7 +9,10 @@
 	</head>
 
 	<body class="n">
-		<?php include "lang/".file_get_contents("lang.tmp").".php"; ?>
+		<?php 
+    include "lang/".file_get_contents("lang.tmp").".php"; 
+    date_default_timezone_set('UTC');
+    ?>
 
 		<table border="0" cellpadding="0" cellspacing="0">
 			<tr valign="top">
@@ -51,7 +54,7 @@
 					<a target=_parent class=n href="lang.php?sl"><?=$TEXT['navi-slovenian']?></a><br>
 					<a target=_parent class=n href="lang.php?zh"><?=$TEXT['navi-chinese']?></a><p>
 
-					<p class="navi">&copy;2002/2005<br>
+					<p class="navi">&copy;2002-<?php echo date("Y"); ?><br>
 					<?php if (file_get_contents("lang.tmp") == "de") { ?>
 						<a target="_new" href="http://www.apachefriends.org/index.html"><img border="0" src="img/apachefriends.gif" alt=""></a><p>
 					<?php } else { ?>

@@ -42,7 +42,7 @@
  * @author    Stephan Schmidt <schst@php.net>
  * @copyright 2003-2008 Stephan Schmidt <schst@php.net>
  * @license   http://opensource.org/licenses/bsd-license New BSD License
- * @version   CVS: $Id: Tokenizer.php,v 1.10 2008/08/24 19:44:14 ashnazg Exp $
+ * @version   CVS: $Id: Tokenizer.php 302598 2010-08-21 03:03:58Z clockwerx $
  * @link      http://pear.php.net/package/XML_Beautifier
  */
 
@@ -62,7 +62,7 @@ require_once 'XML/Parser.php';
  * @author    Stephan Schmidt <schst@php.net>
  * @copyright 2003-2008 Stephan Schmidt <schst@php.net>
  * @license   http://opensource.org/licenses/bsd-license New BSD License
- * @version   Release: 1.2.0
+ * @version   Release: @package_version@
  * @link      http://pear.php.net/package/XML_Beautifier
  * @todo      tokenize DTD
  * @todo      check for xml:space attribute
@@ -283,7 +283,7 @@ class XML_Beautifier_Tokenizer extends XML_Parser
      */
     function _handleDoctype($data)
     {
-        if (eregi(">", $data)) {
+        if (preg_match("/>/i", $data)) {
             $last = $this->_getLastToken();
             if ($last["data"] == "]" ) {
                 $this->_mode = "xml";
@@ -314,7 +314,7 @@ class XML_Beautifier_Tokenizer extends XML_Parser
              * handle comment
              */
             $regs = array();
-            eregi("<!--(.+)-->", $data, $regs);
+            preg_match("/<!--(.+)-->/i", $data, $regs);
             $comment = trim($regs[1]);
             
             $struct = array(
@@ -372,7 +372,7 @@ class XML_Beautifier_Tokenizer extends XML_Parser
                 "depth"      => $this->_depth
             );
 
-        } elseif (eregi("^<!DOCTYPE", $data)) {
+        } elseif (preg_match("/^<!DOCTYPE/i", $data)) {
             $this->_mode = "doctype";
             $struct      = array(
                 "type"    => XML_BEAUTIFIER_DT_DECLARATION,

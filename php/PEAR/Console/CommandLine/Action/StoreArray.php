@@ -16,7 +16,7 @@
  * @author    David JEAN LOUIS <izimobil@gmail.com>
  * @copyright 2007 David JEAN LOUIS
  * @license   http://opensource.org/licenses/mit-license.php MIT License 
- * @version   CVS: $Id: StoreArray.php,v 1.3 2008/10/09 10:44:54 izi Exp $
+ * @version   CVS: $Id: StoreArray.php 282041 2009-06-12 16:34:30Z izi $
  * @link      http://pear.php.net/package/Console_CommandLine
  * @since     File available since release 0.1.0
  * @filesource
@@ -38,12 +38,22 @@ require_once 'Console/CommandLine/Action.php';
  * @author    David JEAN LOUIS <izimobil@gmail.com>
  * @copyright 2007 David JEAN LOUIS
  * @license   http://opensource.org/licenses/mit-license.php MIT License 
- * @version   Release: 1.0.5
+ * @version   Release: 1.1.3
  * @link      http://pear.php.net/package/Console_CommandLine
  * @since     Class available since release 0.1.0
  */
 class Console_CommandLine_Action_StoreArray extends Console_CommandLine_Action
 {
+    // Protected properties {{{
+
+    /**
+     * Force a clean result when first called, overriding any defaults assigned.
+     *
+     * @var object $firstPass First time this action has been called.
+     */
+    protected $firstPass = true;
+
+    // }}}
     // execute() {{{
 
     /**
@@ -57,8 +67,9 @@ class Console_CommandLine_Action_StoreArray extends Console_CommandLine_Action
     public function execute($value = false, $params = array())
     {
         $result = $this->getResult();
-        if (null === $result) {
-            $result = array();
+        if (null === $result || $this->firstPass) {
+            $result          = array();
+            $this->firstPass = false;
         }
         $result[] = $value;
         $this->setResult($result);

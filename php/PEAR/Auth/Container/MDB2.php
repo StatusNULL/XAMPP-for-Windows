@@ -18,7 +18,7 @@
  * @author     Adam Ashley <aashley@php.net>
  * @copyright  2001-2006 The PHP Group
  * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
- * @version    CVS: $Id: MDB2.php,v 1.24 2008/04/04 07:57:02 aashley Exp $
+ * @version    CVS: $Id: MDB2.php 256753 2008-04-04 07:57:02Z aashley $
  * @link       http://pear.php.net/package/Auth
  * @since      File available since Release 1.3.0
  */
@@ -44,7 +44,7 @@ require_once 'MDB2.php';
  * @author     Adam Ashley <aashley@php.net>
  * @copyright  2001-2006 The PHP Group
  * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
- * @version    Release: 1.6.1  File: $Revision: 1.24 $
+ * @version    Release: @package_version@  File: $Revision: 256753 $
  * @link       http://pear.php.net/package/Auth
  * @since      Class available since Release 1.3.0
  */

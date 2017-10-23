@@ -5,13 +5,6 @@
 	$host = "127.0.0.1";
 	$timeout = "1";
 
-	if ($REMOTE_ADDR) {
-		if ($REMOTE_ADDR != $host) {
-			echo "<h2> FORBIDDEN FOR CLIENT $REMOTE_ADDR <h2>";
-			exit;
-		}
-	}
-
 	include ".\securefunctions.php";
 
 	$curdir = getcwd();

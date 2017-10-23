@@ -49,11 +49,15 @@
 						$subject = $_POST['subject'];
 						$message = $_POST['message'];
 
+						$header  = 'MIME-Version: 1.0' . "\r\n";
+						$header .= "Content-type: text/html; charset=iso-8859-1" . "\r\n";
+						$header .= "To: $_POST[recipients]" . "\r\n"; 
+
 						if (($_POST['ccaddress'] == "") || ($_POST['ccaddress'] == " ")) {
-							$header = "From: $_POST[knownsender]";
+							$header .= "From: $_POST[knownsender]" . "\r\n";
 						} else {
-							$header .= "From: $_POST[knownsender]\r\n";
-							$header .= " Cc: $_POST[ccaddress]";
+							$header .= "From: $_POST[knownsender]" . "\r\n";
+							$header .= "Cc: $_POST[ccaddress]" . "\r\n";
 						}
 
 						if (@mail($mailtos, $subject, $message, $header)) {

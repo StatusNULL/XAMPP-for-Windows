@@ -23,11 +23,15 @@ for /f "tokens=2*" %%i in ('%Cmd% ^| find "JavaHome"') do set JAVA_HOME=%%j
 
 echo.
 echo [XAMPP]: Seems fine!
-echo [XAMPP]: Using %JAVA_HOME%
+echo [XAMPP]: Using JAVA_HOME : %JAVA_HOME%
+echo [XAMPP]: Using CATALINA_HOME : %CATALINA_HOME%
 echo.
-echo %CATALINA_HOME%
 
-%CATALINA_HOME%\bin\catalina.bat stop
+if %ERRORLEVEL% == 0 {
+del /F/Q logs\catalina.pid
+}
+
+"%CATALINA_HOME%\bin\catalina.bat" stop
 
 
 :END

@@ -1,8 +1,8 @@
 <?php
 /**
- * $Header: /repository/pear/Log/Log/error_log.php,v 1.9 2008/09/20 19:36:41 jon Exp $
+ * $Header$
  *
- * @version $Revision: 1.9 $
+ * @version $Revision: 293927 $
  * @package Log
  */
 
@@ -59,7 +59,7 @@ class Log_error_log extends Log
     /**
      * Constructs a new Log_error_log object.
      *
-     * @param string $name     Ignored.
+     * @param string $name     One of the PEAR_LOG_TYPE_* constants.
      * @param string $ident    The identity string.
      * @param array  $conf     The configuration array.
      * @param int    $level    Log messages up to and including this level.

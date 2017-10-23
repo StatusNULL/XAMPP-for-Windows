@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2008, Laurent Laville <pear@laurent-laville.org>
+ * Copyright (c) 2008-2009, Laurent Laville <pear@laurent-laville.org>
  *
  * All rights reserved.
  *
@@ -35,7 +35,7 @@
  * @package  PHP_CompatInfo
  * @author   Laurent Laville <pear@laurent-laville.org>
  * @license  http://www.opensource.org/licenses/bsd-license.php  BSD
- * @version  CVS: $Id: Text.php,v 1.11 2008/07/27 14:17:44 farell Exp $
+ * @version  CVS: $Id: Text.php,v 1.13 2009/01/02 10:18:47 farell Exp $
  * @link     http://pear.php.net/package/PHP_CompatInfo
  * @since    File available since Release 1.8.0b3
  */
@@ -53,7 +53,7 @@ require_once 'Console/Table.php';
  * @package  PHP_CompatInfo
  * @author   Laurent Laville <pear@laurent-laville.org>
  * @license  http://www.opensource.org/licenses/bsd-license.php  BSD
- * @version  Release: 1.8.1
+ * @version  Release: 1.9.0
  * @link     http://pear.php.net/package/PHP_CompatInfo
  * @since    Class available since Release 1.8.0b3
  */
@@ -205,6 +205,7 @@ class PHP_CompatInfo_Renderer_Text extends PHP_CompatInfo_Renderer
 
         unset($info['max_version']);
         unset($info['version']);
+        unset($info['classes']);
         unset($info['functions']);
         unset($info['extensions']);
         unset($info['constants']);

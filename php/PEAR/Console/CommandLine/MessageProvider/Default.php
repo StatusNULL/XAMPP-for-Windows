@@ -16,7 +16,7 @@
  * @author    David JEAN LOUIS <izimobil@gmail.com>
  * @copyright 2007 David JEAN LOUIS
  * @license   http://opensource.org/licenses/mit-license.php MIT License 
- * @version   CVS: $Id: Default.php,v 1.5 2008/10/09 10:44:54 izi Exp $
+ * @version   CVS: $Id: Default.php 282427 2009-06-19 10:22:48Z izi $
  * @link      http://pear.php.net/package/Console_CommandLine
  * @since     File available since release 0.1.0
  * @filesource
@@ -28,6 +28,11 @@
 require_once 'Console/CommandLine/MessageProvider.php';
 
 /**
+ * The custom message provider interface.
+ */
+require_once 'Console/CommandLine/CustomMessageProvider.php';
+
+/**
  * Lightweight class that manages messages used by Console_CommandLine package, 
  * allowing the developper to customize these messages, for example to 
  * internationalize a command line frontend.
@@ -37,11 +42,13 @@ require_once 'Console/CommandLine/MessageProvider.php';
  * @author    David JEAN LOUIS <izimobil@gmail.com>
  * @copyright 2007 David JEAN LOUIS
  * @license   http://opensource.org/licenses/mit-license.php MIT License 
- * @version   Release: 1.0.5
+ * @version   Release: 1.1.3
  * @link      http://pear.php.net/package/Console_CommandLine
  * @since     Class available since release 0.1.0
  */
-class Console_CommandLine_MessageProvider_Default implements Console_CommandLine_MessageProvider
+class Console_CommandLine_MessageProvider_Default
+    implements Console_CommandLine_MessageProvider,
+    Console_CommandLine_CustomMessageProvider
 {
     // Properties {{{
 
@@ -70,6 +77,7 @@ class Console_CommandLine_MessageProvider_Default implements Console_CommandLine
         'INVALID_CUSTOM_INSTANCE' => 'Instance does not implement the required interface',
         'LIST_OPTION_MESSAGE'     => 'lists valid choices for option {$name}',
         'LIST_DISPLAYED_MESSAGE'  => 'Valid choices are: ',
+        'INVALID_SUBCOMMAND'      => 'Command "{$command}" is not valid.',
     );
 
     // }}}
@@ -88,12 +96,55 @@ class Console_CommandLine_MessageProvider_Default implements Console_CommandLine
         if (!isset($this->messages[$code])) {
             return 'UNKNOWN';
         }
+        return $this->replaceTemplateVars($this->messages[$code], $vars);
+    }
+
+    // }}}
+    // getWithCustomMessages() {{{
+
+    /**
+     * Retrieve the given string identifier corresponding message.
+     *
+     * @param string $code     The string identifier of the message
+     * @param array  $vars     An array of template variables
+     * @param array  $messages An optional array of messages to use. Array
+     *                         indexes are message codes.
+     *
+     * @return string
+     */
+    public function getWithCustomMessages(
+        $code, $vars = array(), $messages = array()
+    ) {
+        // get message
+        if (isset($messages[$code])) {
+            $message = $messages[$code];
+        } elseif (isset($this->messages[$code])) {
+            $message = $this->messages[$code];
+        } else {
+            $message = 'UNKNOWN';
+        }
+        return $this->replaceTemplateVars($message, $vars);
+    }
+
+    // }}}
+    // replaceTemplateVars() {{{
+
+    /**
+     * Replaces template vars in a message
+     *
+     * @param string $message The message
+     * @param array  $vars    An array of template variables
+     *
+     * @return string
+     */
+    protected function replaceTemplateVars($message, $vars = array())
+    {
         $tmpkeys = array_keys($vars);
         $keys    = array();
         foreach ($tmpkeys as $key) {
             $keys[] = '{$' . $key . '}';
         }
-        return str_replace($keys, array_values($vars), $this->messages[$code]);
+        return str_replace($keys, array_values($vars), $message);
     }
 
     // }}}

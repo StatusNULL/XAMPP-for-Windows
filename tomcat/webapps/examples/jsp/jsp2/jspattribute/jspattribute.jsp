@@ -1,4 +1,4 @@
-<!--
+<%--
  Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
   this work for additional information regarding copyright ownership.
@@ -13,7 +13,7 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
--->
+--%>
 <%@ taglib prefix="my" uri="http://tomcat.apache.org/jsp2-example-taglib"%>
 
 <html>
@@ -36,7 +36,7 @@
       Bean created!  Setting foo.bar...<br>
       <jsp:setProperty name="foo" property="bar">
         <jsp:attribute name="value">
-	  <my:helloWorld/>
+          <my:helloWorld/>
         </jsp:attribute>
       </jsp:setProperty>
     </jsp:useBean>

@@ -1,21 +1,23 @@
-###### ApacheFriends XAMPP (Basispaket) version 1.7.4 ######
+###### ApacheFriends XAMPP Version 1.7.5 ######
 
-  + Apache 2.2.17
-  + MySQL 5.5.8 (Community Server)
-  + PHP 5.3.5 (VC6 X86 32bit) + PEAR 
-  + XAMPP Control Version 2.5 from www.nat32.com
+  + Apache 2.2.21
+  + MySQL 5.5.15 (Community Server)
+  + PHP 5.3.8 (VC9 X86 32bit thread safe) + PEAR 
+  + XAMPP Control Panel Version 2.5 von www.nat32.com
+  + (BETA) XAMPP Control Panel Version 3.0.2 von Steffen Strueber (nicht in der USB & lite Version)
+    vgl http://www.apachefriends.org/f/viewtopic.php?f=16&t=46743
   + XAMPP Security
   + SQLite 2.8.15
-  + OpenSSL 0.9.8o
-  + phpMyAdmin 3.3.9
-  + ADOdb 5.11
-  + Mercury Mail Transport System v4.62
-  + FileZilla FTP Server 0.9.37
-  + Webalizer 2.01-10
+  + OpenSSL 1.0.0e
+  + phpMyAdmin 3.4.4
+  + ADOdb 5.14
+  + Mercury Mail Transport System v4.62 (nicht in der USB & lite Version)
+  + FileZilla FTP Server 0.9.39 (nicht in der USB & lite Version)
+  + Webalizer 2.01-10 (nicht in der USB & lite Version)
   + Zend Optimizer 3.3.0 
-  + Perl 5.10.1
-  + Mod_perl 2.0.4
-  + Tomcat 7.0.3 
+  + Perl 5.10.1 (nicht in der USB & lite Version)
+  + Mod_perl 2.0.4 (nicht in der USB & lite Version)
+  + Tomcat 7.0.21 (nicht in der USB & lite Version)
 
 --------------------------------------------------------------- 
 
@@ -80,8 +82,8 @@ bzw. als Dienste deinstallieren.
 
 4) WEBDAV: 
 
-   Benutzer: wampp
-   Password: xampp 
+   Benutzer: xampp-dav-unsecure
+   Password: ppmax2011 
 
 ---------------------------------------------------------------
 

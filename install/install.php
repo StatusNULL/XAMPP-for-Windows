@@ -1,4 +1,8 @@
+#!D:\rel174new\tests\xampp\php\php.exe -q
+
 <?php
+
+
 		/*
 	#### Installer PHP  1.5 ####
 	#### Author: Kay Vogelgesang & Carsten Wiedmann for www.apachefriends.org 2005 ####
@@ -6,12 +10,42 @@
 
 	/// Where I stand? ///
 	$curdir = getcwd();
+  $usbstick="0";
+  
+  if ( $_SERVER["argv"][1] == "usb" ) {
+            // echo   $_SERVER["argv"][1];
+            $usbstick="1";
+            echo "\r\n  ########################################################################\n";
+	echo "  #                                                                      #\r\n";
+	echo "  #                  XAMPP USB Stick Installation                        #\r\n";;
+	echo "  #                                                                      #\r\n";
+	echo "  ########################################################################\r\n\r\n";
+  }
+
+
+
 	list($partition, $nonpartition) = preg_split ("/:/", $curdir); //Fix by Wiedmann
 	$partwampp = substr(realpath(__FILE__), 0, strrpos(dirname(realpath(__FILE__)), '\\'));
+
 	$directorwampp = NULL;
-	$awkpart = str_replace("&", "\\\\&", eregi_replace ("\\\\", "\\\\", $partwampp)); //Fix by Wiedmann
-	$awkpartslash = str_replace("&", "\\\\&", ereg_replace ("\\\\", "/", $partwampp)); //Fix by Wiedmann
-	$phpdir = $partwampp;
+	if ($usbstick == "1" ) {
+	   $dirpartwampp=$nonpartition;
+  } else {
+  	$dirpartwampp=$partwampp;
+  }
+	$awkpart = str_replace("&", "\\\\&", eregi_replace ("\\\\", "\\\\", $dirpartwampp)); //Fix by Wiedmann
+	$awkpartslash = str_replace("&", "\\\\&", ereg_replace ("\\\\", "/", $dirpartwampp)); //Fix by Wiedmann
+
+  	
+	// Only debug
+  // echo $partition."\n";
+	// 	echo $nonpartition."\n";
+	//		echo $partwampp."\n\n";
+          // echo $awkpart."\n"; 
+				    // echo $awkpartslash."\n";
+				          // exit;			
+				
+  $phpdir = $partwampp;
 	$dir = ereg_replace("\\\\", "/", $partwampp);
 	$ppartition = "$partition:";
 
@@ -48,11 +82,11 @@
 		$xamppversion = "?.?.?";
     // include_once "$partwampp\install\.version";
   }
-	
+  date_default_timezone_set('UTC');
 	echo "\r\n  ########################################################################\n";
 	echo "  # ApacheFriends XAMPP setup win32 Version                              #\r\n";
 	echo "  #----------------------------------------------------------------------#\r\n";
-	echo "  # Copyright (c) 2002-2009 Apachefriends $xamppversion                    #\r\n";
+	echo "  # Copyright (c) 2002-".date("Y")." Apachefriends $xamppversion                          #\r\n";
 	echo "  #----------------------------------------------------------------------#\r\n";
 	echo "  # Authors: Kay Vogelgesang <kvo@apachefriends.org>                     #\r\n";
 	echo "  #          Carsten Wiedmann <webmaster@wiedmann-online.de>             #\r\n";
@@ -66,6 +100,13 @@
 		$datei = fopen($installsysroot, 'r');
 		while (!feof($datei)) {
 			$zeile = fgets($datei, 255);
+			if ( $zeile == "usbstick = 1" ) {
+        echo "  USB stick installation found! Using relative paths by default ($nonpartition).";
+          $dirpartwampp=$nonpartition;
+          $usbstick="1";
+          $partwampp=$nonpartition;
+        //exit;
+      } 
 			$sysroot[] = $zeile;
 			$i += 1;
 		}
@@ -85,8 +126,12 @@
 		}
 	} else {
 		$installsys = fopen($installsysroot, 'w');
-		$wamppinfo = "DIR = $partwampp\r\nxampp = $xamppversion\r\nserver = 0\r\nperl = 0\r\npython = 0\r\nutils = 0\r\njava = 0\r\nother = 0";
-		fputs($installsys, $wamppinfo);
+		if ( $usbstick == "1" ) {
+		$wamppinfo = "DIR = $nonpartition\r\nxampp = $xamppversion\r\nserver = 0\r\nperl = 0\r\npython = 0\r\nutils = 0\r\njava = 0\r\nother = 0\r\nusbstick = $usbstick";
+		} else {
+    $wamppinfo = "DIR = $partwampp\r\nxampp = $xamppversion\r\nserver = 0\r\nperl = 0\r\npython = 0\r\nutils = 0\r\njava = 0\r\nother = 0\r\nusbstick = $usbstick";
+    }
+    fputs($installsys, $wamppinfo);
 		fclose($installsys);
 		$xamppinstaller = "newinstall";
 	}

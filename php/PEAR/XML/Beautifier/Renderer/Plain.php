@@ -42,7 +42,7 @@
  * @author    Stephan Schmidt <schst@php.net>
  * @copyright 2003-2008 Stephan Schmidt <schst@php.net>
  * @license   http://opensource.org/licenses/bsd-license New BSD License
- * @version   CVS: $Id: Plain.php,v 1.7 2008/08/24 19:44:14 ashnazg Exp $
+ * @version   CVS: $Id: Plain.php 265438 2008-08-24 19:44:14Z ashnazg $
  * @link      http://pear.php.net/package/XML_Beautifier
  */
 
@@ -64,7 +64,7 @@ require_once XML_BEAUTIFIER_INCLUDE_PATH . '/Renderer.php';
  * @author    Stephan Schmidt <schst@php.net>
  * @copyright 2003-2008 Stephan Schmidt <schst@php.net>
  * @license   http://opensource.org/licenses/bsd-license New BSD License
- * @version   Release: 1.2.0
+ * @version   Release: @package_version@
  * @link      http://pear.php.net/package/XML_Beautifier
  * @todo      option to specify inline tags
  * @todo      option to specify treatment of whitespace in data sections

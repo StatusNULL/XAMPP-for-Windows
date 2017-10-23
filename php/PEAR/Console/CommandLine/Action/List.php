@@ -16,7 +16,7 @@
  * @author    David JEAN LOUIS <izimobil@gmail.com>
  * @copyright 2007 David JEAN LOUIS
  * @license   http://opensource.org/licenses/mit-license.php MIT License 
- * @version   CVS: $Id: List.php,v 1.1 2008/10/09 10:44:54 izi Exp $
+ * @version   CVS: $Id: List.php 276559 2009-02-27 08:03:17Z izi $
  * @link      http://pear.php.net/package/Console_CommandLine
  * @since     File available since release 0.1.0
  * @filesource
@@ -36,7 +36,7 @@ require_once 'Console/CommandLine/Action.php';
  * @author    David JEAN LOUIS <izimobil@gmail.com>
  * @copyright 2007 David JEAN LOUIS
  * @license   http://opensource.org/licenses/mit-license.php MIT License 
- * @version   Release: 1.0.5
+ * @version   Release: 1.1.3
  * @link      http://pear.php.net/package/Console_CommandLine
  * @since     Class available since release 0.1.0
  */
@@ -46,6 +46,12 @@ class Console_CommandLine_Action_List extends Console_CommandLine_Action
 
     /**
      * Executes the action with the value entered by the user.
+     * Possible parameters are:
+     * - message: an alternative message to display instead of the default 
+     *   message,
+     * - delimiter: an alternative delimiter instead of the comma,
+     * - post: a string to append after the message (default is the new line 
+     *   char).
      *
      * @param mixed $value  The option value
      * @param array $params An optional array of parameters
@@ -55,8 +61,12 @@ class Console_CommandLine_Action_List extends Console_CommandLine_Action
     public function execute($value = false, $params = array())
     {
         $list = isset($params['list']) ? $params['list'] : array();
-        $msg  = $this->parser->message_provider->get('LIST_DISPLAYED_MESSAGE');
-        $this->parser->outputter->stdout($msg . implode(', ', $list) . "\n");
+        $msg  = isset($params['message']) 
+            ? $params['message'] 
+            : $this->parser->message_provider->get('LIST_DISPLAYED_MESSAGE');
+        $del  = isset($params['delimiter']) ? $params['delimiter'] : ', ';
+        $post = isset($params['post']) ? $params['post'] : "\n";
+        $this->parser->outputter->stdout($msg . implode($del, $list) . $post);
         exit(0);
     }
     // }}}

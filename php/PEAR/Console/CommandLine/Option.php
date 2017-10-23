@@ -16,7 +16,7 @@
  * @author    David JEAN LOUIS <izimobil@gmail.com>
  * @copyright 2007 David JEAN LOUIS
  * @license   http://opensource.org/licenses/mit-license.php MIT License 
- * @version   CVS: $Id: Option.php,v 1.6 2008/10/09 10:44:54 izi Exp $
+ * @version   CVS: $Id: Option.php 292158 2009-12-15 12:14:28Z rquadling $
  * @link      http://pear.php.net/package/Console_CommandLine
  * @since     File available since release 0.1.0
  * @filesource
@@ -36,7 +36,7 @@ require_once 'Console/CommandLine/Element.php';
  * @author    David JEAN LOUIS <izimobil@gmail.com>
  * @copyright 2007 David JEAN LOUIS
  * @license   http://opensource.org/licenses/mit-license.php MIT License 
- * @version   Release: 1.0.5
+ * @version   Release: 1.1.3
  * @link      http://pear.php.net/package/Console_CommandLine
  * @since     Class available since release 0.1.0
  */
@@ -73,7 +73,7 @@ class Console_CommandLine_Option extends Console_CommandLine_Element
     public $default;
 
     /**
-     * An array of possible values for the option if this array is not empty 
+     * An array of possible values for the option. If this array is not empty 
      * and the value passed is not in the array an exception is raised.
      * This only make sense for actions that accept values of course.
      *
@@ -144,6 +144,16 @@ class Console_CommandLine_Option extends Console_CommandLine_Element
     public $add_list_option = false;
 
     // }}}
+    // Private properties {{{
+
+    /**
+     * When an action is called remember it to allow for multiple calls.
+     *
+     * @var object $action_instance Placeholder for action
+     */
+    private $_action_instance = null;
+
+    // }}}
     // __construct() {{{
 
     /**
@@ -170,10 +180,12 @@ class Console_CommandLine_Option extends Console_CommandLine_Element
     /**
      * Returns the string representation of the option.
      *
+     * @param string $delim Delimiter to use between short and long option
+     *
      * @return string The string representation of the option
      * @todo use __toString() instead
      */
-    public function toString()
+    public function toString($delim = ", ")
     {
         $ret     = '';
         $padding = '';
@@ -182,7 +194,7 @@ class Console_CommandLine_Option extends Console_CommandLine_Element
             if ($this->expectsArgument()) {
                 $ret .= ' ' . $this->help_name;
             }
-            $padding = ', ';
+            $padding = $delim;
         }
         if ($this->long_name != null) {
             $ret .= $padding . $this->long_name;
@@ -228,17 +240,6 @@ class Console_CommandLine_Option extends Console_CommandLine_Element
      */
     public function dispatchAction($value, $result, $parser)
     {
-        // check value is in option choices
-        if (!empty($this->choices) && !in_array($value, $this->choices)) {
-            throw Console_CommandLine_Exception::factory(
-                'OPTION_VALUE_NOT_VALID',
-                array(
-                    'name'    => $this->name,
-                    'choices' => implode('", "', $this->choices),
-                    'value'   => $value,
-                ), $parser
-            );
-        }
         $actionInfo = Console_CommandLine::$actions[$this->action];
         if (true === $actionInfo[1]) {
             // we have a "builtin" action
@@ -246,8 +247,24 @@ class Console_CommandLine_Option extends Console_CommandLine_Element
             include_once implode('/', $tokens) . '.php';
         }
         $clsname = $actionInfo[0];
-        $action  = new $clsname($result, $this, $parser);
-        $action->execute($value, $this->action_params);
+        if ($this->_action_instance === null) {
+            $this->_action_instance  = new $clsname($result, $this, $parser);
+        }
+
+        // check value is in option choices
+        if (!empty($this->choices) && !in_array($this->_action_instance->format($value), $this->choices)) {
+            throw Console_CommandLine_Exception::factory(
+                'OPTION_VALUE_NOT_VALID',
+                array(
+                    'name'    => $this->name,
+                    'choices' => implode('", "', $this->choices),
+                    'value'   => $value,
+                ),
+                $parser,
+                $this->messages
+            );
+        }
+        $this->_action_instance->execute($value, $this->action_params);
     }
 
     // }}}
@@ -309,6 +326,46 @@ class Console_CommandLine_Option extends Console_CommandLine_Element
         if ($this->action == 'Callback' && !is_callable($this->callback)) {
             Console_CommandLine::triggerError('option_invalid_callback',
                 E_USER_ERROR, array('{$name}' => $this->name));
+        }
+    }
+
+    // }}}
+    // setDefaults() {{{
+
+    /**
+     * Set the default value according to the configured action.
+     *
+     * Note that for backward compatibility issues this method is only called 
+     * when the 'force_options_defaults' is set to true, it will become the
+     * default behaviour in the next major release of Console_CommandLine.
+     *
+     * @return void
+     */
+    public function setDefaults()
+    {
+        if ($this->default !== null) {
+            // already set
+            return;
+        }
+        switch ($this->action) {
+        case 'Counter':
+        case 'StoreInt':
+            $this->default = 0;
+            break;
+        case 'StoreFloat':
+            $this->default = 0.0;
+            break;
+        case 'StoreArray':
+            $this->default = array();
+            break;
+        case 'StoreTrue':
+            $this->default = false;
+            break;
+        case 'StoreFalse':
+            $this->default = true;
+            break;
+        default:
+            return;
         }
     }
 

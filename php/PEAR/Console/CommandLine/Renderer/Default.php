@@ -16,7 +16,7 @@
  * @author    David JEAN LOUIS <izimobil@gmail.com>
  * @copyright 2007 David JEAN LOUIS
  * @license   http://opensource.org/licenses/mit-license.php MIT License 
- * @version   CVS: $Id: Default.php,v 1.6 2008/10/09 10:44:54 izi Exp $
+ * @version   CVS: $Id: Default.php 282213 2009-06-16 08:15:06Z izi $
  * @link      http://pear.php.net/package/Console_CommandLine
  * @since     File available since release 0.1.0
  * @filesource
@@ -35,7 +35,7 @@ require_once 'Console/CommandLine/Renderer.php';
  * @author    David JEAN LOUIS <izimobil@gmail.com>
  * @copyright 2007 David JEAN LOUIS
  * @license   http://opensource.org/licenses/mit-license.php MIT License 
- * @version   Release: 1.0.5
+ * @version   Release: 1.1.3
  * @link      http://pear.php.net/package/Console_CommandLine
  * @since     Class available since release 0.1.0
  */
@@ -49,6 +49,13 @@ class Console_CommandLine_Renderer_Default implements Console_CommandLine_Render
      * @var integer $line_width Line width
      */
     public $line_width = 75;
+
+    /**
+     * Integer that define the max width of the help text.
+     *
+     * @var integer $line_width Line width
+     */
+    public $options_on_different_lines = false;
 
     /**
      * An instance of Console_CommandLine.
@@ -153,19 +160,18 @@ class Console_CommandLine_Renderer_Default implements Console_CommandLine_Render
      */
     protected function name()
     {
-        $name   = '';
+        $name   = $this->parser->name;
         $parent = $this->parser->parent;
         while ($parent) {
-            $name .= $parent->name . ' ';
             if (count($parent->options) > 0) {
-                $name .= '[' 
+                $name = '[' 
                     . strtolower($this->parser->message_provider->get('OPTION_WORD',
                           array('plural' => 's'))) 
-                    . '] ';
+                    . '] ' . $name;
             }
+            $name = $parent->name . ' ' . $name;
             $parent = $parent->parent;
         }
-        $name .= $this->parser->name;
         return $this->wrap($name);
     }
 
@@ -226,8 +232,24 @@ class Console_CommandLine_Renderer_Default implements Console_CommandLine_Render
                 . strtolower($this->parser->message_provider->get('OPTION_WORD'))
                 . ']';
         }
-        //XXX
-        $ret .= " <command> [options] [args]";
+        $ret       .= " <command>";
+        $hasArgs    = false;
+        $hasOptions = false;
+        foreach ($this->parser->commands as $command) {
+            if (!$hasArgs && count($command->args) > 0) {
+                $hasArgs = true;
+            }
+            if (!$hasOptions && ($command->add_help_option || 
+                $command->add_version_option || count($command->options) > 0)) {
+                $hasOptions = true;
+            }
+        }
+        if ($hasOptions) {
+            $ret .= ' [options]';
+        }
+        if ($hasArgs) {
+            $ret .= ' [args]';
+        }
         return $this->columnWrap($ret, 2);
     }
 
@@ -274,17 +296,31 @@ class Console_CommandLine_Renderer_Default implements Console_CommandLine_Render
         $col     = 0;
         $options = array();
         foreach ($this->parser->options as $option) {
-            $optstr    = '  ' . $option->toString();
-            $options[] = array($optstr, $option->description);
-            $ln        = strlen($optstr);
+            $delim    = $this->options_on_different_lines ? "\n" : ', ';
+            $optstr   = $option->toString($delim);
+            $lines    = explode("\n", $optstr);
+            $lines[0] = '  ' . $lines[0];
+            if (count($lines) > 1) {
+                $lines[1] = '  ' . $lines[1];
+                $ln       = strlen($lines[1]);
+            } else {
+                $ln = strlen($lines[0]);
+            }
+            $options[] = array($lines, $option->description);
             if ($col < $ln) {
                 $col = $ln;
             }
         }
         $ret = $this->parser->message_provider->get('OPTION_WORD') . ":";
         foreach ($options as $option) {
-            $text = str_pad($option[0], $col) . '  ' . $option[1];
-            $ret .= "\n" . $this->columnWrap($text, $col+2);
+            if (count($option[0]) > 1) {
+                $text = str_pad($option[0][1], $col) . '  ' . $option[1];
+                $pre  = $option[0][0] . "\n";
+            } else {
+                $text = str_pad($option[0][0], $col) . '  ' . $option[1];
+                $pre  = '';
+            }
+            $ret .= "\n" . $pre . $this->columnWrap($text, $col+2);
         }
         return $ret;
     }
@@ -305,7 +341,7 @@ class Console_CommandLine_Renderer_Default implements Console_CommandLine_Render
         $col      = 0;
         foreach ($this->parser->commands as $cmdname=>$command) {
             $cmdname    = '  ' . $cmdname;
-            $commands[] = array($cmdname, $command->description);
+            $commands[] = array($cmdname, $command->description, $command->aliases);
             $ln         = strlen($cmdname);
             if ($col < $ln) {
                 $col = $ln;
@@ -314,6 +350,16 @@ class Console_CommandLine_Renderer_Default implements Console_CommandLine_Render
         $ret = $this->parser->message_provider->get('COMMAND_WORD') . ":";
         foreach ($commands as $command) {
             $text = str_pad($command[0], $col) . '  ' . $command[1];
+            if ($aliasesCount = count($command[2])) {
+                $pad = '';
+                $text .= ' (';
+                $text .= $aliasesCount > 1 ? 'aliases: ' : 'alias: ';
+                foreach ($command[2] as $alias) {
+                    $text .= $pad . $alias;
+                    $pad   = ', ';
+                }
+                $text .= ')';
+            }
             $ret .= "\n" . $this->columnWrap($text, $col+2);
         }
         return $ret;

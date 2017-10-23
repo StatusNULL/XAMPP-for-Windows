@@ -1,5 +1,4 @@
-<HTML>
-<!--
+<%--
  Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
   this work for additional information regarding copyright ownership.
@@ -14,10 +13,10 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
--->
-
+--%>
+<HTML>
 <HEAD><TITLE> 
-	Calendar: A JSP APPLICATION
+    Calendar: A JSP APPLICATION
 </TITLE></HEAD>
 
 
@@ -25,7 +24,7 @@
 <jsp:useBean id="table" scope="session" class="cal.TableBean" />
 
 <% 
-	String time = request.getParameter ("time");
+    String time = request.getParameter ("time");
 %>
 
 <FONT SIZE=5> Please add the following event:

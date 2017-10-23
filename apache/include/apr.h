@@ -78,7 +78,7 @@
 
 /* Restrict the server to a subset of Windows XP header files by default
  */
-#define _WIN32_WINNT 0x0501
+#define _WIN32_WINNT 0x0502
 #endif
 #ifndef NOUSER
 #define NOUSER
@@ -276,12 +276,13 @@ extern "C" {
 #define APR_HAVE_IN_ADDR        1
 #define APR_HAVE_INET_ADDR      1
 #define APR_HAVE_INET_NETWORK   0
-#define APR_HAVE_IPV6           0
+#define APR_HAVE_IPV6           1
 #define APR_HAVE_MEMMOVE        1
 #define APR_HAVE_SETRLIMIT      0
 #define APR_HAVE_SIGACTION      0
 #define APR_HAVE_SIGSUSPEND     0
 #define APR_HAVE_SIGWAIT        0
+#define APR_HAVE_SA_STORAGE     0
 #define APR_HAVE_STRCASECMP     0
 #define APR_HAVE_STRDUP         1
 #define APR_HAVE_STRNCASECMP    0
