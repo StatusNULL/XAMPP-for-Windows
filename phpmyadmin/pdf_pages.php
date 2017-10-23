@@ -1,5 +1,5 @@
 <?php
-/* $Id: pdf_pages.php,v 2.14 2005/05/22 17:09:27 lem9 Exp $ */
+/* $Id: pdf_pages.php,v 2.15 2005/07/28 16:50:37 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -445,7 +445,7 @@ function resetDrag() {
         echo "\n" . '    <input type="hidden" name="c_table_rows" value="' . ($i + 1) . '" />';
         echo ($cfg['WYSIWYG-PDF'] ? "\n" . '    <input type="hidden" name="showwysiwyg" value="' . ((isset($showwysiwyg) && $showwysiwyg == '1') ? '1' : '0') . '" />' : '');
         echo "\n" . '    <input type="checkbox" name="with_field_names" ' . (isset($with_field_names) ? 'checked="checked"' : ''). ' />' . $strColumnNames . '<br />';
-        echo "\n" . '    <input type="submit" value="' . $strGo . '" />';
+        echo "\n" . '    <input type="submit" value="' . $strSave . '" />';
         echo "\n" . '</form>' . "\n\n";
     } // end if
 

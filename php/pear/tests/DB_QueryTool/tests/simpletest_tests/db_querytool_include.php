@@ -1,5 +1,5 @@
 <?php
-// $Id: db_querytool_include.php,v 1.1 2005/02/25 14:25:08 quipo Exp $
+// $Id: db_querytool_include.php,v 1.2 2005/03/25 23:16:07 quipo Exp $
 
 require_once 'DB/QueryTool.php';
 require_once dirname(__FILE__).'/db_settings.php';
@@ -14,6 +14,14 @@ class DB_QT extends DB_QueryTool
         array(
             'name'      => TABLE_ANSWER,
             'shortName' => TABLE_ANSWER
+        ),
+        array(
+            'name'      => TABLE_USER,
+            'shortName' => TABLE_USER
+        ),
+        array(
+            'name'      => TABLE_TRANSLATION,
+            'shortName' => TABLE_TRANSLATION
         ),
     );
 

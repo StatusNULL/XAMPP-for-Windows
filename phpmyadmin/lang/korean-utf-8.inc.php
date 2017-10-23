@@ -1,5 +1,5 @@
 <?php
-/* $Id: korean-utf-8.inc.php,v 2.61 2005/06/12 10:10:00 swix Exp $ */
+/* $Id: korean-utf-8.inc.php,v 2.65 2005/07/29 17:03:18 lem9 Exp $ */
 
 /* Translated by WooSuhan <kjh@unews.NOSPAM.co.kr> */
 
@@ -242,7 +242,6 @@ $strNoTablesFound = '데이터베이스에 테이블이 없습니다.';
 $strNoUsersFound = '사용자가 없습니다.';
 $strNone = '없음';
 $strNotNumber = '은 숫자(번호)가 아닙니다!';
-$strNotValidNumber = '은 올바른 열 번호가 아닙니다!';
 $strNumTables = '테이블 수';
 
 $strOperations = '테이블 작업';
@@ -831,4 +830,10 @@ $strCreateDatabaseBeforeCopying = 'CREATE DATABASE before copying';  //to transl
 $strGeneratePassword = 'Generate Password';  //to translate
 $strGenerate = 'Generate';  //to translate
 $strCopy = 'Copy';  //to translate
+$strTransformation_application_octetstream__hex = 'Displays hexadecimal representation of data.';  //to translate
+$strInvalidFieldCount = 'Table must have at least one field.';  //to translate
+$strInvalidRowNumber = '%d is not valid row number.';  //to translate
+$strInvalidColumnCount = 'Column count has to be larger than zero.';  //to translate
+$strInvalidFieldAddCount = 'You have to add at least one field.';  //to translate
+$strAndThen = 'and then';  //to translate
 ?>

@@ -1,5 +1,5 @@
 <?php
-/* $Id: czech-utf-8.inc.php,v 2.96.2.1 2005/06/30 17:22:37 lem9 Exp $ */
+/* $Id: czech-utf-8.inc.php,v 2.102 2005/08/01 21:11:55 nijel Exp $ */
 
 /**
  * Czech language file by
@@ -59,6 +59,7 @@ $strAll = 'Všechno';
 $strAlterOrderBy = 'Změnit pořadí tabulky podle';
 $strAnalyzeTable = 'Analyzovat tabulku';
 $strAnd = 'a';
+$strAndThen = 'a poté';
 $strAnIndex = 'K&nbsp;tabulce %s byl přidán index';
 $strAnyHost = 'Jakýkoliv počítač';
 $strAny = 'Jakýkoliv';
@@ -251,7 +252,7 @@ $strEncloseInTransaction = 'Uzavřít příkazy v&nbsp;transakci';
 $strEndCut = 'KONEC VÝPISU';
 $strEnd = 'Konec';
 $strEndRaw = 'KONEC VÝPISU';
-$strEngineAvailable = 'Úložiště %s není dostupné na tomto MySQL serveru.';
+$strEngineAvailable = 'Úložiště %s je dostupné na tomto MySQL serveru.';
 $strEngineDisabled = 'Úložiště %s je vypnuté na tomto MySQL serveru.';
 $strEngines = 'Úložiště';
 $strEngineUnsupported = 'Tento MySQL server nepodporuje úložiště %s.';
@@ -360,6 +361,10 @@ $strInstructions = 'Instrukce';
 $strInternalNotNecessary = '* Interní relace není potřebná, pokud již relace existuje v InnoDB.';
 $strInternalRelations = 'Interní relace';
 $strInUse = 'právě se používá';
+$strInvalidColumnCount = 'Počet sloupců musí být větší než nula.';
+$strInvalidFieldAddCount = 'Musíte přidat alespoň jeden sloupec.';
+$strInvalidFieldCount = 'Tabulka musí mít alespoň jeden sloupec.';
+$strInvalidRowNumber = '%d není platné číslo řádku.';
 
 $strJapanese = 'Japonština';
 $strJumpToDB = 'Na databázi &quot;%s&quot;.';
@@ -476,7 +481,6 @@ $strNoThemeSupport = 'Není podporována změna tématu, zkontrolujte nastavení
 $strNotNumber = 'Nebylo zadáno číslo!';
 $strNotOK = 'není v pořádku';
 $strNotSet = '<b>%s</b> tabulka nenalezena nebo není nastavena v&nbsp;%s';
-$strNotValidNumber = ' není platné číslo řádku!';
 $strNoUsersFound = 'Žádný uživatel nenalezen.';
 $strNoValidateSQL = 'Bez kontroly SQL';
 $strNull = 'Nulový';

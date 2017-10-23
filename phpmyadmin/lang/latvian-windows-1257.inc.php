@@ -1,5 +1,5 @@
 <?php
-/* $Id: latvian-windows-1257.inc.php,v 2.76 2005/06/12 10:10:00 swix Exp $ */
+/* $Id: latvian-windows-1257.inc.php,v 2.80 2005/07/29 17:03:18 lem9 Exp $ */
 
 /**
  * Latvian language file by Sandis Jçrics <sandisj at parks.lv>
@@ -426,7 +426,6 @@ $strNone = 'Nav';
 $strNotNumber = 'Tas nav numurs!';
 $strNotOK = 'nav OK';
 $strNotSet = 'Tabula <b>%s</b> nav atrasta vai nav atzîmeta iekð %s';
-$strNotValidNumber = ' nav derîgs lauku skaits!';
 $strNull = 'Nulle';
 $strNumSearchResultsInTable = '%s rezultâti tabulâ <i>%s</i>';
 $strNumSearchResultsTotal = '<b>Kopumâ:</b> <i>%s</i> rezultâti';
@@ -816,4 +815,10 @@ $strCreateDatabaseBeforeCopying = 'CREATE DATABASE before copying';  //to transl
 $strGeneratePassword = 'Generate Password';  //to translate
 $strGenerate = 'Generate';  //to translate
 $strCopy = 'Copy';  //to translate
+$strTransformation_application_octetstream__hex = 'Displays hexadecimal representation of data.';  //to translate
+$strInvalidFieldCount = 'Table must have at least one field.';  //to translate
+$strInvalidRowNumber = '%d is not valid row number.';  //to translate
+$strInvalidColumnCount = 'Column count has to be larger than zero.';  //to translate
+$strInvalidFieldAddCount = 'You have to add at least one field.';  //to translate
+$strAndThen = 'and then';  //to translate
 ?>

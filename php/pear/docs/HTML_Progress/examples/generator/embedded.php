@@ -1,12 +1,12 @@
 <?php
-@include '../include_path.php';
 /**
  * How to embedded HTML_Progress_Generator into existing html page
  * and allows php/css source-code download.
  *
- * @version    $Id: embedded.php,v 1.2 2004/10/16 12:16:20 farell Exp $
+ * @version    $Id: embedded.php,v 1.4 2005/08/28 14:57:37 farell Exp $
  * @author     Laurent Laville <pear@laurent-laville.org>
  * @package    HTML_Progress
+ * @subpackage Examples
  */
 
 require_once 'HTML/Progress/generator.php';
@@ -17,12 +17,12 @@ require_once 'HTML/Progress/generator.php';
  */
 require_once 'HTML/Progress/generator/ITDynamic.php';
 
-/* 2. 'ActionDisplay' is default classname that should exists 
+/* 2. 'ActionDisplay' is default classname that should exists
       to manage wizard/tabbed display. But you can also create
-      your own class under a new name. Then you've to give 
+      your own class under a new name. Then you've to give
       the new name to HTML_Progress_Generator.
       For example:
-      
+
       class MyDisplayHandler extends HTML_QuickForm_Action_Display
       {
            ...
@@ -31,9 +31,13 @@ require_once 'HTML/Progress/generator/ITDynamic.php';
       'ActionDisplay' ('HTML/Progress/generator/default.php')
       will be used.
  */
+
+/**
+ * @ignore
+ */
 class MyDisplayHandler extends HTML_QuickForm_Action_Display
 {
-    function _renderForm(&$page) 
+    function _renderForm(&$page)
     {
         $pageName = $page->getAttribute('name');
         $tabPreview = array_slice ($page->controller->_tabs, -2, 1);
@@ -67,19 +71,23 @@ class MyDisplayHandler extends HTML_QuickForm_Action_Display
     }
 }
 
-/* 3. 'ActionProcess' is default classname that should exists 
+/* 3. 'ActionProcess' is default classname that should exists
       to save your progress bar php/css source-code. But you can also create
-      your own class under a new name. Then you've to give 
+      your own class under a new name. Then you've to give
       the new name to HTML_Progress_Generator.
       For example:
-      
+
       class MyProcessHandler extends HTML_QuickForm_Action
       {
            ...
       }
       If your 'MyProcessHandler' class is not defined, then default
-      'ActionProcess' ('HTML/Progress/generator/process.php') 
+      'ActionProcess' ('HTML/Progress/generator/process.php')
       will be used.
+ */
+
+/**
+ * @ignore
  */
 class MyProcessHandler extends HTML_QuickForm_Action
 {
@@ -93,12 +101,12 @@ class MyProcessHandler extends HTML_QuickForm_Action
             $page->isFormBuilt() or $page->buildForm();
             $page->controller->isValid();
 
-            // what kind of source code is requested  
+            // what kind of source code is requested
             $code = $page->exportValue('phpcss');
             $bar = $page->controller->createProgressBar();
 
             $lineEnd = OS_WINDOWS ? "\r\n" : "\n";
-            
+
             if (isset($code['C']) && !isset($code['P'])) {
                 $this->exportOutput($bar->getStyle(), 'text/css');
             }
@@ -109,7 +117,7 @@ class MyProcessHandler extends HTML_QuickForm_Action
                 if (isset($code['C'])) {
                     $strCSS  = '<style type="text/css">'.$lineEnd;
                     $strCSS .= '<!--'.$lineEnd;
-                    $strCSS .= $bar->getStyle() . $lineEnd;
+                    $strCSS .= $bar->getStyle();
                     $strCSS .= '// -->'.$lineEnd;
                     $strCSS .= '</style>'.$lineEnd;
                     $strPHP  = $strCSS;
@@ -120,7 +128,7 @@ class MyProcessHandler extends HTML_QuickForm_Action
                 $strPHP .= 'require_once \'HTML/Progress.php\';'.$lineEnd.$lineEnd;
                 $strPHP .= '$progress = new HTML_Progress();'.$lineEnd;
                 $strPHP .= '$progress->setIdent(\'PB1\');'.$lineEnd;
-                    
+
                 if ($bar->isIndeterminate()) {
                     $strPHP .= '$progress->setIndeterminate(true);'.$lineEnd;
                 }
@@ -219,7 +227,7 @@ class MyProcessHandler extends HTML_QuickForm_Action
                 $strPHP .= "'$attr'=>".($val?'true':'false').', ';
             } else {
                 $strPHP .= "'$attr'=>'$val', ";
-            }   
+            }
         }
         $strPHP = ereg_replace(', $', '', $strPHP);
         $strPHP .= '));';

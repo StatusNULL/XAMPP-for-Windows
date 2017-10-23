@@ -1,5 +1,5 @@
 <?php
-/* $Id: bosnian-utf-8.inc.php,v 2.69 2005/06/12 10:09:56 swix Exp $ */
+/* $Id: bosnian-utf-8.inc.php,v 2.73 2005/07/29 17:03:06 lem9 Exp $ */
 
 /**
  *     Translated by:
@@ -366,7 +366,6 @@ $strNone = 'nema';
 $strNotNumber = 'Ovo nije broj!';
 $strNotOK = 'nije u redu';
 $strNotSet = '<b>%s</b> tabela nije pronađena ili nije postavljena u %s';
-$strNotValidNumber = 'nije odgovarajući broj kolone!';
 $strNull = 'Null';
 $strNumSearchResultsInTable = '%s pogodaka unutar tabele <i>%s</i>';
 $strNumSearchResultsTotal = '<b>Ukupno:</b> <i>%s</i> pogodaka';
@@ -821,4 +820,10 @@ $strCreateDatabaseBeforeCopying = 'CREATE DATABASE before copying';  //to transl
 $strGeneratePassword = 'Generate Password';  //to translate
 $strGenerate = 'Generate';  //to translate
 $strCopy = 'Copy';  //to translate
+$strTransformation_application_octetstream__hex = 'Displays hexadecimal representation of data.';  //to translate
+$strInvalidFieldCount = 'Table must have at least one field.';  //to translate
+$strInvalidRowNumber = '%d is not valid row number.';  //to translate
+$strInvalidColumnCount = 'Column count has to be larger than zero.';  //to translate
+$strInvalidFieldAddCount = 'You have to add at least one field.';  //to translate
+$strAndThen = 'and then';  //to translate
 ?>

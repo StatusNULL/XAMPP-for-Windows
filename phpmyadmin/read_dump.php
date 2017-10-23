@@ -1,5 +1,5 @@
 <?php
-/* $Id: read_dump.php,v 2.34 2005/05/08 12:58:27 lem9 Exp $ */
+/* $Id: read_dump.php,v 2.35 2005/08/09 12:09:46 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -99,21 +99,21 @@ if ($sql_file != 'none') {
             if (!is_writeable($tmp_subdir)) {
                 $sql_query = PMA_readFile($sql_file, $sql_file_compression);
                 if ($sql_query == FALSE) {
-                    $message = $strFileCouldNotBeRead;
+                    $message = $strFileCouldNotBeRead . ' (1)';
                 }
             } else {
                 $sql_file_new = $tmp_subdir . basename($sql_file);
                 if (move_uploaded_file($sql_file, $sql_file_new)) {
                     $sql_query = PMA_readFile($sql_file_new, $sql_file_compression);
                     if ($sql_query == FALSE) {
-                        $message = $strFileCouldNotBeRead;
+                        $message = $strFileCouldNotBeRead . ' (2)';
                     }
                     unlink($sql_file_new);
                 } else {
                     // Moving uploaded file failed. Falling back to try reading it immediately.
                     $sql_query = PMA_readFile($sql_file, $sql_file_compression);
                     if ($sql_query == FALSE) {
-                        $message = $strFileCouldNotBeRead;
+                        $message = $strFileCouldNotBeRead . ' (3)';
                     }
                 }
             }
@@ -121,7 +121,7 @@ if ($sql_file != 'none') {
             // read from the normal upload dir
             $sql_query = PMA_readFile($sql_file, $sql_file_compression);
             if ($sql_query == FALSE) {
-                $message = $strFileCouldNotBeRead;
+                $message = $strFileCouldNotBeRead . ' (4)';
             }
         }
 

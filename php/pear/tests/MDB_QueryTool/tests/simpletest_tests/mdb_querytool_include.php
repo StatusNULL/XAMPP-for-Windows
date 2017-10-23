@@ -1,5 +1,5 @@
 <?php
-// $Id: mdb_querytool_include.php,v 1.1 2005/02/25 14:15:59 quipo Exp $
+// $Id: mdb_querytool_include.php,v 1.2 2005/03/25 22:57:28 quipo Exp $
 
 require_once 'MDB/QueryTool.php';
 require_once dirname(__FILE__).'/db_settings.php';
@@ -14,6 +14,14 @@ class MDB_QT extends MDB_QueryTool
         array(
             'name'      => TABLE_ANSWER,
             'shortName' => TABLE_ANSWER
+        ),
+        array(
+            'name'      => TABLE_USER,
+            'shortName' => TABLE_USER
+        ),
+        array(
+            'name'      => TABLE_TRANSLATION,
+            'shortName' => TABLE_TRANSLATION
         ),
     );
 

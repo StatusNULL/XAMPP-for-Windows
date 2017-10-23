@@ -45,15 +45,15 @@ $TEXT['navi-guest1']="FCKeditor";
 
 $TEXT['navi-languages']="Språk";
 $TEXT['navi-norwegian']="Norsk";
-$TEXT['navi-english']="English";
 $TEXT['navi-german']="Deutsch";
+$TEXT['navi-english']="English";
+$TEXT['navi-spanish']="Español";
 $TEXT['navi-french']="Francais";
+$TEXT['navi-italian']="Italiano";
 $TEXT['navi-dutch']="Nederlands";
 $TEXT['navi-polish']="Polski";
-$TEXT['navi-spanish']="Español";
-$TEXT['navi-italian']="Italiano";
+$TEXT['navi-slovenian']="Slovenian";
 $TEXT['navi-chinese']="&#20013;&#25991;";
-
 
 // ---------------------------------------------------------------------
 // STATUS
@@ -71,7 +71,7 @@ $TEXT['status-cgi']="Common Gateway Interface (CGI)";
 $TEXT['status-ssi']="Server Side Includes (SSI)";
 $TEXT['status-python']="Python med mod_python";
 $TEXT['status-mmcache']="PHP tilleggspakke »eAccelerator«";
-$TEXT['status-mmcache-url']="http://www.apachefriends.org/faq-xampp-linux-en.html#mmcache";
+$TEXT['status-mmcache-url']="http://www.apachefriends.org/faq-xampp-windows-en.html#mmcache";
 $TEXT['status-smtp']="SMTP Service";
 $TEXT['status-ftp']="FTP Service";
 $TEXT['status-tomcat']="Tomcat Service";
@@ -93,7 +93,7 @@ $TEXT['status-tab3']="Hint";
 
 $TEXT['security-head']="XAMPP SIKKERHET";
 $TEXT['security-text1']="Denne siden gir deg en oversikt om Statusen på sikkerheten på din XAMPP installasjon.(Vennligst forsett lesingen etter tabellen.)";
-$TEXT['security-text2']="Det grønnmerkede området er sikkert; det rødmerkede området er usikkert og gulmerkede området er statusen ukjent for (for eksempel applikasjonen kjører ikke).<p><p>To fix the problems for mysql, phpmyadmin and the xampp directory simply use</B><p>=> <A HREF=xamppsecurity.php><B>http://localhost/security/xamppsecurity.php</B></A> <= &nbsp;&nbsp;[allowed only for localhost]";
+$TEXT['security-text2']="Det grønnmerkede området er sikkert; det rødmerkede området er usikkert og gulmerkede området er statusen ukjent for (for eksempel applikasjonen kjører ikke).<p><p>To fix the problems for mysql, phpmyadmin and the xampp directory simply use</B><p>=> <A HREF=/security/xamppsecurity.php><B>http://localhost/security/xamppsecurity.php</B></A> <= &nbsp;&nbsp;[allowed only for localhost]";
 
 $TEXT['security-ok']="SIKRET";
 $TEXT['security-nok']="USIKRET";
@@ -116,7 +116,7 @@ $TEXT['security-checkpmamysqlbruker-ytext']="phpMyAdmin lagrer dine inntillinger
 
 $TEXT['security-checkmysql-nok']="Administratorbrukeren av MySQL har IKKE satt noen passord";
 $TEXT['security-checkmysql-ok']="Administratorbrukeren av MySQL har ikke lengre passord satt";
-$TEXT['security-checkmysql-text']="Hver lokal Linuxmaskin kan få tilgang til din MySql database med administrator rettigheter. Du BURDE sette et passord.";
+$TEXT['security-checkmysql-text']="Hver lokal Windowsmaskin kan få tilgang til din MySql database med administrator rettigheter. Du BURDE sette et passord.";
 
 $TEXT['security-pop-nok']="Testbrukeren (nybruker) for Mercury Mail serveren (POP3) har et gammelt passord(wampp)";
 $TEXT['security-pop-ok']="Testbrukeren \"newuser\" for POP3 serveren (Mercury Mail?) eksisterer ikke lengre eller har nytt passord";
@@ -172,7 +172,7 @@ $TEXT['xampp-config-notok']="<br><br>ERROR: Ditt system kunne IKKE aktivere kata
 // START
 // ---------------------------------------------------------------------
 
-$TEXT['start-head']="Velkommen til XAMPP for Linux";
+$TEXT['start-head']="Velkommen til XAMPP for Windows";
 
 $TEXT['start-subhead']="Gratulerer:<br>Du har vellykket installert XAMPP på din maskin!";
 
@@ -199,12 +199,12 @@ $TEXT['manuals-text1']="XAMPP består av mange forskjellige programmer sammensvei
 
 $TEXT['manuals-list1']="
 <ul>
-<li><a href=http://httpd.apache.org/docs-2.0/>Apache 2 dokumentasjon</a>
+<li><a href=http://httpd.apache.org/docs-2.0/en/>Apache 2 dokumentasjon</a>
 <li><a href=http://www.php.net/manual/en/>PHP <b>referenz </b>dokumentasjon</a>
 <li><a href=http://www.perldoc.com/perl5.8.0/pod/perl.html>Perl dokumentasjon</a>
-<li><a href=http://www.mysql.com/documentation/mysql/bychapter/>MySQL dokumentasjon</a>
-<li><a href=http://php.weblogs.com/ADODB>ADODB</a>
-<li><a href=http://eaccelerator.net/>eAccelerator for PHP</a>
+<li><a href=http://dev.mysql.com/doc/mysql/en/index.html>MySQL dokumentasjon</a>
+<li><a href=http://phplens.com/adodb/>ADODB</a>
+<li><a href=http://eaccelerator.net/DocumentationUk/>eAccelerator</a>
 <li><a href=http://www.ros.co.nz/pdf/readme.pdf>pdf class dokumentasjon</a>
 </ul>";
 
@@ -212,8 +212,8 @@ $TEXT['manuals-text2']="Og en liten liste med verktøy og dokumentasjon av Apache
 
 $TEXT['manuals-list2']="
 <ul>
-<li><a href=http://www.apachefriends.org/faq-en.html>Apache Friends dokumentasjon</a>
-<li><a href=http://www.freewebmasterhelp.com/tutorials/php>PHP Verktøy</a> av David Gowans
+<li><a href=http://www.apachefriends.org/en/faq-xampp.html>Apache Friends dokumentasjon</a>
+<li><a href=http://www.freewebmasterhelp.com/tutorials/php/>PHP Verktøy</a> av David Gowans
 <li><a href=http://www.davesite.com/webstation/html/>HTML - Et Interaktiv Verktøy For Nybegynnere</a> av Dave Kristula
 <li><a href=http://www.comp.leeds.ac.uk/Perl/start.html>Perl Verktøy</a> av Nik Silver
 </ul>";

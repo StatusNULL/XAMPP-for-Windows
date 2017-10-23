@@ -1,6 +1,6 @@
 <?php
 
-/* $Id: persian-utf-8.inc.php,v 2.75 2005/06/12 10:10:01 swix Exp $ */
+/* $Id: persian-utf-8.inc.php,v 2.79 2005/07/29 17:03:20 lem9 Exp $ */
 /*
 Persian(Farsi) translation by : Bornis Group
 www.BornisGroup.com
@@ -214,7 +214,6 @@ $strNoTablesFound = 'در اين پايگاه داده هيچ جدولي وجو�
 $strNotNumber = 'اين يك عدد نيست!';
 $strNotOK = 'not OK';
 $strNotSet = 'جدول <b>%s</b> وجود ندارد و يا در %s تنظيم نشده‌است';
-$strNotValidNumber = ' يك شماره سطر صحيح نيست!';
 $strNoUsersFound = 'هيچ كاربري وچود ندارد.';
 $strNo = 'خير';
 $strNull = 'خالي';
@@ -837,4 +836,10 @@ $strCreateDatabaseBeforeCopying = 'CREATE DATABASE before copying';  //to transl
 $strGeneratePassword = 'Generate Password';  //to translate
 $strGenerate = 'Generate';  //to translate
 $strCopy = 'Copy';  //to translate
+$strTransformation_application_octetstream__hex = 'Displays hexadecimal representation of data.';  //to translate
+$strInvalidFieldCount = 'Table must have at least one field.';  //to translate
+$strInvalidRowNumber = '%d is not valid row number.';  //to translate
+$strInvalidColumnCount = 'Column count has to be larger than zero.';  //to translate
+$strInvalidFieldAddCount = 'You have to add at least one field.';  //to translate
+$strAndThen = 'and then';  //to translate
 ?>

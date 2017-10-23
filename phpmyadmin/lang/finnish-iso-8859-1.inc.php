@@ -1,5 +1,5 @@
 <?php
-/* $Id: finnish-iso-8859-1.inc.php,v 2.75.2.2 2005/06/30 20:22:38 lem9 Exp $ */
+/* $Id: finnish-iso-8859-1.inc.php,v 2.81 2005/07/29 17:03:10 lem9 Exp $ */
 
 /*
   Finnish language file by:
@@ -484,7 +484,6 @@ $strNone = 'Ei mitään';
 $strNotNumber = 'Tämä ei ole numero!';
 $strNotOK = 'Ei kunnossa';
 $strNotSet = '<b>%s</b>-taulukkoa ei löytynyt tai sitä ei ole määritelty %s-tiedostossa';
-$strNotValidNumber = ' ei ole hyväksyttävä rivin numero!';
 $strNull = 'Tyhjä';
 $strNumSearchResultsInTable = '%s hakutulosta taulukossa <i>%s</i>';
 $strNumSearchResultsTotal = '<b>Yhteensä:</b> <i>%s</i> hakutulosta';
@@ -821,4 +820,9 @@ $strZeroRemovesTheLimit = 'Huom: Näiden valintojen asettaminen nollaksi (0) pois
 $strZip = '"zip-pakattu"';
 
 $strTransformation_application_octetstream__hex = 'Displays hexadecimal representation of data.';  //to translate
+$strInvalidFieldCount = 'Table must have at least one field.';  //to translate
+$strInvalidRowNumber = '%d is not valid row number.';  //to translate
+$strInvalidColumnCount = 'Column count has to be larger than zero.';  //to translate
+$strInvalidFieldAddCount = 'You have to add at least one field.';  //to translate
+$strAndThen = 'and then';  //to translate
 ?>

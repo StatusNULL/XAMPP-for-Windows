@@ -1,5 +1,5 @@
 <?php
-/* $Id: arabic-utf-8.inc.php,v 2.74 2005/06/12 10:09:55 swix Exp $ */
+/* $Id: arabic-utf-8.inc.php,v 2.78 2005/07/29 17:03:05 lem9 Exp $ */
 
 /**
  * Original translation to Arabic by Fisal <fisal77 at hotmail.com>
@@ -387,7 +387,6 @@ $strNone = 'لاشئ';
 $strNotNumber = 'هذا ليس رقم!';
 $strNotOK = 'ليس صالحاً';
 $strNotSet = 'الجدول <b>%s</b> غير موجود أو محدد في %s';
-$strNotValidNumber = ' هذا ليس عدد صف صحيح!';
 $strNull = 'خالي';
 $strNumSearchResultsInTable = '%s مطابقة في الجدول <i>%s</i>';
 $strNumSearchResultsTotal = '<b>المجموع:</b> <i>%s</i>مطابقة';
@@ -816,4 +815,10 @@ $strCreateDatabaseBeforeCopying = 'CREATE DATABASE before copying';  //to transl
 $strGeneratePassword = 'Generate Password';  //to translate
 $strGenerate = 'Generate';  //to translate
 $strCopy = 'Copy';  //to translate
+$strTransformation_application_octetstream__hex = 'Displays hexadecimal representation of data.';  //to translate
+$strInvalidFieldCount = 'Table must have at least one field.';  //to translate
+$strInvalidRowNumber = '%d is not valid row number.';  //to translate
+$strInvalidColumnCount = 'Column count has to be larger than zero.';  //to translate
+$strInvalidFieldAddCount = 'You have to add at least one field.';  //to translate
+$strAndThen = 'and then';  //to translate
 ?>

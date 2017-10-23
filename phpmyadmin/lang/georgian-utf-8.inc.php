@@ -1,5 +1,5 @@
 <?php
-/* $Id: georgian-utf-8.inc.php,v 2.70 2005/06/12 10:09:58 swix Exp $ */
+/* $Id: georgian-utf-8.inc.php,v 2.74 2005/07/29 17:03:17 lem9 Exp $ */
 
 /**
  * Translation by Kakha Mchedlidze <kakha at qartuli.com>
@@ -214,7 +214,6 @@ $strNoRights = 'თქვენ არაგაქვთ ამის უფლ�
 $strNoTablesFound = 'მონაცემთა ბაზა არ შეიცავს ცხრილებს.';
 $strNotNumber = 'ეს რიცხვი არაა!';
 $strNotSet = '<b>%s</b> ცხრილი ვერ ვიპვე ან უწესრიგობაა %s-ში';
-$strNotValidNumber = ' სტრიქონების მიუწვდომელი რაოდენობა!';
 $strNoUsersFound = 'მომხმარებელი არ არის ნაპოვნი.';
 $strNull = 'ნული';
 $strNumSearchResultsInTable = '%s შესაბამისობა ცხრილის შიგნით<i>%s</i>';
@@ -836,4 +835,10 @@ $strCreateDatabaseBeforeCopying = 'CREATE DATABASE before copying';  //to transl
 $strGeneratePassword = 'Generate Password';  //to translate
 $strGenerate = 'Generate';  //to translate
 $strCopy = 'Copy';  //to translate
+$strTransformation_application_octetstream__hex = 'Displays hexadecimal representation of data.';  //to translate
+$strInvalidFieldCount = 'Table must have at least one field.';  //to translate
+$strInvalidRowNumber = '%d is not valid row number.';  //to translate
+$strInvalidColumnCount = 'Column count has to be larger than zero.';  //to translate
+$strInvalidFieldAddCount = 'You have to add at least one field.';  //to translate
+$strAndThen = 'and then';  //to translate
 ?>

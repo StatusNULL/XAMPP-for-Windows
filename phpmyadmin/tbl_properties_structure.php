@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_properties_structure.php,v 2.37.2.1 2005/06/30 17:20:26 lem9 Exp $ */
+/* $Id: tbl_properties_structure.php,v 2.40 2005/07/23 12:02:37 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 require_once('./libraries/grab_globals.lib.php');
@@ -170,6 +170,10 @@ while ($row = PMA_DBI_fetch_assoc($fields_rs)) {
     if (preg_match('@^(set|enum)\((.+)\)$@i', $type, $tmp)) {
         $tmp[2]       = substr(preg_replace('@([^,])\'\'@', '\\1\\\'', ',' . $tmp[2]), 1);
         $type         = $tmp[1] . '(' . str_replace(',', ', ', $tmp[2]) . ')';
+
+        // for the case ENUM('&#8211;','&ldquo;')
+        $type         = htmlspecialchars($type);
+        
         $type_nowrap  = '';
 
         $binary       = 0;
@@ -551,7 +555,7 @@ if (!$tbl_is_view) {
 ?><br />
 <!-- Add some new fields -->
 <form method="post" action="tbl_addfield.php"
-    onsubmit="return checkFormElementInRange(this, 'num_fields', 1)">
+    onsubmit="return checkFormElementInRange(this, 'num_fields', '<?php echo str_replace('\'', '\\\'', $GLOBALS['strInvalidFieldAddCount']); ?>', 1)">
     <?php
         echo PMA_generate_common_hidden_inputs($db, $table);
         if ($cfg['PropertiesIconic']) {

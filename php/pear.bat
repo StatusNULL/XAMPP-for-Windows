@@ -16,12 +16,17 @@ REM ----------------------------------------------------------------------
 REM  Authors:     Alexander Merz (alexmerz@php.net)
 REM ----------------------------------------------------------------------
 REM
-REM  Last updated 3/13/2004 ($Id$ is not replaced if the file is binary)
+REM  Last updated 12/29/2004 ($Id$ is not replaced if the file is binary)
 
 REM change this lines to match the paths of your system
 REM -------------------
 
-@ECHO OFF
+
+REM Test to see if this is a raw pear.bat (uninstalled version)
+SET TMPTMPTMPTMPT=@includ
+SET PMTPMTPMT=%TMPTMPTMPTMPT%e_path@
+FOR %%x IN ("\xampp\php\pear") DO (if %%x=="%PMTPMTPMT%" GOTO :NOTINSTALLED)
+
 :: Check PEAR global ENV, set them if they do not exist
 IF "%PHP_PEAR_INSTALL_DIR%"=="" SET "PHP_PEAR_INSTALL_DIR=\xampp\php\pear"
 IF "%PHP_PEAR_BIN_DIR%"=="" SET "PHP_PEAR_BIN_DIR=\xampp\php"
@@ -32,17 +37,61 @@ IF "%PHP_PEAR_DOC_DIR%"=="" SET "PHP_PEAR_DOC_DIR=%PHP_PEAR_INSTALL_DIR%\docs"
 IF "%PHP_PEAR_DATA_DIR%"=="" SET "PHP_PEAR_DATA_DIR=%PHP_PEAR_INSTALL_DIR%\data"
 IF "%PHP_PEAR_TEST_DIR%"=="" SET "PHP_PEAR_TEST_DIR=%PHP_PEAR_INSTALL_DIR%\tests"
 IF "%PHP_PEAR_CACHE_DIR%"=="" SET "PHP_PEAR_CACHE_DIR=\xampp\tmp"
+GOTO :INSTALLED
 
-:: Check Folders and files
+:NOTINSTALLED
+ECHO WARNING: This is a raw, uninstalled pear.bat
+
+REM Check to see if we can grab the directory of this file (Windows NT+)
+IF %~n0 == pear (
+FOR %%x IN (cli\php.exe php.exe) DO (if "%%~$PATH:x" NEQ "" (
+SET "PHP_PEAR_PHP_BIN=%%~$PATH:x"
+echo Using PHP Executable "%PHP_PEAR_PHP_BIN%"
+"%PHP_PEAR_PHP_BIN%" -v
+GOTO :NEXTTEST
+))
+GOTO :FAILAUTODETECT
+:NEXTTEST
+IF "%PHP_PEAR_PHP_BIN%" NEQ "" (
+
+REM We can use this PHP to run a temporary php file to get the dirname of pear
+
+echo ^<?php $s=getcwd^(^);chdir^($a=dirname^(__FILE__^).'\\'^);if^(stristr^($a,'\\scripts'^)^)$a=dirname^(dirname^($a^)^).'\\';$f=fopen^($s.'\\~a.a','wb'^);echo$s.'\\~a.a';fwrite^($f,$a^);fclose^($f^);chdir^($s^);?^> > ~~getloc.php
+"%PHP_PEAR_PHP_BIN%" ~~getloc.php
+set /p PHP_PEAR_BIN_DIR=fakeprompt < ~a.a
+DEL ~a.a
+DEL ~~getloc.php
+set "PHP_PEAR_INSTALL_DIR=%PHP_PEAR_BIN_DIR%pear"
+
+REM Make sure there is a pearcmd.php at our disposal
+
+IF NOT EXIST %PHP_PEAR_INSTALL_DIR%\pearcmd.php (
+IF EXIST %PHP_PEAR_INSTALL_DIR%\scripts\pearcmd.php COPY %PHP_PEAR_INSTALL_DIR%\scripts\pearcmd.php %PHP_PEAR_INSTALL_DIR%\pearcmd.php
+IF EXIST pearcmd.php COPY pearcmd.php %PHP_PEAR_INSTALL_DIR%\pearcmd.php
+IF EXIST %~dp0\scripts\pearcmd.php COPY %~dp0\scripts\pearcmd.php %PHP_PEAR_INSTALL_DIR%\pearcmd.php
+)
+)
+GOTO :INSTALLED
+) ELSE (
+REM Windows Me/98 cannot succeed, so allow the batch to fail
+)
+:FAILAUTODETECT
+echo WARNING: failed to auto-detect pear information
+:INSTALLED
+
+REM Check Folders and files
 IF NOT EXIST "%PHP_PEAR_INSTALL_DIR%" GOTO PEAR_INSTALL_ERROR
 IF NOT EXIST "%PHP_PEAR_INSTALL_DIR%\pearcmd.php" GOTO PEAR_INSTALL_ERROR2
 IF NOT EXIST "%PHP_PEAR_BIN_DIR%" GOTO PEAR_BIN_ERROR
 IF NOT EXIST "%PHP_PEAR_PHP_BIN%" GOTO PEAR_PHPBIN_ERROR
-attrib +r %PHP_PEAR_BIN_DIR%\pear.bat >nul 2<&1
-attrib -h %PHP_PEAR_INSTALL_DIR%\.filemap >nul 2<&1
-attrib -h %PHP_PEAR_INSTALL_DIR%\.lock >nul 2<&1
-
-:: launch pearcmd
+ATTRIB +R %PHP_PEAR_BIN_DIR%\pear.bat >nul
+ATTRIB +R %PHP_PEAR_BIN_DIR%\peardev.bat >nul
+ATTRIB +R %PHP_PEAR_BIN_DIR%\pecl.bat >nul
+ATTRIB -H %PHP_PEAR_INSTALL_DIR%\.depdb >nul
+ATTRIB -H %PHP_PEAR_INSTALL_DIR%\.depdblock >nul
+ATTRIB -H %PHP_PEAR_INSTALL_DIR%\.filemap >nul
+ATTRIB -H %PHP_PEAR_INSTALL_DIR%\.lock >nul
+REM launch pearcmd
 GOTO RUN
 :PEAR_INSTALL_ERROR
 ECHO PHP_PEAR_INSTALL_DIR is not set correctly.
@@ -76,5 +125,7 @@ GOTO END
 :RUN
 "%PHP_PEAR_PHP_BIN%" -C -d output_buffering=1 -f "%PHP_PEAR_INSTALL_DIR%\pearcmd.php" -- %1 %2 %3 %4 %5 %6 %7 %8 %9
 :END
-attrib -r %PHP_PEAR_BIN_DIR%\pear.bat >nul 2<&1
+ATTRIB -R %PHP_PEAR_BIN_DIR%\pear.bat >nul
+ATTRIB -R %PHP_PEAR_BIN_DIR%\peardev.bat >nul
+ATTRIB -R %PHP_PEAR_BIN_DIR%\pecl.bat >nul
 @ECHO ON

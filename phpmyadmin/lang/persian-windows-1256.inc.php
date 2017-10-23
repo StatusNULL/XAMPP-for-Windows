@@ -1,6 +1,6 @@
 <?php
 
-/* $Id: persian-windows-1256.inc.php,v 2.72 2005/06/12 10:10:01 swix Exp $ */
+/* $Id: persian-windows-1256.inc.php,v 2.76 2005/07/29 17:03:20 lem9 Exp $ */
 /*
 Persian(Farsi) translation by : Bornis Group
 www.BornisGroup.com
@@ -213,7 +213,6 @@ $strNoTablesFound = 'ÏÑ Çíä ÇíÇå ÏÇÏå åí ÌÏæáí æÌæÏ äÏÇÑÏ .';
 $strNotNumber = 'Çíä íß ÚÏÏ äíÓÊ!';
 $strNotOK = 'not OK';
 $strNotSet = 'ÌÏæá <b>%s</b> æÌæÏ äÏÇÑÏ æ íÇ ÏÑ %s ÊäÙíã äÔÏåÇÓÊ';
-$strNotValidNumber = ' íß ÔãÇÑå ÓØÑ ÕÍíÍ äíÓÊ!';
 $strNoUsersFound = 'åí ßÇÑÈÑí ææÏ äÏÇÑÏ.';
 $strNo = 'ÎíÑ';
 $strNull = 'ÎÇáí';
@@ -836,4 +835,10 @@ $strCreateDatabaseBeforeCopying = 'CREATE DATABASE before copying';  //to transl
 $strGeneratePassword = 'Generate Password';  //to translate
 $strGenerate = 'Generate';  //to translate
 $strCopy = 'Copy';  //to translate
+$strTransformation_application_octetstream__hex = 'Displays hexadecimal representation of data.';  //to translate
+$strInvalidFieldCount = 'Table must have at least one field.';  //to translate
+$strInvalidRowNumber = '%d is not valid row number.';  //to translate
+$strInvalidColumnCount = 'Column count has to be larger than zero.';  //to translate
+$strInvalidFieldAddCount = 'You have to add at least one field.';  //to translate
+$strAndThen = 'and then';  //to translate
 ?>

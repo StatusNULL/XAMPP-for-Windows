@@ -1,18 +1,18 @@
-  ApacheFriends XAMPP (basic package) version 1.4.15
+  ApacheFriends XAMPP (basic package) version 1.4.16
 
   + Apache 2.0.54
-  + MySQL 4.1.13
-  + PHP 5.0.4 + PHP 4.4.0 + PEAR
+  + MySQL 4.1.14
+  + PHP 5.0.5 + PHP 4.4.0 + PEAR
   + eAccelerator 0.9.3 (PHP5) / 0.9.4-dev(PHP4)
   + PHP-Switch win32 1.0 (von Apachefriends, man nehme die "php-switch.bat") 
   + XAMPP Control Version 2.1 from www.nat32.com	
   + XAMPP Security 1.0	
   + SQLite 2.8.15
   + OpenSSL 0.9.8
-  + phpMyAdmin 2.6.3-pl1
+  + phpMyAdmin 2.6.4-pl1
   + ADODB 4.65
   + Mercury Mail Transport System for Win32 and NetWare Systems v4.01a
-  + FileZilla FTP Server 0.9.8c
+  + FileZilla FTP Server 0.9.10a
   + Webalizer 2.01-10
   + Zend Optimizer 2.5.10a
  
@@ -20,13 +20,13 @@
   
   + 64 MB RAM (recommended)
   + 160 MB free Fixed Disk 
-  + Windows 98, ME, XP Home
+  + Windows 98, ME
   + Windows NT, 2000, XP (Recommended)
 
 
 SCHNELLINSTALLATION:
 
-[Schtitt 1: Auf die obersten Hirachie eines beliebigen Laufwerks bzw. 
+[Schritt 1: Auf die obersten Hirachie eines beliebigen Laufwerks bzw. 
 auf dem Wechseldatenträger des USP Sticks entpacken => E:\ oder W:\. Es 
 entsteht E:\xampp oder W:\xampp. Für den USB Stick nicht die 
 "setup_xampp.bat" nutzen, um ihn auch transportabel nutzen zu können!]
@@ -94,10 +94,10 @@ NUR FÜR NT SYSTEME
 \...\xampp\apache\apache_uninstallservice.bat =   
 ==> Deinstalliert des Apache 2 als Dienst
 
-\...\xampp\apache\mysql_installservice.bat =
+\...\xampp\mysql\mysql_installservice.bat =
 ==> Installiert MySQL als Dienst
 
-\...\xampp\apache\mysql_uninstallservice.bat = 
+\...\xampp\mysql\mysql_uninstallservice.bat = 
 ==> Deinstalliert MySQL als Dienst
 
 ==> Nach allen Dienst(de)installationen, system neustarten! 
@@ -122,7 +122,7 @@ Will man XAMPP in einem Netzwerk betreiben, so dass der XAMPP-Server auch von an
 erreichbar ist, dann sollte man unbedingt den folgende URL aufrufen, mit dem man 
 diese Unsicherheiten einschränken kann: 
 
-http://localhost/xampp/xamppsecurity.php 
+http://localhost/security/
 
 Hier kann das root Passwort für MySQL + phpMyAdmin und auch ein Verzeichnisschutz für die 
 XAMPP-Seiten eingerichtet werden. 

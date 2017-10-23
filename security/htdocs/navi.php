@@ -41,15 +41,16 @@ include("lang/".file_get_contents("lang.tmp").".php");
 <tr><td bgcolor=#fb7922 colspan=1 background="img/strichel.gif" class=white><img src=img/blank.gif width=1 height=1></td></tr>
 <tr valign=top><td align=right class=navi>
 
-<a target=_parent class=n href="lang.php?en"><?=$TEXT['navi-english']?></a><br>
 <a target=_parent class=n href="lang.php?de"><?=$TEXT['navi-german']?></a><br>
-<a target=_parent class=n href="lang.php?fr"><?=$TEXT['navi-french']?></a><br>
-<a target=_parent class=n href="lang.php?nl"><?=$TEXT['navi-dutch']?></a><br>
-<a target=_parent class=n href="lang.php?pl"><?=$TEXT['navi-polish']?></a><br>
+<a target=_parent class=n href="lang.php?en"><?=$TEXT['navi-english']?></a><br>
 <a target=_parent class=n href="lang.php?es"><?=$TEXT['navi-spanish']?></a><br>
-<a target=_parent class=n href="lang.php?zh"><?=$TEXT['navi-chinese']?></a><br>
+<a target=_parent class=n href="lang.php?fr"><?=$TEXT['navi-french']?></a><br>
 <a target=_parent class=n href="lang.php?it"><?=$TEXT['navi-italian']?></a><br>
-<a target=_parent class=n href="lang.php?no"><?=$TEXT['navi-norwegian']?></a><p>
+<a target=_parent class=n href="lang.php?nl"><?=$TEXT['navi-dutch']?></a><br>
+<a target=_parent class=n href="lang.php?no"><?=$TEXT['navi-norwegian']?></a><br>
+<a target=_parent class=n href="lang.php?pl"><?=$TEXT['navi-polish']?></a><br>
+<a target=_parent class=n href="lang.php?sl"><?=$TEXT['navi-slovenian']?></a><br>
+<a target=_parent class=n href="lang.php?zh"><?=$TEXT['navi-chinese']?></a><p>
 
 
 <p class=navi>&copy;2002/2005<br>

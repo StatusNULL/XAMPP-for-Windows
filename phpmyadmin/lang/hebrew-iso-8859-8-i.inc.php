@@ -1,5 +1,5 @@
 <?php
-/* $Id: hebrew-iso-8859-8-i.inc.php,v 2.73 2005/06/12 10:09:59 swix Exp $ */
+/* $Id: hebrew-iso-8859-8-i.inc.php,v 2.77 2005/07/29 17:03:17 lem9 Exp $ */
 
 /* Translated by: Yuval "Etus" Sarna */
 
@@ -239,7 +239,6 @@ $strNoUsersFound = 'אף משתמש/משתמשים נמצאו.';
 $strNone = 'NULL';
 $strNotNumber = 'זהו לא מספר !';
 $strNotSet = 'הטבלה <b>%s</b> לא נמצאה ב- %s';
-$strNotValidNumber = ' הוא לא מספר שורה בר תוקף !';
 $strNull = 'NULL';
 $strNumSearchResultsInTable = '%s תוצאה/תוצאות בתוך הטבלה <i>%s</i>';
 $strNumTables = 'טבלאות';
@@ -832,4 +831,10 @@ $strCreateDatabaseBeforeCopying = 'CREATE DATABASE before copying';  //to transl
 $strGeneratePassword = 'Generate Password';  //to translate
 $strGenerate = 'Generate';  //to translate
 $strCopy = 'Copy';  //to translate
+$strTransformation_application_octetstream__hex = 'Displays hexadecimal representation of data.';  //to translate
+$strInvalidFieldCount = 'Table must have at least one field.';  //to translate
+$strInvalidRowNumber = '%d is not valid row number.';  //to translate
+$strInvalidColumnCount = 'Column count has to be larger than zero.';  //to translate
+$strInvalidFieldAddCount = 'You have to add at least one field.';  //to translate
+$strAndThen = 'and then';  //to translate
 ?>

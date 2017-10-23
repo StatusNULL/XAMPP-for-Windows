@@ -1,10 +1,11 @@
 <?php
 /**
  * API setMinimum Unit tests for HTML_Progress_DM class.
- * 
- * @version    $Id: HTML_Progress_TestCase_DM_setMinimum.php,v 1.3 2004/08/10 22:18:05 farell Exp $
+ *
+ * @version    $Id: HTML_Progress_TestCase_DM_setMinimum.php,v 1.4 2005/08/28 14:12:09 farell Exp $
  * @author     Laurent Laville <pear@laurent-laville.org>
  * @package    HTML_Progress
+ * @ignore
  */
 
 class HTML_Progress_TestCase_DM_setMinimum extends PHPUnit_TestCase
@@ -41,7 +42,7 @@ class HTML_Progress_TestCase_DM_setMinimum extends PHPUnit_TestCase
         return preg_replace('/\\s+/', '', $str);
     }
 
-    function _methodExists($name) 
+    function _methodExists($name)
     {
         if (substr(PHP_VERSION,0,1) < '5') {
             $n = strtolower($name);
@@ -68,7 +69,7 @@ class HTML_Progress_TestCase_DM_setMinimum extends PHPUnit_TestCase
             $this->assertTrue(false, $err['message']);
         } else {
             $this->assertTrue(true);
-	}
+        }
     }
 
     /**

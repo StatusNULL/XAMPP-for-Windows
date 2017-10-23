@@ -1,13 +1,13 @@
 <?php
-@include '../include_path.php';
 /**
  * FTP file Upload
  * This example shows how to upload file on a ftp server,
  * that may be different than web server.
  *
- * @version    $Id: ftpupload.php,v 1.1 2004/07/02 17:51:34 farell Exp $
+ * @version    $Id: ftpupload.php,v 1.2 2005/07/25 11:43:56 farell Exp $
  * @author     Laurent Laville <pear@laurent-laville.org>
  * @package    HTML_Progress
+ * @subpackage Examples
  */
 
 require_once 'HTML/QuickForm.php';
@@ -83,7 +83,7 @@ function DoUpload() {
   parent.files.selfref.submit();
 }
 //-->
-</script> 
+</script>
 </head>
 <body>
 

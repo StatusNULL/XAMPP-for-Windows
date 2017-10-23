@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_create.php,v 2.15 2005/05/26 16:55:15 lem9 Exp $ */
+/* $Id: tbl_create.php,v 2.16 2005/08/04 19:24:16 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -7,12 +7,16 @@
  */
 require_once('./libraries/grab_globals.lib.php');
 $js_to_run = 'functions.js';
-require_once('./header.inc.php');
-
-// Check parameters
 
 require_once('./libraries/common.lib.php');
 
+if (isset($table)) {
+    $table = PMA_sanitize($table);
+}
+
+require_once('./header.inc.php');
+
+// Check parameters
 PMA_checkParameters(array('db', 'table'));
 
 /**

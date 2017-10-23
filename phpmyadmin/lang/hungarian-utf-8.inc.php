@@ -429,7 +429,6 @@ $strNone = 'Nincs';
 $strNotNumber = 'Ez nem egy szám!';
 $strNotOK = 'Nincs rendben';
 $strNotSet = '<b>%s</b> táblát nem találtam vagy nincs benne: %s';
-$strNotValidNumber = ' nem érvényes sorszám!';
 $strNull = 'Null';
 $strNumSearchResultsInTable = '%s találat <i>%s</i> táblában';
 $strNumSearchResultsTotal = '<b>Összes:</b> <i>%s</i> találat';
@@ -827,6 +826,13 @@ $strSocketProblem = '(or the local MySQL server\'s socket is not correctly confi
 $strStorageEngine = 'Storage Engine';  //to translate
 $strStorageEngines = 'Storage Engines';  //to translate
 
+$strTransformation_application_octetstream__hex = 'Displays hexadecimal representation of data.';  //to translate
+
 $strUseTabKey = 'Use TAB key to move from value to value, or CTRL+arrows to move anywhere';  //to translate
 
+$strInvalidFieldCount = 'Table must have at least one field.';  //to translate
+$strInvalidRowNumber = '%d is not valid row number.';  //to translate
+$strInvalidColumnCount = 'Column count has to be larger than zero.';  //to translate
+$strInvalidFieldAddCount = 'You have to add at least one field.';  //to translate
+$strAndThen = 'and then';  //to translate
 ?>

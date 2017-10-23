@@ -1,5 +1,5 @@
 <?php
-/* $Id: malay-iso-8859-1.inc.php,v 2.70 2005/06/12 10:10:00 swix Exp $ */
+/* $Id: malay-iso-8859-1.inc.php,v 2.74 2005/07/29 17:03:19 lem9 Exp $ */
 
 /*
 Projek Penterjemahan (l10n) phpmyadmin.net boleh diakses di laman http://shapik.johordt.com/l10n
@@ -260,7 +260,6 @@ $strNone = 'Tiada';
 $strNotNumber = 'Ini adalah bukan nombor!!';
 $strNotOK = 'tidak OK';
 $strNotSet = 'Jadual <b>%s</b> tidak dijumpai atau ditetapkan pada %s';
-$strNotValidNumber = ' adalah bukan baris yang sah!';
 $strNull = 'Null';
 $strNumSearchResultsInTable = '%s padanan di dalam jadual <i>%s</i>';
 $strNumSearchResultsTotal = '<b>Jumlah</b>: <i>%s</i> padanan';
@@ -831,4 +830,10 @@ $strCreateDatabaseBeforeCopying = 'CREATE DATABASE before copying';  //to transl
 $strGeneratePassword = 'Generate Password';  //to translate
 $strGenerate = 'Generate';  //to translate
 $strCopy = 'Copy';  //to translate
+$strTransformation_application_octetstream__hex = 'Displays hexadecimal representation of data.';  //to translate
+$strInvalidFieldCount = 'Table must have at least one field.';  //to translate
+$strInvalidRowNumber = '%d is not valid row number.';  //to translate
+$strInvalidColumnCount = 'Column count has to be larger than zero.';  //to translate
+$strInvalidFieldAddCount = 'You have to add at least one field.';  //to translate
+$strAndThen = 'and then';  //to translate
 ?>

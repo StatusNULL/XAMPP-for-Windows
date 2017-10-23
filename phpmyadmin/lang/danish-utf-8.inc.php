@@ -1,6 +1,6 @@
 <?php
-/*  $Id: danish-utf-8.inc.php,v 2.86.2.2 2005/06/30 19:42:20 lem9 Exp $  */
-/* Dansk oversætter AlleyKat kan kontaktes på < phpmyadmin (at) phpbb2.dk > */
+/* $Id: danish-utf-8.inc.php,v 2.93 2005/08/18 09:58:59 lem9 Exp $ */
+/* Dansk v 2.92 18/8-2005 00:00:00 - oversætter AlleyKat kan kontaktes på < phpmyadmin (at) phpbb2.dk > */
 
 $charset = 'utf-8';
 $allow_recoding = TRUE;
@@ -56,6 +56,7 @@ $strAlterOrderBy = 'Arranger rækkeorden efter';
 $strAnIndex = 'Der er tilføjet et indeks til %s';
 $strAnalyzeTable = 'Analyser tabel';
 $strAnd = 'Og';
+$strAndThen = "og så";
 $strAny = 'Enhver';
 $strAnyHost = 'Enhver vært';
 $strAnyUser = 'Enhver bruger';
@@ -355,6 +356,10 @@ $strInsertedRows = 'Indsatte rækker:';
 $strInstructions = 'Instruktioner';
 $strInternalNotNecessary = '* En intern relation er ikke nødvendig når den også eksisterer i InnoDB.';
 $strInternalRelations = 'Interne relationer';
+$strInvalidColumnCount = 'Kolonnetælling skal være større end nul.';
+$strInvalidFieldAddCount = 'Du skal tilføje mindst ét felt.';
+$strInvalidFieldCount = 'Tabellen skal indeholde mindst ét felt.';
+$strInvalidRowNumber = '%d er ikke gyldigt rækkenummer.';
 
 $strJapanese = 'Japansk';
 $strJumpToDB = 'Hop til database &quot;%s&quot;.';
@@ -473,7 +478,6 @@ $strNone = 'Intet';
 $strNotNumber = 'Dette er ikke et tal!';
 $strNotOK = 'ikke OK';
 $strNotSet = 'Tabel <b>%s</b> findes ikke eller er ikke sat i %s';
-$strNotValidNumber = ' er ikke et gyldigt rækkenummer!';
 $strNull = 'Nulværdi';
 $strNumSearchResultsInTable = '%s hit(s) i tabel <i>%s</i>';
 $strNumSearchResultsTotal = '<b>Total:</b> <i>%s</i> hit(s)';

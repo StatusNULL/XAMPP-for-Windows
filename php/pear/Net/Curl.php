@@ -18,7 +18,7 @@
  * @author     Joe Stump <joe@joestump.net> 
  * @copyright  1997-2005 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Revision: 1.9 $
+ * @version    CVS: $Revision: 1.11 $
  * @link       http://pear.php.net/package/Net_Curl
  */
 
@@ -277,7 +277,7 @@ class Net_Curl
      * 2 : to check the existence of a common name  and also verify that it 
      *     matches the hostname provided.
      *
-     * @var integer $verifyHost
+     * @var bool $verifyHost
      * @access public
      */
     var $verifyHost = 2;
@@ -444,23 +444,34 @@ class Net_Curl
             $ret = curl_setopt($this->_ch, CURLOPT_PROXYUSERPWD, $this->proxyUser . ':' . $this->proxyPassword);
         }
 
-        // Certificate handling
-        if ($this->verifyPeer === true) {
-            $ret = curl_setopt($this->_ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
-            if (is_numeric($this->verifyHost)) {
-                $ret = curl_setopt($this->_ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
-            }
+        if (is_bool($this->verifyPeer)) {
+            if(!$this->setOption(CURLOPT_SSL_VERIFYPEER,$this->verifyPeer)) {
+                return PEAR::raiseError('Error setting CURLOPT_SSL_VERIFYPEER');
+            } 
+        }
 
+        if (is_numeric($this->verifyHost) && $this->verifyHost >= 0 &&
+            $this->verifyHost <= 2) {
+            if(!$this->setOption(CURLOPT_SSL_VERIFYHOST,$this->verifyHost)) {
+                return PEAR::raiseError('Error setting CURLOPT_SSL_VERIFYPEER');
+            } 
+        }
+
+        if (is_bool($this->verifyPeer) && $this->verifyPeer == true) {
             if (isset($this->caInfo) && strlen($this->caInfo)) {
                 if (file_exists($this->caInfo)) {
-                    $ret = curl_setopt($this->_ch, CURLOPT_CAINFO, $this->caInfo);
+                    if (!$this->setOption(CURLOPT_CAINFO,$this->caInfo)) { 
+                        return PEAR::raiseError('Error setting CURLOPT_CAINFO');
+                    }
                 } else {
                     return PEAR::raiseError('Could not find CA info: '.$this->caInfo);
                 }
             }
 
             if (isset($this->caPath) && is_string($this->caPath)) {
-                $ret = curl_setopt($this->_ch, CURLOPT_CAPATH, $this->caPath);
+                if (!$this->setOption(CURLOPT_CAPATH,$this->caPath)) {
+                    return PEAR::raiseError('Error setting CURLOPT_CAPATH');
+                }
             }
         }
       
@@ -507,8 +518,9 @@ class Net_Curl
             if (is_array($this->fields)) {
                 $sets = array();
                 foreach ($this->fields as $key => $val) {
-                    $sets[] = $key . '=' . $val;
+                    $sets[] = $key . '=' . urlencode($val);
                 } 
+
                 $fields = implode('&',$sets);
             } else {
                 $fields = $this->fields;
@@ -620,7 +632,7 @@ class Net_Curl
     function setOption($option, $value)
     {
         if (is_resource($this->_ch)) {
-            return curl_setopt($this->_ch, $options, $value);
+            return curl_setopt($this->_ch, $option, $value);
         }
 
         return false;

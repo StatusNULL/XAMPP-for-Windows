@@ -1,5 +1,5 @@
 <?php
-/* $Id: german-utf-8.inc.php,v 2.93.2.1 2005/06/30 17:24:51 lem9 Exp $ */
+/* $Id: german-utf-8.inc.php,v 2.99 2005/08/20 20:10:39 lem9 Exp $ */
 
 /**
  * For suggestions concerning this file please contact
@@ -150,7 +150,7 @@ $strComments = 'Kommentare';
 $strCompatibleHashing = 'MySQL&nbsp;4.0 kompatibel';
 $strCompleteInserts = 'Vollständige \'INSERT\'s';
 $strCompression = 'Kompression';
-$strConfigFileError = 'phpMyAdmin konnte Ihre Konfigurationsdatei nicht verarbeiten!<br />Dies kann passieren, wenn der PHP-Parser Syntaxfehler in ihr findet oder sie nicht existiert.<br />Bitte rufen Sie die Konfigurationsdatei üben den unteren Link direkt auf und lesen Sie die PHP-Fehlermeldungen, die Sie erhalten. Meistens fehlt bloß irgendwo ein Anführungszeichen oder Semikolon.<br />Wenn Sie eine leere Seite erhalten, ist Ihre Konfigurationsdatei in Ordnung.';
+$strConfigFileError = 'phpMyAdmin konnte Ihre Konfigurationsdatei nicht verarbeiten!<br />Dies kann passieren, wenn der PHP-Parser Syntaxfehler in ihr findet oder sie nicht existiert.<br />Bitte rufen Sie die Konfigurationsdatei über den unteren Link direkt auf und lesen Sie die PHP-Fehlermeldungen, die Sie erhalten. Meistens fehlt bloß irgendwo ein Anführungszeichen oder Semikolon.<br />Wenn Sie eine leere Seite erhalten, ist Ihre Konfigurationsdatei in Ordnung.';
 $strConfigureTableCoord = 'Bitte konfigurieren Sie die Koordinaten für die Tabelle %s';
 $strConnectionError = 'Die Verbindung konnte aufgrund von ungültigen Einstellungen nicht hergestellt werden.';
 $strConnections = 'Verbindungen';
@@ -478,7 +478,6 @@ $strNoThemeSupport = 'Die Unterstützung für Oberflächendesigns ist deaktivier
 $strNotNumber = 'Das ist keine Zahl!';
 $strNotOK = 'fehlerhaft';
 $strNotSet = 'Die Tabelle <b>%s</b> wurde entweder nicht gefunden oder in der Kofigurationsdatei %s nicht gesetzt.';
-$strNotValidNumber = ' ist keine gültige Zeilennummer!';
 $strNoUsersFound = 'Es wurden keine Benutzer gefunden.';
 $strNoValidateSQL = 'SQL-Validierung umgehen';
 $strNull = 'Null';
@@ -821,4 +820,9 @@ $strPrivDescShowView = 'Allows performing SHOW CREATE VIEW queries.';  //to tran
 $strRoutines = 'Routines';  //to translate
 
 $strTransformation_application_octetstream__hex = 'Displays hexadecimal representation of data.';  //to translate
+$strInvalidFieldCount = 'Table must have at least one field.';  //to translate
+$strInvalidRowNumber = '%d is not valid row number.';  //to translate
+$strInvalidColumnCount = 'Column count has to be larger than zero.';  //to translate
+$strInvalidFieldAddCount = 'You have to add at least one field.';  //to translate
+$strAndThen = 'and then';  //to translate
 ?>

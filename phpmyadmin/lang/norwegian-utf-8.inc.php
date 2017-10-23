@@ -1,5 +1,5 @@
 <?php
-/* $Id: norwegian-utf-8.inc.php,v 2.83.2.1 2005/06/30 17:06:26 lem9 Exp $ */
+/* $Id: norwegian-utf-8.inc.php,v 2.89 2005/08/18 10:50:13 lem9 Exp $ */
 
 /**
  * Translated by Sven-Erik Andersen <sven-erik.andersen at pkf107.no>
@@ -59,6 +59,7 @@ $strAlterOrderBy = 'Endre tabellrekkefølge ved';
 $strAnIndex = 'En indeks har blitt lagt til %s';
 $strAnalyzeTable = 'Analyser tabell';
 $strAnd = 'og';
+$strAndThen = 'og så';
 $strAny = 'Alle';
 $strAnyHost = 'Alle verter';
 $strAnyUser = 'Alle brukere';
@@ -358,6 +359,10 @@ $strInsertedRows = 'Innsatte rader:';
 $strInstructions = 'Instruksjoner';
 $strInternalNotNecessary = '* En intern relasjon er ikke nødvendig når den også eksisterer i InnoDB.';
 $strInternalRelations = 'Interne relasjoner';
+$strInvalidColumnCount = 'Antall kolonner må være større enn null.';
+$strInvalidFieldAddCount = 'Du må sette inn minst ett felt.';
+$strInvalidFieldCount = 'Tabellen må ha minst ett felt.';
+$strInvalidRowNumber = '%d er ikke et gyldig radnummer.';
 
 $strJapanese = 'japansk';
 $strJumpToDB = 'Hopp til databasen &quot;%s&quot;.';
@@ -476,7 +481,6 @@ $strNone = 'Ingen';
 $strNotNumber = 'Dette er ikke ett tall!';
 $strNotOK = 'ikke OK';
 $strNotSet = '<b>%s</b> tabellen ble ikke funnet eller ikke konfigurert i %s';
-$strNotValidNumber = ' er ikke et gyldig radnummer!';
 $strNull = 'Null';
 $strNumSearchResultsInTable = '%s treff i tabell <i>%s</i>';
 $strNumSearchResultsTotal = '<b>Totalt:</b> <i>%s</i> treff';
@@ -743,6 +747,7 @@ $strTraditionalChinese = 'Tradisjonell kinesisk';
 $strTraditionalSpanish = 'Tradisjonell spansk';
 $strTraffic = 'Trafikk';
 $strTransformation_application_octetstream__download = 'Vis en link for å kunne laste ned de binære dataene til et felt. Den første opsjonen er filnavnet til den binære fila. Den andre opsjonen er et potensielt feltnavn i en tabell som inneholder filnavnet. Hvis du velger den andre opsjonen så må den første være satt til en tom strengverdi';
+$strTransformation_application_octetstream__hex = 'Vis dataene i heksadesimal.';
 $strTransformation_image_jpeg__inline = 'Viser et klikkbart tommelfingerbilde; valg: bredde, høyde i piksler (bevarer originale forhold)';
 $strTransformation_image_jpeg__link = 'Viser en link til dette bildet (m.a.o. direkte blob-nedlasting).';
 $strTransformation_image_png__inline = 'Se image/jpeg: inline';
@@ -812,5 +817,4 @@ $strYes = 'Ja';
 
 $strZeroRemovesTheLimit = 'Merk: Ved å sette disse til 0 (null) fjernes begrensningen.';
 $strZip = 'Komprimert (zip)';
-$strTransformation_application_octetstream__hex = 'Displays hexadecimal representation of data.';  //to translate
 ?>

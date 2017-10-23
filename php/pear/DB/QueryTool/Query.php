@@ -19,7 +19,7 @@
  * @author     Lorenzo Alberton <l dot alberton at quipo dot it>
  * @copyright  2003-2005 Wolfram Kriesing, Paolo Panto, Lorenzo Alberton
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Query.php,v 1.57 2005/02/27 19:13:19 quipo Exp $
+ * @version    CVS: $Id: Query.php,v 1.61 2005/09/08 17:03:21 quipo Exp $
  * @link       http://pear.php.net/package/DB_QueryTool
  */
 
@@ -358,7 +358,7 @@ class DB_QueryTool_Query
         // build the query directly
         // if $column is '' then _buildSelect selects '*' anyway, so that's the same behaviour as before
         $query['select'] = $this->_buildSelect($column);
-        $query['where']  = $this->_buildWhere($this->table.'.'.$this->primaryCol.'='.$id);
+        $query['where']  = $this->_buildWhere($this->table.'.'.$this->primaryCol.'='.$this->db->quoteSmart($id));
         $queryString = $this->_buildSelectQuery($query);
 
         return $this->returnResult($this->execute($queryString,$getMethod));
@@ -373,9 +373,9 @@ class DB_QueryTool_Query
      * @version    2002/04/23
      * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
-     * @param      array   this is an array of ids to retreive
+     * @param      array   this is an array of ids to retrieve
      * @param      string  the column to search in for
-     * @return     mixed   an array of the retreived data, or false in case of failure
+     * @return     mixed   an array of the retrieved data, or false in case of failure
      *                       when failing an error is set in $this->_error
      */
     function getMultiple($ids, $column='')
@@ -406,7 +406,7 @@ class DB_QueryTool_Query
      * @param      int     to start from
      * @param      int     the number of rows to show
      * @param      string  the DB-method to use, i dont know if we should leave this param here ...
-     * @return     mixed   an array of the retreived data, or false in case of failure
+     * @return     mixed   an array of the retrieved data, or false in case of failure
      *                       when failing an error is set in $this->_error
      */
     function getAll($from=0,$count=0,$method='getAll')
@@ -434,10 +434,10 @@ class DB_QueryTool_Query
      * @version    2003/02/25
      * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
-     * @param      string  the column that shall be retreived
+     * @param      string  the column that shall be retrieved
      * @param      int     to start from
      * @param      int     the number of rows to show
-     * @return     mixed   an array of the retreived data, or false in case of failure
+     * @return     mixed   an array of the retrieved data, or false in case of failure
      *                     when failing an error is set in $this->_error
      */
     function getCol($column=null, $from=0, $count=0)
@@ -465,7 +465,7 @@ class DB_QueryTool_Query
      * @access     public
      * @author     Wolfram Kriesing <wk@visionp.de>
      * @param
-     * @return     mixed   an array of the retreived data, or false in case of failure
+     * @return     mixed   an array of the retrieved data, or false in case of failure
      *                       when failing an error is set in $this->_error
      */
     function getCount()
@@ -597,14 +597,15 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
     function update($newData)
     {
         $query = array();
+        $raw = $this->getOption('raw');
         // do only set the 'where' part in $query, if a primary column is given
         // if not the default 'where' clause is used
         if (isset($newData[$this->primaryCol])) {
-            $query['where'] = $this->primaryCol.'='.$newData[$this->primaryCol];
+            $query['where'] = $this->primaryCol.'='
+                .($raw ? $newData[$this->primaryCol] : $this->db->quoteSmart($newData[$this->primaryCol]));
         }
         $newData = $this->_checkColumns($newData, 'update');
         $values = array();
-        $raw = $this->getOption('raw');
         foreach ($newData as $key => $aData) {         // quote the data
             //$values[] = "{$this->table}.$key=". ($raw ? $aData : $this->db->quote($aData));
             $values[] = "$key=". ($raw ? $aData : $this->db->quote($aData));
@@ -650,11 +651,12 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
         $newData = $this->_checkColumns($newData, 'add');
         $newData = $this->_quoteArray($newData);
 
-        $query = sprintf(   'INSERT INTO %s (%s) VALUES (%s)',
-                            $this->table,
-                            implode(', ', array_keys($newData)),
-                            implode(', ', $newData)
-                       );
+        $query = sprintf(
+            'INSERT INTO %s (%s) VALUES (%s)',
+            $this->table,
+            implode(', ', array_keys($newData)),
+            implode(', ', $newData)
+        );
         return $this->execute($query, 'query') ? $id : false;
     }
 
@@ -1142,7 +1144,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * gets the join-condition
      *
      * @access public
-     * @param  string  [null|''|'table'|'tables'|'right'|'left']
+     * @param  string  [null|''|'table'|'tables'|'right'|'left'|'inner']
      * @return array   gets the join parameters
      */
     function getJoin($what=null)
@@ -1162,8 +1164,10 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
                     }
                 }
                 break;
+            case 'inner':   // return inner-join data only
             case 'right':   // return right-join data only
             case 'left':    // return left join data only
+            default:
                 if (count($this->_join[$what])) {
                     $ret = array_merge($ret, $this->_join[$what]);
                 }
@@ -1592,8 +1596,8 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
             $from .= ','.implode(',',array_keys($join['default']));
         }
 
-        // handle left/right joins
-        foreach (array('left', 'right') as $joinType) {
+        // handle left/right/inner joins
+        foreach (array('left', 'right', 'inner') as $joinType) {
             if (isset($join[$joinType]) && count($join[$joinType])) {
                 foreach($join[$joinType] as $table => $condition) {
                     // replace the _TABLENAME_COLUMNNAME by TABLENAME.COLUMNNAME
@@ -2137,7 +2141,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * @param object reference
      * @return mixed
      */
-    function returnResult(&$result)
+    function returnResult($result)
     {
         if ($this->_resultType == 'none') {
             return $result;

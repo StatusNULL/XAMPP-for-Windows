@@ -1,5 +1,5 @@
 <?php
-    // $Id: sql.php,v 1.1 2003/06/09 19:48:19 quipo Exp $
+    // $Id: sql.php,v 1.2 2005/03/25 22:54:38 quipo Exp $
 
     $dbStructure = array(
         'mysql' => array(
@@ -12,6 +12,8 @@
                     'DROP TABLE IF EXISTS '.TABLE_QUESTION.'_seq;',
                     'DROP TABLE IF EXISTS '.TABLE_ANSWER.';',
                     'DROP TABLE IF EXISTS '.TABLE_ANSWER.'_seq;',
+                    'DROP TABLE IF EXISTS '.TABLE_TRANSLATION.';',
+                    'DROP TABLE IF EXISTS '.TABLE_TRANSLATION.'_seq;',
 
                     "CREATE TABLE ".TABLE_ADDRESS." (
                         id int(11) NOT NULL default '0',
@@ -20,7 +22,7 @@
                         street varchar(100) NOT NULL default '',
                         phone varchar(100) NOT NULL default '',
                         PRIMARY KEY  (id)
-                    ) TYPE=MyISAM;",
+                    );",
 
                     "CREATE TABLE ".TABLE_USER." (
                         id int(11) NOT NULL default '0',
@@ -30,20 +32,26 @@
                         address_id int(11) NOT NULL default '0',
                         company_id int(11) NOT NULL default '0',
                         PRIMARY KEY  (id)
-                    ) TYPE=MyISAM;",
+                    );",
 
                     "CREATE TABLE ".TABLE_QUESTION." (
                         id int(11) NOT NULL default '0',
                         ".TABLE_QUESTION." varchar(255) NOT NULL default '',
                         PRIMARY KEY  (id)
-                    ) TYPE=MyISAM;",
+                    );",
 
                     "CREATE TABLE ".TABLE_ANSWER." (
                         id int(11) NOT NULL default '0',
                         ".TABLE_ANSWER." varchar(255) NOT NULL default '',
                         ".TABLE_QUESTION."_id int(11) NOT NULL default '0',
                         PRIMARY KEY  (id)
-                    ) TYPE=MyISAM;"
+                    );",
+
+                    "CREATE TABLE ".TABLE_TRANSLATION." (
+                        string varchar(5) NOT NULL,
+                        translation varchar(10) NOT NULL,
+                        PRIMARY KEY  (string)
+                    );",
 
                 ),
 
@@ -55,7 +63,9 @@
                     'DROP TABLE IF EXISTS '.TABLE_QUESTION.';',
                     'DROP TABLE IF EXISTS '.TABLE_QUESTION.'_seq;',
                     'DROP TABLE IF EXISTS '.TABLE_ANSWER.';',
-                    'DROP TABLE IF EXISTS '.TABLE_ANSWER.'_seq;'
+                    'DROP TABLE IF EXISTS '.TABLE_ANSWER.'_seq;',
+                    'DROP TABLE IF EXISTS '.TABLE_TRANSLATION.';',
+                    'DROP TABLE IF EXISTS '.TABLE_TRANSLATION.'_seq;',
             )
         ),
 

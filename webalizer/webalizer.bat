@@ -1,2 +1,2 @@
-ECHO OFF
+@echo off
 webalizer.exe -c webalizer.conf

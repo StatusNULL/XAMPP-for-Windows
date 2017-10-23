@@ -1,5 +1,5 @@
 <?php
-/* $Id: thai-tis-620.inc.php,v 2.71 2005/06/12 10:10:11 swix Exp $ */
+/* $Id: thai-tis-620.inc.php,v 2.75 2005/07/29 17:03:23 lem9 Exp $ */
 
 // first created 2002/04/29 Arthit Suriyawongkul & Warit Wanasathian
 // last modified 2004/08/22 Arthit Suriyawongkul
@@ -357,7 +357,6 @@ $strNone = 'ไม่มี';
 $strNotNumber = 'ค่านี้ไม่ใช่ตัวเลข!';
 $strNotOK = 'ไม่ตกลง';
 $strNotSet = 'ไม่พบตาราง <b>%s</b> ใน %s';
-$strNotValidNumber = ' ไม่ใช่หมายเลขแถวที่ถูกต้อง!';
 $strNull = 'ว่างเปล่า (null)';
 $strNumSearchResultsInTable = 'พบ %s ผลลัพธ์ที่ตรงในตาราง <i>%s</i>';
 $strNumSearchResultsTotal = '<b>รวม:</b> <i>%s</i> ผลลัพธ์ที่ตรง';
@@ -832,4 +831,10 @@ $strCreateDatabaseBeforeCopying = 'CREATE DATABASE before copying';  //to transl
 $strGeneratePassword = 'Generate Password';  //to translate
 $strGenerate = 'Generate';  //to translate
 $strCopy = 'Copy';  //to translate
+$strTransformation_application_octetstream__hex = 'Displays hexadecimal representation of data.';  //to translate
+$strInvalidFieldCount = 'Table must have at least one field.';  //to translate
+$strInvalidRowNumber = '%d is not valid row number.';  //to translate
+$strInvalidColumnCount = 'Column count has to be larger than zero.';  //to translate
+$strInvalidFieldAddCount = 'You have to add at least one field.';  //to translate
+$strAndThen = 'and then';  //to translate
 ?>

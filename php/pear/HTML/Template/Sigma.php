@@ -17,7 +17,7 @@
 // |          Alexey Borzov <avb@php.net>                                 |
 // +----------------------------------------------------------------------+
 //
-// $Id: Sigma.php,v 1.12 2004/10/20 10:52:14 avb Exp $
+// $Id: Sigma.php,v 1.13 2005/08/09 14:58:45 avb Exp $
 //
 
 require_once 'PEAR.php';
@@ -114,7 +114,7 @@ define('SIGMA_CALLBACK_SYNTAX_ERROR',     -14);
 *
 * @author   Ulf Wendel <ulf.wendel@phpdoc.de>
 * @author   Alexey Borzov <avb@php.net>
-* @version  $Revision: 1.12 $
+* @version  $Revision: 1.13 $
 * @access   public
 * @package  HTML_Template_Sigma
 */
@@ -1187,7 +1187,7 @@ class HTML_Template_Sigma extends PEAR
         if (!($fh = @fopen($filename, 'r'))) {
             return $this->raiseError($this->errorMessage(SIGMA_TPL_NOT_FOUND, $filename), SIGMA_TPL_NOT_FOUND);
         }
-        $content = fread($fh, filesize($filename));
+        $content = fread($fh, max(1, filesize($filename)));
         fclose($fh);
         return $content;
     }
@@ -1217,7 +1217,7 @@ class HTML_Template_Sigma extends PEAR
                 $funcId   = substr(md5(serialize($funcData)), 0, 10);
 
                 // update block info
-                $this->_blocks[$block] = str_replace($match[0], '{__function_' . $funcId . '__}', $this->_blocks[$block]);
+                $this->_blocks[$block] = str_replace($match[0], $this->openingDelimiter . '__function_' . $funcId . '__' . $this->closingDelimiter, $this->_blocks[$block]);
                 $this->_blockVariables[$block]['__function_' . $funcId . '__'] = true;
                 $this->_functions[$block][$funcId] = $funcData;
             }
@@ -1733,7 +1733,7 @@ class HTML_Template_Sigma extends PEAR
                 $funcId   = substr(md5(serialize($funcData)), 0, 10);
                 $template = substr($template, $i);
 
-                $this->_blocks[$block] .= '{__function_' . $funcId . '__}';
+                $this->_blocks[$block] .= $this->openingDelimiter . '__function_' . $funcId . '__' . $this->closingDelimiter;
                 $this->_blockVariables[$block]['__function_' . $funcId . '__'] = true;
                 $this->_functions[$block][$funcId] = $funcData;
             }

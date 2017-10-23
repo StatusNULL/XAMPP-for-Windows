@@ -1,5 +1,5 @@
 <?php
-/* $Id: czech-iso-8859-2.inc.php,v 2.96.2.1 2005/06/30 17:22:37 lem9 Exp $ */
+/* $Id: czech-iso-8859-2.inc.php,v 2.102 2005/08/01 21:11:54 nijel Exp $ */
 
 /**
  * Czech language file by
@@ -58,6 +58,7 @@ $strAll = 'V¹echno';
 $strAlterOrderBy = 'Zmìnit poøadí tabulky podle';
 $strAnalyzeTable = 'Analyzovat tabulku';
 $strAnd = 'a';
+$strAndThen = 'a poté';
 $strAnIndex = 'K&nbsp;tabulce %s byl pøidán index';
 $strAnyHost = 'Jakýkoliv poèítaè';
 $strAny = 'Jakýkoliv';
@@ -250,7 +251,7 @@ $strEncloseInTransaction = 'Uzavøít pøíkazy v&nbsp;transakci';
 $strEndCut = 'KONEC VÝPISU';
 $strEnd = 'Konec';
 $strEndRaw = 'KONEC VÝPISU';
-$strEngineAvailable = 'Úlo¾i¹tì %s není dostupné na tomto MySQL serveru.';
+$strEngineAvailable = 'Úlo¾i¹tì %s je dostupné na tomto MySQL serveru.';
 $strEngineDisabled = 'Úlo¾i¹tì %s je vypnuté na tomto MySQL serveru.';
 $strEngines = 'Úlo¾i¹tì';
 $strEngineUnsupported = 'Tento MySQL server nepodporuje úlo¾i¹tì %s.';
@@ -359,6 +360,10 @@ $strInstructions = 'Instrukce';
 $strInternalNotNecessary = '* Interní relace není potøebná, pokud ji¾ relace existuje v InnoDB.';
 $strInternalRelations = 'Interní relace';
 $strInUse = 'právì se pou¾ívá';
+$strInvalidColumnCount = 'Poèet sloupcù musí být vìt¹í ne¾ nula.';
+$strInvalidFieldAddCount = 'Musíte pøidat alespoò jeden sloupec.';
+$strInvalidFieldCount = 'Tabulka musí mít alespoò jeden sloupec.';
+$strInvalidRowNumber = '%d není platné èíslo øádku.';
 
 $strJapanese = 'Japon¹tina';
 $strJumpToDB = 'Na databázi &quot;%s&quot;.';
@@ -475,7 +480,6 @@ $strNoThemeSupport = 'Není podporována zmìna tématu, zkontrolujte nastavení a té
 $strNotNumber = 'Nebylo zadáno èíslo!';
 $strNotOK = 'není v poøádku';
 $strNotSet = '<b>%s</b> tabulka nenalezena nebo není nastavena v&nbsp;%s';
-$strNotValidNumber = ' není platné èíslo øádku!';
 $strNoUsersFound = '®ádný u¾ivatel nenalezen.';
 $strNoValidateSQL = 'Bez kontroly SQL';
 $strNull = 'Nulový';

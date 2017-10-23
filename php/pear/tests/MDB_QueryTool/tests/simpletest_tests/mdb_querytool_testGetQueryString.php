@@ -1,5 +1,5 @@
 <?php
-// $Id: mdb_querytool_testGetQueryString.php,v 1.1 2005/02/25 14:15:59 quipo Exp $
+// $Id: mdb_querytool_testGetQueryString.php,v 1.3 2005/03/18 15:08:30 quipo Exp $
 
 require_once dirname(__FILE__).'/mdb_querytool_test_base.php';
 
@@ -25,6 +25,18 @@ class TestOfMDB_QueryTool_GetQueryString extends TestOfMDB_QueryTool
             $expected = 'SELECT question.id AS id,question.question AS question FROM question WHERE id=1';
         } else {
             $expected = 'SELECT question.id AS "id",question.question AS "question" FROM question WHERE id=1';
+        }
+        $this->assertEqual($expected, $this->qt->getQueryString());
+    }
+    function test_selectWithJoin() {
+        $this->qt =& new MDB_QT(TABLE_QUESTION);
+        $joinOn = TABLE_QUESTION.'.id='.TABLE_ANSWER.'.question_id';
+        $this->qt->setJoin(TABLE_ANSWER, $joinOn, 'left');
+        
+        if (DB_TYPE == 'ibase') {
+            $expected = 'SELECT answer.id AS t_answer_id,answer.answer AS t_answer_answer,answer.question_id AS t_answer_question_id,question.id AS id,question.question AS question FROM question LEFT JOIN answer ON question.id=answer.question_id';
+        } else {
+            $expected = 'SELECT answer.id AS "_answer_id",answer.answer AS "_answer_answer",answer.question_id AS "_answer_question_id",question.id AS "id",question.question AS "question" FROM question LEFT JOIN answer ON question.id=answer.question_id';
         }
         $this->assertEqual($expected, $this->qt->getQueryString());
     }

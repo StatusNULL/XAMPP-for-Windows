@@ -1,5 +1,5 @@
 <?php
-/* $Id: server_privileges.php,v 2.49 2005/06/12 10:25:38 swix Exp $ */
+/* $Id: server_privileges.php,v 2.51 2005/08/07 12:48:11 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -552,7 +552,7 @@ function PMA_displayLoginInformationFields($mode = 'new', $indent = 0)
        . $spaces . '<tr>' . "\n"
        . $spaces . '    <td bgcolor="' . $cfg['BgcolorTwo'] . '">' . "\n"
        . $spaces . '        <label for="text_pma_pw2">' . "\n"
-       . $spaces . '            ' . $GLOBALS[''] . $GLOBALS['strGeneratePassword'] . ':' . "\n"
+       . $spaces . '            ' . $GLOBALS['strGeneratePassword'] . ':' . "\n"
        . $spaces . '        </label>' . "\n"
        . $spaces . '    </td>' . "\n"
        . $spaces . '    <td bgcolor="' . $cfg['BgcolorTwo'] . '">' . "\n"
@@ -1132,7 +1132,7 @@ if (empty($adduser) && empty($checkprivs)) {
                    . '            </label></td></tr>' . "\n"
                    . '            <tr bgcolor="' . $cfg['BgcolorOne'] . '"><td width="16" class="nowrap">&nbsp;</td><td valign="top"><input type="radio" title="' . $strRevokeAndDelete . ' ' . $strRevokeAndDeleteDescr . '" name="mode" id="radio_mode_2" value="2" /></td>' . "\n"
                    . '            <td><label for="radio_mode_2" title="' . $strRevokeAndDelete . ' ' . $strRevokeAndDeleteDescr . '">' . "\n"
-                   . '                ' . wordwrap($strRevokeAndDelete,75,'<br />') . "\n"
+                   . '                ' . $strRevokeAndDelete . "\n"
                    . '            </label></td></tr>' . "\n"
                    . '            <tr bgcolor="' . $cfg['BgcolorOne'] . '"><td width="16" class="nowrap">&nbsp;</td><td valign="top"><input type="radio" title="' . $strDeleteAndFlush . ' ' . $strDeleteAndFlushDescr . '" name="mode" id="radio_mode_3" value="3" /></td>' . "\n"
                    . '            <td><label for="radio_mode_3" title="' . $strDeleteAndFlush . ' ' . $strDeleteAndFlushDescr . '">' . "\n"

@@ -18,7 +18,7 @@
 # |          Pierre-Alain Joye <pajoye@pearfr.org>                       |
 # |          Greg Beaver <cellog@php.net>                                |
 # +----------------------------------------------------------------------+
-# $Id: go-pear,v 1.76 2005/04/04 05:14:08 cellog Exp $
+# $Id: go-pear,v 1.77 2005/09/15 23:52:42 cellog Exp $
 #
 # Automatically download all the files needed to run the "pear" command
 # (the PEAR package installer).  Requires PHP 4.1.0 or newer.
@@ -159,8 +159,7 @@ if (WEBINSTALLER) {
     $installer_packages[] = 'Pager';
     $installer_packages[] = 'HTML_Template_IT';
     $installer_packages[] = 'Net_UserAgent_Detect';
-    $installer_packages[] = 'PEAR_Frontend_Web-0.4';
-    // otherwise things will break when PEAR 1.4.0 is out
+    $installer_packages[] = 'PEAR_Frontend_Web';
 }
 
 $pfc_packages = array(
@@ -742,7 +741,6 @@ if (!WEBINSTALLER) {
 ******************************************************************************
 WARNING!  The include_path defined in the currently used php.ini does not
 contain the PEAR PHP directory you just specified:
-
 <$php_dir>
 If the specified directory is also not in the include_path used by
 your scripts, you will have problems getting any PEAR packages working.
@@ -1279,7 +1277,6 @@ function detect_install_dirs($_prefix = null) {
 function displayHTMLHeader()
 {
 ?>
-
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
@@ -1525,7 +1522,6 @@ function displayHTML($page = 'Welcome', $data = array())
   </tr>
 
   <tr bgcolor="#003300"><td colspan="3"></td></tr>
-
 </table>
 
 
@@ -1547,7 +1543,6 @@ function displayHTML($page = 'Welcome', $data = array())
        </a><br/>
 
        <img src="<?php echo basename(__FILE__); ?>?action=img&amp;img=smallpear" border="0">
-
 <?php if ($page == 'install') echo '<span class="green">'; ?>
          Complete installation<br/>
 <?php if ($page == 'install') echo '</span>'; ?>
@@ -1567,7 +1562,6 @@ function displayHTML($page = 'Welcome', $data = array())
   <td width="20">
   </td>
   <td>
-
 <?php
     if ($page == 'error') {
 ?>
@@ -1600,7 +1594,6 @@ function displayHTML($page = 'Welcome', $data = array())
             with PHP: <?php echo implode(', ', $GLOBALS['pfc_packages']); ?>.<br/>
             <br/>
             <a href="<?php echo basename(__FILE__); ?>?step=config" class="green">Next &gt;&gt;</a>
-
 <?php
     } elseif ($page == 'config') {
         if (!empty($GLOBALS['http_proxy'])) {
@@ -1630,7 +1623,6 @@ function displayHTML($page = 'Welcome', $data = array())
               </TR>
             </table>
             <TABLE border="0">
-
 <?php
     // Display error messages
         if (isset($GLOBALS['www_errors']) && sizeof($GLOBALS['www_errors']) ) {
@@ -1660,7 +1652,6 @@ function displayHTML($page = 'Welcome', $data = array())
             <br/><hr/><br/>
             The following PEAR packages are common ones, and can be installed<br/>
             by go-pear too: <br/>
-
 <?php echo implode(', ', $GLOBALS['pfc_packages']);?>.<br/>
             <input type="checkbox" name="install_pfc" <?php if($GLOBALS['install_pfc']) echo 'checked';?>> Install those too<br/>
             <br/><br/>
@@ -1700,7 +1691,6 @@ function displayHTML($page = 'Welcome', $data = array())
                         </TD>
                       </TR>
                     </table>
-
 <?php
         }
 ?>
@@ -1854,7 +1844,6 @@ function displayHTML($page = 'Welcome', $data = array())
               </td>
             </tr>
             </table>
-
 <?php
     }
 ?>
@@ -1933,7 +1922,6 @@ function displayHTMLInstallationSummary($data = '')
             <br/>
             Thanks for using go-pear!<br/>
             <br/>
-
 <?php
     if ($next === NULL) {
 ?>
@@ -1949,7 +1937,6 @@ function displayHTMLInstallationSummary($data = '')
                         </TD>
                       </TR>
                     </table>
-
 <?php
     } else {
         if ($_GET['step'] == 'install-progress') {
@@ -2370,7 +2357,6 @@ $includepath
 ******************************************************************************
 WARNING!  I cannot write to $pathIni, but I succesfully created a php.ini
 under <$prefix/php.ini-gopear>. Please replace the file <$pathIni> with
-
 <$prefixIni> or modify your php.ini by adding:
 
 $includepath

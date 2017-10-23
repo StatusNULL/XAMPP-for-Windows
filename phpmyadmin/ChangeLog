@@ -2,10 +2,334 @@
 phpMyAdmin - Changelog
 ----------------------
 
-$Id: ChangeLog,v 2.1112.2.14 2005/07/04 21:47:07 lem9 Exp $
+$Id: ChangeLog,v 2.1238.2.12 2005/09/15 16:44:29 lem9 Exp $
 $Source: /cvsroot/phpmyadmin/phpMyAdmin/ChangeLog,v $
 
+2005-09-15 Marc Delisle  <lem9@users.sourceforge.net>
+    ### 2.6.4-pl1 released
+
+2005-09-14 Marc Delisle  <lem9@users.sourceforge.net>
+    * export.php: bug #1290730, https export under MSIE fails
+
+2005-09-12 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_relation.php: bug #1287611, no Save button in Relation view
+      when pmadb is not defined
+
+2005-09-10 Marc Delisle  <lem9@users.sourceforge.net>
+    ### 2.6.4 released
+
+2005-09-06 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/mongolian update, thanks to Bayarsaikhan Enkhtaivan
+
+2005-09-07 Michal Čihař  <michal@cihar.com>
+    * main.php, libraries/auth/cookie.auth.lib.php: XSS on username (bug
+      #1283552)
+
+2005-09-06 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/serbian: Updated, thanks to Mihailo Stefanovic (mikis).
+
+2005-09-05 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/defines.lib.php, themes/*/info.inc.php: needs generation 2
+    * header.inc.php: XSS on $title, thanks to Christian Wenz
+
+2005-09-02 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/turkish update, thanks to boralioglu.
+
+2005-08-28 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/belarusian updates, thanks to Jaska Zedlik
+    ### 2.6.4-rc1 released
+
+2005-08-26 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/indonesian: update thanks to Rachim Tamsjadi - tamsy
+    * lang/polish: update thanks to Jakub Wilk - ubanus
+
+2005-08-23 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/display_tbl.lib.php: bug #1267177, wrong return page
+    * main.php, libraries/common.lib.php, Documentation.html,
+      config.inc.php: patch #1257134, removed code to display the warning if 
+      PmaAbsoluteUri is not set. A notice will still display if the autodetect
+      code is unable to figure out the proper URI. Thanks to Isaac Bennetch
+
+2005-08-23 Michal Čihař  <michal@cihar.com>
+    * libraries/database_interface.lib.php: Abide cfg['Lang'] settings even if
+      using MySQL > 4.1.x (bug #1266626).
+    * libraries/display_tbl.lib.php: Do not get TABLES as table name, it's
+      used on some queries by MySQL 5.0.x (bug #1266623).
+
+2005-08-22 Michal Čihař  <michal@cihar.com>
+    * error.php, libraries/common.lib.php, libraries/sanitizing.lib.php:
+      Protect against possible XSS (bug #1265740), move input sanitizing to
+      special file.
+    * config.inc.php, libraries/common.lib.php,
+      libraries/config_import.lib.php, libraries/display_export.lib.php:
+      Default charset for export is now configurable (RFE #1263772).
+
+2005-08-20 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/common.lib.php, new error.php: patch #1258978, move common
+      code for error pages out of common.lib.php, thanks to Sebastian Mendel
+    * lang/german*: bug #1258956, typo
+    * libraries/defines.lib.php, themes/original/info.inc.php, 
+      themes/darkblue_orange/info.inc.php: PMA 2.6.4 needs theme version 3
+
+2005-08-19 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/chinese_traditional: Updates, thanks to Siu Sun.
+    * lang/japanese: updated, thanks to Tadashi Jokagi (elf2000)
+
+2005-08-18 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/indonesian: Update thanks to Rachim Tamsjadi - tamsy.
+    * lang/galician: Updates, thanks to Xosé Calvo.
+    * lang/brazilian-portuguese: update, thanks to Airon Luis Pereira
+    * lang/danish: Updated, thanks to AlleyKat - dk_alleykat.
+    * lang/bulgarian:  Updated, thanks to Stanislav Yordanov (stanprog).
+    * lang/estonian: Update thanks to Alvar Soome - finsoft.
+    * lang/slovak: update, thanks to Ivan Kuriscak - shylauda69
+    * lang/swedish: Updated, thanks to Björn T. Hallberg (bth).
+    * lang/catalan update, thanks to Xavier Navarro (xavin).
+    * lang/spanish: Updated, thanks to Daniel Hinostroza (hinostroza)
+    * lang/norwegian: Update, thanks to Sven-Erik Andersen
+    * lang/azerbaijani: update, thanks to Shehriyar Imanov (sheki).
+
+2005-08-16 Marc Delisle  <lem9@users.sourceforge.net>
+    * css/phpmyadmin.css.php, db_details_links.php, querywindow.php,
+      server_links.inc.php, tbl_properties_links.php, libraries/common.lib.php
+      themes/*/css/theme_right.css.php, themes/original/img/error.ico:
+      patch #1252031, CSS for navigation tabs, thanks to Sebastian Mendel
+
+2005-08-15 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/common.lib.php: bug #1259951, invalid argument for foreach()
+
+2005-08-14 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_change.php: $goto was not encoded in the form, resulting in a
+      problem after editing/saving a row (seen in IE6)
+    * libraries/common.lib.php, /display_tbl.lib.php, /functions.js, /grab_globals.lib.php:
+      patch #1257955 for bug #1248577 (incorrect message "you should define a primary key")
+      and bug #1253125 (request URI too large), thanks to Sebastian Mendel
+    * (many files): patch #1253465, avoid error messages for unset variables
+      in PHP functions that require a parameter passed by reference,
+      thanks to Sebastian Mendel
+
+2005-08-12 Marc Delisle  <lem9@users.sourceforge.net>
+    * header.inc.php: remove the 'InnoDB free' segment from table comments
+    * footer.inc.php: bug #1257106, display problem in the left frame (IE)
+
+2005-08-11 Marc Delisle  <lem9@users.sourceforge.net>
+    * queryframe.php: shorten the path of db subtree items,
+      thanks to Edward Rudd - urkle
+    * config.inc.php, header.inc.php, tbl_properties_links.php,
+      themes/*/css/theme_right.css.php, tbl_properties_table_info.php,
+      Documentation.html, libraries/config_import.lib.php: patch #1249528,
+      move table comments to header and enable configuration of header for
+      TRUE/FALSE/'both', thanks to Sebastian Mendel - cybot_tm
+    * db_details.php: undefined $header_url_qry
+    * sql.php: bug #1255869, "MySQL returned an empty result set" not
+      displayed in all cases
+	  
+2005-08-09 Marc Delisle  <lem9@users.sourceforge.net>
+    * read_dump.php: add unique numbers to $strFileCouldNotBeRead to
+      improve support when someone gets this error
+    * Documentation.html: patch #1253248, links and anchors to every FAQ
+      item, thanks to Alexander Schuch - ci-dev
+
+2005-08-08 Michal Čihař  <michal@cihar.com>
+    * libraries/export/htmlword.php: Fix undefined variable when exporting
+      relations (bug #1253457).
+
+2005-08-08 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/dbi/mysqli.dbi.lib.php: bug #1253453, using mysqli extension
+      with MySQL 4.0.x
+    * libraries/mysql_charsets.lib.php, /relation_cleanup.lib.php,
+      /tbl_move_copy.php: patch #1253461 (code cleanup), 
+      thanks to Sebastian Mendel
+    * libraries/sqlparser.lib.php: patch #1253478, variable initialization
+      and code cleanup, thanks to Sebastian Mendel
+
+2005-08-07 Marc Delisle  <lem9@users.sourceforge.net>
+    * Documentation.html: Save button for PDF schema coordinates,
+      thanks to Ryan Schmidt
+    * server_privileges.php: undefined index $GLOBALS[''],
+      thanks to Ryan Schmidt
+    * queryframe.php: need at least 2 items to display a group in the
+      database selector, thanks to Ryan Schmidt
+
+2005-08-06 Marc Delisle  <lem9@users.sourceforge.net>
+    * queryframe.php: fixes for tree subgroups in databases selector:
+      escaping of special characters, display a db name inside its own
+      group, and proper closing of optgroup, thanks to Ryan Schmidt
+
+2005-08-05 Marc Delisle  <lem9@users.sourceforge.net>
+    * Documentation.html, readme.php, license.php: 
+      bug #965548, displaying README and LICENSE, thanks to Ryan Schmidt
+
+2005-08-04 Michal Čihař  <michal@cihar.com>
+    * libraries/common.lib.php, export.php: Show error header on error to make
+      clear that something bad has happened.
+
+2005-08-04 Marc Delisle  <lem9@users.sourceforge.net>
+    * queryframe.php: patch #1250899:
+     - unified spaces between icons
+     - cleaned html and php code
+     - display of querywindow-icon now follows
+       $cfg['QueryFrame']
+     - always use no_js=1 if $cfg['QueryFrameJS'] == true
+      thanks to Sebastian Mendel
+    * Documentation.html: patch #1169308, FAQ 1.17a improved,
+      thanks to Isaac Bennetch
+    * queryframe.php, footer.inc.php, config.inc.php, Documentation.html,
+      libraries/common.lib.php, /config_import.lib.php:
+      patch #1246245, tree subgroups for databases (in selector),
+      thanks to Edward Rudd - urkle
+    * db_details.php, tbl_query_box.php: patch #1250935, interface
+      improvements, thanks to Sebastian Mendel
+    * tbl_create.php: bug #1252124, XSS on table creation page
+
+2005-08-02 Marc Delisle  <lem9@users.sourceforge.net>
+    * server_privileges.php: patch #1249363, remove unneeded wordwrap(),
+      table width should be limited by template if necessary,
+      thanks to Sebastian Mendel - cybot_tm
+    * server_databases.php: patch #1249371, correct calculation of colspan,
+      and patch #1249414, display improvements, thanks to Sebastian Mendel;
+      also,  $dbstats should contain 0 or 1, not the colspan
+    * sql.php: patch #1249451, display improvement for bookmark dialog,
+      thanks to Sebastian Mendel
+    * libraries/common.lib.php: patch #1249457, display improvements for Edit
+      Explain etc dialog, thanks to Sebastian Mendel
+
+2005-08-01 Michal Čihař  <michal@cihar.com>
+    * lang/czech: Fix bad translation (is was translated to is not :-)),
+      update.
+
+2005-08-01 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/common.lib.php: bug #1249239, XSS vulnerability on Create page
+    * Documentation.html: "bug #1248598, explain another cause of the Missing
+      parameter error
+
+2005-07-29 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_change.php, lang/*: new message $strAndThen
+	* libraries/dbg/profiling.php: patch #1160439, improvements,
+	  thanks to Glen Arason
+	* scripts/upgrade.pl: patch #1198492, current version check,
+	  thanks to Herman van Rink - helmo
+
+2005-07-28 Marc Delisle  <lem9@users.sourceforge.net>
+    * pdf_pages.php: Go button renamed to Save because it's really used to save coordinates
+
+2005-07-26 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_change.php: bug #1243908, left panel browse icon alt tag not updated
+      after inserting a row
+    * config.inc.php, libraries/config_import.lib.php, /common.lib.php:
+      RFE #1177459, BOOL column type
+
+2005-07-26 Michal Čihař  <michal@cihar.com>
+    * export.php: Use actual MIME type for CSV.
+
+2005-07-25 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_change.php: insert another new row: dropdown choice should be sticky
+
+2005-07-24 Michal Čihař  <michal@cihar.com>
+    * libraries/check_user_privileges.lib.php: Undefined variable (bug
+      #1243885).
+    * libraries/config_import.lib.php: Do not override theme properties when
+      path is not set.
+    * libraries/select_theme.lib.php: Do not attempt to sort themes when
+      themes are disabled (bug #1243883).
+
+2005-07-23 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_properties_structure.php, tbl_properties.inc.php:
+      bug #1157230, escape special chars in ENUM or SET
+
+2005-07-22 Marc Delisle  <lem9@users.sourceforge.net>
+    * db_details_structure.php: table creation should not be possible
+      in information_schema
+    * db_operations.php: those operations do not make sense on
+      information_schema
+    * browse_foreigners.php: bug #1242805, Show All does not work while
+      browsing foreign values
+    * libraries/relation.lib.php: for the new ForeignKeyDropdownOrder, id and
+      content were reversed (id-content showed content then id)
+
+2005-07-21 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/auth/cookie.auth.lib.php: bug #1240880, XSS on the
+      cookie-based login panel
+
+2005-07-20 Marc Delisle  <lem9@users.sourceforge.net>
+    * ChangeLog: automatic utf-8 encoding modeline, thanks to Michal
+
+2005-07-19 Marc Delisle  <lem9@users.sourceforge.net>
+    * translators.html: message about French translation will be in French
+
+2005-07-16 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/string.lib.php: typo
+    * libraries/sqlparser.data.php: bug #1238222, parsing of ISNULL()
+
+2005-07-14 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/*: removed unused strInvalidRowCount
+
+2005-07-13 Marc Delisle  <lem9@users.sourceforge.net>
+    * Documentation.html: how to enable the charset choice for exported file
+
+2005-07-13 Michal Čihař  <michal@cihar.com>
+    * libraries/common.lib.php: Use eval for config file including to catch
+      parse errors (bug #1223319), on error page display config file that
+      actually failed.
+    * main.php, server_databases.php, libraries/check_user_privileges.lib.php,
+      libraries/display_create_database.lib.php: Show box for creating
+      database only if user has privileges to do so (bug #1167892).
+    * libraries/display_tbl.lib.php: Use better message, thanks to Marc for
+      noticing this.
+
+2005-07-12 Marc Delisle  <lem9@users.sourceforge.net>
+    * sql.php: for Insert row and Export, use post when the query is too big
+    * export.php: bug #1116026, export under IE 6 (XP SP2)
+
+2005-07-11 Marc Delisle  <lem9@users.sourceforge.net>
+    * tbl_relations.php: bug #1227710, unsaved relations lost when changing 
+      field to display
+
+2005-07-11 Michal Čihař  <michal@cihar.com>
+    * db_operations.php: Allow adding DROP TABLE when copying database (RFE
+      #1235761).
+
+2005-07-10 Robin Johnson <robbat2@users.sourceforge.net>
+    * config.inc.php, Documentation.html, libraries/common.lib.php,
+      libraries/config_import.lib.php:
+      Document previous foreign-key dropdown work, and also ensure that the
+      configuration import code works properly with it.
+	
+2005-07-10 Michal Čihař  <michal@cihar.com>
+    * libraries/auth/http.auth.lib.php: Support FastGCI in http auth (patch
+      #1192219)
+    * Documentation.html, config.inc.php, left.php, queryframe.php,
+      libraries/common.lib.php, libraries/config_import.lib.php,
+      libraries/header_meta_style.inc.php, libraries/select_theme.lib.php:
+      User can now have different theme per server (RFE #1231599).
+    * config.inc.php: Add OLD_PASSWORD (bug #1216178).
+    * main.php: Correct ALT attribute for image (bug #1232124).
+    * mult_submits.inc.php, libraries/display_tbl.lib.php: Don't forget
+      browsing state while deleting multiple rows (bug #1232624).
+    * tbl_row_action.php: Fix undefined variable warning.
+    * db_details_structure.php, db_operations.php, header.inc.php,
+      querywindow.php, tbl_indexes.php, tbl_properties.inc.php,
+      tbl_properties_structure.php, lang/*, libraries/display_tbl.lib.php,
+      libraries/functions.js, libraries/indexes.js: Show better error messages
+      when checking numerical inputs (bug #1207402).
+    * sql.php, libraries/common.lib.php: Use post for print view when query is
+      too big (bug #1203692).
+
+2005-07-10 Marc Delisle  <lem9@users.sourceforge.net>
+    * libraries/display_tbl.lib.php: bug #1235473 display_tbl.lib.php,
+      Undefined variable order_img
+    * libraries/functions.js: bug #1234098, invalid "normal" cursor style
+    * queryframe.php: bug #1231804, query windows does not open in new window,
+      thanks to Michael Keck
+    * db_details_qbe.php: bug #1234616, minor theme text color issue
+
+2005-07-06 Marc Delisle  <lem9@users.sourceforge.net>
+    * db_search.php: bug #1233349, db search in MySQL 5.0.x on fields 
+      without a charset
+
 2005-07-04 Marc Delisle  <lem9@users.sourceforge.net>
+    * lang/spanish: Updated, thanks to Daniel Hinostroza (hinostroza)
+      and Mastermnd for the 2.6.2 translation cleanup
     * tbl_properties_table_info.php: bug #1231917, commands out of sync
 
 2005-07-03 Marc Delisle  <lem9@users.sourceforge.net>
@@ -20,25 +344,45 @@ $Source: /cvsroot/phpmyadmin/phpMyAdmin/ChangeLog,v $
       instructions, thanks to Isaac Bennetch - ibennetch
 
 2005-06-30 Marc Delisle  <lem9@users.sourceforge.net>
-    * lang/hungarian update, thanks to Mih�ly M�sz�ros <necronix@freemail.hu>
+    * lang/hungarian update, thanks to Mihály Mészáros <necronix@freemail.hu>
     * lang/japanese: updated, thanks to Tadashi Jokagi (elf2000)
+    * lang/chinese_traditional: Updates, thanks to Siu Sun
     * lang/catalan update, thanks to Xavier Navarro (xavin).
     * lang/lithuanian: Updated, thanks to Vilius Simonaitis - maumas98
     * lang/danish: Updated, thanks to AlleyKat - dk_alleykat.
     * lang/swedish: Updated, thanks to Björn T. Hallberg (bth).
 
 2005-06-29 Marc Delisle  <lem9@users.sourceforge.net>
-    * tbl_properties_table_info.php: bug #1228862, creating a table under
+    * tbl_properties_table_info.php: bug #1228862, creating a table under 
       MySQL 5.x with wrong table type
 
 2005-06-28 Marc Delisle  <lem9@users.sourceforge.net>
     * tbl_properties_operations.php: bug #1225635,
       cannot change table's collation under MySQL 5.0.4
 
-2005-06-24 Michal �.iha�.  <michal@cihar.com>
+2005-06-27 Michal Čihař  <michal@cihar.com>
+    * config.inc.php: Better comments describing multi server setup (patch
+      #1226666).
+    * db_details_links.php: Place export tab on same place as on table page
+      (RFE #1047874).
+    * tbl_properties_links.php: Switch browse and properties tabs
+    * db_details_structure.php: Make order of icons same as on table view (RFE
+      #1047874).
+
+2005-06-24 Michal Čihař  <michal@cihar.com>
     * tbl_change.php, tbl_properties_links.php, libraries/export/sql.php:
       Remove error reporting.
+    * config.inc.php, libraries/common.lib.php,
+      libraries/config_import.lib.php, libraries/display_export.lib.php:
+      Configurable file name templates (RFE #1226941).
+    * themes.php, libraries/select_theme.lib.php: Sort themes, use only one
+      code for browsing directory with themes (RFE #1184251).
+    * tbl_change.php: Use select instead of input, this saves some place and
+      looks better (RFE #1169931).
+    * tbl_change.php: Display column comment while editing data (RFE #860912).
     * lang/sync_lang.sh: Fix belarusian name.
+    * libraries/transformations/application_octetstream__hex.inc.php, lang/*:
+      Add hex transformation (RFE #1100068).
 
 2005-06-24 Marc Delisle  <lem9@users.sourceforge.net>
     * db_operations.php: problem renaming a db
@@ -47,13 +391,23 @@ $Source: /cvsroot/phpmyadmin/phpMyAdmin/ChangeLog,v $
     * lang/german-*.inc.php: Updates.
     * db_operations.php: Cleaning up Marc's code... ;-p
 
-2005-06-23 Michal �.iha�.  <michal@cihar.com>
+2005-06-23 Robin Johnson <robbat2@users.sourceforge.net>
+    * config.inc.php, libraries/relation.lib.php,
+	libraries/get_foreign.lib.php, tbl_select.php, tbl_change.php: Support for
+	customizing foreign-key dropdown, take #2, now very customizable, incl max
+	item limit.
+
+2005-06-23 Michal Čihař  <michal@cihar.com>
     * lang/czech: Update.
 
 2005-06-22 Alexander M. Turek  <me@derrabus.de>
     * tbl_properties_structure.php: Undefined index.
 
-2005-06-22 Garvin Hicking  <pma@supergarv.de>
+2005-06-22 Robin Johnson <robbat2@users.sourceforge.net>
+    * config.inc.php, libraries/relation.lib.php: Support for customizing
+	foreign-key dropdown, take #1.
+
+2005-06-22 Garvin Hicking  <rabustoldmethatiforgotmyemailaddress@supergarv.de>
     * server_databases.php: Bug #1225315, wrong message displayed
       when no databases were dropped.
     * tbl_properties.inc.php: Patch #1225452, JS error for
@@ -75,20 +429,20 @@ $Source: /cvsroot/phpmyadmin/phpMyAdmin/ChangeLog,v $
       bug #1221359, Copying a db containing a MERGE table
 
 2005-06-12 Marc Delisle  <lem9@users.sourceforge.net>
-    * tbl_properties.inc.php: visually bind the Add x fields dialog to its 
+    * tbl_properties.inc.php: visually bind the Add x fields dialog to its
       submit button
-    * db_operations.php: bug #1215688, Copying database does not preserve 
+    * db_operations.php: bug #1215688, Copying database does not preserve
       default charset and collation
     ### 2.6.3-rc1 released
 
 2005-06-12 Olivier Mueller <om@omnis.ch>
-    * lang/*, server_privileges.php: added strings for RFE #1197482: 
+    * lang/*, server_privileges.php: added strings for RFE #1197482:
       $strGeneratePassword, $strGenerate and $strCopy
 
 2005-06-11 Marc Delisle  <lem9@users.sourceforge.net>
     * tbl_properties_export.php: bug #1169791, exporting results from queries
       with limit keyword
-    * lang/mongolian* update, thanks to Bayarsaikhan Enkhtaivan 
+    * lang/mongolian* update, thanks to Bayarsaikhan Enkhtaivan
     * lang/finnish: update, thanks to Jouni Kahkonen
     * lang/norwegian: Update, thanks to Sven-Erik Andersen
     * lang/galician: Updates, thanks to Xosé Calvo.
@@ -110,12 +464,12 @@ $Source: /cvsroot/phpmyadmin/phpMyAdmin/ChangeLog,v $
       a different language and this translation is really tatarish)
     * lang/mongolian*, libraries/select_lang.lib.php,
       translators.html, Documentation.html, README:
-      new language (mongolian), thanks to Bayarsaikhan Enkhtaivan 
+      new language (mongolian), thanks to Bayarsaikhan Enkhtaivan
 
 2005-06-05 Marc Delisle  <lem9@users.sourceforge.net>
     * libraries/functions.js: bug #1207405, invalid SQL when creating
       table with zero fields
-    * sql.php: bug #1204951, left frame browse icon alt tag 
+    * sql.php: bug #1204951, left frame browse icon alt tag
       not updated on emptying table
 
 2005-06-05 Michal Čihař  <michal@cihar.com>
@@ -6682,7 +7036,7 @@ $Source: /cvsroot/phpmyadmin/phpMyAdmin/ChangeLog,v $
          --- Older ChangeLogs can be found on our project website ---
                      http://www.phpmyadmin.net/old-stuff/ChangeLogs/
 
-# vim: ft=changelog fenc=utf-8
+# vim: ft=changelog fenc=utf-8 encoding=utf-8
 # vim: expandtab ts=4 sw=4 sts=4
 # vim: fde=getline(v\:lnum-1)=~'^\\s*$'&&getline(v\:lnum)=~'\\S'?'>1'\:1&&v\:lnum>8&&getline(v\:lnum)!~'^#'
 # vim: fdn=1 fdm=expr

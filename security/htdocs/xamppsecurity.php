@@ -330,8 +330,9 @@ echo "<tr>
   </tr>
   <tr>
     <td align=left width=\"200\">&nbsp;</td><td align=left width=\"400\"><input type=submit value=\"".$TEXT['mysql-rootsetup-passwdchange']."\" name=\"changing\"></td>
-  </tr>
-		 <tr>
+  </tr>";
+}
+	echo "<tr>
     <td align=left width=\"200\">&nbsp;</td><td align=center width=\"400\">&nbsp;</td>
   </tr>
 		  <tr>
@@ -371,7 +372,6 @@ echo "<tr>
   </tr>
   </table>
 </form>";
-}
 ?>
 
 </body>

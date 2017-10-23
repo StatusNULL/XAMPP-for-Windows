@@ -1,5 +1,5 @@
 <?php
-/* $Id: footer.inc.php,v 2.15 2005/05/30 00:04:08 lem9 Exp $ */
+/* $Id: footer.inc.php,v 2.17 2005/08/12 13:14:06 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -24,10 +24,12 @@ if ($cfg['QueryFrame'] && $cfg['QueryFrameJS']) {
         $tables              = PMA_DBI_try_query('SHOW TABLES FROM ' . PMA_backquote($db) . ';', NULL, PMA_DBI_QUERY_STORE);
         $num_tables          = ($tables) ? @PMA_DBI_num_rows($tables) : 0;
         $common_url_query    = PMA_generate_common_url($db);
+        // if we put a space before the left bracket, it causes a display
+        // problem in IE
         if ($num_tables) {
-            $num_tables_disp = ' (' . $num_tables . ')';
+            $num_tables_disp = '(' . $num_tables . ')';
         } else {
-            $num_tables_disp = ' (-)';
+            $num_tables_disp = '(-)';
         }
     ?>
     var forceQueryFrameReload = false;
@@ -58,7 +60,8 @@ if ($cfg['QueryFrame'] && $cfg['QueryFrameJS']) {
     if (parent.frames.queryframe && parent.frames.queryframe.document && parent.frames.queryframe.document.left && parent.frames.queryframe.document.left.lightm_db) {
         selidx = parent.frames.queryframe.document.left.lightm_db.selectedIndex;
         if (parent.frames.queryframe.document.left.lightm_db.options[selidx].value == "<?php echo addslashes($db); ?>" && forceQueryFrameReload == false) {
-            parent.frames.queryframe.document.left.lightm_db.options[selidx].text = "<?php echo addslashes($db) . $num_tables_disp; ?>";
+            parent.frames.queryframe.document.left.lightm_db.options[selidx].text =
+                parent.frames.queryframe.document.left.lightm_db.options[selidx].text.replace(/(.*)\([0-9]+\)/,'$1<?php echo $num_tables_disp;?>');
         } else {
             parent.frames.queryframe.location.reload();
             setTimeout("dbBoxSetup();",2000);

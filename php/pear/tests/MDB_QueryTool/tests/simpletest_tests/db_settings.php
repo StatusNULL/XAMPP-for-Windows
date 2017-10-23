@@ -1,5 +1,5 @@
 <?php
-// $Id: db_settings.php,v 1.1 2005/02/25 14:15:59 quipo Exp $
+// $Id: db_settings.php,v 1.2 2005/03/25 22:57:28 quipo Exp $
 
 $dbtype = isset($_GET['type']) ? $_GET['type'] : 'mysql';
 $valid_dbms = array(
@@ -13,6 +13,7 @@ define('TABLE_USER',     'querytool_user');
 define('TABLE_ADDRESS',  'querytool_address');
 define('TABLE_QUESTION', 'question');
 define('TABLE_ANSWER',   'answer');
+define('TABLE_TRANSLATION',  'tr');
 
 switch ($dbtype) {
     case 'pgsql':

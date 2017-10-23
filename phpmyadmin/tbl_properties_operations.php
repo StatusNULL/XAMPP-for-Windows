@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_properties_operations.php,v 2.28.2.1 2005/06/30 17:34:34 lem9 Exp $ */
+/* $Id: tbl_properties_operations.php,v 2.29 2005/06/28 10:59:39 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**

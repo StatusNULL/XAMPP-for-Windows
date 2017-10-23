@@ -4,7 +4,7 @@
 // GLOBAL
 // ---------------------------------------------------------------------
 
-$TEXT['global-xampp']="XAMPP dla Linux";
+$TEXT['global-xampp']="XAMPP dla Windows";
 
 // ---------------------------------------------------------------------
 // NAVIGATION
@@ -44,16 +44,16 @@ $TEXT['navi-phpsqliteadmin']="phpSQLiteAdmin";
 
 
 $TEXT['navi-languages']="Languages";
-$TEXT['navi-english']="English";
-$TEXT['navi-german']="Deutsch";
-$TEXT['navi-french']="Francais";
-$TEXT['navi-dutch']="Nederlands";
 $TEXT['navi-polish']="Polski";
-$TEXT['navi-italian']="Italiano";
-$TEXT['navi-norwegian']="Norsk";
+$TEXT['navi-german']="Deutsch";
+$TEXT['navi-english']="English";
 $TEXT['navi-spanish']="Español";
+$TEXT['navi-french']="Francais";
+$TEXT['navi-italian']="Italiano";
+$TEXT['navi-dutch']="Nederlands";
+$TEXT['navi-norwegian']="Norsk";
+$TEXT['navi-slovenian']="Slovenian";
 $TEXT['navi-chinese']="&#20013;&#25991;";
-
 
 // ---------------------------------------------------------------------
 // STATUS
@@ -71,7 +71,7 @@ $TEXT['status-cgi']="Common Gateway Interface (CGI)";
 $TEXT['status-ssi']="Server Side Includes (SSI)";
 $TEXT['status-python']="Python z mod_python";
 $TEXT['status-mmcache']="PHP extension »eAccelerator«";
-$TEXT['status-mmcache-url']="http://www.apachefriends.org/faq-lampp-en.html#mmcache";
+$TEXT['status-mmcache-url']="http://www.apachefriends.org/faq-wampp-en.html#mmcache";
 $TEXT['status-smtp']="Us&#322;uga SMTP";
 $TEXT['status-ftp']="Us&#322;uga FTP";
 $TEXT['status-tomcat']="Us&#322;uga Tomcat";
@@ -93,7 +93,15 @@ $TEXT['status-tab3']="Informacje";
 
 $TEXT['security-head']="Bezpiecze&#324;stwo XAMPP";
 $TEXT['security-text1']="Na tej stronie znajduj&#261; si&#281; informacje og&oacute;lne o stanie bezpiecze&#324;stwa twojej instalacji XAMPP. (Ci&#261;g dalszy tekstu znajduje si&#281; pod tabelk&#261;.)";
-$TEXT['security-text2']="Punkty zaznaczone na zielono s&#261; zabezpieczone; punkty czerwone oznaczaj&#261; brak zabezpieczenia, a punkty &#380;ó&#322;te nie mog&#322;y zosta&#263; sprawdzone (na przyk&#322;ad dlatego, &#380;e us&#322;uga nie jest uruchomiona).<p>To fix or close all these matters simply call<p><b>/opt/lampp/lampp security</b><p>This will start an interactive program.";
+$TEXT['security-text2']="The green marked points are secure; the red marked points are definitively unsecure and the yellow marked points couldn't be checked (for example because the sofware to check isn't running).<p>To fix the problems for mysql, phpmyadmin and the xampp directory simply use</B><p>=> <A HREF=/security/xamppsecurity.php><B>http://localhost/security/xamppsecurity.php</B></A> <= &nbsp;&nbsp;[allowed only for localhost]<br>&nbsp;<br>&nbsp;<br>
+Some other important notes:<UL>
+	<LI>All these test are made ONLY for host \"localhost\" (127.0.0.1).</LI>
+	<LI><I><B>For FileZilla FTP und Mercury Mail, you must fix all security problems by yourself! Sorry. </B></I></LI>
+	<LI>If your computer is not online or blocked by a firewall, your servers are SECURE against outside attacks.</LI>
+	<LI>If servers are not running, these servers are although SECURE!</LI></UL>";
+$TEXT['security-text3']="<B>Please consider this: 
+With more XAMPP security some examples will NOT execute error free. If you use PHP in \"safe mode\" for example some functions of this security frontend will not working anymore. Often even more security means less functionality at the same time.</B>";
+$TEXT['security-text4']="The XAMPP default ports:";
 
 $TEXT['security-ok']="BEZPIECZNY";
 $TEXT['security-nok']="NIEBEZPIECZNY";
@@ -116,17 +124,34 @@ $TEXT['security-checkpmamysqluser-text']="phpMyAdmin zapisuje Twoje ustawienia w
 
 $TEXT['security-checkmysql-nok']="U&#380;ytkownik root w MySQL nie ma has&#322;a";
 $TEXT['security-checkmysql-ok']="U&#380;ytkownik root w MySQL ju&#380; ma has&#322;o";
-$TEXT['security-checkmysql-text']="Ka&#380;dy lokalny u&#380;ytkownik w Linuxie ma dost&#281;p do Twojej bazy danych MySQL z prawami administratora. powinienie&#347; ustawi&#263; has&#322;o dost&#281;pu.";
+$TEXT['security-checkmysql-text']="Ka&#380;dy lokalny u&#380;ytkownik w Windows ma dost&#281;p do Twojej bazy danych MySQL z prawami administratora. powinienie&#347; ustawi&#263; has&#322;o dost&#281;pu.";
+
+$TEXT['security-pop-nok']="The test user (newuser) for Mercury Mail server (POP3) have an old password (wampp)";
+$TEXT['security-pop-ok']="The test user \"newuser\" for the POP3 server (Mercury Mail?) does not exists anymore or have a new password";
+$TEXT['security-pop-out']="A POP3 server like Mercury Mail is not running or is blocked by a firewall!";
+$TEXT['security-pop-notload']="<I>The necessary IMAP extension for this secure test is not loading (php.ini)!</I><br>";
+$TEXT['security-pop-text']="Please check and perhaps edit all users and passwords in the the Mercury Mail server configuration!";
 
 $TEXT['security-checkftppassword-nok']="Has&#322;o dla u&#380;ytkownika nobody w FTP to nadal 'lampp'";
 $TEXT['security-checkftppassword-ok']="Has&#322;o dla u&#380;ytkownika nobody w FTP juz nie jest 'lampp'";
+$TEXT['security-checkftppassword-out']="A FTP server is not running  or is blocked by a firewall!";
 $TEXT['security-checkftppassword-text']="Stosuj&#261;c standardowe has&#322;o na u&#380;ytkownika nobody w FTP, ka&#380;dy mo&#380;e wysy&#322;a&#263; lub zmienia&#263; pliki na Twoim serwerze XAMPP. Je&#380;eli uruchomione zosta&#322;o ProFTPD, has&#322;o dla u&#380;ytkownika nobody powinno zosta&#263; zmienione.";
+
+$TEXT['security-phpmyadmin-nok']="PhpMyAdmin is free accessible by network";
+$TEXT['security-phpmyadmin-ok']="PhpMyAdmin password login is enabled.";
+$TEXT['security-phpmyadmin-out']="PhpMyAdmin: Could not find the 'config.inc.php' ...";
+$TEXT['security-phpmyadmin-text']="PhpMyAdmin is accessible by network without password. The configuration 'httpd' or 'cookie' in the \"config.inc.php\" can help.";
+
+$TEXT['security-checkphp-nok']="PHP is NOT running in \"safe mode\"";
+$TEXT['security-checkphp-ok']="PHP is running in \"safe mode\"";
+$TEXT['security-checkphp-out']="Unable to control the setting of PHP!";
+$TEXT['security-checkphp-text']="If do you want to offer PHP executions for outside persons, please think about a \"safe mode\" configuration. But for standalone developer we recommend NOT the \"safe mode\" configuration because some important functions will not working then. <A HREF=\"http://www.php.net/features.safe-mode\" target=\"_new\"><font size=1>More Info</font></A>";
 
 // ---------------------------------------------------------------------
 // START
 // ---------------------------------------------------------------------
 
-$TEXT['start-head']="Witamy w XAMPP dla Linux";
+$TEXT['start-head']="Witamy w XAMPP dla Windows";
 
 $TEXT['start-subhead']="Gratulacje:<br>XAMPP zosta&#322; pomy&#347;lnie zainstalowany w tym systemie!";
 
@@ -154,10 +179,12 @@ $TEXT['manuals-text1']="XAMPP to po&#322;&#261;czenie wielu ró&#380;nych aplikac
 
 $TEXT['manuals-list1']="
 <ul>
-<li><a href=http://httpd.apache.org/docs-2.0/>Dokumentacja Apache 2</a>
+<li><a href=http://httpd.apache.org/docs-2.0/en/>Dokumentacja Apache 2</a>
 <li><a href=http://www.php.net/manual/en/>Dokumentacja PHP</a>
 <li><a href=http://www.perldoc.com/perl5.8.0/pod/perl.html>Dokumentacja Perl</a>
-<li><a href=http://www.mysql.com/documentation/mysql/bychapter/>Dokumentacja MySQL</a>
+<li><a href=http://dev.mysql.com/doc/mysql/en/index.html>Dokumentacja MySQL</a>
+<li><a href=http://phplens.com/adodb/>ADODB</a>
+<li><a href=http://eaccelerator.net/DocumentationUk/>eAccelerator</a>
 <li><a href=http://www.ros.co.nz/pdf/readme.pdf>Dokumentacja pdf class</a>
 </ul>";
 
@@ -165,8 +192,8 @@ $TEXT['manuals-text2']="Oraz krótka lista tutoriali i strona z dokumentacja Apac
 
 $TEXT['manuals-list2']="
 <ul>
-<li><a href=http://www.apachefriends.org/faq-en.html>Dokumentacja Apache Friends</a>
-<li><a href=http://www.freewebmasterhelp.com/tutorials/php>PHP Tutorial</a> - autor David Gowans
+<li><a href=http://www.apachefriends.org/en/faq-xampp.html>Dokumentacja Apache Friends</a>
+<li><a href=http://www.freewebmasterhelp.com/tutorials/php/>PHP Tutorial</a> - autor David Gowans
 <li><a href=http://www.davesite.com/webstation/html/>HTML - Interaktywny Tutorial Dla Pocz&#261;tkuj&#261;cych</a> - autor Dave Kristula
 <li><a href=http://www.comp.leeds.ac.uk/Perl/start.html>Perl Tutorial</a> - autor Nik Silver
 </ul>";
@@ -183,7 +210,7 @@ $TEXT['components-text1']="XAMPP &#322;&#261;czy w sobie wiele ró&#380;nych apli
 
 $TEXT['components-text2']="Podzi&#281;kowania dla developerów tego oprogramowania.";
 
-$TEXT['components-text3']="W katalogu <b>\(mini)xampp\licenses</b> znajduj&#261; si&#281; licencje wszystkich programów.";
+$TEXT['components-text3']="W katalogu <b>\\xampp\licenses</b> znajduj&#261; si&#281; licencje wszystkich programów.";
 
 // ---------------------------------------------------------------------
 // CD COLLECTION DEMO

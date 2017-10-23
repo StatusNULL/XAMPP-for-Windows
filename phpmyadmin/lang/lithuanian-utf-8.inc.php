@@ -1,5 +1,5 @@
 <?php
-/* $Id: lithuanian-utf-8.inc.php,v 2.71.2.1 2005/06/30 19:22:11 lem9 Exp $ */
+/* $Id: lithuanian-utf-8.inc.php,v 2.76 2005/07/29 17:03:18 lem9 Exp $ */
 
 $charset = 'utf-8';
 $allow_recoding = TRUE;
@@ -451,7 +451,6 @@ $strNone = 'Nėra';
 $strNotNumber = 'Įveskite skaičių!';
 $strNotOK = 'Negerai';
 $strNotSet = 'Lentelė <b>%s</b> nerasta arba nenurodyta %s byloje';
-$strNotValidNumber = ' netinkamas eilutės numeris!';
 $strNull = 'Null';
 $strNumSearchResultsInTable = '%s atitikmuo(enys) lentelėje <i>%s</i>';
 $strNumSearchResultsTotal = '<b>Viso:</b> <i>%s</i> atitikmuo(enys)';
@@ -819,4 +818,11 @@ $strPrivDescAlterRoutine = 'Allows altering and dropping stored routines.';  //t
 $strPrivDescCreateRoutine = 'Allows creating stored routines.';  //to translate
 $strPrivDescExecute5 = 'Allows executing stored routines.';  //to translate
 
+$strTransformation_application_octetstream__hex = 'Displays hexadecimal representation of data.';  //to translate
+
+$strInvalidFieldCount = 'Table must have at least one field.';  //to translate
+$strInvalidRowNumber = '%d is not valid row number.';  //to translate
+$strInvalidColumnCount = 'Column count has to be larger than zero.';  //to translate
+$strInvalidFieldAddCount = 'You have to add at least one field.';  //to translate
+$strAndThen = 'and then';  //to translate
 ?>

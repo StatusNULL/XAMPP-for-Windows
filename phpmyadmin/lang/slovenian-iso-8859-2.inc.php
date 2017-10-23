@@ -1,5 +1,5 @@
 <?php
-/* $Id: slovenian-iso-8859-2.inc.php,v 2.71 2005/06/12 10:10:07 swix Exp $ */
+/* $Id: slovenian-iso-8859-2.inc.php,v 2.75 2005/07/29 17:03:22 lem9 Exp $ */
 
 /* By: urska.colner, agenda d.o.o. <urska.colner@agenda.si>, uros kositer, agenda d.o.o. <urosh@agenda.si> */
 
@@ -396,7 +396,6 @@ $strNone = 'Brez';
 $strNotNumber = 'To ni ¹tevilo!';
 $strNotOK = 'Ni v redu';
 $strNotSet = 'Tabele <b>%s</b> ni mogoèe najti ali pa ni v %s';
-$strNotValidNumber = ' ni veljavna ¹tevilka vrstice!';
 $strNull = 'Null';
 $strNumSearchResultsInTable = '%s zadetek(ov) v tabeli <i>%s</i>';
 $strNumSearchResultsTotal = '<b>Skupaj:</b> <i>%s</i> zadetek(ov)';
@@ -809,4 +808,10 @@ $strCreateDatabaseBeforeCopying = 'CREATE DATABASE before copying';  //to transl
 $strGeneratePassword = 'Generate Password';  //to translate
 $strGenerate = 'Generate';  //to translate
 $strCopy = 'Copy';  //to translate
+$strTransformation_application_octetstream__hex = 'Displays hexadecimal representation of data.';  //to translate
+$strInvalidFieldCount = 'Table must have at least one field.';  //to translate
+$strInvalidRowNumber = '%d is not valid row number.';  //to translate
+$strInvalidColumnCount = 'Column count has to be larger than zero.';  //to translate
+$strInvalidFieldAddCount = 'You have to add at least one field.';  //to translate
+$strAndThen = 'and then';  //to translate
 ?>

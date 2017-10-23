@@ -1,18 +1,18 @@
-  ApacheFriends XAMPP (basic package) version 1.4.15
+ ApacheFriends XAMPP (basic package) version 1.4.16
 
   + Apache 2.0.54
-  + MySQL 4.1.13
-  + PHP 5.0.4 + PHP 4.4.0 + PEAR
-  + eAccelerator 0.9.3(PHP5) / 0.9.4-dev(PHP4)
-  + PHP-Switch win32 1.0 
+  + MySQL 4.1.14
+  + PHP 5.0.5 + PHP 4.4.0 + PEAR
+  + eAccelerator 0.9.3 (PHP5) / 0.9.4-dev(PHP4)
+  + PHP-Switch win32 1.0 (from Apachefriends, use the "php-switch.bat") 
   + XAMPP Control Version 2.1 from www.nat32.com	
   + XAMPP Security 1.0	
   + SQLite 2.8.15
   + OpenSSL 0.9.8
-  + phpMyAdmin 2.6.3-pl1
+  + phpMyAdmin 2.6.4-pl1
   + ADODB 4.65
   + Mercury Mail Transport System for Win32 and NetWare Systems v4.01a
-  + FileZilla FTP Server 0.9.8c
+  + FileZilla FTP Server 0.9.10a
   + Webalizer 2.01-10
   + Zend Optimizer 2.5.10a
  
@@ -20,7 +20,7 @@
  
   + 64 MB RAM (recommended)
   + 160 MB free Fixed Disk 
-  + Windows 98, ME, XP Home
+  + Windows 98, ME
   + Windows NT, 2000, XP (Recommended)
 
 QUICK INSTALLATION:
@@ -91,10 +91,10 @@ ONLY FOR NT SYSTEMS
 \...\xampp\apache\apache_uninstallservice.bat =
 ==> Uninstall Apache 2 as service   
 
-\...\xampp\apache\mysql_installservice.bat =
+\...\xampp\mysql\mysql_installservice.bat =
 ==> Install MySQL as service   
 
-\...\xampp\apache\mysql_uninstallservice.bat =
+\...\xampp\mysql\mysql_uninstallservice.bat =
 ==> Uninstall MySQL as service   
 
 ==> After all Service (un)installations, better restart system!
@@ -115,7 +115,7 @@ Examples are accessible via network.
 
 To fix most of the security weaknesses simply call the following URL:
 
-http://127.0.0.1/xampp/xamppsecurity.php
+http://localhost/security/
 
 The root password for MySQL + phpMyAdmin and also a XAMPP directory protection can being established here.
 

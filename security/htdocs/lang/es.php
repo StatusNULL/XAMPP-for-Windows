@@ -46,13 +46,14 @@ $TEXT['navi-guest1']="FCKeditor";
                                                                                                                  
 $TEXT['navi-languages']="Lenguajes";
 $TEXT['navi-spanish']="Español";
-$TEXT['navi-english']="English";
 $TEXT['navi-german']="Deutsch";
-$TEXT['navi-polish']="Polski";
+$TEXT['navi-english']="English";
 $TEXT['navi-french']="Francais";
+$TEXT['navi-italian']="Italiano";
 $TEXT['navi-dutch']="Nederlands";
 $TEXT['navi-norwegian']="Norsk";
-$TEXT['navi-italian']="Italiano";
+$TEXT['navi-polish']="Polski";
+$TEXT['navi-slovenian']="Slovenian";
 $TEXT['navi-chinese']="&#20013;&#25991;";
 
 // ---------------------------------------------------------------------
@@ -94,7 +95,7 @@ $TEXT['status-tab3']="Consejo";
 
 $TEXT['security-head']="XAMPP-Seguridad";
 $TEXT['security-text1']="Por medio de este resumen puede verse que puntos de la instalación aún son inseguros y tendrían que ser controlados.(Siga leyendo debajo de la tabla.)";
-$TEXT['security-text2']="Los puntos marcados en verde estan seguros; los puntos en rojo son definitivamente inseguros y en los amarillos no se pudo comprobar la seguridad (por ejemplo porque el programa a comprobar no estaba en marcha).<p>Para solucionar estos agujeros en la seguridad llame simplemente al siguiente comando:<p>=> <A HREF=xamppsecurity.php><B>http://localhost/security/xamppsecurity.php</B></A> <= &nbsp;&nbsp;[allowed only for localhost]<p>De esta manera se inicia un programa interactivo, que cerrará todos estos agujeros de seguridad.";
+$TEXT['security-text2']="Los puntos marcados en verde estan seguros; los puntos en rojo son definitivamente inseguros y en los amarillos no se pudo comprobar la seguridad (por ejemplo porque el programa a comprobar no estaba en marcha).<p>Para solucionar estos agujeros en la seguridad llame simplemente al siguiente comando:<p>=> <A HREF=/security/xamppsecurity.php><B>http://localhost/security/xamppsecurity.php</B></A> <= &nbsp;&nbsp;[allowed only for localhost]<p>De esta manera se inicia un programa interactivo, que cerrará todos estos agujeros de seguridad.";
 
 $TEXT['security-text3']="<B>Please consider this: 
 With more XAMPP security some examples will NOT execute error free. If you use PHP in \"safe mode\" for example some functions of this security frontend will not working anymore. Often even more security means less functionality at the same time.</B>";
@@ -204,12 +205,12 @@ $TEXT['manuals-text1']="XAMPP combina muchos paquetes diferentes en un sólo paqu
 
 $TEXT['manuals-list1']="
 <ul>
-<li><a href=http://httpd.apache.org/docs-2.0/>Apache 2 Dokumentation (en Inglés)</a>
-<li><a href=http://www.php.net/manual/de/>PHP <b>Referenz-</b>Dokumentation (en Alemán)</a>
+<li><a href=http://httpd.apache.org/docs-2.0/en/>Apache 2 Dokumentation (en Inglés)</a>
+<li><a href=http://www.php.net/manual/en/>PHP <b>Referenz-</b>Dokumentation (en Inglés)</a>
 <li><a href=http://www.perldoc.com/perl5.8.0/pod/perl.html>Perl Dokumentation (en Inglés)</a>
-<li><a href=http://www.mysql.com/documentation/mysql/bychapter/>MySQL Dokumentation (en Inglés)</a>
-<li><a href=http://php.weblogs.com/ADODB>ADODB (en Inglés)</a>
-<li><a href=http://turck-mmcache.sourceforge.net/>Turck MMCache para PHP (en Inglés)</a>
+<li><a href=http://dev.mysql.com/doc/mysql/en/index.html>MySQL Dokumentation (en Inglés)</a>
+<li><a href=http://phplens.com/adodb/>ADODB (en Inglés)</a>
+<li><a href=http://eaccelerator.net/DocumentationUk/>eAccelerator (en Inglés)</a>
 <li><a href=http://www.ros.co.nz/pdf/readme.pdf>pdf class Dokumentation</a>
 </ul>";
 
@@ -217,10 +218,10 @@ $TEXT['manuals-text2']="Y aquí una pequeña selección de las instrucciones y de l
 
 $TEXT['manuals-list2']="
 <ul>
-<li><a href=http://www.apachefriends.org/faq.html>Documentación Apache Friends</a>
-<li><a href=http://www.schattenbaum.net/php/>PHP para tí</a> (incl. Introducción a MySQL-) de Claudia Schaffarik
-<li><a href=http://selfhtml.teamone.de/>SELFHTML</a> de Stefan Münz
-<li><a href=http://cgi.de2.info/>Introducción a CGI</a> de Stephan Muller
+<li><a href=http://www.apachefriends.org/en/faq-xampp.html>Documentación Apache Friends</a>
+<li><a href=http://www.freewebmasterhelp.com/tutorials/php/>PHP para tí</a> by David Gowans
+<li><a href=http://www.davesite.com/webstation/html/>HTML - An Interactive Tutorial For Beginners</a> by Dave Kristula
+<li><a href=http://www.comp.leeds.ac.uk/Perl/start.html>Introducción a CGI</a> by Nik Silver
 </ul>";
 
 $TEXT['manuals-text3']="Mucha diversión y exito con la lectura! :)";

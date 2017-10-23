@@ -13,15 +13,17 @@
 -->
 <img src="img/xampp-logo.jpg">
 <p>
-<a href="/security/lang.php?en">English</a> / 
 <a href="/security/lang.php?de">Deutsch</a> /
-<a href="/security/lang.php?fr">Francais</a> /
-<a href="/security/lang.php?nl">Nederlands</a> / 
+<a href="/security/lang.php?en">English</a> / 
 <a href="/security/lang.php?es">Spanish</a> /
-<a href="/security/lang.php?pl">Polish</a> / 
-<a href="/security/lang.php?zh">Chinese</a> /
+<a href="/security/lang.php?fr">Francais</a> /
 <a href="/security/lang.php?it">Italiano</a> /
-<a href="/security/lang.php?no">Norsk</a> 
+<a href="/security/lang.php?nl">Nederlands</a> / 
+<a href="/security/lang.php?no">Norsk</a> /
+<a href="/security/lang.php?pl">Polish</a> / 
+<a href="/security/lang.php?sl">Slovenian</a> /
+<a href="/security/lang.php?zh">Chinese</a> /
+
 </center>
 </body>
 </html>

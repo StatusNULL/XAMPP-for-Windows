@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_select.php,v 2.26 2005/05/19 10:27:16 lem9 Exp $ */
+/* $Id: tbl_select.php,v 2.27 2005/06/23 14:16:32 robbat2 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -286,7 +286,7 @@ function PMA_tbl_select_operator(f, index, multiple) {
             // here, the 4th parameter is empty because there is no current
             // value of data for the dropdown (the search page initial values
             // are displayed empty)
-            echo PMA_foreignDropdown($disp_row, $foreign_field, $foreign_display, '', 100);
+            echo PMA_foreignDropdown($disp_row, $foreign_field, $foreign_display, '', $cfg['ForeignKeyMaxLimit']);
             echo '                    </select>' . "\n";
         } else if (isset($foreign_link) && $foreign_link == true) {
         ?>

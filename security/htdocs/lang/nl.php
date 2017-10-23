@@ -48,14 +48,15 @@ $TEXT['navi-specialguest']="Huidige Bezoeker";
 $TEXT['navi-guest1']="FCKeditor";
 
 $TEXT['navi-languages']="Talen";
-$TEXT['navi-english']="English";
-$TEXT['navi-german']="Deutsch";
-$TEXT['navi-french']="Francais";
 $TEXT['navi-dutch']="Nederlands";
-$TEXT['navi-polish']="Polski";
+$TEXT['navi-german']="Deutsch";
+$TEXT['navi-english']="English";
 $TEXT['navi-spanish']="Español";
-$TEXT['navi-norwegian']="Norsk";
+$TEXT['navi-french']="Francais";
 $TEXT['navi-italian']="Italiano";
+$TEXT['navi-norwegian']="Norsk";
+$TEXT['navi-polish']="Polski";
+$TEXT['navi-slovenian']="Slovenian";
 $TEXT['navi-chinese']="&#20013;&#25991;";
 
 // ---------------------------------------------------------------------
@@ -97,7 +98,7 @@ $TEXT['status-tab3']="Hint";
 
 $TEXT['security-head']="XAMPP beveiliging";
 $TEXT['security-text1']="Deze bladzijde geeft een overzicht van de beveiligingsstatus van uw XAMPP installatie. (Ga verder met lezen na de tabel.)";
-$TEXT['security-text2']="De groen aangegeven onderdelen zijn veilig; de rood aangegeven onderdelen zijn absoluut onveilig en de geel gemarkeerde onderdelen konden niet worden gecontroleerd (bijv. omdat de software om dit na te lopen niet actief is).<p>Om de problemen voor mysql, phpmyadmin en de xampp directory op te lossen kunt u eenvoudigweg gebruik maken van: </B><p>=> <A HREF=xamppsecurity.php><B>http://localhost/security/xamppsecurity.php</B></A> <= &nbsp;&nbsp;[alleen mogelijk op de localhost]<br>&nbsp;<br>&nbsp;<br>
+$TEXT['security-text2']="De groen aangegeven onderdelen zijn veilig; de rood aangegeven onderdelen zijn absoluut onveilig en de geel gemarkeerde onderdelen konden niet worden gecontroleerd (bijv. omdat de software om dit na te lopen niet actief is).<p>Om de problemen voor mysql, phpmyadmin en de xampp directory op te lossen kunt u eenvoudigweg gebruik maken van: </B><p>=> <A HREF=/security/xamppsecurity.php><B>http://localhost/security/xamppsecurity.php</B></A> <= &nbsp;&nbsp;[alleen mogelijk op de localhost]<br>&nbsp;<br>&nbsp;<br>
 Nog enkele belangrijke opmerkingen:<UL>
 	<LI>Al deze test zijn ALLEEN voor de host op \"localhost\" (127.0.0.1).</LI>
 	<LI><I><B>Voor FileZilla FTP en Mercury Mail moet u alle beveiliging zelf instellen! Sorry. </B></I></LI>
@@ -192,7 +193,7 @@ $TEXT['start-text1']="U kunt nu beginnen met het gebruiken van Apache en de bijb
 
 $TEXT['start-text2']="Na het testen kunt u de voorbeelden onder de link 'test' bekijken.";
 
-$TEXT['start-text3']="Als u wilt beginnen met programmeren in PHP of Perl (of wat dan ook) kijk dan eerst in <a target=extern href=http://www.apachefriends.org/lampp-en.html>de XAMPP handleiding</a> en leer daar meer over uw XAMPP installatie.";
+$TEXT['start-text3']="Als u wilt beginnen met programmeren in PHP of Perl (of wat dan ook) kijk dan eerst in <a target=extern href=http://www.apachefriends.org/wampp-en.html>de XAMPP handleiding</a> en leer daar meer over uw XAMPP installatie.";
 
 $TEXT['start-text4']="Ook OpenSSL wordt ondersteund. Gebruik a.u.b. het Testcertificaat op URL <a href='https://127.0.0.1' target='_top'>https://127.0.0.1</a> of op <a href='https://localhost' target='_top'>https://localhost</a>";
 
@@ -209,11 +210,12 @@ $TEXT['manuals-text1']="XAMPP combineert veel verschillende sofwarepakketten in 
 
 $TEXT['manuals-list1']="
 <ul>
-<li><a href=http://httpd.apache.org/docs-2.0/>Apache 2 documentatie</a>
+<li><a href=http://httpd.apache.org/docs-2.0/en/>Apache 2 documentatie</a>
 <li><a href=http://www.php.net/manual/en/>PHP <b>referenz </b>documentatie</a>
 <li><a href=http://www.perldoc.com/perl5.8.0/pod/perl.html>Perl documentatie</a>
-<li><a href=http://www.mysql.com/documentation/mysql/bychapter/>MySQL documentatie</a>
-<li><a href=http://proftpd.linux.co.uk/localsite/Userguide/linked/userguide.html>ProFTPD gebruikershandleiding</a>
+<li><a href=http://dev.mysql.com/doc/mysql/en/index.html>MySQL documentatie</a>
+<li><a href=http://phplens.com/adodb/>ADODB</a>
+<li><a href=http://eaccelerator.net/DocumentationUk/>eAccelerator</a>
 <li><a href=http://www.ros.co.nz/pdf/readme.pdf>pdf class documentatie</a>
 </ul>";
 
@@ -221,8 +223,8 @@ $TEXT['manuals-text2']="En een lijstje van tutorials en de pagina met de Apache 
 
 $TEXT['manuals-list2']="
 <ul>
-<li><a href=http://www.apachefriends.org/faq-en.html>Apache Friends documentation</a>
-<li><a href=http://www.freewebmasterhelp.com/tutorials/php>PHP Tutorial</a> by David Gowans
+<li><a href=http://www.apachefriends.org/en/faq-xampp.html>Apache Friends documentation</a>
+<li><a href=http://www.freewebmasterhelp.com/tutorials/php/>PHP Tutorial</a> by David Gowans
 <li><a href=http://www.davesite.com/webstation/html/>HTML - An Interactive Tutorial For Beginners</a> by Dave Kristula
 <li><a href=http://www.comp.leeds.ac.uk/Perl/start.html>Perl Tutorial</a> by Nik Silver
 </ul>";
@@ -239,7 +241,7 @@ $TEXT['components-text1']="XAMPP combineert veel verschillende sofware pakketten
 
 $TEXT['components-text2']="Heel veel dank aan de ontwikkelaars van deze programma's.";
 
-$TEXT['components-text3']="In de directory <b>/opt/lampp/licenses</b> vindt u alle licenties en README bestanden van deze programma's.";
+$TEXT['components-text3']="In de directory <b>\\xampp\licenses</b> vindt u alle licenties en README bestanden van deze programma's.";
 
 // ---------------------------------------------------------------------
 // CD COLLECTION DEMO

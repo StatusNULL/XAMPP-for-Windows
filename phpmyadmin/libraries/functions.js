@@ -1,4 +1,4 @@
-/* $Id: functions.js,v 2.14 2005/06/06 00:42:48 lem9 Exp $ */
+/* $Id: functions.js,v 2.17 2005/08/14 19:31:55 lem9 Exp $ */
 
 
 /**
@@ -45,7 +45,11 @@ function confirmLink(theLink, theSqlQuery)
 
     var is_confirmed = confirm(confirmMsg + ' :\n' + theSqlQuery);
     if (is_confirmed) {
-        theLink.href += '&is_js_confirmed=1';
+    	if ( typeof(theLink.href) != 'undefined' ) {
+            theLink.href += '&is_js_confirmed=1';
+        } else if ( typeof(theLink.form) != 'undefined' ) {
+            theLink.form.action += '?is_js_confirmed=1';
+        }
     }
 
     return is_confirmed;
@@ -280,7 +284,7 @@ function emptyFormElements(theForm, theFieldName)
  *
  * @return  boolean  whether a valid number has been submitted or not
  */
-function checkFormElementInRange(theForm, theFieldName, min, max)
+function checkFormElementInRange(theForm, theFieldName, message, min, max)
 {
     var theField         = theForm.elements[theFieldName];
     var val              = parseInt(theField.value);
@@ -302,7 +306,7 @@ function checkFormElementInRange(theForm, theFieldName, min, max)
     // It's a number but it is not between min and max
     else if (val < min || val > max) {
         theField.select();
-        alert(val + errorMsg2);
+        alert(message.replace('%d', val));
         theField.focus();
         return false;
     }
@@ -455,7 +459,7 @@ function setPointer(theRow, theRowNum, theAction, theDefaultColor, thePointerCol
     if (theAction == "over" || theAction == "click") {
         theRow.style.cursor='pointer';
     } else {
-        theRow.style.cursor='normal';
+        theRow.style.cursor='default';
     }
 
     // 2. Gets the current row and exits if the browser can't get it

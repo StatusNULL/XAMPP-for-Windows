@@ -45,13 +45,14 @@ $TEXT['navi-guest1']="FCKeditor";
 
 $TEXT['navi-languages']="Lingue";
 $TEXT['navi-italian']="Italiano";
-$TEXT['navi-english']="English";
-$TEXT['navi-norwegian']="Norsk";
 $TEXT['navi-german']="Deutsch";
+$TEXT['navi-english']="English";
+$TEXT['navi-spanish']="Español";
 $TEXT['navi-french']="Francais";
 $TEXT['navi-dutch']="Nederlands";
+$TEXT['navi-norwegian']="Norsk";
 $TEXT['navi-polish']="Polski";
-$TEXT['navi-spanish']="Español";
+$TEXT['navi-slovenian']="Slovenian";
 $TEXT['navi-chinese']="&#20013;&#25991;";
 
 // ---------------------------------------------------------------------
@@ -70,7 +71,7 @@ $TEXT['status-cgi']="Common Gateway Interface (CGI)";
 $TEXT['status-ssi']="Server Side Includes (SSI)";
 $TEXT['status-python']="Python con mod_python";
 $TEXT['status-mmcache']="Estensione PHP »eAccelerator«";
-$TEXT['status-mmcache-url']="http://www.apachefriends.org/faq-xampp-linux-en.html#mmcache";
+$TEXT['status-mmcache-url']="http://www.apachefriends.org/faq-xampp-windows-en.html#mmcache";
 $TEXT['status-smtp']="Server SMTP";
 $TEXT['status-ftp']="Server FTP";
 $TEXT['status-tomcat']="Server Tomcat";
@@ -92,7 +93,7 @@ $TEXT['status-tab3']="Consiglio";
 
 $TEXT['security-head']="SICUREZZA DI XAMPP";
 $TEXT['security-text1']="Questa pagina offre una panoramica sulla sicurezza della tua installazione XAMPP. (Cortesemente, continua a leggere dopo la tabella.)";
-$TEXT['security-text2']="Le voci contrassegnate in verde sono sicure; quelle in rosso sono assolutamente non sicure e quelle in giallo non sono state valutate (ad esempio perchè il software di verifica non è in esecuzione).<p><p>To fix the problems for mysql, phpmyadmin and the xampp directory simply use</B><p>=> <A HREF=xamppsecurity.php><B>http://localhost/xampp/xamppsecurity.php</B></A> <= &nbsp;&nbsp;[allowed only for localhost]";
+$TEXT['security-text2']="Le voci contrassegnate in verde sono sicure; quelle in rosso sono assolutamente non sicure e quelle in giallo non sono state valutate (ad esempio perchè il software di verifica non è in esecuzione).<p><p>To fix the problems for mysql, phpmyadmin and the xampp directory simply use</B><p>=> <A HREF=/security/xamppsecurity.php><B>http://localhost/security/xamppsecurity.php</B></A> <= &nbsp;&nbsp;[allowed only for localhost]";
 
 $TEXT['security-ok']="SICURO";
 $TEXT['security-nok']="INSICURO";
@@ -115,7 +116,7 @@ $TEXT['security-checkpmamysqluser-text']="phpMyAdmin salva le impostazioni in un
 
 $TEXT['security-checkmysql-nok']="L'utente admin di MySQL non ha una password";
 $TEXT['security-checkmysql-ok']="L'utente admin di MySQL ha una password";
-$TEXT['security-checkmysql-text']="Qualisasi utente locale su macchine Linux può accedere al database MySQL con diritti di amministratore. Dovresti scegliere una password.";
+$TEXT['security-checkmysql-text']="Qualisasi utente locale su macchine Windows può accedere al database MySQL con diritti di amministratore. Dovresti scegliere una password.";
 
 $TEXT['security-pop-nok']="L'utente di test (newuser) per il server Mercury Mail (POP3) ha una vecchia password (wampp)";
 $TEXT['security-pop-ok']="L'utente di test \"newuser\" per il server POP3 (Mercury Mail?) non esiste più oppure ha una nuova password";
@@ -171,7 +172,7 @@ $TEXT['xampp-config-notok']="<br><br>ERRORE: Il tuo sistema NON può attivare la 
 // INIZIO
 // ---------------------------------------------------------------------
 
-$TEXT['start-head']="Benvenuto a XAMPP per Linux";
+$TEXT['start-head']="Benvenuto a XAMPP per Windows";
 
 $TEXT['start-subhead']="Congratulazioni:<br>Hai installato XAMPP con successo!";
 
@@ -198,12 +199,12 @@ $TEXT['manuals-text1']="XAMPP unisce diversi pacchetti software in un unica solu
 
 $TEXT['manuals-list1']="
 <ul>
-<li><a href=http://httpd.apache.org/docs-2.0/>Documentazione Apache 2</a>
+<li><a href=http://httpd.apache.org/docs-2.0/en/>Documentazione Apache 2</a>
 <li><a href=http://www.php.net/manual/en/>Documentazione PHP <b>reference </b></a>
-<li><a href=http://www.perl.org/docs.html>Documentazione Perl</a>
-<li><a href=http://www.mysql.com/documentation/mysql/bychapter/>Documentazione MySQL</a>
-<li><a http://phplens.com/lens/adodb/docs-adodb.htm>ADODB</a>
-<li><a href=http://eaccelerator.net/>eAccellerator per PHP</a>
+<li><a href=http://www.perldoc.com/perl5.8.0/pod/perl.html>Documentazione Perl</a>
+<li><a href=http://dev.mysql.com/doc/mysql/en/index.html>Documentazione MySQL</a>
+<li><a href=http://phplens.com/adodb/>ADODB</a>
+<li><a href=http://eaccelerator.net/DocumentationUk/>eAccellerator per PHP</a>
 <li><a href=http://www.ros.co.nz/pdf/readme.pdf>Documentazione classe pdf</a>
 </ul>";
 
@@ -212,7 +213,7 @@ $TEXT['manuals-text2']="E una piccola lista di tutorial e la pagina di documenta
 $TEXT['manuals-list2']="
 <ul>
 <li><a href=http://www.apachefriends.org/en/faq-xampp.html>Documentazione Apache Friends</a>
-<li><a href=http://www.freewebmasterhelp.com/tutorials/php>Tutorial PHP</a> a cura di David Gowans
+<li><a href=http://www.freewebmasterhelp.com/tutorials/php/>Tutorial PHP</a> a cura di David Gowans
 <li><a href=http://www.davesite.com/webstation/html/>HTML - Un Tutorial interattivo per i principianti</a> a cura di Dave Kristula
 <li><a href=http://www.comp.leeds.ac.uk/Perl/start.html>Tutorial Perl</a> a cura di Nik Silver
 </ul>";

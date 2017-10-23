@@ -1,5 +1,5 @@
 <?php
-/* $Id: greek-utf-8.inc.php,v 2.70 2005/06/12 10:09:59 swix Exp $ */
+/* $Id: greek-utf-8.inc.php,v 2.74 2005/07/29 17:03:17 lem9 Exp $ */
 
 /* Translated by Kyriakos Xagoraris <theremon at users.sourceforge.net> */
 
@@ -360,7 +360,6 @@ $strNone = 'Κανένα';
 $strNotNumber = 'Αυτό δεν είναι αριθμός!';
 $strNotOK = 'ΛΑΘΟΣ';
 $strNotSet = 'Ο πίνακας <b>%s</b> δεν βρέθηκε ή δεν ορίστηκε στη %s';  
-$strNotValidNumber = ' δεν είναι υπαρκτός αριθμός Εγγραφής!';
 $strNull = 'Κενό';
 $strNumSearchResultsInTable = '%s αποτελέσματα στον πίνακα <i>%s</i>';
 $strNumSearchResultsTotal = '<b>Σύνολο:</b> <i>%s</i> αποτελέσματα';
@@ -817,4 +816,10 @@ $strCreateDatabaseBeforeCopying = 'CREATE DATABASE before copying';  //to transl
 $strGeneratePassword = 'Generate Password';  //to translate
 $strGenerate = 'Generate';  //to translate
 $strCopy = 'Copy';  //to translate
+$strTransformation_application_octetstream__hex = 'Displays hexadecimal representation of data.';  //to translate
+$strInvalidFieldCount = 'Table must have at least one field.';  //to translate
+$strInvalidRowNumber = '%d is not valid row number.';  //to translate
+$strInvalidColumnCount = 'Column count has to be larger than zero.';  //to translate
+$strInvalidFieldAddCount = 'You have to add at least one field.';  //to translate
+$strAndThen = 'and then';  //to translate
 ?>

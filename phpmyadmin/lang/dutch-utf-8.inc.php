@@ -1,5 +1,5 @@
 <?php
-/* $Id: dutch-utf-8.inc.php,v 2.77 2005/06/12 10:09:57 swix Exp $ */
+/* $Id: dutch-utf-8.inc.php,v 2.81 2005/07/29 17:03:09 lem9 Exp $ */
 
 /*
  * Updated by "CaliMonk" <calimonk at gmx.net> on 2005/01/04.
@@ -429,7 +429,6 @@ $strNone = 'Geen';
 $strNotNumber = 'Dit is geen cijfer!';
 $strNotOK = 'Niet Goed';
 $strNotSet = '<b>%s</b> tabel niet gevonden of niet ingesteld in %s';
-$strNotValidNumber = ' geen geldig rij nummer!';
 $strNull = 'Null';
 $strNumSearchResultsInTable = '%s overeenkomst(en) in de tabel<i>%s</i>';
 $strNumSearchResultsTotal = '<b>Totaal:</b> <i>%s</i> overeenkomst(en)';
@@ -812,4 +811,10 @@ $strCreateDatabaseBeforeCopying = 'CREATE DATABASE before copying';  //to transl
 $strGeneratePassword = 'Generate Password';  //to translate
 $strGenerate = 'Generate';  //to translate
 $strCopy = 'Copy';  //to translate
+$strTransformation_application_octetstream__hex = 'Displays hexadecimal representation of data.';  //to translate
+$strInvalidFieldCount = 'Table must have at least one field.';  //to translate
+$strInvalidRowNumber = '%d is not valid row number.';  //to translate
+$strInvalidColumnCount = 'Column count has to be larger than zero.';  //to translate
+$strInvalidFieldAddCount = 'You have to add at least one field.';  //to translate
+$strAndThen = 'and then';  //to translate
 ?>

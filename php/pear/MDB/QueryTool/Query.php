@@ -17,7 +17,7 @@
  * @author     Lorenzo Alberton <l dot alberton at quipo dot it>
  * @copyright  2004-2005 Lorenzo Alberton
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Query.php,v 1.45 2005/02/27 19:13:03 quipo Exp $
+ * @version    CVS: $Id: Query.php,v 1.49 2005/09/08 16:57:52 quipo Exp $
  * @link       http://pear.php.net/package/MDB_QueryTool
  */
 
@@ -397,7 +397,7 @@ class MDB_QueryTool_Query
      *
      * @param   int     to start from
      * @param   int     the number of rows to show
-     * @return  mixed   an array of the retreived data, or false in case of failure
+     * @return  mixed   an array of the retrieved data, or false in case of failure
      *                  when failing an error is set in $this->_error
      * @access  public
      */
@@ -1102,7 +1102,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * gets the join-condition
      *
      * @access public
-     * @param  string  [null|''|'table'|'tables'|'right'|'left']
+     * @param  string  [null|''|'table'|'tables'|'right'|'left'|'inner']
      * @return array   gets the join parameters
      */
     function getJoin($what=null)
@@ -1122,9 +1122,11 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
                     }
                 }
                 break;
+            case 'inner':   // return inner-join data only
             case 'right':   // return right-join data only
             case 'left':    // return left join data only
-                if (count($this->_join[$what])) {
+            default:
+                if (isset($this->_join[$what]) && count($this->_join[$what])) {
                     $ret = array_merge($ret, $this->_join[$what]);
                 }
                 break;
@@ -1566,8 +1568,8 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
             $from .= ','.implode(',',array_keys($join['default']));
         }
 
-        // handle left/right joins
-        foreach (array('left', 'right') as $joinType) {
+        // handle left/right/inner joins
+        foreach (array('left', 'right', 'inner') as $joinType) {
             if (isset($join[$joinType]) && count($join[$joinType])) {
                 foreach($join[$joinType] as $table => $condition) {
                     // replace the _TABLENAME_COLUMNNAME by TABLENAME.COLUMNNAME
@@ -1715,10 +1717,17 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
                             } else {
                                 $cols[$aTable][] = $this->table. '.' .$colName . ' AS "'. $colName .'"';
                             }
-                            
                         } else {
-                            //$cols[$aTable][] = "$aTable.$colName AS \"_".$this->getTableShortName($aTable)."_$colName\"";
-                            $cols[$aTable][] = $aTable. '.' .$colName .' AS "_'. $this->getTableShortName($aTable) .'_'. $colName .'"';
+                            if ($this->db->phptype == 'ibase') {
+                                //$cols[$aTable][] = $aTable. '.' .$colName . ' AS _'. $this->getTableShortName($aTable) .'_'. $colName;
+                                //with ibase, don't quote aliases,
+                                //and prepend the joined table cols alias with "t_"
+                                //because an alias starting with just "_" triggers
+                                //an "invalid token" error
+                                $cols[$aTable][] = $aTable. '.' .$colName . ' AS t_'. $this->getTableShortName($aTable) .'_'. $colName;
+                            } else {
+                                $cols[$aTable][] = $aTable. '.' .$colName . ' AS "_'. $this->getTableShortName($aTable) .'_'. $colName .'"';
+                            }
                         }
                     }
                 }
@@ -1942,7 +1951,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
                                 );
         // $query['limit'] has preference!
         $limit = isset($query['limit']) ? $query['limit'] : $this->_limit;
-        if (!$isCalledViaGetCount && @$limit[1]) {    // is there a count set?
+        if (!$isCalledViaGetCount && !empty($limit[1])) {    // is there a count set?
             if (MDB::isError($error = $this->db->setSelectedRowRange($limit[0], $limit[1]))) {
                 $this->_errorSet('MDB_QueryTool_Common::_buildSelectQuery setSelectedRowRange failed '.$error->getMessage());
                 $this->_errorLog($error->getUserInfo());
@@ -2103,7 +2112,7 @@ so that's why we do the following, i am not sure if that is standard SQL and abs
      * @return mixed [boolean, array or object]
      * @access     public
      */
-    function returnResult(&$result)
+    function returnResult($result)
     {
         if ($this->_resultType == 'none') {
             return $result;

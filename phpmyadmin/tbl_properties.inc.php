@@ -1,5 +1,5 @@
 <?php
-/* $Id: tbl_properties.inc.php,v 2.35.2.1 2005/06/30 17:12:13 lem9 Exp $ */
+/* $Id: tbl_properties.inc.php,v 2.38 2005/07/23 12:14:39 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 // Check parameters
 
@@ -303,14 +303,13 @@ for ($i = 0 ; $i < $num_fields; $i++) {
         $content_cells[$i][$ci] = '';
     }
 
-    $content_cells[$i][$ci] .= "\n" . '<input id="field_' . $i . '_' . ($ci - $ci_offset) . '" type="text" name="field_length[]" size="8" value="' . str_replace('"', '&quot;', $length) . '" class="textfield" />' . "\n";
-    $ci++;
-
     if (preg_match('@^(set|enum)$@i', $type)) {
         $binary           = 0;
         $unsigned         = 0;
         $zerofill         = 0;
+        $length_to_display = htmlspecialchars($length);
     } else {
+        $length_to_display = $length;
         if (!preg_match('@BINARY[\(]@i', $row['Type']) && PMA_MYSQL_INT_VERSION < 40100) {
             $binary           = stristr($row['Type'], 'binary');
         } else {
@@ -319,6 +318,9 @@ for ($i = 0 ; $i < $num_fields; $i++) {
         $unsigned         = stristr($row['Type'], 'unsigned');
         $zerofill         = stristr($row['Type'], 'zerofill');
     }
+
+    $content_cells[$i][$ci] .= "\n" . '<input id="field_' . $i . '_' . ($ci - $ci_offset) . '" type="text" name="field_length[]" size="8" value="' . str_replace('"', '&quot;', $length_to_display) . '" class="textfield" />' . "\n";
+    $ci++;
 
     if (PMA_MYSQL_INT_VERSION >= 40100) {
         $tmp_collation          = empty($row['Collation']) ? NULL : $row['Collation'];
@@ -699,7 +701,7 @@ echo "\n";
 if ($action == 'tbl_create.php' || $action == 'tbl_addfield.php') {
     echo '<div class="tblHeaders" style="width: 30%; text-align: left; padding: 3px;">' . "\n";
     echo '    ' . sprintf($strAddFields,  '<input type="text" name="added_fields" size="2" value="1" onfocus="this.select()" style="vertical-align: middle;" />') . "\n";
-    echo '    &nbsp;<input type="submit" name="submit_num_fields" value="' . $strGo . '" onclick="return checkFormElementInRange(this.form, \'added_fields\', 1)" style="vertical-align: middle;" />' . "\n";
+    echo '    &nbsp;<input type="submit" name="submit_num_fields" value="' . $strGo . '" onclick="return checkFormElementInRange(this.form, \'added_fields\', \'' . str_replace('\'', '\\\'', $GLOBALS['strInvalidFieldAddCount']) . '\', 1)" style="vertical-align: middle;" />' . "\n";
     echo '</div>' . "\n";
     echo "<br />\n";
 }

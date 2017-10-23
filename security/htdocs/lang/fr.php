@@ -47,13 +47,14 @@ $TEXT['navi-guest1']="FCKeditor";
 
 $TEXT['navi-languages']="Langues";
 $TEXT['navi-french']="Francais";
-$TEXT['navi-english']="English";
 $TEXT['navi-german']="Deutsch";
-$TEXT['navi-dutch']="Nederlands";
-$TEXT['navi-polish']="Polski";
+$TEXT['navi-english']="English";
 $TEXT['navi-spanish']="Español";
-$TEXT['navi-norwegian']="Norsk";
 $TEXT['navi-italian']="Italiano";
+$TEXT['navi-dutch']="Nederlands";
+$TEXT['navi-norwegian']="Norsk";
+$TEXT['navi-polish']="Polski";
+$TEXT['navi-slovenian']="Slovenian";
 $TEXT['navi-chinese']="&#20013;&#25991;";
 
 // ---------------------------------------------------------------------
@@ -70,7 +71,7 @@ $TEXT['status-perl']="Perl avec mod_perl";
 $TEXT['status-cgi']="Common Gateway Interface (CGI)";
 $TEXT['status-ssi']="Server Side Includes (SSI)";
 $TEXT['status-mmcache']="PHP extension \"Turck MMCache\"";
-$TEXT['status-mmcache-url']="http://www.apachefriends.org/faq-lampp-en.html#mmcache";
+$TEXT['status-mmcache-url']="http://www.apachefriends.org/faq-wampp-en.html#mmcache";
 $TEXT['status-smtp']="Serveur SMTP";
 $TEXT['status-ftp']="Serveur FTP";
 $TEXT['status-oci8']="PHP extension \"OCI8/Oracle\"";
@@ -95,7 +96,7 @@ $TEXT['status-tab3']="Conseil";
 
 $TEXT['security-head']="Securité XAMPP";
 $TEXT['security-text1']="Cette page vous donne un bref aperçu du statut de securité de votre installation de XAMPP. (Veuillez lire la suite après le tableau.) <I>Sorry, but no french translation for this section available, so switching to english.</I>";
-$TEXT['security-text2']="The green marked points are secure; the red marked points are definitively unsecure and the yellow marked points couldn't be checked (for example because the sofware to check isn't running).<p>To fix the problems for mysql, phpmyadmin and the xampp directory simply use</B><p>=> <A HREF=xamppsecurity.php><B>http://localhost/security/xamppsecurity.php</B></A> <= &nbsp;&nbsp;[allowed only for localhost]<br>&nbsp;<br>&nbsp;<br>
+$TEXT['security-text2']="The green marked points are secure; the red marked points are definitively unsecure and the yellow marked points couldn't be checked (for example because the sofware to check isn't running).<p>To fix the problems for mysql, phpmyadmin and the xampp directory simply use</B><p>=> <A HREF=/security/xamppsecurity.php><B>http://localhost/security/xamppsecurity.php</B></A> <= &nbsp;&nbsp;[allowed only for localhost]<br>&nbsp;<br>&nbsp;<br>
 Some other important notes:<UL>
 	<LI>All these test are made ONLY for host \"localhost\" (127.0.0.1).</LI>
 	<LI><I><B>For FileZilla FTP und Mercury Mail, you must fix all security problems by yourself! Sorry. </B></I></LI>
@@ -126,7 +127,7 @@ $TEXT['security-checkpmamysqluser-text']="phpMyAdmin saves your preferences in a
 
 $TEXT['security-checkmysql-nok']="The MySQL admin user root has NO password";
 $TEXT['security-checkmysql-ok']="The MySQL admin user root has no longer no password";
-$TEXT['security-checkmysql-text']="Every local user on Linux box can access your MySQL database with administrator rights. You should set a password.";
+$TEXT['security-checkmysql-text']="Every local user on Windows box can access your MySQL database with administrator rights. You should set a password.";
 
 $TEXT['security-pop-nok']="The test user (newuser) for Mercury Mail server (POP3) have an old password (wampp)";
 $TEXT['security-pop-ok']="The test user \"newuser\" for the POP3 server (Mercury Mail?) does not exists anymore or have a new password";
@@ -181,7 +182,7 @@ $TEXT['xampp-config-notok']="<br><br>ERROR: Your system could NOT activate the d
 // START
 // ---------------------------------------------------------------------
 
-$TEXT['start-head']="Bienvenue dans XAMPP pour Linux";
+$TEXT['start-head']="Bienvenue dans XAMPP pour Windows";
 
 $TEXT['start-subhead']="Bravo:<br>Vous venez d'installer XAMPP avec succès!";
 
@@ -189,7 +190,7 @@ $TEXT['start-text1']="Vous pouvez dès lors commencer à utiliser Apache and Co. V
 
 $TEXT['start-text2']="Après les tests, vous pouvez aller voir les exemples situés sous les liens de test.";
 
-$TEXT['start-text3']="Avant de commencer à programmer en PHP ou en Perl (ou autre ;),  allez voir le fichier <a href=http://www.apachefriends.org/lampp-en.html>XAMPP lisez-moi</a> pour avoir plus d'informations sur votre installation XAMPP.";
+$TEXT['start-text3']="Avant de commencer à programmer en PHP ou en Perl (ou autre ;),  allez voir le fichier <a href=http://www.apachefriends.org/wampp-en.html>XAMPP lisez-moi</a> pour avoir plus d'informations sur votre installation XAMPP.";
 
 $TEXT['start-text4']="Pour le support OpenSSL, veuillez utiliser le certificat de test avec <a href='https://127.0.0.1' target='_top'>https://127.0.0.1</a> ou <a href='https://localhost' target='_top'>https://localhost</a>";
 
@@ -208,12 +209,12 @@ $TEXT['manuals-text1']="XAMPP regroupe beaucoup de logiciels différents dans un 
 
 $TEXT['manuals-list1']="
 <ul>
-<li><a href=http://httpd.apache.org/docs-2.0/>Documentation Apache 2</a>
+<li><a href=http://httpd.apache.org/docs-2.0/en/>Documentation Apache 2</a>
 <li><a href=http://www.php.net/manual/en/>Documentation de <b>référence </b>PHP</a>
 <li><a href=http://www.perldoc.com/perl5.8.0/pod/perl.html>Documentation Perl </a>
-<li><a href=http://www.mysql.com/documentation/mysql/bychapter/>Documentation MySQL</a>
-<li><a href=http://php.weblogs.com/ADODB>ADODB</a>
-<li><a href=http://turck-mmcache.sourceforge.net/>Turck MMCache pour PHP</a>
+<li><a href=http://dev.mysql.com/doc/mysql/en/index.html>Documentation MySQL</a>
+<li><a href=http://phplens.com/adodb/>ADODB</a>
+<li><a href=http://eaccelerator.net/DocumentationUk/>eAccelerator</a>
 <li><a href=http://www.ros.co.nz/pdf/readme.pdf>Documentation class pdf </a>
 </ul>";
 
@@ -221,8 +222,8 @@ $TEXT['manuals-text2']="Et une petite liste de tutoriaux et la page de documenta
 
 $TEXT['manuals-list2']="
 <ul>
-<li><a href=http://www.apachefriends.org/faq-en.html>Documentation Apache Friends </a>
-<li><a href=http://www.freewebmasterhelp.com/tutorials/php> Tutoriel PHP </a> by David Gowans
+<li><a href=http://www.apachefriends.org/en/faq-xampp.html>Documentation Apache Friends </a>
+<li><a href=http://www.freewebmasterhelp.com/tutorials/php/> Tutoriel PHP </a> by David Gowans
 <li><a href=http://www.davesite.com/webstation/html/>HTML - Un Tutoriel Interactif pour Débutants</a> by Dave Kristula
 <li><a href=http://www.comp.leeds.ac.uk/Perl/start.html> Tutoriel Perl </a> by Nik Silver
 </ul>";
@@ -239,7 +240,7 @@ $TEXT['components-text1']=" XAMPP regroupe beaucoup de logiciels différents dans
 
 $TEXT['components-text2']="Un grand merci aux développeurs de ces programmes.";
 
-$TEXT['components-text3']="Dans le répertoire <b>/opt/lampp/licenses</b> vous trouverez toutes les licences de ces programmes.";
+$TEXT['components-text3']="Dans le répertoire <b>\\xampp\licenses</b> vous trouverez toutes les licences de ces programmes.";
 
 // ---------------------------------------------------------------------
 // CD COLLECTION DEMO

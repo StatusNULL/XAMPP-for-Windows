@@ -1,5 +1,5 @@
 <?php
-/* $Id: russian-cp-866.inc.php,v 2.62 2005/06/12 10:10:02 swix Exp $ */
+/* $Id: russian-cp-866.inc.php,v 2.66 2005/07/29 17:03:21 lem9 Exp $ */
 
 /**
  * Translated by Gosha Sakovich <gt2 at users.sourceforge.net>
@@ -380,7 +380,6 @@ $strNone = 'Нет';
 $strNotNumber = 'Это не число!';
 $strNotOK = 'Не готово';
 $strNotSet = 'Таблица <b>%s</b> не найдена';
-$strNotValidNumber = ' недопустимое количество рядов!';
 $strNull = 'Ноль';
 $strNumSearchResultsInTable = '%s записи(ей) в таблице <i>%s</i>';
 $strNumSearchResultsTotal = '<b>Итого:</b> <i>%s</i> записи(ей)';
@@ -815,4 +814,10 @@ $strCreateDatabaseBeforeCopying = 'CREATE DATABASE before copying';  //to transl
 $strGeneratePassword = 'Generate Password';  //to translate
 $strGenerate = 'Generate';  //to translate
 $strCopy = 'Copy';  //to translate
+$strTransformation_application_octetstream__hex = 'Displays hexadecimal representation of data.';  //to translate
+$strInvalidFieldCount = 'Table must have at least one field.';  //to translate
+$strInvalidRowNumber = '%d is not valid row number.';  //to translate
+$strInvalidColumnCount = 'Column count has to be larger than zero.';  //to translate
+$strInvalidFieldAddCount = 'You have to add at least one field.';  //to translate
+$strAndThen = 'and then';  //to translate
 ?>

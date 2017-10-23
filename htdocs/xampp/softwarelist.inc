@@ -8,9 +8,8 @@
 <a href="http://www.freetype.org">Freetype</a>,
 <a href="http://www.mrunix.net/webalizer/">Webalizer</a>,
 <a href="http://perl.apache.org">mod_perl</a>,
-<a href="http://turck-mmcache.sourceforge.net/">Turck MMCache</a>,
+<a href="http://eaccelerator.net/">eAccelerator</a>,
 <a href="http://mcrypt.sourceforge.net/">mcrypt</a>,
-<a href="http://www.hwaci.com/sw/sqlite/">SQLite</a>,
-<a href="http://www.aditus.nu/jpgraph/">JpGraph</a>
-<a href="http://www.pmail.com/overviews/ovw_mercury.htm">Mercury Mail Transport System</a>
-<a href="http://www.priadoblender.com">PHPBlender PHP Compiler</a>
+<a href="http://www.sqlite.org/">SQLite</a>,
+<a href="http://www.pmail.com/overviews/ovw_mercury.htm">Mercury Mail Transport System</a>,
+<a href="http://glob.com.au/sendmail/">fake sendmail for windows</a>

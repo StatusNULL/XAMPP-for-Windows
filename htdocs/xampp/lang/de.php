@@ -45,14 +45,15 @@ $TEXT['navi-specialguest']="Current Guest";
 $TEXT['navi-guest1']="FCKeditor";
                                                                                                                  
 $TEXT['navi-languages']="Sprachen";
-$TEXT['navi-english']="English";
 $TEXT['navi-german']="Deutsch";
-$TEXT['navi-french']="Francais";
-$TEXT['navi-dutch']="Nederlands";
-$TEXT['navi-polish']="Polski";
+$TEXT['navi-english']="English";
 $TEXT['navi-spanish']="Español";
-$TEXT['navi-norwegian']="Norsk";
+$TEXT['navi-french']="Francais";
 $TEXT['navi-italian']="Italiano";
+$TEXT['navi-dutch']="Nederlands";
+$TEXT['navi-norwegian']="Norsk";
+$TEXT['navi-polish']="Polski";
+$TEXT['navi-slovenian']="Slovenian";
 $TEXT['navi-chinese']="&#20013;&#25991;";
 
 // ---------------------------------------------------------------------
@@ -93,7 +94,7 @@ $TEXT['status-tab3']="Hinweis";
 
 $TEXT['security-head']="XAMPP SICHERHEIT";
 $TEXT['security-text1']="Anhand dieser Übersicht kann man sehen welche Punkte an der XAMPP-Installation noch unsicher sind und noch überprüft werden müssten. (Bitte unter der Tabelle weiterlesen.)";
-$TEXT['security-text2']="Die grün markierten Punkte sind sicher; die rot marktierten Punkte sind definitiv unsicher und bei den gelb martierten Punkten konnte die Sicherheit nicht überprüft werden (zum Beispiel weil das zu testende Programm gar nicht läuft).<br>&nbsp;<br><B>Diese Sicherheitslücken im XAMPP Verzeichnis, dem ROOT Passwort für MySQL und der Sicherung von PHPMyAdmin können nun einfach über den folgenden Link geschlossen werden:</B><p>=> <A HREF=xamppsecurity.php><B>http://localhost/xampp/xamppsecurity.php</B></A> <= &nbsp;&nbsp;[nur über localhost möglich]<br>&nbsp;<br>&nbsp;<br>
+$TEXT['security-text2']="Die grün markierten Punkte sind sicher; die rot marktierten Punkte sind definitiv unsicher und bei den gelb martierten Punkten konnte die Sicherheit nicht überprüft werden (zum Beispiel weil das zu testende Programm gar nicht läuft).<br>&nbsp;<br><B>Diese Sicherheitslücken im XAMPP Verzeichnis, dem ROOT Passwort für MySQL und der Sicherung von PHPMyAdmin können nun einfach über den folgenden Link geschlossen werden:</B><p>=> <A HREF=/security/xamppsecurity.php><B>http://localhost/security/xamppsecurity.php</B></A> <= &nbsp;&nbsp;[nur über localhost möglich]<br>&nbsp;<br>&nbsp;<br>
 Weitere wichtige Hinweise:<UL>
 	<LI>Alle XAMPP Prüfungen beziehen sich nur auf den Host \"localhost\" (127.0.0.1).</LI>
 	<LI><I><B>Der FileZilla FTP und der Mercury Mail Server müsst ihr selbst absichern !!</B></I></LI>
@@ -206,12 +207,12 @@ $TEXT['manuals-text1']="XAMPP verbindet viele unterschiedliche Pakete in einem P
 
 $TEXT['manuals-list1']="
 <ul>
-<li><a href=http://httpd.apache.org/docs-2.0/>Apache 2 Dokumentation (in Englisch)</a>
+<li><a href=http://httpd.apache.org/docs-2.0/de/>Apache 2 Dokumentation (in Deutsch)</a>
 <li><a href=http://www.php.net/manual/de/>PHP <b>Referenz-</b>Dokumentation (in Deutsch)</a>
-<li><a href=http://www.perl.org/docs.html>Perl Dokumentation (in Englisch)</a>
-<li><a href=http://www.mysql.com/documentation/mysql/bychapter/>MySQL Dokumentation (in Englisch)</a>
-<li><a http://phplens.com/lens/adodb/docs-adodb.htm>ADODB</a>
-<li><a href=http://eaccelerator.sourceforge.net/>eAccelerator</a>
+<li><a href=http://www.perldoc.com/perl5.8.0/pod/perl.html>Perl Dokumentation (in Englisch)</a>
+<li><a href=http://dev.mysql.com/doc/mysql/de/index.html>MySQL Dokumentation (in Deutsch)</a>
+<li><a href=http://phplens.com/adodb/>ADODB (in Englisch)</a>
+<li><a href=http://eaccelerator.net/DocumentationUk/>eAccelerator (in Englisch)</a>
 <li><a href=http://www.ros.co.nz/pdf/readme.pdf>pdf class Dokumentation</a>
 </ul>";
 
@@ -219,10 +220,10 @@ $TEXT['manuals-text2']="Und hier noch eine kleine Auswahl an deutschsprachigen A
 
 $TEXT['manuals-list2']="
 <ul>
-<li><a href=http://www.apachefriends.org/faq.html>Apache Friends Dokumentation</a>
+<li><a href=http://www.apachefriends.org/de/faq-xampp.html>Apache Friends Dokumentation</a>
 <li><a href=http://www.schattenbaum.net/php/>PHP für Dich</a> (incl. MySQL-Einführung) von Claudia Schaffarik
-<li><a href=http://selfhtml.teamone.de/>SELFHTML</a> von Stefan Münz
-<li><a href=http://cgi.de2.info/>CGI Einführung</a> von Stephan Muller
+<li><a href=http://de.selfhtml.org/>SELFHTML</a> von Stefan Münz
+<li><a href=http://www.stephan-muller.com/cgi/>CGI Einführung</a> von Stephan Muller
 </ul>";
 
 $TEXT['manuals-text3']="Viel Spaß und Erfolg beim Lesen! :)";

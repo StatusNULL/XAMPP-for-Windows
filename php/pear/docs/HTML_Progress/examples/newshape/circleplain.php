@@ -1,11 +1,11 @@
-<?php 
-@include '../include_path.php';
+<?php
 /**
  * plain Circle Progress example.
  *
- * @version    $Id: circleplain.php,v 1.1 2004/06/29 20:48:52 farell Exp $
+ * @version    $Id: circleplain.php,v 1.2 2005/07/25 11:19:41 farell Exp $
  * @author     Laurent Laville <pear@laurent-laville.org>
  * @package    HTML_Progress
+ * @subpackage Examples
  */
 
 require_once 'HTML/Progress.php';
@@ -36,13 +36,13 @@ if (file_exists('../temp/c0.png')) {
 <?php echo $bar->getStyle(); ?>
 
 body {
-	background-color: #EEEEEE;
-	color: #000000;
-	font-family: Verdana, Arial;
+    background-color: #EEEEEE;
+    color: #000000;
+    font-family: Verdana, Arial;
 }
 
 a:visited, a:active, a:link {
-	color: navy;
+    color: navy;
 }
 // -->
 </style>
@@ -53,14 +53,11 @@ a:visited, a:active, a:link {
 </script>
 </head>
 <body>
-<h1><?php echo basename(__FILE__); ?></h1>
 
-<?php 
-echo $bar->toHtml(); 
+<?php
+echo $bar->toHtml();
 $bar->run();
 ?>
-
-<p>&lt;&lt; <a href="../index.html">Back examples TOC</a></p>
 
 </body>
 </html>

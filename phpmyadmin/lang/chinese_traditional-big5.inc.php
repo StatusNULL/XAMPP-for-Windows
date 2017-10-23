@@ -1,5 +1,5 @@
 <?php
-/* $Id: chinese_traditional-big5.inc.php,v 2.40.2.1 2005/06/30 17:03:17 lem9 Exp $ */
+/* $Id: chinese_traditional-big5.inc.php,v 2.47 2005/08/19 16:43:37 lem9 Exp $ */
 
 /**
  * Last translation by: Siu Sun <siusun@best-view.net>
@@ -57,6 +57,7 @@ $strAfterInsertSame = '返回這頁';
 $strAll = '全部';
 $strAllTableSameWidth = '以相同寬度顯示所有資料表?';
 $strAlterOrderBy = '根據欄位內容排序記錄';
+$strAndThen = '然後';
 $strAnIndex = '索引已經新增到 %s';
 $strAnalyzeTable = '分析資料表';
 $strAnd = '與';
@@ -359,6 +360,10 @@ $strInsertedRows = '新增列數:';
 $strInstructions = '指令';
 $strInternalNotNecessary = '* 當內部關聯在 InnoDB 已存在時是無需要的.';
 $strInternalRelations = '內部關聯';
+$strInvalidColumnCount = '欄位數目需要大於零.';
+$strInvalidFieldAddCount = '你最少要加入一個欄位.';
+$strInvalidFieldCount = '資料表最少需要有一個欄位.';
+$strInvalidRowNumber = '%d 不是一個有效的列數數目.';
 
 $strJapanese = '日語';
 $strJumpToDB = '跳到資料庫 &quot;%s&quot;.';
@@ -477,7 +482,6 @@ $strNone = '不適用';
 $strNotNumber = '這不是一個數字!';
 $strNotOK = '未能確定';
 $strNotSet = '<b>%s</b> 資料表找不到或還未在 %s 設定';
-$strNotValidNumber = '不是有效的列數!';
 $strNull = 'Null'; //should expressed in English
 $strNumSearchResultsInTable = '%s 項資料符合 - 於資料表 <i>%s</i>';
 $strNumSearchResultsTotal = '<b>總計:</b> <i>%s</i> 項資料符合';
@@ -743,6 +747,7 @@ $strTraditionalChinese = '繁體中文';
 $strTraditionalSpanish = '傳統西班牙語';
 $strTraffic = '流量';
 $strTransformation_application_octetstream__download = '於欄位顯示連線來下載二進制資料. 第一個選項是二進制的檔案名稱. 第二個選項可設定可用的欄位名稱用作檔案名稱. 如您設定了第二個選項, 第一個選項無需設定';
+$strTransformation_application_octetstream__hex = '以十六進制方式顯示.';
 $strTransformation_image_jpeg__inline = '顯示可按式圖像; 選項; 寬度,高度[以像素為單位] (保時原有比例)';
 $strTransformation_image_jpeg__link = '顯示圖像的連線 (直接下載).';
 $strTransformation_image_png__inline = '參看 image/jpeg: 內建';
@@ -813,5 +818,4 @@ $strYes = ' 是 ';
 $strZeroRemovesTheLimit = '註: 設定這些選項為 0 (零) 可解除限制.';
 $strZip = '"zipped"';
 
-$strTransformation_application_octetstream__hex = 'Displays hexadecimal representation of data.';  //to translate
 ?>

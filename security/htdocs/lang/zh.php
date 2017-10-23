@@ -45,13 +45,15 @@ $TEXT['navi-guest1']="FCKeditor";
 
 $TEXT['navi-languages']="ÓïÑÔ";
 $TEXT['navi-chinese']="ÖĞÎÄ";
-$TEXT['navi-english']="English";
 $TEXT['navi-german']="Deutsch";
+$TEXT['navi-english']="English";
+$TEXT['navi-spanish']="Español";
 $TEXT['navi-french']="Francais";
-$TEXT['navi-dutch']="Nederlands";
-$TEXT['navi-spanish']="Spanish";
-$TEXT['navi-norwegian']="Norsk";
 $TEXT['navi-italian']="Italiano";
+$TEXT['navi-dutch']="Nederlands";
+$TEXT['navi-norwegian']="Norsk";
+$TEXT['navi-polish']="Polski";
+$TEXT['navi-slovenian']="Slovenian";
 
 // ---------------------------------------------------------------------
 // STATUS
@@ -91,7 +93,7 @@ $TEXT['status-tab3']="ÌáÊ¾";
 
 $TEXT['security-head']="XAMPP °²È«";
 $TEXT['security-text1']="±¾Ò³Ìá¹©¹ØÓÚXAMPP°²×°ºó°²È«×´Ì¬µÄ¿ìËÙ¸ÅÊö. (Çë²»ÒªÍü¼ÇÔÄ¶Á×´Ì¬±íºóÃæµÄÄÚÈİ)";
-$TEXT['security-text2']="ÂÌÉ«±ê¼ÇµÄ²¿·Ö±íÊ¾°²È«£»ºìÉ«±ê¼ÇµÄ²¿·Ö±íÊ¾È·Êµ²»°²È«£»»ÆÉ«±ê¼ÇµÄ²¿·Ö±íÊ¾ÎŞ·¨¼ì²éÆä×´Ì¬(Æ©Èç, Ëù¼ì²éµÄÈí¼şÃ»ÓĞÔËĞĞ)<p>Òª½â¾ö¶ÔÓÚmysql, phpmyadminÒÔ¼°xamppÄ¿Â¼µÄÎÊÌâ, ÄúÖ»Ğè¼òµ¥µÄÖ´ĞĞ</B><p>=> <A HREF=xamppsecurity.php><B>http://localhost/security/xamppsecurity.php</B></A> <= &nbsp;&nbsp;[Ö»ÔÊĞílocalhost]<br>&nbsp;<br>&nbsp;<br>
+$TEXT['security-text2']="ÂÌÉ«±ê¼ÇµÄ²¿·Ö±íÊ¾°²È«£»ºìÉ«±ê¼ÇµÄ²¿·Ö±íÊ¾È·Êµ²»°²È«£»»ÆÉ«±ê¼ÇµÄ²¿·Ö±íÊ¾ÎŞ·¨¼ì²éÆä×´Ì¬(Æ©Èç, Ëù¼ì²éµÄÈí¼şÃ»ÓĞÔËĞĞ)<p>Òª½â¾ö¶ÔÓÚmysql, phpmyadminÒÔ¼°xamppÄ¿Â¼µÄÎÊÌâ, ÄúÖ»Ğè¼òµ¥µÄÖ´ĞĞ</B><p>=> <A HREF=/security/xamppsecurity.php><B>http://localhost/security/xamppsecurity.php</B></A> <= &nbsp;&nbsp;[Ö»ÔÊĞílocalhost]<br>&nbsp;<br>&nbsp;<br>
 ÆäËûÒ»Ğ©ÖØÒªÌáÊ¾:<UL>
 	<LI>ËùÓĞÕâĞ©²âÊÔ¶¼Ö»ÏŞÓÚÖ÷»ú\"localhost\" (127.0.0.1)</LI>
 	<LI><I><B>¶ÔÓÚFileZilla FTPÒÔ¼°Mercury Mail, Äú±ØĞë×Ô¼ºĞŞ¸´ËùÓĞµÄ°²È«ÎÊÌâ!¶Ô´ËÎÒÃÇ±íÊ¾±§Ç¸. </B></I></LI>
@@ -205,12 +207,12 @@ $TEXT['manuals-text1']="XAMPP½«¶àÖÖ²»Í¬µÄÈí¼ş°ü×ÛºÏÎªÒ»¸ö°ü, ÏÂÃæÊÇÆäÖĞÒ»Ğ©ÖØÒªÈ
 
 $TEXT['manuals-list1']="
 <ul>
-<li><a href=http://httpd.apache.org/docs-2.0/>Apache 2 documentation</a>
+<li><a href=http://httpd.apache.org/docs-2.0/en/>Apache 2 documentation</a>
 <li><a href=http://www.php.net/manual/en/>PHP <b>referenz </b>documentation</a>
 <li><a href=http://www.perldoc.com/perl5.8.0/pod/perl.html>Perl documentation</a>
-<li><a href=http://www.mysql.com/documentation/mysql/bychapter/>MySQL documentation</a>
-<li><a href=http://php.weblogs.com/ADODB>ADODB</a>
-<li><a href=http://turck-mmcache.sourceforge.net/>Turck MMCache for PHP</a>
+<li><a href=http://dev.mysql.com/doc/mysql/en/index.html>MySQL documentation</a>
+<li><a href=http://phplens.com/adodb/>ADODB</a>
+<li><a href=http://eaccelerator.net/DocumentationUk/>eAccelerator</a>
 <li><a href=http://www.ros.co.nz/pdf/readme.pdf>pdf class documentation</a>
 </ul>";
 
@@ -218,8 +220,8 @@ $TEXT['manuals-text2']="Ò»¸ö¼òµ¥µÄ½Ì³ÌÁĞ±íÒÔ¼°Apache FriendsµÄÎÄµµÒ³:";
 
 $TEXT['manuals-list2']="
 <ul>
-<li><a href=http://www.apachefriends.org/faq-en.html>Apache Friends documentation</a>
-<li><a href=http://www.freewebmasterhelp.com/tutorials/php>PHP Tutorial</a> by David Gowans
+<li><a href=http://www.apachefriends.org/en/faq-xampp.html>Apache Friends documentation</a>
+<li><a href=http://www.freewebmasterhelp.com/tutorials/php/>PHP Tutorial</a> by David Gowans
 <li><a href=http://www.davesite.com/webstation/html/>HTML - An Interactive Tutorial For Beginners</a> by Dave Kristula
 <li><a href=http://www.comp.leeds.ac.uk/Perl/start.html>Perl Tutorial</a> by Nik Silver
 </ul>";
@@ -236,7 +238,7 @@ $TEXT['components-text1']="XXAMPP½«¶àÖÖ²»Í¬µÄÈí¼ş°ü×ÛºÏÎªÒ»¸ö°ü, ÏÂÃæÊÇËùÓĞÈí¼ş°
 
 $TEXT['components-text2']="¸ĞĞ»ÕâĞ©³ÌĞòµÄ¿ª·¢ÈËÔ±.";
 
-$TEXT['components-text3']="ÔÚ<b>/opt/lampp/licenses</b>Ä¿Â¼ÖĞ, Äú½«ÕÒµ½ÕâĞ©³ÌĞòµÄĞí¿ÉÖ¤(license)ÎÄ¼şÒÔ¼°READMEÎÄ¼ş.";
+$TEXT['components-text3']="ÔÚ<b>\\xampp\licenses</b>Ä¿Â¼ÖĞ, Äú½«ÕÒµ½ÕâĞ©³ÌĞòµÄĞí¿ÉÖ¤(license)ÎÄ¼şÒÔ¼°READMEÎÄ¼ş.";
 
 // ---------------------------------------------------------------------
 // CD COLLECTION DEMO

@@ -1,5 +1,5 @@
 <?php
-// $Id: db_querytool_test_base.php,v 1.1 2005/02/25 14:25:08 quipo Exp $
+// $Id: db_querytool_test_base.php,v 1.2 2005/03/25 23:16:07 quipo Exp $
 
 require_once 'simple_include.php';
 require_once dirname(__FILE__).'/db_querytool_include.php';
@@ -32,10 +32,26 @@ class TestOfDB_QueryTool extends UnitTestCase
         if (PEAR::isError($this->qt->db)) {
             $this->assertTrue(false, $this->qt->db->getUserInfo());
         }
+        $this->qt->table = TABLE_USER;
         $this->qt->removeAll();
+        $this->qt->table = TABLE_QUESTION;
+        $this->qt->removeAll();
+        $this->qt->table = TABLE_ANSWER;
+        $this->qt->removeAll();
+        $this->qt->db->dropSequence(TABLE_USER);
+        $this->qt->db->dropSequence(TABLE_QUESTION);
+        $this->qt->db->dropSequence(TABLE_ANSWER);
     }
     function tearDown() {
+        $this->qt->table = TABLE_USER;
         $this->qt->removeAll();
+        $this->qt->table = TABLE_QUESTION;
+        $this->qt->removeAll();
+        $this->qt->table = TABLE_ANSWER;
+        $this->qt->removeAll();
+        $this->qt->db->dropSequence(TABLE_USER);
+        $this->qt->db->dropSequence(TABLE_QUESTION);
+        $this->qt->db->dropSequence(TABLE_ANSWER);
         unset($this->qt);
     }
     function _getSampleData($row, $id = null) {

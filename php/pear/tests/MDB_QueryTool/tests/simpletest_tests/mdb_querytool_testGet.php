@@ -1,5 +1,5 @@
 <?php
-// $Id: mdb_querytool_testGet.php,v 1.1 2005/02/25 14:15:59 quipo Exp $
+// $Id: mdb_querytool_testGet.php,v 1.5 2005/04/22 14:37:02 quipo Exp $
 
 require_once dirname(__FILE__).'/mdb_querytool_test_base.php';
 
@@ -25,6 +25,23 @@ class TestOfMDB_QueryTool_Get extends TestOfMDB_QueryTool
         $this->assertTrue($id != false);
         
         $newData['id'] = $id;
+        $this->assertEqual($newData, $this->qt->get($id));
+    }
+
+    function test_AddGetPKNotInteger() {
+        $this->qt = new MDB_QT(TABLE_TRANSLATION);
+        $this->qt->primaryCol = 'string';
+
+        $newData = array('string' => 'aaa', 'translation' => 'AAA');
+        $id      = $this->qt->add($newData);
+        $this->assertTrue($id != false);
+
+        $this->assertEqual($newData, $this->qt->get($id));
+
+        $newData = array('string' => 'bbb', 'translation' => 'BBB');
+        $id      = $this->qt->add($newData);
+        $this->assertTrue($id != false);
+
         $this->assertEqual($newData, $this->qt->get($id));
     }
 
@@ -80,11 +97,66 @@ class TestOfMDB_QueryTool_Get extends TestOfMDB_QueryTool
 
         //$newData['id'] = $id;
         $data = $question->getAll();
-        $expected =  array( '_answer_id' => $aid,
-                            '_answer_answer' => $theAnswer,
-                            '_answer_question_id' => $qid,
-                            'id' => $qid,
-                            'question' => $theQuestion);
+        if (DB_TYPE == 'ibase') {
+            $expected =  array(
+                't_answer_id'          => $aid,
+                't_answer_answer'      => $theAnswer,
+                't_answer_question_id' => $qid,
+                'id'                   => $qid,
+                'question'             => $theQuestion,
+            );
+        } else {
+            $expected =  array(
+                '_answer_id'          => $aid,
+                '_answer_answer'      => $theAnswer,
+                '_answer_question_id' => $qid,
+                'id'                  => $qid,
+                'question'            => $theQuestion,
+            );
+        }
+        // assertEquals doesnt sort arrays recursively, so we have to extract the data :-(
+        // we cant do this:     $this->assertEquals(array($newData),$question->getAll());
+        $this->assertEqual($expected, $data[0]);
+    }
+
+    function test_innerJoin()
+    {
+        $theQuestion = 'Why does this not work?';
+        $theAnswer   = 'I dont know!';
+
+        $question = new MDB_QT(TABLE_QUESTION);
+        $question->removeAll();
+
+        $newQuest = array(TABLE_QUESTION => $theQuestion);
+        $qid = $question->add($newQuest);
+
+        $answer = new MDB_QT(TABLE_ANSWER);
+        $answer->removeAll();
+
+        $newAnswer = array(TABLE_QUESTION.'_id' => $qid, TABLE_ANSWER => $theAnswer);
+        $aid = $answer->add($newAnswer);
+
+        $question->setJoin(TABLE_ANSWER ,TABLE_QUESTION.'.id = '.TABLE_ANSWER.'.question_id' , 'inner');
+
+        $data = $question->getAll();
+
+        if (DB_TYPE == 'ibase') {
+            $expected =  array(
+                't_answer_id'          => $aid,
+                't_answer_answer'      => $theAnswer,
+                't_answer_question_id' => $qid,
+                'id'                   => $qid,
+                'question'             => $theQuestion,
+            );
+        } else {
+            $expected =  array(
+                '_answer_id'          => $aid,
+                '_answer_answer'      => $theAnswer,
+                '_answer_question_id' => $qid,
+                'id'                  => $qid,
+                'question'            => $theQuestion,
+            );
+        }
         // assertEquals doesnt sort arrays recursively, so we have to extract the data :-(
         // we cant do this:     $this->assertEquals(array($newData),$question->getAll());
         $this->assertEqual($expected, $data[0]);
@@ -99,7 +171,7 @@ class TestOfMDB_QueryTool_Get extends TestOfMDB_QueryTool
      * this is done for preventing ambiguous column names, that's why it only applies
      * in joined queries ...
      */
-    function test_testSqlFunction()
+    function test_sqlFunction()
     {
         $theQuestion = 'Why does this not work?';
         $theAnswer   = 'I dont know!';
@@ -132,6 +204,92 @@ class TestOfMDB_QueryTool_Get extends TestOfMDB_QueryTool
         // check 'id as qid'
         $question->setSelect('LOWER( question ), '.TABLE_ANSWER.'.*');
         $this->assertTrue(strpos($question->_buildSelectQuery(), 'LOWER( '.TABLE_QUESTION.'.question )'));
+    }
+
+    /**
+     * This method checks if the setJoin() method is working correctly
+     *
+     * check if stuff like MAX(id), LOWER(question), etc. will be converted to
+     *     MAX(TABLE_QUESTION.id), LOWER(TABLE_QUESTION.question)
+     * this is done for preventing ambiguous column names, that's why it only applies
+     * in joined queries ...
+     */
+    function test_setJoin()
+    {
+        $theQuestion = 'Why does this not work?';
+        $theAnswer   = 'I dont know!';
+
+        $question = new MDB_QT(TABLE_QUESTION);
+        $newQuest = array(TABLE_QUESTION => $theQuestion);
+        $qid = $question->add($newQuest);
+        $this->assertTrue($qid != false);
+
+        $answer    = new MDB_QT(TABLE_ANSWER);
+        $newAnswer = array(TABLE_QUESTION.'_id' => $qid, TABLE_ANSWER => $theAnswer);
+        $aid = $answer->add($newAnswer);
+        $this->assertTrue($aid != false);
+
+        $joinOn = TABLE_QUESTION.'.id='.TABLE_ANSWER.'.question_id';
+        $question->setJoin(TABLE_ANSWER, $joinOn);
+        
+        if (DB_TYPE == 'ibase') {
+            $expected =  array(
+                't_answer_id'          => $aid,
+                't_answer_answer'      => $theAnswer,
+                't_answer_question_id' => $qid,
+                'id'                   => $qid,
+                'question'             => $theQuestion,
+            );
+        } else {
+            $expected =  array(
+                '_answer_id'          => $aid,
+                '_answer_answer'      => $theAnswer,
+                '_answer_question_id' => $qid,
+                'id'                  => $qid,
+                'question'            => $theQuestion,
+            );
+        }
+        $this->assertEqual($expected, $question->get($qid));
+    }
+
+    /**
+     * This method checks if the getJoin() method is working correctly
+     */
+    function test_getJoin()
+    {
+        $question = new MDB_QT(TABLE_QUESTION);
+        $joinOn1 = TABLE_QUESTION.'.id='.TABLE_ANSWER.'.question_id';
+        $question->setJoin(TABLE_ANSWER, $joinOn1);
+
+        $all = array(
+            'default' => array(TABLE_ANSWER => $joinOn1),
+        );
+        $tables = array(TABLE_ANSWER);
+        $right  = array();
+        $left   = array();
+
+        $this->assertEqual($all,    $question->getJoin());
+        $this->assertEqual($tables, $question->getJoin('tables'));
+        $this->assertEqual($right,  $question->getJoin('right'));
+        $this->assertEqual($left,   $question->getJoin('left'));
+
+        //--------------------------------------------------------
+
+        $joinOn2 = TABLE_USER.'.id='.TABLE_ANSWER.'.question_id';
+        $question->setRightJoin(TABLE_USER, $joinOn2);
+
+        $all = array(
+            'default' => array(TABLE_ANSWER => $joinOn1),
+            'right'   => array(TABLE_USER   => $joinOn2),
+        );
+        $tables = array(TABLE_ANSWER, TABLE_USER);
+        $right  = array(TABLE_USER => $joinOn2);
+        $left   = array();
+
+        $this->assertEqual($all,    $question->getJoin());
+        $this->assertEqual($tables, $question->getJoin('tables'));
+        $this->assertEqual($right,  $question->getJoin('right'));
+        $this->assertEqual($left,   $question->getJoin('left'));
     }
 }
 

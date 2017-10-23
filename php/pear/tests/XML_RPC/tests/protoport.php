@@ -38,7 +38,7 @@
  * Therefore, we'll assume the tests should use the version of
  * XML_RPC that has come from there as well.
  */
-if ('1.3.3' != '@'.'package_version'.'@') {
+if ('1.4.3' != '@'.'package_version'.'@') {
     /**
      * Get the needed class from the PEAR installation
      */

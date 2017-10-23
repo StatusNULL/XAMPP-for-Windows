@@ -374,7 +374,7 @@ if ($xamppinstaller=="newinstall")
 if ($system=="Windows")
 {
 	$confhttpdroot=$partwampp."\apache\\conf\\httpd.conf";
-	$includewin="Win32DisableAcceptEx ON\r\n";
+	$includewin="Win32DisableAcceptEx\r\n";
 	echo "\r\n  Disable AcceptEx Winsocks v2 support (only NT)";
 	$datei = fopen($confhttpdroot,'r');
 	unset($newzeile);
@@ -406,7 +406,7 @@ if ($system=="Windows")
 	$confhttpdroot=$partwampp."\php\\php4\\httpd4.conf";
 	if (file_exists($confhttpdroot))
 	{
-	$includewin="Win32DisableAcceptEx ON\r\n";
+	$includewin="Win32DisableAcceptEx\r\n";
 	$datei = fopen($confhttpdroot,'r');
 	unset($newzeile);
 	$i=0;
@@ -437,7 +437,7 @@ if ($system=="Windows")
 	$confhttpdroot=$partwampp."\php\\httpd5.conf";
 	if (file_exists($confhttpdroot))
 	{
-	$includewin="Win32DisableAcceptEx ON\r\n";
+	$includewin="Win32DisableAcceptEx\r\n";
 	$datei = fopen($confhttpdroot,'r');
 	unset($newzeile);
 	$i=0;
@@ -469,7 +469,7 @@ if ($system=="Windows")
 else
 {
 	$confhttpdroot=$partwampp."\apache\\conf\\httpd.conf";
-	$includewin="# Win32DisableAcceptEx ON\r\n";
+	$includewin="# Win32DisableAcceptEx\r\n";
 	echo "\r\n  Enable AcceptEx Winsocks v2 support for NT systems";
 	$datei = fopen($confhttpdroot,'r');
 	$i=0;
@@ -501,7 +501,7 @@ else
 	$confhttpdroot=$partwampp."\php\\php4\\httpd4.conf";
 	if (file_exists($confhttpdroot))
 	{
-	$includewin="# Win32DisableAcceptEx ON\r\n";
+	$includewin="# Win32DisableAcceptEx\r\n";
 	$datei = fopen($confhttpdroot,'r');
 	$i=0;
 	unset($newzeile);
@@ -532,7 +532,7 @@ else
 	$confhttpdroot=$partwampp."\php\\httpd5.conf";
 	if (file_exists($confhttpdroot))
 	{
-	$includewin="# Win32DisableAcceptEx ON\r\n";
+	$includewin="# Win32DisableAcceptEx\r\n";
 	$datei = fopen($confhttpdroot,'r');
 	$i=0;
 	unset($newzeile);

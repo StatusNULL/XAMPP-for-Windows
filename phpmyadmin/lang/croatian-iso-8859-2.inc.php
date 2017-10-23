@@ -1,5 +1,5 @@
 <?php
-/* $Id: croatian-iso-8859-2.inc.php,v 2.70 2005/06/12 10:09:57 swix Exp $ */
+/* $Id: croatian-iso-8859-2.inc.php,v 2.74 2005/07/29 17:03:08 lem9 Exp $ */
 
 /**
  * Translation made by: Sime Essert <sime@nofrx.org>
@@ -191,7 +191,6 @@ $strNoQuery = 'Nema SQL upita!';
 $strNoRights = 'Nemate dovoljno prava za ovo podruèje!';
 $strNoTablesFound = 'Tablica nije pronaðena u bazi.';
 $strNotNumber = 'To nije broj!';
-$strNotValidNumber = ' nije odgovarajuæi broj redaka!';
 $strNoUsersFound = 'Korisnik(ci) nije pronaðen.';
 $strNull = 'Null';
 
@@ -835,4 +834,10 @@ $strCreateDatabaseBeforeCopying = 'CREATE DATABASE before copying';  //to transl
 $strGeneratePassword = 'Generate Password';  //to translate
 $strGenerate = 'Generate';  //to translate
 $strCopy = 'Copy';  //to translate
+$strTransformation_application_octetstream__hex = 'Displays hexadecimal representation of data.';  //to translate
+$strInvalidFieldCount = 'Table must have at least one field.';  //to translate
+$strInvalidRowNumber = '%d is not valid row number.';  //to translate
+$strInvalidColumnCount = 'Column count has to be larger than zero.';  //to translate
+$strInvalidFieldAddCount = 'You have to add at least one field.';  //to translate
+$strAndThen = 'and then';  //to translate
 ?>

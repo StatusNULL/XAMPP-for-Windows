@@ -2,9 +2,10 @@
 /**
  * Generator usage example using ITDynamic QF renderer.
  *
- * @version    $Id: itdynamic.php,v 1.1 2004/06/27 13:08:05 farell Exp $
+ * @version    $Id: itdynamic.php,v 1.2 2005/07/25 12:52:15 farell Exp $
  * @author     Laurent Laville <pear@laurent-laville.org>
  * @package    HTML_Progress
+ * @subpackage Examples
  */
 
 require_once 'HTML/Progress/generator.php';

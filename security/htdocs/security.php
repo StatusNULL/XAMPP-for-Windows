@@ -131,7 +131,7 @@ if ($command=="ftp")
 @fclose($handle);
 
 	$conn_id = ftp_connect("127.0.0.1"); 
-	$login_result = ftp_login($conn_id, "newuser", "wampp"); 
+	$login_result = @ftp_login($conn_id, "newuser", "wampp"); 
 	if ((!$conn_id) || (!$login_result)) 
 	{ 
        $status=0;

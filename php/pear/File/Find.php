@@ -3,7 +3,7 @@
 // +----------------------------------------------------------------------+
 // | PHP Version 4                                                        |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2002 The PHP Group                                |
+// | Copyright (c) 1997-2005 The PHP Group                                |
 // +----------------------------------------------------------------------+
 // | This source file is subject to version 2.02 of the PHP license,      |
 // | that is bundled with this package in the file LICENSE, and is        |
@@ -16,36 +16,40 @@
 // | Author: Sterling Hughes <sterling@php.net>                           |
 // +----------------------------------------------------------------------+
 //
-// $Id: Find.php,v 1.1 2002/10/24 21:31:57 tuupola Exp $
+// $Id: Find.php,v 1.19 2005/09/11 10:03:30 techtonik Exp $
 //
 
 require_once 'PEAR.php';
+
+define('FILE_FIND_VERSION', '@package_version@');
 
 /**
 *  Commonly needed functions searching directory trees
 *
 * @access public
-* @version $Id: Find.php,v 1.1 2002/10/24 21:31:57 tuupola Exp $
+* @version $Id: Find.php,v 1.19 2005/09/11 10:03:30 techtonik Exp $
 * @package File
 * @author Sterling Hughes <sterling@php.net>
 */
 class File_Find
 {
     /**
-    * internal dir-list
-    * @var array
-    */
-    var $_dirs       = array ();
+     * internal dir-list
+     * @var array
+     */
+    var $_dirs = array();
+
     /**
-    * founded files
-    * @var array
-    */
-    var $files       = array ();
+     * found files
+     * @var array
+     */
+    var $files = array();
+
     /**
-    * founded dirs
-    * @var array
-    */
-    var $directories = array ();
+     * found dirs
+     * @var array
+     */
+    var $directories = array();
 
     /**
      * Search the current directory to find matches for the
@@ -66,28 +70,29 @@ class File_Find
      *
      * @author Sterling Hughes <sterling@php.net>
      * @access public
+     * @static
      */
-    function &glob ($pattern, $dirpath, $pattern_type='php')
+    function &glob($pattern, $dirpath, $pattern_type = 'php')
     {
-        $dh = @opendir ($dirpath);
+        $dh = @opendir($dirpath);
 
         if (!$dh) {
-            $pe = new FileFindException("Cannot open directory");
-            return ($pe);
+            $pe = PEAR::raiseError("Cannot open directory");
+            return $pe;
         }
 
         $match_function = File_Find::_determineRegex($pattern, $pattern_type);
         $matches = array();
-        while ($entry = @readdir ($dh)) {
+        while (false !== ($entry = @readdir($dh))) {
             if ($match_function($pattern, $entry) &&
-                $entry != '.'                     &&
-                $entry != '..') {
+                $entry != '.' && $entry != '..') {
                 $matches[] = $entry;
             }
         }
 
-        @closedir ($dh);
-        return count($matches) > 0 ? $matches : null;
+        @closedir($dh);
+
+        return (count($matches) > 0) ? $matches : null;
     }
 
     /**
@@ -103,8 +108,24 @@ class File_Find
      * @author Sterling Hughes <sterling@php.net>
      * @access public
      */
-    function &maptree ($directory)
+    function &maptree($directory)
     {
+
+        /* if called statically */
+        if (!isset($this)  || !is_a($this, "File_Find")) {
+            $obj = &new File_Find();
+            return $obj->maptree($directory);
+        }
+      
+        /* clear the results just in case */
+        $this->files       = array();
+        $this->directories = array();
+
+        /* consistency rules - strip out trailing slashes */
+        $directory = preg_replace('![\\/]+$!', '', $directory);
+        /* use only native system directory delimiters */
+        $directory = preg_replace("![\\/]+!", DIRECTORY_SEPARATOR, $directory);
+
         $this->_dirs = array($directory);
 
         while (count($this->_dirs)) {
@@ -139,19 +160,18 @@ class File_Find
      *
      * @author Mika Tuupola <tuupola@appelsiini.net>
      * @access public
+     * @static
      */
-
-    function &mapTreeMultiple($directory, $maxrecursion=0, $count=0)
+    function &mapTreeMultiple($directory, $maxrecursion = 0, $count = 0)
     {   
-
         $retval = array();
 
         $count++;
 
         $directory .= DIRECTORY_SEPARATOR;
-        $dh=opendir($directory);
-        while ($entry = readdir($dh)) {
-            if ($entry != "." && $entry != "..") {
+        $dh = opendir($directory);
+        while (false !== ($entry = @readdir($dh))) {
+            if ($entry != '.' && $entry != '..') {
                  array_push($retval, $entry);
             }
         }
@@ -163,22 +183,21 @@ class File_Find
             $path = str_replace(DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR,
                                 DIRECTORY_SEPARATOR, $path);
       
-            if (!(is_array($val))) {
-                if (is_dir($path)) {
-                    unset($retval[$key]);
-                    if ($maxrecursion == 0 || $count < $maxrecursion) {
-                        $retval[$val] = File_Find::mapTreeMultiple($path, 
-                                        $maxrecursion, $count);
-                    }
+            if (!is_array($val) && is_dir($path)) {
+                unset($retval[$key]);
+                if ($maxrecursion == 0 || $count < $maxrecursion) {
+                    $retval[$val] = &File_Find::mapTreeMultiple($path, 
+                                    $maxrecursion, $count);
                 }
             }
         }
-        return($retval);
+
+        return $retval;
     }
 
     /**
-     * Search the specified directory tree with the specified pattern.  Return an
-     * array containing all matching files (no directories included).
+     * Search the specified directory tree with the specified pattern.  Return
+     * an array containing all matching files (no directories included).
      *
      * @param string $pattern the pattern to match every file with.
      *
@@ -187,27 +206,48 @@ class File_Find
      * @param string $type the type of regular expression support to use, either
      * 'php' or 'perl'.
      *
-     * @return array a list of files matching the pattern parameter in the the directory
-     * path specified by the directory parameter
+     * @param bool $fullpath whether the regex should be matched against the
+     * full path or only against the filename
+     *
+     * @param string $match can be either 'files', 'dirs' or 'both' to specify
+     * the kind of list to return
+     *
+     * @return array a list of files matching the pattern parameter in the the
+     * directory path specified by the directory parameter
      *
      * @author Sterling Hughes <sterling@php.net>
      * @access public
+     * @static
      */
-    function &search ($pattern, $directory, $type='php') {
+    function &search($pattern, $directory, $type = 'php', $fullpath = true, $match = 'files')
+    {
+
         $matches = array();
-        list (,$files)  = File_Find::maptree($directory);
+        list ($directories,$files)  = File_Find::maptree($directory);
+        switch($match) {
+            case 'directories': $data = $directories; break;
+            case 'both': $data = array_merge($directories, $files); break;
+            case 'files':
+            default:
+                $data = $files;
+        }
+        unset($files, $directories);
+
         $match_function = File_Find::_determineRegex($pattern, $type);
 
-        reset($files);
-        while (list(,$entry) = each($files)) {
-            if ($match_function($pattern, $entry))
+        reset($data);
+        while (list(,$entry) = each($data)) {
+            if ($match_function($pattern, 
+                                $fullpath ? $entry : basename($entry))) {
                 $matches[] = $entry;
+            }
         }
 
         return ($matches);
     }
+
     /**
-     * Determine whether or not a variable is a PEAR exception
+     * Determine whether or not a variable is a PEAR error
      *
      * @param object PEAR_Error $var the variable to test.
      *
@@ -215,21 +255,11 @@ class File_Find
      * it returns false.
      * @access public
      */
-    function isError (&$var)
+    function isError(&$var)
     {
         return PEAR::isError($var);
     }
 
-    /**
-     * Fetch the current File_Find version
-     *
-     * @return string the current File_Find version.
-     * @access public
-     */
-    function File_Find_version()
-    {
-         return 1.1;
-    }
     /**
      * internal function to build singular directory trees, used by
      * File_Find::maptree()
@@ -237,28 +267,29 @@ class File_Find
      * @param string $directory name of the directory to read
      * @return void
      */
-    function _build ($directory)
+    function _build($directory)
     {
-        $dh = @opendir ($directory);
+
+        $dh = @opendir($directory);
 
         if (!$dh) {
-            $pe = new FileFindException("Cannot open directory");
+            $pe = PEAR::raiseError("Cannot open directory");
             return $pe;
         }
 
-        while ($entry = @readdir($dh)) {
-            if ($entry != '.' &&
-                $entry != '..') {
+        while (false !== ($entry = @readdir($dh))) {
+            if ($entry != '.' && $entry != '..') {
 
                 $entry = $directory.DIRECTORY_SEPARATOR.$entry;
+                $entry = str_replace(DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR,
+                                     DIRECTORY_SEPARATOR, $entry);
 
-                if (is_dir($entry))
+                if (is_dir($entry)) {
                     array_push($this->_dirs, $entry);
-                else
+                } else {
                     array_push($this->files, $entry);
-
+                }
             }
-
         }
 
         @closedir($dh);
@@ -272,11 +303,11 @@ class File_Find
      * @return string kind of function ( "eregi", "ereg" or "preg_match") ;
      *
      */
-    function _determineRegex ($pattern, $type)
+    function _determineRegex($pattern, $type)
     {
-        if (! strcasecmp($type, 'perl')) {
+        if (!strcasecmp($type, 'perl')) {
             $match_function = 'preg_match';
-        } else if (! strcasecmp(substr($pattern, -2), '/i')) {
+        } else if (!strcasecmp(substr($pattern, -2), '/i')) {
             $match_function = 'eregi';
         } else {
             $match_function = 'ereg';
@@ -284,41 +315,7 @@ class File_Find
 
         return $match_function;
     }
-
-//End Class
 }
-/**
-* Exception Class for Errorhandling of File_Find
-* @access public
-*/
-class FileFindException extends PEAR_Error
-{
-    /**
-    * classname
-    * @var string
-    */
-    var $classname             = 'FileFindException';
-    /**
-    * Message in front of the error message
-    * @var string
-    */
-    var $error_message_prepend = 'Error in File_Find';
-    /**
-    * Creates a PEAR_Error object
-    *
-    * @param string $message    Error message
-    * @param int    $mode       Error mode
-    * @param int    $level      Error level
-    *
-    * @return object PEAR_Error
-    * @access public
-    */
-    function FileFindException ($message, $mode = PEAR_ERROR_RETURN, $level = E_USER_NOTICE)
-    {
-        $this->PEAR_Error($message, $mode, $level);
-    }
-}
-
 
 /*
  * Local variables:

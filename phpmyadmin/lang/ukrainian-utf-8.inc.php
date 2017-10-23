@@ -1,5 +1,5 @@
 <?php
-/* $Id: ukrainian-utf-8.inc.php,v 2.71 2005/06/12 10:10:11 swix Exp $ */
+/* $Id: ukrainian-utf-8.inc.php,v 2.75 2005/07/29 17:03:24 lem9 Exp $ */
 
 $charset = 'utf-8';
 $allow_recoding = TRUE;
@@ -360,7 +360,6 @@ $strNone = 'Немає';
 $strNotNumber = 'Це не число!';
 $strNotOK = 'не OK';
 $strNotSet = 'Таблицю <b>%s</b> не знайдено або не визначено у %s';
-$strNotValidNumber = ' недопустима кількість рядків!';
 $strNull = 'Нуль';
 $strNumSearchResultsInTable = '%s співпадіння у таблиці <i>%s</i>';
 $strNumSearchResultsTotal = '<b>Разом:</b> <i>%s</i> співпадіння';
@@ -813,4 +812,10 @@ $strCreateDatabaseBeforeCopying = 'CREATE DATABASE before copying';  //to transl
 $strGeneratePassword = 'Generate Password';  //to translate
 $strGenerate = 'Generate';  //to translate
 $strCopy = 'Copy';  //to translate
+$strTransformation_application_octetstream__hex = 'Displays hexadecimal representation of data.';  //to translate
+$strInvalidFieldCount = 'Table must have at least one field.';  //to translate
+$strInvalidRowNumber = '%d is not valid row number.';  //to translate
+$strInvalidColumnCount = 'Column count has to be larger than zero.';  //to translate
+$strInvalidFieldAddCount = 'You have to add at least one field.';  //to translate
+$strAndThen = 'and then';  //to translate
 ?>

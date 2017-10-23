@@ -1,23 +1,25 @@
 <?php
-//
-// +----------------------------------------------------------------------+
-// | PHP Version 5                                                        |
-// +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2004 The PHP Group                                |
-// +----------------------------------------------------------------------+
-// | This source file is subject to version 3.0 of the PHP license,       |
-// | that is bundled with this package in the file LICENSE, and is        |
-// | available through the world-wide-web at the following url:           |
-// | http://www.php.net/license/3_0.txt.                                  |
-// | If you did not receive a copy of the PHP license and are unable to   |
-// | obtain it through the world-wide-web, please send a note to          |
-// | license@php.net so we can mail you a copy immediately.               |
-// +----------------------------------------------------------------------+
-// | Authors: Stig Bakken <ssb@php.net>                                   |
-// |                                                                      |
-// +----------------------------------------------------------------------+
-//
-// $Id: Guess.php,v 1.13.4.1 2004/10/19 04:15:56 cellog Exp $
+/**
+ * The OS_Guess class
+ *
+ * PHP versions 4 and 5
+ *
+ * LICENSE: This source file is subject to version 3.0 of the PHP license
+ * that is available through the world-wide-web at the following URI:
+ * http://www.php.net/license/3_0.txt.  If you did not receive a copy of
+ * the PHP License and are unable to obtain it through the web, please
+ * send a note to license@php.net so we can mail you a copy immediately.
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Stig Bakken <ssb@php.net>
+ * @author     Gregory Beaver <cellog@php.net>
+ * @copyright  1997-2005 The PHP Group
+ * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
+ * @version    CVS: $Id: Guess.php,v 1.18 2005/05/15 04:38:16 cellog Exp $
+ * @link       http://pear.php.net/package/PEAR
+ * @since      File available since PEAR 0.1
+ */
 
 // {{{ uname examples
 
@@ -80,6 +82,21 @@
  * - define endianness, to allow matchSignature("bigend") etc.
  */
 
+/**
+ * Retrieves information about the current operating system
+ *
+ * This class uses php_uname() to grok information about the current OS
+ *
+ * @category   pear
+ * @package    PEAR
+ * @author     Stig Bakken <ssb@php.net>
+ * @author     Gregory Beaver <cellog@php.net>
+ * @copyright  1997-2005 The PHP Group
+ * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
+ * @version    Release: 1.4.1
+ * @link       http://pear.php.net/package/PEAR
+ * @since      Class available since Release 0.1
+ */
 class OS_Guess
 {
     var $sysname;
@@ -124,10 +141,10 @@ class OS_Guess
         }
 
         switch ($sysname) {
-            case 'AIX':
+            case 'AIX' :
                 $release = "$parts[3].$parts[2]";
                 break;
-            case 'Windows':
+            case 'Windows' :
                 switch ($parts[1]) {
                     case '95/98':
                         $release = '9x';
@@ -138,7 +155,7 @@ class OS_Guess
                 }
                 $cpu = 'i386';
                 break;
-            case 'Linux':
+            case 'Linux' :
                 $extra = $this->_detectGlibcVersion();
                 // use only the first two digits from the kernel version
                 $release = ereg_replace('^([[:digit:]]+\.[[:digit:]]+).*', '\1', $parts[2]);
@@ -180,6 +197,10 @@ class OS_Guess
 
     function _detectGlibcVersion()
     {
+        static $glibc = false;
+        if ($glibc !== false) {
+            return $glibc; // no need to run this multiple times
+        }
         // Use glibc's <features.h> header file to
         // get major and minor version number:
         include_once "System.php";
@@ -206,9 +227,9 @@ class OS_Guess
             }
         }
         if (!($major && $minor)) {
-            return '';
+            return $glibc = '';
         }
-        return "glibc{$major}.{$minor}";
+        return $glibc = "glibc{$major}.{$minor}";
     }
 
     function getSignature()

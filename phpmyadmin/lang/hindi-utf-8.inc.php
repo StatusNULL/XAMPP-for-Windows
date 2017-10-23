@@ -1,5 +1,5 @@
 <?php
-/* $Id: hindi-utf-8.inc.php,v 2.72 2005/06/12 10:09:59 swix Exp $ */
+/* $Id: hindi-utf-8.inc.php,v 2.76 2005/07/29 17:03:17 lem9 Exp $ */
 
 // Hindi translation
 // 1st release   :   by Girish Nair <girishn@nagpur.dot.net.in(outdated)> : 08-Aug-2002
@@ -500,7 +500,6 @@ $strNoValidateSQL = 'Skip Validate SQL'; //to translate
 $strNone = 'None'; //to translate
 $strNotOK = 'not OK'; //to translate
 $strNotSet = '<b>%s</b> table not found or not set in %s'; //to translate
-$strNotValidNumber = ' is not a valid row number!'; //to translate
 $strNull = 'Null'; //to translate
 $strNumSearchResultsInTable = '%s match(es) inside table <i>%s</i>'; //to translate
 $strNumSearchResultsTotal = '<b>Total:</b> <i>%s</i> match(es)'; //to translate
@@ -840,4 +839,10 @@ $strCreateDatabaseBeforeCopying = 'CREATE DATABASE before copying';  //to transl
 $strGeneratePassword = 'Generate Password';  //to translate
 $strGenerate = 'Generate';  //to translate
 $strCopy = 'Copy';  //to translate
+$strTransformation_application_octetstream__hex = 'Displays hexadecimal representation of data.';  //to translate
+$strInvalidFieldCount = 'Table must have at least one field.';  //to translate
+$strInvalidRowNumber = '%d is not valid row number.';  //to translate
+$strInvalidColumnCount = 'Column count has to be larger than zero.';  //to translate
+$strInvalidFieldAddCount = 'You have to add at least one field.';  //to translate
+$strAndThen = 'and then';  //to translate
 ?>

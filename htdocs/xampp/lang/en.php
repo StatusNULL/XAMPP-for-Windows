@@ -46,12 +46,13 @@ $TEXT['navi-guest1']="FCKeditor";
 $TEXT['navi-languages']="Languages";
 $TEXT['navi-english']="English";
 $TEXT['navi-german']="Deutsch";
-$TEXT['navi-french']="Francais";
-$TEXT['navi-dutch']="Nederlands";
-$TEXT['navi-polish']="Polski";
 $TEXT['navi-spanish']="Español";
-$TEXT['navi-norwegian']="Norsk";
+$TEXT['navi-french']="Francais";
 $TEXT['navi-italian']="Italiano";
+$TEXT['navi-dutch']="Nederlands";
+$TEXT['navi-norwegian']="Norsk";
+$TEXT['navi-polish']="Polski";
+$TEXT['navi-slovenian']="Slovenian";
 $TEXT['navi-chinese']="&#20013;&#25991;";
 
 // ---------------------------------------------------------------------
@@ -92,7 +93,7 @@ $TEXT['status-tab3']="Hint";
 
 $TEXT['security-head']="XAMPP SECURITY";
 $TEXT['security-text1']="This page gives you a quick overview about the security status of your XAMPP installation. (Please continue reading after the table.)";
-$TEXT['security-text2']="The green marked points are secure; the red marked points are definitively unsecure and the yellow marked points couldn't be checked (for example because the sofware to check isn't running).<p>To fix the problems for mysql, phpmyadmin and the xampp directory simply use</B><p>=> <A HREF=xamppsecurity.php><B>http://localhost/xampp/xamppsecurity.php</B></A> <= &nbsp;&nbsp;[allowed only for localhost]<br>&nbsp;<br>&nbsp;<br>
+$TEXT['security-text2']="The green marked points are secure; the red marked points are definitively unsecure and the yellow marked points couldn't be checked (for example because the sofware to check isn't running).<p>To fix the problems for mysql, phpmyadmin and the xampp directory simply use</B><p>=> <A HREF=/security/xamppsecurity.php><B>http://localhost/security/xamppsecurity.php</B></A> <= &nbsp;&nbsp;[allowed only for localhost]<br>&nbsp;<br>&nbsp;<br>
 Some other important notes:<UL>
 	<LI>All these test are made ONLY for host \"localhost\" (127.0.0.1).</LI>
 	<LI><I><B>For FileZilla FTP und Mercury Mail, you must fix all security problems by yourself! Sorry. </B></I></LI>
@@ -123,7 +124,7 @@ $TEXT['security-checkpmamysqluser-text']="phpMyAdmin saves your preferences in a
 
 $TEXT['security-checkmysql-nok']="The MySQL admin user root has NO password";
 $TEXT['security-checkmysql-ok']="The MySQL admin user root has no longer no password";
-$TEXT['security-checkmysql-text']="Every local user on Linux box can access your MySQL database with administrator rights. You should set a password.";
+$TEXT['security-checkmysql-text']="Every local user on Windows box can access your MySQL database with administrator rights. You should set a password.";
 
 $TEXT['security-pop-nok']="The test user (newuser) for Mercury Mail server (POP3) have an old password (wampp)";
 $TEXT['security-pop-ok']="The test user \"newuser\" for the POP3 server (Mercury Mail?) does not exists anymore or have a new password";
@@ -207,12 +208,12 @@ $TEXT['manuals-text1']="XAMPP combines many different sofware packages into one 
 
 $TEXT['manuals-list1']="
 <ul>
-<li><a href=http://httpd.apache.org/docs-2.0/>Apache 2 documentation</a>
+<li><a href=http://httpd.apache.org/docs-2.0/en/>Apache 2 documentation</a>
 <li><a href=http://www.php.net/manual/en/>PHP <b>referenz </b>documentation</a>
-<li><a href=http://www.perl.org/docs.html>Perl documentation</a>
-<li><a href=http://www.mysql.com/documentation/mysql/bychapter/>MySQL documentation</a>
-<li><a http://phplens.com/lens/adodb/docs-adodb.htm>ADODB</a>
-<li><a href=http://eaccelerator.sourceforge.net/>eAccelerator</a>
+<li><a href=http://www.perldoc.com/perl5.8.0/pod/perl.html>Perl documentation</a>
+<li><a href=http://dev.mysql.com/doc/mysql/en/index.html>MySQL documentation</a>
+<li><a href=http://phplens.com/adodb/>ADODB</a>
+<li><a href=http://eaccelerator.net/DocumentationUk/>eAccelerator</a>
 <li><a href=http://www.ros.co.nz/pdf/readme.pdf>pdf class documentation</a>
 </ul>";
 
@@ -220,8 +221,8 @@ $TEXT['manuals-text2']="And a small list of tutorials and the Apache Friends doc
 
 $TEXT['manuals-list2']="
 <ul>
-<li><a href=http://www.apachefriends.org/faq-en.html>Apache Friends documentation</a>
-<li><a href=http://www.freewebmasterhelp.com/tutorials/php>PHP Tutorial</a> by David Gowans
+<li><a href=http://www.apachefriends.org/en/faq-xampp.html>Apache Friends documentation</a>
+<li><a href=http://www.freewebmasterhelp.com/tutorials/php/>PHP Tutorial</a> by David Gowans
 <li><a href=http://www.davesite.com/webstation/html/>HTML - An Interactive Tutorial For Beginners</a> by Dave Kristula
 <li><a href=http://www.comp.leeds.ac.uk/Perl/start.html>Perl Tutorial</a> by Nik Silver
 </ul>";

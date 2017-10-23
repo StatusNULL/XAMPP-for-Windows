@@ -1,14 +1,13 @@
 <?php
-/* $Id: tbl_properties_table_info.php,v 2.12.4.2 2005/07/04 21:44:27 lem9 Exp $ */
+/* $Id: tbl_properties_table_info.php,v 2.15 2005/08/11 13:56:32 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 // this should be recoded as functions, to avoid messing with global
 // variables
 
-// Check parameters
-
 require_once('./libraries/common.lib.php');
 
+// Check parameters
 PMA_checkParameters(array('db', 'table'));
 
 /**
@@ -45,7 +44,13 @@ if ($table_info_result && PMA_DBI_num_rows($table_info_result) > 0) {
     } else {
         $tbl_is_view     = FALSE;
         $tbl_type        = isset($showtable['Type']) ? strtoupper($showtable['Type']) : '';
-        $show_comment    = (isset($showtable['Comment']) ? $showtable['Comment'] : '');
+        // a new comment could be coming from tbl_properties_operations.php
+        // and we want to show it in the header
+        if (isset($submitcomment) && isset($comment)) {
+            $show_comment = $comment;
+        } else {
+            $show_comment    = (isset($showtable['Comment']) ? $showtable['Comment'] : '');
+        }
     }
     $tbl_collation       = empty($showtable['Collation']) ? '' : $showtable['Collation'];
     $table_info_num_rows = (isset($showtable['Rows']) ? $showtable['Rows'] : 0);

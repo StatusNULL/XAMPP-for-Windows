@@ -1,20 +1,23 @@
 <?php
-@include '../include_path.php';
 /**
  * An example of Listener usage with HTTP_Request and HTML_Progress.
  *
  * Credit: Alexey Borzov <avb@php.net>
  *         for his download-progress.php pattern in HTTP_Request package
- * 
- * @version    $Id: shockwaveflash.php,v 1.1 2004/06/27 14:03:50 farell Exp $
+ *
+ * @version    $Id: shockwaveflash.php,v 1.3 2005/08/28 14:58:19 farell Exp $
  * @author     Laurent Laville <pear@laurent-laville.org>
  * @package    HTML_Progress
+ * @subpackage Examples
  */
 
 require_once 'HTTP/Request.php';
 require_once 'HTTP/Request/Listener.php';
 require_once 'HTML/Progress.php';
 
+/**
+ * @ignore
+ */
 class HTTP_Request_DownloadListener extends HTTP_Request_Listener
 {
    /**
@@ -63,7 +66,7 @@ class HTTP_Request_DownloadListener extends HTTP_Request_Listener
     function update(&$subject, $event, $data = null)
     {
         switch ($event) {
-            case 'sentRequest': 
+            case 'sentRequest':
                 $this->_target = basename($subject->_url->path);
                 break;
 

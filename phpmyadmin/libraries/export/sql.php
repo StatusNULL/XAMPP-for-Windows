@@ -1,7 +1,6 @@
 <?php
-/* $Id: sql.php,v 2.44.4.1 2005/06/30 17:28:00 lem9 Exp $ */
+/* $Id: sql.php,v 2.45 2005/06/24 12:01:43 nijel Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
-
 /**
  * Set of functions used to build SQL dumps of tables
  */
