@@ -1,6 +1,10 @@
 <?php
-/* $Id: Config.class.php 10510 2007-07-20 13:03:09Z lem9 $ */
-// vim: expandtab sw=4 ts=4 sts=4:
+/* vim: set expandtab sw=4 ts=4 sts=4: */
+/**
+ *
+ *
+ * @version $Id: Config.class.php 10655 2007-09-20 16:33:07Z lem9 $
+ */
 
 /**
  * Configuration class
@@ -81,7 +85,7 @@ class PMA_Config
      */
     function checkSystem()
     {
-        $this->set('PMA_VERSION', '2.10.3');
+        $this->set('PMA_VERSION', '2.11.1');
         /**
          * @deprecated
          */
@@ -252,7 +256,7 @@ class PMA_Config
         $this->set('PMA_IS_WINDOWS', 0);
         // If PHP_OS is defined then continue
         if (defined('PHP_OS')) {
-            if (stristr(PHP_OS, 'win') ) {
+            if (stristr(PHP_OS, 'win')) {
                 // Is it some version of Windows
                 $this->set('PMA_IS_WINDOWS', 1);
             } elseif (stristr(PHP_OS, 'OS/2')) {
@@ -402,7 +406,7 @@ class PMA_Config
         // (from config.inc.php) so that $cfg['DefaultConnectionCollation']
         // can have an effect. Note that the presence of collation
         // information in a cookie has priority over what is defined
-        // in the default or user's config files. 
+        // in the default or user's config files.
         /**
          * @todo check validity of $_COOKIE['pma_collation_connection']
          */
@@ -416,7 +420,7 @@ class PMA_Config
         // Now, a collation information could come from REQUEST
         // (an example of this: the collation selector in main.php)
         // so the following handles the setting of collation_connection
-        // and later, in common.lib.php, the cookie will be set
+        // and later, in common.inc.php, the cookie will be set
         // according to this.
         $this->checkCollationConnection();
 
@@ -534,12 +538,14 @@ class PMA_Config
     }
 
     /**
-     * returns time of last config change.
+     * returns a unique value to force a CSS reload if either the config
+     * or the theme changes
      * @return  int  Unix timestamp
      */
     function getMtime()
     {
-        return max($this->source_mtime, $this->default_source_mtime, $this->set_mtime);
+        return $this->source_mtime + $this->default_source_mtime + $_SESSION['PMA_Theme']->mtime_info;
+        //"max()" most probably would only returns "source" last modified timestamp.
     }
 
     /**
@@ -553,6 +559,7 @@ class PMA_Config
         // they'll get an error if the autodetect code doesn't work
         $pma_absolute_uri = $this->get('PmaAbsoluteUri');
         $is_https = $this->get('is_https');
+
         if (strlen($pma_absolute_uri) < 5
             // needed to catch http/https switch
             || ($is_https && substr($pma_absolute_uri, 0, 6) != 'https:')
@@ -564,7 +571,7 @@ class PMA_Config
             if (PMA_getenv('REQUEST_URI')) {
                 $url = @parse_url(PMA_getenv('REQUEST_URI')); // produces E_WARNING if it cannot get parsed, e.g. '/foobar:/'
                 if ($url === false) {
-                    $url = array( 'path' => $_SERVER['REQUEST_URI'] );
+                    $url = array('path' => $_SERVER['REQUEST_URI']);
                 }
             }
 
@@ -685,7 +692,6 @@ class PMA_Config
                     . $pma_absolute_uri;
             }
         }
-
         $this->set('PmaAbsoluteUri', $pma_absolute_uri);
     }
 
@@ -730,11 +736,13 @@ class PMA_Config
         if (preg_match('/^[0-9.]+(px|em|pt|\%)$/', $new_fontsize)) {
             $this->set('fontsize', $new_fontsize);
         } elseif (! $this->get('fontsize')) {
-            $this->set('fontsize', '100%');
+             // 80% would correspond to the default browser font size
+             // of 16, but use 82% to help read the monoface font
+            $this->set('fontsize', '82%');
         }
 
         if (function_exists('PMA_setCookie')) {
-            PMA_setCookie('pma_fontsize', $this->get('fontsize'), '100%');
+            PMA_setCookie('pma_fontsize', $this->get('fontsize'), '82%');
         }
     }
 
@@ -892,7 +900,7 @@ class PMA_Config
             'PMA_IS_GD2',
             'PMA_USR_OS',
             'PMA_USR_BROWSER_VER',
-            'PMA_USR_BROWSER_AGENT',
+            'PMA_USR_BROWSER_AGENT'
             );
 
         foreach ($defines as $define) {
@@ -916,7 +924,7 @@ class PMA_Config
      * @param   string  $current_size   current selected font size with unit
      * @return  array   selectable font sizes
      */
-    function getFontsizeOptions($current_size = '100%')
+    function getFontsizeOptions($current_size = '82%')
     {
         $unit = preg_replace('/[0-9.]*/', '', $current_size);
         $value = preg_replace('/[^0-9.]*/', '', $current_size);
