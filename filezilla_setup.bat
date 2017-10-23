@@ -1,3 +1,3 @@
 @echo off
 echo FileZilla FTP Setup ... 
-FileZillaFTP\FileZillaServer.exe
+"FileZillaFTP\FileZillaServer.exe"

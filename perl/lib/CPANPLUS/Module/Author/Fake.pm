@@ -17,12 +17,12 @@ $Params::Check::VERBOSE = 1;
 
 =head1 NAME
 
-CPANPLUS::Module::Author::Fake
+CPANPLUS::Module::Author::Fake - dummy author object for CPANPLUS
 
 =head1 SYNOPSIS
 
     my $auth = CPANPLUS::Module::Author::Fake->new(
-                    name    => 'Foo Bar',
+                    author  => 'Foo Bar',
                     email   => 'luser@foo.com',
                     cpanid  => 'FOO',
                     _id     => $cpan->id,
@@ -63,7 +63,7 @@ sub new {
     unless( $obj->_id ) {
         error(loc("No '%1' specified -- No CPANPLUS object associated!",'_id'));
         return;
-    } 
+    }
 
     ### rebless object ###
     return bless $obj, $class;

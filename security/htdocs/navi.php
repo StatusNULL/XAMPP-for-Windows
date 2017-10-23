@@ -42,17 +42,17 @@
 			</tr>
 			<tr valign="top">
 				<td align="right" class="navi">
-					<a target=_parent class=n href="lang.php?de"><?=$TEXT['navi-german']?></a><br>
-					<a target=_parent class=n href="lang.php?en"><?=$TEXT['navi-english']?></a><br>
-					<a target=_parent class=n href="lang.php?es"><?=$TEXT['navi-spanish']?></a><br>
-					<a target=_parent class=n href="lang.php?fr"><?=$TEXT['navi-french']?></a><br>
-					<a target=_parent class=n href="lang.php?it"><?=$TEXT['navi-italian']?></a><br>
-					<a target=_parent class=n href="lang.php?nl"><?=$TEXT['navi-dutch']?></a><br>
-					<a target=_parent class=n href="lang.php?no"><?=$TEXT['navi-norwegian']?></a><br>
-					<a target=_parent class=n href="lang.php?pl"><?=$TEXT['navi-polish']?></a><br>
-					<a target=_parent class=n href="lang.php?pt"><?=$TEXT['navi-portuguese']?></a><br>
-					<a target=_parent class=n href="lang.php?sl"><?=$TEXT['navi-slovenian']?></a><br>
-					<a target=_parent class=n href="lang.php?zh"><?=$TEXT['navi-chinese']?></a><p>
+					<a target=_parent class=n href="lang.php?de"><?php print $TEXT['navi-german']; ?></a><br>
+					<a target=_parent class=n href="lang.php?en"><?php print $TEXT['navi-english']; ?></a><br>
+					<a target=_parent class=n href="lang.php?es"><?php print $TEXT['navi-spanish']; ?></a><br>
+					<a target=_parent class=n href="lang.php?fr"><?php print $TEXT['navi-french']; ?></a><br>
+					<a target=_parent class=n href="lang.php?it"><?php print $TEXT['navi-italian']; ?></a><br>
+					<a target=_parent class=n href="lang.php?nl"><?php print $TEXT['navi-dutch']; ?></a><br>
+					<a target=_parent class=n href="lang.php?no"><?php print $TEXT['navi-norwegian']; ?></a><br>
+					<a target=_parent class=n href="lang.php?pl"><?php print $TEXT['navi-polish']; ?></a><br>
+					<a target=_parent class=n href="lang.php?pt"><?php print $TEXT['navi-portuguese']; ?></a><br>
+					<a target=_parent class=n href="lang.php?sl"><?php print $TEXT['navi-slovenian']; ?></a><br>
+					<a target=_parent class=n href="lang.php?zh"><?php print $TEXT['navi-chinese']; ?></a><p>
 
 					<p class="navi">&copy;2002-<?php echo date("Y"); ?><br>
 					<?php if (file_get_contents("lang.tmp") == "de") { ?>

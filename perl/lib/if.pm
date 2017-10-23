@@ -1,10 +1,10 @@
 package if;
 
-$VERSION = '0.05';
+$VERSION = '0.0602';
 
 sub work {
   my $method = shift() ? 'import' : 'unimport';
-  die "Too few arguments to `use if' (some code returning an empty list in list context?)"
+  die "Too few arguments to 'use if' (some code returning an empty list in list context?)"
     unless @_ >= 2;
   return unless shift;		# CONDITION
 
@@ -50,7 +50,7 @@ required version of the module.
 
 =head1 AUTHOR
 
-Ilya Zakharevich L<mailto:perl-module-if@ilyaz.org>.
+Ilya Zakharevich L<mailto:ilyaz@cpan.org>.
 
 =cut
 

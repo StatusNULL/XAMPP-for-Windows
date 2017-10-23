@@ -1,24 +1,39 @@
 @rem = '--*-Perl-*--
 @echo off
 if "%OS%" == "Windows_NT" goto WinNT
-perl -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
+"%~dp0perl.exe" -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
 goto endofperl
 :WinNT
-perl -x -S %0 %*
+"%~dp0perl.exe" -x -S %0 %*
 if NOT "%COMSPEC%" == "%SystemRoot%\system32\cmd.exe" goto endofperl
 if %errorlevel% == 9009 echo You do not have Perl in your PATH.
 if errorlevel 1 goto script_failed_so_exit_with_non_zero_val 2>nul
 goto endofperl
 @rem ';
-#!perl
+#!/usr/bin/perl
 #line 15
-    eval 'exec perl -S $0 "$@"'
-	if 0;
 
 require 5.003;
 
-my $VERSION = '20080331.00';
-my $stty    = undef;
+my $stty;
+BEGIN {
+    foreach my $s (qw(/bin/stty /usr/bin/stty)) {
+	if (-x $s) {
+	    $stty = $s;
+	    last;
+	}
+    }
+}
+
+require Devel::DProf;
+
+if($] > 5.013010) {
+    require deprecate;
+
+    if (deprecate::__loaded_from_core('Devel::DProf', $INC{'Devel/DProf.pm'},'Devel/DProf.pm')) {
+        warn "dprofpp will be removed from the Perl core distribution in the next major release. Please install Devel::DProf from CPAN.\n";
+    }
+}
 
 =head1 NAME
 
@@ -27,13 +42,13 @@ dprofpp - display perl profile data
 =head1 SYNOPSIS
 
 dprofpp [B<-a>|B<-z>|B<-l>|B<-v>|B<-U>] [B<-d>] [B<-s>|B<-r>|B<-u>] [B<-q>] [B<-F>] [B<-I|-E>] [B<-O cnt>] [B<-A>] [B<-R>] [B<-S>] [B<-g subroutine>] [B<-G> <regexp> [B<-P>]] [B<-f> <regexp>] [profile]
-  
+
 dprofpp B<-T> [B<-F>] [B<-g subroutine>] [profile]
 
 dprofpp B<-t> [B<-F>] [B<-g subroutine>] [profile]
 
 dprofpp B<-G> <regexp> [B<-P>] [profile]
- 
+
 dprofpp B<-p script> [B<-Q>] [other opts]
 
 dprofpp B<-V> [profile]
@@ -196,7 +211,7 @@ calling level then it is displayed once with a repeat count.
 =item B<-S>
 
 Display I<merged> subroutine call tree to stdout.  Statistics are
-displayed for each branch of the tree.  
+displayed for each branch of the tree.
 
 When a function is called multiple (I<not necessarily consecutive>)
 times in the same branch then all these calls go into one branch of
@@ -221,7 +236,7 @@ XS_VERSION variable will be displayed, too.
 =item B<-v>
 
 Sort by average time spent in subroutines during each call.  This may help
-identify candidates for inlining. 
+identify candidates for inlining.
 
 =item B<-z>
 
@@ -365,7 +380,7 @@ Setup: {
 
 	if( defined $opt_V ){
 		my $fh = 'main::fh';
-		print "$0 version: $VERSION\n";
+		print "$0 version: $Devel::DProf::VERSION\n";
 		open( $fh, "<$Monfile" ) && do {
 			local $XS_VERSION = 'early';
 			header($fh);
@@ -380,7 +395,7 @@ Setup: {
 	$sort = 'by_calls' if defined $opt_l;
 	$sort = 'by_alpha' if defined $opt_a;
 	$sort = 'by_avgcpu' if defined $opt_v;
-	
+
 	if(defined $opt_d){
 		$sort = "r".$sort;
 	}
@@ -525,7 +540,7 @@ sub settime {
   my( $runtime, $hz ) = @_;
 
   $hz ||= 1;
-  
+
   if( $opt_r ){
     $$runtime = ($rrun_rtime - $overhead)/$hz;
   }
@@ -559,18 +574,18 @@ sub exclusives_in_tree {
   $deep_times->{kids_time} = $kids_time;
 }
 
-sub kids_by_incl { $kids{$b}{incl_time} <=> $kids{$a}{excl_time} 
+sub kids_by_incl { $kids{$b}{incl_time} <=> $kids{$a}{excl_time}
 		   or $a cmp $b }
 
 sub display_tree {
   my( $deep_times, $name, $level ) = @_;
   exclusives_in_tree($deep_times);
-  
+
   my $kid;
 
   my $time;
   if (%{$deep_times->{kids}}) {
-    $time = sprintf '%.*fs = (%.*f + %.*f)', 
+    $time = sprintf '%.*fs = (%.*f + %.*f)',
       $time_precision, $deep_times->{incl_time}/$hz,
         $time_precision, $deep_times->{excl_time}/$hz,
           $time_precision, $deep_times->{kids_time}/$hz;
@@ -582,12 +597,12 @@ sub display_tree {
 
   for $kid (sort kids_by_incl %{$deep_times->{kids}}) {
     display_tree( $deep_times->{kids}{$kid}, $kid, $level + 1 );
-  }  
+  }
 }
 
 # Report the times in seconds.
 sub display {
-	my( $runtime, $hz, $names, $calls, $times, $ctimes, $cnt, 
+	my( $runtime, $hz, $names, $calls, $times, $ctimes, $cnt,
 	    $idkeys, $deep_times ) = @_;
 	my( $x, $key, $s, $cs );
 	#format: $ncalls, $name, $secs, $percall, $pcnt
@@ -611,7 +626,7 @@ sub display {
 	    $pcnt = $secs = $ncalls = $percall = "";
 	    write while( length $name );
 	    last unless --$cnt;
-	  }	  
+	  }
 	}
 }
 
@@ -639,7 +654,7 @@ sub add_to_tree {
   die "Shorted?!" unless @$curdeep_times >= 2;
   my $entry = $curdeep_times->[-2]{kids}{$name} ||= {
     count => 0,
-    kids => {}, 
+    kids => {},
     incl_time => 0,
   };
   # Now transfer to the new node (could not do earlier, since name can change)
@@ -714,12 +729,12 @@ sub parsestack {
 
 		next unless $in_level or $name eq $opt_g;
 		if ( $dir eq '-' or $dir eq '*' ) {
-		  	my $ename = $dir eq '*' ? $stack[-1][0]  : $name;
+			my $ename = $dir eq '*' ? $stack[-1][0]  : $name;
 			$overhead += $over_per_call;
-		  	if ($name eq "Devel::DProf::write") {
+			if ($name eq "Devel::DProf::write") {
 			  $overhead += $t - $dprof_stamp;
 			  next;
-		  	} elsif (defined $opt_g and $ename eq $opt_g) {
+			} elsif (defined $opt_g and $ename eq $opt_g) {
 			  $in_level--;
 			}
 			add_to_tree($curdeep_times, $ename,
@@ -728,15 +743,15 @@ sub parsestack {
 				   $t - $overhead,
 				   $times, $ctimes, $name, \$in, $tab,
 				   $curdeep_times, \%outer );
-		} 
+		}
 		next unless $in_level or $name eq $opt_g;
 		if( $dir eq '+' or $dir eq '*' ){
-		  	if ($name eq "Devel::DProf::write") {
+			if ($name eq "Devel::DProf::write") {
 			  $dprof_stamp = $t;
 			  next;
-		  	} elsif (defined $opt_g and $name eq $opt_g) {
+			} elsif (defined $opt_g and $name eq $opt_g) {
 			  $in_level++;
-		  	}
+			}
 			$overhead += $over_per_call;
 			if( $opt_T ){
 				print ' ' x $in, "$name\n";
@@ -767,8 +782,8 @@ sub parsestack {
 			}
 			$calls->{$name}++;
                         $outer{$name}++;
-			push @$curdeep_times, { kids => {}, 
-						name => $name, 
+			push @$curdeep_times, { kids => {},
+						name => $name,
 						enter_stamp => $t - $overhead,
 					      } if $opt_S;
 			$x = [ $name, $t - $overhead ];
@@ -804,9 +819,9 @@ sub parsestack {
 			warn( "Faking " . scalar( @stack ) . " exit timestamp(s).\n");
 			foreach $x ( reverse @stack ){
 				$name = $x->[0];
-				exitstamp( \@stack, \@tstack, 
-					   $t - $overhead, $times, 
-					   $ctimes, $name, \$in, $tab, 
+				exitstamp( \@stack, \@tstack,
+					   $t - $overhead, $times,
+					   $ctimes, $name, \$in, $tab,
 					   $curdeep_times, \%outer );
 				add_to_tree($curdeep_times, $name,
 					    $t - $overhead)

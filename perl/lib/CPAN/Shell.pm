@@ -47,7 +47,7 @@ use vars qw(
              "CPAN/Tarzip.pm",
              "CPAN/Version.pm",
             );
-$VERSION = "5.5";
+$VERSION = "5.5002";
 # record the initial timestamp for reload.
 $reload = { map {$INC{$_} ? ($_,(stat $INC{$_})[9]) : ()} @relo };
 @CPAN::Shell::ISA = qw(CPAN::Debug);
@@ -325,7 +325,14 @@ sub d { $CPAN::Frontend->myprint(shift->format_result('Distribution',@_));}
 #-> sub CPAN::Shell::m ;
 sub m { # emacs confused here }; sub mimimimimi { # emacs in sync here
     my $self = shift;
-    $CPAN::Frontend->myprint($self->format_result('Module',@_));
+    my @m = @_;
+    for (@m) {
+        if (m|(?:\w+/)*\w+\.pm$|) { # same regexp in expandany
+            s/.pm$//;
+            s|/|::|g;
+        }
+    }
+    $CPAN::Frontend->myprint($self->format_result('Module',@m));
 }
 
 #-> sub CPAN::Shell::i ;
@@ -368,16 +375,8 @@ sub o {
             $cfilter ||= "";
             my $qrfilter = eval 'qr/$cfilter/';
             my($k,$v);
-            $CPAN::Frontend->myprint("\$CPAN::Config options from ");
-            my @from;
-            if (exists $INC{'CPAN/Config.pm'}) {
-                push @from, $INC{'CPAN/Config.pm'};
-            }
-            if (exists $INC{'CPAN/MyConfig.pm'}) {
-                push @from, $INC{'CPAN/MyConfig.pm'};
-            }
-            $CPAN::Frontend->myprint(join " and ", map {"'$_'"} @from);
-            $CPAN::Frontend->myprint(":\n");
+            my $configpm = CPAN::HandleConfig->require_myconfig_or_config;
+            $CPAN::Frontend->myprint("\$CPAN::Config options from $configpm\:\n");
             for $k (sort keys %CPAN::HandleConfig::can) {
                 next unless $k =~ /$qrfilter/;
                 $v = $CPAN::HandleConfig::can{$k};
@@ -648,22 +647,21 @@ sub _reload_this {
 
 #-> sub CPAN::Shell::mkmyconfig ;
 sub mkmyconfig {
-    my($self, $cpanpm, %args) = @_;
-    require CPAN::FirstTime;
-    my $home = CPAN::HandleConfig::home();
-    $cpanpm = $INC{'CPAN/MyConfig.pm'} ||
-        File::Spec->catfile(split /\//, "$home/.cpan/CPAN/MyConfig.pm");
-    File::Path::mkpath(File::Basename::dirname($cpanpm)) unless -e $cpanpm;
-    CPAN::HandleConfig::require_myconfig_or_config();
-    $CPAN::Config ||= {};
-    $CPAN::Config = {
-        %$CPAN::Config,
-        build_dir           =>  undef,
-        cpan_home           =>  undef,
-        keep_source_where   =>  undef,
-        histfile            =>  undef,
-    };
-    CPAN::FirstTime::init($cpanpm, %args);
+    my($self) = @_;
+    if ( my $configpm = $INC{'CPAN/MyConfig.pm'} ) {
+        $CPAN::Frontend->myprint(
+            "CPAN::MyConfig already exists as $configpm.\n" .
+            "Running configuration again...\n"
+        );
+        require CPAN::FirstTime;
+        CPAN::FirstTime::init($configpm);
+    }
+    else {
+        # force some missing values to be filled in with defaults
+        delete $CPAN::Config->{$_}
+            for qw/build_dir cpan_home keep_source_where histfile/;
+        CPAN::HandleConfig->load( make_myconfig => 1 );
+    }
 }
 
 #-> sub CPAN::Shell::_binary_extensions ;
@@ -1202,7 +1200,7 @@ sub autobundle {
     my($fh) = FileHandle->new(">$to") or Carp::croak "Can't open >$to: $!";
     $fh->print(
                "package Bundle::$me;\n\n",
-               "\$VERSION = '0.01';\n\n",
+               "\$","VERSION = '0.01';\n\n", # hide from perl-reversion
                "1;\n\n",
                "__END__\n\n",
                "=head1 NAME\n\n",
@@ -1223,13 +1221,28 @@ sub autobundle {
     $fh->close;
     $CPAN::Frontend->myprint("\nWrote bundle file
     $to\n\n");
+    return $to;
 }
 
 #-> sub CPAN::Shell::expandany ;
 sub expandany {
     my($self,$s) = @_;
     CPAN->debug("s[$s]") if $CPAN::DEBUG;
-    if ($s =~ m|/| or substr($s,-1,1) eq ".") { # looks like a file or a directory
+    my $module_as_path = "";
+    if ($s =~ m|(?:\w+/)*\w+\.pm$|) { # same regexp in sub m
+        $module_as_path = $s;
+        $module_as_path =~ s/.pm$//;
+        $module_as_path =~ s|/|::|g;
+    }
+    if ($module_as_path) {
+        if ($module_as_path =~ m|^Bundle::|) {
+            $self->local_bundles;
+            return $self->expand('Bundle',$module_as_path);
+        } else {
+            return $self->expand('Module',$module_as_path)
+                if $CPAN::META->exists('CPAN::Module',$module_as_path);
+        }
+    } elsif ($s =~ m|/| or substr($s,-1,1) eq ".") { # looks like a file or a directory
         $s = CPAN::Distribution->normalize($s);
         return $CPAN::META->instance('CPAN::Distribution',$s);
         # Distributions spring into existence, not expand
@@ -1435,6 +1448,7 @@ sub print_ornamented {
 
     local $| = 1; # Flush immediately
     if ( $CPAN::Be_Silent ) {
+        # WARNING: variable Be_Silent is poisoned and must be eliminated.
         print {report_fh()} $what;
         return;
     }
@@ -1483,6 +1497,13 @@ sub myprint {
                            );
 }
 
+my %already_printed;
+#-> sub CPAN::Shell::mywarnonce ;
+sub myprintonce {
+    my($self,$what) = @_;
+    $self->myprint($what) unless $already_printed{$what}++;
+}
+
 sub optprint {
     my($self,$category,$what) = @_;
     my $vname = $category . "_verbosity";
@@ -1505,6 +1526,13 @@ sub myexit {
 sub mywarn {
     my($self,$what) = @_;
     $self->print_ornamented($what, $CPAN::Config->{colorize_warn}||'bold red on_white');
+}
+
+my %already_warned;
+#-> sub CPAN::Shell::mywarnonce ;
+sub mywarnonce {
+    my($self,$what) = @_;
+    $self->mywarn($what) unless $already_warned{$what}++;
 }
 
 # only to be used for shell commands
@@ -1585,6 +1613,8 @@ sub setup_output {
 # RE-adme||MA-ke||TE-st||IN-stall : nearly everything runs through here
 sub rematein {
     my $self = shift;
+    # this variable was global and disturbed programmers, so localize:
+    local $CPAN::Distrostatus::something_has_failed_at;
     my($meth,@some) = @_;
     my @pragma;
     while($meth =~ /^(ff?orce|notest)$/) {
@@ -1626,10 +1656,22 @@ sub rematein {
             if (substr($s,-1,1) eq ".") {
                 $obj = CPAN::Shell->expandany($s);
             } else {
-                $CPAN::Frontend->mywarn("Sorry, $meth with a regular expression is ".
-                                        "not supported.\nRejecting argument '$s'\n");
-                $CPAN::Frontend->mysleep(2);
-                next;
+                my @obj;
+            CLASS: for my $class (qw(Distribution Bundle Module)) {
+                    if (@obj = $self->expand($class,$s)) {
+                        last CLASS;
+                    }
+                }
+                if (@obj) {
+                    if (1==@obj) {
+                        $obj = $obj[0];
+                    } else {
+                        $CPAN::Frontend->mywarn("Sorry, $meth with a regular expression is ".
+                                                "only supported when unambiguous.\nRejecting argument '$s'\n");
+                        $CPAN::Frontend->mysleep(2);
+                        next STHING;
+                    }
+                }
             }
         } elsif ($meth eq "ls") {
             $self->globls($s,\@pragma);
@@ -1643,7 +1685,7 @@ sub rematein {
             if ($meth =~ /^($needs_recursion_protection)$/) {
                 # it would be silly to check for recursion for look or dump
                 # (we are in CPAN::Shell::rematein)
-                CPAN->debug("Going to test against recursion") if $CPAN::DEBUG;
+                CPAN->debug("Testing against recursion") if $CPAN::DEBUG;
                 eval {  $obj->color_cmd_tmps(0,1); };
                 if ($@) {
                     if (ref $@
@@ -1806,7 +1848,7 @@ sub recent {
   my($self) = @_;
   if ($CPAN::META->has_inst("XML::LibXML")) {
       my $url = $CPAN::Defaultrecent;
-      $CPAN::Frontend->myprint("Going to fetch '$url'\n");
+      $CPAN::Frontend->myprint("Fetching '$url'\n");
       unless ($CPAN::META->has_usable("LWP")) {
           $CPAN::Frontend->mydie("LWP not installed; cannot continue");
       }
@@ -1894,7 +1936,7 @@ sub smoke {
     my $distros = $self->recent;
   DISTRO: for my $distro (@$distros) {
         next if $distro =~ m|/Bundle-|; # XXX crude heuristic to skip bundles
-        $CPAN::Frontend->myprint(sprintf "Going to download and test '$distro'\n");
+        $CPAN::Frontend->myprint(sprintf "Downloading and testing '$distro'\n");
         {
             my $skip = 0;
             local $SIG{INT} = sub { $skip = 1 };

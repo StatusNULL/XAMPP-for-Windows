@@ -1,7 +1,7 @@
 use 5.006_001;			# for (defined ref) and $#$v and our
 package Dumpvalue;
 use strict;
-our $VERSION = '1.13';
+our $VERSION = '1.17';
 our(%address, $stab, @stab, %stab, %subs);
 
 # documentation nits, handle complex data structures better by chromatic
@@ -15,7 +15,7 @@ our(%address, $stab, @stab, %stab, %subs);
 # (IZ) changes for objectification:
 #   c) quote() renamed to method set_quote();
 #   d) unctrlSet() renamed to method set_unctrl();
-#   f) Compiles with `use strict', but in two places no strict refs is needed:
+#   f) Compiles with 'use strict', but in two places no strict refs is needed:
 #      maybe more problems are waiting...
 
 my %defaults = (
@@ -230,14 +230,14 @@ sub unwrap {
       if ($#$v >= 0) {
 	$short = $sp . "0..$#{$v}  " .
 	  join(" ", 
-	       map {exists $v->[$_] ? $self->stringify($v->[$_]) : "empty"} ($[..$tArrayDepth)
+	       map {exists $v->[$_] ? $self->stringify($v->[$_]) : "empty"} (0..$tArrayDepth)
 	      ) . "$shortmore";
       } else {
 	$short = $sp . "empty array";
       }
       (print "$short\n"), return if length $short <= $self->{compactDump};
     }
-    for my $num ($[ .. $tArrayDepth) {
+    for my $num (0 .. $tArrayDepth) {
       return if $DB::signal and $self->{stopDbSignal};
       print "$sp$num  ";
       if (exists $v->[$num]) {
@@ -299,7 +299,7 @@ sub set_unctrl {
     if ($in eq 'unctrl' or $in eq 'quote') {
       $self->{unctrl} = $in;
     } else {
-      print "Unknown value for `unctrl'.\n";
+      print "Unknown value for 'unctrl'.\n";
     }
   }
   $self->{unctrl};
@@ -541,7 +541,7 @@ I<as is>.  If C<quoteHighBit> is set, they will be quoted.
 
 =item C<usageOnly>
 
-rudimentally per-package memory usage dump.  If set,
+rudimentary per-package memory usage dump.  If set,
 C<dumpvars> calculates total size of strings in variables in the package.
 
 =item unctrl
@@ -585,7 +585,7 @@ Prints a dump to the currently selected filehandle.
 
   $dumper->dumpValues($value1, $value2);
 
-Same as C< $dumper->dumpValue([$value1, $value2]); >.
+Same as C<< $dumper->dumpValue([$value1, $value2]); >>.
 
 =item stringify
 

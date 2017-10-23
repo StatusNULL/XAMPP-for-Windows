@@ -35,7 +35,7 @@
                              image files), including the WEB-INF subdirectory
                              and its configuration file contents.
 
-     $Id: build.xml.txt 1060015 2011-01-17 17:31:45Z markt $
+     $Id: build.xml.txt 1200125 2011-11-10 04:05:48Z kkolinko $
 -->
 
 
@@ -474,7 +474,7 @@
 
   NOTE: The /WEB-INF/web.xml web application configuration file is not reread
   on a reload. If you have made changes to your web.xml file you must stop
-  then start the web application. 
+  then start the web application.
 
 -->
 

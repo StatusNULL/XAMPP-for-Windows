@@ -351,6 +351,11 @@
 	<li>le spam et autres obscénités sont strictement interdits avec Mercury!;</li>
 	</ul>";
 	$TEXT['mail-url'] = "<a href=\"http://www.pmail.com/overviews/ovw_mercury.htm\" target=\"_top\">http://www.pmail.com/overviews/ovw_mercury.htm</a>";
+	$TEXT['mail-note-important'] = "IMPORTANT";
+	$TEXT['mail-note-text1'] = "There are three variants for sending emails with PHP. One of these three possibilities have to be activated in the xampp\php\php.ini file.";
+	$TEXT['mail-note-text2'] = "<b>mailToDisk</b> (<i>Default</i>) - All emails are written in the xampp\mailoutput folder on local disk. XAMPP mailToDisk is the default and you have nothing to do in the php.ini.";
+	$TEXT['mail-note-text3'] = "<b>fakemail</b> - With fakemail (sendmail.exe)) all emails are forwarding to your mailbox. Please edit the xampp\sendmail\sendmail.ini first with your mailbox credentials. And do not forget to activate fakemail (senmail.exe)) in the xampp\php\php.ini.";	
+	$TEXT['mail-note-text4'] = "<b>Mercury Mail Server</b> or some other Mail Socket Server on localhost. This option have to be activated in the php.ini also.";
 	// ---------------------------------------------------------------------
 	// FileZilla FTP
 	// ---------------------------------------------------------------------

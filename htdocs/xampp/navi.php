@@ -26,7 +26,7 @@
 			<tr valign="top">
 				<td align="right" class="navi">
 					<a name="start" id="start" class="nh" target="content" onclick="h(this);" href="start.php"><?php echo $TEXT['navi-welcome']; ?></a><br>
-					<a class="n" target="content" onclick="h(this);" href="status.php"><?=$TEXT['navi-status']?></a><br>
+					<a class="n" target="content" onclick="h(this);" href="status.php"><?php print $TEXT['navi-status']; ?></a><br>
 					<a class="n" target="new" onclick="h(this);" href="/security/lang.php?<?php echo file_get_contents("lang.tmp"); ?>"><?php echo $TEXT['navi-security']; ?></a><br>
 					<a class="n" target="content" onclick="h(this);" href="manuals.php"><?php echo $TEXT['navi-doc']; ?></a><br>
 					<a class="n" target="content" onclick="h(this);" href="components.php"><?php echo $TEXT['navi-components']; ?></a><br>&nbsp;<br>
@@ -106,7 +106,7 @@
 				if ($xmodell == "XAMPP") { ?>	
           	<?php include "navitools.inc"; ?>
           	<br>
-				<?php } ?>			
+				<?php } else { ?> <a class="n" target="content" onclick="h(this);" href="mailform.php">Mail</a><br> <?php } ?>			
 				</td>
 			</tr>				
 					<?php include "special.inc"; ?>

@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: DefaultInputHandler.php 293 2007-11-04 16:51:45Z hans $
+ *  $Id: DefaultInputHandler.php 1334 2011-10-21 14:55:48Z mrook $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -28,7 +28,7 @@ include_once 'phing/system/io/ConsoleReader.php';
  *
  * @author Hans Lellelid <hans@xmpl.org> (Phing)
  * @author Stefan Bodewig <stefan.bodewig@epost.de> (Ant)
- * @version $Revision: 1.6 $
+ * @version $Revision: 1334 $
  * @package phing.input
  */
 class DefaultInputHandler implements InputHandler {
@@ -66,14 +66,18 @@ class DefaultInputHandler implements InputHandler {
      */
     protected function getPrompt(InputRequest $request) {
         $prompt = $request->getPrompt();
+        $defaultValue = $request->getDefaultValue();
         
         if ($request instanceof YesNoInputRequest) {
+            $choices = $request->getChoices();
+            $defaultValue = $choices[(int) !$request->getDefaultValue()];
             $prompt .= '(' . implode('/', $request->getChoices()) .')';
         } elseif ($request instanceof MultipleChoiceInputRequest) { // (a,b,c,d)
             $prompt .= '(' . implode(',', $request->getChoices()) . ')';            
         }
+        
         if ($request->getDefaultValue() !== null) {
-            $prompt .= ' ['.$request->getDefaultValue().']';
+            $prompt .= ' ['.$defaultValue.']';
         }
         $pchar = $request->getPromptChar();        
         return $prompt . ($pchar ? $pchar . ' ' : ' ');

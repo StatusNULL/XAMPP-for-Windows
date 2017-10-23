@@ -219,7 +219,6 @@
 /* #undef HAVE_PTHREAD_ATTR_SETSTACKSIZE */
 /* #undef HAVE_PTHREAD_CONDATTR_CREATE */
 /* #undef HAVE_PTHREAD_CONDATTR_SETCLOCK */
-/* #undef HAVE_PTHREAD_INIT */
 /* #undef HAVE_PTHREAD_KEY_DELETE */
 /* #undef HAVE_PTHREAD_KEY_DELETE */
 /* #undef HAVE_PTHREAD_KILL */
@@ -610,10 +609,10 @@
 #define PACKAGE "mysql"
 #define PACKAGE_BUGREPORT ""
 #define PACKAGE_NAME "MySQL Server"
-#define PACKAGE_STRING "MySQL Server 5.5.15"
+#define PACKAGE_STRING "MySQL Server 5.5.25a"
 #define PACKAGE_TARNAME "mysql"
-#define PACKAGE_VERSION "5.5.15"
-#define VERSION "5.5.15"
+#define PACKAGE_VERSION "5.5.25a"
+#define VERSION "5.5.25a"
 #define PROTOCOL_VERSION 10
 
 

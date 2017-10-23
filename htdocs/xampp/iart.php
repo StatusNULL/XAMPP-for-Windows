@@ -1,5 +1,5 @@
-<? include("langsettings.php"); ?>
-<?
+<?php include("langsettings.php"); ?>
+<?php
 //    Copyright (C) 2002/2003 Kai Seidler, oswald@apachefriends.org
 //
 //    This program is free software; you can redistribute it and/or modify
@@ -32,17 +32,17 @@
         &nbsp;<p>
         <h1><?php echo $TEXT['iart-head']; ?></h1>
 
-        <img width="520" height="320" src="iart.php?img=1&text=<?=urlencode($text)?>" alt=""><p class="small">
-        <?=$TEXT['iart-text1']?><p>
+        <img width="520" height="320" src="iart.php?img=1&text=<?php print urlencode($text); ?>" alt=""><p class="small">
+        <?php print $TEXT['iart-text1']; ?><p>
         <form name="ff" action="iart.php" method="get">
             <input type="text" name="text" value="<?php echo htmlentities($text); ?>" size="30">
-            <input type="submit" value="<?=$TEXT['iart-ok']?>">
+            <input type="submit" value="<?php print $TEXT['iart-ok']; ?>">
         </form>
         <p>
         <?php include("showcode.php"); ?>
     </body>
 </html>
-<?
+<?php
 	exit;
 	}
 

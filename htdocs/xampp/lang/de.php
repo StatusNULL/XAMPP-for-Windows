@@ -297,24 +297,24 @@
 	$TEXT['flash-ok'] = "OK";
 	$TEXT['flash-text1'] = "Das MING Projekt für Windows wurde leider nicht weiterverfolgt und ist deshalb unvollständig.<br>Vgl. bitte <a class=blue target=extern href=\"http://www.opaque.net/wiki/index.php?Ming\">Ming - an SWF output library and PHP module</a>";
 
-	// ---------------------------------------------------------------------
-	// PHONE BOOK DEMO
-	// ---------------------------------------------------------------------
+// ---------------------------------------------------------------------
+// PHONE BOOK DEMO
+// ---------------------------------------------------------------------
 
-	$TEXT['phonebook-head'] = "Telefonbuch (Beispiel für PHP+SQLite)";
+$TEXT['phonebook-head']="Telefonbuch (Beispiel für PHP+SQLite)";
 
-	$TEXT['phonebook-text1'] = "Ein sehr einfaches Telefonbuch. Allerdings mit einer sehr aktuellen Technik:<br>SQLite, einer SQL-Datenbank ohne extra Server.";
+$TEXT['phonebook-text1']="Ein sehr einfaches Telefonbuch. Allerdings mit einer sehr aktuellen Technik:<br>SQLite, einer SQL-Datenbank ohne extra Server.";
 
-	$TEXT['phonebook-error'] = "Kann die Datenbank nicht öffnen!";
-	$TEXT['phonebook-head1'] = "Meine Telefonnummern";
-	$TEXT['phonebook-attrib1'] = "Nachname";
-	$TEXT['phonebook-attrib2'] = "Vorname";
-	$TEXT['phonebook-attrib3'] = "Telefonnummer";
-	$TEXT['phonebook-attrib4'] = "Aktion";
-	$TEXT['phonebook-sure'] = "Wirklich sicher?";
-	$TEXT['phonebook-head2'] = "Eintrag hinzufügen";
-	$TEXT['phonebook-button1'] = "LÖSCHEN";
-	$TEXT['phonebook-button2'] = "HINZUFÜGEN";
+$TEXT['phonebook-error']="Kann die Datenbank nicht öffnen!";
+$TEXT['phonebook-head1']="Meine Telefonnummern";
+$TEXT['phonebook-attrib1']="Nachname";
+$TEXT['phonebook-attrib2']="Vorname";
+$TEXT['phonebook-attrib3']="Telefonnummer";
+$TEXT['phonebook-attrib4']="Aktion";
+$TEXT['phonebook-sure']="Wirklich sicher?";
+$TEXT['phonebook-head2']="Eintrag hinzufügen";
+$TEXT['phonebook-button1']="LÖSCHEN";
+$TEXT['phonebook-button2']="HINZUFÜGEN";
 
 	// ---------------------------------------------------------------------
 	// ABOUT
@@ -356,6 +356,11 @@
 	<li>SPAM und andere Schweinereien sind mit Mercury total verboten!;</li>
 	</ul>";
 	$TEXT['mail-url'] = "<a href=\"http://www.pmail.com/overviews/ovw_mercury.htm\" target=\"_top\">http://www.pmail.com/overviews/ovw_mercury.htm</a>";
+	$TEXT['mail-note-important'] = "WICHTIG";
+	$TEXT['mail-note-text1'] = "Es stehen drei Varianten zur Verfügung, um Emails mit PHP zur versenden. Einer der drei Möglichkeiten müssen in xampp\php\php.ini jeweils aktiviert sein.";
+	$TEXT['mail-note-text2'] = "<b>mailToDisk</b> (<i>Default</i>) - Alle Emails werden auf in das xampp\mailoutput Verzeichnis auf der lokale Festplatte geschrieben. XAMPP mailToDisk ist der Standard und muss nicht extra in der php.ini aktiviert werden";
+	$TEXT['mail-note-text3'] = "<b>fakemail</b> - Mit fakemail (sendmail.exe)) werden alle Emails an ein entferntes Postfach weitergeleitet. Um das Postfach für fakemail einzurichten müssen die Postfach Credentials in der xampp\sendmail\sendmail.ini bekannt gemacht werden und ebenfalls in der xampp\php\php.ini konfiguriert sein.";	
+	$TEXT['mail-note-text4'] = "<b>Mercury Mail Server</b> oder ein anderer Mail Server auf localhost. Diese Option muss in der php.ini aktviert sein.";
 	// ---------------------------------------------------------------------
 	// FileZilla FTP
 	// ---------------------------------------------------------------------

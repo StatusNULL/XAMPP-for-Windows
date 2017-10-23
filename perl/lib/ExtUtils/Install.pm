@@ -38,11 +38,11 @@ ExtUtils::Install - install files from here to there
 
 =head1 VERSION
 
-1.54
+1.58
 
 =cut
 
-$VERSION = '1.54';  # <---- dont forget to update the POD section just above this line!
+$VERSION = '1.58';  # <---- dont forget to update the POD section just above this line!
 $VERSION = eval $VERSION;
 
 =pod
@@ -73,6 +73,8 @@ has occured.
 If this value is defined but false then such an operation has
 ocurred, but should not impact later operations.
 
+=over
+
 =begin _private
 
 =item _chmod($$;$)
@@ -86,6 +88,8 @@ Warns about something only once.
 =item _choke(@)
 
 Dies with a special message.
+
+=back
 
 =end _private
 
@@ -169,6 +173,8 @@ sub _chmod($$;$) {
 
 =begin _private
 
+=over
+
 =item _move_file_at_boot( $file, $target, $moan  )
 
 OS-Specific, Win32/Cygwin
@@ -235,6 +241,7 @@ sub _move_file_at_boot { #XXX OS-SPECIFIC
 
 =begin _private
 
+
 =item _unlink_or_rename( $file, $tryhard, $installing )
 
 OS-Specific, Win32/Cygwin
@@ -262,6 +269,8 @@ a derivative of the original in the same directory) so that the caller can
 use it to install under. In all other cases of success returns $file.
 On failure throws a fatal error.
 
+=back
+
 =end _private
 
 =cut
@@ -288,7 +297,7 @@ sub _unlink_or_rename { #XXX OS-SPECIFIC
          "Going to try to rename it to '$tmp'.\n";
 
     if ( rename $file, $tmp ) {
-        warn "Rename succesful. Scheduling '$tmp'\nfor deletion at reboot.\n";
+        warn "Rename successful. Scheduling '$tmp'\nfor deletion at reboot.\n";
         # when $installing we can set $moan to true.
         # IOW, if we cant delete the renamed file at reboot its
         # not the end of the world. The other cases are more serious
@@ -301,7 +310,7 @@ sub _unlink_or_rename { #XXX OS-SPECIFIC
         _move_file_at_boot( $tmp, $file );
         return $tmp;
     } else {
-        _choke("Rename failed:$!", "Cannot procede.");
+        _choke("Rename failed:$!", "Cannot proceed.");
     }
 
 }
@@ -312,6 +321,8 @@ sub _unlink_or_rename { #XXX OS-SPECIFIC
 =head2 Functions
 
 =begin _private
+
+=over
 
 =item _get_install_skip
 
@@ -509,7 +520,7 @@ sub _mkpath {
 
 Wrapper around File::Copy::copy to handle errors.
 
-If $verbose is true and >1 then additional dignostics will be emitted.
+If $verbose is true and >1 then additional diagnostics will be emitted.
 
 If $dry_run is true then the copy will not actually occur.
 
@@ -555,8 +566,6 @@ sub _chdir {
 =pod
 
 =end _private
-
-=over 4
 
 =item B<install>
 
@@ -781,7 +790,7 @@ sub install { #XXX OS-SPECIFIC
 
                 ];
             #restore the original directory we were in when File::Find
-            #called us so that it doesnt get horribly confused.
+            #called us so that it doesn't get horribly confused.
             _chdir($save_cwd);
         }, $current_directory );
         _chdir($cwd);
@@ -1047,7 +1056,7 @@ sub uninstall {
 
 Remove shadowed files. If $ignore is true then it is assumed to hold
 a filename to ignore. This is used to prevent spurious warnings from
-occuring when doing an install at reboot.
+occurring when doing an install at reboot.
 
 We now only die when failing to remove a file that has precedence over
 our own, when our install has precedence we only warn.

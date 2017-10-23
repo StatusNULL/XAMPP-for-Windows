@@ -1,6 +1,6 @@
-<? include("langsettings.php"); ?>
+<?php include("langsettings.php"); ?>
 
-<?
+<?php
 if (urlencode(@$_REQUEST['action']) == "getpdf") {
         mysql_connect("localhost", "root", "");
         mysql_select_db("cdcol");
@@ -51,12 +51,12 @@ if (urlencode(@$_REQUEST['action']) == "getpdf") {
 <body>
 
 &nbsp;<p>
-<h1><?=$TEXT['cds-head']?></h1>
+<h1><?php print $TEXT['cds-head']; ?></h1>
 
-<?=$TEXT['cds-text1']?><p>
-<?=$TEXT['cds-text2']?><p>
+<?php print $TEXT['cds-text1']; ?><p>
+<?php print $TEXT['cds-text2']; ?><p>
 
-<?
+<?php
 
 //    Copyright (C) 2002/2003 Kai Seidler, oswald@apachefriends.org
 //
@@ -83,20 +83,20 @@ if (urlencode(@$_REQUEST['action']) == "getpdf") {
 	mysql_select_db("cdcol");
 ?>
 
-<h2><?=$TEXT['cds-head1']?></h2>
+<h2><?php print $TEXT['cds-head1']; ?></h2>
 
 <table border=0 cellpadding=0 cellspacing=0>
 <tr bgcolor=#f87820>
 <td><img src=img/blank.gif width=10 height=25></td>
-<td class=tabhead><img src=img/blank.gif width=200 height=6><br><b><?=$TEXT['cds-attrib1']?></b></td>
-<td class=tabhead><img src=img/blank.gif width=200 height=6><br><b><?=$TEXT['cds-attrib2']?></b></td>
-<td class=tabhead><img src=img/blank.gif width=50 height=6><br><b><?=$TEXT['cds-attrib3']?></b></td>
-<td class=tabhead><img src=img/blank.gif width=50 height=6><br><b><?=$TEXT['cds-attrib4']?></b></td>
+<td class=tabhead><img src=img/blank.gif width=200 height=6><br><b><?php print $TEXT['cds-attrib1']; ?></b></td>
+<td class=tabhead><img src=img/blank.gif width=200 height=6><br><b><?php print $TEXT['cds-attrib2']; ?></b></td>
+<td class=tabhead><img src=img/blank.gif width=50 height=6><br><b><?php print $TEXT['cds-attrib3']; ?></b></td>
+<td class=tabhead><img src=img/blank.gif width=50 height=6><br><b><?php print $TEXT['cds-attrib4']; ?></b></td>
 <td><img src=img/blank.gif width=10 height=25></td>
 </tr>
 
 
-<?
+<?php
 	if(@$_REQUEST['interpret']!="")
 	{
 		$titel=mysql_real_escape_string($_REQUEST['titel']);
@@ -144,17 +144,17 @@ if (urlencode(@$_REQUEST['action']) == "getpdf") {
 
 </table>
 
-<h2><?=$TEXT['cds-head2']?></h2>
+<h2><?php print $TEXT['cds-head2']; ?></h2>
 
 <form action=cds.php method=get>
 <table border=0 cellpadding=0 cellspacing=0>
-<tr><td><?=$TEXT['cds-attrib1']?>:</td><td><input type=text size=30 name=interpret></td></tr>
-<tr><td><?=$TEXT['cds-attrib2']?>:</td><td> <input type=text size=30 name=titel></td></tr>
-<tr><td><?=$TEXT['cds-attrib3']?>:</td><td> <input type=text size=5 name=jahr></td></tr>
-<tr><td></td><td><input type=submit border=0 value="<?=$TEXT['cds-button2']?>"></td></tr>
+<tr><td><?php print $TEXT['cds-attrib1']; ?>:</td><td><input type=text size=30 name=interpret></td></tr>
+<tr><td><?php print $TEXT['cds-attrib2']; ?>:</td><td> <input type=text size=30 name=titel></td></tr>
+<tr><td><?php print $TEXT['cds-attrib3']; ?>:</td><td> <input type=text size=5 name=jahr></td></tr>
+<tr><td></td><td><input type=submit border=0 value="<?php print $TEXT['cds-button2']; ?>"></td></tr>
 </table>
 </form>
-<? include("showcode.php"); ?>
+<?php include("showcode.php"); ?>
 
 </body>
 </html>

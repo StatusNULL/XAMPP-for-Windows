@@ -6,10 +6,7 @@
  * @todo    add failover or warn if sessions are not configured properly
  * @todo    add an option to use mm-module for session handler
  * @see     http://www.php.net/session
- * @uses    session_name()
- * @uses    session_start()
- * @uses    ini_set()
- * @package phpMyAdmin
+ * @package PhpMyAdmin
  */
 if (! defined('PHPMYADMIN')) {
     exit;
@@ -44,7 +41,8 @@ if (!empty($path)) {
 
 // but not all user allow cookies
 @ini_set('session.use_only_cookies', false);
-@ini_set('session.use_trans_sid', true);
+// do not force transparent session ids, see bug #3398788
+//@ini_set('session.use_trans_sid', true);
 @ini_set('url_rewriter.tags',
     'a=href,frame=src,input=src,form=fakeentry,fieldset=');
 //ini_set('arg_separator.output', '&amp;');
@@ -95,7 +93,7 @@ if (! isset($_COOKIE[$session_name])) {
  * Token which is used for authenticating access queries.
  * (we use "space PMA_token space" to prevent overwriting)
  */
-if (!isset($_SESSION[' PMA_token '])) {
+if (! isset($_SESSION[' PMA_token '])) {
     $_SESSION[' PMA_token '] = md5(uniqid(rand(), true));
 }
 
@@ -104,7 +102,6 @@ if (!isset($_SESSION[' PMA_token '])) {
  * should be called before login and after successfull login
  * (only required if sensitive information stored in session)
  *
- * @uses    session_regenerate_id() to secure session from fixation
  */
 function PMA_secureSession()
 {

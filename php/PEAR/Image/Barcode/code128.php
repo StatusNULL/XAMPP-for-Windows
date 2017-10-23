@@ -38,7 +38,7 @@
  * @author     Jeffrey K. Brown <jkb@darkfantastic.net>
  * @copyright  2005 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: code128.php 304741 2010-10-25 09:14:17Z clockwerx $
+ * @version    CVS: $Id$
  * @link       http://pear.php.net/package/Image_Barcode
  */
 

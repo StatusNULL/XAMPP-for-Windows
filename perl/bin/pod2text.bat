@@ -1,10 +1,10 @@
 @rem = '--*-Perl-*--
 @echo off
 if "%OS%" == "Windows_NT" goto WinNT
-perl -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
+"%~dp0perl.exe" -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
 goto endofperl
 :WinNT
-perl -x -S %0 %*
+"%~dp0perl.exe" -x -S %0 %*
 if NOT "%COMSPEC%" == "%SystemRoot%\system32\cmd.exe" goto endofperl
 if %errorlevel% == 9009 echo You do not have Perl in your PATH.
 if errorlevel 1 goto script_failed_so_exit_with_non_zero_val 2>nul
@@ -12,12 +12,13 @@ goto endofperl
 @rem ';
 #!perl
 #line 15
-    eval 'exec \xampp\perl\bin\perl.exe -S $0 ${1+"$@"}'
+    eval 'exec C:\strawberry\perl\bin\perl.exe -S $0 ${1+"$@"}'
         if $running_under_some_shell;
 
 # pod2text -- Convert POD data to formatted ASCII text.
 #
-# Copyright 1999, 2000, 2001, 2004, 2006, 2008 Russ Allbery <rra@stanford.edu>
+# Copyright 1999, 2000, 2001, 2004, 2006, 2008, 2010
+#     Russ Allbery <rra@stanford.edu>
 #
 # This program is free software; you may redistribute it and/or modify it
 # under the same terms as Perl itself.
@@ -32,9 +33,6 @@ use Pod::Text ();
 use Pod::Usage qw(pod2usage);
 
 use strict;
-
-# Silence -w warnings.
-use vars qw($running_under_some_shell);
 
 # Take an initial pass through our options, looking for one of the form
 # -<number>.  We turn that into -w <number> for compatibility with the
@@ -277,7 +275,7 @@ Russ Allbery <rra@stanford.edu>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 1999, 2000, 2001, 2004, 2006, 2008 Russ Allbery
+Copyright 1999, 2000, 2001, 2004, 2006, 2008, 2010 Russ Allbery
 <rra@stanford.edu>.
 
 This program is free software; you may redistribute it and/or modify it

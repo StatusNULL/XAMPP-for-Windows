@@ -48,7 +48,7 @@
  * @author    Aleksander Machniak <alec@php.net>
  * @copyright 2003-2006 PEAR <pear-group@php.net>
  * @license   http://www.opensource.org/licenses/bsd-license.php BSD License
- * @version   CVS: $Id: mimePart.php 305690 2010-11-23 12:41:00Z alec $
+ * @version   CVS: $Id$
  * @link      http://pear.php.net/package/Mail_mime
  */
 
@@ -131,6 +131,7 @@ class Mail_mimePart
     */
     var $_eol = "\r\n";
 
+
     /**
     * Constructor.
     *
@@ -144,7 +145,7 @@ class Mail_mimePart
     *     charset           - Content character set
     *     cid               - Content ID to apply
     *     disposition       - Content disposition, inline or attachment
-    *     dfilename         - Filename parameter for content disposition
+    *     filename          - Filename parameter for content disposition
     *     description       - Content description
     *     name_encoding     - Encoding of the attachment name (Content-Type)
     *                         By default filenames are encoded using RFC2231
@@ -184,6 +185,11 @@ class Mail_mimePart
 
             case 'body_file':
                 $this->_body_file = $value;
+                break;
+
+            // for backward compatibility
+            case 'dfilename':
+                $params['filename'] = $value;
                 break;
             }
         }
@@ -633,8 +639,8 @@ class Mail_mimePart
         // RFC 2045:
         // value needs encoding if contains non-ASCII chars or is longer than 78 chars
         if (!preg_match('#[^\x20-\x7E]#', $value)) {
-            $token_regexp = '#([^\x21,\x23-\x27,\x2A,\x2B,\x2D'
-                . ',\x2E,\x30-\x39,\x41-\x5A,\x5E-\x7E])#';
+            $token_regexp = '#([^\x21\x23-\x27\x2A\x2B\x2D'
+                . '\x2E\x30-\x39\x41-\x5A\x5E-\x7E])#';
             if (!preg_match($token_regexp, $value)) {
                 // token
                 if (strlen($name) + strlen($value) + 3 <= $maxLength) {
@@ -656,7 +662,7 @@ class Mail_mimePart
 
         // RFC2231:
         $encValue = preg_replace_callback(
-            '/([^\x21,\x23,\x24,\x26,\x2B,\x2D,\x2E,\x30-\x39,\x41-\x5A,\x5E-\x7E])/',
+            '/([^\x21\x23\x24\x26\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E])/',
             array($this, '_encodeReplaceCallback'), $value
         );
         $value = "$charset'$language'$encValue";
@@ -800,6 +806,9 @@ class Mail_mimePart
 
         // Structured header (make sure addr-spec inside is not encoded)
         if (!empty($separator)) {
+            // Simple e-mail address regexp
+            $email_regexp = '([^\s<]+|("[^\r\n"]+"))@\S+';
+
             $parts = Mail_mimePart::_explodeQuotedString($separator, $value);
             $value = '';
 
@@ -817,12 +826,12 @@ class Mail_mimePart
                 }
 
                 // let's find phrase (name) and/or addr-spec
-                if (preg_match('/^<\S+@\S+>$/', $part)) {
+                if (preg_match('/^<' . $email_regexp . '>$/', $part)) {
                     $value .= $part;
-                } else if (preg_match('/^\S+@\S+$/', $part)) {
+                } else if (preg_match('/^' . $email_regexp . '$/', $part)) {
                     // address without brackets and without name
                     $value .= $part;
-                } else if (preg_match('/<*\S+@\S+>*$/', $part, $matches)) {
+                } else if (preg_match('/<*' . $email_regexp . '>*$/', $part, $matches)) {
                     // address with name (handle name)
                     $address = $matches[0];
                     $word = str_replace($address, '', $part);

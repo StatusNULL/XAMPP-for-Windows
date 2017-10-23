@@ -1,4 +1,4 @@
-#!/xampp/perl/bin/perl.exe
+#!/usr/bin/perl
 
 use Getopt::Long;
 use File::Basename;
@@ -7,7 +7,7 @@ use strict;
 
 use PPM;
 
-$PPM::VERSION = '2.1.9_01';
+$PPM::VERSION = '11.11_01';
 
 my %help;
 
@@ -821,7 +821,7 @@ unusable.
 
 If required, this command should be run from a shell prompt:
 
-    \xampp\perl\site\lib> ppm genconfig > ppm.xml
+    C:\Perl\site\lib> ppm genconfig > ppm.xml
 
 The getconfig command prints the location of the PPM configuration file
 used at PPM startup.

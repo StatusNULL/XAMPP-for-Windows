@@ -560,7 +560,7 @@ The Net::SMTP class is a subclass of Net::Cmd and IO::Socket::INET.
 
 This example prints the mail domain name of the SMTP server known as mailhost:
 
-    #!/xampp/perl/bin/perl.exe -w
+    #!/usr/local/bin/perl -w
 
     use Net::SMTP;
 
@@ -571,7 +571,7 @@ This example prints the mail domain name of the SMTP server known as mailhost:
 This example sends a small message to the postmaster at the SMTP server
 known as mailhost:
 
-    #!/xampp/perl/bin/perl.exe -w
+    #!/usr/local/bin/perl -w
 
     use Net::SMTP;
 

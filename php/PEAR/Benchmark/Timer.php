@@ -19,7 +19,7 @@
  * @author    Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright 2002-2005 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license   http://www.php.net/license/3_0.txt The PHP License, Version 3.0
- * @version   CVS: $Id: Timer.php 268884 2008-11-12 20:57:49Z clockwerx $
+ * @version   CVS: $Id$
  * @link      http://pear.php.net/package/Benchmark
  */
 require_once 'PEAR.php';

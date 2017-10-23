@@ -19,7 +19,7 @@
  * @author    Matthias Englert <Matthias.Englert@gmx.de>
  * @copyright 2002-2006 Matthias Englert <Matthias.Englert@gmx.de>
  * @license   http://www.php.net/license/3_0.txt The PHP License, Version 3.0
- * @version   CVS: $Id: Profiler.php 268884 2008-11-12 20:57:49Z clockwerx $
+ * @version   CVS: $Id$
  * @link      http://pear.php.net/package/Benchmark
  */
 
@@ -418,9 +418,9 @@ class Benchmark_Profiler extends PEAR
             $item = end($this->_stack);
 
             if (isset($this->_callers[$name][$item["name"]])) {
-                $this->_callers[$name][$item]++;
+                $this->_callers[$name][$item["name"]]++;
             } else {
-                $this->_callers[$name][$item] = 1;
+                $this->_callers[$name][$item["name"]] = 1;
             }
 
             if (isset($this->_calls[$item][$name])) {

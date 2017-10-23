@@ -11,11 +11,11 @@
 <td><img src="img/blank.gif" width=89 height=1></td>
 <td><img src="img/xampp-logo-new.gif"></td>
 <td><img src="img/blank.gif" width=5 height=1></td>
-<? if(file_get_contents("lang.tmp")=="de") { ?>
+<?php if(file_get_contents("lang.tmp")=="de") { ?>
 <td><img src="img/head-fuer.gif"></td>
-<? } else { ?>
+<?php } else { ?>
 <td><img src="img/head-for.gif"></td>
-<? } ?>
+<?php } ?>
 <td><img src="img/blank.gif" width=10 height=1></td>
 <td><img src="img/head-windows.gif"></td>
 <td width="90%" id="langsel">

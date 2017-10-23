@@ -83,10 +83,10 @@
 	    ?>
 	     <form method="get" action="biorhythm.php">
 	     <!-- Please enter your birthday: -->
-	     <?=$TEXT['bio-ask']?>:
+	     <?php print $TEXT['bio-ask']; ?>:
 		<br>
 	     <input type="text" name="birthdate" value="MM/DD/YYYY"><p>
-	     <input type=submit value="<?=$TEXT['bio-ok']?>">
+	     <input type=submit value="<?php print $TEXT['bio-ok']; ?>">
 	     <input type="hidden" name="showpng" value=1>
 	     </form>
 	    <?php

@@ -94,7 +94,7 @@
 #                   Example (all one line)
 #                   LOGGING_MANAGER="-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager"
 #
-# $Id: catalina.sh 1146069 2011-07-13 14:47:32Z markt $
+# $Id: catalina.sh 1202062 2011-11-15 06:50:02Z mturk $
 # -----------------------------------------------------------------------------
 
 # OS specific support.  $var _must_ be set to either true or false.
@@ -494,7 +494,7 @@ elif [ "$1" = "configtest" ] ; then
       -Dcatalina.base=\"$CATALINA_BASE\" \
       -Dcatalina.home=\"$CATALINA_HOME\" \
       -Djava.io.tmpdir=\"$CATALINA_TMPDIR\" \
-      org.apache.catalina.startup.Bootstrap configtest 
+      org.apache.catalina.startup.Bootstrap configtest
     result=$?
     if [ $result -ne 0 ]; then
         echo "Configuration error detected!"

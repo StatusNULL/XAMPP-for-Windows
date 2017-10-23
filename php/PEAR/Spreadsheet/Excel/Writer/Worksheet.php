@@ -278,6 +278,12 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
     var $print_colmax;
 
     /**
+    * Whether to display RightToLeft.
+    * @var integer
+    */
+    var $_Arabic;
+
+    /**
     * Whether to use outline.
     * @var integer
     */
@@ -344,6 +350,18 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
     var $_str_table;
 
     /**
+     * Number of merged cell ranges in actual record
+     * @var int $_merged_cells_counter
+     */
+    var $_merged_cells_counter = 0;
+
+    /**
+     * Number of actual mergedcells record
+     * @var int $_merged_cells_record
+     */
+    var $_merged_cells_record = 0;
+
+    /**
     * Merged cell ranges
     * @var array
     */
@@ -364,13 +382,15 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
     * @param mixed   &$firstsheet  The first worksheet in the workbook we belong to
     * @param mixed   &$url_format  The default format for hyperlinks
     * @param mixed   &$parser      The formula parser created for the Workbook
+    * @param string  $tmp_dir      The path to the directory for temporary files
     * @access private
     */
     function Spreadsheet_Excel_Writer_Worksheet($BIFF_version, $name,
                                                 $index, &$activesheet,
                                                 &$firstsheet, &$str_total,
                                                 &$str_unique, &$str_table,
-                                                &$url_format, &$parser)
+                                                &$url_format, &$parser,
+                                                $tmp_dir)
     {
         // It needs to call its parent's constructor explicitly
         $this->Spreadsheet_Excel_Writer_BIFFwriter();
@@ -454,12 +474,16 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
         $this->_outline_below     = 1;
         $this->_outline_right     = 1;
         $this->_outline_on        = 1;
+        $this->_Arabic            = 0;
 
         $this->_merged_ranges     = array();
 
         $this->_input_encoding    = '';
 
         $this->_dv                = array();
+        
+        $this->_tmp_dir           = $tmp_dir;
+        $this->_tmp_file          = '';
 
         $this->_initialize();
     }
@@ -473,14 +497,32 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
     */
     function _initialize()
     {
+        if ($this->_using_tmpfile == false) {
+            return;
+        }
+
+        if ($this->_tmp_dir === '' && ini_get('open_basedir') === true) {
+            // open_basedir restriction in effect - store data in memory
+            // ToDo: Let the error actually have an effect somewhere
+            $this->_using_tmpfile = false;  
+            return new PEAR_Error('Temp file could not be opened since open_basedir restriction in effect - please use setTmpDir() - using memory storage instead');
+        }
+
         // Open tmp file for storing Worksheet data
-        $fh = tmpfile();
-        if ($fh) {
-            // Store filehandle
-            $this->_filehandle = $fh;
+        if ($this->_tmp_dir === '') {
+            $fh = tmpfile();
         } else {
+            // For people with open base dir restriction
+            $this->_tmp_file = tempnam($this->_tmp_dir, "Spreadsheet_Excel_Writer");
+            $fh = @fopen($this->_tmp_file, "w+b");
+        }
+
+        if ($fh === false) {
             // If tmpfile() fails store data in memory
             $this->_using_tmpfile = false;
+        } else {
+            // Store filehandle
+            $this->_filehandle = $fh;
         }
     }
 
@@ -603,6 +645,16 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
             $this->_storeDataValidity();
         }*/
         $this->_storeEof();
+
+        if ( $this->_tmp_file != '' ) {
+          if ( $this->_filehandle ) {
+            fclose($this->_filehandle);
+            $this->_filehandle = '';
+          }
+          @unlink($this->_tmp_file);
+          $this->_tmp_file      = '';
+          $this->_using_tmpfile = true;
+        }
     }
 
     /**
@@ -662,9 +714,18 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
         if (($last_row < $first_row) || ($last_col < $first_col)) {
             return;
         }
+
+        $max_record_ranges = floor(($this->_limit - 6) / 8);
+        if($this->_merged_cells_counter >= $max_record_ranges)
+          {
+            $this->_merged_cells_record++;
+            $this->_merged_cells_counter = 0;
+          }
+
         // don't check rowmin, rowmax, etc... because we don't know when this
         // is going to be called
-        $this->_merged_ranges[] = array($first_row, $first_col, $last_row, $last_col);
+        $this->_merged_ranges[$this->_merged_cells_record][] = array($first_row, $first_col, $last_row, $last_col);
+        $this->_merged_cells_counter++;
     }
 
     /**
@@ -728,16 +789,40 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
     * @param integer $hidden   The optional hidden atribute
     * @param integer $level    The optional outline level
     */
-    function setColumn($firstcol, $lastcol, $width, $format = null, $hidden = 0, $level = 0)
-    {
-        $this->_colinfo[] = array($firstcol, $lastcol, $width, &$format, $hidden, $level);
-
-        // Set width to zero if column is hidden
-        $width = ($hidden) ? 0 : $width;
-
-        for ($col = $firstcol; $col <= $lastcol; $col++) {
-            $this->col_sizes[$col] = $width;
-        }
+    function setColumn($firstcol, $lastcol, $width, $format = null, $hidden = 0, $level = 0) 
+    { // added by Dan Lynn <dan@spiderweblabs.com) on 2006-12-06 
+        // look for any ranges this might overlap and remove, size or split where necessary 
+        foreach ($this->_colinfo as $key => $colinfo) 
+        {
+            $existing_start = $colinfo[0]; $existing_end = $colinfo[1]; 
+            // if the new range starts within another range 
+            if ($firstcol > $existing_start && $firstcol < $existing_end) 
+            { // trim the existing range to the beginning of the new range 
+                $this->_colinfo[$key][1] = $firstcol - 1; 
+                // if the new range lies WITHIN the existing range 
+                if ($lastcol < $existing_end) 
+                { // split the existing range by adding a range after our new range 
+                    $this->_colinfo[] = array($lastcol+1, $existing_end, $colinfo[2], &$colinfo[3], $colinfo[4], $colinfo[5]); 
+                } 
+            } // if the new range ends inside an existing range 
+            elseif ($lastcol > $existing_start && $lastcol < $existing_end) 
+            { // trim the existing range to the end of the new range 
+                $this->_colinfo[$key][0] = $lastcol + 1; 
+            } // if the new range completely overlaps the existing range 
+            elseif ($firstcol <= $existing_start && $lastcol >= $existing_end) 
+            { 
+                unset($this->_colinfo[$key]); 
+            } 
+        } // added by Dan Lynn <dan@spiderweblabs.com) on 2006-12-06 
+        // regenerate keys 
+        $this->_colinfo = array_values($this->_colinfo); 
+        $this->_colinfo[] = array($firstcol, $lastcol, $width, &$format, $hidden, $level); 
+        // Set width to zero if column is hidden 
+        $width = ($hidden) ? 0 : $width; 
+        for ($col = $firstcol; $col <= $lastcol; $col++) 
+        { 
+            $this->col_sizes[$col] = $width; 
+        } 
     }
 
     /**
@@ -1155,9 +1240,6 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
         } elseif (preg_match("/^=/", $token)) {
             // Match formula
             return $this->writeFormula($row, $col, $token, $format);
-        } elseif (preg_match("/^@/", $token)) {
-            // Match formula
-            return $this->writeFormula($row, $col, $token, $format);
         } elseif ($token == '') {
             // Match blank
             return $this->writeBlank($row, $col, $format);
@@ -1319,7 +1401,7 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
         $row     = $match[2];
 
         // Convert base26 column string to number
-        $chars = split('', $col);
+        $chars = explode('', $col);
         $expn  = 0;
         $col   = 0;
 
@@ -1384,6 +1466,16 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
         if ($this->_outline_on) {
             $this->_outline_on = 1;
         }
+     }
+
+    /**
+    * This method sets the worksheet direction to right-to-left (RTL)
+    *
+    * @param bool $rtl
+    */
+    function setRTL($rtl = true)
+    {
+        $this->_Arabic = ($rtl ? 1 : 0);
      }
 
     /******************************************************************************
@@ -1878,7 +1970,7 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
         if ($str == '') {
             $str = $url;
         }
-        $str_error = $this->writeString($row1, $col1, $str, $format);
+        $str_error = is_numeric($str) ? $this->writeNumber($row1, $col1, $str, $format) : $this->writeString($row1, $col1, $str, $format);
         if (($str_error == -2) || ($str_error == -3)) {
             return $str_error;
         }
@@ -1941,7 +2033,7 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
         if ($str == '') {
             $str = $url;
         }
-        $str_error = $this->writeString($row1, $col1, $str, $format);
+        $str_error = is_numeric($str) ? $this->writeNumber($row1, $col1, $str, $format) : $this->writeString($row1, $col1, $str, $format);
         if (($str_error == -2) || ($str_error == -3)) {
             return $str_error;
         }
@@ -2015,7 +2107,7 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
         if ($str == '') {
             $str = preg_replace('/\#/', ' - ', $url);
         }
-        $str_error = $this->writeString($row1, $col1, $str, $format);
+        $str_error = is_numeric($str) ? $this->writeNumber($row1, $col1, $str, $format) : $this->writeString($row1, $col1, $str, $format);
         if (($str_error == -2) or ($str_error == -3)) {
             return $str_error;
         }
@@ -2222,7 +2314,7 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
         $fFrozen        = $this->_frozen;        // 3
         $fDspZeros      = 1;                     // 4
         $fDefaultHdr    = 1;                     // 5
-        $fArabic        = 0;                     // 6
+        $fArabic        = $this->_Arabic;        // 6
         $fDspGuts       = $this->_outline_on;    // 7
         $fFrozenNoSplit = 0;                     // 0 - bit
         $fSelected      = $this->selected;       // 1
@@ -2387,14 +2479,16 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
             return;
         }
         $record   = 0x00E5;
-        $length   = 2 + count($this->_merged_ranges) * 8;
-
-        $header   = pack('vv', $record, $length);
-        $data     = pack('v',  count($this->_merged_ranges));
-        foreach ($this->_merged_ranges as $range) {
-            $data .= pack('vvvv', $range[0], $range[2], $range[1], $range[3]);
-        }
-        $this->_append($header . $data);
+        foreach($this->_merged_ranges as $ranges)
+          {
+            $length   = 2 + count($ranges) * 8; 
+            $header   = pack('vv', $record, $length);
+            $data     = pack('v',  count($ranges));
+            foreach($ranges as $range) 
+              $data .= pack('vvvv', $range[0], $range[2], $range[1], $range[3]);
+            $string=$header.$data;
+            $this->_append(&$string, true);
+          }
     }
 
     /**
@@ -2879,7 +2973,7 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
         $colcount = count($this->_colinfo);
         for ($i = 0; $i < $colcount; $i++) {
            // Skip cols without outline level info.
-           if (count($col_level) >= 6) {
+           if (count($this->_colinfo[$i]) >= 6) {
               $col_level = max($this->_colinfo[$i][5], $col_level);
            }
         }
@@ -2895,8 +2989,8 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
             $col_level++;
         }
 
-        $header      = pack("vv",   $record, $length);
-        $data        = pack("vvvv", $dxRwGut, $dxColGut, $row_level, $col_level);
+        $header = pack("vv",   $record, $length);
+        $data   = pack("vvvv", $dxRwGut, $dxColGut, $row_level, $col_level);
 
         $this->_prepend($header.$data);
     }
@@ -2940,8 +3034,8 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
             $grbit |= 0x0400; // Outline symbols displayed
         }
 
-        $header      = pack("vv", $record, $length);
-        $data        = pack("v",  $grbit);
+        $header = pack("vv", $record, $length);
+        $data   = pack("v",  $grbit);
         $this->_prepend($header . $data);
     }
 

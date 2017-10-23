@@ -16,11 +16,11 @@
   limitations under the License.
 --%>
 &lt;html>
-&lt;% 
+&lt;%
    double freeMem = Runtime.getRuntime().freeMemory();
    double totlMem = Runtime.getRuntime().totalMemory();
    double percent = freeMem/totlMem;
-   if (percent &lt; 0.5) { 
+   if (percent &lt; 0.5) {
 %>
 
 &lt;jsp:forward page="one.jsp"/>

@@ -19,7 +19,7 @@
  * @author     Didier Fournout <didier.fournout@nyc.fr>
  * @copyright  2005 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: ean13.php 304741 2010-10-25 09:14:17Z clockwerx $
+ * @version    CVS: $Id$
  * @link       http://pear.php.net/package/Image_Barcode
  */
 
@@ -157,9 +157,9 @@ class Image_Barcode_ean13 extends Image_Barcode
     {
         // Calculate the barcode width
         $barcodewidth = (strlen($text)) * (7 * $this->_barwidth)
-            + 3 // left
-            + 5 // center
-            + 3 // right
+            + 3 * $this->_barwidth  // left
+            + 5 * $this->_barwidth  // center
+            + 3 * $this->_barwidth // right
             + imagefontwidth($this->_font)+1
             ;
 

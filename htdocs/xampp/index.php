@@ -1,4 +1,4 @@
-<?
+<?php
 	if(file_get_contents("lang.tmp")=="")
 	{
 		header("Location: splash.php");	
@@ -9,8 +9,8 @@
 <head>
 <meta name="author" content="Kai Oswald Seidler">
 <meta http-equiv="cache-control" content="no-cache">
-<?include("lang/".file_get_contents("lang.tmp").".php"); ?>
-<title>XAMPP <?include('.version');?></title>
+<?php include("lang/".file_get_contents("lang.tmp").".php"); ?>
+<title>XAMPP <?php include('.version');?></title>
 
 <frameset rows="74,*" marginwidth="0" marginheight="0" frameborder="0" border="0" borderwidth="0">
     <frame name="head" src="head.php" scrolling=no>

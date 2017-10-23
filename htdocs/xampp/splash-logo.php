@@ -1,4 +1,4 @@
-<?
+<?php
   $m = new SWFMovie();
   $m->setDimension(400, 100);
   $m->setBackground(0xff, 0xff, 0xff);

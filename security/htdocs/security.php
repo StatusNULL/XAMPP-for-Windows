@@ -1,5 +1,3 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-	"http://www.w3.org/TR/html4/loose.dtd">
 <html>
 	<head>
 		<meta name="author" content="Kai Oswald Seidler, Kay Vogelgesang, Carsten Wiedmann">
@@ -183,7 +181,7 @@
 
 			line($TEXT['security-phpmyadmin-nok'], $TEXT['security-phpmyadmin-ok'], $TEXT['security-phpmyadmin-text'], $TEXT['security-phpmyadmin-out'], "", "phpmyadmin");
 
-      line($TEXT['security-checkphp-nok'], $TEXT['security-checkphp-ok'], $TEXT['security-checkphp-text'], $TEXT['security-checkphp-out'], "", "php");
+      // line($TEXT['security-checkphp-nok'], $TEXT['security-checkphp-ok'], $TEXT['security-checkphp-text'], $TEXT['security-checkphp-out'], "", "php");
       
 	      $xopen = fopen("..\..\htdocs\\\\\\\\xampp\.modell", 'r');
         $xmodell = fread($xopen, filesize("..\..\htdocs\\\\\\\\xampp\.modell"));

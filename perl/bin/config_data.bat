@@ -1,16 +1,16 @@
 @rem = '--*-Perl-*--
 @echo off
 if "%OS%" == "Windows_NT" goto WinNT
-perl -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
+"%~dp0perl.exe" -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
 goto endofperl
 :WinNT
-perl -x -S %0 %*
+"%~dp0perl.exe" -x -S %0 %*
 if NOT "%COMSPEC%" == "%SystemRoot%\system32\cmd.exe" goto endofperl
 if %errorlevel% == 9009 echo You do not have Perl in your PATH.
 if errorlevel 1 goto script_failed_so_exit_with_non_zero_val 2>nul
 goto endofperl
 @rem ';
-#!\xampp\perl\bin\perl.exe 
+#!C:\strawberry\perl\bin\perl.exe 
 #line 15
 
 use strict;
@@ -105,7 +105,7 @@ sub load_config {
 
   $mod =~ /^([\w:]+)$/
     or die "Invalid module name '$mod'";
-  
+
   my $cf = $mod . "::ConfigData";
   eval "require $cf";
   die $@ if $@;
@@ -117,10 +117,10 @@ sub usage {
   my %defs = @_;
 
   my $out = "\nUsage: $0 [options]\n\n  Options include:\n";
-  
+
   foreach my $name (sort keys %defs) {
     $out .= "  --$name";
-    
+
     for ($defs{$name}{type}) {
       /^=s$/  and      $out .= " <string>";
       /^=s%$/ and      $out .= " <string>=<value>";
@@ -157,11 +157,11 @@ config_data - Query or change configuration of Perl modules
   # Get config/feature values
   config_data --module Foo::Bar --feature bazzable
   config_data --module Foo::Bar --config magic_number
-  
+
   # Set config/feature values
   config_data --module Foo::Bar --set_feature bazzable=1
   config_data --module Foo::Bar --set_config magic_number=42
-  
+
   # Print a usage message
   config_data --help
 

@@ -1,4 +1,4 @@
-#!/xampp/perl/bin/perl.exe -w
+#!/usr/bin/perl -w
 
 package Math::BigFloat::Trace;
 
@@ -12,7 +12,7 @@ use vars qw($VERSION @ISA $PACKAGE @EXPORT_OK
 
 @ISA = qw(Exporter Math::BigFloat);
 
-$VERSION = 0.01;
+$VERSION = '0.29';
 
 use overload;	# inherit overload from BigFloat
 

@@ -7,7 +7,7 @@
  * For changing this file you should know what you are doing. For this reason
  * options here are not part of normal configuration.
  *
- * @package phpMyAdmin
+ * @package PhpMyAdmin
  */
 
 /**
@@ -59,4 +59,10 @@ define('CUSTOM_FOOTER_FILE', CONFIG_DIR . 'config.footer.inc.php');
  * Default value for check for version upgrades.
  */
 define('VERSION_CHECK_DEFAULT', true);
+
+/**
+ * Path to gettext.inc file. Useful when you want php-gettext somewhere else,
+ * eg. /usr/share/php/gettext/gettext.inc.
+ */
+define('GETTEXT_INC', './libraries/php-gettext/gettext.inc');
 ?>

@@ -25,7 +25,7 @@
 	$TEXT['navi-perlenv'] = "MiniPerl";
 	$TEXT['navi-iart'] = "ƒCƒ“ƒXƒ^ƒ“ƒgƒA[ƒg";
 	$TEXT['navi-iart2'] = "ƒtƒ‰ƒbƒVƒ…ƒA[ƒg";
-	$TEXT['navi-phonebook'] = "“d˜b’ ";
+	$TEXT['navi-phonebook'] = "“d˜b’ ";
 	$TEXT['navi-perlasp'] = "Perl:ASP";
 	$TEXT['navi-pear'] = "Excel_Writer";
 	$TEXT['navi-adodb'] = "ADOdb";
@@ -52,7 +52,7 @@
 
 	$TEXT['status-head'] = "XAMPP ƒXƒe[ƒ^ƒX";
 	$TEXT['status-text1'] = "‚±‚Ìƒy[ƒW‚Å‚Í‰Ò“­’†‚Ì‚à‚ÌA‚»‚¤‚Å‚È‚¢‚à‚Ì‚Ìî•ñ‚ğˆê——‚ÅŒ©‚é‚±‚Æ‚ª‚Å‚«‚Ü‚·B";
-	$TEXT['status-text2'] = "İ’è‚Ì•ÏX‚Ìd•û‚É‚æ‚Á‚Ä‚ÍAŒë‚Á‚½ƒlƒKƒeƒBƒu‚ÈƒXƒe[ƒ^ƒXEƒŒƒ|[ƒg‚ªo‚éê‡‚ª‚ ‚è‚Ü‚·B SSL’ÊM (https://localhost)‚Å‚ÍAƒŒƒ|[ƒg‚ª‘S‚Ä‹N“®‚µ‚È‚¢ê‡‚ª‚ ‚è‚Ü‚·B";
+	$TEXT['status-text2'] = "İ’è‚Ì•ÏX‚Ìd•û‚É‚æ‚Á‚Ä‚ÍAŒë‚Á‚½ƒlƒKƒeƒBƒu‚ÈƒXƒe[ƒ^ƒXEƒŒƒ|[ƒg‚ªo‚éê‡‚ª‚ ‚è‚Ü‚·B SSL’ÊM (https://localhost)‚Å‚ÍAƒŒƒ|[ƒg‚ª‘S‚Ä‹N“®‚µ‚È‚¢ê‡‚ª‚ ‚è‚Ü‚·B";
 
 	$TEXT['status-mysql'] = "MySQL ƒf[ƒ^ƒx[ƒX";
 	$TEXT['status-ssl'] = "HTTPS (SSL)";
@@ -88,10 +88,10 @@
 	‚»‚Ì‚Ù‚©‚Ìd—v‚Èƒƒ‚:<ul>
 	<li>‘S‚Ä‚ÌƒeƒXƒgƒy[ƒW‚Ílocalhost(127.0.0.1)‚Ì‚½‚ß‚¾‚¯‚Éì¬‚³‚ê‚Ä‚¢‚Ü‚·B</li>
 	<li><i><b>FileZilla FTP‚ÆMercury Mail‚ÍA©•ª©g‚ÅƒZƒLƒ…ƒŠƒeƒB‚Ì–â‘è“_‚ğ‰ğŒˆ‚µ‚Ä‚­‚¾‚³‚¢B</b></i></li>
-	<li>‚à‚µA‚ ‚È‚½‚ÌƒRƒ“ƒsƒ…[ƒ^‚ªƒIƒ“ƒ‰ƒCƒ“‚Å‚È‚¢ê‡A‚Ü‚½‚Íƒtƒ@ƒCƒAƒEƒH[ƒ‹‚ÅƒuƒƒbƒN‚³‚ê‚Ä‚¢‚éê‡A‚ ‚È‚½‚ÌƒT[ƒo‚ÍŠO•”‚©‚çUŒ‚‚³‚ê‚é‚±‚Æ‚Í‚ ‚è‚Ü‚¹‚ñB</li>
+	<li>‚à‚µA‚ ‚È‚½‚ÌƒRƒ“ƒsƒ…[ƒ^‚ªƒIƒ“ƒ‰ƒCƒ“‚Å‚È‚¢ê‡A‚Ü‚½‚Íƒtƒ@ƒCƒAƒEƒH[ƒ‹‚ÅƒuƒƒbƒN‚³‚ê‚Ä‚¢‚éê‡A‚ ‚È‚½‚ÌƒT[ƒo‚ÍŠO•”‚©‚çUŒ‚‚³‚ê‚é‚±‚Æ‚Í‚ ‚è‚Ü‚¹‚ñB</li>
 	<li>‚à‚µAƒT[ƒo‚ª‹N“®‚µ‚Ä‚¢‚È‚¢ê‡A‚»‚ê‚ç‚ÌƒT[ƒo‚ÍˆÀ‘S‚Å‚·B</li></ul>";
 	$TEXT['security-text3'] = "<b>‚æ‚­ŒŸ“¢‚µ‚Ä‚­‚¾‚³‚¢:
-	XAMPP‚ÌƒZƒLƒ…ƒŠƒeƒB‚ğİ’è‚·‚é‚ÆA‚¢‚­‚Â‚©‚ÌƒTƒ“ƒvƒ‹‚ªÀs‚Å‚«‚È‚­‚È‚è‚Ü‚·B‚à‚µA‚ ‚È‚½‚ªPHP‚ğ\"safe mode\"‚Åg‚Á‚Ä‚¢‚½ê‡AƒZƒLƒ…ƒŠƒeƒBİ’è‚Ì‚¢‚­‚Â‚©‚Ì‹@”\‚ª“®ì‚µ‚Ü‚¹‚ñBƒZƒLƒ…ƒŠƒeƒB‚ğİ’è‚·‚é‚ÆA‹@”\‚ª§ŒÀ‚³‚ê‚éê‡‚ª‚ ‚è‚Ü‚·B</b>";
+	XAMPP‚ÌƒZƒLƒ…ƒŠƒeƒB‚ğİ’è‚·‚é‚ÆA‚¢‚­‚Â‚©‚ÌƒTƒ“ƒvƒ‹‚ªÀs‚Å‚«‚È‚­‚È‚è‚Ü‚·B‚à‚µA‚ ‚È‚½‚ªPHP‚ğ\"safe mode\"‚Åg‚Á‚Ä‚¢‚½ê‡AƒZƒLƒ…ƒŠƒeƒBİ’è‚Ì‚¢‚­‚Â‚©‚Ì‹@”\‚ª“®ì‚µ‚Ü‚¹‚ñBƒZƒLƒ…ƒŠƒeƒB‚ğİ’è‚·‚é‚ÆA‹@”\‚ª§ŒÀ‚³‚ê‚éê‡‚ª‚ ‚è‚Ü‚·B</b>";
 	$TEXT['security-text4'] = "XAMPPƒfƒtƒHƒ‹ƒg‚Ìƒ|[ƒg:";
 
 	$TEXT['security-ok'] = "ˆÀ‘S";
@@ -103,20 +103,20 @@
 
 	$TEXT['security-checkapache-nok'] = "‚±‚ê‚ç‚ÌXAMPPƒy[ƒW‚Íˆê”Ê“I‚Éƒlƒbƒgƒ[ƒNŒo—R‚ÅƒAƒNƒZƒX‰Â”\‚Å‚·B";
 	$TEXT['security-checkapache-ok'] = "‚±‚ê‚ç‚ÌXAMPPƒy[ƒW‚Íƒlƒbƒgƒ[ƒNŒo—R‚Å‚Ìˆê”Ê“I‚ÈƒAƒNƒZƒX‚ª‰Â”\‚Å‚È‚­‚È‚è‚Ü‚µ‚½B";
-	$TEXT['security-checkapache-text'] = "Œ»İ‚²——‚É‚È‚Á‚Ä‚¢‚é‚·‚×‚Ä‚ÌXAMPPƒfƒ‚ƒy[ƒW‚ÍAƒlƒbƒgƒ[ƒNã‚Åˆê”Ê“I‚ÉƒAƒNƒZƒX‰Â”\‚Å‚·B‚ ‚È‚½‚ÌIPƒAƒhƒŒƒX‚ğ’m‚Á‚Ä‚¢‚él‚Í’N‚Å‚à‚±‚ê‚ç‚Ìƒy[ƒW‚ğŒ©‚é‚±‚Æ‚ª‚Å‚«‚Ü‚·B";
+	$TEXT['security-checkapache-text'] = "Œ»İ‚²——‚É‚È‚Á‚Ä‚¢‚é‚·‚×‚Ä‚ÌXAMPPƒfƒ‚ƒy[ƒW‚ÍAƒlƒbƒgƒ[ƒNã‚Åˆê”Ê“I‚ÉƒAƒNƒZƒX‰Â”\‚Å‚·B‚ ‚È‚½‚ÌIPƒAƒhƒŒƒX‚ğ’m‚Á‚Ä‚¢‚él‚Í’N‚Å‚à‚±‚ê‚ç‚Ìƒy[ƒW‚ğŒ©‚é‚±‚Æ‚ª‚Å‚«‚Ü‚·B";
 
 	$TEXT['security-checkmysqlport-nok'] = "MySQL ‚Íƒlƒbƒgƒ[ƒNŒo—R‚ÅƒAƒNƒZƒX‰Â”\‚Å‚·";
 	$TEXT['security-checkmysqlport-ok'] = "MySQL ‚Íƒlƒbƒgƒ[ƒNã‚ÅƒAƒNƒZƒX‚Å‚«‚È‚­‚È‚è‚Ü‚µ‚½";
-	$TEXT['security-checkmysqlport-text'] = "ƒZƒLƒ…ƒŠƒeƒBEƒŠ[ƒN‚Ì‰Â”\«‚ª‚ ‚è‚Ü‚·i­‚È‚­‚Æ‚à—˜_ã‚ÌƒZƒLƒ…ƒŠƒeƒBEƒŠ[ƒN‚Å‚·jBƒZƒLƒ…ƒŠƒeƒB‚É‚Â‚¢‚Ä•sˆÀ‚ª‚ ‚è‚Ü‚µ‚½‚çAMySQL‚Ìƒlƒbƒgƒ[ƒNEƒCƒ“ƒ^[ƒtƒF[ƒX‚ğ–³Œø‚É‚·‚é‚±‚Æ‚ğ‚¨Š©‚ß‚µ‚Ü‚·B";
+	$TEXT['security-checkmysqlport-text'] = "ƒZƒLƒ…ƒŠƒeƒBEƒŠ[ƒN‚Ì‰Â”\«‚ª‚ ‚è‚Ü‚·i­‚È‚­‚Æ‚à—˜_ã‚ÌƒZƒLƒ…ƒŠƒeƒBEƒŠ[ƒN‚Å‚·jBƒZƒLƒ…ƒŠƒeƒB‚É‚Â‚¢‚Ä•sˆÀ‚ª‚ ‚è‚Ü‚µ‚½‚çAMySQL‚Ìƒlƒbƒgƒ[ƒNEƒCƒ“ƒ^[ƒtƒF[ƒX‚ğ–³Œø‚É‚·‚é‚±‚Æ‚ğ‚¨Š©‚ß‚µ‚Ü‚·B";
 
-	$TEXT['security-checkpmamysqluser-nok'] = "phpMyAdmin ƒ†[ƒUpma ‚ÉƒpƒXƒ[ƒh‚ª‚ ‚è‚Ü‚¹‚ñ";
+	$TEXT['security-checkpmamysqluser-nok'] = "phpMyAdmin ƒ†[ƒUpma ‚ÉƒpƒXƒ[ƒh‚ª‚ ‚è‚Ü‚¹‚ñ";
 	$TEXT['security-checkpmamysqluser-ok'] = "phpMyAdmin ƒ†[ƒUpma ‚ÍƒpƒXƒ[ƒh–³‚µ‚Ìó‘Ô‚ª‰ğÁ‚³‚ê‚Ü‚µ‚½";
-	$TEXT['security-checkpmamysqluser-text'] = "phpMyAdmin‚ÍA‚ ‚È‚½‚Ì’Ç‰ÁMySQL database‚Ì‘I‘ğ‚ğ•Û‘¶‚µ‚Ü‚·B‚±‚Ìƒf[ƒ^‚ÉƒAƒNƒZƒX‚·‚é‚Ì‚ÉAphpMyAdmin‚Å‚Í“Á•Ê‚Èƒ†[ƒUpma‚ğg—p‚µ‚Ü‚·B‚±‚Ìƒ†[ƒU‚ÍAƒfƒtƒHƒ‹ƒg‚ÌƒCƒ“ƒXƒg[ƒ‹‚Å‚ÍƒpƒXƒ[ƒh‚ª—^‚¦‚ç‚ê‚Ä‚¢‚È‚¢‚Ì‚ÅAƒZƒLƒ…ƒŠƒeƒB‚Ìƒgƒ‰ƒuƒ‹‚ğ”ğ‚¯‚é‚½‚ß‚É‚Í‚±‚Ìƒ†[ƒU‚ÉƒpƒXƒ[ƒh‚ğ—^‚¦‚é•K—v‚ª‚ ‚è‚Ü‚·B";
+	$TEXT['security-checkpmamysqluser-text'] = "phpMyAdmin‚ÍA‚ ‚È‚½‚Ì’Ç‰ÁMySQL database‚Ì‘I‘ğ‚ğ•Û‘¶‚µ‚Ü‚·B‚±‚Ìƒf[ƒ^‚ÉƒAƒNƒZƒX‚·‚é‚Ì‚ÉAphpMyAdmin‚Å‚Í“Á•Ê‚Èƒ†[ƒUpma‚ğg—p‚µ‚Ü‚·B‚±‚Ìƒ†[ƒU‚ÍAƒfƒtƒHƒ‹ƒg‚ÌƒCƒ“ƒXƒg[ƒ‹‚Å‚ÍƒpƒXƒ[ƒh‚ª—^‚¦‚ç‚ê‚Ä‚¢‚È‚¢‚Ì‚ÅAƒZƒLƒ…ƒŠƒeƒB‚Ìƒgƒ‰ƒuƒ‹‚ğ”ğ‚¯‚é‚½‚ß‚É‚Í‚±‚Ìƒ†[ƒU‚ÉƒpƒXƒ[ƒh‚ğ—^‚¦‚é•K—v‚ª‚ ‚è‚Ü‚·B";
 
-	$TEXT['security-checkmysql-nok'] = "MySQLƒ†[ƒUƒ‹[ƒg‚ÉƒpƒXƒ[ƒh‚ª‚ ‚è‚Ü‚¹‚ñ";
+	$TEXT['security-checkmysql-nok'] = "MySQLƒ†[ƒUƒ‹[ƒg‚ÉƒpƒXƒ[ƒh‚ª‚ ‚è‚Ü‚¹‚ñ";
 	$TEXT['security-checkmysql-ok'] = "MySQLƒ†[ƒUƒ‹[ƒg‚ÍƒpƒXƒ[ƒh‚ª–³‚µ‚Ìó‘Ô‚ª‰ğÁ‚³‚ê‚Ü‚µ‚½";
 	$TEXT['security-checkmysql-out'] = "MySQLƒT[ƒo‚Í‹N“®‚µ‚Ä‚¢‚È‚¢‚©Aƒtƒ@ƒCƒAƒEƒH[ƒ‹‚ÅƒuƒƒbƒN‚³‚ê‚Ä‚¢‚Ü‚·!";
-	$TEXT['security-checkmysql-text'] = "Windows Boxã‚Ìƒ[ƒJƒ‹ƒ†[ƒU‚Å‚ ‚ê‚Î’N‚Å‚à‚ ‚È‚½‚ÌMySQLƒf[ƒ^ƒx[ƒX‚ÉŠÇ—ÒŒ ŒÀ‚ÅƒAƒNƒZƒX‚Å‚«‚Ü‚·BƒpƒXƒ[ƒh‚ğİ’è‚µ‚Ä‚­‚¾‚³‚¢B";
+	$TEXT['security-checkmysql-text'] = "Windows Boxã‚Ìƒ[ƒJƒ‹ƒ†[ƒU‚Å‚ ‚ê‚Î’N‚Å‚à‚ ‚È‚½‚ÌMySQLƒf[ƒ^ƒx[ƒX‚ÉŠÇ—ÒŒ ŒÀ‚ÅƒAƒNƒZƒX‚Å‚«‚Ü‚·BƒpƒXƒ[ƒh‚ğİ’è‚µ‚Ä‚­‚¾‚³‚¢B";
 
 	$TEXT['security-pop-nok'] = "Mercury ƒ[ƒ‹ƒT[ƒo(POP3)‚ÌƒeƒXƒgƒ†[ƒU(newuser)‚ÍŒÃ‚¢ƒpƒXƒ[ƒh‚Ì‚Ü‚Ü‚Å‚·(wampp)";
 	$TEXT['security-pop-ok'] = "POP3ƒT[ƒo(Mercury Mail)‚ÌƒeƒXƒgƒ†[ƒU \"newuser\" ‚Í‘¶İ‚µ‚È‚¢‚©AV‚µ‚¢ƒpƒXƒ[ƒh‚ªİ’è‚³‚ê‚Ü‚µ‚½B";
@@ -137,7 +137,7 @@
 	$TEXT['security-checkphp-nok'] = "PHP‚Í\"safe mode\"‚Å‹N“®‚µ‚Ä‚¢‚Ü‚¹‚ñB";
 	$TEXT['security-checkphp-ok'] = "PHP‚Í\"safe mode\"‚Å‹N“®‚µ‚Ä‚¢‚Ü‚·B";
 	$TEXT['security-checkphp-out'] = "PHP‚Ìİ’è‚Å§Œä‚Å‚«‚Ü‚¹‚ñ!";
-	$TEXT['security-checkphp-text'] = "‚à‚µAŒöŠJƒT[ƒo‚ÅPHP‚Ì“®ì‚ğ‹–‰Â‚·‚é‚Ì‚Å‚ ‚ê‚ÎA\"safe mode\"‚Ìİ’è‚ğ‹–ì‚É“ü‚ê‚Ä‚­‚¾‚³‚¢B ‚µ‚©‚µAƒXƒ^ƒ“ƒhƒAƒƒ“‚ÅŠJ”­‚·‚éê‡A\"safe mode\"‚Å‚Í‚¢‚­‚Â‚©‚Ìd—v‚È‹@”\‚ª“®ì‚µ‚È‚¢ˆ×A\"safe mode\"‚Í‚¨‚·‚·‚ß‚µ‚Ü‚¹‚ñB<a href=\"http://www.php.net/features.safe-mode\" target=\"_new\"><font size=1>Ú×î•ñ</font></a>";
+	$TEXT['security-checkphp-text'] = "‚à‚µAŒöŠJƒT[ƒo‚ÅPHP‚Ì“®ì‚ğ‹–‰Â‚·‚é‚Ì‚Å‚ ‚ê‚ÎA\"safe mode\"‚Ìİ’è‚ğ‹–ì‚É“ü‚ê‚Ä‚­‚¾‚³‚¢B ‚µ‚©‚µAƒXƒ^ƒ“ƒhƒAƒƒ“‚ÅŠJ”­‚·‚éê‡A\"safe mode\"‚Å‚Í‚¢‚­‚Â‚©‚Ìd—v‚È‹@”\‚ª“®ì‚µ‚È‚¢ˆ×A\"safe mode\"‚Í‚¨‚·‚·‚ß‚µ‚Ü‚¹‚ñB<a href=\"http://www.php.net/features.safe-mode\" target=\"_new\"><font size=1>Ú×î•ñ</font></a>";
 
 
 	// ---------------------------------------------------------------------
@@ -163,10 +163,10 @@
 	$TEXT['xampp-setup-user'] = "ƒ†[ƒU:";
 	$TEXT['xampp-setup-passwd'] = "ƒpƒXƒ[ƒh:";
 	$TEXT['xampp-setup-start'] = "ˆÀ‘S‚ÈXAMPPƒfƒBƒŒƒNƒgƒŠ‚ğì¬‚µ‚Ä‚­‚¾‚³‚¢B";
-	$TEXT['xampp-setup-notok'] = "<br><br>ƒGƒ‰[:ƒ†[ƒU–¼‚Ì•¶š‚ÍA‚R•¶šˆÈã‚P‚T•¶š–¢–‚Å“ü—Í‚µ‚Ä‚­‚¾‚³‚¢B“Áê‚È•¶š‚â‹ó”’‚Í”F‚ß‚ç‚ê‚Ä‚¢‚Ü‚¹‚ñB<br><br>";
+	$TEXT['xampp-setup-notok'] = "<br><br>ƒGƒ‰[:ƒ†[ƒU–¼‚Ì•¶‘‚ÍA‚R•¶‘ˆÈã‚P‚T•¶‘–¢–‚Å“ü—Í‚µ‚Ä‚­‚¾‚³‚¢B“Áê‚È•¶‘‚â‹ó”’‚Í”F‚ß‚ç‚ê‚Ä‚¢‚Ü‚¹‚ñB<br><br>";
 	$TEXT['xampp-setup-ok'] = "<br><br>root‚ÌƒpƒXƒ[ƒh‚ª•ÏX‚³‚ê‚Ü‚µ‚½Bİ’è‚ğ—LŒø‚É‚·‚é‚½‚ß‚ÉAMySQL‚ğÄ‹N“®‚µ‚Ä‚­‚¾‚³‚¢B<br><br>";
 	$TEXT['xampp-config-ok'] = "<br><br>¬Œ÷: XAMPP‚ÌƒfƒBƒŒƒNƒgƒŠ§Œä‚ªİ’è‚³‚ê‚Ü‚µ‚½!‘Sƒ†[ƒU‚Ìƒf[ƒ^‚ÍAˆÈ‰º‚Ìƒtƒ@ƒCƒ‹‚ÉŠi”[‚³‚ê‚Ü‚µ‚½:<br>";
-	$TEXT['xampp-config-notok'] = "<br><br>ƒGƒ‰[: ‚ ‚È‚½‚ÌƒVƒXƒeƒ€‚Å‚ÍA \".htaccess\"‚Æ\"htpasswd.exe\"‚É‚æ‚éƒfƒBƒŒƒNƒgƒŠ§Œä‚ª—LŒø‚Å‚Í‚ ‚è‚Ü‚¹‚ñB‚¨‚»‚ç‚­APHP‚ª\"Safe Mode\"‚Å‹N“®‚µ‚Ä‚¢‚Ü‚·B <br><br>";
+	$TEXT['xampp-config-notok'] = "<br><br>ƒGƒ‰[: ‚ ‚È‚½‚ÌƒVƒXƒeƒ€‚Å‚ÍA \".htaccess\"‚Æ\"htpasswd.exe\"‚É‚æ‚éƒfƒBƒŒƒNƒgƒŠ§Œä‚ª—LŒø‚Å‚Í‚ ‚è‚Ü‚¹‚ñB‚¨‚»‚ç‚­APHP‚ª\"Safe Mode\"‚Å‹N“®‚µ‚Ä‚¢‚Ü‚·B <br><br>";
 
 	// ---------------------------------------------------------------------
 	// START
@@ -296,7 +296,7 @@
 
 	$TEXT['phonebook-head'] = "ƒtƒ‰ƒbƒVƒ…ƒA[ƒg (PHP+MING‚Ì–—á)";
 
-	$TEXT['phonebook-text1'] = "ŠÈ’P‚È“d˜b’ ƒXƒNƒŠƒvƒg‚Å‚·‚ªAÅV‚ÌƒeƒNƒmƒƒW[‚ğ‹ìg‚µ‚ÄÀ‘•‚³‚ê‚Ä‚¢‚Ü‚·F@SQLiteASQLƒf[ƒ^ƒx[ƒXAƒT[ƒo‚Íg—p‚µ‚Ü‚¹‚ñB";
+	$TEXT['phonebook-text1'] = "ŠÈ’P‚È“d˜b’ ƒXƒNƒŠƒvƒg‚Å‚·‚ªAÅV‚ÌƒeƒNƒmƒƒW[‚ğ‹ìg‚µ‚ÄÀ‘•‚³‚ê‚Ä‚¢‚Ü‚·F@SQLiteASQLƒf[ƒ^ƒx[ƒXAƒT[ƒo‚Íg—p‚µ‚Ü‚¹‚ñB";
 
 	$TEXT['phonebook-error'] = "ƒf[ƒ^ƒx[ƒX‚ğŠJ‚¯‚Ü‚¹‚ñ‚Å‚µ‚½I";
 	$TEXT['phonebook-head1'] = "ƒ}ƒC“d˜b”Ô†";
@@ -348,18 +348,24 @@
 	<li>ƒXƒpƒ€‚â‹Ö~—pŒê‚ÍAMercury‚Å‘S‘Ì“I‚É‹–‰Â‚³‚ê‚Ä‚¢‚Ü‚¹‚ñ!;</li>
 	</ul>";
 	$TEXT['mail-url'] = "<a href=\"http://www.pmail.com/overviews/ovw_mercury.htm\" target=\"_top\">http://www.pmail.com/overviews/ovw_mercury.htm</a>";
+	$TEXT['mail-note-important'] = "IMPORTANT";
+	$TEXT['mail-note-text1'] = "There are three variants for sending emails with PHP. One of these three possibilities have to be activated in the xampp\php\php.ini file.";
+	$TEXT['mail-note-text2'] = "<b>mailToDisk</b> (<i>Default</i>) - All emails are written in the xampp\mailoutput folder on local disk. XAMPP mailToDisk is the default and you have nothing to do in the php.ini.";
+	$TEXT['mail-note-text3'] = "<b>fakemail</b> - With fakemail (sendmail.exe)) all emails are forwarding to your mailbox. Please edit the xampp\sendmail\sendmail.ini first with your mailbox credentials. And do not forget to activate fakemail (senmail.exe)) in the xampp\php\php.ini.";	
+	$TEXT['mail-note-text4'] = "<b>Mercury Mail Server</b> or some other Mail Socket Server on localhost. This option have to be activated in the php.ini also.";
+	
 	// ---------------------------------------------------------------------
 	// FileZilla FTP
 	// ---------------------------------------------------------------------
 
 	$TEXT['filezilla-head'] = "FileZilla FTP Server";
-	$TEXT['filezilla-install'] = "Apache‚ÍFTPƒT[ƒo‚Å‚Í<U>‚ ‚è‚Ü‚¹‚ñ</U>... ‚µ‚©‚µFileZilla‚ÍFTPƒT[ƒo‚Å‚·BŸ‚ğQÆ‚µ‚ÄŒŸ“¢‚µ‚Ä‚­‚¾‚³‚¢B";
-	$TEXT['filezilla-install2'] = "XAMPP‚ÌƒfƒBƒŒƒNƒgƒŠ‚ÉˆÚ“®‚µ‚ÄAƒZƒbƒgƒAƒbƒv‚Ì‚½‚ß‚É\"filezilla_setup.bat\"‚ğÀs‚µ‚Ä‚­‚¾‚³‚¢B ’–Ú: For Windows NT, 2000 ‚Æ XP Professional‚Å‚ÍAFileZilla‚ÍƒT[ƒrƒX‚Æ‚µ‚ÄƒCƒ“ƒXƒg[ƒ‹‚·‚é•K—v‚ª‚ ‚è‚Ü‚·B";
-	$TEXT['filezilla-install3'] = "\"FileZilla FTP\"‚ğİ’è‚µ‚Ü‚·B İ’è‚Ì‚½‚ß‚É,FileZilla‚ÌƒCƒ“ƒ^[ƒtƒFƒCƒX‚Å‚ ‚é\"FileZilla Server Interface.exe\"‚ğg‚Á‚Ä‚­‚¾‚³‚¢BŸ‚Í“ñ‚Â‚Ìƒ†[ƒU‚É‚Â‚¢‚Ä‚Ì—á‚Å‚·:<br><br>
+	$TEXT['filezilla-install'] = "Apache‚ÍFTPƒT[ƒo‚Å‚Í<U>‚ ‚è‚Ü‚¹‚ñ</U>... ‚µ‚©‚µFileZilla‚ÍFTPƒT[ƒo‚Å‚·BŸ‚ğQÆ‚µ‚ÄŒŸ“¢‚µ‚Ä‚­‚¾‚³‚¢B";
+	$TEXT['filezilla-install2'] = "XAMPP‚ÌƒfƒBƒŒƒNƒgƒŠ‚ÉˆÚ“®‚µ‚ÄAƒZƒbƒgƒAƒbƒv‚Ì‚½‚ß‚É\"filezilla_setup.bat\"‚ğÀs‚µ‚Ä‚­‚¾‚³‚¢B ’–Ú: For Windows NT, 2000 ‚Æ XP Professional‚Å‚ÍAFileZilla‚ÍƒT[ƒrƒX‚Æ‚µ‚ÄƒCƒ“ƒXƒg[ƒ‹‚·‚é•K—v‚ª‚ ‚è‚Ü‚·B";
+	$TEXT['filezilla-install3'] = "\"FileZilla FTP\"‚ğİ’è‚µ‚Ü‚·B İ’è‚Ì‚½‚ß‚É,FileZilla‚ÌƒCƒ“ƒ^[ƒtƒFƒCƒX‚Å‚ ‚é\"FileZilla Server Interface.exe\"‚ğg‚Á‚Ä‚­‚¾‚³‚¢BŸ‚Í“ñ‚Â‚Ìƒ†[ƒU‚É‚Â‚¢‚Ä‚Ì—á‚Å‚·:<br><br>
 	A: ƒfƒtƒHƒ‹ƒg‚Ìƒ†[ƒU‚Í\"newuser\", ƒpƒXƒ[ƒh‚Í\"wampp\"‚Å‚·Bƒz[ƒ€ƒfƒBƒŒƒNƒgƒŠ‚Íxampp\htdocs‚Å‚·B<br>
-	B: “½–¼ƒ†[ƒU‚Í\"anonymous\", ƒpƒXƒ[ƒh‚Í‚ ‚è‚Ü‚¹‚ñBƒz[ƒ€ƒfƒBƒŒƒNƒgƒŠ‚Íxampp\anonymous‚Å‚·B<br><br>
-	ƒfƒtƒHƒ‹ƒg‚Å‚Íƒ‹[ƒvƒoƒbƒN‚Å‚ ‚é127.0.0.1‚ªw’è‚³‚ê‚Ä‚¢‚Ü‚·B";
-	$TEXT['filezilla-install4'] = "FTPƒT[ƒo‚Í\"FileZillaFTP_stop.bat\"‚Å’â~‚µ‚Ä‚­‚¾‚³‚¢BFileZilla‚ÌƒT[ƒrƒX‚ÍA\"FileZillaServer.exe\"‚ğ’¼Úg‚Á‚Ä‚­‚¾‚³‚¢B‚»‚µ‚ÄA‚ ‚È‚½‚Í‘S‚Ä‚Ì‹N“®ƒIƒvƒVƒ‡ƒ“‚ğİ’è‚Å‚«‚Ü‚·B";
+	B: “½–¼ƒ†[ƒU‚Í\"anonymous\", ƒpƒXƒ[ƒh‚Í‚ ‚è‚Ü‚¹‚ñBƒz[ƒ€ƒfƒBƒŒƒNƒgƒŠ‚Íxampp\anonymous‚Å‚·B<br><br>
+	ƒfƒtƒHƒ‹ƒg‚Å‚Íƒ‹[ƒvƒoƒbƒN‚Å‚ ‚é127.0.0.1‚ªw’è‚³‚ê‚Ä‚¢‚Ü‚·B";
+	$TEXT['filezilla-install4'] = "FTPƒT[ƒo‚Í\"FileZillaFTP_stop.bat\"‚Å’â~‚µ‚Ä‚­‚¾‚³‚¢BFileZilla‚ÌƒT[ƒrƒX‚ÍA\"FileZillaServer.exe\"‚ğ’¼Úg‚Á‚Ä‚­‚¾‚³‚¢B‚»‚µ‚ÄA‚ ‚È‚½‚Í‘S‚Ä‚Ì‹N“®ƒIƒvƒVƒ‡ƒ“‚ğİ’è‚Å‚«‚Ü‚·B";
 	$TEXT['filezilla-url'] = "<br><br><a href=\"http://filezilla.sourceforge.net\" target=\"_top\">http://filezilla.sourceforge.net</a>";
 
 	// ---------------------------------------------------------------------
@@ -382,7 +388,7 @@
 	// ---------------------------------------------------------------------
 
 	$TEXT['ADOdb-head'] = "ADOdb - ‚»‚Ì‚Ù‚©‚Ìƒf[ƒ^ƒx[ƒXƒAƒNƒZƒX(PHP)";
-	$TEXT['ADOdb-text'] = "ADOdb‚ÍActive Data Objectsƒf[ƒ^ƒx[ƒX—p‚É‚Å‚«‚Ä‚¢‚Ü‚·B„‚½‚¿‚ÍŒ»İAMySQL, PostgreSQL, Interbase, Firebird, Informix, Oracle, MS SQL 7, Foxpro, Access, ADO, Sybase, FrontBase, DB2, SAP DB, SQLite,‚»‚µ‚Ägeneric ODBC‚ğƒTƒ|[ƒg‚µ‚Ä‚¢‚Ü‚·B Sybase, Informix, FrontBase, PostgreSQL‚Ìƒhƒ‰ƒCƒo[‚ÍƒRƒ~ƒ…ƒjƒeƒB[‚ÌvŒ£‚Åì¬‚³‚ê‚Ü‚µ‚½B‚ ‚È‚½‚Í\(mini)xampp\php\pear\adodb‚ÅŒ©‚é‚±‚Æ‚ª‚Å‚«‚Ü‚·B";
+	$TEXT['ADOdb-text'] = "ADOdb‚ÍActive Data Objectsƒf[ƒ^ƒx[ƒX—p‚É‚Å‚«‚Ä‚¢‚Ü‚·B„‚½‚¿‚ÍŒ»İAMySQL, PostgreSQL, Interbase, Firebird, Informix, Oracle, MS SQL 7, Foxpro, Access, ADO, Sybase, FrontBase, DB2, SAP DB, SQLite,‚»‚µ‚Ägeneric ODBC‚ğƒTƒ|[ƒg‚µ‚Ä‚¢‚Ü‚·B Sybase, Informix, FrontBase, PostgreSQL‚Ìƒhƒ‰ƒCƒo[‚ÍƒRƒ~ƒ…ƒjƒeƒB[‚ÌvŒ£‚Åì¬‚³‚ê‚Ü‚µ‚½B‚ ‚È‚½‚Í\(mini)xampp\php\pear\adodb‚ÅŒ©‚é‚±‚Æ‚ª‚Å‚«‚Ü‚·B";
 	$TEXT['ADOdb-example'] = "—á:";
 	$TEXT['ADOdb-dbserver'] = "ƒf[ƒ^ƒx[ƒXƒT[ƒo (MySQL, Oracle ..?)";
 	$TEXT['ADOdb-host'] = "ƒf[ƒ^ƒx[ƒXƒT[ƒo‚ÌƒzƒXƒg (–¼‘O‚©IPƒAƒhƒŒƒX)";
@@ -424,22 +430,22 @@
 
 	$TEXT['switch-head'] = "PHP Switch 1.0 win32 for XAMPP";
 	$TEXT['switch-phpversion'] = "<i><b>Œ»İ‚±‚ÌXAMPP‚É‚Í";
-	$TEXT['switch-whatis'] = "<b>PHP switch‚Å‰½‚©ì‚ê‚Ü‚·‚©?</b><br>apachefriends‚ÌPHP Switch‚Í XAMPP‚ÌPHP‚Ìƒo[ƒWƒ‡ƒ“‚S‚©‚ç‚T‚ÉØ‚è‘Ö‚¦‚½‚èA–ß‚µ‚½‚è‚µ‚Ü‚·B‚ ‚È‚½‚ÍPHP4‚©PHP5‚ÅƒXƒNƒŠƒvƒg‚ÌƒeƒXƒg‚ğ‚·‚é–‚ª‚Å‚«‚Ü‚·B<p>";
-	$TEXT['switch-find'] = "<b>PHP Switch‚Í‚Ç‚±‚É‚ ‚è‚Ü‚·‚©?</b><br>XAMPP‚ÌPHP Switch‚Í\"php-switch.php\"‚Æ‚¢‚¤–¼‘O‚ÌPHPƒtƒ@ƒCƒ‹iXAMPPƒCƒ“ƒXƒg[ƒ‹ƒtƒHƒ‹ƒ_j‚ÅÀs‚Å‚«‚Ü‚·BÀs‚Ì‚½‚ß‚É‚ÍA‚±‚Ìƒtƒ@ƒCƒ‹‚ğg‚í‚È‚¯‚ê‚Î‚È‚è‚Ü‚¹‚ñ: ";
-	$TEXT['switch-care'] = "<b>“ï‚µ‚­‚ ‚è‚Ü‚¹‚ñ‚©?</b><br>PHP Switch‚Í Ÿ‚Ìê‡PHP‚Ìƒo[ƒWƒ‡ƒ“‚ª•ÏX‚Å‚«‚Ü‚¹‚ñBa) Apache HTTPD ‚ª‹N“®‚µ‚Ä‚¢‚éB ‚Ü‚½‚Í/‚©‚Â b) ƒCƒ“ƒXƒg[ƒ‹ƒtƒHƒ‹ƒ_‚Ì\".phpversion\"ƒtƒ@ƒCƒ‹‚ª‹ó”’A‚Ü‚½‚ÍƒoƒO‚ª‚ ‚éB \".phpversion\"‚É‚Í, \"4\"‚©\"5\"‚Ì‚æ‚¤‚ÉXAMPP‚ÌŒ»İ‚Ìƒo[ƒWƒ‡ƒ“‚Ì‚ª‘‚©‚ê‚Ä‚¢‚Ü‚·BApache HTTPD‚ğ\"shutdown\"‚µ‚Ä‚©‚ç\"php-switch.bat\"‚ğÀs‚µ‚Ä‚­‚¾‚³‚¢B<p>";
-	$TEXT['switch-where4'] = "<b>‚Ç‚±‚É(ŒÃ‚¢)İ’èƒtƒ@ƒCƒ‹‚ª‚ ‚è‚Ü‚·‚©?</b><br><br>PHP 4—p:<br>";
+	$TEXT['switch-whatis'] = "<b>PHP switch‚Å‰½‚©ì‚ê‚Ü‚·‚©?</b><br>apachefriends‚ÌPHP Switch‚Í XAMPP‚ÌPHP‚Ìƒo[ƒWƒ‡ƒ“‚S‚©‚ç‚T‚ÉØ‚è‘Ö‚¦‚½‚èA–ß‚µ‚½‚è‚µ‚Ü‚·B‚ ‚È‚½‚ÍPHP4‚©PHP5‚ÅƒXƒNƒŠƒvƒg‚ÌƒeƒXƒg‚ğ‚·‚é–‚ª‚Å‚«‚Ü‚·B<p>";
+	$TEXT['switch-find'] = "<b>PHP Switch‚Í‚Ç‚±‚É‚ ‚è‚Ü‚·‚©?</b><br>XAMPP‚ÌPHP Switch‚Í\"php-switch.php\"‚Æ‚¢‚¤–¼‘O‚ÌPHPƒtƒ@ƒCƒ‹iXAMPPƒCƒ“ƒXƒg[ƒ‹ƒtƒHƒ‹ƒ_j‚ÅÀs‚Å‚«‚Ü‚·BÀs‚Ì‚½‚ß‚É‚ÍA‚±‚Ìƒtƒ@ƒCƒ‹‚ğg‚í‚È‚¯‚ê‚Î‚È‚è‚Ü‚¹‚ñ: ";
+	$TEXT['switch-care'] = "<b>“ï‚µ‚­‚ ‚è‚Ü‚¹‚ñ‚©?</b><br>PHP Switch‚Í Ÿ‚Ìê‡PHP‚Ìƒo[ƒWƒ‡ƒ“‚ª•ÏX‚Å‚«‚Ü‚¹‚ñBa) Apache HTTPD ‚ª‹N“®‚µ‚Ä‚¢‚éB ‚Ü‚½‚Í/‚©‚Â b) ƒCƒ“ƒXƒg[ƒ‹ƒtƒHƒ‹ƒ_‚Ì\".phpversion\"ƒtƒ@ƒCƒ‹‚ª‹ó”’A‚Ü‚½‚ÍƒoƒO‚ª‚ ‚éB \".phpversion\"‚É‚Í, \"4\"‚©\"5\"‚Ì‚æ‚¤‚ÉXAMPP‚ÌŒ»İ‚Ìƒo[ƒWƒ‡ƒ“‚Ì‚ª‘‚©‚ê‚Ä‚¢‚Ü‚·BApache HTTPD‚ğ\"shutdown\"‚µ‚Ä‚©‚ç\"php-switch.bat\"‚ğÀs‚µ‚Ä‚­‚¾‚³‚¢B<p>";
+	$TEXT['switch-where4'] = "<b>‚Ç‚±‚É(ŒÃ‚¢)İ’èƒtƒ@ƒCƒ‹‚ª‚ ‚è‚Ü‚·‚©?</b><br><br>PHP 4—p:<br>";
 	$TEXT['switch-where5'] = "<br><br>PHP 5—p:<br>";
 	$TEXT['switch-make1'] = "<b>İ’èƒtƒ@ƒCƒ‹‚Ì‰½‚ª•ÏX‚³‚ê‚Ü‚·‚©?</b><br><br>There lives! For PHP4 or PHP5 in the<br>";
 	$TEXT['switch-make2'] = "<br><br> .. PHP4—p‚ÍˆÀ‘S‚Å‚· ...<br>";
 	$TEXT['switch-make3'] = "<br><br> .. PHP5—p‚ÍˆÀ‘S‚Å‚· ...<br>";
 	$TEXT['switch-make4'] = "<br><br>‚»‚µ‚ÄA‚±‚ê‚ç‚Ìƒtƒ@ƒCƒ‹‚ÍPHP switching‚Å–ß‚·‚±‚Æ‚ª‚Å‚«‚Ü‚·B<p>";
-	$TEXT['switch-not'] = "<b>PHP‚É‚Í–â‘è‚ ‚è‚Ü‚¹‚ñ‚ª\"Ø‚è‘Ö‚¦\"‚Å‚«‚Ü‚¹‚ñB</b><br>";
+	$TEXT['switch-not'] = "<b>PHP‚É‚Í–â‘è‚ ‚è‚Ü‚¹‚ñ‚ª\"Ø‚è‘Ö‚¦\"‚Å‚«‚Ü‚¹‚ñB</b><br>";
 
 	// ---------------------------------------------------------------------
 	// Cocoon
 	// ---------------------------------------------------------------------
 
-	$TEXT['go-cocoon'] = "Cocoon‚ÍŸ‚ÌAhttp://localhost/cocoon/‚É‚ ‚è‚Ü‚·B";
+	$TEXT['go-cocoon'] = "Cocoon‚ÍŸ‚ÌAhttp://localhost/cocoon/‚É‚ ‚è‚Ü‚·B";
 	$TEXT['path-cocoon'] = "‚»‚µ‚ÄAŸ‚ÌƒtƒHƒ‹ƒ_‚ÉW‚ß‚Ä‚­‚¾‚³‚¢B: ...\\xampp\\tomcat\\webapps\\cocoon";
 
 	// ---------------------------------------------------------------------

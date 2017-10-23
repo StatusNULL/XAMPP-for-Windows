@@ -30,7 +30,7 @@
  * @author    Greg Beaver <cellog@php.net>
  * @copyright 2001-2008 Gregory Beaver
  * @license   http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @version   CVS: $Id: common.inc.php,v 1.15 2008/02/24 02:35:44 ashnazg Exp $
+ * @version   CVS: $Id: common.inc.php 288074 2009-09-05 02:16:26Z ashnazg $
  * @filesource
  * @link      http://www.phpdoc.org
  * @link      http://pear.php.net/PhpDocumentor
@@ -42,11 +42,11 @@
  */
 
 /* phpDocumentor version */
-if ('C:\php\pear' != '@'.'PEAR-DIR@') {
+if ('\xampp\php\pear' != '@'.'PEAR-DIR@') {
     /** @ignore */
-    define("PHPDOCUMENTOR_VER", "1.4.2");
+    define("PHPDOCUMENTOR_VER", "1.4.4");
 } else {
-    define("PHPDOCUMENTOR_VER", "1.4.1");
+    define("PHPDOCUMENTOR_VER", "1.4.3");
 }
 
 /* phpDocumentor URL */
@@ -70,7 +70,7 @@ define('_IN_PHP5',
 // determine which "clone" class to set, based on PHP major version
 $cloneClassDir  = 'PhpDocumentor' . DIRECTORY_SEPARATOR . 'phpDocumentor';
 $cloneClassFile = 'clone.inc.php';
-if ('1.4.2' == '@'.'VER@') {
+if ('1.4.4' == '@'.'VER@') {
     // we're _not_ in a PEAR installation
     $cloneClassDir = dirname(__FILE__);
 }
@@ -303,7 +303,10 @@ function fancy_debug($s,$v)
  */
 function phpDocumentor_get_class($object)
 {
-    return strtolower(get_class($object));
+    if (is_object($object)) {
+        return strtolower(get_class($object));
+    }
+    return false;
 }
 
 ?>

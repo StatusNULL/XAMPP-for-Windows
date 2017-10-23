@@ -1,10 +1,10 @@
 @rem = '--*-Perl-*--
 @echo off
 if "%OS%" == "Windows_NT" goto WinNT
-perl -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
+"%~dp0perl.exe" -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
 goto endofperl
 :WinNT
-perl -x -S %0 %*
+"%~dp0perl.exe" -x -S %0 %*
 if NOT "%COMSPEC%" == "%SystemRoot%\system32\cmd.exe" goto endofperl
 if %errorlevel% == 9009 echo You do not have Perl in your PATH.
 if errorlevel 1 goto script_failed_so_exit_with_non_zero_val 2>nul
@@ -78,7 +78,7 @@ Along with methods of XMLRPC::Lite you'll be able (and that's much more
 interesting) run any XMLRPC methods you know about on remote server and
 see processed results. You can even switch on debugging (with call 
 something like: C<on_debug(sub{print@_})>) and see XMLRPC code with 
-headers sent and recieved.
+headers sent and received.
 
 =head1 COPYRIGHT
 

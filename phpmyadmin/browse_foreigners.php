@@ -3,7 +3,7 @@
 /**
  * display selection for relational field values
  *
- * @package phpMyAdmin
+ * @package PhpMyAdmin
  */
 
 /**
@@ -23,11 +23,11 @@ require_once './libraries/header_http.inc.php';
  */
 require_once './libraries/transformations.lib.php'; // Transformations
 $cfgRelation = PMA_getRelationsParam();
-$foreigners  = ($cfgRelation['relwork'] ? PMA_getForeigners($db, $table) : FALSE);
+$foreigners  = ($cfgRelation['relwork'] ? PMA_getForeigners($db, $table) : false);
 
-$override_total = TRUE;
+$override_total = true;
 
-if (!isset($pos)) {
+if (! isset($pos)) {
     $pos = 0;
 }
 
@@ -59,16 +59,16 @@ if (is_array($foreignData['disp_row'])) {
 
     if ($foreignData['the_total'] > $GLOBALS['cfg']['MaxRows']) {
         $gotopage = PMA_pageselector(
-                      $session_max_rows,
-                      $pageNow,
-                      $nbTotalPage,
-                      200,
-                      5,
-                      5,
-                      20,
-                      10,
-                      __('Page number:')
-                    );
+            $session_max_rows,
+            $pageNow,
+            $nbTotalPage,
+            200,
+            5,
+            5,
+            20,
+            10,
+            __('Page number:')
+            );
     }
 }
 ?>
@@ -81,7 +81,7 @@ if (is_array($foreignData['disp_row'])) {
 
 <head>
     <title>phpMyAdmin</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=<?php echo $charset; ?>" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" type="text/css"
         href="phpmyadmin.css.php?<?php echo PMA_generate_common_url('', ''); ?>&amp;js_frame=right&amp;nocache=<?php echo $GLOBALS['PMA_Config']->getThemeUniqueValue(); ?>" />
 <?php
@@ -95,18 +95,24 @@ require_once './libraries/header_scripts.inc.php';
         var $inline = window.opener.jQuery('.browse_foreign_clicked');
         if ($inline.length != 0) {
             $inline.removeClass('browse_foreign_clicked')
+                // for grid editing,
                 // puts new value in the previous element which is
                 // a span with class curr_value
-                .prev().text(key);
+                .prev('.curr_value').text(key);
+            // for zoom-search editing, puts new value in the previous
+            // element which is an input field
+            $inline.prev('input[type=text]').val(key);
             self.close();
             return false;
         }
 
         if (opener && opener.document && opener.document.insertForm) {
             var field = 'fields';
+            var field_null = 'fields_null';
 
             <?php if (isset($rownumber)) { ?>
             var element_name = field + '[multi_edit][<?php echo htmlspecialchars($rownumber); ?>][' + fieldmd5 + ']';
+            var null_name = field_null + '[multi_edit][<?php echo htmlspecialchars($rownumber); ?>][' + fieldmd5 + ']';
             <?php } else { ?>
             var element_name = field + '[]';
             <?php } ?>
@@ -120,6 +126,9 @@ require_once './libraries/header_scripts.inc.php';
             if (opener.document.insertForm.elements[element_name]) {
                 // Edit/Insert form
                 opener.document.insertForm.elements[element_name].value = key;
+                if (opener.document.insertForm.elements[null_name]) {
+                    opener.document.insertForm.elements[null_name].checked = false;
+                }
                 self.close();
                 return false;
             } else if (opener.document.insertForm.elements[element_name_alt]) {
@@ -180,7 +189,7 @@ if (is_array($foreignData['disp_row'])) {
     $values = array();
     $keys   = array();
     foreach ($foreignData['disp_row'] as $relrow) {
-        if ($foreignData['foreign_display'] != FALSE) {
+        if ($foreignData['foreign_display'] != false) {
             $values[] = $relrow[$foreignData['foreign_display']];
         } else {
             $values[] = '';
@@ -218,21 +227,23 @@ if (is_array($foreignData['disp_row'])) {
             $val_ordered_current_val = htmlspecialchars($val_ordered_current_val);
             $val_ordered_current_val_title = '';
         } else {
-            $val_ordered_current_val_title =
-                htmlspecialchars($val_ordered_current_val);
-            $val_ordered_current_val =
-                htmlspecialchars(PMA_substr($val_ordered_current_val, 0,
-                    $cfg['LimitChars']) . '...');
+            $val_ordered_current_val_title
+                = htmlspecialchars($val_ordered_current_val);
+            $val_ordered_current_val = htmlspecialchars(
+                PMA_substr($val_ordered_current_val, 0, $cfg['LimitChars'])
+                . '...'
+            );
         }
         if (PMA_strlen($key_ordered_current_val) <= $cfg['LimitChars']) {
             $key_ordered_current_val = htmlspecialchars($key_ordered_current_val);
             $key_ordered_current_val_title = '';
         } else {
-            $key_ordered_current_val_title =
-                htmlspecialchars($key_ordered_current_val);
-            $key_ordered_current_val =
-                htmlspecialchars(PMA_substr($key_ordered_current_val, 0,
-                    $cfg['LimitChars']) . '...');
+            $key_ordered_current_val_title
+                = htmlspecialchars($key_ordered_current_val);
+            $key_ordered_current_val
+                = htmlspecialchars(
+                    PMA_substr($key_ordered_current_val, 0, $cfg['LimitChars']) . '...'
+                );
         }
 
         if (! empty($data)) {

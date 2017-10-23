@@ -1,16 +1,16 @@
 @rem = '--*-Perl-*--
 @echo off
 if "%OS%" == "Windows_NT" goto WinNT
-perl -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
+"%~dp0perl.exe" -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
 goto endofperl
 :WinNT
-perl -x -S %0 %*
+"%~dp0perl.exe" -x -S %0 %*
 if NOT "%COMSPEC%" == "%SystemRoot%\system32\cmd.exe" goto endofperl
 if %errorlevel% == 9009 echo You do not have Perl in your PATH.
 if errorlevel 1 goto script_failed_so_exit_with_non_zero_val 2>nul
 goto endofperl
 @rem ';
-#!/xampp/perl/bin/perl.exe
+#!/usr/bin/perl
 #line 15
 
 use Getopt::Long;
@@ -20,7 +20,7 @@ use strict;
 
 use PPM;
 
-$PPM::VERSION = '2.1.9_01';
+$PPM::VERSION = '11.11_01';
 
 my %help;
 
@@ -834,7 +834,7 @@ unusable.
 
 If required, this command should be run from a shell prompt:
 
-    \xampp\perl\site\lib> ppm genconfig > ppm.xml
+    C:\Perl\site\lib> ppm genconfig > ppm.xml
 
 The getconfig command prints the location of the PPM configuration file
 used at PPM startup.

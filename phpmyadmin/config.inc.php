@@ -21,6 +21,7 @@ $cfg['Servers'][$i]['user'] = 'root';
 $cfg['Servers'][$i]['password'] = '';
 $cfg['Servers'][$i]['extension'] = 'mysql';
 $cfg['Servers'][$i]['AllowNoPassword'] = true;
+$cfg['Lang'] = '';
 
 /* User for advanced features */
 $cfg['Servers'][$i]['controluser'] = 'pma';
@@ -38,6 +39,8 @@ $cfg['Servers'][$i]['history'] = 'pma_history';
 $cfg['Servers'][$i]['designer_coords'] = 'pma_designer_coords';
 $cfg['Servers'][$i]['tracking'] = 'pma_tracking';
 $cfg['Servers'][$i]['userconfig'] = 'pma_userconfig';
+$cfg['Servers'][$i]['recent'] = 'pma_recent';
+$cfg['Servers'][$i]['table_uiprefs'] = 'pma_table_uiprefs';
 
 /*
  * End of servers configuration

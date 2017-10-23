@@ -4,7 +4,7 @@ package I18N::LangTags::List;
 #  Time-stamp: "2004-10-06 23:26:21 ADT"
 use strict;
 use vars qw(%Name %Is_Disrec $Debug $VERSION);
-$VERSION = '0.35';
+$VERSION = '0.35_01';
 # POD at the end.
 
 #----------------------------------------------------------------------
@@ -1736,7 +1736,7 @@ Sean M. Burke, sburkeE<64>cpan.org
 
 # To generate a list of just the two and three-letter codes:
 
-#!/xampp/perl/bin/perl.exe -w
+#!/usr/local/bin/perl -w
 
 require 5; # Time-stamp: "2001-03-13 21:53:39 MST"
  # Sean M. Burke, sburke@cpan.org

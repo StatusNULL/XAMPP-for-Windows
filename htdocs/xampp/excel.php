@@ -27,7 +27,7 @@
 					<td align="left" width="480">&nbsp;</td>
 				</tr>
 				<tr>
-					<td align=left width="20">&nbsp;</td><td align=left width="480"><?=$TEXT['pear-text']?></td>
+					<td align=left width="20">&nbsp;</td><td align=left width="480"><?php print $TEXT['pear-text']; ?></td>
 				</tr>
 				<tr>
 					<td align="left" width="20">&nbsp;</td>

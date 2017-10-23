@@ -6,7 +6,7 @@ use Carp ();
 use Pod::Simple::Methody ();
 use Pod::Simple ();
 use vars qw( @ISA $VERSION $FREAKYMODE);
-$VERSION = '3.11';
+$VERSION = '3.20';
 @ISA = ('Pod::Simple::Methody');
 BEGIN { *DEBUG = defined(&Pod::Simple::DEBUG)
           ? \&Pod::Simple::DEBUG
@@ -71,7 +71,7 @@ sub end_L           {
     if (my $link = delete $_[0]{'Link'}) {
         # Append the URL to the output unless it's already present.
         $_[0]{'Thispara'} .= " <$link->{to}>"
-            unless $_[0]{'Thispara'} =~ /\b\E$link->{to}/;
+            unless $_[0]{'Thispara'} =~ /\b\Q$link->{to}/;
     }
 }
 
@@ -156,7 +156,7 @@ Patches against Pod::Simple are welcome. Please send bug reports to
 
 =head1 COPYRIGHT AND DISCLAIMERS
 
-Copyright (c) 2002 Sean M. Burke.  All rights reserved.
+Copyright (c) 2002 Sean M. Burke.
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

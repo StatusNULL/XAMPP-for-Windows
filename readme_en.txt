@@ -1,21 +1,21 @@
-###### ApacheFriends XAMPP version 1.7.7 ######
+###### ApacheFriends XAMPP Version 1.8.0 ######
 
-  + Apache 2.2.21
-  + MySQL 5.5.16 (Community Server)
-  + PHP 5.3.8 (VC9 X86 32bit thread safe) + PEAR
-  + XAMPP Control Panel Version 2.5 from www.nat32.com 
-  + (BETA) XAMPP Control Panel Version 3.0.2 by Steffen Strueber (not in the USB & lite version)
-    see http://www.apachefriends.org/f/viewtopic.php?f=16&t=46743
+  + Apache 2.4.2
+  + MySQL 5.5.25a (Community Server)
+  + PHP 5.4.4 (VC9 X86 32bit thread safe) + PEAR 
+  + XAMPP Control Panel Version 3.0.12 by hackattack142 (Great Thanks!!))
+    Vgl.: http://www.apachefriends.org/f/viewtopic.php?f=16&t=46743
+  + phpMyAdmin 3.5.2
+  + OpenSSL 1.0.1c
+  + ADOdb 5.15
   + XAMPP Security
-  + OpenSSL 1.0.0e
-  + phpMyAdmin 3.4.5
-  + ADOdb 5.14
-  + Mercury Mail Transport System v4.62 (not in the USB & lite version)
-  + FileZilla FTP Server 0.9.39 (not in the USB & lite version)
-  + Webalizer 2.23-04 (not in the USB & lite version)
-  + Perl 5.10.1 (not in the USB & lite version)
-  + Mod_perl 2.0.4 (not in the USB & lite version)
-  + Tomcat 7.0.21 (not in the USB & lite version)
+  + Mercury Mail Transport System v4.62 (not included in the portable version)
+  + FileZilla FTP Server 0.9.41 (not included in the portable version)
+  + Webalizer 2.23-04 (not included in the portable version) 
+  + Strawberry Perl 5.16.0.1 Portable
+  + Tomcat 7.0.28 (not included in the portable version)
+  + Old XAMPP Control Panel Version 2.5 von www.nat32.com (depricated)
+  + XAMPP mailToDisk 1.0 (write sendet emails via PHP on local disk in <xampp>\mailoutput. Is activated in the php.ini as mail default.)
 
 --------------------------------------------------------------- 
 
@@ -23,7 +23,7 @@
  
   + 64 MB RAM (RECOMMENDED)
   + 350 MB free fixed disk 
-  + Windows NT, 2000, 2003, XP (RECOMMENDED), VISTA, Windows 7
+  + Windows 2003, XP (RECOMMENDED), VISTA, Windows 7
 
 ---------------------------------------------------------------
 
@@ -54,6 +54,18 @@ Examples:
 
 Step 5: XAMPP UNINSTALL? Simply remove the "xampp" Directory.
 But before please shutdown the apache and mysql.
+
+---------------------------------------------------------------
+
+* PHP MAIL FUNCTION:
+
+There are three ways to work with the PHP Mail function.
+
+1) With XAMPP mailToDisk every mail sending via the PHP mail() function will written in the <xampp>\mailoutput folder. MailToDisk is the default you do not have to change the php.ini. And please do not use mailToDisk for production! 
+2) With fakemail (sendmail.exe) you will send all mail() to your personal mail account. Therefore you have to edit the <xampp>\sendmail\sendmail.ini first. Then please activate fakemail (sendamil.exe) in the php.ini and comment out the mailToDisk line.       
+3) You can use a SMTP Server like the Mercury Mail Server alternate. Therefore comment out all sendmail_path lines in the php.ini. Now use the -> SMTP = localhost und -> smtp_port = 25 lines of course with your values in the php.ini.    
+
+Attention : If XAMPP is installed in a base directory with spaces (e.g. c:\program files\xampp) fakemail and mailtodisk do not work correctly. In this case please copy the sendmail or mailtodisk folder in your root folder (e.g. C:\sendmail) and use this for sendmail_path.
 
 ---------------------------------------------------------------
 

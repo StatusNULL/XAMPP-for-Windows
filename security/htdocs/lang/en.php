@@ -99,7 +99,7 @@
 	<li>All these test are made ONLY for host \"localhost\" (127.0.0.1).</li>
 	<li><i><b>For FileZilla FTP und Mercury Mail, you must fix all security problems by yourself! Sorry. </b></i></li>
 	<li>If your computer is not online or blocked by a firewall, your servers are SECURE against outside attacks.</li>
-	<li>If servers are not running, these servers are although SECURE!</li></ul>";
+	<li>If servers are not running, these servers are also SECURE!</li></ul>";
 	$TEXT['security-text3'] = "<b>Please consider this:
 	With more XAMPP security some examples will NOT execute error free. If you use PHP in \"safe mode\" for example some functions of this security frontend will not working anymore. Often even more security means less functionality at the same time.</b>";
 	$TEXT['security-text4'] = "The XAMPP default ports:";

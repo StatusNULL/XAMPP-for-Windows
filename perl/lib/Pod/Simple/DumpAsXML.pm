@@ -1,7 +1,7 @@
 
 require 5;
 package Pod::Simple::DumpAsXML;
-$VERSION = '3.11';
+$VERSION = '3.20';
 use Pod::Simple ();
 BEGIN {@ISA = ('Pod::Simple')}
 
@@ -114,7 +114,7 @@ L<Pod::Simple>.
 L<Pod::Simple::XMLOutStream> is rather like this class.
 Pod::Simple::XMLOutStream's output is space-padded in a way
 that's better for sending to an XML processor (that is, it has
-no ignoreable whitespace). But
+no ignorable whitespace). But
 Pod::Simple::DumpAsXML's output is much more human-readable, being
 (more-or-less) one token per line, with line-wrapping.
 
@@ -141,7 +141,7 @@ Patches against Pod::Simple are welcome. Please send bug reports to
 
 =head1 COPYRIGHT AND DISCLAIMERS
 
-Copyright (c) 2002 Sean M. Burke.  All rights reserved.
+Copyright (c) 2002 Sean M. Burke.
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

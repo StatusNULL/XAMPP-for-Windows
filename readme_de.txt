@@ -1,21 +1,21 @@
-###### ApacheFriends XAMPP Version 1.7.7 ######
+###### ApacheFriends XAMPP Version 1.8.0 ######
 
-  + Apache 2.2.21
-  + MySQL 5.5.16 (Community Server)
-  + PHP 5.3.8 (VC9 X86 32bit thread safe) + PEAR 
-  + XAMPP Control Panel Version 2.5 von www.nat32.com
-  + (BETA) XAMPP Control Panel Version 3.0.2 von Steffen Strueber (nicht in der USB & lite Version)
-    vgl http://www.apachefriends.org/f/viewtopic.php?f=16&t=46743
+  + Apache 2.4.2
+  + MySQL 5.5.25a (Community Server)
+  + PHP 5.4.4 (VC9 X86 32bit thread safe) + PEAR 
+  + XAMPP Control Panel Version 3.0.12 von hackattack142 (Ein großes Danke Schön!)
+    Vgl.: http://www.apachefriends.org/f/viewtopic.php?f=16&t=46743
+  + phpMyAdmin 3.5.2
+  + OpenSSL 1.0.1c
+  + ADOdb 5.15
   + XAMPP Security
-  + OpenSSL 1.0.0e
-  + phpMyAdmin 3.4.5
-  + ADOdb 5.14
-  + Mercury Mail Transport System v4.62 (nicht in der USB & lite Version)
-  + FileZilla FTP Server 0.9.39 (nicht in der USB & lite Version)
-  + Webalizer 2.23-04 (nicht in der USB & lite Version) 
-  + Perl 5.10.1 (nicht in der USB & lite Version)
-  + Mod_perl 2.0.4 (nicht in der USB & lite Version)
-  + Tomcat 7.0.21 (nicht in der USB & lite Version)
+  + Mercury Mail Transport System v4.62 (nicht in der Portable Version)
+  + FileZilla FTP Server 0.9.41 (nicht in der Portable Version)
+  + Webalizer 2.23-04 (nicht in der Portable Version) 
+  + Strawberry Perl 5.16.0.1 Portable
+  + Tomcat 7.0.28 (nicht in der Portable Version)
+  + Old XAMPP Control Panel Version 2.5 von www.nat32.com (depricated)
+  + XAMPP mailToDisk 1.0 (schreibt verdendete Mails über PHP auf die Festplatte unter <xampp>\mailoutput. In der php.ini als Mail Default aktiviert.)
 
 --------------------------------------------------------------- 
 
@@ -23,7 +23,7 @@
   
   + 64 MB RAM (EMPFOHLEN)
   + 350 MB freier Speicherplatz
-  + Windows NT, 2000, 2003, XP (EMPFOHLEN), VISTA, Windows 7
+  + Windows 2003, XP (EMPFOHLEN), VISTA, Windows 7
   
 * ACHTUNG!!!!
 
@@ -50,6 +50,18 @@ Schritt 5: Das Root-Verzeichnis (Hauptdokumente) für HTTP (oft HTML) ist => C:\x
 Schritt 6: XAMPP DEINSTALLIEREN?
 Einfach das "XAMPP"-Verzeichnis löschen. Vorher aber alle Server stoppen 
 bzw. als Dienste deinstallieren.
+
+---------------------------------------------------------------
+
+* PHP MAIL FUNCTION:
+
+Es gibt drei Arten die PHP Mail function testweise zu benutzen.
+
+1) Mit XAMPP mailToDisk wird jede Email die über die Mail Funktion von PHP versendet wird nach <xampp>\mailoutput geschrieben. MailToDisk ist Standard und Bedarf keine Änderung in der php.ini. MailToDisk keinesfalls produktiv einsetzen! 
+2) Mit fakemail (sendmail.exe) werden alle Mails versendet mit PHP mail() in ein von ihnen definiertes externes Postfach geschickt. Zuvor müssen sie ihr Postfach in der <xampp>\sendmail\sendmail.ini konfigurieren und auch die sendmail.exe in der php.ini aktivieren.  
+3) Sie bnutzen einen eigenen SMTP Server wie der im XAMPP integrierte Mercury Mail Server oder einen externen SMTP Server (wie IIS). Hierzu kommentieren sie in der php.ini alle sendmail_path Zeilen aus und kommentieren dafür die Zeilen -> SMTP = localhost und -> smtp_port = 25 mit ihren Daten ein.  
+
+ACHTUNG: Wenn sie im Installationspfad Leerzeichen verwenden (wie c:\program files\xampp), wird mailToDisk und fakemail (sendmail.exe) u.U. nicht funktionieren. In diesem Fall den <xampp>\mailtodisk bzw. <xampp>\sendmail in ein Vereichnis ohne Leerzeichen kopieren und den neuen Pfad entsprechend in der php.ini aktualisieren.     
 
 ---------------------------------------------------------------
 

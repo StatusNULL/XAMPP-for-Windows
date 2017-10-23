@@ -429,7 +429,7 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
 
             $header      = pack("vv",       $record, $length);
 
-            $rotation      = 0x00;
+            $rotation      = $this->_rotation;
             $biff8_options = 0x00;
             $data  = pack("vvvC", $ifnt, $ifmt, $style, $align);
             $data .= pack("CCC", $rotation, $biff8_options, $used_attrib);
@@ -533,28 +533,28 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
     function _getColor($name_color = '')
     {
         $colors = array(
-                        'aqua'    => 0x0F,
-                        'cyan'    => 0x0F,
-                        'black'   => 0x08,
-                        'blue'    => 0x0C,
-                        'brown'   => 0x10,
-                        'magenta' => 0x0E,
-                        'fuchsia' => 0x0E,
-                        'gray'    => 0x17,
-                        'grey'    => 0x17,
-                        'green'   => 0x11,
-                        'lime'    => 0x0B,
-                        'navy'    => 0x12,
-                        'orange'  => 0x35,
-                        'purple'  => 0x14,
-                        'red'     => 0x0A,
-                        'silver'  => 0x16,
-                        'white'   => 0x09,
-                        'yellow'  => 0x0D
+                          'aqua'    => 0x07,
+                          'cyan'    => 0x07,
+                          'black'   => 0x00,
+                          'blue'    => 0x04,
+                          'brown'   => 0x10,
+                          'magenta' => 0x06,
+                          'fuchsia' => 0x06,
+                          'gray'    => 0x17,
+                          'grey'    => 0x17,
+                          'green'   => 0x11,
+                          'lime'    => 0x03,
+                          'navy'    => 0x12,
+                          'orange'  => 0x35,
+                          'purple'  => 0x14,
+                          'red'     => 0x02,
+                          'silver'  => 0x16,
+                          'white'   => 0x01,
+                          'yellow'  => 0x05
                        );
 
         // Return the default color, 0x7FFF, if undef,
-        if ($name_color == '') {
+        if ($name_color === '') {
             return(0x7FFF);
         }
 
@@ -566,11 +566,6 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
         // or the default color if string is unrecognised,
         if (preg_match("/\D/",$name_color)) {
             return(0x7FFF);
-        }
-
-        // or an index < 8 mapped into the correct range,
-        if ($name_color < 8) {
-            return($name_color + 8);
         }
 
         // or the default color if arg is outside range,
@@ -996,13 +991,25 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
                 $this->_rotation = 0;
                 break;
             case 90:
+                if ($this->_BIFF_version == 0x0500) {
                 $this->_rotation = 3;
+                } elseif ($this->_BIFF_version == 0x0600) {
+                    $this->_rotation = 180;
+                }
                 break;
             case 270:
+                if ($this->_BIFF_version == 0x0500) {
                 $this->_rotation = 2;
+                } elseif ($this->_BIFF_version == 0x0600) {
+                    $this->_rotation = 90;
+                }
                 break;
             case -1:
+                if ($this->_BIFF_version == 0x0500) {
                 $this->_rotation = 1;
+                } elseif ($this->_BIFF_version == 0x0600) {
+                    $this->_rotation = 255;
+                }
                 break;
             default :
                 return $this->raiseError("Invalid value for angle.".

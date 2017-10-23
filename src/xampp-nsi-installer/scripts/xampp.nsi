@@ -9,7 +9,7 @@ SetCompressor /solid lzma
 XPStyle on
 ; HM NIS Edit Wizard helper defines
   !define PRODUCT_NAME "XAMPP"
-  !define PRODUCT_VERSION "1.7.5"
+  !define PRODUCT_VERSION "1.8.0"
   !define PRODUCT_PUBLISHER "Kay Vogelgesang, Kai Oswald Seidler, ApacheFriends"
   !define PRODUCT_WEB_SITE "http://www.apachefriends.org"
 Caption "XAMPP ${PRODUCT_VERSION} win32"
@@ -110,7 +110,7 @@ ShowUninstDetails show
 Section "XAMPP Files" SEC01
 SetOutPath "$INSTDIR"
 SetOverwrite ifnewer
-File /r "F:\release175\release_rc2\xampp\*.*"
+File /r "F:\release180\release\xampp\*.*"
 ExecWait '"$INSTDIR\php\php.exe" -n -d output_buffering=0 "$INSTDIR\install\install.php"' $4
 
 WriteRegStr HKLM "Software\xampp" "Install_Dir" "$INSTDIR"
@@ -220,8 +220,7 @@ Function .onInit
         Goto no_vista
         detection_VISTA:
                         ReadRegStr $R2 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" EnableLUA
-                        ReadRegStr $R0 HKCU "Control Panel\International" Locale
-                        StrCmp $R0 "00000407" detection_de
+                        StrCmp $LANGUAGE "1031" detection_de
                         GOTO no_de
                         detection_de:
                         StrCmp $R2 "1" IS_UACDE
@@ -291,18 +290,18 @@ StrCmp $1 "0" no_httpd
        StrCmp $R0 "BLOCKED" Port80Abort
        ReadINIStr $R1 "$INSTDIR\install\portcheck.ini" "Ports" "Port443"
        StrCmp $R1 "BLOCKED" Port80Abort
-       ExecWait 'cmd /C cd "$INSTDIR\apache\bin" & httpd.exe -k install & net start Apache2.2' $9
+       ExecWait 'cmd /C cd "$INSTDIR\apache\bin" & httpd.exe -k install & net start Apache2.4' $9
        Goto no_httpd
        Port80Abort:
        StrCmp $4 "1031" german
     ;   StrCmp $4 "1041" japan
-       StrCpy $INST_MESS1 "Ports 80 or 443 (SSL) already in use! Installing Apache2.2 service failed!"
+       StrCpy $INST_MESS1 "Ports 80 or 443 (SSL) already in use! Installing Apache2.4 service failed!"
        Goto mess1
        ; japan:
-       ; StrCpy $INST_MESS1 "ポート 80 または 443 (SSL) はすでに利用されています。Apache2.2をサービスとしてインストールするのに失敗しました。"
+       ; StrCpy $INST_MESS1 "ポート 80 または 443 (SSL) はすでに利用されています。Apache2.4をサービスとしてインストールするのに失敗しました。"
        ; Goto mess1
        german:
-       StrCpy $INST_MESS1 "Ports 80 oder 443 (SSL) bereits in Nutzung! Apache2.2-Dienst konnte nicht eingerichtet werden."
+       StrCpy $INST_MESS1 "Ports 80 oder 443 (SSL) bereits in Nutzung! Apache2.4-Dienst konnte nicht eingerichtet werden."
        mess1:
        WriteRegStr HKLM "Software\xampp" "apacheservice" "0"
        MessageBox MB_OK "$INST_MESS1"
@@ -426,7 +425,7 @@ ReadRegStr $5 HKLM "Software\xampp" "services"
 StrCmp $5 "0" srv_Abort
 ReadRegStr $2 HKLM "Software\xampp" "apacheservice"
 StrCmp $2 "0" no_httpd
-ExecWait 'cmd /C net stop Apache2.2 & "$INSTDIR\apache\bin\httpd.exe" -k uninstall' $9
+ExecWait 'cmd /C net stop Apache2.4 & "$INSTDIR\apache\bin\httpd.exe" -k uninstall' $9
 no_httpd:
 ReadRegStr $3 HKLM "Software\xampp" "mysqlservice"
 StrCmp $3 "0" no_mysql
@@ -437,8 +436,10 @@ StrCmp $4 "0" no_ftpd
 ; Starte: "F:\temp\program files\xampp\FileZillaFTP\FileZillaServer.exe" /stop
 ; Starte: "F:\temp\program files\xampp\FileZillaFTP\FileZillaServer.exe" /uninstall
 ; net stop "FileZilla Server FTP server"
-ExecWait '"$INSTDIR\FileZillaFTP\FileZillaServer.exe" /stop' $8
+ExecWait 'cmd /C net stop FileZillaServer' $8
+;ExecWait '"$INSTDIR\FileZillaFTP\FileZillaServer.exe" /stop' $8
 ExecWait '"$INSTDIR\FileZillaFTP\FileZillaServer.exe" /uninstall' $8
+ExecWait '"$INSTDIR\FileZillaFTP\FileZillaServer.exe" /uninstall' $9
 no_ftpd:
 
 ReadRegStr $6 HKLM "Software\xampp" "tomcatservice"
@@ -466,7 +467,6 @@ StrCmp $8 "0" no_pfiles
 no_pfiles:
 
 
-
 RMDir /r "$INSTDIR\anonymous"
 RMDir /r "$INSTDIR\apache"
 RMDir /r "$INSTDIR\cgi-bin"
@@ -487,6 +487,7 @@ RMDir /r "$INSTDIR\webdav"
 RMDir /r "$INSTDIR\nsis"
 RMDir /r "$INSTDIR\contrib"
 RMDir /r "$INSTDIR\src"
+RMDir /r "$INSTDIR\locale"
 
 Delete "$INSTDIR\apache_start.bat"
 Delete "$INSTDIR\apache_stop.bat"
@@ -507,7 +508,6 @@ Delete "$INSTDIR\xampp_start.exe"
 Delete "$INSTDIR\xampp_stop.exe"
 Delete "$INSTDIR\xampp-changes.txt"
 Delete "$INSTDIR\xampp-portcheck.exe"
-Delete "$INSTDIR\xampp-control.exe"
 Delete "$INSTDIR\Uninstall.exe"
 Delete "$INSTDIR\javapath.ini"
 Delete "$INSTDIR\readme-addon-perl.txt"
@@ -520,7 +520,11 @@ Delete "$INSTDIR\xampp_chkdll.exe"
 Delete "$INSTDIR\xampp_service_mercury.exe"
 Delete "$INSTDIR\catalina_start.bat"
 Delete "$INSTDIR\catalina_stop.bat"
-Delete "$INSTDIR\xampp-control-3-beta.exe"
+Delete "$INSTDIR\catalina_service.bat"
+Delete "$INSTDIR\xampp-control.exe"
+Delete "$INSTDIR\xampp-control-old.exe"
+Delete "$INSTDIR\xampp-control.ini"
+Delete "$INSTDIR\xampp-control.log"
 ;Delete "$INSTDIR\msvcr71.dll"
 
 DeleteRegKey HKLM "Software\xampp"

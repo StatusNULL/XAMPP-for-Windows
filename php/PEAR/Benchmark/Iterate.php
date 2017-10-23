@@ -19,7 +19,7 @@
  * @author    Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @copyright 2002-2005 Sebastian Bergmann <sb@sebastian-bergmann.de>
  * @license   http://www.php.net/license/3_0.txt The PHP License, Version 3.0
- * @version   CVS: $Id: Iterate.php 268884 2008-11-12 20:57:49Z clockwerx $
+ * @version   CVS: $Id$
  * @link      http://pear.php.net/package/Benchmark
  */
 
@@ -107,12 +107,12 @@ class Benchmark_Iterate extends Benchmark_Timer
         $iterations    = array_shift($arguments);
         $function_name = array_shift($arguments);
 
-        if (strstr($function_name, '::')) {
+        if (is_string($function_name) && strstr($function_name, '::')) {
             $function_name = explode('::', $function_name);
             $objectmethod  = $function_name[1];
         }
 
-        if (strstr($function_name, '->')) {
+        if (is_string($function_name) && strstr($function_name, '->')) {
             list($objectname, $objectmethod) = explode('->', $function_name);
 
             $object = $GLOBALS[$objectname];

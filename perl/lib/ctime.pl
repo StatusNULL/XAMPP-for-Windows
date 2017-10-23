@@ -1,12 +1,17 @@
+warn "Legacy library @{[(caller(0))[6]]} will be removed from the Perl core distribution in the next major release. Please install it from the CPAN distribution Perl4::CoreLibs. It is being used at @{[(caller)[1]]}, line @{[(caller)[2]]}.\n";
+
 ;# ctime.pl is a simple Perl emulation for the well known ctime(3C) function.
 #
 # This library is no longer being maintained, and is included for backward
 # compatibility with Perl 4 programs which may require it.
+# This legacy library is deprecated and will be removed in a future
+# release of perl.
 #
 # In particular, this should not be used as an example of modern Perl
 # programming techniques.
 #
 # Suggested alternative: the POSIX ctime function
+
 ;#
 ;# Waldemar Kebsch, Federal Republic of Germany, November 1988
 ;# kebsch.pad@nixpbe.UUCP
@@ -32,7 +37,6 @@ sub ctime {
     package ctime;
 
     local($time) = @_;
-    local($[) = 0;
     local($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst);
 
     # Determine what time zone is in effect.

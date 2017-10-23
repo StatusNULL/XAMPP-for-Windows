@@ -1,5 +1,5 @@
 
- Apache HTTP Server 2.2 Limited OpenSSL Distribution
+ Apache HTTP Server 2.3 Limited OpenSSL Distribution
 
  This binary installation of OpenSSL is a limited distribution of the
  files derived from the OpenSSL project:
@@ -13,7 +13,7 @@
    bin\openssl.exe
 
  These are the minimal libraries and tools required to use mod_ssl as 
- distributed with Apache HTTP Server version 2.2.  No library link files, 
+ distributed with Apache HTTP Server version 2.3.  No library link files, 
  headers or sources are distributed with this binary distribution.  Please 
  refer to the <http://www.openssl.org/> site for complete source or binary 
  distributions.
@@ -32,7 +32,7 @@
 --------------------------------------------------------------------------------
 
 
- OpenSSL 1.0.0e 6 Sep 2011
+ OpenSSL 1.0.1c 10 May 2012
 
  Copyright (c) 1998-2011 The OpenSSL Project
  Copyright (c) 1995-1998 Eric A. Young, Tim J. Hudson

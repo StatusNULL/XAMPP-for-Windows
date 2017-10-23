@@ -8,90 +8,13 @@
  *
  */
 
-/* This structure must the beginning of XPVFM in sv.h  */
+/* This structure must match the beginning of XPVFM in sv.h  */
 
 struct xpvcv {
-    union {
-	NV	xnv_nv;		/* numeric value, if any */
-	HV *	xgv_stash;
-	struct {
-	    U32	xlow;
-	    U32	xhigh;
-	}	xpad_cop_seq;	/* used by pad.c for cop_sequence */
-	struct {
-	    U32 xbm_previous;	/* how many characters in string before rare? */
-	    U8	xbm_flags;
-	    U8	xbm_rare;	/* rarest character in string */
-	}	xbm_s;		/* fields from PVBM */
-    }		xnv_u;
-    STRLEN	xpv_cur;	/* length of xp_pv as a C string */
-    STRLEN	xpv_len;	/* allocated size */
-    union {
-	IV	xivu_iv;
-	UV	xivu_uv;
-	void *	xivu_p1;
-	I32	xivu_i32;	/* depth, >= 2 indicates recursive call */
-	HEK *	xivu_namehek;
-    }		xiv_u;
-    union {
-	MAGIC*	xmg_magic;	/* linked list of magicalness */
-	HV*	xmg_ourstash;	/* Stash for our (when SvPAD_OUR is true) */
-    } xmg_u;
-    HV*		xmg_stash;	/* class package */
-
-    HV *	xcv_stash;
-    union {
-	OP *	xcv_start;
-	ANY	xcv_xsubany;
-    }		xcv_start_u;
-    union {
-	OP *	xcv_root;
-	void	(*xcv_xsub) (pTHX_ CV*);
-    }		xcv_root_u;
-    GV *	xcv_gv;
-    char *	xcv_file;
-    PADLIST *	xcv_padlist;
-    CV *	xcv_outside;
-    U32		xcv_outside_seq; /* the COP sequence (at the point of our
-				  * compilation) in the lexically enclosing
-				  * sub */
-    cv_flags_t	xcv_flags;
+    _XPV_HEAD;
+    _XPVCV_COMMON;
+    I32	xcv_depth;	/* >= 2 indicates recursive call */
 };
-
-typedef struct {
-    STRLEN	xpv_cur;	/* length of xp_pv as a C string */
-    STRLEN	xpv_len;	/* allocated size */
-    union {
-	IV	xivu_iv;
-	UV	xivu_uv;
-	void *	xivu_p1;
-	I32	xivu_i32;	/* depth, >= 2 indicates recursive call */
-	HEK *	xivu_namehek;
-    }		xiv_u;
-    union {
-	MAGIC*	xmg_magic;	/* linked list of magicalness */
-	HV*	xmg_ourstash;	/* Stash for our (when SvPAD_OUR is true) */
-    } xmg_u;
-    HV*		xmg_stash;	/* class package */
-
-    HV *	xcv_stash;
-    union {
-	OP *	xcv_start;
-	ANY	xcv_xsubany;
-    }		xcv_start_u;
-    union {
-	OP *	xcv_root;
-	void	(*xcv_xsub) (pTHX_ CV*);
-    }		xcv_root_u;
-    GV *	xcv_gv;
-    char *	xcv_file;
-    PADLIST *	xcv_padlist;
-    CV *	xcv_outside;
-    U32		xcv_outside_seq; /* the COP sequence (at the point of our
-				  * compilation) in the lexically enclosing
-				  * sub */
-    cv_flags_t	xcv_flags;
-} xpvcv_allocated;
 
 /*
 =head1 Handy Values
@@ -99,59 +22,94 @@ typedef struct {
 =for apidoc AmU||Nullcv
 Null CV pointer.
 
+(deprecated - use C<(CV *)NULL> instead)
+
 =head1 CV Manipulation Functions
 
+This section documents functions to manipulate CVs which are code-values,
+or subroutines. For more information, see L<perlguts>.
+
 =for apidoc Am|HV*|CvSTASH|CV* cv
-Returns the stash of the CV.
+Returns the stash of the CV. A stash is the symbol table hash, containing
+the package-scoped variables in the package where the subroutine was defined.
+For more information, see L<perlguts>.
+
+This also has a special use with XS AUTOLOAD subs.
+See L<perlguts/Autoloading with XSUBs>.
 
 =cut
 */
 
-#define Nullcv Null(CV*)
+#ifndef PERL_CORE
+#  define Nullcv Null(CV*)
+#endif
 
-#define CvSTASH(sv)	((XPVCV*)MUTABLE_PTR(SvANY(sv)))->xcv_stash
+#define CvSTASH(sv)	(0+((XPVCV*)MUTABLE_PTR(SvANY(sv)))->xcv_stash)
+#define CvSTASH_set(cv,st) Perl_cvstash_set(aTHX_ cv, st)
 #define CvSTART(sv)	((XPVCV*)MUTABLE_PTR(SvANY(sv)))->xcv_start_u.xcv_start
 #define CvROOT(sv)	((XPVCV*)MUTABLE_PTR(SvANY(sv)))->xcv_root_u.xcv_root
 #define CvXSUB(sv)	((XPVCV*)MUTABLE_PTR(SvANY(sv)))->xcv_root_u.xcv_xsub
 #define CvXSUBANY(sv)	((XPVCV*)MUTABLE_PTR(SvANY(sv)))->xcv_start_u.xcv_xsubany
-#define CvGV(sv)	((XPVCV*)MUTABLE_PTR(SvANY(sv)))->xcv_gv
+#define CvGV(sv)	(0+((XPVCV*)MUTABLE_PTR(SvANY(sv)))->xcv_gv)
+#define CvGV_set(cv,gv)	Perl_cvgv_set(aTHX_ cv, gv)
 #define CvFILE(sv)	((XPVCV*)MUTABLE_PTR(SvANY(sv)))->xcv_file
 #ifdef USE_ITHREADS
-#  define CvFILE_set_from_cop(sv, cop)	(CvFILE(sv) = savepv(CopFILE(cop)))
+#  define CvFILE_set_from_cop(sv, cop)	\
+    (CvFILE(sv) = savepv(CopFILE(cop)), CvDYNFILE_on(sv))
 #else
-#  define CvFILE_set_from_cop(sv, cop)	(CvFILE(sv) = CopFILE(cop))
+#  define CvFILE_set_from_cop(sv, cop)	\
+    (CvFILE(sv) = CopFILE(cop), CvDYNFILE_off(sv))
 #endif
 #define CvFILEGV(sv)	(gv_fetchfile(CvFILE(sv)))
 #if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
 #  define CvDEPTH(sv) (*({const CV *const _cvdepth = (const CV *)sv; \
 			  assert(SvTYPE(_cvdepth) == SVt_PVCV);	 \
-			  &((XPVCV*)SvANY(_cvdepth))->xiv_u.xivu_i32; \
+			  &((XPVCV*)SvANY(_cvdepth))->xcv_depth; \
 			}))
 #else
-#  define CvDEPTH(sv)	((XPVCV*)MUTABLE_PTR(SvANY(sv)))->xiv_u.xivu_i32
+#  define CvDEPTH(sv)	((XPVCV*)MUTABLE_PTR(SvANY(sv)))->xcv_depth
 #endif
 #define CvPADLIST(sv)	((XPVCV*)MUTABLE_PTR(SvANY(sv)))->xcv_padlist
 #define CvOUTSIDE(sv)	((XPVCV*)MUTABLE_PTR(SvANY(sv)))->xcv_outside
 #define CvFLAGS(sv)	((XPVCV*)MUTABLE_PTR(SvANY(sv)))->xcv_flags
 #define CvOUTSIDE_SEQ(sv) ((XPVCV*)MUTABLE_PTR(SvANY(sv)))->xcv_outside_seq
 
+/* These two are sometimes called on non-CVs */
+#define CvPROTO(sv)                               \
+	(                                          \
+	 SvPOK(sv)                                  \
+	  ? SvTYPE(sv) == SVt_PVCV && CvAUTOLOAD(sv) \
+	     ? SvEND(sv)+1 : SvPVX_const(sv)          \
+	  : NULL                                       \
+	)
+#define CvPROTOLEN(sv)	                          \
+	(                                          \
+	 SvPOK(sv)                                  \
+	  ? SvTYPE(sv) == SVt_PVCV && CvAUTOLOAD(sv) \
+	     ? SvLEN(sv)-SvCUR(sv)-2                  \
+	     : SvCUR(sv)                               \
+	  : 0                                           \
+	)
+
 #define CVf_METHOD	0x0001	/* CV is explicitly marked as a method */
-#define CVf_LOCKED	0x0002	/* CV locks itself or first arg on entry */
-#define CVf_LVALUE	0x0004  /* CV return value can be used as lvalue */
+#define CVf_LVALUE	0x0002  /* CV return value can be used as lvalue */
+#define CVf_CONST	0x0004  /* inlinable sub */
+#define CVf_ISXSUB	0x0008	/* CV is an XSUB, not pure perl.  */
 
 #define CVf_WEAKOUTSIDE	0x0010  /* CvOUTSIDE isn't ref counted */
 #define CVf_CLONE	0x0020	/* anon CV uses external lexicals */
 #define CVf_CLONED	0x0040	/* a clone of one of those */
-#define CVf_ANON	0x0080	/* CvGV() can't be trusted */
+#define CVf_ANON	0x0080	/* CV is not pointed to by a GV */
 #define CVf_UNIQUE	0x0100	/* sub is only called once (eg PL_main_cv,
 				 * require, eval). */
 #define CVf_NODEBUG	0x0200	/* no DB::sub indirection for this CV
 				   (esp. useful for special XSUBs) */
-#define CVf_CONST	0x0400  /* inlinable sub */
-#define CVf_ISXSUB	0x0800	/* CV is an XSUB, not pure perl.  */
+#define CVf_CVGV_RC	0x0400	/* CvGV is reference counted */
+#define CVf_DYNFILE	0x1000	/* The filename isn't static  */
+#define CVf_AUTOLOAD	0x2000	/* SvPVX contains AUTOLOADed sub name  */
 
 /* This symbol for optimised communication between toke.c and op.c: */
-#define CVf_BUILTIN_ATTRS	(CVf_METHOD|CVf_LOCKED|CVf_LVALUE)
+#define CVf_BUILTIN_ATTRS	(CVf_METHOD|CVf_LVALUE)
 
 #define CvCLONE(cv)		(CvFLAGS(cv) & CVf_CLONE)
 #define CvCLONE_on(cv)		(CvFLAGS(cv) |= CVf_CLONE)
@@ -177,10 +135,6 @@ Returns the stash of the CV.
 #define CvMETHOD_on(cv)		(CvFLAGS(cv) |= CVf_METHOD)
 #define CvMETHOD_off(cv)	(CvFLAGS(cv) &= ~CVf_METHOD)
 
-#define CvLOCKED(cv)		(CvFLAGS(cv) & CVf_LOCKED)
-#define CvLOCKED_on(cv)		(CvFLAGS(cv) |= CVf_LOCKED)
-#define CvLOCKED_off(cv)	(CvFLAGS(cv) &= ~CVf_LOCKED)
-
 #define CvLVALUE(cv)		(CvFLAGS(cv) & CVf_LVALUE)
 #define CvLVALUE_on(cv)		(CvFLAGS(cv) |= CVf_LVALUE)
 #define CvLVALUE_off(cv)	(CvFLAGS(cv) &= ~CVf_LVALUE)
@@ -205,6 +159,18 @@ Returns the stash of the CV.
 #define CvISXSUB(cv)		(CvFLAGS(cv) & CVf_ISXSUB)
 #define CvISXSUB_on(cv)		(CvFLAGS(cv) |= CVf_ISXSUB)
 #define CvISXSUB_off(cv)	(CvFLAGS(cv) &= ~CVf_ISXSUB)
+
+#define CvCVGV_RC(cv)		(CvFLAGS(cv) & CVf_CVGV_RC)
+#define CvCVGV_RC_on(cv)	(CvFLAGS(cv) |= CVf_CVGV_RC)
+#define CvCVGV_RC_off(cv)	(CvFLAGS(cv) &= ~CVf_CVGV_RC)
+
+#define CvDYNFILE(cv)		(CvFLAGS(cv) & CVf_DYNFILE)
+#define CvDYNFILE_on(cv)	(CvFLAGS(cv) |= CVf_DYNFILE)
+#define CvDYNFILE_off(cv)	(CvFLAGS(cv) &= ~CVf_DYNFILE)
+
+#define CvAUTOLOAD(cv)		(CvFLAGS(cv) & CVf_AUTOLOAD)
+#define CvAUTOLOAD_on(cv)	(CvFLAGS(cv) |= CVf_AUTOLOAD)
+#define CvAUTOLOAD_off(cv)	(CvFLAGS(cv) &= ~CVf_AUTOLOAD)
 
 /* Flags for newXS_flags  */
 #define XS_DYNAMIC_FILENAME	0x01	/* The filename isn't static  */
@@ -263,6 +229,8 @@ should print 123:
 
 =cut
 */
+
+typedef OP *(*Perl_call_checker)(pTHX_ OP *, GV *, SV *);
 
 /*
  * Local variables:

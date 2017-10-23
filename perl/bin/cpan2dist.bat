@@ -1,20 +1,17 @@
 @rem = '--*-Perl-*--
 @echo off
 if "%OS%" == "Windows_NT" goto WinNT
-perl -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
+"%~dp0perl.exe" -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
 goto endofperl
 :WinNT
-perl -x -S %0 %*
+"%~dp0perl.exe" -x -S %0 %*
 if NOT "%COMSPEC%" == "%SystemRoot%\system32\cmd.exe" goto endofperl
 if %errorlevel% == 9009 echo You do not have Perl in your PATH.
 if errorlevel 1 goto script_failed_so_exit_with_non_zero_val 2>nul
 goto endofperl
 @rem ';
-#!perl
+#!/usr/bin/perl -w
 #line 15
-    eval 'exec \xampp\perl\bin\perl.exe -S $0 ${1+"$@"}'
-	if $running_under_some_shell;
-#!/xampp/perl/bin/perl.exe -w
 use strict;
 use CPANPLUS::Backend;
 use CPANPLUS::Dist;
@@ -56,7 +53,7 @@ GetOptions( $opts,
             'default-ignorelist!',  'edit-metafile!',
             'install!'
         );
-        
+
 die usage() if exists $opts->{'help'};
 
 ### parse options
@@ -65,12 +62,14 @@ my $keep        = $opts->{'keepsource'} ? 1 : 0;
 my $prereqbuild = exists $opts->{'buildprereq'}
                     ? $opts->{'buildprereq'}
                     : 0;
-my $timeout     = exists $opts->{'timeout'} 
-                    ? $opts->{'timeout'} 
+my $timeout     = exists $opts->{'timeout'}
+                    ? $opts->{'timeout'}
                     : 300;
 
 ### use default answers?
-$ENV{'PERL_MM_USE_DEFAULT'} = $opts->{'defaults'} ? 1 : 0;
+unless ( $ENV{'PERL_MM_USE_DEFAULT'} ) {
+  $ENV{'PERL_MM_USE_DEFAULT'} = $opts->{'defaults'} ? 1 : 0;
+}
 
 my $format;
 ### if provided, we go with the command line option, fall back to conf setting
@@ -78,7 +77,7 @@ my $format;
     $conf->set_conf( dist_type  => $format );
 
     ### is this a valid format??
-    die loc("Invalid format: " . ($format || "[NONE]") ) . usage() 
+    die loc("Invalid format: " . ($format || "[NONE]") ) . usage()
         unless $formats{$format};
 
     ### any options to fix config entries
@@ -86,14 +85,14 @@ my $format;
         while( my($key,$val) = each %$set_conf ) {
             $conf->set_conf( $key => $val );
         }
-    }        
+    }
 
     ### any options to fix program entries
     {   my $set_prog = $opts->{'set-program'} || {};
         while( my($key,$val) = each %$set_prog ) {
             $conf->set_program( $key => $val );
         }
-    }        
+    }
 
     ### any other options passed
     {   my %map = ( verbose     => 'verbose',
@@ -101,54 +100,54 @@ my $format;
                     skiptest    => 'skiptest',
                     makefile    => 'prefer_makefile'
                 );
-                
-        ### set config options from arguments        
+
+        ### set config options from arguments
         while (my($key,$val) = each %map) {
-            my $bool = exists $opts->{$key} 
-                            ? $opts->{$key} 
+            my $bool = exists $opts->{$key}
+                            ? $opts->{$key}
                             : $conf->get_conf($val);
             $conf->set_conf( $val => $bool );
-        }    
-    }        
+        }
+    }
 }
 
 my @modules = @ARGV;
 if( exists $opts->{'modulelist'} ) {
-    push @modules, map { parse_file( $_ ) } @{ $opts->{'modulelist'} }; 
-} 
+    push @modules, map { parse_file( $_ ) } @{ $opts->{'modulelist'} };
+}
 
 die usage() unless @modules;
 
 ### set up munge callback if requested
 {   if( $opts->{'edit-metafile'} ) {
         my $editor = $conf->get_program('editor');
-        
+
         if( $editor ) {
-    
+
             ### register install callback ###
             $cb->_register_callback(
                 name    => 'munge_dist_metafile',
                 code    => sub {
                                 my $self = shift;
                                 my $text = shift or return;
-                            
+
                                 my($fh,$file) = tempfile( UNLINK => 1 );
-                                
+
                                 unless( print $fh $text ) {
                                     warn "Could not print metafile information: $!";
                                     return;
                                 }
-                                
+
                                 close $fh;
-                                
+
                                 system( $editor => $file );
-                                
+
                                 my $cont = $cb->_get_file_contents( file => $file );
-                                
+
                                 return $cont;
                             },
             );
-            
+
         } else {
             warn "No editor configured. Can not edit metafiles!\n";
         }
@@ -158,13 +157,13 @@ die usage() unless @modules;
 my $fh;
 LOGFILE: {
     if( my $file = $opts->{logfile} ) {
-        open $fh, ">$file" or ( 
+        open $fh, ">$file" or (
             warn loc("Could not open '%1' for writing: %2", $file,$!),
             last LOGFILE
-        );            
-        
+        );
+
         warn "Logging to '$file'\n";
-        
+
         *STDERR = $fh;
         *STDOUT = $fh;
     }
@@ -173,7 +172,7 @@ LOGFILE: {
 ### reload indices if so desired
 $cb->reload_indices() if $opts->{'flushcache'};
 
-{   my @ban      = exists $opts->{'ban'}  
+{   my @ban      = exists $opts->{'ban'}
                             ? map { qr/$_/ } @{ $opts->{'ban'} }
                             : ();
 
@@ -181,54 +180,54 @@ $cb->reload_indices() if $opts->{'flushcache'};
     if( exists $opts->{'banlist'} ) {
         push @ban, map { parse_file( $_, 1 ) } @{ $opts->{'banlist'} };
     }
-    
+
     push @ban,  map  { s/\s+//; $_ }
                 map  { [split /\s*#\s*/]->[0] }
                 grep { /#/ }
-                map  { split /\n/ } _default_ban_list() 
+                map  { split /\n/ } _default_ban_list()
         if $opts->{'default-banlist'};
-    
-    ### use our prereq install callback 
+
+    ### use our prereq install callback
     $conf->set_conf( prereqs => PREREQ_ASK );
-    
+
     ### register install callback ###
     $cb->_register_callback(
             name    => 'install_prerequisite',
             code    => \&__ask_about_install,
     );
 
-    
+
     ### check for ban patterns when handling prereqs
     sub __ask_about_install {
-  
+
         my $mod     = shift or return;
         my $prereq  = shift or return;
-    
-    
+
+
         ### die with an error object, so we can verify that
         ### the die came from this location, and that it's an
         ### 'acceptable' death
         my $pat = ban_me( $prereq );
         die bless sub { loc("Module '%1' requires '%2' to be installed " .
                         "but found in your ban list (%3) -- skipping",
-                        $mod->module, $prereq->module, $pat ) 
+                        $mod->module, $prereq->module, $pat )
                   }, PREREQ_SKIP_CLASS if $pat;
         return 1;
-    }    
-    
+    }
+
     ### should we skip this module?
     sub ban_me {
         my $mod = shift;
-        
+
         for my $pat ( @ban ) {
             return $pat if $mod->module =~ /$pat/i;
         }
         return;
     }
-}    
+}
 
 ### patterns to strip from prereq lists
-{   my @ignore      = exists $opts->{'ignore'}  
+{   my @ignore      = exists $opts->{'ignore'}
                         ? map { qr/$_/ } @{ $opts->{'ignore'} }
                         : ();
 
@@ -239,10 +238,10 @@ $cb->reload_indices() if $opts->{'flushcache'};
     push @ignore, map  { s/\s+//; $_ }
                   map  { [split /\s*#\s*/]->[0] }
                   grep { /#/ }
-                  map  { split /\n/ } _default_ignore_list() 
+                  map  { split /\n/ } _default_ignore_list()
         if $opts->{'default-ignorelist'};
 
-    
+
     ### register install callback ###
     $cb->_register_callback(
             name    => 'filter_prereqs',
@@ -252,7 +251,7 @@ $cb->reload_indices() if $opts->{'flushcache'};
     sub __filter_prereqs {
         my $cb      = shift;
         my $href    = shift;
-        
+
         for my $name ( keys %$href ) {
             my $obj = $cb->parse_module( module => $name ) or (
                 warn "Cannot make a module object out of ".
@@ -263,44 +262,44 @@ $cb->reload_indices() if $opts->{'flushcache'};
                 warn loc("'%1' found in your ignore list (%2) ".
                          "-- filtering it out\n", $name, $pat);
 
-                delete $href->{ $name };                         
+                delete $href->{ $name };
             }
         }
 
         return $href;
     }
-    
+
     ### should we skip this module?
     sub ignore_me {
         my $mod = shift;
-        
+
         for my $pat ( @ignore ) {
             return $pat if $mod->module =~ /$pat/i;
             return $pat if $mod->package_name =~ /$pat/i;
         }
         return;
-    }   
-}     
+    }
+}
 
 
 my %done;
 for my $name (@modules) {
 
     my $obj;
-    
+
     ### is it a tarball? then we get it locally and transform it
     ### and its dependencies into .debs
     if( $tarball ) {
         ### make sure we use an absolute path, so chdirs() dont
         ### mess things up
-        $name = File::Spec->rel2abs( $name ); 
+        $name = File::Spec->rel2abs( $name );
 
         ### ENOTARBALL?
         unless( -e $name ) {
             warn loc("Archive '$name' does not exist");
             next;
         }
-        
+
         $obj = CPANPLUS::Module::Fake->new(
                         module  => basename($name),
                         path    => dirname($name),
@@ -317,7 +316,7 @@ for my $name (@modules) {
         ### set the location of the tarball
         $obj->status->fetch($name);
 
-    ### plain old cpan module?    
+    ### plain old cpan module?
     } else {
 
         ### find the corresponding module object ###
@@ -332,26 +331,26 @@ for my $name (@modules) {
         warn loc("'%1' found in your ban list (%2) -- skipping\n",
                     $obj->module, $pat );
         next;
-    }        
-    
-    ### or just ignored it? 
+    }
+
+    ### or just ignored it?
     if( my $pat = ignore_me( $obj ) ) {
         warn loc("'%1' found in your ignore list (%2) -- skipping\n",
                     $obj->module, $pat );
         next;
-    }        
-    
+    }
+
 
     my $target  = $opts->{'install'} ? 'install' : 'create';
-    my $dist    = eval { 
+    my $dist    = eval {
                     local $SIG{ALRM} = sub { die bless {}, ALARM_CLASS }
                         if $timeout;
-                        
+
                     alarm $timeout || 0;
 
                     my $dist_opts = $opts->{'dist-opts'} || {};
 
-                    my $rv = $obj->install(   
+                    my $rv = $obj->install(
                             prereq_target   => $target,
                             target          => $target,
                             keep_source     => $keep,
@@ -360,32 +359,32 @@ for my $name (@modules) {
                             ### any passed arbitrary options
                             %$dist_opts,
                     );
-                    
-                    alarm 0; 
+
+                    alarm 0;
 
                     $rv;
-                }; 
-                
+                };
+
     ### set here again, in case the install dies
     alarm 0;
 
     ### install failed due to a 'die' in our prereq skipper?
     if( $@ and ref $@ and $@->isa( PREREQ_SKIP_CLASS ) ) {
-        warn loc("Dist creation of '%1' skipped: '%2'", 
+        warn loc("Dist creation of '%1' skipped: '%2'",
                     $obj->module, $@->() );
         next;
 
     } elsif ( $@ and ref $@ and $@->isa( ALARM_CLASS ) ) {
         warn loc("\nDist creation of '%1' skipped, build time exceeded: ".
                  "%2 seconds\n", $obj->module, $timeout );
-        next;                    
+        next;
 
     ### died for some other reason? just report and skip
     } elsif ( $@ ) {
         warn loc("Dist creation of '%1' failed: '%2'",
                     $obj->module, $@ );
         next;
-    }        
+    }
 
     ### we didn't get a dist object back?
     unless ($dist and $obj->status->dist) {
@@ -412,7 +411,7 @@ sub parse_file {
         s/^(\S+).*/$1/;                 # skip extra info
         push @rv, $qr ? qr/$_/ : $_;    # add pattern to the list
     }
-   
+
     return @rv;
 }
 
@@ -444,11 +443,11 @@ sub usage {
 
  Usage: cpan2dist [--format FMT] [OPTS] Mod::Name [Mod::Name, ...]
         cpan2dist [--format FMT] [OPTS] --modulelist /tmp/mods.list
-        cpan2dist [--format FMT] [OPTS] --archive /tmp/dist [/tmp/dist2] 
+        cpan2dist [--format FMT] [OPTS] --archive /tmp/dist [/tmp/dist2]
 
     Will create a distribution of type FMT of the modules
     specified on the command line, and all their prerequisites.
-    
+
     Can also create a distribution of type FMT from a local
     archive and all of its prerequisites.
 
@@ -460,21 +459,21 @@ $formats
 
     You can install more formats from CPAN!
     \n];
-    
+
     $usage .= << '=cut';
 =pod
-    
+
 Options:
 
     ### take no argument:
     --help          Show this help message
     --install       Install this package (and any prerequisites you built)
-                    after building it. 
+                    after building it.
     --skiptest      Skip tests. Can be negated using --noskiptest
     --force         Force operation. Can be negated using --noforce
     --verbose       Be verbose. Can be negated using --noverbose
     --keepsource    Keep sources after building distribution. Can be
-                    negated by --nokeepsource. May not be supported 
+                    negated by --nokeepsource. May not be supported
                     by all formats
     --makefile      Prefer Makefile.PL over Build.PL. Can be negated
                     using --nomakefile. Defaults to your config setting
@@ -498,7 +497,7 @@ Options:
                   Are appended to the ban list built up by --ban
                   May be given multiple times.
     --ignore      Patterns of modules to exclude from prereq list. Useful
-                  for when a prereq listed by a CPAN module is resolved 
+                  for when a prereq listed by a CPAN module is resolved
                   in another way than from its corresponding CPAN package
                   (Match is done on both module name, and package name of
                   the package the module is in, case-insensitive)
@@ -511,71 +510,71 @@ Options:
     --logfile     File to log all output to. By default, all output goes
                   to the console.
     --timeout     The allowed time for buliding a distribution before
-                  aborting. This is useful to terminate any build that 
-                  hang or happen to be interactive despite being told not 
-                  to be. Defaults to 300 seconds. To turn off, you can 
+                  aborting. This is useful to terminate any build that
+                  hang or happen to be interactive despite being told not
+                  to be. Defaults to 300 seconds. To turn off, you can
                   set it to 0.
     --set-config  Change any options as specified in your config for this
-                  invocation only. See CPANPLUS::Config for a list of 
+                  invocation only. See CPANPLUS::Config for a list of
                   supported options.
     --set-program Change any programs as specified in your config for this
-                  invocation only. See CPANPLUS::Config for a list of 
+                  invocation only. See CPANPLUS::Config for a list of
                   supported programs.
     --dist-opts   Arbitrary options passed along to the chosen installer
                   format's prepare()/create() routine. Please see the
-                  documentation of the installer of your choice for 
+                  documentation of the installer of your choice for
                   options it accepts.
 
     ### builtin lists
     --default-banlist    Use our builtin banlist. Works just like --ban
                          and --banlist, but with pre-set lists. See the
                          "Builtin Lists" section for details.
-    --default-ignorelist Use our builtin ignorelist. Works just like 
-                         --ignore and --ignorelist but with pre-set lists. 
+    --default-ignorelist Use our builtin ignorelist. Works just like
+                         --ignore and --ignorelist but with pre-set lists.
                          See the "Builtin Lists" section for details.
 
 Examples:
 
-    ### build a debian package of DBI and its prerequisites, 
+    ### build a debian package of DBI and its prerequisites,
     ### don't bother running tests
     cpan2dist --format CPANPLUS::Dist::Deb --buildprereq --skiptest DBI
-    
+
     ### build a debian package of DBI and its prerequisites and install them
     cpan2dist --format CPANPLUS::Dist::Deb --buildprereq --install DBI
-    
-    ### Build a package, whose format is determined by your config, of 
+
+    ### Build a package, whose format is determined by your config, of
     ### the local tarball, reloading cpanplus' indices first and using
     ### the tarballs Makefile.PL if it has one.
     cpan2dist --makefile --flushcache --archive /path/to/Cwd-1.0.tgz
-    
+
     ### build a package from Net::FTP, but dont build any packages or
-    ### dependencies whose name match 'Foo', 'Bar' or any of the 
+    ### dependencies whose name match 'Foo', 'Bar' or any of the
     ### patterns mentioned in /tmp/ban
     cpan2dist --ban Foo --ban Bar --banlist /tmp/ban Net::FTP
-    
+
     ### build a package from Net::FTP, but ignore its listed dependency
     ### on IO::Socket, as it's shipped per default with the OS we're on
     cpan2dist --ignore IO::Socket Net::FTP
-    
+
     ### building all modules listed, plus their prerequisites
-    cpan2dist --ignorelist /tmp/modules.ignore --banlist /tmp/modules.ban 
-      --modulelist /tmp/modules.list --buildprereq --flushcache 
+    cpan2dist --ignorelist /tmp/modules.ignore --banlist /tmp/modules.ban
+      --modulelist /tmp/modules.list --buildprereq --flushcache
       --makefile --defaults
-    
+
     ### pass arbitrary options to the format's prepare()/create() routine
     cpan2dist --dist-opts deb_version=3 --dist-opts prefix=corp
 
 =cut
-    
+
     $usage .= qq[
 Builtin Lists:
 
     Ignore list:] . _default_ignore_list() . qq[
     Ban list:] .    _default_ban_list();
-    
+
     ### strip the pod directives
     $usage =~ s/=pod\n//g;
-    
+
     return $usage;
 }
 
@@ -595,10 +594,10 @@ if you like, or supply your own if need be.
 
 =head2 Built-In Ignore List
 
-=pod 
+=pod
 
 You can use this list of regexes to ignore modules matching
-to be listed as prerequisites of a package. Particulaly useful
+to be listed as prerequisites of a package. Particularly useful
 if they are bundled with core-perl anyway and they have known
 issues building.
 
@@ -615,9 +614,9 @@ sub _default_ignore_list {
     ^Cwd$                   # Provided with core anyway
     ^File::Spec             # Provided with core anyway
     ^Config$                # Perl's own config, not shipped separately
-    ^ExtUtils::MakeMaker$   # Shipped with perl, recent versions 
+    ^ExtUtils::MakeMaker$   # Shipped with perl, recent versions
                             # have bug 14721 (see rt.cpan.org)
-    ^ExtUtils::Install$     # Part of of EU::MM, same reason    
+    ^ExtUtils::Install$     # Part of of EU::MM, same reason
 
 =cut
 
@@ -640,7 +639,7 @@ sub _default_ban_list {
 
     ^GD$                # Needs c libaries
     ^Berk.*DB           # DB packages require specific options & linking
-    ^DBD::              # DBD drives require database files/headers
+    ^DBD::              # DBD drivers require database files/headers
     ^XML::              # XML modules usually require expat libraries
     Apache              # These usually require apache libraries
     SSL                 # These usually require SSL certificates & libs
@@ -671,10 +670,10 @@ This module by Jos Boumans E<lt>kane@cpan.orgE<gt>.
 
 =head1 COPYRIGHT
 
-The CPAN++ interface (of which this module is a part of) is copyright (c) 
+The CPAN++ interface (of which this module is a part of) is copyright (c)
 2001 - 2007, Jos Boumans E<lt>kane@cpan.orgE<gt>. All rights reserved.
 
-This library is free software; you may redistribute and/or modify it 
+This library is free software; you may redistribute and/or modify it
 under the same terms as Perl itself.
 
 =cut

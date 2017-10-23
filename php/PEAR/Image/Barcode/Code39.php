@@ -20,7 +20,7 @@
  * @author     Ryan Briones <ryanbriones@webxdesign.org>
  * @copyright  2005 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Code39.php 304741 2010-10-25 09:14:17Z clockwerx $
+ * @version    CVS: $Id$
  * @link       http://pear.php.net/package/Image_Barcode
  */
 
@@ -75,6 +75,13 @@ class Image_Barcode_Code39 extends Image_Barcode
      * @var integer
      */
     var $_barthickwidth = 3;
+
+    /**
+     * Font size
+     *
+     * @var integer
+     */
+    var $_font_size = 2;
 
     /**
      * Coding map
@@ -183,8 +190,8 @@ class Image_Barcode_Code39 extends Image_Barcode
        // Allocate black and white colors to the image
        $black = imagecolorallocate( $img, 0, 0, 0 );
        $white = imagecolorallocate( $img, 255, 255, 255 );
-       $font_height = ( $noText ? 0 : imagefontheight( "gdFontSmall" ) );
-       $font_width = imagefontwidth( "gdFontSmall" );
+       $font_height = ( $noText ? 0 : imagefontheight( $this->_font_size ) );
+       $font_width = imagefontwidth( $this->_font_size );
 
        // fill background with white color
        imagefill( $img, 0, 0, $white );
@@ -217,7 +224,7 @@ class Image_Barcode_Code39 extends Image_Barcode
             // draw text under barcode
             imagestring(
                 $img,
-                'gdFontSmall',
+                $this->_font_size,
                 ( $barcode_len - $font_width * strlen( $this->text ) )/2,
                 $this->_barcodeheight - $font_height,
                 $this->text,

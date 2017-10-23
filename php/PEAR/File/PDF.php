@@ -5,10 +5,10 @@
  *
  * Based on the FPDF class by Olivier Plathey (http://www.fpdf.org/).
  *
- * $Horde: framework/File_PDF/PDF.php,v 1.64 2008/02/26 23:18:55 jan Exp $
+ * $Horde: framework/File_PDF/PDF.php,v 1.18.10.22 2011/08/06 21:37:11 jan Exp $
  *
  * Copyright 2001-2003 Olivier Plathey <olivier@fpdf.org>
- * Copyright 2003-2008 The Horde Project (http://www.horde.org/)
+ * Copyright 2003-2009 The Horde Project (http://www.horde.org/)
  *
  * See the enclosed file COPYING for license information (LGPL). If you
  * did not receive this file, see http://www.fsf.org/copyleft/lgpl.html.
@@ -2619,7 +2619,7 @@ class File_PDF {
             if (!empty($path)) {
                 $file = $path . strtolower($fontkey) . '.php';
             } else {
-                $file = 'File/PDF/fonts/' . strtolower($fontkey) . '.php';
+                $file = dirname(__FILE__) . '/PDF/fonts/' . strtolower($fontkey) . '.php';
             }
             include $file;
             if (!isset($font_widths[$fontkey])) {

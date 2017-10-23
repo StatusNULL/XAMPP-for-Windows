@@ -1,5 +1,3 @@
-#!D:\rel174new\tests\xampp\php\php.exe -q
-
 <?php
 
 
@@ -27,7 +25,7 @@
 	list($partition, $nonpartition) = preg_split ("/:/", $curdir); //Fix by Wiedmann
 	$partwampp = substr(realpath(__FILE__), 0, strrpos(dirname(realpath(__FILE__)), '\\'));
 
-	$directorwampp = NULL;
+	$directorwampp = NULL;                                                  
 	if ($usbstick == "1" ) {
 	   $dirpartwampp=$nonpartition;
   } else {
@@ -173,7 +171,7 @@
 				}
 				fclose($datei);
         // echo "  Configure for $update $updateversion\r\n";
-        echo "  Configure for Version $xamppversion\r\n";
+        // echo "  Configure for Version $xamppversion\r\n";
 				if (file_exists($installsysroot)) {
 					$datei = fopen($installsysroot, 'r');
 					unset($newzeile);
@@ -237,15 +235,15 @@
 				}
 				// httpd.conf modification for Perl, Python or Java (only single)
 				////// PATH CHANGING SINCE APACHE 2.2 
-				if ($update == "perl") {
+				/* if ($update == "perl") {
 					$includehttpdconf = "\r\n\r\nInclude conf/extra/perl.conf";
-				}
+				} */
 				if ($update == "python") {
 					$includehttpdconf = "\r\n\r\nInclude conf/extra/python.conf";
 				}
-				if ($update == "java") {
+				/* if ($update == "java") {
 					$includehttpdconf = "\r\n\r\nInclude conf/extra/java.conf";
-				}
+				} */
 		if ((($update == "perl") || ($update == "python") || ($update == "java")) && ($updatemake == "makenew")) {
 					$datei = fopen($confhttpdroot, 'a');
 					if ($datei) {
@@ -376,14 +374,14 @@
 		$system = system("echo '%os%'");
 		if ($system != "'Windows_NT'") {
 			$system = "Windows";
-			echo "  $system 98/ME/HOME (not NT)";
+			echo "  $system 98/ME/HOME";
 		}
-		echo "  Please wait ...";
+		echo "  Updating configuration files ... please wait ...";
 		if ($xamppinstaller == "newinstall") {
 			if ($system == "Windows") {
 				$confhttpdroot = $partwampp."\apache\\conf\\httpd.conf";
 				$includewin = "Win32DisableAcceptEx\r\n";
-				echo "\r\n  Disable AcceptEx Winsocks v2 support (only NT)";
+				echo "\r\n  Disable AcceptEx Winsocks v2 support";
 				$datei = fopen($confhttpdroot, 'r');
 				unset($newzeile);
 				$i = 0;
@@ -407,7 +405,7 @@
 			} else {
 				$confhttpdroot = $partwampp."\apache\\conf\\httpd.conf";
 				$includewin = "# Win32DisableAcceptEx\r\n";
-				echo "\r\n  Enable AcceptEx Winsocks v2 support for NT systems";
+				// echo "\r\n  Enable AcceptEx Winsocks v2 support";
 				$datei = fopen($confhttpdroot, 'r');
 				$i = 0;
 				unset($newzeile);
@@ -474,7 +472,7 @@
 			if ($updatemake == "doppelt") {
 				break;
 			}
-
+      // echo "DEBUG: Working with $awkconfig now ... \r\n";
 			$awkrealm = $awkexe." -v DIR=".$awknewdir." -v CONFIG=".$awkconfig. " -v CONFIGNEW=".$awkconfigtemp. "  -v SUBSTIT=".$substit." -f ".$awk;
 
 			if (file_exists($awk) && file_exists($awkexe) && file_exists($configreal)) {
@@ -531,7 +529,7 @@
 			if ($updatemake == "doppelt") {
 				break;
 			}
-
+      // echo "DEBUG: Working with $awkconfig now ... \r\n";
 			$awkrealm = $awkexe." -v DIR=".$awkslashdir." -v CONFIG=".$awkconfig. " -v CONFIGNEW=".$awkconfigtemp. "  -v SUBSTIT=".$substitslash." -f ".$awk;
 
 			if (file_exists($awk) && file_exists($awkexe) && file_exists($configreal)) {

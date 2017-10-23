@@ -1,16 +1,16 @@
 @rem = '--*-Perl-*--
 @echo off
 if "%OS%" == "Windows_NT" goto WinNT
-perl -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
+"%~dp0perl.exe" -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
 goto endofperl
 :WinNT
-perl -x -S %0 %*
+"%~dp0perl.exe" -x -S %0 %*
 if NOT "%COMSPEC%" == "%SystemRoot%\system32\cmd.exe" goto endofperl
 if %errorlevel% == 9009 echo You do not have Perl in your PATH.
 if errorlevel 1 goto script_failed_so_exit_with_non_zero_val 2>nul
 goto endofperl
 @rem ';
-#!/xampp/perl/bin/perl.exe -w
+#!/usr/bin/perl -w
 #line 15
 
 =head1 NAME
@@ -19,7 +19,7 @@ lwp-download - Fetch large files from the web
 
 =head1 SYNOPSIS
 
-B<lwp-download> [B<-a>] <I<url>> [<I<local path>>]
+B<lwp-download> [B<-a>] [B<-s>] <I<url>> [<I<local path>>]
 
 =head1 DESCRIPTION
 
@@ -29,15 +29,19 @@ file.
 If I<local path> is not specified, then the current directory is
 assumed.
 
-If I<local path> is a directory, then the basename of the file to save
-is picked up from the Content-Disposition header or the URL of the
-response.  If the file already exists, then B<lwp-download> will
-prompt before it overwrites and will fail if its standard input is not
-a terminal.  This form of invocation will also fail is no acceptable
-filename can be derived from the sources mentioned above.
+If I<local path> is a directory, then the last segment of the path of the
+I<url> is appended to form a local filename.  If the I<url> path ends with
+slash the name "index" is used.  With the B<-s> option pick up the last segment
+of the filename from server provided sources like the Content-Disposition
+header or any redirect URLs.  A file extension to match the server reported
+Content-Type might also be appended.  If a file with the produced filename
+already exists, then B<lwp-download> will prompt before it overwrites and will
+fail if its standard input is not a terminal.  This form of invocation will
+also fail is no acceptable filename can be derived from the sources mentioned
+above.
 
 If I<local path> is not a directory, then it is simply used as the
-path to save into.
+path to save into.  If the file already exists it's overwritten.
 
 The I<lwp-download> program is implemented using the I<libwww-perl>
 library.  It is better suited to down load big files than the
@@ -70,6 +74,8 @@ use LWP::UserAgent ();
 use LWP::MediaTypes qw(guess_media_type media_suffix);
 use URI ();
 use HTTP::Date ();
+use Encode;
+use Encode::Locale;
 
 my $progname = $0;
 $progname =~ s,.*/,,;    # only basename left in progname
@@ -79,14 +85,14 @@ $progname =~ s/\.\w*$//; # strip extension if any
 #parse option
 use Getopt::Std;
 my %opt;
-unless (getopts('a', \%opt)) {
+unless (getopts('as', \%opt)) {
     usage();
 }
 
-my $url = URI->new(shift || usage());
-my $argfile = shift;
+my $url = URI->new(decode(locale => shift) || usage());
+my $argfile = encode(locale_fs => decode(locale => shift));
 usage() if defined($argfile) && !length($argfile);
-my $VERSION = "5.827";
+my $VERSION = "6.00";
 
 my $ua = LWP::UserAgent->new(
    agent => "lwp-download/$VERSION ",
@@ -119,20 +125,17 @@ my $res = $ua->request(HTTP::Request->new(GET => $url),
 
 	  unless (defined $argfile) {
 	      # find a suitable name to use
-	      $file = $res->filename;
+	      $file = $opt{s} && $res->filename;
 
 	      # if this fails we try to make something from the URL
 	      unless ($file) {
-		  my $req = $res->request;  # not always there
-		  my $rurl = $req ? $req->uri : $url;
-
-		  $file = ($rurl->path_segments)[-1];
+		  $file = ($url->path_segments)[-1];
 		  if (!defined($file) || !length($file)) {
 		      $file = "index";
 		      my $suffix = media_suffix($res->content_type);
 		      $file .= ".$suffix" if $suffix;
 		  }
-		  elsif ($rurl->scheme eq 'ftp' ||
+		  elsif ($url->scheme eq 'ftp' ||
 			   $file =~ /\.t[bg]z$/   ||
 			   $file =~ /\.tar(\.(Z|gz|bz2?))?$/
 			  ) {
@@ -151,7 +154,9 @@ my $res = $ua->request(HTTP::Request->new(GET => $url),
 	      # validate that we don't have a harmful filename now.  The server
 	      # might try to trick us into doing something bad.
 	      if (!length($file) ||
-                  $file =~ s/([^a-zA-Z0-9_\.\-\+\~])/sprintf "\\x%02x", ord($1)/ge)
+                  $file =~ s/([^a-zA-Z0-9_\.\-\+\~])/sprintf "\\x%02x", ord($1)/ge ||
+		  $file =~ /^\./
+	      )
               {
 		  die "Will not save <$url> as \"$file\".\nPlease override file name on the command line.\n";
 	      }
@@ -187,12 +192,17 @@ my $res = $ua->request(HTTP::Request->new(GET => $url),
 	      }
 	      else {
 		  print "Saving to '$file'...\n";
+		  use Fcntl qw(O_WRONLY O_EXCL O_CREAT);
+		  sysopen(FILE, $file, O_WRONLY|O_EXCL|O_CREAT) ||
+		      die "Can't open $file: $!";
 	      }
 	  }
 	  else {
 	      $file = $argfile;
 	  }
-	  open(FILE, ">$file") || die "Can't open $file: $!\n";
+	  unless (fileno(FILE)) {
+	      open(FILE, ">", $file) || die "Can't open $file: $!\n";
+	  }
           binmode FILE unless $opt{a};
 	  $length = $res->content_length;
 	  $flength = fbytes($length) if defined $length;

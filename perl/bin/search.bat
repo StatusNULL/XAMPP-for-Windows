@@ -1,16 +1,16 @@
 @rem = '--*-Perl-*--
 @echo off
 if "%OS%" == "Windows_NT" goto WinNT
-perl -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
+"%~dp0perl.exe" -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
 goto endofperl
 :WinNT
-perl -x -S %0 %*
+"%~dp0perl.exe" -x -S %0 %*
 if NOT "%COMSPEC%" == "%SystemRoot%\system32\cmd.exe" goto endofperl
 if %errorlevel% == 9009 echo You do not have Perl in your PATH.
 if errorlevel 1 goto script_failed_so_exit_with_non_zero_val 2>nul
 goto endofperl
 @rem ';
-#!\xampp\perl\bin\perl.exe -w
+#!/usr/local/bin/perl -w
 #line 15
 'di';
 'ig00';
@@ -195,8 +195,6 @@ However, duplicating things (such as -name '*.c' -name '*.txt') implies OR.
 If any letter in -newer/-older is upper case, "or equal" is
 inserted into the test.
 
-You can always find the latest version on the World Wide Web in
-   http://www.wg.omron.co.jp/~jfriedl/perl/
 INLINE_LITERAL_TEXT
 	  exit(0);
       }
@@ -479,7 +477,7 @@ sub prepare_to_search
 	  ##
 	  if ($underlineOK) {
 	     if ($regex =~ m/[?*+{}()\\.|^\$[]/) {
-		warn "$0: warning, can't underline-safe ``$regex''.\n";
+		warn "$0: warning, can't underline-safe '$regex'.\n";
 	     } else {
 		$regex = join($underline_glue, split(//, $regex));
 	     }
@@ -1156,10 +1154,7 @@ more powerful and efficient (and intuitive, I think).
 
 This manual describes
 .I search
-as of version "941227.4". You can always find the latest version at
-.nf
-   http://www.wg.omron.co.jp/~jfriedl/perl/index.html
-.fi
+as of version "941227.4".
 
 .SH "QUICK EXAMPLE"
 Basic use is simple:

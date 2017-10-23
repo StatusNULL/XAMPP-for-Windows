@@ -1,4 +1,4 @@
-<?
+<?php
 $languages['en']="English";
 $languages['de']="Deutsch";
 $languages['fr']="Francais";

@@ -1,4 +1,4 @@
-<?
+<?php
 // ---------------------------------------------------------------------
 // GLOBAL
 // ---------------------------------------------------------------------
@@ -243,6 +243,52 @@ $TEXT['about-subhead2']="Design";
 $TEXT['about-subhead3']="Colaboração";
 
 $TEXT['about-subhead4']="Contatos pessoais";
+
+	// ---------------------------------------------------------------------
+	// MERCURY
+	// ---------------------------------------------------------------------
+
+	$TEXT['mail-head'] = "Mala-direta com o servidor SMTP e POP3 Mercury Mail";
+	$TEXT['mail-hinweise'] = "Algumas notas importantes para utilizar o Mercury!";
+	$TEXT['mail-adress'] = "Remetente:";
+	$TEXT['mail-adressat'] = "Destinatário:";
+	$TEXT['mail-cc'] = "CC:";
+	$TEXT['mail-subject'] = "Assunto:";
+	$TEXT['mail-message'] = "Mensagem:";
+	$TEXT['mail-sendnow'] = "Esta mensagem ser agora enviada ...";
+	$TEXT['mail-sendok'] = "Esta mensagem foi enviada com sucesso!";
+	$TEXT['mail-sendnotok'] = "Erro! A mensagem nor pode ser enviada!";
+	$TEXT['mail-help1'] = "Notes da utilização do Mercury:<br><br>";
+	$TEXT['mail-help2'] = "<ul>
+	<li>O servidor Mercury necessita uma conexão externa na inicialização;</li>
+	<li>Ao iniciar, o Mercury define o Domain Name Service (DNS) automaticamente como sendo o nome do servidor de seu provedor;</li>
+	<li>Para todos os usuários de gateway: Por favor, configure seu DNS via TCP/IP (ex. via InterNic com um número de IP 198.41.0.4);</li>
+	<li>O arquivo de configuração do Mercury é denominado MERCURY.INI;</li>
+	<li>Por favor, envie uma mensagem para postmaster@localhost ou admin@localhost para testar e verifique o resultado nas pastas: xampp.../mailserver/MAIL/postmaster ou (...)/admin;</li>
+	<li>Exixte um usuário teste denominado \"newuser\" (newuser@localhost) e com a Senha = wampp;</li>
+	<li>Spam e outras obcenidades são totalmente proibidas com o Mercury!;</li>
+	</ul>";
+	$TEXT['mail-url'] = "<a href=\"http://www.pmail.com/overviews/ovw_mercury.htm\" target=\"_top\">http://www.pmail.com/overviews/ovw_mercury.htm</a>";
+	$TEXT['mail-note-important'] = "IMPORTANT";
+	$TEXT['mail-note-text1'] = "There are three variants for sending emails with PHP. One of these three possibilities have to be activated in the xampp\php\php.ini file.";
+	$TEXT['mail-note-text2'] = "<b>mailToDisk</b> (<i>Default</i>) - All emails are written in the xampp\mailoutput folder on local disk. XAMPP mailToDisk is the default and you have nothing to do in the php.ini.";
+	$TEXT['mail-note-text3'] = "<b>fakemail</b> - With fakemail (sendmail.exe)) all emails are forwarding to your mailbox. Please edit the xampp\sendmail\sendmail.ini first with your mailbox credentials. And do not forget to activate fakemail (senmail.exe)) in the xampp\php\php.ini.";	
+	$TEXT['mail-note-text4'] = "<b>Mercury Mail Server</b> or some other Mail Socket Server on localhost. This option have to be activated in the php.ini also.";
+
+	// ---------------------------------------------------------------------
+	// FileZilla FTP
+	// ---------------------------------------------------------------------
+
+	$TEXT['filezilla-head'] = "Servidor FTP FileZilla";
+	$TEXT['filezilla-install'] = "O Apache <U>não</U> é um servidor de FTP ... mas o FTP FileZilla é. Por favor, considere as seguintes referências.";
+	$TEXT['filezilla-install2'] = "No diretório principal do xampp, rodar o arquivo de lote \"filezilla_setup.bat\" para configurar. Atenção: Para o Windows NT, 2000 e XP Profissional, o FileZilla necessita ser instalado como um serviço.";
+	$TEXT['filezilla-install3'] = "Configure o servidor de FTP \"FileZilla\". Utilize-se da interface do FileZilla para configurá-lo, que poder ser acessada pelo arquivo \"FileZilla Server Interface.exe\". Existem dois usuários neste exemplo:<br><br>
+	A: O usuário padrão \"newuser\" com senha \"wampp\". O diretório principal dele é xampp\htdocs.<br>
+	B: Um usuário anônimo \"anonymous\" sem senha definida. O diretório principal dele é xampp\anonymous.<br><br>
+	A interface padrão é no endereço de loopback com IP 127.0.0.1.";
+	$TEXT['filezilla-install4'] = "O servidor FTP será finaliza com o arquivo lote \"FileZillaFTP_stop.bat\". Para o servidor FTP FileZilla sendo utilizado como um serviço do Windows, por favor se utilize diretamente do arquivo \"FileZillaServer.exe\". Com ele você pode configurar todas as opções de inicialização.";
+	$TEXT['filezilla-url'] = "<br><br><a href=\"http://filezilla.sourceforge.net\" target=\"_top\">http://filezilla.sourceforge.net</a>";
+
 
 	// ---------------------------------------------------------------------
 	// NAVI SPECIALS SECTION

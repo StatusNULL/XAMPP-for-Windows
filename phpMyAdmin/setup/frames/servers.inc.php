@@ -2,7 +2,7 @@
 /**
  * Server create and edit view
  *
- * @package phpMyAdmin-setup
+ * @package PhpMyAdmin-setup
  */
 
 if (!defined('PHPMYADMIN')) {
@@ -26,7 +26,7 @@ $server_exists = !empty($id) && $cf->get("Servers/$id") !== null;
 
 if ($mode == 'edit' && $server_exists) {
     $page_title = __('Edit server')
-        . ' ' . $id . ' <small>(' . $cf->getServerDSN($id) . ')</small>';
+        . ' ' . $id . ' <small>(' . htmlspecialchars($cf->getServerDSN($id)) . ')</small>';
 } elseif ($mode == 'remove' && $server_exists) {
     $cf->removeServer($id);
     header('Location: index.php');

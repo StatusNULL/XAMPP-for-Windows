@@ -12,15 +12,18 @@
 
 	<body>
 		&nbsp;<br>
-	<h1><?=$TEXT['start-head']?>!</h1>
-	<b><?=$TEXT['start-subhead']?></b><p>
+	<h1><?php print $TEXT['start-head']; ?>!</h1>
+	<b><?php print $TEXT['start-subhead']; ?></b><p><p>
+
+	<b>++++ ++++ <i>A great thank you to hackattack142 for this new fine Control Panel!</i> ++++ ++++</b><p> 
+	<img src="img/xampp-site-and-control-panel.jpg" alt="New Control Panel" /><p><p>
+	<?php print $TEXT['start-text1']; ?><p>
+	<?php print $TEXT['start-text2']; ?><p>
+	<?php print $TEXT['start-text3']; ?><p>
+	<?php print $TEXT['start-text4']; ?><p>
+	<?php print $TEXT['start-text6']; ?><p>
 	
 
-	<?=$TEXT['start-text1']?><p>
-	<?=$TEXT['start-text2']?><p>
-	<?=$TEXT['start-text3']?><p>
-	<?=$TEXT['start-text4']?><p>
-	<?=$TEXT['start-text6']?>
 
 	</body>
 </html>

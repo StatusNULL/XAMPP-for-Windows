@@ -1,7 +1,7 @@
 # Pod::Man -- Convert POD data to formatted *roff input.
 #
-# Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009
-#     Russ Allbery <rra@stanford.edu>
+# Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
+#     2010 Russ Allbery <rra@stanford.edu>
 # Substantial contributions by Sean Burke <sburke@cpan.org>
 #
 # This program is free software; you may redistribute it and/or modify it
@@ -31,12 +31,12 @@ use subs qw(makespace);
 use vars qw(@ISA %ESCAPES $PREAMBLE $VERSION);
 
 use Carp qw(croak);
+use Encode qw(encode);
 use Pod::Simple ();
-use POSIX qw(strftime);
 
 @ISA = qw(Pod::Simple);
 
-$VERSION = '2.22';
+$VERSION = '2.25';
 
 # Set the debugging level.  If someone has inserted a debug function into this
 # class already, use that.  Otherwise, use any Pod::Simple debug function
@@ -255,11 +255,11 @@ sub _handle_element_start {
 
     # If we have a command handler, we need to accumulate the contents of the
     # tag before calling it.  Turn off IN_NAME for any command other than
-    # <Para> so that IN_NAME isn't still set for the first heading after the
-    # NAME heading.
+    # <Para> and the formatting codes so that IN_NAME isn't still set for the
+    # first heading after the NAME heading.
     if ($self->can ("cmd_$method")) {
         DEBUG > 2 and print "<$element> starts saving a tag\n";
-        $$self{IN_NAME} = 0 if ($element ne 'Para');
+        $$self{IN_NAME} = 0 if ($element ne 'Para' && length ($element) > 1);
 
         # How we're going to format embedded text blocks depends on the tag
         # and also depends on our parent tags.  Thankfully, inside tags that
@@ -395,6 +395,10 @@ sub quote_literal {
     # array or hash index, separated out just because we want to use it in
     # several places in the following regex.
     my $index = '(?: \[.*\] | \{.*\} )?';
+
+    # If in NAME section, just return an ASCII quoted string to avoid
+    # confusing tools like whatis.
+    return qq{"$_"} if $$self{IN_NAME};
 
     # Check for things that we don't want to quote, and if we find any of
     # them, return the string with just a font change and no quoting.
@@ -712,6 +716,7 @@ sub outindex {
     for (@output) {
         my ($type, $entry) = @$_;
         $entry =~ s/\"/\"\"/g;
+        $entry =~ s/\\/\\\\/g;
         $self->output (".IX $type " . '"' . $entry . '"' . "\n");
     }
 }
@@ -719,7 +724,11 @@ sub outindex {
 # Output some text, without any additional changes.
 sub output {
     my ($self, @text) = @_;
-    print { $$self{output_fh} } @text;
+    if ($$self{ENCODE}) {
+        print { $$self{output_fh} } encode ('UTF-8', join ('', @text));
+    } else {
+        print { $$self{output_fh} } @text;
+    }
 }
 
 ##############################################################################
@@ -736,17 +745,19 @@ sub start_document {
         return;
     }
 
-    # If we were given the utf8 option, set an output encoding on our file
-    # handle.  Wrap in an eval in case we're using a version of Perl too old
-    # to understand this.
-    #
-    # This is evil because it changes the global state of a file handle that
-    # we may not own.  However, we can't just blindly encode all output, since
-    # there may be a pre-applied output encoding (such as from PERL_UNICODE)
-    # and then we would double-encode.  This seems to be the least bad
-    # approach.
+    # When UTF-8 output is set, check whether our output file handle already
+    # has a PerlIO encoding layer set.  If it does not, we'll need to encode
+    # our output before printing it (handled in the output() sub).  Wrap the
+    # check in an eval to handle versions of Perl without PerlIO.
+    $$self{ENCODE} = 0;
     if ($$self{utf8}) {
-        eval { binmode ($$self{output_fh}, ':encoding(UTF-8)') };
+        $$self{ENCODE} = 1;
+        eval {
+            my @layers = PerlIO::get_layers ($$self{output_fh});
+            if (grep { $_ eq 'utf8' } @layers) {
+                $$self{ENCODE} = 0;
+            }
+        }
     }
 
     # Determine information for the preamble and then output it.
@@ -853,7 +864,12 @@ sub devise_date {
     } else {
         $time = time;
     }
-    return strftime ('%Y-%m-%d', localtime $time);
+
+    # Can't use POSIX::strftime(), which uses Fcntl, because MakeMaker
+    # uses this and it has to work in the core which can't load dynamic
+    # libraries.
+    my ($year, $month, $day) = (localtime $time)[5,4,3];
+    return sprintf ("%04d-%02d-%02d", $year + 1900, $month + 1, $day);
 }
 
 # Print out the preamble and the title.  The meaning of the arguments to .TH
@@ -940,8 +956,9 @@ sub cmd_para {
         if defined ($line) && DEBUG && !$$self{IN_NAME};
 
     # Force exactly one newline at the end and strip unwanted trailing
-    # whitespace at the end.
-    $text =~ s/\s*$/\n/;
+    # whitespace at the end, but leave "\ " backslashed space from an S< >
+    # at the end of a line.
+    $text =~ s/((?:\\ )*)\s*$/$1\n/;
 
     # Output the paragraph.
     $self->output ($self->protect ($self->textmapfonts ($text)));
@@ -1076,9 +1093,9 @@ sub cmd_head4 {
 
 # All of the formatting codes that aren't handled internally by the parser,
 # other than L<> and X<>.
-sub cmd_b { return '\f(BS' . $_[2] . '\f(BE' }
-sub cmd_i { return '\f(IS' . $_[2] . '\f(IE' }
-sub cmd_f { return '\f(IS' . $_[2] . '\f(IE' }
+sub cmd_b { return $_[0]->{IN_NAME} ? $_[2] : '\f(BS' . $_[2] . '\f(BE' }
+sub cmd_i { return $_[0]->{IN_NAME} ? $_[2] : '\f(IS' . $_[2] . '\f(IE' }
+sub cmd_f { return $_[0]->{IN_NAME} ? $_[2] : '\f(IS' . $_[2] . '\f(IE' }
 sub cmd_c { return $_[0]->quote_literal ($_[2]) }
 
 # Index entries are just added to the pending entries.
@@ -1092,7 +1109,15 @@ sub cmd_x {
 # a URL.
 sub cmd_l {
     my ($self, $attrs, $text) = @_;
-    return $$attrs{type} eq 'url' ? "<$text>" : $text;
+    if ($$attrs{type} eq 'url') {
+        if (not defined($$attrs{to}) or $$attrs{to} eq $text) {
+            return "<$text>";
+        } else {
+            return "$text <$$attrs{to}>";
+        }
+    } else {
+        return $text;
+    }
 }
 
 ##############################################################################

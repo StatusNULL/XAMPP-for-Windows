@@ -1324,7 +1324,7 @@ int UpdateStatus(HWND hDlg)
 
 	// Determine Apache SERVICE status
 
-    result = GetServiceStatus("Apache2.2");
+    result = GetServiceStatus("Apache2.4");
 
     if (result > 0) {
 
@@ -2093,7 +2093,7 @@ int do_job(int m, int n) {
 
             if (n) {
                 if (pjob->service) {
-                    result = ServiceStart("Apache2.2");
+                    result = ServiceStart("Apache2.4");
                     if (result == SYSERR)
                         lbprintf(hList, "ERROR: Apache service not started [%d]", result);
                     else
@@ -2127,7 +2127,7 @@ int do_job(int m, int n) {
             }
             else {
                 if (pjob->service) {
-                    result = ServiceStop("Apache2.2");
+                    result = ServiceStop("Apache2.4");
                     if (result == SYSERR)
                         lbprintf(hList, "ERROR: %d", result);
                     else

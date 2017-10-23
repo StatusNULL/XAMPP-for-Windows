@@ -1,5 +1,7 @@
 package B::Lint::Debug;
 
+our $VERSION = '1.14';
+
 =head1 NAME
 
 B::Lint::Debug - Adds debugging stringification to B::
@@ -11,13 +13,15 @@ should not be loaded unless you're debugging.
 
 =cut
 
-package B::SPECIAL;
+package # hide from PAUSE
+    B::SPECIAL;
 use overload '""' => sub {
     my $self = shift @_;
     "SPECIAL($$self)";
 };
 
-package B::OP;
+package # hide from PAUSE
+    B::OP;
 use overload '""' => sub {
     my $self  = shift @_;
     my $class = ref $self;
@@ -26,7 +30,8 @@ use overload '""' => sub {
     "$class($name)";
 };
 
-package B::SVOP;
+package # hide from PAUSE
+    B::SVOP;
 use overload '""' => sub {
     my $self  = shift @_;
     my $class = ref $self;
@@ -35,7 +40,8 @@ use overload '""' => sub {
     "$class($name," . $self->sv . "," . $self->gv . ")";
 };
 
-package B::SPECIAL;
+package # hide from PAUSE
+    B::SPECIAL;
 sub DESTROY { }
 our $AUTOLOAD;
 
@@ -43,7 +49,8 @@ sub AUTOLOAD {
     my $cx = 0;
     print "AUTOLOAD $AUTOLOAD\n";
 
-    package DB;
+    package # hide from PAUSE
+        DB;
     while ( my @stuff = caller $cx ) {
 
         print "$cx: [@DB::args] [@stuff]\n";

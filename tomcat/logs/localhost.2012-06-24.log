@@ -1,0 +1,10 @@
+24.06.2012 20:22:45 org.apache.catalina.core.ApplicationContext log
+INFO: ContextListener: contextInitialized()
+24.06.2012 20:22:45 org.apache.catalina.core.ApplicationContext log
+INFO: SessionListener: contextInitialized()
+24.06.2012 20:22:45 org.apache.catalina.core.ApplicationContext log
+INFO: ContextListener: attributeAdded('org.apache.jasper.compiler.TldLocationsCache', 'org.apache.jasper.compiler.TldLocationsCache@eaf40c')
+24.06.2012 20:22:51 org.apache.catalina.core.ApplicationContext log
+INFO: SessionListener: contextDestroyed()
+24.06.2012 20:22:51 org.apache.catalina.core.ApplicationContext log
+INFO: ContextListener: contextDestroyed()

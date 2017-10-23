@@ -2,7 +2,7 @@
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
  *
- * @package phpMyAdmin
+ * @package PhpMyAdmin
  */
 
 /**
@@ -11,6 +11,8 @@
 require_once './libraries/common.inc.php';
 
 $GLOBALS['js_include'][] = 'export.js';
+$GLOBALS['js_include'][] = 'codemirror/lib/codemirror.js';
+$GLOBALS['js_include'][] = 'codemirror/mode/mysql/mysql.js';
 
 /**
  * Gets tables informations and displays top links
@@ -51,10 +53,10 @@ if (! empty($sql_query)) {
 
         if (isset($where_clause) && is_array($where_clause)
          && count($where_clause) > 0) {
-            $wheres[] = '(' . implode(') OR (',$where_clause) . ')';
+            $wheres[] = '(' . implode(') OR (', $where_clause) . ')';
         }
 
-        if (!empty($analyzed_sql[0]['where_clause']))  {
+        if (!empty($analyzed_sql[0]['where_clause'])) {
             $wheres[] = $analyzed_sql[0]['where_clause'];
         }
 

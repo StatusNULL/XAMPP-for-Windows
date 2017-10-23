@@ -1,17 +1,20 @@
 @rem = '--*-Perl-*--
 @echo off
 if "%OS%" == "Windows_NT" goto WinNT
-perl -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
+"%~dp0perl.exe" -x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9
 goto endofperl
 :WinNT
-perl -x -S %0 %*
+"%~dp0perl.exe" -x -S %0 %*
 if NOT "%COMSPEC%" == "%SystemRoot%\system32\cmd.exe" goto endofperl
 if %errorlevel% == 9009 echo You do not have Perl in your PATH.
 if errorlevel 1 goto script_failed_so_exit_with_non_zero_val 2>nul
 goto endofperl
 @rem ';
-#!/usr/bin/perl
+#!perl
 #line 15
+    eval 'exec C:\strawberry\perl\bin\perl.exe -S $0 ${1+"$@"}'
+	if $running_under_some_shell;
+#!/usr/bin/perl
 
 =head1 NAME
 
@@ -26,6 +29,8 @@ See L<Module::CoreList> for one.
     corelist -v
     corelist [-a|-d] <ModuleName> | /<ModuleRegex>/ [<ModuleVersion>] ...
     corelist [-v <PerlVersion>] [ <ModuleName> | /<ModuleRegex>/ ] ...
+    corelist [-r <PerlVersion>] ...
+    corelist --diff PerlVersion PerlVersion
 
 =head1 OPTIONS
 
@@ -36,31 +41,66 @@ See L<Module::CoreList> for one.
 lists all versions of the given module (or the matching modules, in case you
 used a module regexp) in the perls Module::CoreList knows about.
 
-    corelist -a utf8
+    corelist -a Unicode
 
-    utf8 was first released with perl 5.006
-      5.006      undef
-      5.006001   undef
-      5.006002   undef
-      5.007003   1.00
-      5.008      1.00
-      5.008001   1.02
-      5.008002   1.02
-      5.008003   1.02
-      5.008004   1.03
-      5.008005   1.04
-      5.008006   1.04
-      5.008007   1.05
-      5.008008   1.06
-      5.009      1.02
-      5.009001   1.02
-      5.009002   1.04
-      5.009003   1.06
+    Unicode was first released with perl v5.6.2
+      v5.6.2     3.0.1
+      v5.8.0     3.2.0
+      v5.8.1     4.0.0
+      v5.8.2     4.0.0
+      v5.8.3     4.0.0
+      v5.8.4     4.0.1
+      v5.8.5     4.0.1
+      v5.8.6     4.0.1
+      v5.8.7     4.1.0
+      v5.8.8     4.1.0
+      v5.8.9     5.1.0
+      v5.9.0     4.0.0
+      v5.9.1     4.0.0
+      v5.9.2     4.0.1
+      v5.9.3     4.1.0
+      v5.9.4     4.1.0
+      v5.9.5     5.0.0
+      v5.10.0    5.0.0
+      v5.10.1    5.1.0
+      v5.11.0    5.1.0
+      v5.11.1    5.1.0
+      v5.11.2    5.1.0
+      v5.11.3    5.2.0
+      v5.11.4    5.2.0
+      v5.11.5    5.2.0
+      v5.12.0    5.2.0
+      v5.12.1    5.2.0
+      v5.12.2    5.2.0
+      v5.12.3    5.2.0
+      v5.12.4    5.2.0
+      v5.13.0    5.2.0
+      v5.13.1    5.2.0
+      v5.13.2    5.2.0
+      v5.13.3    5.2.0
+      v5.13.4    5.2.0
+      v5.13.5    5.2.0
+      v5.13.6    5.2.0
+      v5.13.7    6.0.0
+      v5.13.8    6.0.0
+      v5.13.9    6.0.0
+      v5.13.10   6.0.0
+      v5.13.11   6.0.0
+      v5.14.0    6.0.0
+      v5.14.1    6.0.0
+      v5.15.0    6.0.0
 
 =item -d
 
 finds the first perl version where a module has been released by
 date, and not by version number (as is the default).
+
+=item --diff
+
+Given two versions of perl, this prints a human-readable table of all module
+changes between the two.  The output format may change in the future, and is
+meant for I<humans>, not programs.  For programs, use the L<Module::CoreList>
+API.
 
 =item -? or -help
 
@@ -81,6 +121,12 @@ like C<5.8.8>.)
 
 In module filtering context, it can be used as Perl version filter.
 
+=item -r
+
+lists all of the perl releases and when they were released
+
+If you pass a perl version you get the release date for that version only.
+
 =back
 
 As a special case, if you specify the module name C<Unicode>, you'll get
@@ -97,33 +143,91 @@ use warnings;
 
 my %Opts;
 
-GetOptions(\%Opts, qw[ help|?! man! v|version:f a! d ] );
+GetOptions(
+    \%Opts,
+    qw[ help|?! man! r|release:s v|version:s a! d diff|D ]
+);
 
 pod2usage(1) if $Opts{help};
 pod2usage(-verbose=>2) if $Opts{man};
 
-if(exists $Opts{v} ){
-    if( !$Opts{v} ) {
-        print "\nModule::CoreList has info on the following perl versions:\n";
-        print "$_\n" for sort keys %Module::CoreList::version;
+if(exists $Opts{r} ){
+    if ( !$Opts{r} ) {
+        print "\nModule::CoreList has release info for the following perl versions:\n";
+        my $versions = { };
+        my $max_ver_len = max_mod_len(\%Module::CoreList::released);
+        for my $ver ( sort keys %Module::CoreList::released ) {
+          printf "%-${max_ver_len}s    %s\n", format_perl_version($ver), $Module::CoreList::released{$ver};
+        }
         print "\n";
         exit 0;
     }
 
-    $Opts{v} = numify_version( $Opts{v} );
-    my $version_hash = Module::CoreList->find_version($Opts{v});
+    my $num_r = numify_version( $Opts{r} );
+    my $version_hash = Module::CoreList->find_version($num_r);
+
     if( !$version_hash ) {
-        print "\nModule::CoreList has no info on perl v$Opts{v}\n\n";
+        print "\nModule::CoreList has no info on perl $Opts{r}\n\n";
+        exit 1;
+    }
+
+    printf "Perl %s was released on %s\n\n", format_perl_version($num_r), $Module::CoreList::released{$num_r};
+    exit 0;
+}
+
+if(exists $Opts{v} ){
+    if( !$Opts{v} ) {
+        print "\nModule::CoreList has info on the following perl versions:\n";
+        print format_perl_version($_)."\n" for sort keys %Module::CoreList::version;
+        print "\n";
+        exit 0;
+    }
+
+    my $num_v = numify_version( $Opts{v} );
+    my $version_hash = Module::CoreList->find_version($num_v);
+
+    if( !$version_hash ) {
+        print "\nModule::CoreList has no info on perl $Opts{v}\n\n";
         exit 1;
     }
 
     if ( !@ARGV ) {
-	print "\nThe following modules were in perl v$Opts{v} CORE\n";
-	print "$_ ", $version_hash->{$_} || " ","\n"
-	for sort keys %$version_hash;
+	print "\nThe following modules were in perl $Opts{v} CORE\n";
+	my $max_mod_len = max_mod_len($version_hash);
+	for my $mod ( sort keys %$version_hash ) {
+	    printf "%-${max_mod_len}s  %s\n", $mod, $version_hash->{$mod} || "";
+	}
 	print "\n";
 	exit 0;
     }
+}
+
+if ($Opts{diff}) {
+    if(@ARGV != 2) {
+        die "\nprovide exactly two perl core versions to diff with --diff\n";
+    }
+
+    my ($old_ver, $new_ver) = @ARGV;
+
+    my $old = numify_version($old_ver);
+    my $new = numify_version($new_ver);
+
+    my %diff = Module::CoreList::changes_between($old, $new);
+
+    for my $lib (sort keys %diff) {
+      my $diff = $diff{$lib};
+
+      my $was = ! exists  $diff->{left} ? '(absent)'
+              : ! defined $diff->{left} ? '(undef)'
+              :                          $diff->{left};
+
+      my $now = ! exists  $diff->{right} ? '(absent)'
+              : ! defined $diff->{right} ? '(undef)'
+              :                          $diff->{right};
+
+        printf "%-35s %10s %10s\n", $lib, $was, $now;
+    }
+    exit(0);
 }
 
 if ( !@ARGV ) {
@@ -168,7 +272,8 @@ sub module_version {
     my($mod,$ver) = @_;
 
     if ( $Opts{v} ) {
-	my $version_hash = Module::CoreList->find_version($Opts{v});
+	my $numeric_v = numify_version($Opts{v});
+	my $version_hash = Module::CoreList->find_version($numeric_v);
 	if ($version_hash) {
 	    print $mod, " ", $version_hash->{$mod} || 'undef', "\n";
 	    return;
@@ -182,10 +287,15 @@ sub module_version {
     my $msg = $mod;
     $msg .= " $ver" if $ver;
 
+    my $rem = $Opts{d}
+	? Module::CoreList->removed_from_by_date($mod)
+	: Module::CoreList->removed_from($mod);
+
     if( defined $ret ) {
         $msg .= " was ";
         $msg .= "first " unless $ver;
-        $msg .= "released with perl $ret"
+        $msg .= "released with perl " . format_perl_version($ret);
+        $msg .= " and removed from " . format_perl_version($rem) if $rem;
     } else {
         $msg .= " was not in CORE (or so I think)";
     }
@@ -193,23 +303,60 @@ sub module_version {
     print "\n",$msg,"\n";
 
     if(defined $ret and exists $Opts{a} and $Opts{a}){
-        for my $v(
-            sort keys %Module::CoreList::version ){
-
-            printf "  %-10s %-10s\n",
-                $v,
-                $Module::CoreList::version{$v}{$mod}
-                    || 'undef'
-                    if exists $Module::CoreList::version{$v}{$mod};
-        }
-        print "\n";
+        display_a($mod);
     }
 }
+
+
+sub max_mod_len {
+    my $versions = shift;
+    my $max = 0;
+    for my $mod (keys %$versions) {
+        $max = max($max, length $mod);
+    }
+
+    return $max;
+}
+
+sub max {
+    my($this, $that) = @_;
+    return $this if $this > $that;
+    return $that;
+}
+
+sub display_a {
+    my $mod = shift;
+
+    for my $v (grep !/000$/, sort keys %Module::CoreList::version ) {
+        next unless exists $Module::CoreList::version{$v}{$mod};
+
+        my $mod_v = $Module::CoreList::version{$v}{$mod} || 'undef';
+        printf "  %-10s %-10s\n", format_perl_version($v), $mod_v;
+    }
+    print "\n";
+}
+
+
+{
+    my $have_version_pm;
+    sub have_version_pm {
+        return $have_version_pm if defined $have_version_pm;
+        return $have_version_pm = eval { require version; 1 };
+    }
+}
+
+
+sub format_perl_version {
+    my $v = shift;
+    return $v if $v < 5.006 or !have_version_pm;
+    return version->new($v)->normal;
+}
+
 
 sub numify_version {
     my $ver = shift;
     if ($ver =~ /\..+\./) {
-	eval { require version ; 1 }
+	have_version_pm()
 	    or die "You need to install version.pm to use dotted version numbers\n";
         $ver = version->new($ver)->numify;
     }

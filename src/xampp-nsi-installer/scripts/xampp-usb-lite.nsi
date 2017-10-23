@@ -9,7 +9,7 @@ SetCompressor /solid lzma
 XPStyle on
 ; HM NIS Edit Wizard helper defines
   !define PRODUCT_NAME "XAMPP (USB)"
-  !define PRODUCT_VERSION "1.7.5"
+  !define PRODUCT_VERSION "1.8.0"
   !define PRODUCT_PUBLISHER "Kay Vogelgesang, Kai Oswald Seidler, ApacheFriends"
   !define PRODUCT_WEB_SITE "http://www.apachefriends.org"
 Caption "XAMPP USB & Lite ${PRODUCT_VERSION} win32"
@@ -98,7 +98,7 @@ ShowInstDetails show
 Section "XAMPP Files" SEC01
 SetOutPath "$INSTDIR"
 SetOverwrite ifnewer
-File /r "F:\release175\release_rc2\xampp-win32-1.7.5-usb-lite\xampp\*.*"
+File /r "F:\release180\release\usb-lite\xampp\*.*"
 ExecWait '"$INSTDIR\php\php.exe" -n -d output_buffering=0 "$INSTDIR\install\install.php" usb' $4
 
 SectionEnd

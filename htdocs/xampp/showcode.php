@@ -1,4 +1,4 @@
-<?
+<?php
 	echo '&nbsp;<p>&nbsp;<p>';
 	if(@$_REQUEST['showcode']!=1)
 	{

@@ -1,6 +1,6 @@
 # Pod::Text -- Convert POD data to formatted ASCII text.
 #
-# Copyright 1999, 2000, 2001, 2002, 2004, 2006, 2008
+# Copyright 1999, 2000, 2001, 2002, 2004, 2006, 2008, 2009
 #     Russ Allbery <rra@stanford.edu>
 #
 # This program is free software; you may redistribute it and/or modify it
@@ -29,6 +29,7 @@ use strict;
 use vars qw(@ISA @EXPORT %ESCAPES $VERSION);
 
 use Carp qw(carp croak);
+use Encode qw(encode);
 use Exporter ();
 use Pod::Simple ();
 
@@ -37,7 +38,7 @@ use Pod::Simple ();
 # We have to export pod2text for backward compatibility.
 @EXPORT = qw(pod2text);
 
-$VERSION = '3.13';
+$VERSION = '3.15';
 
 ##############################################################################
 # Initialization
@@ -250,7 +251,8 @@ sub reformat {
 # necessary to match the input encoding unless UTF-8 output is forced.  This
 # preserves the traditional pass-through behavior of Pod::Text.
 sub output {
-    my ($self, $text) = @_;
+    my ($self, @text) = @_;
+    my $text = join ('', @text);
     $text =~ tr/\240\255/ /d;
     unless ($$self{opt_utf8} || $$self{CHECKED_ENCODING}) {
         my $encoding = $$self{encoding} || '';
@@ -259,7 +261,11 @@ sub output {
         }
         $$self{CHECKED_ENCODING} = 1;
     }
-    print { $$self{output_fh} } $text;
+    if ($$self{ENCODE}) {
+        print { $$self{output_fh} } encode ('UTF-8', $text);
+    } else {
+        print { $$self{output_fh} } $text;
+    }
 }
 
 # Output a block of code (something that isn't part of the POD text).  Called
@@ -284,17 +290,19 @@ sub start_document {
     # We have to redo encoding handling for each document.
     delete $$self{CHECKED_ENCODING};
 
-    # If we were given the utf8 option, set an output encoding on our file
-    # handle.  Wrap in an eval in case we're using a version of Perl too old
-    # to understand this.
-    #
-    # This is evil because it changes the global state of a file handle that
-    # we may not own.  However, we can't just blindly encode all output, since
-    # there may be a pre-applied output encoding (such as from PERL_UNICODE)
-    # and then we would double-encode.  This seems to be the least bad
-    # approach.
+    # When UTF-8 output is set, check whether our output file handle already
+    # has a PerlIO encoding layer set.  If it does not, we'll need to encode
+    # our output before printing it (handled in the output() sub).  Wrap the
+    # check in an eval to handle versions of Perl without PerlIO.
+    $$self{ENCODE} = 0;
     if ($$self{opt_utf8}) {
-        eval { binmode ($$self{output_fh}, ':encoding(UTF-8)') };
+        $$self{ENCODE} = 1;
+        eval {
+            my @layers = PerlIO::get_layers ($$self{output_fh});
+            if (grep { $_ eq 'utf8' } @layers) {
+                $$self{ENCODE} = 0;
+            }
+        };
     }
 
     return '';
@@ -303,6 +311,14 @@ sub start_document {
 ##############################################################################
 # Text blocks
 ##############################################################################
+
+# Intended for subclasses to override, this method returns text with any
+# non-printing formatting codes stripped out so that length() correctly
+# returns the length of the text.  For basic Pod::Text, it does nothing.
+sub strip_format {
+    my ($self, $string) = @_;
+    return $string;
+}
 
 # This method is called whenever an =item command is complete (in other words,
 # we've seen its associated paragraph or know for certain that it doesn't have
@@ -325,7 +341,8 @@ sub item {
     my $indent = $$self{INDENTS}[-1];
     $indent = $$self{opt_indent} unless defined $indent;
     my $margin = ' ' x $$self{opt_margin};
-    my $fits = ($$self{MARGIN} - $indent >= length ($tag) + 1);
+    my $tag_length = length ($self->strip_format ($tag));
+    my $fits = ($$self{MARGIN} - $indent >= $tag_length + 1);
 
     # If the tag doesn't fit, or if we have no associated text, print out the
     # tag separately.  Otherwise, put the tag in the margin of the paragraph.
@@ -350,7 +367,7 @@ sub item {
         $space =~ s/^$margin /$margin:/ if $$self{opt_alt};
         $text = $self->reformat ($text);
         $text =~ s/^$margin /$margin:/ if ($$self{opt_alt} && $indent > 0);
-        my $tagspace = ' ' x length $tag;
+        my $tagspace = ' ' x $tag_length;
         $text =~ s/^($space)$tagspace/$1$tag/ or warn "Bizarre space in item";
         $self->output ($text);
     }
@@ -563,7 +580,15 @@ sub cmd_c {
 # a URL.
 sub cmd_l {
     my ($self, $attrs, $text) = @_;
-    return $$attrs{type} eq 'url' ? "<$text>" : $text;
+    if ($$attrs{type} eq 'url') {
+        if (not defined($$attrs{to}) or $$attrs{to} eq $text) {
+            return "<$text>";
+        } else {
+            return "$text <$$attrs{to}>";
+        }
+    } else {
+        return $text;
+    }
 }
 
 ##############################################################################
@@ -852,7 +877,7 @@ how to use Pod::Simple.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 1999, 2000, 2001, 2002, 2004, 2006, 2008 Russ Allbery
+Copyright 1999, 2000, 2001, 2002, 2004, 2006, 2008, 2009 Russ Allbery
 <rra@stanford.edu>.
 
 This program is free software; you may redistribute it and/or modify it
