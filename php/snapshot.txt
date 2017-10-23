@@ -1,7 +1,7 @@
 This snapshot was automatically generated on
-Wed, 23 Aug 2006 17:14:49 +0200
+Thu, 02 Nov 2006 12:41:34 +0100
 
-Version: 5.1.6
+Version: 5.2.0
 Branch: HEAD
 Build: Release_TS
 
@@ -11,14 +11,16 @@ bcmath
 calendar
 com_dotnet
 ctype
-date
+session
+filter
 ftp
 hash
 iconv
+json
 odbc
 pcre
 Reflection
-session
+date
 libxml
 standard
 tokenizer
@@ -33,6 +35,16 @@ xmlwriter
 
 
 Dependency information:
+Module: php5apache2_2_filter.dll
+===========================
+	libapr-1.dll
+	libaprutil-1.dll
+
+Module: php5apache2_2.dll
+===========================
+	libapr-1.dll
+	libaprutil-1.dll
+
 Module: php_curl.dll
 ===========================
 	libeay32.dll

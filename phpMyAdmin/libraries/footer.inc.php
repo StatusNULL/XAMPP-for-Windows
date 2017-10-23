@@ -1,5 +1,5 @@
 <?php
-/* $Id: footer.inc.php,v 2.20.2.1 2006/09/19 21:24:41 lem9 Exp $ */
+/* $Id: footer.inc.php 9420 2006-09-19 21:27:40Z lem9 $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**

@@ -1,5 +1,5 @@
 <?php
-/* $Id: english-utf-8.inc.php,v 2.159.2.1 2006/08/30 10:43:14 nijel Exp $ */
+/* $Id: english-utf-8.inc.php 9380 2006-08-30 10:43:15Z nijel $ */
 
 $charset = 'utf-8';
 $allow_recoding = TRUE;

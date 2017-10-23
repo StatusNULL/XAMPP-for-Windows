@@ -10,9 +10,8 @@
 	//
 	function pageHeader() {
 		global $TEXT;
-		echo "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"	\"http://www.w3.org/TR/html4/loose.dtd\">";
+
 		echo "<html><head>";
-		echo '<meta name="author" content="Kai Oswald Seidler, Kay Vogelgesang, Carsten Wiedmann">';
 		echo '<link href="xampp.css" rel="stylesheet" type="text/css">';
 		echo "<title></title>";
 		echo "</head><body>";
@@ -80,13 +79,8 @@
 			<input type="hidden" name="showpng" value="1">
 		</form>
 <?php
-		if (isset($_GET['source']) && ($_GET['source'] == "in")) {
-			include "code.php";
-			$beispiel = $_SERVER['SCRIPT_FILENAME'];
-			pagecode($beispiel);
-		} else {
-			echo "<p><br><br><h2><u><a href=\"$_SERVER[PHP_SELF]?source=in\">".$TEXT['srccode-in']."</a></u></h2>";
-		}
+
+    	include("showcode.php");
 
 		pageFooter();
 		exit;

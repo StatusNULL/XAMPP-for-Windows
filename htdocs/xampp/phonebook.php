@@ -1,20 +1,18 @@
-<?php
-	include "langsettings.php";
-?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-	"http://www.w3.org/TR/html4/loose.dtd">
+<?php include("langsettings.php"); ?>
 <html>
 	<head>
-		<meta name="author" content="Kai Oswald Seidler, Kay Vogelgesang, Carsten Wiedmann">
+		<meta name="author" content="Kai Oswald Seidler">
 		<link href="xampp.css" rel="stylesheet" type="text/css">
 		<title></title>
 	</head>
 
 	<body>
 		&nbsp;<p>
-		<h1><?php echo $TEXT['phonebook-head']; ?></h1>
 
-		<?php echo $TEXT['phonebook-text1']; ?><p>
+		<h1><?=$TEXT['phonebook-head']?></h1>
+
+		<?=$TEXT['phonebook-text1']?><p>
+		<?=$TEXT['phonebook-text2']?><p>
 
 		<?php
 			// Copyright (C) 2003 Kai Seidler <oswald@apachefriends.org>
@@ -52,21 +50,21 @@
 			</tr>
 
 			<?php
-				if (!empty($_GET['firstname'])) {
-					if (empty($_GET['lastname'])) {
-						$_GET['lastname'] = '';
-					}
-					if (empty($_GET['phone'])) {
-						$_GET['phone'] = '';
-					}
-					sqlite_query($db, "INSERT INTO users (firstname, lastname, phone) VALUES('$_GET[firstname]', '$_GET[lastname]', '$_GET[phone]')");
+				$firstname=$_REQUEST['firstname'];
+				$lastname=$_REQUEST['lastname'];
+				$phone=$_REQUEST['phone'];
+
+				if($firstname!="")
+				{
+						sqlite_query($db,"INSERT INTO users (firstname,lastname,phone) VALUES('$firstname','$lastname','$phone')");
 				}
 
-				if (isset($_GET['action']) && ($_GET['action'] == "del")) {
-					sqlite_query($db, "DELETE FROM users WHERE id = $_GET[id]");
+				if($_REQUEST['action']=="del")
+				{
+						sqlite_query($db,"DELETE FROM users WHERE id={$_REQUEST['id']};");
 				}
 
-				$result = sqlite_query($db, "SELECT id, firstname, lastname, phone FROM users ORDER BY lastname");
+				$result=sqlite_query($db,"SELECT id,firstname,lastname,phone FROM users ORDER BY lastname;");
 
 				$i = 0;
 				while ($row = sqlite_fetch_array($result)) {
@@ -96,25 +94,16 @@
 
 		</table>
 
-		<h2><?php echo $TEXT['phonebook-head2']; ?></h2>
+<h2><?=$TEXT['phonebook-head2']?></h2>
 
-		<form action="phonebook.php" method="get">
-			<table border="0" cellpadding="0" cellspacing="0">
-			<tr><td><?php echo $TEXT['phonebook-attrib1']; ?>:</td><td><input type="text" size="20" name="lastname"></td></tr>
-			<tr><td><?php echo $TEXT['phonebook-attrib2']; ?>:</td><td> <input type="text" size="20" name="firstname"></td></tr>
-			<tr><td><?php echo $TEXT['phonebook-attrib3']; ?>:</td><td> <input type="text" size="20" name="phone"></td></tr>
-			<tr><td></td><td><input type="submit" value="<?php echo $TEXT['phonebook-button2']; ?>"></td></tr>
-			</table>
-		</form>
-		<p>
-		<?php
-			if (isset($_GET['source']) && ($_GET['source'] == "in")) {
-				include "code.php";
-				$beispiel = $_SERVER['SCRIPT_FILENAME'];
-				pagecode($beispiel);
-			} else {
-				echo "<p><br><br><h2><u><a href=\"$_SERVER[PHP_SELF]?source=in\">".$TEXT['srccode-in']."</a></u></h2>";
-			}
-		?>
+<form action=phonebook.php method=get>
+<table border=0 cellpadding=0 cellspacing=0>
+<tr><td><?=$TEXT['phonebook-attrib1']?>:</td><td><input type=text size=20 name=lastname></td></tr>
+<tr><td><?=$TEXT['phonebook-attrib2']?>:</td><td> <input type=text size=20 name=firstname></td></tr>
+<tr><td><?=$TEXT['phonebook-attrib3']?>:</td><td> <input type=text size=20 name=phone></td></tr>
+<tr><td></td><td><input type=submit border=0 value="<?=$TEXT['phonebook-button2']?>"></td></tr>
+</table>
+</form>
+	    <?php include("showcode.php"); ?>
 	</body>
 </html>

@@ -1,5 +1,5 @@
 <?php
-/* $Id: belarusian_cyrillic-windows-1251.inc.php,v 1.74.2.1 2006/08/12 20:24:34 lem9 Exp $ */
+/* $Id: belarusian_cyrillic-windows-1251.inc.php 9293 2006-08-12 20:24:34Z lem9 $ */
 
 /**
  *     Translated by:

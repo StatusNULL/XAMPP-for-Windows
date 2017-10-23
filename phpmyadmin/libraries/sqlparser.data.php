@@ -1,5 +1,5 @@
 <?php
-/* $Id: sqlparser.data.php,v 2.25.2.1 2006/08/12 19:14:11 lem9 Exp $ */
+/* $Id: sqlparser.data.php 9284 2006-08-12 19:14:48Z lem9 $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 

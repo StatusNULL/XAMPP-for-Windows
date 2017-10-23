@@ -28,7 +28,7 @@
 	$TEXT['navi-iart2'] = "Umetnost animacije";
 	$TEXT['navi-phonebook'] = "Telefonski imenik";
 	$TEXT['navi-perlasp'] = "Perl:ASP";
-	$TEXT['navi-pear'] = "PEAR:Excel_Writer";
+	$TEXT['navi-pear'] = "Excel_Writer";
 	$TEXT['navi-adodb'] = "ADOdb";
 	$TEXT['navi-perl'] = "Perl";
 	$TEXT['navi-python'] = "Python";
@@ -43,18 +43,6 @@
 	$TEXT['navi-jpgraph'] = "JpGraph";
 
 	$TEXT['navi-languages'] = "Jeziki";
-	$TEXT['navi-slovenian'] = "Slovenian";
-	$TEXT['navi-german'] = "Deutsch";
-	$TEXT['navi-english'] = "English";
-	$TEXT['navi-spanish'] = "Español";
-	$TEXT['navi-french'] = "Francais";
-	$TEXT['navi-italian'] = "Italiano";
-	$TEXT['navi-dutch'] = "Nederlands";
-	$TEXT['navi-norwegian'] = "Norsk";
-	$TEXT['navi-polish'] = "Polski";
-	$TEXT['navi-portuguese'] = "Português";
-	$TEXT['navi-chinese'] = "&#20013;&#25991;";
-	$TEXT['navi-ptbrazil']="Português (Brasil)";
 
 	// ---------------------------------------------------------------------
 	// STATUS
@@ -192,7 +180,7 @@
 
 	$TEXT['start-text3'] = "&#268;e &#382;elite pri&#269;eti programirati v PHP ali Perl-u (ali kakorkoli &#382;e;) prosim najprej poglejte v <a target=\"extern\" href=\"http://www.apachefriends.org/wampp-en.html\">XAMPP priro&#269;nik</a> da boste dobili ve&#269; informacij o va&#353;i XAMPP namestitvi.";
 
-	$TEXT['start-text4'] = "Veliko sre&#269;e,<br>Kay Vogelgesang, Carsten Wiedmann + Kai 'Oswald' Seidler<br> Lokaliziral, priredil in namestil troj&#269;ek Mambo, Moodle, Egroupware: Janko Harej in Iztok Osredkar";
+	$TEXT['start-text4'] = "Veliko sre&#269;e,<br>Kay Vogelgesang + Kai 'Oswald' Seidler<br> Lokaliziral, priredil in namestil troj&#269;ek Mambo, Moodle, Egroupware: Janko Harej in Iztok Osredkar";
 
 	$TEXT['start-text5'] = "";
 
@@ -340,12 +328,6 @@
 	$TEXT['about-subhead3'] = "Collaboration";
 
 	$TEXT['about-subhead4'] = "Contact persons";
-
-	// ---------------------------------------------------------------------
-	// CODE
-	// ---------------------------------------------------------------------
-
-	$TEXT['srccode-in'] = "Dobi izvorno kodo";
 
 	// ---------------------------------------------------------------------
 	// MERCURY

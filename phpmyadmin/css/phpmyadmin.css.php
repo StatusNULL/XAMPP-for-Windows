@@ -1,11 +1,18 @@
 <?php
-/* $Id: phpmyadmin.css.php,v 2.93.2.1 2006/08/14 12:41:29 cybot_tm Exp $ */
+/* $Id: phpmyadmin.css.php 9552 2006-10-13 12:24:47Z lem9 $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 chdir('..');
 define('PMA_MINIMUM_COMMON', true);
 require_once './libraries/common.lib.php';
 require_once './libraries/sqlparser.lib.php';
+
+// MSIE 6 (at least some unpatched versions) has problems loading CSS 
+// when zlib_compression is on
+if (PMA_USR_BROWSER_AGENT == 'IE' && PMA_USR_BROWSER_VER == '6'
+ && (ini_get('zlib.output_compression')) ) {
+    ini_set('zlib.output_compression', 'Off');
+}
 
 if ($GLOBALS['text_dir'] === 'ltr') {
     $right = 'right';

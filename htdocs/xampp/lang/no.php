@@ -4,6 +4,8 @@
 	// ---------------------------------------------------------------------
 
 	$TEXT['global-xampp'] = "XAMPP for Windows";
+	$TEXT['global-showcode'] = "Få kildekoden her";
+	$TEXT['global-sourcecode'] = "Kildekoden";
 
 	// ---------------------------------------------------------------------
 	// NAVIGASJON
@@ -26,7 +28,7 @@
 	$TEXT['navi-iart2'] = "Flash Kunst";
 	$TEXT['navi-phonebook'] = "Telefonbok";
 	$TEXT['navi-perlasp'] = "Perl:ASP";
-	$TEXT['navi-pear'] = "PEAR:Excel_Teksteditor";
+	$TEXT['navi-pear'] = "Excel_Teksteditor";
 	$TEXT['navi-adodb'] = "ADOdb";
 	$TEXT['navi-perl'] = "Perl";
 	$TEXT['navi-python'] = "Python";
@@ -44,18 +46,6 @@
 	$TEXT['navi-guest1'] = "FCKeditor";
 
 	$TEXT['navi-languages'] = "Språk";
-	$TEXT['navi-norwegian'] = "Norsk";
-	$TEXT['navi-german'] = "Deutsch";
-	$TEXT['navi-english'] = "English";
-	$TEXT['navi-spanish'] = "Español";
-	$TEXT['navi-french'] = "Francais";
-	$TEXT['navi-italian'] = "Italiano";
-	$TEXT['navi-dutch'] = "Nederlands";
-	$TEXT['navi-polish'] = "Polski";
-	$TEXT['navi-portuguese'] = "Português";
-	$TEXT['navi-slovenian'] = "Slovenian";
-	$TEXT['navi-chinese'] = "&#20013;&#25991;";
-	$TEXT['navi-ptbrazil']="Português (Brasil)";
 
 	// ---------------------------------------------------------------------
 	// STATUS
@@ -193,7 +183,7 @@
 
 	$TEXT['start-text5'] = "Og en veldig viktig påminnelse! Stor takk for hjelp og support til Nemesis, KriS, Boppy, Pc-Dummy og alle andre venner av XAMPP!";
 
-	$TEXT['start-text6'] = "Lykke Til, Kay Vogelgesang, Carsten Wiedmann + Kai 'Oswald' Seidler";
+	$TEXT['start-text6'] = "Lykke Til, Kay Vogelgesang + Kai 'Oswald' Seidler";
 
 	// ---------------------------------------------------------------------
 	// MANUALER
@@ -327,12 +317,6 @@
 	$TEXT['about-subhead3'] = "Collaboration";
 
 	$TEXT['about-subhead4'] = "Kontakt personer";
-
-	// ---------------------------------------------------------------------
-	// KODE
-	// ---------------------------------------------------------------------
-
-	$TEXT['srccode-in'] = "Få kildekoden her";
 
 	// ---------------------------------------------------------------------
 	// MERCURY

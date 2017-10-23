@@ -4,6 +4,7 @@
 	// ---------------------------------------------------------------------
 
 	$TEXT['global-xampp'] = "XAMPP dla Windows";
+	$TEXT['global-showcode'] = "Zobacz &#378;r&oacute;d&#322;o tutaj";
 
 	// ---------------------------------------------------------------------
 	// NAVIGATION
@@ -26,7 +27,7 @@
 	$TEXT['navi-iart2'] = "Flash Art";
 	$TEXT['navi-phonebook'] = "Ksi&#261;&#380;ka telefoniczna";
 	$TEXT['navi-perlasp'] = "Perl:ASP";
-	$TEXT['navi-pear'] = "PEAR:Excel_Writer";
+	$TEXT['navi-pear'] = "Excel_Writer";
 	$TEXT['navi-adodb'] = "ADOdb";
 	$TEXT['navi-perl'] = "Perl";
 	$TEXT['navi-python'] = "Python";
@@ -43,18 +44,6 @@
 
 
 	$TEXT['navi-languages'] = "Languages";
-	$TEXT['navi-polish'] = "Polski";
-	$TEXT['navi-german'] = "Deutsch";
-	$TEXT['navi-english'] = "English";
-	$TEXT['navi-spanish'] = "Español";
-	$TEXT['navi-french'] = "Francais";
-	$TEXT['navi-italian'] = "Italiano";
-	$TEXT['navi-dutch'] = "Nederlands";
-	$TEXT['navi-norwegian'] = "Norsk";
-	$TEXT['navi-portuguese'] = "Português";
-	$TEXT['navi-slovenian'] = "Slovenian";
-	$TEXT['navi-chinese'] = "&#20013;&#25991;";
-	$TEXT['navi-ptbrazil']="Português (Brasil)";
 
 	// ---------------------------------------------------------------------
 	// STATUS
@@ -169,7 +158,7 @@
 
 	$TEXT['start-text5'] = "";
 
-	$TEXT['start-text6'] = "Powodzenia, Kay Vogelgesang, Carsten Wiedmann + Kai 'Oswald' Seidler";
+	$TEXT['start-text6'] = "Powodzenia, Kay Vogelgesang + Kai 'Oswald' Seidler";
 
 	// ---------------------------------------------------------------------
 	// MANUALS
@@ -303,12 +292,6 @@
 	$TEXT['about-subhead3'] = "Wspó&#322;praca";
 
 	$TEXT['about-subhead4'] = "Kontakt";
-
-	// ---------------------------------------------------------------------
-	// CODE
-	// ---------------------------------------------------------------------
-
-	$TEXT['srccode-in'] = "Zobacz &#378;r&oacute;d&#322;o tutaj";
 
 	// ---------------------------------------------------------------------
 	// MERCURY

@@ -321,10 +321,13 @@ then
     ulimit -n $open_files
     args="--open-files-limit=$open_files $args"
   fi
-  if test -n "$core_file_size"
-  then
-    ulimit -c $core_file_size
-  fi
+fi
+
+# Try to set the core file size (even if we aren't root) because many systems
+# don't specify a hard limit on core file size.
+if test -n "$core_file_size"
+then
+  ulimit -c $core_file_size
 fi
 
 #
@@ -379,9 +382,9 @@ do
   rm -f $safe_mysql_unix_port $pid_file	# Some extra safety
   if test -z "$args"
   then
-    $NOHUP_NICENESS $ledir/$MYSQLD $defaults --basedir=$MY_BASEDIR_VERSION --datadir=$DATADIR $USER_OPTION --pid-file=$pid_file --skip-locking >> $err_log 2>&1
+    $NOHUP_NICENESS $ledir/$MYSQLD $defaults --basedir=$MY_BASEDIR_VERSION --datadir=$DATADIR $USER_OPTION --pid-file=$pid_file --skip-external-locking >> $err_log 2>&1
   else
-    eval "$NOHUP_NICENESS $ledir/$MYSQLD $defaults --basedir=$MY_BASEDIR_VERSION --datadir=$DATADIR $USER_OPTION --pid-file=$pid_file --skip-locking $args >> $err_log 2>&1"
+    eval "$NOHUP_NICENESS $ledir/$MYSQLD $defaults --basedir=$MY_BASEDIR_VERSION --datadir=$DATADIR $USER_OPTION --pid-file=$pid_file --skip-external-locking $args >> $err_log 2>&1"
   fi
   if test ! -f $pid_file		# This is removed if normal shutdown
   then

@@ -29,7 +29,7 @@
 	$TEXT['navi-iart2'] = "Flash Art";
 	$TEXT['navi-phonebook'] = "TelefoonBoek";
 	$TEXT['navi-perlasp'] = "Perl:ASP";
-	$TEXT['navi-pear'] = "PEAR:Excel_Writer";
+	$TEXT['navi-pear'] = "Excel_Writer";
 	$TEXT['navi-adodb'] = "ADOdb";
 	$TEXT['navi-perl'] = "Perl";
 	$TEXT['navi-python'] = "Python";
@@ -48,18 +48,6 @@
 	$TEXT['navi-guest1'] = "FCKeditor";
 
 	$TEXT['navi-languages'] = "Talen";
-	$TEXT['navi-dutch'] = "Nederlands";
-	$TEXT['navi-german'] = "Deutsch";
-	$TEXT['navi-english'] = "English";
-	$TEXT['navi-spanish'] = "Español";
-	$TEXT['navi-french'] = "Francais";
-	$TEXT['navi-italian'] = "Italiano";
-	$TEXT['navi-norwegian'] = "Norsk";
-	$TEXT['navi-polish'] = "Polski";
-	$TEXT['navi-portuguese'] = "Português";
-	$TEXT['navi-slovenian'] = "Slovenian";
-	$TEXT['navi-chinese'] = "&#20013;&#25991;";
-	$TEXT['navi-ptbrazil']="Português (Brasil)";
 
 	// ---------------------------------------------------------------------
 	// STATUS
@@ -202,7 +190,7 @@
 
 	$TEXT['start-text4'] = "Ook OpenSSL wordt ondersteund. Gebruik a.u.b. het Testcertificaat op URL <a href='https://127.0.0.1' target='_top'>https://127.0.0.1</a> of op <a href='https://localhost' target='_top'>https://localhost</a>";
 
-	$TEXT['start-text5'] = "Veel succes,<br>Kay Vogelgesang, Carsten Wiedmann + Kai 'Oswald' Seidler";
+	$TEXT['start-text5'] = "Veel succes,<br>Kay Vogelgesang + Kai 'Oswald' Seidler";
 
 	$TEXT['start-text6'] = "";
 
@@ -334,15 +322,6 @@
 	$TEXT['about-subhead2'] = "Ontwerp";
 	$TEXT['about-subhead3'] = "Collaboration";
 	$TEXT['about-subhead4'] = "Contactpersonen";
-
-
-	// ONLY ENGLISH LANGUAGE SECTION
-
-	// ---------------------------------------------------------------------
-	// CODE
-	// ---------------------------------------------------------------------
-
-	$TEXT['srccode-in'] = "Hier vind je de broncode";
 
 	// ---------------------------------------------------------------------
 	// MERCURY

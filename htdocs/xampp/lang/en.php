@@ -4,6 +4,8 @@
 	// ---------------------------------------------------------------------
 
 	$TEXT['global-xampp'] = "XAMPP for Windows";
+	$TEXT['global-showcode']="Show source code";
+	$TEXT['global-sourcecode']="Source code";
 
 	// ---------------------------------------------------------------------
 	// NAVIGATION
@@ -26,7 +28,7 @@
 	$TEXT['navi-iart2'] = "Flash Art";
 	$TEXT['navi-phonebook'] = "Phone Book";
 	$TEXT['navi-perlasp'] = "Perl:ASP";
-	$TEXT['navi-pear'] = "PEAR:Excel_Writer";
+	$TEXT['navi-pear'] = "Excel_Writer";
 	$TEXT['navi-adodb'] = "ADOdb";
 	$TEXT['navi-perl'] = "Perl";
 	$TEXT['navi-python'] = "Python";
@@ -44,18 +46,6 @@
 	$TEXT['navi-guest1'] = "FCKeditor";
 
 	$TEXT['navi-languages'] = "Languages";
-	$TEXT['navi-english'] = "English";
-	$TEXT['navi-german'] = "Deutsch";
-	$TEXT['navi-spanish'] = "Español";
-	$TEXT['navi-french'] = "Francais";
-	$TEXT['navi-italian'] = "Italiano";
-	$TEXT['navi-dutch'] = "Nederlands";
-	$TEXT['navi-norwegian'] = "Norsk";
-	$TEXT['navi-polish'] = "Polski";
-	$TEXT['navi-portuguese'] = "Português";
-	$TEXT['navi-slovenian'] = "Slovenian";
-	$TEXT['navi-chinese'] = "&#20013;&#25991;";
-	$TEXT['navi-ptbrazil']="Português (Brasil)";
 
 	// ---------------------------------------------------------------------
 	// STATUS
@@ -187,8 +177,6 @@
 
 	$TEXT['start-subhead'] = "Congratulations:<br>You successfully installed XAMPP on this system!";
 
-	$TEXT['start-text-newest'] = "<hr><br><i>The responsible developers for this XAMPP version for win32 were</i><br><ul><li><i>Carsten Wiedmann</i></li><li><i>Kay Vogelgesang</i></li></ul><hr>";
-
 	$TEXT['start-text1'] = "Now you can start using Apache and Co. Firstly you should try »Status« on the left navigation to make sure everything works fine.";
 
 	$TEXT['start-text2'] = "";
@@ -199,7 +187,7 @@
 
 	$TEXT['start-text5'] = "And very important! Big thanks for help and support to Carsten, Nemesis, KriS, Boppy, Pc-Dummy and all other friends of XAMPP!";
 
-	$TEXT['start-text6'] = "Good luck, Kay Vogelgesang, Carsten Wiedmann + Kai 'Oswald' Seidler";
+	$TEXT['start-text6'] = "Good luck, Kay Vogelgesang + Kai 'Oswald' Seidler";
 
 	// ---------------------------------------------------------------------
 	// MANUALS
@@ -333,12 +321,6 @@
 	$TEXT['about-subhead3'] = "Collaboration";
 
 	$TEXT['about-subhead4'] = "Contact persons";
-
-	// ---------------------------------------------------------------------
-	// CODE
-	// ---------------------------------------------------------------------
-
-	$TEXT['srccode-in'] = "Get the source here";
 
 	// ---------------------------------------------------------------------
 	// MERCURY

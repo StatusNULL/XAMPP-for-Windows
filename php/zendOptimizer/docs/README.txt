@@ -1,5 +1,5 @@
-                       Zend Optimizer(TM), version 3.0.1
-                       =================================
+                       Zend Optimizer(TM), version 3.0
+                       ===============================
 
 
 This package contains the Zend Optimizer from Zend Technologies Ltd.

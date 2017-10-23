@@ -4,6 +4,8 @@
 	// ---------------------------------------------------------------------
 
 	$TEXT['global-xampp'] = "XAMPP for Windows";
+	$TEXT['global-showcode'] = "Visualizza il codice sorgente";
+	$TEXT['global-sourcecode'] = "Codice sorgente";
 
 	// ---------------------------------------------------------------------
 	// MENU DI NAVIGAZIONE
@@ -26,7 +28,7 @@
 	$TEXT['navi-iart2'] = "Grafica Flash";
 	$TEXT['navi-phonebook'] = "Rubrica";
 	$TEXT['navi-perlasp'] = "Perl:ASP";
-	$TEXT['navi-pear'] = "PEAR:Excel_Writer";
+	$TEXT['navi-pear'] = "Excel_Writer";
 	$TEXT['navi-adodb'] = "ADOdb";
 	$TEXT['navi-perl'] = "Perl";
 	$TEXT['navi-python'] = "Python";
@@ -44,18 +46,6 @@
 	$TEXT['navi-guest1'] = "FCKeditor";
 
 	$TEXT['navi-languages'] = "Lingue";
-	$TEXT['navi-italian'] = "Italiano";
-	$TEXT['navi-german'] = "Deutsch";
-	$TEXT['navi-english'] = "English";
-	$TEXT['navi-spanish'] = "Español";
-	$TEXT['navi-french'] = "Francais";
-	$TEXT['navi-dutch'] = "Nederlands";
-	$TEXT['navi-norwegian'] = "Norsk";
-	$TEXT['navi-polish'] = "Polski";
-	$TEXT['navi-portuguese'] = "Português";
-	$TEXT['navi-slovenian'] = "Slovenian";
-	$TEXT['navi-chinese'] = "&#20013;&#25991;";
-	$TEXT['navi-ptbrazil']="Português (Brasil)";
 
 	// ---------------------------------------------------------------------
 	// STATO
@@ -193,7 +183,7 @@
 
 	$TEXT['start-text5'] = "";
 
-	$TEXT['start-text6'] = "Buon lavoro, Kay Vogelgesang, Carsten Wiedmann + Kai 'Oswald' Seidler";
+	$TEXT['start-text6'] = "Buon lavoro, Kay Vogelgesang + Kai 'Oswald' Seidler";
 
 	// ---------------------------------------------------------------------
 	// MANUALI
@@ -327,12 +317,6 @@
 	$TEXT['about-subhead3'] = "Collaborazione";
 
 	$TEXT['about-subhead4'] = "Contatti";
-
-	// ---------------------------------------------------------------------
-	// CODICE
-	// ---------------------------------------------------------------------
-
-	$TEXT['srccode-in'] = "Visualizza il codice sorgente";
 
 	// ---------------------------------------------------------------------
 	// MERCURY

@@ -33,18 +33,6 @@ $TEXT['navi-webalizer']="Webalizer";
 $TEXT['navi-phpsqliteadmin']="phpSQLiteAdmin";
                                                                                                                         
 $TEXT['navi-languages']="Idiomas";
-$TEXT['navi-english']="English";
-$TEXT['navi-german']="Deutsch";
-$TEXT['navi-french']="Francais";
-$TEXT['navi-dutch']="Nederlands";
-$TEXT['navi-polish']="Polski";
-$TEXT['navi-italian']="Italiano";
-$TEXT['navi-norwegian']="Norsk";
-$TEXT['navi-spanish']="Español";
-$TEXT['navi-chinese']="&#20013;&#25991;";
-$TEXT['navi-ptbrazil']="Português (Brasil)";
-
-
 
 // ---------------------------------------------------------------------
 // STATUS

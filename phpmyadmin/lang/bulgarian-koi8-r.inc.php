@@ -1,5 +1,5 @@
 <?php
-/* $Id: bulgarian-koi8-r.inc.php,v 2.149.2.3 2006/09/15 12:03:00 lem9 Exp $ */
+/* $Id: bulgarian-koi8-r.inc.php 9408 2006-09-15 12:03:00Z lem9 $ */
 
 /**
  * Translated by Stanislav Yordanov <stanprog at stanprog.com>

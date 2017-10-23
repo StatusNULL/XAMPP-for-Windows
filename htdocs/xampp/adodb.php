@@ -152,14 +152,6 @@
 		</form>
 
 		<p>
-		<?php
-			if (isset($_GET['source']) && ($_GET['source'] == "in")) {
-				include "code.php";
-				$beispiel = $_SERVER['SCRIPT_FILENAME'];
-				pagecode($beispiel);
-			} else {
-				echo "<p><br><br><h2><u><a href=\"$_SERVER[PHP_SELF]?source=in\">".$TEXT['srccode-in']."</a></u></h2>";
-			}
-		?>
+	    <?php include("showcode.php"); ?>
 	</body>
 </html>

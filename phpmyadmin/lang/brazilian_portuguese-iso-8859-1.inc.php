@@ -1,5 +1,5 @@
 <?php
-/* $Id: brazilian_portuguese-iso-8859-1.inc.php,v 2.143.2.2 2006/08/30 10:43:14 nijel Exp $ */
+/* $Id: brazilian_portuguese-iso-8859-1.inc.php 9380 2006-08-30 10:43:15Z nijel $ */
 
 /**
  * translated by: 

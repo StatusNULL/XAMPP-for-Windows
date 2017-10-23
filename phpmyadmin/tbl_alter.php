@@ -1,13 +1,13 @@
 <?php
-/* $Id: tbl_alter.php,v 2.30 2006/02/21 11:07:44 cybot_tm Exp $ */
+/* $Id: tbl_alter.php 9499 2006-10-04 13:10:13Z nijel $ */
 // vim: expandtab sw=4 ts=4 sts=4:
-
-require_once './libraries/Table.class.php';
 
 /**
  * Gets some core libraries
  */
 require_once('./libraries/common.lib.php');
+require_once('./libraries/Table.class.php');
+
 
 $js_to_run = 'functions.js';
 require_once('./libraries/header.inc.php');

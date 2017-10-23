@@ -168,14 +168,5 @@
 
 		<?php echo $TEXT['status-text2']; ?><p>
 
-		<?php
-			if (isset($_GET['source']) && ($_GET['source'] == "in")) {
-				include "code.php";
-				$beispiel = $_SERVER['SCRIPT_FILENAME'];
-				pagecode($beispiel);
-			} else {
-				print("<p><br><br><h2><u><a href=\"$_SERVER[PHP_SELF]?source=in\">".$TEXT['srccode-in']."</a></u></h2>");
-			}
-		?>
 	</body>
 </html>

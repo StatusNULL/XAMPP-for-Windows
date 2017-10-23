@@ -1,5 +1,5 @@
 <?php
-/* $Id: portuguese-iso-8859-15.inc.php,v 2.76.2.1 2006/08/30 10:43:15 nijel Exp $ */
+/* $Id: portuguese-iso-8859-15.inc.php 9380 2006-08-30 10:43:15Z nijel $ */
 
 /**
  * Portuguese language file by

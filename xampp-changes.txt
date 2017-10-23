@@ -1,3 +1,18 @@
+20. Nov 2006 XAMPP 1.5.5 beta 2
+- UPDATE FileZilla FTP Server 0.9.20
+- UPDATE XAMPP Web Style 
+- UPDATE Zend Optimizer 3.0.2
+
+11. Nov. 2006 XAMPP 1.5.5 beta 1
+- UPDATE phpMyAdmin 2.9.1.0
+- UPDATE PHP 5.2.0
+
+30 Okt. 2006 XAMPP 1.5.5 beta 0
+- UPDATE phpMyAdmin 2.9.0.2
+- UPDATE MySQL 5.0.27
+- UPDATE FileZilla FTP Server 0.9.19
+- UPDATE ADOdb 4.93
+
 30 Sept. 2006 XAMPP  1.5.4a
 
 - UPDATE OpenSSL 0.9.8d

@@ -45,7 +45,8 @@
 					<?php include "navipython.inc"; ?>
 					<?php include "navijava.inc"; ?>
 
-					<br>&nbsp;<br>
+					<br>
+					<br>
 					<span class="nh"><?php echo $TEXT['navi-tools']; ?></span><br>
 				</td>
 			</tr>
@@ -66,26 +67,10 @@
 				<td align="right" class="navi">
 					<?php include "naviguest.inc"; ?>
 					<br>
-					<span class="nh"><?php echo $TEXT['navi-languages']; ?></span><br>
 				</td>
-			</tr>
-			<tr>
-				<td height="1" bgcolor="#fb7922" colspan="1" style="background-image:url(img/strichel.gif)" class="white"></td>
 			</tr>
 			<tr valign="top">
 				<td align="right" class="navi">
-<a target=_parent class=n href="lang.php?en"><?=$TEXT['navi-english']?></a><br>
-<a target=_parent class=n href="lang.php?de"><?=$TEXT['navi-german']?></a><br>
-<a target=_parent class=n href="lang.php?fr"><?=$TEXT['navi-french']?></a><br>
-<a target=_parent class=n href="lang.php?nl"><?=$TEXT['navi-dutch']?></a><br>
-<a target=_parent class=n href="lang.php?pl"><?=$TEXT['navi-polish']?></a><br>
-<a target=_parent class=n href="lang.php?es"><?=$TEXT['navi-spanish']?></a><br>
-<a target=_parent class=n href="lang.php?zh"><?=$TEXT['navi-chinese']?></a><br>
-<a target=_parent class=n href="lang.php?it"><?=$TEXT['navi-italian']?></a><br>
-<a target=_parent class=n href="lang.php?no"><?=$TEXT['navi-norwegian']?></a><br>
-<a target=_parent class=n href="lang.php?pt_br"><?=$TEXT['navi-ptbrazil']?></a><p>
-
-					
 &nbsp;
 <p class=navi>&copy;2002-2006<br>
 <? if(file_get_contents("lang.tmp")=="de") { ?>

@@ -9,7 +9,7 @@
 
 machine=i686
 system=pc-linux-gnu
-version=5.0.21
+version=5.0.27
 SOURCE=`pwd`
 CP="cp -p"
 MV="mv"
@@ -96,7 +96,7 @@ mkdir $BASE $BASE/bin $BASE/docs \
 
 if [ $BASE_SYSTEM != "netware" ] ; then
  mkdir $BASE/share/mysql $BASE/tests $BASE/sql-bench $BASE/man \
-  $BASE/man/man1 $BASE/data $BASE/data/mysql $BASE/data/test
+  $BASE/man/man1 $BASE/man/man8 $BASE/data $BASE/data/mysql $BASE/data/test
 
  chmod o-rwx $BASE/data $BASE/data/*
 fi
@@ -134,7 +134,7 @@ BIN_FILES="extra/comp_err$BS extra/replace$BS extra/perror$BS \
   client/mysql$BS client/mysqlshow$BS client/mysqladmin$BS \
   client/mysqldump$BS client/mysqlimport$BS \
   client/mysqltest$BS client/mysqlcheck$BS \
-  client/mysqlbinlog$BS \
+  client/mysqlbinlog$BS client/mysql_upgrade$BS \
   tests/mysql_client_test$BS \
   libmysqld/examples/mysql_client_test_embedded$BS \
   libmysqld/examples/mysqltest_embedded$BS \
@@ -178,11 +178,21 @@ if [ $BASE_SYSTEM = "netware" ] ; then
 fi
 
 copyfileto $BASE/lib \
-  libmysql/.libs/libmysqlclient.a libmysql/.libs/libmysqlclient.so* \
-  libmysql/libmysqlclient.* libmysql_r/.libs/libmysqlclient_r.a \
-  libmysql_r/.libs/libmysqlclient_r.so* libmysql_r/libmysqlclient_r.* \
+  libmysql/.libs/libmysqlclient.a \
+  libmysql/.libs/libmysqlclient.so* \
+  libmysql/.libs/libmysqlclient.sl* \
+  libmysql/.libs/libmysqlclient*.dylib \
+  libmysql/libmysqlclient.* \
+  libmysql_r/.libs/libmysqlclient_r.a \
+  libmysql_r/.libs/libmysqlclient_r.so* \
+  libmysql_r/.libs/libmysqlclient_r.sl* \
+  libmysql_r/.libs/libmysqlclient_r*.dylib \
+  libmysql_r/libmysqlclient_r.* \
+  libmysqld/.libs/libmysqld.a \
+  libmysqld/.libs/libmysqld.so* \
+  libmysqld/.libs/libmysqld.sl* \
+  libmysqld/.libs/libmysqld*.dylib \
   mysys/libmysys.a strings/libmystrings.a dbug/libdbug.a \
-  libmysqld/.libs/libmysqld.a libmysqld/.libs/libmysqld.so* \
   libmysqld/libmysqld.a netware/libmysql.imp \
   zlib/.libs/libz.a
 
@@ -209,6 +219,7 @@ if [ $BASE_SYSTEM != "netware" ] ; then
   fi
   if [ -d man ] ; then
     $CP man/*.1 $BASE/man/man1
+    $CP man/*.8 $BASE/man/man8
   fi
 fi
 
@@ -299,7 +310,6 @@ else
 fi
 
 # Make safe_mysqld a symlink to mysqld_safe for backwards portability
-# To be removed in MySQL 4.1
 if [ $BASE_SYSTEM != "netware" ] ; then
   (cd $BASE/bin ; ln -s mysqld_safe safe_mysqld )
 fi

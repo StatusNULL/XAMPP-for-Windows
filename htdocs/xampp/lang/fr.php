@@ -4,6 +4,8 @@
 	// ---------------------------------------------------------------------
 
 	$TEXT['global-xampp'] = "XAMPP pour Windows";
+	$TEXT['global-showcode'] = "Obtenir les sources ici";
+	$TEXT['showcode'] = "Sources";
 
 	// ---------------------------------------------------------------------
 	// NAVIGATION
@@ -24,9 +26,9 @@
 	$TEXT['navi-perlenv'] = "MiniPerl";
 	$TEXT['navi-iart'] = "Instant Art";
 	$TEXT['navi-iart2'] = "Flash Art";
-	$TEXT['navi-phonebook'] = "Répertoire Téléphonique";
+	$TEXT['navi-phonebook'] = "Répertoire<br>Téléphonique";
 	$TEXT['navi-perlasp'] = "Perl:ASP";
-	$TEXT['navi-pear'] = "PEAR:Excel_Writer";
+	$TEXT['navi-pear'] = "Excel_Writer";
 	$TEXT['navi-adodb'] = "ADOdb";
 	$TEXT['navi-perl'] = "Module Perl";
 	$TEXT['navi-sms'] = "SMS Api";
@@ -46,18 +48,6 @@
 	$TEXT['navi-guest1'] = "FCKeditor";
 
 	$TEXT['navi-languages'] = "Langues";
-	$TEXT['navi-french'] = "Francais";
-	$TEXT['navi-german'] = "Deutsch";
-	$TEXT['navi-english'] = "English";
-	$TEXT['navi-spanish'] = "Español";
-	$TEXT['navi-italian'] = "Italiano";
-	$TEXT['navi-dutch'] = "Nederlands";
-	$TEXT['navi-norwegian'] = "Norsk";
-	$TEXT['navi-polish'] = "Polski";
-	$TEXT['navi-portuguese'] = "Português";
-	$TEXT['navi-slovenian'] = "Slovenian";
-	$TEXT['navi-chinese'] = "&#20013;&#25991;";
-	$TEXT['navi-ptbrazil']="Português (Brasil)";
 
 	// ---------------------------------------------------------------------
 	// STATUS
@@ -201,7 +191,7 @@
 
 	$TEXT['start-text5'] = "Et très important! Merci pour l'aide et le support de Carsten, Nemesis, KriS, Boppy, Pc-Dummy et tous les autres amis de XAMPP!";
 
-	$TEXT['start-text6'] = "Bonne chance,<br>Kay Vogelgesang, Carsten Wiedmann + Kai 'Oswald' Seidler";
+	$TEXT['start-text6'] = "Bonne chance,<br>Kay Vogelgesang + Kai 'Oswald' Seidler";
 
 	// ---------------------------------------------------------------------
 	// MANUALS
@@ -335,12 +325,6 @@
 	$TEXT['about-subhead3'] = "Collaboration";
 
 	$TEXT['about-subhead4'] = "Contacts";
-
-	// ---------------------------------------------------------------------
-	// CODE
-	// ---------------------------------------------------------------------
-
-	$TEXT['srccode-in'] = "Obtenir les sources ici";
 
 	// ---------------------------------------------------------------------
 	// MERCURY

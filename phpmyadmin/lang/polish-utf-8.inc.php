@@ -1,5 +1,5 @@
 <?php
-/* $Id: polish-utf-8.inc.php,v 2.146.2.1 2006/08/12 19:46:14 lem9 Exp $ */
+/* $Id: polish-utf-8.inc.php 9287 2006-08-12 19:46:14Z lem9 $ */
 
 $charset = 'utf-8';
 $allow_recoding = TRUE;

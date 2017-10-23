@@ -4,6 +4,8 @@
 	// ---------------------------------------------------------------------
 
 	$TEXT['global-xampp'] = "XAMPP para Windows";
+	$TEXT['global-showcode'] = "Seleccionar el código fuente";
+	$TEXT['global-sourcecode'] = "Código fuente";
 
 	// ---------------------------------------------------------------------
 	// NAVIGATION
@@ -26,7 +28,7 @@
 	$TEXT['navi-iart2'] = "Flash Art";
 	$TEXT['navi-phonebook'] = "Agenda de telefonos";
 	$TEXT['navi-perlasp'] = "Perl:ASP";
-	$TEXT['navi-pear'] = "PEAR:Excel_Writer";
+	$TEXT['navi-pear'] = "Excel_Writer";
 	$TEXT['navi-adodb'] = "ADOdb";
 	$TEXT['navi-perl'] = "Perl";
 	$TEXT['navi-python'] = "Python";
@@ -44,18 +46,6 @@
 	$TEXT['navi-guest1'] = "FCKeditor";
 
 	$TEXT['navi-languages'] = "Lenguajes";
-	$TEXT['navi-spanish'] = "Español";
-	$TEXT['navi-german'] = "Deutsch";
-	$TEXT['navi-english'] = "English";
-	$TEXT['navi-french'] = "Francais";
-	$TEXT['navi-italian'] = "Italiano";
-	$TEXT['navi-dutch'] = "Nederlands";
-	$TEXT['navi-norwegian'] = "Norsk";
-	$TEXT['navi-polish'] = "Polski";
-	$TEXT['navi-portuguese'] = "Português";
-	$TEXT['navi-slovenian'] = "Slovenian";
-	$TEXT['navi-chinese'] = "&#20013;&#25991;";
-	$TEXT['navi-ptbrazil']="Português (Brasil)";
 
 	// ---------------------------------------------------------------------
 	// STATUS
@@ -196,7 +186,7 @@
 
 	$TEXT['start-text5'] = "Y muy importante! Un gran agradecimiento a la colaboración y ayuda de Carsten, Nemesis, KriS, Boppy, Pc-Dummy y a todos los amigos de XAMPP!";
 
-	$TEXT['start-text6'] = "Os deseamos mucha diversión, Kay Vogelgesang, Carsten Wiedmann + Kai 'Oswald' Seidler";
+	$TEXT['start-text6'] = "Os deseamos mucha diversión, Kay Vogelgesang + Kai 'Oswald' Seidler";
 
 	// ---------------------------------------------------------------------
 	// MANUALS
@@ -331,12 +321,6 @@
 	$TEXT['about-subhead3'] = "Colaboraciones";
 
 	$TEXT['about-subhead4'] = "Personas de contacto";
-
-	// ---------------------------------------------------------------------
-	// CODE
-	// ---------------------------------------------------------------------
-
-	$TEXT['srccode-in'] = "Seleccionar el código fuente";
 
 	// ---------------------------------------------------------------------
 	// MERCURY

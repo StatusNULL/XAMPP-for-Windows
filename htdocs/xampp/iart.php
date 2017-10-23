@@ -17,20 +17,14 @@
 	// along with this program; if not, write to the Free Software
 	// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-	if (empty($_GET['text'])) {
-		$_GET['text'] = "ceci n est pas un ami d apache";
-	}
-	if (empty($_GET['egal'])) {
-		if (empty($_GET['art'])) {
-			$_GET['art'] = rand(1000, 9999);
-		}
-		$_GET['artn'] = rand(1000, 9999);
+ 		$text=$_REQUEST['text'];
+        if($text=="") $text="ceci n est pas un ami d apache";
+        if($_REQUEST['img']!=1)
+        {
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-	"http://www.w3.org/TR/html4/loose.dtd">
 <html>
 	<head>
-		<meta name="author" content="Kai Oswald Seidler, Kay Vogelgesang, Carsten Wiedmann">
+		<meta name="author" content="Kai Oswald Seidler">
 		<link href="xampp.css" rel="stylesheet" type="text/css">
 		<title></title>
 	</head>
@@ -39,30 +33,21 @@
 		&nbsp;<p>
 		<h1><?php echo $TEXT['iart-head']; ?></h1>
 
-		<img width="520" height="320" src="iart.php?egal=<?php echo $_GET['art']; ?>&amp;text=<?php echo urlencode($_GET['text']);?>" alt=""><p class="small">
-		<?php echo $TEXT['iart-text1']; ?><p>
+		<img width="520" height="320" src="iart.php?img=1&text=<?=urlencode($text)?>" alt=""><p class="small">
+		<?=$TEXT['iart-text1']?><p>
 		<form name="ff" action="iart.php" method="get">
-			<input type="text" name="text" value="<?php echo $_GET['text']; ?>" size="30">
-			<input type="submit" value="<?php echo $TEXT['iart-ok']; ?>">
-			<input type="hidden" name="artn" value="<?php echo $_GET['artn']; ?>">
+			<input type="text" name="text" value="<?=$text?>" size="30">
+			<input type="submit" value="<?=$TEXT['iart-ok']?>">
 		</form>
 		<p>
-		<?php
-			if (isset($_GET['source']) && ($_GET['source'] == "in")) {
-				include "code.php";
-				$beispiel = $_SERVER['SCRIPT_FILENAME'];
-				pagecode($beispiel);
-			} else {
-				echo "<p><br><br><h2><u><a href=\"$_SERVER[PHP_SELF]?source=in\">".$TEXT['srccode-in']."</a></u></h2>";
-			}
-		?>
+		<?php include("showcode.php"); ?>
 	</body>
 </html>
 <?php
 		exit;
 	}
 
-	$fontfile = ".\AnkeCalligraph.TTF";
+	$fontfile = "./AnkeCalligraph.TTF";
 
 	$size = 9;
 	$h = 320;
@@ -83,7 +68,8 @@
 
 	header("Content-Type: image/png");
 
-	srand($_GET['egal']);
+	srand(time());
+
 	$c = 1;
 	$anz = 10;
 	$step = (4 / $anz);

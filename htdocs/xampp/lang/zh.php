@@ -4,6 +4,7 @@
 	// ---------------------------------------------------------------------
 
 	$TEXT['global-xampp'] = "XAMPP for Windows";
+	$TEXT['global-showcode'] = "获得源代码";
 
 	// ---------------------------------------------------------------------
 	// NAVIGATION
@@ -26,7 +27,7 @@
 	$TEXT['navi-iart2'] = "Flash艺术";
 	$TEXT['navi-phonebook'] = "电话簿";
 	$TEXT['navi-perlasp'] = "Perl:ASP";
-	$TEXT['navi-pear'] = "PEAR:Excel_Writer";
+	$TEXT['navi-pear'] = "Excel_Writer";
 	$TEXT['navi-adodb'] = "ADOdb";
 	$TEXT['navi-perl'] = "Perl";
 	$TEXT['navi-python'] = "Python";
@@ -44,18 +45,6 @@
 	$TEXT['navi-guest1'] = "FCKeditor";
 
 	$TEXT['navi-languages'] = "语言";
-	$TEXT['navi-chinese'] = "中文";
-	$TEXT['navi-german'] = "Deutsch";
-	$TEXT['navi-english'] = "English";
-	$TEXT['navi-spanish'] = "Espa駉l";
-	$TEXT['navi-french'] = "Francais";
-	$TEXT['navi-italian'] = "Italiano";
-	$TEXT['navi-dutch'] = "Nederlands";
-	$TEXT['navi-norwegian'] = "Norsk";
-	$TEXT['navi-polish'] = "Polski";
-	$TEXT['navi-portuguese'] = "Portugu阺";
-	$TEXT['navi-slovenian'] = "Slovenian";
-	$TEXT['navi-ptbrazil']="Portugu阺 (Brasil)";
 
 	// ---------------------------------------------------------------------
 	// STATUS
@@ -191,7 +180,7 @@
 	
 	$TEXT['start-text1'] = "现在您可以开始使用Apache以及其他的组件. 首先, 您可以通过左侧的导航条上的'状态'功能来查看他们是否工作正常.";
 
-	$TEXT['start-text2'] = "<b>感谢Carsten Wiedmann提供了PHP 4.3.10对MySQL 4.1.8的支持以及他为Webalizer win32版本提供的补丁! :-)</b>";
+	$TEXT['start-text2'] = "";
 
 	$TEXT['start-text3'] = "";
 
@@ -199,7 +188,7 @@
 
 	$TEXT['start-text5'] = "很重要的一点! 非常感谢给予Carsten, Nemesis, KriS, Boppy, Pc-Dummy以及XAMPP帮助与支持的所有朋友!";
 
-	$TEXT['start-text6'] = "祝您好运, Kay Vogelgesang, Carsten Wiedmann + Kai 'Oswald' Seidler";
+	$TEXT['start-text6'] = "祝您好运, Kay Vogelgesang + Kai 'Oswald' Seidler";
 
 	// ---------------------------------------------------------------------
 	// MANUALS
@@ -333,12 +322,6 @@
 	$TEXT['about-subhead3'] = "合作";
 
 	$TEXT['about-subhead4'] = "联系人";
-
-	// ---------------------------------------------------------------------
-	// CODE
-	// ---------------------------------------------------------------------
-
-	$TEXT['srccode-in'] = "获得源代码";
 
 	// ---------------------------------------------------------------------
 	// MERCURY

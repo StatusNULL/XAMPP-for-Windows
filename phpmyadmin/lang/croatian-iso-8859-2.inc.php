@@ -1,5 +1,5 @@
 <?php
-/* $Id: croatian-iso-8859-2.inc.php,v 2.141.2.1 2006/08/29 15:33:12 nijel Exp $ */
+/* $Id: croatian-iso-8859-2.inc.php 9375 2006-08-29 15:33:28Z nijel $ */
 
 /**
  *   Croatian language file by

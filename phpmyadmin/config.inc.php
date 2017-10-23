@@ -514,7 +514,7 @@ $cfg['ThemePath']           = './themes';    // using themes manager please set 
                                              // else leave empty
 $cfg['ThemeManager']        = TRUE;          // if you want to use selectable themes and if ThemesPath not empty
                                              // set it to true, else set it to false (default is false);
-$cfg['ThemeDefault']        = 'xampp';         // set up default theme, if ThemePath not empty
+$cfg['ThemeDefault']        = 'darkblue_orange';         // set up default theme, if ThemePath not empty
                                              // you can set up here an valid path to themes or 'original' for
                                              // the original pma-theme
 $cfg['ThemePerServer']      = FALSE;         // allow diferent theme for each configured server

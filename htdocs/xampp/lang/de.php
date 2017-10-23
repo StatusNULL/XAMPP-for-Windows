@@ -4,6 +4,8 @@
 	// ---------------------------------------------------------------------
 
 	$TEXT['global-xampp'] = "XAMPP für Windows";
+	$TEXT['global-showcode']="Quellcode zeigen";
+	$TEXT['global-sourcecode']="Quellcode";
 
 	// ---------------------------------------------------------------------
 	// NAVIGATION
@@ -26,7 +28,7 @@
 	$TEXT['navi-iart2'] = "Flash Art";
 	$TEXT['navi-phonebook'] = "Telefonbuch";
 	$TEXT['navi-perlasp'] = "Perl:ASP";
-	$TEXT['navi-pear'] = "PEAR:Excel_Writer";
+	$TEXT['navi-pear'] = "Excel_Writer";
 	$TEXT['navi-adodb'] = "ADOdb";
 	$TEXT['navi-perl'] = "Perl";
 	$TEXT['navi-python'] = "Python";
@@ -44,18 +46,6 @@
 	$TEXT['navi-guest1'] = "FCKeditor";
 
 	$TEXT['navi-languages'] = "Sprachen";
-	$TEXT['navi-german'] = "Deutsch";
-	$TEXT['navi-english'] = "English";
-	$TEXT['navi-spanish'] = "Español";
-	$TEXT['navi-french'] = "Francais";
-	$TEXT['navi-italian'] = "Italiano";
-	$TEXT['navi-dutch'] = "Nederlands";
-	$TEXT['navi-norwegian'] = "Norsk";
-	$TEXT['navi-polish'] = "Polski";
-	$TEXT['navi-portuguese'] = "Português";
-	$TEXT['navi-slovenian'] = "Slovenian";
-	$TEXT['navi-chinese'] = "&#20013;&#25991;";
-	$TEXT['navi-ptbrazil']="Português (Brasil)";
 
 	// ---------------------------------------------------------------------
 	// STATUS
@@ -184,8 +174,6 @@
 
 	$TEXT['start-subhead'] = "Herzlichen Glückwunsch:<br>XAMPP ist erfolgreich auf diesem Rechner installiert!";
 
-	$TEXT['start-text-newest'] = "<hr><br><i>Die zuständigen Entwickler dieser XAMPP Version für win32 waren</i><br><ul><li><i>Carsten Wiedmann</i></li><li><i>Kay Vogelgesang</i></li></ul><hr>";
-
 	$TEXT['start-text1'] = "Nun kann es losgehen. :) Als erstes bitte einmal auf der linken Seite auf »Status« klicken. Damit bekommt man einen Überblick was alles schon funktioniert. Ein paar Funktionen werden ausgeschaltet sein. Das ist Absicht so. Es sind Funktionen, die nicht überall funktionieren oder evtl. Probleme bereiten könnten.";
 
 	$TEXT['start-text2'] = "";
@@ -196,7 +184,7 @@
 
 	$TEXT['start-text5'] = "Und ganz wichtig! Einen großen Dank für die Mitarbeit und Mithilfe an Carsten, Nemesis, KriS, Boppy, Pc-Dummy und allen anderen Freunden von XAMPP!";
 
-	$TEXT['start-text6'] = "Viel Spaß, Kay Vogelgesang, Carsten Wiedmann + Kai 'Oswald' Seidler";
+	$TEXT['start-text6'] = "Viel Spaß, Kay Vogelgesang + Kai 'Oswald' Seidler";
 
 	// ---------------------------------------------------------------------
 	// MANUALS
@@ -341,12 +329,6 @@
 	$TEXT['about-subhead3'] = "Mitwirkung";
 
 	$TEXT['about-subhead4'] = "Ansprechpartner";
-
-	// ---------------------------------------------------------------------
-	// CODE
-	// ---------------------------------------------------------------------
-
-	$TEXT['srccode-in'] = "Den Quellcode einblenden";
 
 	// ---------------------------------------------------------------------
 	// MERCURY

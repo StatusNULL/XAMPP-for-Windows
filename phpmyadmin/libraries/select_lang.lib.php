@@ -1,5 +1,5 @@
 <?php
-/* $Id: select_lang.lib.php,v 2.42 2006/06/21 10:40:41 lem9 Exp $ */
+/* $Id: select_lang.lib.php 9711 2006-11-17 09:32:12Z nijel $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -39,6 +39,9 @@ function PMA_langCheck()
     if (! empty($_POST['lang'])) {
         if (PMA_langSet($_POST['lang'])) {
             return true;
+        } elseif (!is_string($_POST['lang'])) {
+            /* Faked request, don't care on localisation */
+            $GLOBALS['lang_failed_request'] = 'Yes';
         } else {
             $GLOBALS['lang_failed_request'] = $_POST['lang'];
         }
@@ -48,6 +51,9 @@ function PMA_langCheck()
     if (! empty($_GET['lang'])) {
         if (PMA_langSet($_GET['lang'])) {
             return true;
+        } elseif (!is_string($_GET['lang'])) {
+            /* Faked request, don't care on localisation */
+            $GLOBALS['lang_failed_request'] = 'Yes';
         } else {
             $GLOBALS['lang_failed_request'] = $_GET['lang'];
         }
@@ -57,6 +63,9 @@ function PMA_langCheck()
     if (! empty($_COOKIE['pma_lang'])) {
         if (PMA_langSet($_COOKIE['pma_lang'])) {
             return true;
+        } elseif (!is_string($_COOKIE['lang'])) {
+            /* Faked request, don't care on localisation */
+            $GLOBALS['lang_failed_request'] = 'Yes';
         } else {
             $GLOBALS['lang_failed_cookie'] = $_COOKIE['pma_lang'];
         }
@@ -95,7 +104,7 @@ function PMA_langCheck()
  */
 function PMA_langSet(&$lang)
 {
-    if (empty($lang) || empty($GLOBALS['available_languages'][$lang])) {
+    if (!is_string($lang) || empty($lang) || empty($GLOBALS['available_languages'][$lang])) {
         return false;
     }
     $GLOBALS['lang'] = $lang;
@@ -220,7 +229,6 @@ $available_languages = array(
     'ar-utf-8'          => array('ar|arabic', 'arabic-utf-8', 'ar', '&#1575;&#1604;&#1593;&#1585;&#1576;&#1610;&#1577;'),
     'az-iso-8859-9'     => array('az|azerbaijani', 'azerbaijani-iso-8859-9', 'az', 'Az&#601;rbaycanca'),
     'az-utf-8'          => array('az|azerbaijani', 'azerbaijani-utf-8', 'az', 'Az&#601;rbaycanca'),
-
     'becyr-win1251'     => array('be|belarusian', 'belarusian_cyrillic-windows-1251', 'be', '&#1041;&#1077;&#1083;&#1072;&#1088;&#1091;&#1089;&#1082;&#1072;&#1103;'),
     'becyr-utf-8'       => array('be|belarusian', 'belarusian_cyrillic-utf-8', 'be', '&#1041;&#1077;&#1083;&#1072;&#1088;&#1091;&#1089;&#1082;&#1072;&#1103;'),
     'belat-utf-8'       => array('be[-_]lat|belarusian latin', 'belarusian_latin-utf-8', 'be-lat', 'Byelorussian'),
