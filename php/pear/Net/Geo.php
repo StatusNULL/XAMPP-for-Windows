@@ -17,7 +17,7 @@
 // |                                                                      |
 // +----------------------------------------------------------------------+
 //
-// $Id: Geo.php,v 1.5 2002/04/25 23:49:47 graeme Exp $
+// $Id: Geo.php,v 1.7 2004/02/18 22:59:20 lsmith Exp $
 
 require_once 'PEAR.php';
 require_once 'Cache/Function.php';
@@ -28,7 +28,7 @@ require_once 'Cache/Function.php';
  * Can accept input of an AS number, an IP address or a host name
  * Input can be individual or an array of addresses
  *
- * $geo = new NetGeo();
+ * $geo = new Net_Geo();
  * $geo->getRecord("php.net");
  * $geo->getRecord(array("php.net", "google.com"));
  *
@@ -564,7 +564,7 @@ class Net_Geo
                 $urlinfo["port"] = 80;
             }
         
-            $sp = @fsockopen($urlinfo["host"], $urlinfo["port"], &$errno, &$errstr, $this->default_timeout);
+            $sp = @fsockopen($urlinfo["host"], $urlinfo["port"], $errno, $errstr, $this->default_timeout);
             if (!$sp) {
                 return false;
             }

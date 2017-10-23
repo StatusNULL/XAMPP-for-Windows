@@ -13,7 +13,7 @@
 // +------------------------------------------------------------------------+
 //
 $path = dirname(__FILE__);
-include_once( "C:\xampp\php\pear\data/PhpDocumentor/docbuilder/includes/utilities.php" );
+include_once( "\xampp\php\pear\data/PhpDocumentor/docbuilder/includes/utilities.php" );
 
 $filename = '';
 if (isset($_GET) && isset($_GET['fileName'])) {

@@ -1,29 +1,28 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	"http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head><title>XAMPP 1.5 WIN32</title>
-<link href="xampp.css" rel="stylesheet" type="text/css">
-</head>
+	<head>
+		<meta name="author" content="Kai Oswald Seidler, Kay Vogelgesang, Carsten Wiedmann">
+		<link href="xampp.css" rel="stylesheet" type="text/css">
+		<title>XAMPP 1.5 WIN32</title>
+	</head>
 
-<body class=white bgcolor=#ffffff>
-<center>
-<img src=img/blank.gif height=180 width=1><br>
-<!--
-<OBJECT classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
-     codebase="http://active.macromedia.com/flash2/cabs/swflash.cab#version=4,0,0,0"
-     ID=anim WIDTH=400 HEIGHT=100><PARAM NAME=movie VALUE="splash-swf.php"> <PARAM NAME=loop VALUE=false> <PARAM NAME=quality VALUE=high> <EMBED src="splash-swf.php" loop=false quality=high WIDTH=400 HEIGHT=100 TYPE="application/x-shockwave-flash" PLUGINSPAGE="http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash"></EMBED></OBJECT>
--->
-<img src="img/xampp-logo.jpg">
-<p>
-<a href="/security/lang.php?de">Deutsch</a> /
-<a href="/security/lang.php?en">English</a> / 
-<a href="/security/lang.php?es">Spanish</a> /
-<a href="/security/lang.php?fr">Francais</a> /
-<a href="/security/lang.php?it">Italiano</a> /
-<a href="/security/lang.php?nl">Nederlands</a> / 
-<a href="/security/lang.php?no">Norsk</a> /
-<a href="/security/lang.php?pl">Polish</a> / 
-<a href="/security/lang.php?sl">Slovenian</a> /
-<a href="/security/lang.php?zh">Chinese</a> /
-
-</center>
-</body>
+	<body class="white" bgcolor="#ffffff">
+		<center>
+			<img src="img/blank.gif" alt="" height="180" width="1"><br>
+			<img src="img/xampp-logo.jpg" alt="">
+			<p>
+			<a href="/security/lang.php?de">Deutsch</a> /
+			<a href="/security/lang.php?en">English</a> /
+			<a href="/security/lang.php?es">Spanish</a> /
+			<a href="/security/lang.php?fr">Francais</a> /
+			<a href="/security/lang.php?it">Italiano</a> /
+			<a href="/security/lang.php?nl">Nederlands</a> /
+			<a href="/security/lang.php?no">Norsk</a> /
+			<a href="/security/lang.php?pl">Polish</a> /
+			<a href="/security/lang.php?pt">Portuguese</a> /
+			<a href="/security/lang.php?sl">Slovenian</a> /
+			<a href="/security/lang.php?zh">Chinese</a>
+		</center>
+	</body>
 </html>

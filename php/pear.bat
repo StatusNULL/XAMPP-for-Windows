@@ -87,6 +87,8 @@ IF NOT EXIST "%PHP_PEAR_PHP_BIN%" GOTO PEAR_PHPBIN_ERROR
 ATTRIB +R %PHP_PEAR_BIN_DIR%\pear.bat >nul
 ATTRIB +R %PHP_PEAR_BIN_DIR%\peardev.bat >nul
 ATTRIB +R %PHP_PEAR_BIN_DIR%\pecl.bat >nul
+ATTRIB +R %PHP_PEAR_BIN_DIR%\phpdoc.bat >nul
+ATTRIB +R %PHP_PEAR_BIN_DIR%\phpunit.bat >nul
 ATTRIB -H %PHP_PEAR_INSTALL_DIR%\.depdb >nul
 ATTRIB -H %PHP_PEAR_INSTALL_DIR%\.depdblock >nul
 ATTRIB -H %PHP_PEAR_INSTALL_DIR%\.filemap >nul
@@ -128,4 +130,6 @@ GOTO END
 ATTRIB -R %PHP_PEAR_BIN_DIR%\pear.bat >nul
 ATTRIB -R %PHP_PEAR_BIN_DIR%\peardev.bat >nul
 ATTRIB -R %PHP_PEAR_BIN_DIR%\pecl.bat >nul
+ATTRIB -R %PHP_PEAR_BIN_DIR%\phpdoc.bat >nul
+ATTRIB -R %PHP_PEAR_BIN_DIR%\phpunit.bat >nul
 @ECHO ON

@@ -5,6 +5,6 @@
  * for 2.6.1 and higher
 */
 $theme_name = 'XAMPP';
-$theme_version = 1;
+$theme_version = 2;
 $theme_generation = 2;
 ?>

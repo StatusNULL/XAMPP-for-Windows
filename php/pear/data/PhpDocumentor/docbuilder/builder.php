@@ -39,11 +39,11 @@ $GLOBALS['_phpDocumentor_install_dir'] = 'PhpDocumentor';
 include_once("$root_dir/phpDocumentor/common.inc.php");
 
 // find the .ini directory by parsing phpDocumentor.ini and extracting _phpDocumentor_options[userdir]
-$ini = phpDocumentor_parse_ini_file('C:\xampp\php\pear\data/PhpDocumentor/phpDocumentor.ini', true);
+$ini = phpDocumentor_parse_ini_file('\xampp\php\pear\data/PhpDocumentor/phpDocumentor.ini', true);
 if (isset($ini['_phpDocumentor_options']['userdir']))
     $configdir = $ini['_phpDocumentor_options']['userdir'];
 else
-    $configdir = 'C:\xampp\php\pear\data/user';
+    $configdir = '\xampp\php\pear\data/user';
 
 // allow the user to change this at runtime
 if (!empty($_REQUEST['altuserdir'])) $configdir = $_REQUEST['altuserdir'];

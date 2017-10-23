@@ -1,11 +1,10 @@
 <?php
-/* $Id: tbl_indexes.php,v 2.24 2005/07/10 20:35:26 nijel Exp $ */
+/* $Id: tbl_indexes.php,v 2.27 2005/11/18 12:50:49 cybot_tm Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
  * Gets some core libraries
  */
-require_once('./libraries/grab_globals.lib.php');
 require_once('./libraries/common.lib.php');
 require_once('./libraries/tbl_indexes.lib.php');
 
@@ -22,18 +21,18 @@ $index_types_cnt   = count($index_types);
  */
 if (!defined('PMA_IDX_INCLUDED')) {
     // Not a valid db name -> back to the welcome page
-    if (0 < strlen($db)) {
+    if (!empty($db)) {
         $is_db = PMA_DBI_select_db($db);
     }
-    if ((0 == strlen($db)) || !$is_db) {
+    if (empty($db) || !$is_db) {
         PMA_sendHeaderLocation($cfg['PmaAbsoluteUri'] . 'main.php?' . PMA_generate_common_url('', '', '&') . (isset($message) ? '&message=' . urlencode($message) : '') . '&reload=1');
         exit;
     }
     // Not a valid table name -> back to the default db_details sub-page
-    if (0 < strlen($table)) {
+    if (!empty($table)) {
         $is_table = PMA_DBI_query('SHOW TABLES LIKE \'' . PMA_sqlAddslashes($table, TRUE) . '\'', NULL, PMA_DBI_QUERY_STORE);
     }
-    if ((0 == strlen($table))
+    if (empty($table)
         || !($is_table && PMA_DBI_num_rows($is_table))) {
         PMA_sendHeaderLocation($cfg['PmaAbsoluteUri'] . $cfg['DefaultTabDatabase'] . '?' . PMA_generate_common_url($db, '', '&') . (isset($message) ? '&message=' . urlencode($message) : '') . '&reload=1');
         exit;
@@ -283,7 +282,7 @@ else if (!defined('PMA_IDX_INCLUDED')
     } // end for
     ?>
             </select>
-            <?php echo PMA_showMySQLDocu('Reference', 'ALTER_TABLE') . "\n"; ?>
+            <?php echo PMA_showMySQLDocu('SQL-Syntax', 'ALTER_TABLE') . "\n"; ?>
         </td>
     </tr>
 
@@ -363,7 +362,7 @@ else if (!defined('PMA_IDX_INCLUDED')
     <?php
     echo "\n";
     echo '        ' . $strIndexes . ':' . "\n";
-    echo '        ' . PMA_showMySQLDocu('MySQL_Optimisation', 'Optimising_Database_Structure') . "\n";
+    echo '        ' . PMA_showMySQLDocu('optimization', 'optimizing-database-structure') . "\n";
 ?></td></tr><?php
     $edit_link_text = '';
     $drop_link_text = '';

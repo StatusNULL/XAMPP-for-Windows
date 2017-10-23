@@ -179,7 +179,7 @@ and load the tokenizer extension for faster parsing (your version is ".phpversio
             $_phpDocumentor_setting = phpDocumentor_parse_ini_file($file.'.ini');
         } else
         {
-            $configdir = str_replace('\\','/', 'C:\xampp\php\pear\data/PhpDocumentor') . PATH_DELIMITER . 'user' . PATH_DELIMITER;
+            $configdir = str_replace('\\','/', '\xampp\php\pear\data/PhpDocumentor') . PATH_DELIMITER . 'user' . PATH_DELIMITER;
             if (isset($_phpDocumentor_options['userdir'])) $configdir = $_phpDocumentor_options['userdir'];
             if (substr($configdir,-1) != '/')
             {
@@ -636,11 +636,11 @@ and load the tokenizer extension for faster parsing (your version is ".phpversio
     {
         phpDocumentor_out("Parsing configuration file phpDocumentor.ini...");
         flush();
-        $options = phpDocumentor_parse_ini_file(str_replace('\\','/', 'C:\xampp\php\pear\data/PhpDocumentor') . PATH_DELIMITER . 'phpDocumentor.ini',true);
+        $options = phpDocumentor_parse_ini_file(str_replace('\\','/', '\xampp\php\pear\data/PhpDocumentor') . PATH_DELIMITER . 'phpDocumentor.ini',true);
 
         if (!$options)
         {
-            print "ERROR: cannot open phpDocumentor.ini in directory C:\xampp\php\pear\data/PhpDocumentor\n";
+            print "ERROR: cannot open phpDocumentor.ini in directory \xampp\php\pear\data/PhpDocumentor\n";
             print "-Is phpdoc in either the path or include_path in your php.ini file?";
             exit;
         }

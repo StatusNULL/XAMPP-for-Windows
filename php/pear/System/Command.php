@@ -18,7 +18,7 @@
 // | Author: Dan Allen <dan@mojavelinux.com>
 // +----------------------------------------------------------------------+
 
-// $Id: Command.php,v 1.5 2005/09/01 12:51:08 arnaud Exp $
+// $Id: Command.php,v 1.6 2005/10/23 10:36:31 arnaud Exp $
 
 // }}}
 // {{{ includes
@@ -54,7 +54,7 @@ define('SYSTEM_COMMAND_STDERR',           -11);
  *
  * @author  Anders Johannsen <anders@johannsen.com>
  * @author  Dan Allen <dan@mojavelinux.com>
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 
 // }}}
@@ -224,7 +224,7 @@ class System_Command {
 
         $option = strtoupper($in_option);
 
-        if (empty($this->options[$option])) {
+        if (!isset($this->options[$option])) {
             PEAR::raiseError(null, SYSTEM_COMMAND_ERROR, null, E_USER_NOTICE, null, 'System_Command_Error', true);
             return false;
         }

@@ -1,25 +1,24 @@
-<?
-	if(file_get_contents("lang.tmp")=="")
-	{
-		header("Location: splash.php");	
-		exit();
+<?php
+	if (file_get_contents("lang.tmp") == "") {
+		header("Location: splash.php");
+		exit;
 	}
 ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN"
+	"http://www.w3.org/TR/html4/frameset.dtd">
 <html>
-<head>
-<link REL="icon" HREF="img/xampp.ico">
-<meta name="author" content="Kai Oswald Seidler, Kay Vogelgesang">
-<?include("lang/".file_get_contents("lang.tmp").".php"); ?>
-<title><?=$TEXT['global-xampp']?> <?include('.version');?></title>
+	<head>
+		<meta name="author" content="Kai Oswald Seidler, Kay Vogelgesang, Carsten Wiedmann">
+		<link rel="icon" href="img/xampp.ico">
+		<?php include "lang/".file_get_contents("lang.tmp").".php"; ?>
+		<title><?php echo $TEXT['global-xampp']; ?> <?php include '.version'; ?></title>
+	</head>
 
-<frameset rows="68,*" marginwidth="0" marginheight="0" frameborder="0" border="0" borderwidth="0">
-    <frame name="head" src="head.php" scrolling=no>
-<frameset cols="170,*" marginwidth="0" marginheight="0" frameborder="0" border="0" borderwidth="0">
-    <frame name="navi" src="navi.php" scrolling=auto>
-    <frame name="content" src="start.php" marginwidth=20>
-</frameset>
-</frameset>
-</head>
-<body bgcolor=#ffffff>
-</body>
+	<frameset rows="68,*" border="0" framespacing="0">
+		<frame name="head" src="head.php" frameborder="0" scrolling="no">
+		<frameset cols="175,*" border="0" framespacing="0">
+			<frame name="navi" src="navi.php" frameborder="0" scrolling="auto">
+			<frame name="content" src="start.php" frameborder="0" marginwidth="20">
+		</frameset>
+	</frameset>
 </html>

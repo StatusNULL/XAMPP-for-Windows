@@ -48,9 +48,9 @@ function PMA_generate_common_hidden_inputs ($db = '', $table = '', $indent = 0, 
         $result .= $spaces . '<input type="hidden" name="convcharset" value="' . $convcharset . '" />'  . "\n";
     if (!in_array('collation_connection', $skip) && isset($collation_connection))
         $result .= $spaces . '<input type="hidden" name="collation_connection" value="' . $collation_connection . '" />'  . "\n";
-    if (!in_array('db', $skip) && (0 < strlen($db)))
+    if (!in_array('db', $skip) && !empty($db))
         $result .= $spaces . '<input type="hidden" name="db" value="'.htmlspecialchars($db).'" />' . "\n";
-    if (!in_array('table', $skip) && (0 < strlen($table)))
+    if (!in_array('table', $skip) && !empty($table))
         $result .= $spaces . '<input type="hidden" name="table" value="'.htmlspecialchars($table).'" />' . "\n";
     return $result;
 }
@@ -87,9 +87,9 @@ function PMA_generate_common_url ($db = '', $table = '', $amp = '&amp;')
         $result .= $amp . 'convcharset=' . urlencode($convcharset);
     if (isset($collation_connection))
         $result .= $amp . 'collation_connection=' . urlencode($collation_connection);
-    if (0 < strlen($db))
+    if (!empty($db))
         $result .= $amp . 'db='.urlencode($db);
-    if (0 < strlen($table))
+    if (!empty($table))
         $result .= $amp . 'table='.urlencode($table);
     return $result;
 }

@@ -1,20 +1,21 @@
- ApacheFriends XAMPP (basic package) version 1.5.0-pl1
+  ApacheFriends XAMPP (basic package) version 1.5.1
 
-  + Apache 2.0.55
-  + MySQL 5.0.15 + Bug #13783
-  + PHP 5.0.5 + PHP 4.4.1-pl1 + PEAR
-  + eAccelerator 0.9.4-dev
+  + Apache 2.2.0
+  + MySQL 5.0.18
+  + PHP 5.1.1 + PHP 4.4.1-pl1 + PEAR
+  + eAccelerator 0.9.4-rc1
   + PHP-Switch win32 1.0 (from Apachefriends, use the "php-switch.bat") 
   + XAMPP Control Version 2.1 from www.nat32.com	
   + XAMPP Security 1.0	
   + SQLite 2.8.15
   + OpenSSL 0.9.8a
-  + phpMyAdmin 2.6.4-pl3
-  + ADODB 4.65
+  + phpMyAdmin 2.7.0 pl1
+  + ADOdb 4.68
+  + FPDF 1.5.3
   + Mercury Mail Transport System v4.01b
-  + FileZilla FTP Server 0.9.10a
+  + FileZilla FTP Server 0.9.11
   + Webalizer 2.01-10
-  + Zend Optimizer 2.5.10a
+  + Zend Optimizer 2.6.0
  
 * System Requirements:
  
@@ -31,7 +32,7 @@ build E:\xampp or W:\xampp or something like this. Please do not
 use the "setup_xampp.bat" for an USB stick installation!]   
 
 Step 1: Unpack the package into a directory of your choice. Please start the 
-"setup_xampp.bat" and beginning the installation. Note: xampp makes no 
+"setup_xampp.bat" and beginning the installation. Note: XAMPP makes no 
 entries in the windows registry and no settings for the system variables. 
 
 Step 2: If installation ends successfully, start the Apache 2 with 
@@ -45,10 +46,10 @@ start page with certain examples and test screens.
 
 Step 4: PHP (with mod_php, as *.php, *.php4, *.php3, *.phtml), Perl
 by default with *.cgi, SSI with *.shtml are all located in 
-=> \...\xampp\htdocs\.
+=> \xampp\htdocs\.
 Beispiele (Examples):
-=> \...\xampp\htdocs\test.php => http://localhost/test.php
-=> \...\xampp\myhome\test.php => http://localhost/myhome/test.php
+=> \xampp\htdocs\test.php => http://localhost/test.php
+=> \xampp\myhome\test.php => http://localhost/myhome/test.php
 
 Step 5: XAMPP UNINSTALL? Simply remove the "xampp" Directory.
 But before please shutdown the apache and mysql.  
@@ -85,16 +86,16 @@ password: xampp
 ONLY FOR NT SYSTEMS
 (NT4 | windows 2000 | windows xp)
 
-\...\xampp\apache\apache_installservice.bat =
+\xampp\apache\apache_installservice.bat =
 ==> Install Apache 2 as service   
 
-\...\xampp\apache\apache_uninstallservice.bat =
+\xampp\apache\apache_uninstallservice.bat =
 ==> Uninstall Apache 2 as service   
 
-\...\xampp\mysql\mysql_installservice.bat =
+\xampp\mysql\mysql_installservice.bat =
 ==> Install MySQL as service   
 
-\...\xampp\mysql\mysql_uninstallservice.bat =
+\xampp\mysql\mysql_uninstallservice.bat =
 ==> Uninstall MySQL as service   
 
 ==> After all Service (un)installations, better restart system!
@@ -143,7 +144,7 @@ MYSQL NOTES:
     mysql_start.bat. This file can be found in the same folder you installed
     xampp in, most likely this will be C:\xampp\.
     The exact path to this file is X:\xampp\mysql_start.bat, where
-    "X" indicates the letter of the drive you unpacked xampp into.
+    "X" indicates the letter of the drive you unpacked XAMPP into.
     This batch file starts the MySQL server in console mode. The first 
     intialization might take a few minutes.
     
@@ -183,5 +184,6 @@ MYSQL NOTES:
     may access.
   	    	
 ---------------------------------------------------------------    
+
 Have a lot of fun! Viel Spaﬂ! Bonne Chance!
      

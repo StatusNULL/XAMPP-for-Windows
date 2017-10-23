@@ -1,14 +1,36 @@
-08 Nov 2005, XAMPP 1.5.0-pl1
-- UPDATE Apache 2.0.55 (wiedmann compilation)
-- UPDATE MySQL 5.0.15 + Bug #13783 (wiedmann compilation)
-- UPDATE PHP 4.4.1-pl1 (wiedmann compilation)
-- UPDATE OpenSSL 0.9.8a (wiedmann compilation)
-- UPDATE Mercury Mail Transport System v4.01b
-- UPDATE phpMyAdmin 2.6.4-pl3
-- UPDATE Norway lang file (from Ptomter)
-- UPDATE PEAR (v1.4.2)
-- ADD mod_bw 0.7 (wiedmann compilation)
-- ADD mod_auth_remote 0.1 (wiedmann compilation)
-- CLEAN BUG install.php (wiedmann)
-- CLEAN BUG securefunctions.php (wiedmann)
-- CLEAN BUG security-htdocs => index.php (wiedmann)
+08 Jan 2006, XAMPP 1.5.1
+- UPDATE MySQL 5.0.18 (without ssl support)
+- CHANGE (Activate) PHP gettext module as default
+- CHANGE httpd_webdav.conf 
+- CHANGE httpd.conf + httpd_xampp.conf
+
+28 Dec 2005, XAMPP 1.5.1-beta3
+- CHANGE install.php for addon compatibility
+
+26 Dec 2005, XAMPP 1.5.1-beta2
+- CHANGE httpd.conf structure (with extra folder for all include files)
+- CHANGE install.php (xamppbasic.inc) and php-switch.php for new conf-structure 
+- CHANGE navi.php e.g to the linux xampp (with langsettings.php include) 
+- ADD brazilian language
+- UPDATE phpMyAdmin 2.7.0 pl1
+- UPDATE MySQL 5.0.17 (here only for testing)
+
+02 Dec 2005, XAMPP 1.5.1-beta1
+- UPDATE Apache 2.2.0 (wiedmann compilation)
+- UPDATE MySQL 5.0.16 (wiedmann compilation)
+- UPDATE PHP 5.1.1 (wiedmann compilation)
+- UPDATE eAccelerator 0.9.4-rc1  (wiedmann compilation)
+- UPDATE PHP Extension PDFLib Lite 6.0.2  (wiedmann compilation)
+- UPDATE PHP Extension IMAP 2004g / with SSL (wiedmann compilation)
+- UPDATE FileZilla FTP Server 0.9.11
+- UPDATE phpMyAdmin 2.7.0
+- UPDATE PEAR (v1.4.5)
+- UPDATE ADOdb 4.68
+- ADD FPDF 1.5.3
+- ADD Portuguese lang file (from Marcio)
+- some code cleanup (HTML: valid HTML4.01 / PHP: "register_globals = Off")
+
+Known issues:
+- no Zend Optimizer for PHP5.1.1
+- eAccelerator is not working correkt with PHP5.1.1
+- mod_auth_remote is not working

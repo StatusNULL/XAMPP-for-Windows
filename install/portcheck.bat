@@ -1,4 +1,4 @@
-@ECHO OFF
+@echo off
 echo "Checking necessary ports! Please wait ..."
 set PHP_BIN=..\php\php.exe
 set CONFIG_PHP=portcheck.php -80,443,3306,21,14147,8080

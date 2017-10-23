@@ -1,0 +1,47 @@
+a:17:{s:8:"provides";a:6:{s:37:"class;PEAR_PackageFileManager_GUI_Gtk";a:3:{s:4:"type";s:5:"class";s:4:"name";s:31:"PEAR_PackageFileManager_GUI_Gtk";s:8:"explicit";b:1;}s:46:"function;PEAR_PackageFileManager_GUI_Gtk::show";a:3:{s:4:"type";s:8:"function";s:4:"name";s:37:"PEAR_PackageFileManager_GUI_Gtk::show";s:8:"explicit";b:1;}s:51:"function;PEAR_PackageFileManager_GUI_Gtk::getWidget";a:3:{s:4:"type";s:8:"function";s:4:"name";s:42:"PEAR_PackageFileManager_GUI_Gtk::getWidget";s:8:"explicit";b:1;}s:47:"function;PEAR_PackageFileManager_GUI_Gtk::about";a:3:{s:4:"type";s:8:"function";s:4:"name";s:38:"PEAR_PackageFileManager_GUI_Gtk::about";s:8:"explicit";b:1;}s:54:"function;PEAR_PackageFileManager_GUI_Gtk::showWarnings";a:3:{s:4:"type";s:8:"function";s:4:"name";s:45:"PEAR_PackageFileManager_GUI_Gtk::showWarnings";s:8:"explicit";b:1;}s:57:"function;PEAR_PackageFileManager_GUI_Gtk::checkBeforeQuit";a:3:{s:4:"type";s:8:"function";s:4:"name";s:48:"PEAR_PackageFileManager_GUI_Gtk::checkBeforeQuit";s:8:"explicit";b:1;}}s:8:"filelist";a:2:{s:11:"example.php";a:5:{s:4:"role";s:3:"doc";s:14:"baseinstalldir";s:29:"/PEAR/PackageFileManager/GUI/";s:6:"md5sum";s:32:"f3632859fb3eaaf7f13c03ca73598e34";s:12:"replacements";a:2:{i:0;a:3:{s:4:"type";s:12:"package-info";s:4:"from";s:9:"@version@";s:2:"to";s:7:"version";}i:1;a:3:{s:4:"type";s:12:"package-info";s:4:"from";s:9:"@summary@";s:2:"to";s:7:"summary";}}s:12:"installed_as";s:64:"\xampp\php\pear\docs\PEAR_PackageFileManager_GUI_Gtk\example.php";}s:7:"Gtk.php";a:5:{s:4:"role";s:3:"php";s:14:"baseinstalldir";s:29:"/PEAR/PackageFileManager/GUI/";s:6:"md5sum";s:32:"0072d8c9d4cdf98452db46391dfc3eff";s:12:"replacements";a:2:{i:0;a:3:{s:4:"type";s:12:"package-info";s:4:"from";s:9:"@summary@";s:2:"to";s:7:"summary";}i:1;a:3:{s:4:"type";s:12:"package-info";s:4:"from";s:9:"@version@";s:2:"to";s:7:"version";}}s:12:"installed_as";s:51:"\xampp\php\pear\PEAR\PackageFileManager\GUI\Gtk.php";}}s:10:"xsdversion";s:3:"1.0";s:7:"package";s:31:"PEAR_PackageFileManager_GUI_Gtk";s:7:"summary";s:57:"A PHP-GTK frontend for the PEAR_PackageFileManager class.";s:11:"description";s:663:"A PHP-GTK 1 frontend for the PEAR_PackageFileManager class. It makes it easier for developers to create and maintain PEAR package.xml files.
+
+Features:
+* Update existing package files or create new ones
+* Import values from an existing package file
+* Drag-n-Drop package directory into the application for easy loading
+* Set package level information (package name, description, etc.)
+* Set release level information (version, release notes, etc.)
+* Easily add maintainers
+* Browse package files as a tree and click to add a dependency
+* Add install time global and file replacements
+* Package file preview window
+* Package the package using the new package file
+";s:11:"maintainers";a:1:{i:0;a:4:{s:6:"handle";s:13:"scottmattocks";s:4:"name";s:14:"Scott Mattocks";s:5:"email";s:21:"scottmattocks@php.net";s:4:"role";s:4:"lead";}}s:7:"version";s:5:"1.0.1";s:12:"release_date";s:10:"2005-05-17";s:15:"release_license";s:11:"PHP License";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:27:"Fix bug #4366: Bad md5sum.
+";s:12:"release_deps";a:3:{i:1;a:4:{s:4:"type";s:3:"pkg";s:3:"rel";s:2:"ge";s:7:"version";s:5:"1.5.1";s:4:"name";s:23:"PEAR_PackageFileManager";}i:2;a:4:{s:4:"type";s:3:"pkg";s:3:"rel";s:2:"ge";s:7:"version";s:5:"1.3.5";s:4:"name";s:4:"PEAR";}i:3;a:4:{s:4:"type";s:3:"pkg";s:3:"rel";s:2:"ge";s:7:"version";s:5:"0.1.0";s:4:"name";s:12:"Gtk_FileDrop";}}s:9:"changelog";a:7:{i:0;a:4:{s:7:"version";s:5:"0.9.0";s:12:"release_date";s:10:"2005-03-18";s:13:"release_state";s:4:"beta";s:13:"release_notes";s:196:"Initial release.
+Implements required setOptions() features
+Implements addMaintainer()
+Implements addDepenedency() (packages only)
+Implements debugPackageFile()
+Implements writePackageFile()
+    
+
+";}i:1;a:4:{s:7:"version";s:6:"0.10.0";s:12:"release_date";s:10:"2005-03-21";s:13:"release_state";s:4:"beta";s:13:"release_notes";s:105:"Added packaging via PEAR_Packager.
+Added checks for preview and save before writing and packaging.
+    
+
+";}i:2;a:4:{s:7:"version";s:6:"0.11.0";s:12:"release_date";s:10:"2005-04-04";s:13:"release_state";s:4:"beta";s:13:"release_notes";s:264:"Added support for replacements.
+Pages are note reated until they can be used.
+Added support of importing options from existing package file. 
+(Requires bug fix for PEAR_PackageFileManager to be more effective)
+Cleaned up code.
+Final version before PEPr::CfV
+    
+
+";}i:3;a:4:{s:7:"version";s:6:"0.12.0";s:12:"release_date";s:10:"2004-04-05";s:13:"release_state";s:4:"beta";s:13:"release_notes";s:46:"Cleaned up API and inline documentation
+    
+
+";}i:4;a:4:{s:7:"version";s:8:"1.0.0rc1";s:12:"release_date";s:10:"2005-04-13";s:13:"release_state";s:4:"beta";s:13:"release_notes";s:96:"Removed work around for importing options. Bug in PEAR_PackageFileManager has been fixed.
+    
+
+";}i:5;a:4:{s:7:"version";s:5:"1.0.0";s:12:"release_date";s:10:"2005-05-13";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:65:"No issues reported for one month. A stable release is due.
+    
+
+";}i:6;a:4:{s:7:"version";s:5:"1.0.1";s:12:"release_date";s:10:"2005-05-17";s:13:"release_state";s:6:"stable";s:13:"release_notes";s:33:"Fix bug #4366: Bad md5sum.
+    
+
+";}}s:12:"_lastversion";N;s:7:"dirtree";a:4:{s:52:"\xampp\php\pear\docs\PEAR_PackageFileManager_GUI_Gtk";b:1;s:43:"\xampp\php\pear\PEAR\PackageFileManager\GUI";b:1;s:39:"\xampp\php\pear\PEAR\PackageFileManager";b:1;s:20:"\xampp\php\pear\PEAR";b:1;}s:13:"_lastmodified";i:1133555398;}

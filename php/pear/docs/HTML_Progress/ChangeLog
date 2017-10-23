@@ -1,4 +1,12 @@
-$Id: ChangeLog,v 1.10 2005/09/23 14:48:33 farell Exp $
+$Id: ChangeLog,v 1.11 2005/10/15 11:17:35 farell Exp $
+
+-------------------------Release 1.2.5------------------------
+2005-11-01  Laurent Laville <pear@laurent-laville.org>
+    * bugs fixes:
+      #5654  'Passing by reference' notice under PHP 4.4.0
+
+      HTML_Progress 1.2.x is now compatible PHP 4.3.x, PHP 4.4.x
+      See details in PHP 4.4.0 release info at http://www.php.net/release_4_4_0.php
 
 -------------------------Release 1.2.4------------------------
 2005-10-01  Laurent Laville <pear@laurent-laville.org>

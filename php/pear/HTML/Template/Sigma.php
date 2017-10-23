@@ -17,7 +17,7 @@
 // |          Alexey Borzov <avb@php.net>                                 |
 // +----------------------------------------------------------------------+
 //
-// $Id: Sigma.php,v 1.13 2005/08/09 14:58:45 avb Exp $
+// $Id: Sigma.php,v 1.14 2005/11/05 13:29:55 avb Exp $
 //
 
 require_once 'PEAR.php';
@@ -114,7 +114,7 @@ define('SIGMA_CALLBACK_SYNTAX_ERROR',     -14);
 *
 * @author   Ulf Wendel <ulf.wendel@phpdoc.de>
 * @author   Alexey Borzov <avb@php.net>
-* @version  $Revision: 1.13 $
+* @version  $Revision: 1.14 $
 * @access   public
 * @package  HTML_Template_Sigma
 */
@@ -1730,7 +1730,7 @@ class HTML_Template_Sigma extends PEAR
             if (0 != $state) {
                 return $this->raiseError($this->errorMessage(SIGMA_CALLBACK_SYNTAX_ERROR, (empty($error)? 'Unexpected end of input': $error) . ' in ' . $regs[0] . substr($template, 0, $i)), SIGMA_CALLBACK_SYNTAX_ERROR);
             } else {
-                $funcId   = substr(md5(serialize($funcData)), 0, 10);
+                $funcId   = 'f' . substr(md5(serialize($funcData)), 0, 10);
                 $template = substr($template, $i);
 
                 $this->_blocks[$block] .= $this->openingDelimiter . '__function_' . $funcId . '__' . $this->closingDelimiter;

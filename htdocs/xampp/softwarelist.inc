@@ -3,7 +3,7 @@
 <a href="http://www.php.net">PHP</a>,
 <a href="http://www.cpan.org/">Perl</a>,
 <a href="http://filezilla.sourceforge.net/">FileZilla FTP Server</a>,
-<a href="http://www.phpmyadmin.net">phpMyAdmin</a>,
+<a href="http://www.phpmyadmin.net/">phpMyAdmin</a>,
 <a href="http://www.openssl.org">OpenSSL</a>,
 <a href="http://www.freetype.org">Freetype</a>,
 <a href="http://www.mrunix.net/webalizer/">Webalizer</a>,
@@ -12,4 +12,5 @@
 <a href="http://mcrypt.sourceforge.net/">mcrypt</a>,
 <a href="http://www.sqlite.org/">SQLite</a>,
 <a href="http://www.pmail.com/overviews/ovw_mercury.htm">Mercury Mail Transport System</a>,
-<a href="http://glob.com.au/sendmail/">fake sendmail for windows</a>
+<a href="http://glob.com.au/sendmail/">fake sendmail for windows</a>,
+<a href="http://www.fpdf.org/">FPDF Class</a>

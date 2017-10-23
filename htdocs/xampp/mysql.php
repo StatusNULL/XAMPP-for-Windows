@@ -1,10 +1,7 @@
-<?
-	if(@mysql_connect("localhost", "pma", ""))
-	{
+<?php
+	if (@mysql_connect("localhost", "pma", "")) {
 		echo "OK";
-	}
-	else
-	{
+	} else {
 		echo "NOK";
 	}
 ?>

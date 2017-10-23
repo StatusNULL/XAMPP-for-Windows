@@ -1,37 +1,44 @@
-<? include("langsettings.php"); ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	"http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-<meta name="author" content="Kai Oswald Seidler">
-<link href="xampp.css" rel="stylesheet" type="text/css">
-</head>
+	<head>
+		<meta name="author" content="Kai Oswald Seidler, Kay Vogelgesang, Carsten Wiedmann">
+		<link href="xampp.css" rel="stylesheet" type="text/css">
+		<title></title>
+	</head>
 
-<body>
+	<body>
+		<?php include "lang/".file_get_contents("lang.tmp").".php"; ?>
+		&nbsp;<p>
+		<h1><?php echo $TEXT['flash-head']; ?></h1>
 
-&nbsp;<p>
-<h1><?=$TEXT['flash-head']?></h1>
+		<?php
+			if (empty($_GET['text'])) {
+				$_GET['text'] = "ceci n est pas un ami d apache";
+			}
+		?>
 
-<? if($text=="")$text = "ceci n est pas un ami d apache"; ?>
-	
-<OBJECT classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
-  codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=4,0,0,0" 
-  width=520 height=320>
-<PARAM name="Movie" value="mingswf.php?text=<?=urlencode($text)?>">
-<PARAM name="loop" value="true">
-<EMBED src="mingswf.php?text=<?=urlencode($text)?>" width=520 height=320
-  pluginspage="http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash" LOOP=TRUE>
-</EMBED>
-</OBJECT>
+		<object data="mingswf.php?text=<?php echo urlencode($_GET['text']); ?>" width="520" height="320" type="application/x-shockwave-flash">
+			<param name="movie" value="mingswf.php?text=<?php echo urlencode($_GET['text']); ?>">
+			<param name="loop" value="true">
+            <a href="http://www.macromedia.com/go/getflashplayer"><img src="http://www.macromedia.com/images/shared/download_buttons/get_flash_player.gif" width="88" height="31" alt="get flash player" title=""></a>
+		</object>
 
-<p class=small>
-<?=$TEXT['flash-text1']?>
-<p>
-
-<form name=ff action=ming.php method=get>
-<input type=text name=text value="<?=$text?>" size=30> <input type=submit value="<?=$TEXT['flash-ok']?>">
-</form>
-<? if ($source=="in")
-		{ include("code.php"); $beispiel = $SCRIPT_FILENAME; pagecode($beispiel);} 
-		else
-		{ print("<p><br><br><h2><U><a href=\"$PHP_SELF?source=in\">".$TEXT['srccode-in']."</a></U></h2>");} ?> 
-</body>
+		<p class="small">
+		<?php echo $TEXT['flash-text1']; ?>
+		<p>
+		<form name="ff" action="ming.php" method="get">
+			<input type="text" name="text" value="<?php echo $_GET['text']; ?>" size="30">
+			<input type="submit" value="<?php echo $TEXT['flash-ok']; ?>">
+		</form>
+		<?php
+			if (isset($_GET['source']) && ($_GET['source'] == "in")) {
+				include "code.php";
+				$beispiel = $_SERVER['SCRIPT_FILENAME'];
+				pagecode($beispiel);
+			} else {
+				echo "<p><br><br><h2><u><a href=\"$_SERVER[PHP_SELF]?source=in\">".$TEXT['srccode-in']."</a></u></h2>";
+			}
+		?>
+	</body>
 </html>

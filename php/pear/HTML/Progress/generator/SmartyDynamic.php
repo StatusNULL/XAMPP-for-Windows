@@ -43,7 +43,7 @@ require_once 'Smarty.class.php';
  * @author     Laurent Laville <pear@laurent-laville.org>
  * @copyright  1997-2005 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    Release: 1.2.4
+ * @version    Release: 1.2.5
  * @link       http://pear.php.net/package/HTML_Progress
  */
 

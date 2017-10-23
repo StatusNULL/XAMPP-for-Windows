@@ -5,7 +5,7 @@
  * 
  * @author Donald Lobo <lobo@groundspring.org>
  * 
- * $Id: statemachine.php,v 1.2 2004/03/02 21:15:40 avb Exp $
+ * $Id: statemachine.php,v 1.3 2005/11/03 19:59:03 avb Exp $
  */
 
 require_once 'HTML/QuickForm/Controller.php';
@@ -125,7 +125,7 @@ class PageFirst extends HTML_QuickForm_Page
 
         $this->addElement('submit',     $this->getButtonName('next'), 'Next >>');
 
-        $this->addRule('iradYesNo', 'Select the page', 'required');
+        $this->addRule('iradPageAB', 'Select the page', 'required');
 
         $this->setDefaultAction('next');
     }

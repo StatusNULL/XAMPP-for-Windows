@@ -1,6 +1,6 @@
 <?php
 /* 
-V4.65 22 July 2005  (c) 2000-2005 John Lim (jlim@natsoft.com.my). All rights reserved.
+V4.68 25 Nov 2005  (c) 2000-2005 John Lim (jlim@natsoft.com.my). All rights reserved.
   Released under both BSD license and Lesser GPL library license. 
   Whenever there is any discrepancy between the two licenses, 
   the BSD license will take precedence. 
@@ -74,8 +74,8 @@ class ADODB_mssql extends ADOConnection {
 	var $databaseType = "mssql";	
 	var $dataProvider = "mssql";
 	var $replaceQuote = "''"; // string to use to replace quotes
-	var $fmtDate = "'Y-m-d'";
-	var $fmtTimeStamp = "'Y-m-d h:i:sA'";
+	var $fmtDate = "Y-m-d";
+	var $fmtTimeStamp = "'Y-m-d H:i:s'";
 	var $hasInsertID = true;
 	var $substr = "substring";
 	var $length = 'len';
@@ -125,6 +125,7 @@ class ADODB_mssql extends ADOConnection {
 		$row = $this->GetRow($stmt);
 		
 		//$row = $this->GetRow("execute sp_server_info 2");
+		
 		
 		if ($this->fetchMode === false) {
 			$ADODB_FETCH_MODE = $savem;
@@ -400,13 +401,13 @@ order by constraint_name, referenced_table_name, keyno";
 						 $tmpAr=$ar=array(); 
 						 while($tmpAr=@mssql_fetch_row($rs)) 
 								 $ar[]=$tmpAr[0]; 
-						@mssql_select_db($this->databaseName); 
+						@mssql_select_db($this->database); 
 						 if(sizeof($ar)) 
 								 return($ar); 
 						 else 
 								 return(false); 
 				 } else { 
-						 @mssql_select_db($this->databaseName); 
+						 @mssql_select_db($this->database); 
 						 return(false); 
 				 } 
 		 } 
@@ -457,7 +458,8 @@ order by constraint_name, referenced_table_name, keyno";
  
 	function SelectDB($dbName) 
 	{
-		$this->databaseName = $dbName;
+		$this->database = $dbName;
+		$this->databaseName = $dbName; # obsolete, retained for compat with older adodb versions
 		if ($this->_connectionID) {
 			return @mssql_select_db($dbName);		
 		}
@@ -735,6 +737,7 @@ class ADORecordset_mssql extends ADORecordSet {
 		if ($mode === false) { 
 			global $ADODB_FETCH_MODE;
 			$mode = $ADODB_FETCH_MODE;
+
 		}
 		$this->fetchMode = $mode;
 		return $this->ADORecordSet($id,$mode);

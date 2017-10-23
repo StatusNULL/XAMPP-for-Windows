@@ -30,7 +30,7 @@ FOR %%x IN ("\xampp\php\pear") DO (if %%x=="%PMTPMTPMT%" GOTO :NOTINSTALLED)
 REM Check PEAR global ENV, set them if they do not exist
 IF "%PHP_PEAR_INSTALL_DIR%"=="" SET "PHP_PEAR_INSTALL_DIR=\xampp\php\pear"
 IF "%PHP_PEAR_BIN_DIR%"=="" SET "PHP_PEAR_BIN_DIR=\xampp\php"
-IF "%PHP_PEAR_PHP_BIN%"=="" SET "PHP_PEAR_PHP_BIN=\xampp\php\php.exe"
+IF "%PHP_PEAR_PHP_BIN%"=="" SET "PHP_PEAR_PHP_BIN=%PHP_PEAR_BIN_DIR%\php.exe"
 IF "%PHP_PEAR_SYSCONF_DIR%"=="" SET "PHP_PEAR_SYSCONF_DIR=%PHP_PEAR_BIN_DIR%"
 IF "%PHP_PEAR_EXTENSION_DIR%"=="" SET "PHP_PEAR_EXTENSION_DIR=%PHP_PEAR_BIN_DIR%\ext"
 IF "%PHP_PEAR_DOC_DIR%"=="" SET "PHP_PEAR_DOC_DIR=%PHP_PEAR_INSTALL_DIR%\docs"
@@ -87,6 +87,8 @@ IF NOT EXIST "%PHP_PEAR_PHP_BIN%" GOTO PEAR_PHPBIN_ERROR
 ATTRIB +R %PHP_PEAR_BIN_DIR%\pear.bat >nul
 ATTRIB +R %PHP_PEAR_BIN_DIR%\peardev.bat >nul
 ATTRIB +R %PHP_PEAR_BIN_DIR%\pecl.bat >nul
+ATTRIB +R %PHP_PEAR_BIN_DIR%\phpdoc.bat >nul
+ATTRIB +R %PHP_PEAR_BIN_DIR%\phpunit.bat >nul
 ATTRIB -H %PHP_PEAR_INSTALL_DIR%\.depdb >nul
 ATTRIB -H %PHP_PEAR_INSTALL_DIR%\.depdblock >nul
 ATTRIB -H %PHP_PEAR_INSTALL_DIR%\.filemap >nul
@@ -128,4 +130,6 @@ GOTO END
 ATTRIB -R %PHP_PEAR_BIN_DIR%\pear.bat >nul
 ATTRIB -R %PHP_PEAR_BIN_DIR%\peardev.bat >nul
 ATTRIB -R %PHP_PEAR_BIN_DIR%\pecl.bat >nul
+ATTRIB -R %PHP_PEAR_BIN_DIR%\phpdoc.bat >nul
+ATTRIB -R %PHP_PEAR_BIN_DIR%\phpunit.bat >nul
 @ECHO ON

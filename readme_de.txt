@@ -1,20 +1,21 @@
-  ApacheFriends XAMPP (basic package) version 1.5.0-pl1
+  ApacheFriends XAMPP (basic package) version 1.5.1
 
-  + Apache 2.0.55
-  + MySQL 5.0.15 + Bug #13783
-  + PHP 5.0.5 + PHP 4.4.1-pl1 + PEAR
-  + eAccelerator 0.9.4-dev
+  + Apache 2.2.0
+  + MySQL 5.0.18
+  + PHP 5.1.1 + PHP 4.4.1-pl1 + PEAR
+  + eAccelerator 0.9.4-rc1
   + PHP-Switch win32 1.0 (von Apachefriends, man nehme die "php-switch.bat") 
   + XAMPP Control Version 2.1 from www.nat32.com	
   + XAMPP Security 1.0	
   + SQLite 2.8.15
   + OpenSSL 0.9.8a
-  + phpMyAdmin 2.6.4-pl3
-  + ADODB 4.65
+  + phpMyAdmin 2.7.0 pl1
+  + ADOdb 4.68
+  + FPDF 1.5.3
   + Mercury Mail Transport System v4.01b
-  + FileZilla FTP Server 0.9.10a
+  + FileZilla FTP Server 0.9.11
   + Webalizer 2.01-10
-  + Zend Optimizer 2.5.10a
+  + Zend Optimizer 2.6.0
  
 * System Vorrausetzungen:
   
@@ -23,7 +24,6 @@
   + Windows 98, ME
   + Windows NT, 2000, XP (Recommended)
 
-
 SCHNELLINSTALLATION:
 
 [Schritt 1: Auf die obersten Hirachie eines beliebigen Laufwerks bzw. 
@@ -31,17 +31,17 @@ auf dem Wechseldatenträger des USP Sticks entpacken => E:\ oder W:\. Es
 entsteht E:\xampp oder W:\xampp. Für den USB Stick nicht die 
 "setup_xampp.bat" nutzen, um ihn auch transportabel nutzen zu können!]
 
-Schritt 1: Das Setup mit der  Datei "setup_xampp.bat" im xampp Verzeichnis 
-starten.Bemerkung: xampp macht selbst keine Einträge in die Windows Registry
+Schritt 1: Das Setup mit der  Datei "setup_xampp.bat" im XAMPP Verzeichnis 
+starten.Bemerkung: XAMPP macht selbst keine Einträge in die Windows Registry
 und setzt auch keine Systemvariablen.   
 
 Schritt 2: Apache2 mit PHP4 starten mit
-=> [Laufwerk]:\xampp\apache_start.bat
+=> \xampp\apache_start.bat
 Der Apache 2 wird durch einfaches schließen der 
 Apache Kommandoforderung (CMD) heruntergefahren. 
 
 Schritt 3: MySQL starten der mit 
-=> [Laufwerk]:\xampp\mysql_start.bat
+=> \xampp\mysql_start.bat
 Den MySQL regulär stoppen mit "mysql_stop.bat".
 
 Schritt 4: Öffne deinen Internet Browser und gebe http://127.0.0.1
@@ -49,10 +49,10 @@ oder http://localhost ein. Danach gelangst du zu den zahlreichen
 ApacheFriends Beispielen auf deinem lokalen Server.
 
 Schritt 5: Das Hauptdokumentenverzeichnis für HTTP (oft HTML) ist
-=> [Laufwerk]:\xampp\htdocs. PHP kann die Endungen  *.php, *.php4,
+=> \xampp\htdocs. PHP kann die Endungen  *.php, *.php4,
 *.php3, *.phtml haben, *.shtml für SSI, *.cgi für CGI (z.B. perl).
 
-Schritt 6: xampp DEINSTALLIEREN? Einfach das "xampp" 
+Schritt 6: XAMPP DEINSTALLIEREN? Einfach das "xampp" 
 Verzeichnis löschen. Vorher aber alle Server stoppen 
 bzw. als Dienste  deinstallieren. 
 
@@ -88,16 +88,16 @@ Password: xampp
 NUR FÜR NT SYSTEME
 (NT4 | windows 2000 | windows xp)
 
-\...\xampp\apache\apache_installservice.bat =
+\xampp\apache\apache_installservice.bat =
 ==> Installiert des Apache 2 als Dienst
 
-\...\xampp\apache\apache_uninstallservice.bat =   
+\xampp\apache\apache_uninstallservice.bat =   
 ==> Deinstalliert des Apache 2 als Dienst
 
-\...\xampp\mysql\mysql_installservice.bat =
+\xampp\mysql\mysql_installservice.bat =
 ==> Installiert MySQL als Dienst
 
-\...\xampp\mysql\mysql_uninstallservice.bat = 
+\xampp\mysql\mysql_uninstallservice.bat = 
 ==> Deinstalliert MySQL als Dienst
 
 ==> Nach allen Dienst(de)installationen, system neustarten! 
@@ -173,7 +173,7 @@ Für eine Zugriff in PHP sähe das also aus:
 mysql_connect("localhost","root","");
 Ein Passwort für "root" könnt ihr über den mysqladmin in der Eingabforderung
 setzen. Z.B: 
-    [Laufwerk:]\xampp\mysql\bin\mysqladmin -u root password geheim
+    \xampp\mysql\bin\mysqladmin -u root password geheim
 Wichtig: Nach dem einsetzen eines neuen Passwortes für root muss auch 
 phpMyAdmin informiert werden! Das geschieht über die Datei "config.inc.php"
 zu finden als \xampp\phpmyadmin\config.inc.php. Dort also folgenden 

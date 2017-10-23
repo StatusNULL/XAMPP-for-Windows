@@ -31,14 +31,14 @@ if (!function_exists( 'version_compare' )) {
 * common file information
 */
 include_once("PhpDocumentor/phpDocumentor/common.inc.php");
-include_once("C:\xampp\php\pear\data/PhpDocumentor/docbuilder/includes/utilities.php" );
+include_once("\xampp\php\pear\data/PhpDocumentor/docbuilder/includes/utilities.php" );
 
 // find the .ini directory by parsing phpDocumentor.ini and extracting _phpDocumentor_options[userdir]
-$ini = phpDocumentor_parse_ini_file('C:\xampp\php\pear\data/PhpDocumentor/phpDocumentor.ini', true);
+$ini = phpDocumentor_parse_ini_file('\xampp\php\pear\data/PhpDocumentor/phpDocumentor.ini', true);
 if (isset($ini['_phpDocumentor_options']['userdir'])) {
 	$configdir = $ini['_phpDocumentor_options']['userdir'];
 } else {
-	$configdir =  'C:\xampp\php\pear\data/PhpDocumentor/user';
+	$configdir =  '\xampp\php\pear\data/PhpDocumentor/user';
 }
 
 // allow the user to change this at runtime
@@ -70,7 +70,7 @@ $converters = array(
 // compile a list of available screen shots
 $convScreenShots = array();
 
-$path = 'C:\xampp\php\pear\data/PhpDocumentor/docbuilder/images/';
+$path = '\xampp\php\pear\data/PhpDocumentor/docbuilder/images/';
 if ($dir = opendir($path)) {
 	while (($file = readdir( $dir )) !== false) { 
 		if ($file != '.' && $file != '..') {

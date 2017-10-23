@@ -97,7 +97,7 @@ function PMA_table_move_copy($source_db, $source_table, $target_db, $target_tabl
     }
 
     $source = PMA_backquote($source_db) . '.' . PMA_backquote($source_table);
-    if (0 == strlen($target_db)) $target_db = $source_db;
+    if (empty($target_db)) $target_db = $source_db;
 
     // Doing a select_db could avoid some problems with replicated databases,
     // when moving table from replicated one to not replicated one

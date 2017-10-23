@@ -15,7 +15,7 @@
  * @author     Laurent Laville <pear@laurent-laville.org>
  * @copyright  1997-2005 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Progress.php,v 1.18 2005/09/14 09:10:55 farell Exp $
+ * @version    CVS: $Id: Progress.php,v 1.19 2005/10/15 11:12:23 farell Exp $
  * @link       http://pear.php.net/package/HTML_Progress
  * @since      File available since Release 1.0
  */
@@ -205,7 +205,7 @@ $GLOBALS['_HTML_PROGRESS_ERRORSTACK'] = array();
  * @author     Laurent Laville <pear@laurent-laville.org>
  * @copyright  1997-2005 The PHP Group
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    Release: 1.2.4
+ * @version    Release: 1.2.5
  * @link       http://pear.php.net/package/HTML_Progress
  * @since      Class available since Release 1.0
  */
@@ -1115,7 +1115,7 @@ class HTML_Progress
     function getScript()
     {
         $ui = $this->getUI();
-        $js =& $ui->getScript();
+        $js = $ui->getScript();
         return $js;
     }
 

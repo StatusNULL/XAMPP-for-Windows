@@ -1,84 +1,100 @@
+<?
+	include("langsettings.php");
+?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	"http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-<meta name="author" content="Kai Oswald Seidler, Kay Vogelgesang">
-<link href="xampp.css" rel="stylesheet" type="text/css">
-<script language="JavaScript" src="xampp.js">
-</script>
-</head>
+	<head>
+		<meta name="author" content="Kai Oswald Seidler, Kay Vogelgesang, Carsten Wiedmann">
+		<link href="xampp.css" rel="stylesheet" type="text/css">
+		<script language="JavaScript" type="text/javascript" src="xampp.js"></script>
+		<title></title>
+	</head>
 
-<body leftmargin=0 topmargin=0 class=n>
+	<body class="n">
+		<?php include "lang/".file_get_contents("lang.tmp").".php"; ?>
 
-<? include("lang/".file_get_contents("lang.tmp").".php"); ?>
+		<table border="0" cellpadding="0" cellspacing="0">
+			<tr valign="top">
+				<td align="right" class="navi">
+					<img src="img/blank.gif" alt="" width="145" height="15"><br>
+					<span class="nh">&nbsp;<?php echo $TEXT['navi-xampp']; ?><br>[PHP: <?php echo phpversion(); ?>]</span><br>
+				</td>
+			</tr>
+			<tr>
+				<td height="1" bgcolor="#fb7922" colspan="1" style="background-image:url(img/strichel.gif)" class="white"></td>
+			</tr>
+			<tr valign="top">
+				<td align="right" class="navi">
+					<a name="start" id="start" class="nh" target="content" onclick="h(this);" href="start.php"><?php echo $TEXT['navi-welcome']; ?></a><br>
+					<a class="n" target="content" onclick="h(this);" href="status.php"><?=$TEXT['navi-status']?></a><br>
+					<a class="n" target="new" onclick="h(this);" href="/security/lang.php?<?php echo file_get_contents("lang.tmp"); ?>"><?php echo $TEXT['navi-security']; ?></a><br>
+					<a class="n" target="content" onclick="h(this);" href="manuals.php"><?php echo $TEXT['navi-doc']; ?></a><br>
+					<a class="n" target="content" onclick="h(this);" href="components.php"><?php echo $TEXT['navi-components']; ?></a><br>
+					<a class="n" target="content" onclick="h(this);" href="phpinfo.php">phpinfo()</a><br>&nbsp;<br>
+					<span class=nh><?=$TEXT['navi-demos']?></span><br>
+				</td>
+			</tr>
+			<tr>
+				<td height="1" bgcolor="#fb7922" colspan="1" style="background-image:url(img/strichel.gif)" class="white"></td>
+			</tr>
+			<tr valign="top">
+				<td align="right" class="navi">
+					<?php include "navibasics.inc"; ?>
+					<?php include "naviperl.inc"; ?>
+					<?php include "navipython.inc"; ?>
+					<?php include "navijava.inc"; ?>
 
-<table border=0 cellpadding=0 cellspacing=0>
-<tr valign=top>
-<td align=right class=navi>
-<img src=img/blank.gif width=145 height=15><br>
-<span class=nh>[PHP: <?=phpversion() ?>]</span><br>
-</td></tr>
-<tr><td bgcolor=#fb7922 colspan=1 background="img/strichel.gif" class=white><img src=img/blank.gif width=1 height=1></td></tr>
-<tr valign=top><td align=right class=navi>
-<a name=start id=start class=nh target=content onClick="h(this);" href=start.php><?=$TEXT['navi-welcome']?></a><br>
-<a class=n target=content onClick="h(this);" href="status.php"><?=$TEXT['navi-status']?></a><br>
-<a class=n target=new onClick="h(this);" href="/security/lang.php<?="?".file_get_contents("lang.tmp")?>"><?=$TEXT['navi-security']?></a><br>
-<a class=n target=content onClick="h(this);" href=manuals.php><?=$TEXT['navi-doc']?></a><br>
-<a class=n target=content onClick="h(this);" href=components.php><?=$TEXT['navi-components']?></a><br>
-<a class=n target=content onClick="h(this);" href=phpinfo.php>phpinfo()</a><br>&nbsp;<br>
+					<br>&nbsp;<br>
+					<span class="nh"><?php echo $TEXT['navi-tools']; ?></span><br>
+				</td>
+			</tr>
+			<tr>
+				<td height="1" bgcolor="#fb7922" colspan="1" style="background-image:url(img/strichel.gif)" class="white"></td>
+			</tr>
+			<tr valign="top">
+				<td align="right" class="navi">
+					<?php include "navitools.inc"; ?>
+					<?php include "naviservers.inc"; ?>
+					<?php include "naviother.inc"; ?>
+				</td>
+			</tr>
+			<tr>
+				<td bgcolor="#fb7922" colspan="1" class="white"></td>
+			</tr>
+			<tr valign="top">
+				<td align="right" class="navi">
+					<?php include "naviguest.inc"; ?>
+					<br>
+					<span class="nh"><?php echo $TEXT['navi-languages']; ?></span><br>
+				</td>
+			</tr>
+			<tr>
+				<td height="1" bgcolor="#fb7922" colspan="1" style="background-image:url(img/strichel.gif)" class="white"></td>
+			</tr>
+			<tr valign="top">
+				<td align="right" class="navi">
+					<a target="_parent" class="n" href="lang.php?de"><?php echo $TEXT['navi-german']; ?></a><br>
+					<a target="_parent" class="n" href="lang.php?en"><?php echo $TEXT['navi-english']; ?></a><br>
+					<a target="_parent" class="n" href="lang.php?es"><?php echo $TEXT['navi-spanish']; ?></a><br>
+					<a target="_parent" class="n" href="lang.php?fr"><?php echo $TEXT['navi-french']; ?></a><br>
+					<a target="_parent" class="n" href="lang.php?it"><?php echo $TEXT['navi-italian']; ?></a><br>
+					<a target="_parent" class="n" href="lang.php?nl"><?php echo $TEXT['navi-dutch']; ?></a><br>
+					<a target="_parent" class="n" href="lang.php?no"><?php echo $TEXT['navi-norwegian']; ?></a><br>
+					<a target="_parent" class="n" href="lang.php?pl"><?php echo $TEXT['navi-polish']; ?></a><br>
+					<a target="_parent" class="n" href="lang.php?pt"><?php echo $TEXT['navi-portuguese']; ?></a><br>
+					<a target="_parent" class="n" href="lang.php?sl"><?php echo $TEXT['navi-slovenian']; ?></a><br>
+					<a target="_parent" class="n" href="lang.php?zh"><?php echo $TEXT['navi-chinese']; ?></a><br>
+					<a target=_parent class=n href="lang.php?pt_br"><?=$TEXT['navi-ptbrazil']?></a><p>
 
-<span class=nh><?=$TEXT['navi-demos']?></span><br>
-</td></tr>
-<tr><td bgcolor=#fb7922 colspan=1 background="img/strichel.gif" class=white><img src=img/blank.gif width=1 height=1></td></tr>
-<tr valign=top><td align=right class=navi>
-
-
-
-<?include("navibasics.inc");?>
-<?include("naviperl.inc");?>
-<?include("navipython.inc");?>
-<?include("navijava.inc");?>
-
-
-<br>&nbsp;<br>
-
-<span class=nh><?=$TEXT['navi-tools']?></span><br>
-</td></tr>
-<tr><td bgcolor=#fb7922 colspan=1 background="img/strichel.gif" class=white><img src=img/blank.gif width=1 height=1></td></tr>
-<tr valign=top><td align=right class=navi>
-<?include("navitools.inc");?>
-<?include("naviservers.inc");?>
-<?include("naviother.inc");?>
-
-</td></tr>
-<tr><td bgcolor=#fb7922 colspan=1 class=white></td></tr>
-<tr valign=top><td align=right class=navi>
-<?include("naviguest.inc");?>
-<br>
-<span class=nh><?=$TEXT['navi-languages']?></span><br>
-</td></tr>
-<tr><td bgcolor=#fb7922 colspan=1 background="img/strichel.gif" class=white><img src=img/blank.gif width=1 height=1></td></tr>
-<tr valign=top><td align=right class=navi>
-
-<a target=_parent class=n href="lang.php?de"><?=$TEXT['navi-german']?></a><br>
-<a target=_parent class=n href="lang.php?en"><?=$TEXT['navi-english']?></a><br>
-<a target=_parent class=n href="lang.php?es"><?=$TEXT['navi-spanish']?></a><br>
-<a target=_parent class=n href="lang.php?fr"><?=$TEXT['navi-french']?></a><br>
-<a target=_parent class=n href="lang.php?it"><?=$TEXT['navi-italian']?></a><br>
-<a target=_parent class=n href="lang.php?nl"><?=$TEXT['navi-dutch']?></a><br>
-<a target=_parent class=n href="lang.php?no"><?=$TEXT['navi-norwegian']?></a><br>
-<a target=_parent class=n href="lang.php?pl"><?=$TEXT['navi-polish']?></a><br>
-<a target=_parent class=n href="lang.php?sl"><?=$TEXT['navi-slovenian']?></a><br>
-<a target=_parent class=n href="lang.php?zh"><?=$TEXT['navi-chinese']?></a><p>
-
-
-<p class=navi>&copy;2002/2005<br>
-<? if(file_get_contents("lang.tmp")=="de") { ?>
-<a target="_new" href="http://www.apachefriends.org/index.html"><img border=0 src="img/apachefriends.gif"></a><p>
-<? } else { ?>
-<a target="_new" href="http://www.apachefriends.org/index-en.html"><img border=0 src="img/apachefriends.gif"></a><p>
-<? } ?>
-</td>
-</tr>
-</table>
-</body>
+					<p class="navi">&copy;2002/2005<br>
+					<?php if (file_get_contents("lang.tmp") == "de") { ?>
+						<a target="_new" href="http://www.apachefriends.org/index.html"><img border="0" src="img/apachefriends.gif" alt=""></a><p>
+					<?php } else { ?>
+						<a target="_new" href="http://www.apachefriends.org/index-en.html"><img border="0" src="img/apachefriends.gif" alt=""></a><p>
+					<?php }	?>
+				</td>
+			</tr>
+		</table>
+	</body>
 </html>
-
