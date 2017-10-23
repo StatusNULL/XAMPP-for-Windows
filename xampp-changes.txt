@@ -1,3 +1,6 @@
+31 Mai 2006 XAMPP Release 1.5.3a Release
+- Fix problem for ssi support in httpd.conf
+
 28 Mai 2006, XAMPP Release
 - Delete eAccelarator PHP 4 (because instabil)
  

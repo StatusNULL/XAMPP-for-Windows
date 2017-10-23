@@ -1,4 +1,4 @@
-  ApacheFriends XAMPP (basic package) version 1.5.3
+  ApacheFriends XAMPP (basic package) version 1.5.3a
 
   + Apache 2.2.2
   + MySQL 5.0.21
