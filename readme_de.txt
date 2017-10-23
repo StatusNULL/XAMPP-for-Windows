@@ -1,4 +1,4 @@
-  ApacheFriends XAMPP (Standardpaket) Version 1.6.0
+  ApacheFriends XAMPP (Standardpaket) Version 1.6.0a
 
   + Apache 2.2.4
   + MySQL 5.0.33
