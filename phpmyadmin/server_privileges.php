@@ -12,11 +12,11 @@ require('./server_common.inc.php');
 /**
  * Checks if a dropdown box has been used for selecting a database / table
  */
-if (!empty($pred_dbname)) {
+if (0 < strlen($pred_dbname)) {
     $dbname = $pred_dbname;
     unset($pred_dbname);
 }
-if (!empty($pred_tablename)) {
+if (0 < strlen($pred_tablename)) {
     $tablename = $pred_tablename;
     unset($pred_tablename);
 }
@@ -750,10 +750,10 @@ if (!empty($update_privs)) {
     //
     // It looks curious but reflects the way MySQL works
 
-    if (empty($dbname)) {
+    if (0 == strlen($dbname)) {
         $db_and_table = '*.*';
     } else {
-        if (!empty($tablename)) {
+        if (0 < strlen($tablename)) {
             $db_and_table = str_replace('\\','',PMA_backquote($dbname))
                           . '.' . PMA_backquote($tablename);
         } else {
@@ -770,7 +770,7 @@ if (!empty($update_privs)) {
     }
     $sql_query2 = 'GRANT ' . join(', ', PMA_extractPrivInfo()) . ' ON ' . $db_and_table . ' TO \'' . PMA_sqlAddslashes($username) . '\'@\'' . $hostname . '\'';
 
-    if ((isset($Grant_priv) && $Grant_priv == 'Y') || (empty($dbname) && PMA_MYSQL_INT_VERSION >= 40002 && (isset($max_questions) || isset($max_connections) || isset($max_updates)))) {
+    if ((isset($Grant_priv) && $Grant_priv == 'Y') || ((0 == strlen($dbname)) && PMA_MYSQL_INT_VERSION >= 40002 && (isset($max_questions) || isset($max_connections) || isset($max_updates)))) {
         $sql_query2 .= 'WITH';
         if (isset($Grant_priv) && $Grant_priv == 'Y') {
             $sql_query2 .= ' GRANT OPTION';
@@ -815,7 +815,7 @@ if (!empty($revokeall)) {
     }
     $sql_query = $sql_query0 . (isset($sql_query1) ? ' ' . $sql_query1 : '');
     $message = sprintf($strRevokeMessage, '\'' . $username . '\'@\'' . $hostname . '\'');
-    if (empty($tablename)) {
+    if (0 == strlen($tablename)) {
         unset($dbname);
     } else {
         unset($tablename);
@@ -1176,9 +1176,9 @@ if (empty($adduser) && empty($checkprivs)) {
         echo '<h2>' . "\n"
            . ($cfg['PropertiesIconic'] ? '<img src="' . $pmaThemeImage . 'b_usredit.png" width="16" height="16" border="0" hspace="2" align="middle" />' : '' )
            . '    ' . $strUser . ' <i><a class="h2" href="server_privileges.php?' . $url_query . '&amp;username=' . urlencode($username) . '&amp;hostname=' . urlencode($hostname) . '">\'' . htmlspecialchars($username) . '\'@\'' . htmlspecialchars($hostname) . '\'</a></i>' . "\n";
-        if (!empty($dbname)) {
+        if (0 < strlen($dbname)) {
             echo '    - ' . $strDatabase . ' <i><a class="h2" href="' . $cfg['DefaultTabDatabase'] . '?' . $url_query . '&amp;db=' . urlencode($dbname) . '&amp;reload=1">' . htmlspecialchars($dbname) . '</a></i>' . "\n";
-            if (!empty($tablename)) {
+            if (0 < strlen($tablename)) {
                 echo '    - ' . $strTable . ' <i><a class="h2" href="' . $cfg['DefaultTabTable'] . '?' . $url_query . '&amp;db=' . urlencode($dbname) . '&amp;table=' . urlencode($tablename) . '&amp;reload=1">' . htmlspecialchars($tablename) . '</a></i>' . "\n";
             }
         }
@@ -1196,9 +1196,9 @@ if (empty($adduser) && empty($checkprivs)) {
            . PMA_generate_common_hidden_inputs('', '', 3)
            . '            <input type="hidden" name="username" value="' . htmlspecialchars($username) . '" />' . "\n"
            . '            <input type="hidden" name="hostname" value="' . htmlspecialchars($hostname) . '" />' . "\n";
-        if (!empty($dbname)) {
+        if (0 < strlen($dbname)) {
             echo '            <input type="hidden" name="dbname" value="' . htmlspecialchars($dbname) . '" />' . "\n";
-            if (!empty($tablename)) {
+            if (0 < strlen($tablename)) {
                 echo '            <input type="hidden" name="tablename" value="' . htmlspecialchars($tablename) . '" />' . "\n";
             }
         }
@@ -1206,19 +1206,19 @@ if (empty($adduser) && empty($checkprivs)) {
         PMA_displayPrivTable((empty($dbname) ? '*' : $dbname), ((empty($dbname) || empty($tablename)) ? '*' : $tablename), TRUE, 3);
         echo '        </form>' . "\n"
            . '    </li>' . "\n";
-        if (empty($tablename)) {
+        if (0 == strlen($tablename)) {
             echo '    <li>' . "\n"
-               . '        <b>' . (empty($dbname) ? $strDbPrivileges : $strTblPrivileges) . '</b><br />' . "\n"
+               . '        <b>' . ((0 == strlen($dbname)) ? $strDbPrivileges : $strTblPrivileges) . '</b><br />' . "\n"
                . '        <table border="0" cellpadding="2" cellspacing="1">' . "\n"
                . '            <tr>' . "\n"
-               . '                <th>&nbsp;' . (empty($dbname) ? $strDatabase : $strTable) . '&nbsp;</th>' . "\n"
+               . '                <th>&nbsp;' . ((0 == strlen($dbname)) ? $strDatabase : $strTable) . '&nbsp;</th>' . "\n"
                . '                <th>&nbsp;' . $strPrivileges . '&nbsp;</th>' . "\n"
                . '                <th>&nbsp;' . $strGrantOption . '&nbsp;</th>' . "\n"
-               . '                <th>&nbsp;' . (empty($dbname) ? $strTblPrivileges : $strColumnPrivileges) . '&nbsp;</th>' . "\n"
+               . '                <th>&nbsp;' . ((0 == strlen($dbname)) ? $strTblPrivileges : $strColumnPrivileges) . '&nbsp;</th>' . "\n"
                . '                <th colspan="2">&nbsp;' . $strAction . '&nbsp;</th>' . "\n"
                . '            </tr>' . "\n";
             $user_host_condition = ' WHERE ' . PMA_convert_using('User') . ' = ' . PMA_convert_using(PMA_sqlAddslashes($username), 'quoted') . ' AND ' . PMA_convert_using('Host') . ' = ' . PMA_convert_using($hostname, 'quoted');
-            if (empty($dbname)) {
+            if (0 == strlen($dbname)) {
                 $sql_query = 'SELECT * FROM `db`' . $user_host_condition . ' ORDER BY `Db` ASC;';
             } else {
                 $sql_query = 'SELECT `Table_name`, `Table_priv`, IF(`Column_priv` = ' . (PMA_MYSQL_INT_VERSION >= 40100 ? '_latin1 ' : '') . ' \'\', 0, 1) AS \'Column_priv\' FROM `tables_priv`' . $user_host_condition . ' AND ' . PMA_convert_using('Db') .  ' = ' . PMA_convert_using($dbname, 'quoted') . ' ORDER BY `Table_name` ASC;';
@@ -1230,14 +1230,14 @@ if (empty($adduser) && empty($checkprivs)) {
                    . '            </tr>' . "\n";
             } else {
                 $useBgcolorOne = TRUE;
-                if (empty($dbname)) {
+                if (0 == strlen($dbname)) {
                     $res2 = PMA_DBI_query('SELECT `Db` FROM `tables_priv`' . $user_host_condition . ' GROUP BY `Db` ORDER BY `Db` ASC;');
                     $row2 = PMA_DBI_fetch_assoc($res2);
                 }
                 $found_rows = array();
                 while ($row = PMA_DBI_fetch_assoc($res)) {
 
-                    while (empty($dbname) && $row2 && $row['Db'] > $row2['Db']) {
+                    while ((0 == strlen($dbname)) && $row2 && $row['Db'] > $row2['Db']) {
                         $found_rows[] = $row2['Db'];
 
                         echo '            <tr>' . "\n"
@@ -1253,33 +1253,33 @@ if (empty($adduser) && empty($checkprivs)) {
                         $row2 = PMA_DBI_fetch_assoc($res2);
                         $useBgcolorOne = !$useBgcolorOne;
                     } // end while
-                    $found_rows[] = empty($dbname) ? $row['Db'] : $row['Table_name'];
+                    $found_rows[] = (0 == strlen($dbname)) ? $row['Db'] : $row['Table_name'];
 
                     echo '            <tr>' . "\n"
-                       . '                <td bgcolor="' . ($useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']) . '">' . htmlspecialchars(empty($dbname) ? $row['Db'] : $row['Table_name']) . '</td>' . "\n"
+                       . '                <td bgcolor="' . ($useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']) . '">' . htmlspecialchars((0 == strlen($dbname)) ? $row['Db'] : $row['Table_name']) . '</td>' . "\n"
                        . '                <td bgcolor="' . ($useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']) . '"><tt>' . "\n"
                        . '                    ' . join(',' . "\n" . '            ', PMA_extractPrivInfo($row, TRUE)) . "\n"
                        . '                </tt></td>' . "\n"
-                       . '                <td bgcolor="' . ($useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']) . '">' . (((empty($dbname) && $row['Grant_priv'] == 'Y') || (!empty($dbname) && in_array('Grant', explode(',', $row['Table_priv'])))) ? $strYes : $strNo) . '</td>' . "\n"
+                       . '                <td bgcolor="' . ($useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']) . '">' . ((((0 == strlen($dbname)) && $row['Grant_priv'] == 'Y') || ((0 < strlen($dbname)) && in_array('Grant', explode(',', $row['Table_priv'])))) ? $strYes : $strNo) . '</td>' . "\n"
                        . '                <td bgcolor="' . ($useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']) . '">';
-                    if ((empty($dbname) && $row2 && $row['Db'] == $row2['Db'])
-                        || (!empty($dbname) && $row['Column_priv'])) {
+                    if (((0 == strlen($dbname)) && $row2 && $row['Db'] == $row2['Db'])
+                        || ((0 < strlen($dbname)) && $row['Column_priv'])) {
                         echo $strYes;
-                        if (empty($dbname)) {
+                        if (0 == strlen($dbname)) {
                             $row2 = PMA_DBI_fetch_assoc($res2);
                         }
                     } else {
                         echo $strNo;
                     }
                     echo '</td>' . "\n"
-                       . '                <td bgcolor="' . ($useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']) . '"><a href="server_privileges.php?' . $url_query . '&amp;username=' . urlencode($username) . '&amp;hostname=' . urlencode($hostname) . '&amp;dbname=' . (empty($dbname) ? urlencode($row['Db']) : urlencode($dbname) . '&amp;tablename=' . urlencode($row['Table_name'])) . '">' . $strEdit . '</a></td>' . "\n"
-                       . '                <td bgcolor="' . ($useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']) . '"><a href="server_privileges.php?' . $url_query . '&amp;username=' . urlencode($username) . '&amp;hostname=' . urlencode($hostname) . '&amp;dbname=' . (empty($dbname) ? urlencode($row['Db']) : urlencode($dbname) . '&amp;tablename=' . urlencode($row['Table_name'])) . '&amp;revokeall=1">' . $strRevoke . '</a></td>' . "\n"
+                       . '                <td bgcolor="' . ($useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']) . '"><a href="server_privileges.php?' . $url_query . '&amp;username=' . urlencode($username) . '&amp;hostname=' . urlencode($hostname) . '&amp;dbname=' . ((0 == strlen($dbname)) ? urlencode($row['Db']) : urlencode($dbname) . '&amp;tablename=' . urlencode($row['Table_name'])) . '">' . $strEdit . '</a></td>' . "\n"
+                       . '                <td bgcolor="' . ($useBgcolorOne ? $cfg['BgcolorOne'] : $cfg['BgcolorTwo']) . '"><a href="server_privileges.php?' . $url_query . '&amp;username=' . urlencode($username) . '&amp;hostname=' . urlencode($hostname) . '&amp;dbname=' . ((0 == strlen($dbname)) ? urlencode($row['Db']) : urlencode($dbname) . '&amp;tablename=' . urlencode($row['Table_name'])) . '&amp;revokeall=1">' . $strRevoke . '</a></td>' . "\n"
                        . '            </tr>' . "\n";
                     $useBgcolorOne = !$useBgcolorOne;
                 } // end while
 
 
-                while (empty($dbname) && $row2) {
+                while ((0 == strlen($dbname)) && $row2) {
 
                     $found_rows[] = $row2['Db'];
                     echo '            <tr>' . "\n"
@@ -1296,7 +1296,7 @@ if (empty($adduser) && empty($checkprivs)) {
 
                     $useBgcolorOne = !$useBgcolorOne;
                 } // end while
-                if (empty($dbname)) {
+                if (0 == strlen($dbname)) {
                     PMA_DBI_free_result($res2);
                     unset($res2);
                     unset($row2);
@@ -1311,7 +1311,7 @@ if (empty($adduser) && empty($checkprivs)) {
                . PMA_generate_common_hidden_inputs('', '', 6)
                . '                        <input type="hidden" name="username" value="' . htmlspecialchars($username) . '" />' . "\n"
                . '                        <input type="hidden" name="hostname" value="' . htmlspecialchars($hostname) . '" />' . "\n";
-            if (empty($dbname)) {
+            if (0 == strlen($dbname)) {
                 echo '                        <label for="text_dbname">' . $strAddPrivilegesOnDb . ':</label>' . "\n";
                 $res = PMA_DBI_query('SHOW DATABASES;');
                 $pred_db_array = array();
@@ -1365,7 +1365,7 @@ if (empty($adduser) && empty($checkprivs)) {
                . '        </table><br />' . "\n"
                . '    </li>' . "\n";
         }
-        if (empty($dbname)) {
+        if (0 == strlen($dbname)) {
             echo '    <li>' . "\n"
                . '        <form action="server_privileges.php" method="post" onsubmit="return checkPassword(this);">' . "\n"
                . PMA_generate_common_hidden_inputs('', '', 3)

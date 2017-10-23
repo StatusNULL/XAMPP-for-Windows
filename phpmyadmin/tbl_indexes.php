@@ -22,18 +22,18 @@ $index_types_cnt   = count($index_types);
  */
 if (!defined('PMA_IDX_INCLUDED')) {
     // Not a valid db name -> back to the welcome page
-    if (!empty($db)) {
+    if (0 < strlen($db)) {
         $is_db = PMA_DBI_select_db($db);
     }
-    if (empty($db) || !$is_db) {
+    if ((0 == strlen($db)) || !$is_db) {
         PMA_sendHeaderLocation($cfg['PmaAbsoluteUri'] . 'main.php?' . PMA_generate_common_url('', '', '&') . (isset($message) ? '&message=' . urlencode($message) : '') . '&reload=1');
         exit;
     }
     // Not a valid table name -> back to the default db_details sub-page
-    if (!empty($table)) {
+    if (0 < strlen($table)) {
         $is_table = PMA_DBI_query('SHOW TABLES LIKE \'' . PMA_sqlAddslashes($table, TRUE) . '\'', NULL, PMA_DBI_QUERY_STORE);
     }
-    if (empty($table)
+    if ((0 == strlen($table))
         || !($is_table && PMA_DBI_num_rows($is_table))) {
         PMA_sendHeaderLocation($cfg['PmaAbsoluteUri'] . $cfg['DefaultTabDatabase'] . '?' . PMA_generate_common_url($db, '', '&') . (isset($message) ? '&message=' . urlencode($message) : '') . '&reload=1');
         exit;

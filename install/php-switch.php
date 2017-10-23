@@ -2,7 +2,7 @@
 
 /* 
 #### Installer PHP  1.4 RC2  #### 
-#### Author: Kay Vogelgesang for www.apachefriends.org 2004 ####  
+#### Author: Kay Vogelgesang & Carsten Wiedmann for www.apachefriends.org 2005 ####  
 */    
 
 print "\r\n  ########################################################################\n
@@ -11,7 +11,7 @@ print "\r\n  ###################################################################
   # Copyright (c) 2002-2004 Apachefriends                                #\r\n
   #----------------------------------------------------------------------#\r\n
   # Authors: Kay Vogelgesang <kvo@apachefriends.org>                     #\r\n
-  #          Oswald Kai Seidler <oswald@apachefriends.org>               #\r\n
+  #          Carsten Wiedmann <webmaster@wiedmann-online.de>               #\r\n
   ########################################################################\r\n\r\n"; 
 
 ini_set('default_socket_timeout', '3'); // Fix by Wiedmann

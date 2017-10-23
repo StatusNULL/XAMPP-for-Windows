@@ -19,14 +19,14 @@ $TEXT['navi-about']="Om XAMPP";
 
 $TEXT['navi-demos']="Demoer";
 $TEXT['navi-cdcol']="CD Samling";
-$TEXT['navi-bio']="Bursdagsrytme";
+$TEXT['navi-bio']="Bursdags Grafe";
 $TEXT['navi-guest']="Gjestebok";
 $TEXT['navi-perlenv']="MiniPerl";
 $TEXT['navi-iart']="Øyeblikkelig Kunst";
 $TEXT['navi-iart2']="Flash Kunst";
 $TEXT['navi-phonebook']="Telefonbok";
 $TEXT['navi-perlasp']="Perl:ASP";
-$TEXT['navi-pear']="PEAR:Excel_Writer";
+$TEXT['navi-pear']="PEAR:Excel_Teksteditor";
 $TEXT['navi-adodb']="ADOdb";
 $TEXT['navi-perl']="Perl";
 $TEXT['navi-python']="Python";
@@ -83,7 +83,7 @@ $TEXT['status-lookfaq']="se FAQ";
 $TEXT['status-ok']="OPPERATIV";
 $TEXT['status-nok']="NEDE";
 
-$TEXT['status-tab1']="Komonent";
+$TEXT['status-tab1']="Komponent";
 $TEXT['status-tab2']="Status";
 $TEXT['status-tab3']="Hint";
 
@@ -92,7 +92,7 @@ $TEXT['status-tab3']="Hint";
 // ---------------------------------------------------------------------
 
 $TEXT['security-head']="XAMPP SIKKERHET";
-$TEXT['security-text1']="Denne siden gir deg en oversikt om Statusen på sikkerheten på din XAMPP installasjon.(Vennligst forsett lesingen etter tabellen.)";
+$TEXT['security-text1']="Denne siden gir deg en oversikt om statusen på sikkerheten på din XAMPP installasjon.(Vennligst forsett lesingen etter tabellen.)";
 $TEXT['security-text2']="Det grønnmerkede området er sikkert; det rødmerkede området er usikkert og gulmerkede området er statusen ukjent for (for eksempel applikasjonen kjører ikke).<p><p>To fix the problems for mysql, phpmyadmin and the xampp directory simply use</B><p>=> <A HREF=/security/xamppsecurity.php><B>http://localhost/security/xamppsecurity.php</B></A> <= &nbsp;&nbsp;[allowed only for localhost]";
 
 $TEXT['security-ok']="SIKRET";
@@ -126,7 +126,7 @@ $TEXT['security-pop-text']="Vennligst sjekk og kanskje rediger brukerne og passo
 
 $TEXT['security-checkftppassword-nok']="FTP passordet er forsatt 'lampp'";
 $TEXT['security-checkftppassword-ok']="FTP passordet var velykket endret";
-$TEXT['security-checkftppassword-out']="FTP serveren er nede eller blir blokkern av en brannmur!";
+$TEXT['security-checkftppassword-out']="FTP serveren er nede eller blir blokkert av en brannmur!";
 $TEXT['security-checkftppassword-text']="Hvis FTP serveren var startet, standardbrukeren 'nobody' med passordet  'lampp' kan laste opp å endre filer på XAMPP webserveren.";
 
 $TEXT['security-phpmyadmin-nok']="PhpMyAdmin er fullt tilgjengelig via Nettverket";
@@ -154,7 +154,7 @@ $TEXT['mysql-rootsetup-passwdsuccess']="SUKSESS: Passordet for Superbrukeren ell
 Legg merke til: For at det nye passordet skal tre i kraft for \"root\" må MYSQL restartes !!!! Dataen med det nye passordet er sikkert i følgende fil:";
 $TEXT['mysql-rootsetup-passwdnosuccess']="ERROR: Da muligens root passordet var feil, MySQL nektet login med angitt root passord.";
 $TEXT['mysql-rootsetup-passwdold']="Nåværende passord:";
-$TEXT['mysql-rootsetup-passwd']="Nytt Passord:";
+$TEXT['mysql-rootsetup-passwd']="Nytt passord:";
 $TEXT['mysql-rootsetup-passwdrepeat']="Gjenta det nye passordet:";
 $TEXT['mysql-rootsetup-passwdchange']="Passord endring";
 $TEXT['mysql-rootsetup-phpmyadmin']="PhpMyAdmin identifikasjon:";
@@ -218,7 +218,7 @@ $TEXT['manuals-list2']="
 <li><a href=http://www.comp.leeds.ac.uk/Perl/start.html>Perl Verktøy</a> av Nik Silver
 </ul>";
 
-$TEXT['manuals-text3']="Good luck and have fun! :)";
+$TEXT['manuals-text3']="Lykke til å ha det gøy! :)";
 
 // ---------------------------------------------------------------------
 // COMPONENTS
@@ -293,18 +293,18 @@ $TEXT['flash-ok']="OK";
 
 $TEXT['phonebook-head']="Phone Book (Example for PHP+SQLite)";
 
-$TEXT['phonebook-text1']="A very simple phone book script. But implemented with a very modern and up-to-date technology: SQLite, the SQL database without server.";
+$TEXT['phonebook-text1']="En veldig enkel telefonbok skript, med en veldig moderne og up-to-date teknologi: SQLite, SQL database uten server.";
 
-$TEXT['phonebook-error']="Couldn't open the database!";
-$TEXT['phonebook-head1']="My phone numbers";
-$TEXT['phonebook-attrib1']="Last name";
-$TEXT['phonebook-attrib2']="First name";
-$TEXT['phonebook-attrib3']="Phone number";
-$TEXT['phonebook-attrib4']="Command";
-$TEXT['phonebook-sure']="Sure?";
-$TEXT['phonebook-head2']="Add entry";
-$TEXT['phonebook-button1']="DELETE";
-$TEXT['phonebook-button2']="ADD";
+$TEXT['phonebook-error']="Kan ikke åpne databasen";
+$TEXT['phonebook-head1']="Mine telefonnr:";
+$TEXT['phonebook-attrib1']="Etternavn";
+$TEXT['phonebook-attrib2']="Fornavn";
+$TEXT['phonebook-attrib3']="Telefonnr:";
+$TEXT['phonebook-attrib4']="Handling";
+$TEXT['phonebook-sure']="Sikker?";
+$TEXT['phonebook-head2']="Legg til";
+$TEXT['phonebook-button1']="SLETT";
+$TEXT['phonebook-button2']="LEGG TIL";
 
 // ---------------------------------------------------------------------
 // OM
@@ -455,3 +455,4 @@ $TEXT['guest1-text2']="FCKeditor Hjemmeside: <a href=\"http://www.fckeditor.net\
 $TEXT['guest1-text3']="<a href=\"guest-FCKeditor/fckedit-dynsiden.php\" target=\"_new\">Eksempel siden var skrevet med FCKeditor.</A>"; 
 
 ?>
+

@@ -114,12 +114,12 @@ if (!empty($submit_mult)
 if (!empty($submit_mult) && !empty($what)) {
     $js_to_run = 'functions.js';
     unset($message);
-    if (!empty($table)) {
+    if (0 < strlen($table)) {
         require('./tbl_properties_common.php');
         $url_query .= '&amp;goto=tbl_properties.php&amp;back=tbl_properties.php';
         require('./tbl_properties_table_info.php');
     }
-    elseif (!empty($db)) {
+    elseif (0 < strlen($db)) {
         require('./db_details_common.php');
         require('./db_details_db_info.php');
     }

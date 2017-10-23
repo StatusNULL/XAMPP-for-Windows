@@ -35,10 +35,13 @@ bin_SCRIPTS =		@server_scripts@ \
 			mysqld_multi \
 			mysql_create_system_tables
 
+noinst_SCRIPTS =	make_binary_distribution \
+			make_sharedlib_distribution \
+			make_win_src_distribution
+
 EXTRA_SCRIPTS =		make_binary_distribution.sh \
 			make_sharedlib_distribution.sh \
 			make_win_src_distribution.sh \
-			make_win_binary_distribution.sh \
 			msql2mysql.sh \
 			mysql_config.sh \
 			mysql_fix_privilege_tables.sh \
@@ -87,7 +90,7 @@ CLEANFILES =		@server_scripts@ \
 			make_win_binary_distribution \
 			mysql_create_system_tables
 
-SUPERCLEANFILES =	mysqlbug
+DISTCLEANFILES =        mysqlbug
 
 # We want the right version and configure comand line in mysqlbug
 mysqlbug: ${top_builddir}/config.status mysqlbug.sh
@@ -124,6 +127,7 @@ SUFFIXES = .sh
 	  -e 's!@''innodb_system_libs''@!@innodb_system_libs@!' \
 	  -e 's!@''openssl_libs''@!@openssl_libs@!' \
 	  -e 's!@''VERSION''@!@VERSION@!' \
+	  -e 's!@''MYSQL_BASE_VERSION''@!@MYSQL_BASE_VERSION@!' \
 	  -e 's!@''MYSQL_SERVER_SUFFIX''@!@MYSQL_SERVER_SUFFIX@!' \
 	  -e 's!@''COMPILATION_COMMENT''@!@COMPILATION_COMMENT@!' \
 	  -e 's!@''MACHINE_TYPE''@!@MACHINE_TYPE@!' \
@@ -147,5 +151,3 @@ SUFFIXES = .sh
 
 # Don't update the files from bitkeeper
 %::SCCS/s.%
-
-all: make_win_src_distribution make_binary_distribution make_sharedlib_distribution

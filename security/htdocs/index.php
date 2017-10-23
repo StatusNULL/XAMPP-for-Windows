@@ -1,8 +1,3 @@
-
-<html>
-<head>
-<link REL="icon" HREF="img/xampp.ico">
-<meta name="author" content="Kai Oswald Seidler, Kay Vogelgesang">
 <?
 	if(file_get_contents("lang.tmp")=="")
 	{
@@ -12,6 +7,10 @@
 
 	include("lang/".file_get_contents("lang.tmp").".php"); 
 ?>
+<html>
+<head>
+<link REL="icon" HREF="img/xampp.ico">
+<meta name="author" content="Kai Oswald Seidler, Kay Vogelgesang">
 <title><?=$TEXT['global-xampp']?> | Security Section</title>
 
 <frameset rows="68,*" marginwidth="0" marginheight="0" frameborder="0" border="0" borderwidth="0">

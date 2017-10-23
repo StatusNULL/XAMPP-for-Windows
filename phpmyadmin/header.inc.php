@@ -187,7 +187,7 @@ if (empty($GLOBALS['is_header_sent'])) {
                 $GLOBALS['strServer'],
                 's_host.png' );
         
-        if (!empty($GLOBALS['db'])) {
+        if (0 < strlen($GLOBALS['db'])) {
             
             echo $separator;
             printf( $item,
@@ -197,7 +197,7 @@ if (empty($GLOBALS['is_header_sent'])) {
                     $GLOBALS['strDatabase'],
                     's_db.png' );
             
-            if (!empty($GLOBALS['table'])) {
+            if (0 < strlen($GLOBALS['table'])) {
                 require_once('./tbl_properties_table_info.php');
 
                 echo $separator;

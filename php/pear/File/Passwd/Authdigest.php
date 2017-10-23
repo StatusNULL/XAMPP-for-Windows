@@ -17,7 +17,7 @@
  * @author     Michael Wallner <mike@php.net>
  * @copyright  2003-2005 Michael Wallner
  * @license    http://www.php.net/license/3_0.txt  PHP License 3.0
- * @version    CVS: $Id: Authdigest.php,v 1.12 2005/03/30 18:33:33 mike Exp $
+ * @version    CVS: $Id: Authdigest.php,v 1.13 2005/09/27 06:26:08 mike Exp $
  * @link       http://pear.php.net/package/File_Passwd
  */
 
@@ -54,7 +54,7 @@ require_once 'File/Passwd/Common.php';
 * 
 * @author   Michael Wallner <mike@php.net>
 * @package  File_Passwd
-* @version  $Revision: 1.12 $
+* @version  $Revision: 1.13 $
 * @access   public
 */
 class File_Passwd_Authdigest extends File_Passwd_Common
@@ -241,7 +241,7 @@ class File_Passwd_Authdigest extends File_Passwd_Common
     */
     function changePasswd($user, $realm, $pass)
     {
-        if (PEAR::isError($error = $this->delUser($user, $realm))) {
+        if (PEAR::isError($error = $this->delUserInRealm($user, $realm))) {
             return $error;
         } else {
             return $this->addUser($user, $realm, $pass);

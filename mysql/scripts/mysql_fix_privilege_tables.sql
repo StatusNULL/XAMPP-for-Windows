@@ -9,7 +9,7 @@
 -- this sql script.
 -- On windows you should do 'mysql --force mysql < mysql_fix_privilege_tables.sql'
 
-set table_type=MyISAM;
+set storage_engine=MyISAM;
 
 CREATE TABLE IF NOT EXISTS func (
   name char(64) binary DEFAULT '' NOT NULL,
@@ -64,13 +64,20 @@ CREATE TABLE IF NOT EXISTS tables_priv (
 ALTER TABLE tables_priv
   modify Table_priv set('Select','Insert','Update','Delete','Create','Drop','Grant','References','Index','Alter') COLLATE utf8_general_ci DEFAULT '' NOT NULL,
   modify Column_priv set('Select','Insert','Update','References') COLLATE utf8_general_ci DEFAULT '' NOT NULL;
+ALTER TABLE procs_priv ENGINE=MyISAM, CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
+ALTER TABLE procs_priv
+  modify Proc_priv set('Execute','Alter Routine','Grant') COLLATE utf8_general_ci DEFAULT '' NOT NULL;
+ALTER TABLE procs_priv
+  add Routine_type enum('FUNCTION','PROCEDURE') COLLATE utf8_general_ci NOT NULL AFTER Routine_name;
+ALTER TABLE procs_priv
+  modify Timestamp timestamp(14) AFTER Proc_priv;
 
 CREATE TABLE IF NOT EXISTS columns_priv (
   Host char(60) DEFAULT '' NOT NULL,
-  Db char(60) DEFAULT '' NOT NULL,
+  Db char(64) DEFAULT '' NOT NULL,
   User char(16) DEFAULT '' NOT NULL,
-  Table_name char(60) DEFAULT '' NOT NULL,
-  Column_name char(59) DEFAULT '' NOT NULL,
+  Table_name char(64) DEFAULT '' NOT NULL,
+  Column_name char(64) DEFAULT '' NOT NULL,
   Timestamp timestamp(14),
   Column_priv set('Select','Insert','Update','References') COLLATE utf8_general_ci DEFAULT '' NOT NULL,
   PRIMARY KEY (Host,Db,User,Table_name,Column_name)
@@ -118,9 +125,9 @@ UPDATE user SET Show_db_priv= Select_priv, Super_priv=Process_priv, Execute_priv
 --  for some users.
 
 ALTER TABLE user
-ADD max_questions int(11) NOT NULL AFTER x509_subject,
-ADD max_updates   int(11) unsigned NOT NULL AFTER max_questions,
-ADD max_connections int(11) unsigned NOT NULL AFTER max_updates;
+ADD max_questions int(11) NOT NULL DEFAULT 0 AFTER x509_subject,
+ADD max_updates   int(11) unsigned NOT NULL DEFAULT 0 AFTER max_questions,
+ADD max_connections int(11) unsigned NOT NULL DEFAULT 0 AFTER max_updates;
 
 
 --
@@ -134,12 +141,8 @@ ALTER TABLE host
 ADD Create_tmp_table_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,
 ADD Lock_tables_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL;
 
-alter table db change Db Db char(64) binary DEFAULT '' NOT NULL;
-alter table host change Db Db char(64) binary DEFAULT '' NOT NULL;
 alter table user change max_questions max_questions int(11) unsigned DEFAULT 0  NOT NULL;
-alter table tables_priv change Db Db char(64) binary DEFAULT '' NOT NULL, change Host Host char(60) binary DEFAULT '' NOT NULL, change User User char(16) binary DEFAULT '' NOT NULL, change Table_name Table_name char(64) binary DEFAULT '' NOT NULL;
 alter table tables_priv add KEY Grantor (Grantor);
-alter table columns_priv change Db Db char(64) binary DEFAULT '' NOT NULL, change Host Host char(60) binary DEFAULT '' NOT NULL, change User User char(16) binary DEFAULT '' NOT NULL, change Table_name Table_name char(64) binary DEFAULT '' NOT NULL, change Column_name Column_name char(64) binary DEFAULT '' NOT NULL;
 
 alter table db comment='Database privileges';
 alter table host comment='Host privileges;  Merged with database privileges';
@@ -153,9 +156,9 @@ alter table columns_priv comment='Column privileges';
 ALTER TABLE user
   MODIFY Host char(60) NOT NULL default '',
   MODIFY User char(16) NOT NULL default '',
-  MODIFY Password char(41) NOT NULL default '',
   ENGINE=MyISAM, CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
 ALTER TABLE user
+  MODIFY Password char(41) character set latin1 collate latin1_bin NOT NULL default '',
   MODIFY Select_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,
   MODIFY Insert_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,
   MODIFY Update_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,
@@ -238,8 +241,98 @@ ALTER TABLE tables_priv
   MODIFY Column_priv set('Select','Insert','Update','References') COLLATE utf8_general_ci DEFAULT '' NOT NULL;
 
 #
+# Detect whether we had Create_view_priv
+# 
+SET @hadCreateViewPriv:=0;
+SELECT @hadCreateViewPriv:=1 FROM user WHERE Create_view_priv LIKE '%';
+
+#
+# Create VIEWs privileges (v5.0)
+#
+ALTER TABLE db ADD Create_view_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL AFTER Lock_tables_priv;
+ALTER TABLE host ADD Create_view_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL AFTER Lock_tables_priv;
+ALTER TABLE user ADD Create_view_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL AFTER Repl_client_priv;
+
+#
+# Show VIEWs privileges (v5.0)
+#
+ALTER TABLE db ADD Show_view_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL AFTER Create_view_priv;
+ALTER TABLE host ADD Show_view_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL AFTER Create_view_priv;
+ALTER TABLE user ADD Show_view_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL AFTER Create_view_priv;
+
+#
+# Show/Create views table privileges (v5.0)
+#
+ALTER TABLE tables_priv MODIFY Table_priv set('Select','Insert','Update','Delete','Create','Drop','Grant','References','Index','Alter','Create View','Show view') COLLATE utf8_general_ci DEFAULT '' NOT NULL;
+
+#
+# Assign create/show view privileges to people who have create provileges
+#
+UPDATE user SET Create_view_priv=Create_priv, Show_view_priv=Create_priv where user<>"" AND @hadCreateViewPriv = 0;
+
+#
+#
+#
+SET @hadCreateRoutinePriv:=0;
+SELECT @hadCreateRoutinePriv:=1 FROM user WHERE Create_routine_priv LIKE '%';
+
+#
+# Create PROCEDUREs privileges (v5.0)
+#
+ALTER TABLE db ADD Create_routine_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL AFTER Show_view_priv;
+ALTER TABLE host ADD Create_routine_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL AFTER Show_view_priv;
+ALTER TABLE user ADD Create_routine_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL AFTER Show_view_priv;
+
+#
+# Alter PROCEDUREs privileges (v5.0)
+#
+ALTER TABLE db ADD Alter_routine_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL AFTER Create_routine_priv;
+ALTER TABLE host ADD Alter_routine_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL AFTER Create_routine_priv;
+ALTER TABLE user ADD Alter_routine_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL AFTER Create_routine_priv;
+
+ALTER TABLE db ADD Execute_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL AFTER Alter_routine_priv;
+ALTER TABLE host ADD Execute_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL AFTER Alter_routine_priv;
+
+#
+# Assign create/alter routine privileges to people who have create privileges
+#
+UPDATE user SET Create_routine_priv=Create_priv, Alter_routine_priv=Alter_priv where user<>"" AND @hadCreateRoutinePriv = 0;
+UPDATE db SET Create_routine_priv=Create_priv, Alter_routine_priv=Alter_priv, Execute_priv=Select_priv where user<>"" AND @hadCreateRoutinePriv = 0;
+UPDATE host SET Create_routine_priv=Create_priv, Alter_routine_priv=Alter_priv, Execute_priv=Select_priv where @hadCreateRoutinePriv = 0;
+
+#
+# Add max_user_connections resource limit 
+#
+ALTER TABLE user ADD max_user_connections int(11) unsigned DEFAULT '0' NOT NULL AFTER max_connections;
+
+#
+# user.Create_user_priv
+#
+
+SET @hadCreateUserPriv:=0;
+SELECT @hadCreateUserPriv:=1 FROM user WHERE Create_user_priv LIKE '%';
+
+ALTER TABLE user ADD Create_user_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL AFTER Alter_routine_priv;
+UPDATE user LEFT JOIN db USING (Host,User) SET Create_user_priv='Y'
+  WHERE @hadCreateUserPriv = 0 AND
+        (user.Grant_priv = 'Y' OR db.Grant_priv = 'Y');
+
+#
 # Create some possible missing tables
 #
+CREATE TABLE IF NOT EXISTS procs_priv (
+Host char(60) binary DEFAULT '' NOT NULL,
+Db char(64) binary DEFAULT '' NOT NULL,
+User char(16) binary DEFAULT '' NOT NULL,
+Routine_name char(64) binary DEFAULT '' NOT NULL,
+Routine_type enum('FUNCTION','PROCEDURE') NOT NULL,
+Grantor char(77) DEFAULT '' NOT NULL,
+Proc_priv set('Execute','Alter Routine','Grant') COLLATE utf8_general_ci DEFAULT '' NOT NULL,
+Timestamp timestamp(14),
+PRIMARY KEY (Host,Db,User,Routine_name,Routine_type),
+KEY Grantor (Grantor)
+) CHARACTER SET utf8 COLLATE utf8_bin comment='Procedure privileges';
+
 CREATE TABLE IF NOT EXISTS help_topic (
 help_topic_id int unsigned not null,
 name varchar(64) not null,
@@ -313,3 +406,118 @@ Correction int signed NOT NULL,
 PRIMARY KEY TranTime (Transition_time) 
 ) CHARACTER SET utf8 comment='Leap seconds information for time zones';
 
+
+#
+# Create proc table if it doesn't exists
+#
+
+CREATE TABLE IF NOT EXISTS proc (
+  db                char(64) collate utf8_bin DEFAULT '' NOT NULL,
+  name              char(64) DEFAULT '' NOT NULL,
+  type              enum('FUNCTION','PROCEDURE') NOT NULL,
+  specific_name     char(64) DEFAULT '' NOT NULL,
+  language          enum('SQL') DEFAULT 'SQL' NOT NULL,
+  sql_data_access   enum('CONTAINS_SQL',
+                         'NO_SQL',
+                         'READS_SQL_DATA',
+                         'MODIFIES_SQL_DATA'
+                    ) DEFAULT 'CONTAINS_SQL' NOT NULL,
+  is_deterministic  enum('YES','NO') DEFAULT 'NO' NOT NULL,
+  security_type     enum('INVOKER','DEFINER') DEFAULT 'DEFINER' NOT NULL,
+  param_list        blob DEFAULT '' NOT NULL,
+  returns           char(64) DEFAULT '' NOT NULL,
+  body              longblob DEFAULT '' NOT NULL,
+  definer           char(77) collate utf8_bin DEFAULT '' NOT NULL,
+  created           timestamp,
+  modified          timestamp,
+  sql_mode          set(
+                        'REAL_AS_FLOAT',
+                        'PIPES_AS_CONCAT',
+                        'ANSI_QUOTES',
+                        'IGNORE_SPACE',
+                        'NOT_USED',
+                        'ONLY_FULL_GROUP_BY',
+                        'NO_UNSIGNED_SUBTRACTION',
+                        'NO_DIR_IN_CREATE',
+                        'POSTGRESQL',
+                        'ORACLE',
+                        'MSSQL',
+                        'DB2',
+                        'MAXDB',
+                        'NO_KEY_OPTIONS',
+                        'NO_TABLE_OPTIONS',
+                        'NO_FIELD_OPTIONS',
+                        'MYSQL323',
+                        'MYSQL40',
+                        'ANSI',
+                        'NO_AUTO_VALUE_ON_ZERO',
+                        'NO_BACKSLASH_ESCAPES',
+                        'STRICT_TRANS_TABLES',
+                        'STRICT_ALL_TABLES',
+                        'NO_ZERO_IN_DATE',
+                        'NO_ZERO_DATE',
+                        'INVALID_DATES',
+                        'ERROR_FOR_DIVISION_BY_ZERO',
+                        'TRADITIONAL',
+                        'NO_AUTO_CREATE_USER',
+                        'HIGH_NOT_PRECEDENCE'
+                    ) DEFAULT '' NOT NULL,
+  comment           char(64) collate utf8_bin DEFAULT '' NOT NULL,
+  PRIMARY KEY (db,name,type)
+) engine=MyISAM
+  character set utf8
+  comment='Stored Procedures';
+
+# Correct the name fields to not binary, and expand sql_data_access
+ALTER TABLE proc MODIFY name char(64) DEFAULT '' NOT NULL,
+                 MODIFY specific_name char(64) DEFAULT '' NOT NULL,
+                 MODIFY sql_data_access
+                        enum('CONTAINS_SQL',
+                             'NO_SQL',
+                             'READS_SQL_DATA',
+                             'MODIFIES_SQL_DATA'
+                            ) DEFAULT 'CONTAINS_SQL' NOT NULL,
+                 MODIFY body longblob DEFAULT '' NOT NULL,
+                 MODIFY sql_mode
+                        set('REAL_AS_FLOAT',
+                            'PIPES_AS_CONCAT',
+                            'ANSI_QUOTES',
+                            'IGNORE_SPACE',
+                            'NOT_USED',
+                            'ONLY_FULL_GROUP_BY',
+                            'NO_UNSIGNED_SUBTRACTION',
+                            'NO_DIR_IN_CREATE',
+                            'POSTGRESQL',
+                            'ORACLE',
+                            'MSSQL',
+                            'DB2',
+                            'MAXDB',
+                            'NO_KEY_OPTIONS',
+                            'NO_TABLE_OPTIONS',
+                            'NO_FIELD_OPTIONS',
+                            'MYSQL323',
+                            'MYSQL40',
+                            'ANSI',
+                            'NO_AUTO_VALUE_ON_ZERO',
+                            'NO_BACKSLASH_ESCAPES',
+                            'STRICT_TRANS_TABLES',
+                            'STRICT_ALL_TABLES',
+                            'NO_ZERO_IN_DATE',
+                            'NO_ZERO_DATE',
+                            'INVALID_DATES',
+                            'ERROR_FOR_DIVISION_BY_ZERO',
+                            'TRADITIONAL',
+                            'NO_AUTO_CREATE_USER',
+                            'HIGH_NOT_PRECEDENCE'
+                            ) DEFAULT '' NOT NULL,
+                 DEFAULT CHARACTER SET utf8;
+
+# Correct the character set and collation
+ALTER TABLE proc CONVERT TO CHARACTER SET utf8;
+# Reset some fields after the conversion
+ALTER TABLE proc  MODIFY db
+                         char(64) collate utf8_bin DEFAULT '' NOT NULL,
+                  MODIFY definer
+                         char(77) collate utf8_bin DEFAULT '' NOT NULL,
+                  MODIFY comment
+                         char(64) collate utf8_bin DEFAULT '' NOT NULL;

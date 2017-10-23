@@ -1,7 +1,6 @@
 <?php
-/* $Id: grab_globals.lib.php,v 2.12 2005/08/14 19:31:55 lem9 Exp $ */
+/* $Id: grab_globals.lib.php,v 2.12.2.2 2005/10/21 02:40:39 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
-
 
 /**
  * This library grabs the names and values of the variables sent or posted to a
@@ -11,6 +10,12 @@
  *
  * loic1 - 2001/25/11: use the new globals arrays defined with php 4.1+
  */
+
+// protect against older PHP versions' bug about GLOBALS overwrite
+// (no need to translate this one :) )
+if (isset($_REQUEST['GLOBALS']) || isset($_FILES['GLOBALS'])) {
+    die("GLOBALS overwrite attempt");
+}
 
 function PMA_gpc_extract($array, &$target, $sanitize = TRUE) {
     if (!is_array($array)) {
@@ -99,7 +104,9 @@ if (isset($goto) && strpos(' ' . $goto, '/') > 0 && substr($goto, 0, 2) != './')
 } // end if
 
 if ( ! empty( $__redirect ) ) {
-    require('./' . $__redirect);
+    // TODO: ensure that PMA_securePath() is defined and available
+    // for this script. Meanwhile we duplicate what this function does:
+    require('./' . preg_replace('@\.\.*@','.',$__redirect));
     exit();
 } // end if ( ! empty( $__redirect ) )
 ?>

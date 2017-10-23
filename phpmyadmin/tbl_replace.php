@@ -82,7 +82,7 @@ if (isset($after_insert) && $after_insert == 'new_insert') {
     // Security checkings
     $is_gotofile     = preg_replace('@^([^?]+).*$@', '\\1', $goto);
     if (!@file_exists('./' . $is_gotofile)) {
-        $goto        = (empty($table)) ? 'db_details.php' : 'tbl_properties.php';
+        $goto        = (0 == strlen($table)) ? 'db_details.php' : 'tbl_properties.php';
         $is_gotofile = TRUE;
     } else {
         $is_gotofile = ($is_gotofile == $goto);
@@ -253,7 +253,7 @@ if ($total_affected_rows != 0) {
 $message .= $last_message;
 
 if ($is_gotofile) {
-    if ($goto == 'db_details.php' && !empty($table)) {
+    if ($goto == 'db_details.php' && (0 < strlen($table))) {
         unset($table);
     }
     $js_to_run = 'functions.js';

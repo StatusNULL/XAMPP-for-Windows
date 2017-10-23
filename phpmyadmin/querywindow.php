@@ -8,7 +8,7 @@
  * been defined as startup option and include a core library
  */
 require_once('./libraries/grab_globals.lib.php');
-if (!empty($db)) {
+if (0 < strlen($db)) {
     $db_start = $db;
 }
 
@@ -230,8 +230,8 @@ if ($cfg['QueryFrame'] && $cfg['QueryFrameJS']) {
         echo implode("\n", $input_query_history);
     }
 ?>
-    <input type="hidden" name="db" value="<?php echo (empty($db) ? '' : htmlspecialchars($db)); ?>" />
-    <input type="hidden" name="table" value="<?php echo (empty($table) ? '' : htmlspecialchars($table)); ?>" />
+    <input type="hidden" name="db" value="<?php echo ((0 == strlen($db)) ? '' : htmlspecialchars($db)); ?>" />
+    <input type="hidden" name="table" value="<?php echo ((0 == strlen($table)) ? '' : htmlspecialchars($table)); ?>" />
 
     <input type="hidden" name="query_history_latest" value="" />
     <input type="hidden" name="query_history_latest_db" value="" />

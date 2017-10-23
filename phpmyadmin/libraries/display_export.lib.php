@@ -35,7 +35,7 @@ function PMA_exportIsActive($what, $val) {
 <?php
 $hide_structure = false;
 $hide_sql       = false;
-$hide_xml       = empty($db);
+$hide_xml       = (0 < strlen($db));
 if ($export_type == 'server') {
     echo PMA_generate_common_hidden_inputs('', '', 1);
 } elseif ($export_type == 'database') {
@@ -621,7 +621,7 @@ if (!$hide_structure) { ?>
         </td>
     </tr>
 <?php
-if (isset($table) && !empty($table) && !isset($num_tables)) {
+if (isset($table) && (0 < strlen($table)) && !isset($num_tables)) {
 ?>
     <tr>
         <td colspan="3" align="center">

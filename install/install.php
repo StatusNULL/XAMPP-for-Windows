@@ -17,9 +17,11 @@ print "\r\n  ###################################################################
 /// Where I stand? ///
 $curdir = getcwd();
 list ($partition, $nonpartition) = split (':', $curdir);
-list ($partwampp, $directorwampp) = spliti ('\\\install', $curdir);
-$awkpart = eregi_replace ("\\\\","\\\\",$partwampp);
-$awkpartslash = ereg_replace ("\\\\","/",$partwampp);
+//list ($partwampp, $directorwampp) = spliti ('\\\install', $curdir); //Fix by Wiedmann
+$partwampp = substr(realpath(__FILE__), 0, strrpos(dirname(realpath(__FILE__)), '\\'));
+$directorwampp = NULL;
+$awkpart = str_replace("&", "\\\\&", eregi_replace ("\\\\", "\\\\", $partwampp)); //Fix by Wiedmann
+$awkpartslash = str_replace("&", "\\\\&", ereg_replace ("\\\\", "/", $partwampp)); //Fix by Wiedmann
 $phpdir = $partwampp;
 $dir = ereg_replace ("\\\\","/",$partwampp);
 $ppartition="$partition:";
@@ -76,6 +78,10 @@ $sysroot[]=$zeile;
 $i+=1; 
 	}
 fclose($datei);
+
+$sysroot[2] = str_replace('perl', 'server', $sysroot[2]); // Fix by Wiedmann
+file_put_contents($installsysroot, implode('', $sysroot));
+
 list ($left, $right) = split (' = ', $sysroot[0]);
 // $right = eregi_replace (" ","",$right);
 $right = eregi_replace ("\r\n","",$right);
@@ -132,8 +138,8 @@ if (file_exists($updatesysroot))
 	$right = eregi_replace ("\r\n","",$right);		
 	$update=$left;
 	$update=strtolower($update); 
-	$updateversion=$right;
-	$updateversionzahl = eregi_replace ("\.","",$updateversion);
+	$updateversion=trim($right);
+	$updateversionzahl = eregi_replace ("\.","",sprintf('%0-6s',$updateversion)); // Fix by Wiedmann
 	$updateinc="xampp".$update.".inc";
 	$updateconf=$update.".conf";
 	echo "  Configure for $update $updateversion\r\n";
@@ -160,16 +166,15 @@ if (file_exists($updatesysroot))
             { 
                 for($z=0;$z<$i+1;$z++) 
                 { 
-					if (0 === strpos(trim(strtolower($newzeile[$z])), trim(strtolower($update)))) // Fix by Wiedmann PHP4
-//					if (0 === stripos(trim($newzeile[$z]), trim($update))) // Fix by Wiedmann PHP5
+					if (0 === stripos(trim($newzeile[$z]), trim($update))) // Fix by Wiedmann
 //					if (eregi($update,$newzeile[$z]))
 					{
 						list ($left, $right) = split ('=', $newzeile[$z]);
 						// $right = eregi_replace (" ","",$right);
 						$left = eregi_replace (" ","",$left);
 						$left = eregi_replace ("\r\n","",$left);
-						$right = eregi_replace ("\r\n","",$right);
-						$currentversionzahl = eregi_replace ("\.","",$right);
+						$right = trim(eregi_replace ("\r\n","",$right));
+						$currentversionzahl = eregi_replace ("\.","",sprintf('%0-6s',$right)); // Fix by Wiedmann
 						if ($currentversionzahl == 0 )
 						{
 							$updatemake="makenew"; // New installation
@@ -179,7 +184,7 @@ if (file_exists($updatesysroot))
 						elseif ($currentversionzahl < $updateversionzahl)
 						{
 							$updatemake="update";  // Update installation
-							$putnew="perl = $updateversion\r\n";
+							$putnew="$update = $updateversion\r\n";  //Fix by Wiedmann
 							fputs($datei, $putnew);
 						}
 						else
@@ -225,7 +230,7 @@ if (($update=="perl" || $update=="python" || $update=="java") && $updatemake=="m
             { 
 			fputs($datei, $includehttpdconf);
 			}
-	fclose($datei);	
+	@fclose($datei);	
 	$datei = fopen($confhttpd2root,'a'); 
 	if($datei) 
             { 
@@ -562,7 +567,20 @@ else
 	}
 }
 }
+
+
 $substit="\"".$substit."\"";
+$trans = array(
+	"^" => "\\\\^",
+	"." => "\\\\.",
+	"[" => "\\\\[",
+	"$" => "\\\\$",
+	"(" => "\\\\(",
+	")" => "\\\\)",
+	"+" => "\\\\+",
+	"{" => "\\\\{"
+);
+$substit = strtr($substit, $trans);
 for ($i=0;$i<=$bcount;$i++)
 {
 // $configname=$backslash[$i];
@@ -633,6 +651,17 @@ if (file_exists($awk) && file_exists($awkexe) && file_exists($configreal))
 
 
 $substitslash="\"".$substitslash."\"";
+$trans = array(
+	"^" => "\\\\^",
+	"." => "\\\\.",
+	"[" => "\\\\[",
+	"$" => "\\\\$",
+	"(" => "\\\\(",
+	")" => "\\\\)",
+	"+" => "\\\\+",
+	"{" => "\\\\{"
+);
+$substitslash = strtr($substitslash, $trans);
 for ($i=0;$i<=$scount;$i++)
 {
 ///// 08.08.05 Vogelgesang: For all files with identical file names /////
@@ -763,7 +792,7 @@ if (file_exists($awk) && file_exists($awkexe) && file_exists($configreal))
 	echo "  DONE!\r\n\r\n";
 echo "\r\n  ##### Have fun with ApacheFriends XAMPP! #####\r\n\r\n\r\n";
 sleep(3);
-exit();
+//exit(); // Fix by Wiedmann
 }
 
 
@@ -968,6 +997,12 @@ if ($CS > 0)
 }
 
 
+}
+
+if (file_exists($partwampp.'\install\serverupdate.inc'))	{ // Fix by Wiedmann
+	include $partwampp.'\install\serverupdate.inc';
+	unlink($partwampp.'\install\serverupdate.inc');
+	echo "\r\n".'Ready.'."\r\n";
 }
 
 if ($updatemake=="")

@@ -1,5 +1,5 @@
 <html>
-<head><title>XAMPP 1.4 WIN32</title>
+<head><title>XAMPP 1.5 WIN32</title>
 <link href="xampp.css" rel="stylesheet" type="text/css">
 </head>
 

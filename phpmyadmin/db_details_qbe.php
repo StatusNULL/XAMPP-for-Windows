@@ -128,7 +128,7 @@ while ($i < $tbl_result_cnt) {
     $fld_results_cnt = ($fld_results) ? count($fld_results) : 0;
     $j               = 0;
 
-    if (empty($tbl_names[$tbl]) && !empty($TableList)) {
+    if ((0 == strlen($tbl_names[$tbl])) && !empty($TableList)) {
         $tbl_names[$tbl] = '';
     } else {
         $tbl_names[$tbl] = ' selected="selected"';
@@ -965,11 +965,11 @@ if (isset($Field) && count($Field) > 0) {
 // In case relations are not defined, just generate the FROM clause
 // from the list of tables, however we don't generate any JOIN
 
-if (empty($qry_from) && isset($tab_all)) {
+if ((0 == strlen($qry_from)) && isset($tab_all)) {
     $qry_from = implode(', ', $tab_all);
 }
 // Now let's see what we got
-if (!empty($qry_from)) {
+if (0 < strlen($qry_from)) {
     $encoded_qry  .= urlencode('FROM ' . $qry_from . "\n");
     echo 'FROM ' . htmlspecialchars($qry_from) . "\n";
 }

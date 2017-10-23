@@ -1,4 +1,13 @@
-$Id: ChangeLog,v 1.9 2005/08/28 14:36:25 farell Exp $
+$Id: ChangeLog,v 1.10 2005/09/23 14:48:33 farell Exp $
+
+-------------------------Release 1.2.4------------------------
+2005-10-01  Laurent Laville <pear@laurent-laville.org>
+    * Quality-Assurance: updates headers comment blocks
+
+    * bugs fixes:
+      setBorderPainted(false) inefficient with setBorderAttributes()
+      and a positive width attribute value. Always show a border
+      arround the progress bar.
 
 -------------------------Release 1.2.3------------------------
 2005-08-28  Laurent Laville <pear@laurent-laville.org>

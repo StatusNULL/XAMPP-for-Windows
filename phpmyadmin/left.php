@@ -1,5 +1,5 @@
 <?php
-/* $Id: left.php,v 2.45 2005/07/10 18:42:00 nijel Exp $ */
+/* $Id: left.php,v 2.45.2.1 2005/10/21 01:24:00 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 
@@ -8,13 +8,13 @@
  * been defined as startup option and include a core library
  */
 require_once('./libraries/grab_globals.lib.php');
-if (isset($lightm_db) && !empty($lightm_db)) {
+if (isset($lightm_db) && (0 < strlen($lightm_db))) {
 // no longer urlencoded because of html entities in the db name
 //    $db = urldecode($lightm_db);
     $db = $lightm_db;
 }
 
-if (!empty($db)) {
+if (0 < strlen($db)) {
     $db_start = $db;
 }
 
@@ -39,6 +39,8 @@ if ($cfg['OBGzip']) {
 //PMA_checkParameters(array('hash'));
 if (!isset($hash)) {
     $hash='';
+} else {
+    $hash = PMA_sanitize($hash);
 }
 
 require_once('./libraries/bookmark.lib.php');
@@ -237,7 +239,7 @@ echo "<?xml version=\"1.0\" encoding=\"" . $GLOBALS['charset'] . "\"?".">"; // r
     }
 
 <?php
-if (isset($lightm_db) && !empty($lightm_db)) {
+if (isset($lightm_db) && (0 < strlen($lightm_db))) {
 ?>
     goTo('./<?php echo $cfg['DefaultTabDatabase'] . '?' . PMA_generate_common_url($db, '', '&');?>', window.parent.frames['phpmain<?php echo $hash; ?>']);
 <?php

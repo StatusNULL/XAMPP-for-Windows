@@ -1,4 +1,0 @@
-AuthType Basic
-AuthName "XAMPP with WEBDAV for DREAMWEAVER"
-require valid-user
-AuthUserfile "\xampp\webdav\.htpasswd"

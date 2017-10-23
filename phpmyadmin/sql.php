@@ -142,7 +142,7 @@ if ($is_select) {
         $table = $analyzed_sql[0]['table_ref'][0]['table_true_name'];
     }
     if (isset($analyzed_sql[0]['table_ref'][0]['db'])
-       && !empty($analyzed_sql[0]['table_ref'][0]['db'])) {
+       && (0 < strlen($analyzed_sql[0]['table_ref'][0]['db']))) {
         $db    = $analyzed_sql[0]['table_ref'][0]['db'];
     }
     else {
@@ -174,7 +174,7 @@ if (isset($btnDrop) && $btnDrop == $strNo) {
         $goto = $back;
     }
     if ($is_gotofile) {
-        if (strpos(' ' . $goto, 'db_details') == 1 && !empty($table)) {
+        if (strpos(' ' . $goto, 'db_details') == 1 && (0 < strlen($table))) {
             unset($table);
         }
         $active_page = $goto;
@@ -591,9 +591,9 @@ else {
         if (isset($purge) && $purge == '1') {
             require_once('./libraries/relation_cleanup.lib.php');
 
-            if (isset($table) && isset($db) && !empty($table) && !empty($db)) {
+            if (isset($table) && isset($db) && (0 < strlen($table)) && (0 < strlen($db))) {
                 PMA_relationsCleanupTable($db, $table);
-            } elseif (isset($db) && !empty($db)) {
+            } elseif (isset($db) && (0 < strlen($db))) {
                 PMA_relationsCleanupDatabase($db);
             } else {
                 // garvin: VOID. No DB/Table gets deleted.
@@ -603,7 +603,7 @@ else {
         // garvin: If a column gets dropped, do relation magic.
         if (isset($cpurge) && $cpurge == '1' && isset($purgekey)
             && isset($db) && isset($table)
-            && !empty($db) && !empty($table) && !empty($purgekey)) {
+            && (0 < strlen($db)) && (0 < strlen($table)) && !empty($purgekey)) {
             require_once('./libraries/relation_cleanup.lib.php');
             PMA_relationsCleanupColumn($db, $table, $purgekey);
 
@@ -708,7 +708,7 @@ else {
         } else {
             $js_to_run = 'functions.js';
             unset($message);
-            if (!empty($table)) {
+            if (0 < strlen($table)) {
                 require('./tbl_properties_common.php');
                 $url_query .= '&amp;goto=tbl_properties.php&amp;back=tbl_properties.php';
                 require('./tbl_properties_table_info.php');

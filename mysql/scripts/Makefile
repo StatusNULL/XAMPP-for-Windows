@@ -58,27 +58,45 @@ subdir = scripts
 DIST_COMMON = $(dist_pkgdata_DATA) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/config/ac-macros/alloca.m4 \
+	$(top_srcdir)/config/ac-macros/check_cpu.m4 \
+	$(top_srcdir)/config/ac-macros/character_sets.m4 \
+	$(top_srcdir)/config/ac-macros/compiler_flag.m4 \
+	$(top_srcdir)/config/ac-macros/ha_archive.m4 \
+	$(top_srcdir)/config/ac-macros/ha_berkeley.m4 \
+	$(top_srcdir)/config/ac-macros/ha_blackhole.m4 \
+	$(top_srcdir)/config/ac-macros/ha_example.m4 \
+	$(top_srcdir)/config/ac-macros/ha_federated.m4 \
+	$(top_srcdir)/config/ac-macros/ha_innodb.m4 \
+	$(top_srcdir)/config/ac-macros/ha_ndbcluster.m4 \
+	$(top_srcdir)/config/ac-macros/ha_tina.m4 \
+	$(top_srcdir)/config/ac-macros/large_file.m4 \
+	$(top_srcdir)/config/ac-macros/misc.m4 \
+	$(top_srcdir)/config/ac-macros/openssl.m4 \
+	$(top_srcdir)/config/ac-macros/readline.m4 \
+	$(top_srcdir)/config/ac-macros/yassl.m4 \
+	$(top_srcdir)/config/ac-macros/zlib.m4 \
 	$(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
-mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+mkinstalldirs = $(mkdir_p)
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(pkgdatadir)"
 binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
-SCRIPTS = $(bin_SCRIPTS)
+SCRIPTS = $(bin_SCRIPTS) $(noinst_SCRIPTS)
 SOURCES =
 DIST_SOURCES =
 dist_pkgdataDATA_INSTALL = $(INSTALL_DATA)
 DATA = $(dist_pkgdata_DATA)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /data0/mysqldev/my/mysql-4.1.13-build/missing --run aclocal-1.8
+ACLOCAL = ${SHELL} /data0/mysqldev/my/mysql-5.0.15-build/missing --run aclocal-1.8
 ALLOCA = 
 AMDEP_FALSE = #
 AMDEP_TRUE = 
-AMTAR = ${SHELL} /data0/mysqldev/my/mysql-4.1.13-build/missing --run tar
+AMTAR = ${SHELL} /data0/mysqldev/my/mysql-5.0.15-build/missing --run tar
 AR = ar
+ARFLAGS = cru
 AS = ccache gcc -c
 ASSEMBLER_FALSE = 
 ASSEMBLER_TRUE = #
@@ -88,11 +106,11 @@ ASSEMBLER_sparc64_FALSE =
 ASSEMBLER_sparc64_TRUE = #
 ASSEMBLER_x86_FALSE = 
 ASSEMBLER_x86_TRUE = #
-AUTOCONF = ${SHELL} /data0/mysqldev/my/mysql-4.1.13-build/missing --run autoconf
-AUTOHEADER = ${SHELL} /data0/mysqldev/my/mysql-4.1.13-build/missing --run autoheader
-AUTOMAKE = ${SHELL} /data0/mysqldev/my/mysql-4.1.13-build/missing --run automake-1.8
-AVAILABLE_LANGUAGES = czech danish dutch english estonian french german greek hungarian italian japanese japanese-sjis korean norwegian norwegian-ny polish portuguese romanian russian serbian slovak spanish swedish ukrainian
-AVAILABLE_LANGUAGES_ERRORS =  czech/errmsg.sys danish/errmsg.sys dutch/errmsg.sys english/errmsg.sys estonian/errmsg.sys french/errmsg.sys german/errmsg.sys greek/errmsg.sys hungarian/errmsg.sys italian/errmsg.sys japanese/errmsg.sys japanese-sjis/errmsg.sys korean/errmsg.sys norwegian/errmsg.sys norwegian-ny/errmsg.sys polish/errmsg.sys portuguese/errmsg.sys romanian/errmsg.sys russian/errmsg.sys serbian/errmsg.sys slovak/errmsg.sys spanish/errmsg.sys swedish/errmsg.sys ukrainian/errmsg.sys
+AUTOCONF = ${SHELL} /data0/mysqldev/my/mysql-5.0.15-build/missing --run autoconf
+AUTOHEADER = ${SHELL} /data0/mysqldev/my/mysql-5.0.15-build/missing --run autoheader
+AUTOMAKE = ${SHELL} /data0/mysqldev/my/mysql-5.0.15-build/missing --run automake-1.8
+AVAILABLE_LANGUAGES = czech danish dutch english estonian french german greek hungarian italian japanese korean norwegian norwegian-ny polish portuguese romanian russian serbian slovak spanish swedish ukrainian
+AVAILABLE_LANGUAGES_ERRORS = 
 AWK = gawk
 CC = ccache gcc
 CCAS = ccache gcc
@@ -115,7 +133,7 @@ CPPFLAGS =
 CXX = ccache gcc
 CXXCPP = ccache gcc -E
 CXXDEPMODE = depmode=gcc3
-CXXFLAGS = -O3 -DDBUG_OFF -felide-constructors -fno-exceptions -fno-rtti   -fno-implicit-templates -fno-exceptions -fno-rtti -DUSE_MYSYS_NEW -DDEFINE_CXA_PURE_VIRTUAL $(NDB_CXXFLAGS)
+CXXFLAGS = -O3 -DDBUG_OFF -felide-constructors -fno-exceptions -fno-rtti   -fno-implicit-templates -fno-exceptions -fno-rtti $(NDB_CXXFLAGS)
 CXXLDFLAGS = 
 CXX_VERSION = gcc (GCC) 3.3.3 20040412 (Red Hat Linux 3.3.3-7)
 CYGPATH_W = echo
@@ -134,13 +152,15 @@ EGREP = grep -E
 EXEEXT = 
 F77 = 
 FFLAGS = 
-FIND_PROC = /bin/ps p $$PID | grep -v grep | grep mysqld > /dev/null
+FIND_PROC = /bin/ps p $$PID | grep -v grep | grep $$MYSQLD > /dev/null
 GETCONF = getconf
 GXX = yes
 HAVE_NDBCLUSTER_DB_FALSE = #
 HAVE_NDBCLUSTER_DB_TRUE = 
 HAVE_NETWARE_FALSE = 
 HAVE_NETWARE_TRUE = #
+HAVE_YASSL_FALSE = 
+HAVE_YASSL_TRUE = #
 HOSTNAME = /bin/hostname
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
@@ -159,33 +179,35 @@ LM_CFLAGS =
 LN = /bin/ln
 LN_CP_F = /bin/ln -s
 LN_S = ln -s
-LOCAL_FALSE = 
-LOCAL_TRUE = #
 LTLIBOBJS = 
 MACHINE_TYPE = i686
 MAKEINDEX = no
-MAKEINFO = ${SHELL} /data0/mysqldev/my/mysql-4.1.13-build/missing --run makeinfo
+MAKEINFO = ${SHELL} /data0/mysqldev/my/mysql-5.0.15-build/missing --run makeinfo
 MAKE_BINARY_DISTRIBUTION_OPTIONS =  --with-ndbcluster
 MAKE_SHELL = /bin/sh
-MT_INCLUDES = 
-MT_LD_ADD = 
 MV = /bin/mv
 MYSQLD_DEFAULT_SWITCHES = --skip-locking
 MYSQLD_EXTRA_LDFLAGS = 
 MYSQLD_USER = mysql
-MYSQL_BASE_VERSION = 4.1
-MYSQL_NO_DASH_VERSION = 4.1.13
+MYSQL_BASE_VERSION = 5.0
+MYSQL_NO_DASH_VERSION = 5.0.15
 MYSQL_SERVER_SUFFIX = 
 MYSQL_TCP_PORT = 3306
 MYSQL_TCP_PORT_DEFAULT = 3306
 MYSQL_UNIX_ADDR = /tmp/mysql.sock
-MYSQL_VERSION_ID = 40113
+MYSQL_VERSION_ID = 50015
 NDB_DEFS = -DNDEBUG
 NDB_SCI_INCLUDES = 
 NDB_SCI_LIBS = 
-NDB_VERSION_BUILD = 13
-NDB_VERSION_MAJOR = 4
-NDB_VERSION_MINOR = 1
+NDB_SIZEOF_CHAR = 1
+NDB_SIZEOF_CHARP = 4
+NDB_SIZEOF_INT = 4
+NDB_SIZEOF_LONG = 4
+NDB_SIZEOF_LONG_LONG = 8
+NDB_SIZEOF_SHORT = 2
+NDB_VERSION_BUILD = 15
+NDB_VERSION_MAJOR = 5
+NDB_VERSION_MINOR = 0
 NDB_VERSION_STATUS = 
 NOINST_LDFLAGS = 
 NON_THREADED_LIBS = -lcrypt -lnsl -lm 
@@ -212,7 +234,7 @@ SAVE_CXXLDFLAGS =
 SAVE_LDFLAGS = 
 SED = /bin/sed
 SET_MAKE = 
-SHARED_LIB_VERSION = 14:0:0
+SHARED_LIB_VERSION = 15:0:0
 SHELL = /bin/sh
 STATIC_NSS_FLAGS = 
 STRIP = strip
@@ -220,9 +242,8 @@ SYSTEM_TYPE = pc-linux-gnu
 TAR = gtar
 TARGET_LINUX = true
 TERMCAP_LIB = -lncurses
-THREAD_LOBJECTS = thr_alarm.o thr_lock.o thr_mutex.o thr_rwlock.o my_pthread.o my_thr_init.o
-THREAD_LPROGRAMS = test_thr_alarm$(EXEEXT) test_thr_lock$(EXEEXT)
-VERSION = 4.1.13
+THREAD_LOBJECTS = thr_alarm.o thr_lock.o thr_mutex.o thr_rwlock.o my_pthread.o my_thr_init.o mf_keycache.o
+VERSION = 5.0.15
 WRAPLIBS = 
 YACC = bison -y
 ZLIB_DEPS = -lz
@@ -255,7 +276,6 @@ build_vendor = pc
 datadir = ${prefix}/share
 docs_dirs = Docs
 exec_prefix = ${prefix}
-fs_dirs = 
 host = i686-pc-linux-gnu
 host_alias = 
 host_cpu = i686
@@ -266,8 +286,7 @@ infodir = ${prefix}/info
 innodb_includes = -I../innobase/include
 innodb_libs =  $(top_builddir)/innobase/usr/libusr.a $(top_builddir)/innobase/srv/libsrv.a $(top_builddir)/innobase/dict/libdict.a $(top_builddir)/innobase/que/libque.a $(top_builddir)/innobase/srv/libsrv.a $(top_builddir)/innobase/ibuf/libibuf.a $(top_builddir)/innobase/row/librow.a $(top_builddir)/innobase/pars/libpars.a $(top_builddir)/innobase/btr/libbtr.a $(top_builddir)/innobase/trx/libtrx.a $(top_builddir)/innobase/read/libread.a $(top_builddir)/innobase/usr/libusr.a $(top_builddir)/innobase/buf/libbuf.a $(top_builddir)/innobase/ibuf/libibuf.a $(top_builddir)/innobase/eval/libeval.a $(top_builddir)/innobase/log/liblog.a $(top_builddir)/innobase/fsp/libfsp.a $(top_builddir)/innobase/fut/libfut.a $(top_builddir)/innobase/fil/libfil.a $(top_builddir)/innobase/lock/liblock.a $(top_builddir)/innobase/mtr/libmtr.a $(top_builddir)/innobase/page/libpage.a $(top_builddir)/innobase/rem/librem.a $(top_builddir)/innobase/thr/libthr.a $(top_builddir)/innobase/sync/libsync.a $(top_builddir)/innobase/data/libdata.a $(top_builddir)/innobase/mach/libmach.a $(top_builddir)/innobase/ha/libha.a $(top_builddir)/innobase/dyn/libdyn.a $(top_builddir)/innobase/mem/libmem.a $(top_builddir)/innobase/sync/libsync.a $(top_builddir)/innobase/ut/libut.a $(top_builddir)/innobase/os/libos.a $(top_builddir)/innobase/ut/libut.a
 innodb_system_libs = -lrt
-install_sh = /data0/mysqldev/my/mysql-4.1.13-build/install-sh
-isam_libs = 
+install_sh = /data0/mysqldev/my/mysql-5.0.15-build/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 libmysqld_dirs = libmysqld
@@ -278,22 +297,18 @@ man_dirs = man
 mandir = ${prefix}/man
 mkdir_p = mkdir -p -- .
 ndb_bin_am_ldflags = -static
-ndb_cxxflags_fix = 
+ndb_cxxflags_fix =  
 ndb_mgmclient_libs = $(top_builddir)/ndb/src/mgmclient/libndbmgmclient.la
 ndb_opt_subdirs = 
 ndb_port = 1186
-ndb_port_base = 2202
 ndb_transporter_opt_objs =  SHM_Transporter.lo SHM_Transporter.unix.lo
-ndbcluster_includes = -I../ndb/include -I../ndb/include/ndbapi
+ndbcluster_includes = -I../ndb/include -I../ndb/include/ndbapi -I../ndb/include/mgmapi
 ndbcluster_libs = $(top_builddir)/ndb/src/.libs/libndbclient.a
 ndbcluster_system_libs = 
 netware_dir = 
 oldincludedir = /usr/include
 openssl_includes = 
 openssl_libs = 
-orbit_idl = 
-orbit_includes = 
-orbit_libs = 
 prefix = /usr/local
 program_transform_name = s,x,x,
 pstack_dirs = 
@@ -306,9 +321,9 @@ readline_topdir = cmd-line-utils
 sbindir = ${exec_prefix}/sbin
 server_scripts = mysqld_safe mysql_install_db
 sharedstatedir = ${prefix}/com
-sql_client_dirs = libmysql_r libmysql strings regex client
-sql_server_dirs = strings dbug mysys extra regex isam merge bdb innobase ndb myisam myisammrg heap vio sql
-sql_union_dirs =  strings dbug mysys extra regex isam merge bdb innobase ndb myisam myisammrg heap vio sql  libmysql_r  libmysql  client 
+sql_client_dirs = libmysql_r strings regex mysys libmysql client
+sql_server_dirs = strings mysys dbug extra regex bdb innobase ndb myisam myisammrg heap vio sql
+sql_union_dirs =  strings mysys dbug extra regex bdb innobase ndb myisam myisammrg heap vio sql  libmysql_r  libmysql  client 
 subdirs =  innobase
 sysconfdir = ${prefix}/etc
 target = i686-pc-linux-gnu
@@ -317,10 +332,10 @@ target_cpu = i686
 target_os = linux-gnu
 target_vendor = pc
 thread_dirs = 
-tools_dirs = tools
+tools_dirs = tools server-tools
 uname_prog = /bin/uname
-vio_dir = 
-vio_libs = 
+yassl_dir = 
+yassl_integer_extra_cxxflags = 
 zlib_dir = 
 bin_SCRIPTS = mysqld_safe mysql_install_db \
 			msql2mysql \
@@ -341,10 +356,13 @@ bin_SCRIPTS = mysqld_safe mysql_install_db \
 			mysqld_multi \
 			mysql_create_system_tables
 
+noinst_SCRIPTS = make_binary_distribution \
+			make_sharedlib_distribution \
+			make_win_src_distribution
+
 EXTRA_SCRIPTS = make_binary_distribution.sh \
 			make_sharedlib_distribution.sh \
 			make_win_src_distribution.sh \
-			make_win_binary_distribution.sh \
 			msql2mysql.sh \
 			mysql_config.sh \
 			mysql_fix_privilege_tables.sh \
@@ -393,7 +411,7 @@ CLEANFILES = mysqld_safe mysql_install_db \
 			make_win_binary_distribution \
 			mysql_create_system_tables
 
-SUPERCLEANFILES = mysqlbug
+DISTCLEANFILES = mysqlbug
 SUFFIXES = .sh
 all: all-am
 
@@ -536,6 +554,7 @@ clean-generic:
 
 distclean-generic:
 	-rm -f $(CONFIG_CLEAN_FILES)
+	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -632,14 +651,15 @@ mysqlbug: ${top_builddir}/config.status mysqlbug.sh
 	  -e 's!@''WRAPLIBS''@!!' \
 	  -e 's!@''innodb_system_libs''@!-lrt!' \
 	  -e 's!@''openssl_libs''@!!' \
-	  -e 's!@''VERSION''@!4.1.13!' \
+	  -e 's!@''VERSION''@!5.0.15!' \
+	  -e 's!@''MYSQL_BASE_VERSION''@!5.0!' \
 	  -e 's!@''MYSQL_SERVER_SUFFIX''@!!' \
 	  -e 's!@''COMPILATION_COMMENT''@!Source distribution!' \
 	  -e 's!@''MACHINE_TYPE''@!i686!' \
 	  -e 's!@''HOSTNAME''@!/bin/hostname!' \
 	  -e 's!@''SYSTEM_TYPE''@!pc-linux-gnu!' \
 	  -e 's!@''CHECK_PID''@!/bin/kill -0 $$PID > /dev/null 2> /dev/null!' \
-	  -e 's!@''FIND_PROC''@!/bin/ps p $$PID | grep -v grep | grep mysqld > /dev/null!' \
+	  -e 's!@''FIND_PROC''@!/bin/ps p $$PID | grep -v grep | grep $$MYSQLD > /dev/null!' \
 	  -e 's!@''MYSQLD_DEFAULT_SWITCHES''@!--skip-locking!' \
 	  -e 's!@''MYSQL_UNIX_ADDR''@!/tmp/mysql.sock!' \
 	  -e 's!@''MYSQL_TCP_PORT''@!3306!' \
@@ -656,8 +676,6 @@ mysqlbug: ${top_builddir}/config.status mysqlbug.sh
 
 # Don't update the files from bitkeeper
 %::SCCS/s.%
-
-all: make_win_src_distribution make_binary_distribution make_sharedlib_distribution
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

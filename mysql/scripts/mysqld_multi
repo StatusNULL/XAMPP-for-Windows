@@ -4,7 +4,7 @@ use Getopt::Long;
 use POSIX qw(strftime);
 
 $|=1;
-$VER="2.11";
+$VER="2.15";
 
 $opt_config_file   = undef();
 $opt_example       = 0;
@@ -37,13 +37,13 @@ main();
 
 sub main
 {
-  my ($flag_exit);
+  my $flag_exit= 0;
 
   if (!defined(my_which(my_print_defaults)))
   {
     # We can't throw out yet, since --version, --help, or --example may
     # have been given
-    print "WARNING! my_print_defaults command not found!\n";
+    print "WARNING: my_print_defaults command not found.\n";
     print "Please make sure you have this command available and\n";
     print "in your path. The command is available from the latest\n";
     print "MySQL distribution.\n";
@@ -66,6 +66,11 @@ sub main
 	else
 	{
 	  $opt_config_file= $1;
+	  if (!($opt_config_file =~ m/\//))
+	  {
+	    # No path. Use current working directory
+	    $opt_config_file= "./" . $opt_config_file;
+	  }
 	}
       }
     }
@@ -76,10 +81,18 @@ sub main
     chop @defops;
     splice @ARGV, 0, 0, @defops;
   }
-  GetOptions("help","example","version","mysqld=s","mysqladmin=s",
-             "config-file=s","user=s","password=s","log=s","no-log","tcp-ip",
-             "silent","verbose")
-  || die "Wrong option! See $my_progname --help for detailed information!\n";
+  if (!GetOptions("help","example","version","mysqld=s","mysqladmin=s",
+		  "config-file=s","user=s","password=s","log=s","no-log",
+		  "tcp-ip", "silent","verbose"))
+  {
+    $flag_exit= 1;
+  }
+  if (defined($opt_config_file) && !($opt_config_file =~ m/\//))
+  {
+    # No path. Use current working directory
+    $opt_config_file= "./" . $opt_config_file;
+  }
+  usage() if ($opt_help);
 
   if ($opt_verbose && $opt_silent)
   {
@@ -95,15 +108,14 @@ sub main
     exit(0);
   }
   example() if ($opt_example);
-  usage() if ($opt_help);
   if ($flag_exit)
   {
-    print "Error with an option, see $my_progname --help for more info!\n";
+    print "Error with an option, see $my_progname --help for more info.\n";
     exit(1);
   }
   if (!defined(my_which(my_print_defaults)))
   {
-    print "ABORT: Can't find command 'my_print_defaults'!\n";
+    print "ABORT: Can't find command 'my_print_defaults'.\n";
     print "This command is available from the latest MySQL\n";
     print "distribution. Please make sure you have the command\n";
     print "in your PATH.\n";
@@ -154,6 +166,31 @@ sub main
       stop_mysqlds();
     }
   }
+}
+
+####
+#### Quote option argument. Add double quotes around the argument
+#### and escape the following: $, \, "
+#### This function is needed, because my_print_defaults drops possible
+#### quotes, single or double, from in front of an argument and from
+#### the end.
+####
+
+sub quote_opt_arg
+{
+  my ($option)= @_;
+
+  if ($option =~ m/(\-\-[a-zA-Z0-9\_\-]+)=(.*)/)
+  {
+    $option= $1;
+    $arg= $2;
+    $arg=~ s/\\/\\\\/g; # Escape escape character first to avoid doubling.
+    $arg=~ s/\$/\\\$/g;
+    $arg=~ s/\"/\\\"/g;
+    $arg= "\"" . $arg . "\"";
+    $option= $option . "=" . $arg;
+  }
+  return $option;
 }
 
 ####
@@ -289,7 +326,7 @@ sub start_mysqlds()
       }
       else
       {
-	$options[$j]=~ s/;/\\;/g;
+	$options[$j]= quote_opt_arg($options[$j]);
 	$tmp.= " $options[$j]";
       }
     }
@@ -374,7 +411,12 @@ sub get_mysqladmin_options
   $mysqladmin_found= 0 if (!length($mysqladmin));
   $com = "$mysqladmin";
   $tmp = " -u $opt_user";
-  $tmp.= defined($opt_password) ? " -p$opt_password" : "";
+  if (defined($opt_password)) {
+    my $pw= $opt_password;
+    # Protect single quotes in password
+    $pw =~ s/'/'"'"'/g;
+    $tmp.= " -p'$pw'";
+  }
   $tmp.= $opt_tcp_ip ? " -h 127.0.0.1" : "";
   for ($j = 0; defined($options[$j]); $j++)
   {
@@ -427,6 +469,16 @@ sub find_groups
       open(MY_CNF, "</etc/my.cnf") && (@tmp=<MY_CNF>) && close(MY_CNF);
     }
     for ($i = 0; ($line = shift @tmp); $i++)
+    {
+      $data[$i] = $line;
+    }
+    if (defined($ENV{MYSQL_HOME}) && -f "$ENV{MYSQL_HOME}/my.cnf" &&
+	-r "$ENV{MYSQL_HOME}/my.cnf")
+    {
+      open(MY_CNF, "<$ENV{MYSQL_HOME}/my.cnf") && (@tmp=<MY_CNF>) &&
+      close(MY_CNF);
+    }
+    for (; ($line = shift @tmp); $i++)
     {
       $data[$i] = $line;
     }

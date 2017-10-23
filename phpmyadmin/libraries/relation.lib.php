@@ -297,7 +297,7 @@ function PMA_getForeigners($db, $table, $column = '', $source = 'both') {
         unset($relations);
     }
 
-    if (($source == 'both' || $source == 'innodb') && !empty($table)) {
+    if (($source == 'both' || $source == 'innodb') && (0 < strlen($table))) {
         $show_create_table_query = 'SHOW CREATE TABLE '
             . PMA_backquote($db) . '.' . PMA_backquote($table);
         $show_create_table_res = PMA_DBI_query($show_create_table_query);
@@ -489,7 +489,7 @@ function PMA_getComments($db, $table = '') {
                 $comment[$col] = $row['comment'];
                 // if this version supports native comments and this function
                 // was called with a table parameter 
-                if (PMA_MYSQL_INT_VERSION >= 40100 && !empty($table)) {
+                if (PMA_MYSQL_INT_VERSION >= 40100 && (0 < strlen($table))) {
                     // if native comment found, use it instead of pmadb
                     if (!empty($native_comment[$col])) {
                         $comment[$col] = $native_comment[$col];
@@ -559,7 +559,7 @@ function PMA_setComment($db, $table, $col, $comment, $removekey = '', $mode='aut
     }
 
     // native mode is only for column comments so we need a table name
-    if ($mode == 'native' && !empty($table)) {
+    if ($mode == 'native' && (0 < strlen($table))) {
         $fields = PMA_DBI_get_fields($db, $table);
 
 

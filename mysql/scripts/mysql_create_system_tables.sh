@@ -41,6 +41,7 @@ c_hk=""
 i_ht=""
 c_tzn="" c_tz="" c_tzt="" c_tztt="" c_tzls=""
 i_tzn="" i_tz="" i_tzt="" i_tztt="" i_tzls=""
+c_p="" c_pp=""
 
 # Check for old tables
 if test ! -f $mdata/db.frm
@@ -66,14 +67,19 @@ then
   c_d="$c_d   Alter_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,"
   c_d="$c_d   Create_tmp_table_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,"
   c_d="$c_d   Lock_tables_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,"
+  c_d="$c_d   Create_view_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,"
+  c_d="$c_d   Show_view_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,"
+  c_d="$c_d   Create_routine_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,"
+  c_d="$c_d   Alter_routine_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,"
+  c_d="$c_d   Execute_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,"
   c_d="$c_d PRIMARY KEY Host (Host,Db,User),"
   c_d="$c_d KEY User (User)"
   c_d="$c_d ) engine=MyISAM"
   c_d="$c_d CHARACTER SET utf8 COLLATE utf8_bin"
   c_d="$c_d comment='Database privileges';"
   
-  i_d="INSERT INTO db VALUES ('%','test','','Y','Y','Y','Y','Y','Y','N','Y','Y','Y','Y','Y');
-  INSERT INTO db VALUES ('%','test\_%','','Y','Y','Y','Y','Y','Y','N','Y','Y','Y','Y','Y');"
+  i_d="INSERT INTO db VALUES ('%','test','','Y','Y','Y','Y','Y','Y','N','Y','Y','Y','Y','Y','Y','Y','Y','N','N');
+  INSERT INTO db VALUES ('%','test\_%','','Y','Y','Y','Y','Y','Y','N','Y','Y','Y','Y','Y','Y','Y','Y','N','N');"
 fi
 
 if test ! -f $mdata/host.frm
@@ -97,6 +103,11 @@ then
   c_h="$c_h  Alter_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,"
   c_h="$c_h  Create_tmp_table_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,"
   c_h="$c_h  Lock_tables_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,"
+  c_h="$c_h  Create_view_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,"
+  c_h="$c_h  Show_view_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,"
+  c_h="$c_h  Create_routine_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,"
+  c_h="$c_h  Alter_routine_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,"
+  c_h="$c_h  Execute_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,"
   c_h="$c_h  PRIMARY KEY Host (Host,Db)"
   c_h="$c_h ) engine=MyISAM"
   c_h="$c_h CHARACTER SET utf8 COLLATE utf8_bin"
@@ -112,7 +123,7 @@ then
   c_u="$c_u CREATE TABLE user ("
   c_u="$c_u   Host char(60) binary DEFAULT '' NOT NULL,"
   c_u="$c_u   User char(16) binary DEFAULT '' NOT NULL,"
-  c_u="$c_u   Password char(41) binary DEFAULT '' NOT NULL,"
+  c_u="$c_u   Password char(41) character set latin1 collate latin1_bin DEFAULT '' NOT NULL,"
   c_u="$c_u   Select_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,"
   c_u="$c_u   Insert_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,"
   c_u="$c_u   Update_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,"
@@ -134,6 +145,11 @@ then
   c_u="$c_u   Execute_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,"
   c_u="$c_u   Repl_slave_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,"
   c_u="$c_u   Repl_client_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,"
+  c_u="$c_u   Create_view_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,"
+  c_u="$c_u   Show_view_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,"
+  c_u="$c_u   Create_routine_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,"
+  c_u="$c_u   Alter_routine_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,"
+  c_u="$c_u   Create_user_priv enum('N','Y') COLLATE utf8_general_ci DEFAULT 'N' NOT NULL,"
   c_u="$c_u   ssl_type enum('','ANY','X509', 'SPECIFIED') COLLATE utf8_general_ci DEFAULT '' NOT NULL,"
   c_u="$c_u   ssl_cipher BLOB NOT NULL,"
   c_u="$c_u   x509_issuer BLOB NOT NULL,"
@@ -141,6 +157,7 @@ then
   c_u="$c_u   max_questions int(11) unsigned DEFAULT 0  NOT NULL,"
   c_u="$c_u   max_updates int(11) unsigned DEFAULT 0  NOT NULL,"
   c_u="$c_u   max_connections int(11) unsigned DEFAULT 0  NOT NULL,"
+  c_u="$c_u   max_user_connections int(11) unsigned DEFAULT 0  NOT NULL,"
   c_u="$c_u   PRIMARY KEY Host (Host,User)"
   c_u="$c_u ) engine=MyISAM"
   c_u="$c_u CHARACTER SET utf8 COLLATE utf8_bin"
@@ -148,22 +165,22 @@ then
 
   if test "$1" = "test" 
   then
-    i_u="INSERT INTO user VALUES ('localhost','root','','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','','','','',0,0,0);
-    INSERT INTO user VALUES ('$hostname','root','','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','','','','',0,0,0);
-    REPLACE INTO user VALUES ('127.0.0.1','root','','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','','','','',0,0,0);
+    i_u="INSERT INTO user VALUES ('localhost','root','','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','','','','',0,0,0,0);
+    INSERT INTO user VALUES ('$hostname','root','','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','','','','',0,0,0,0);
+    REPLACE INTO user VALUES ('127.0.0.1','root','','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','','','','',0,0,0,0);
     INSERT INTO user (host,user) values ('localhost','');
     INSERT INTO user (host,user) values ('$hostname','');"
   else
-    i_u="INSERT INTO user VALUES ('localhost','root','','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','','','','',0,0,0);"
+    i_u="INSERT INTO user VALUES ('localhost','root','','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','','','','',0,0,0,0);"
     if test "$windows" = "0"
     then
       i_u="$i_u
-           INSERT INTO user VALUES ('$hostname','root','','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','','','','',0,0,0);
+           INSERT INTO user VALUES ('$hostname','root','','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','','','','',0,0,0,0);
            INSERT INTO user (host,user) values ('$hostname','');
            INSERT INTO user (host,user) values ('localhost','');"
     else
       i_u="$i_u
-	   INSERT INTO user VALUES ('localhost','','','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','','','','',0,0,0);"
+	   INSERT INTO user VALUES ('localhost','','','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','','','','',0,0,0);"
     fi
   fi 
 fi
@@ -198,7 +215,7 @@ then
   c_t="$c_t   Table_name char(64) binary DEFAULT '' NOT NULL,"
   c_t="$c_t   Grantor char(77) DEFAULT '' NOT NULL,"
   c_t="$c_t   Timestamp timestamp(14),"
-  c_t="$c_t   Table_priv set('Select','Insert','Update','Delete','Create','Drop','Grant','References','Index','Alter') COLLATE utf8_general_ci DEFAULT '' NOT NULL,"
+  c_t="$c_t   Table_priv set('Select','Insert','Update','Delete','Create','Drop','Grant','References','Index','Alter','Create View','Show view') COLLATE utf8_general_ci DEFAULT '' NOT NULL,"
   c_t="$c_t   Column_priv set('Select','Insert','Update','References') COLLATE utf8_general_ci DEFAULT '' NOT NULL,"
   c_t="$c_t   PRIMARY KEY (Host,Db,User,Table_name),"
   c_t="$c_t   KEY Grantor (Grantor)"
@@ -227,6 +244,28 @@ then
   c_c="$c_c   comment='Column privileges';"
 fi
 
+if test ! -f $mdata/procs_priv.frm
+then
+  if test "$1" = "verbose" ; then
+    echo "Preparing procs_priv table" 1>&2;
+  fi
+
+  c_pp="$c_pp CREATE TABLE procs_priv ("
+  c_pp="$c_pp   Host char(60) binary DEFAULT '' NOT NULL,"
+  c_pp="$c_pp   Db char(64) binary DEFAULT '' NOT NULL,"
+  c_pp="$c_pp   User char(16) binary DEFAULT '' NOT NULL,"
+  c_pp="$c_pp   Routine_name char(64) binary DEFAULT '' NOT NULL,"
+  c_pp="$c_pp   Routine_type enum('FUNCTION','PROCEDURE') NOT NULL,"
+  c_pp="$c_pp   Grantor char(77) DEFAULT '' NOT NULL,"
+  c_pp="$c_pp   Proc_priv set('Execute','Alter Routine','Grant') COLLATE utf8_general_ci DEFAULT '' NOT NULL,"
+  c_pp="$c_pp   Timestamp timestamp(14),"
+  c_pp="$c_pp   PRIMARY KEY (Host,Db,User,Routine_name,Routine_type),"
+  c_pp="$c_pp   KEY Grantor (Grantor)"
+  c_pp="$c_pp ) engine=MyISAM"
+  c_pp="$c_pp CHARACTER SET utf8 COLLATE utf8_bin"
+  c_pp="$c_pp   comment='Procedure privileges';"
+fi
+
 if test ! -f $mdata/help_topic.frm
 then
   if test "$1" = "verbose" ; then
@@ -235,11 +274,11 @@ then
 
   c_ht="$c_ht CREATE TABLE help_topic ("
   c_ht="$c_ht   help_topic_id    int unsigned not null,"
-  c_ht="$c_ht   name             varchar(64) not null,"
+  c_ht="$c_ht   name             char(64) not null,"
   c_ht="$c_ht   help_category_id smallint unsigned not null,"
   c_ht="$c_ht   description      text not null,"
   c_ht="$c_ht   example          text not null,"
-  c_ht="$c_ht   url              varchar(128) not null,"
+  c_ht="$c_ht   url              char(128) not null,"
   c_ht="$c_ht   primary key      (help_topic_id),"
   c_ht="$c_ht   unique index     (name)"
   c_ht="$c_ht ) engine=MyISAM"
@@ -257,9 +296,9 @@ then
   
   c_hc="$c_hc CREATE TABLE help_category ("
   c_hc="$c_hc   help_category_id   smallint unsigned not null,"
-  c_hc="$c_hc   name               varchar(64) not null,"
+  c_hc="$c_hc   name               char(64) not null,"
   c_hc="$c_hc   parent_category_id smallint unsigned null,"
-  c_hc="$c_hc   url                varchar(128) not null,"
+  c_hc="$c_hc   url                char(128) not null,"
   c_hc="$c_hc   primary key        (help_category_id),"
   c_hc="$c_hc   unique index       (name)"
   c_hc="$c_hc ) engine=MyISAM"
@@ -275,7 +314,7 @@ then
 
   c_hk="$c_hk CREATE TABLE help_keyword ("
   c_hk="$c_hk   help_keyword_id  int unsigned not null,"
-  c_hk="$c_hk   name             varchar(64) not null,"
+  c_hk="$c_hk   name             char(64) not null,"
   c_hk="$c_hk   primary key      (help_keyword_id),"
   c_hk="$c_hk   unique index     (name)"
   c_hk="$c_hk ) engine=MyISAM"
@@ -627,6 +666,66 @@ then
   fi
 fi
 
+if test ! -f $mdata/proc.frm
+then
+  c_p="$c_p CREATE TABLE proc ("
+  c_p="$c_p   db                char(64) collate utf8_bin DEFAULT '' NOT NULL,"
+  c_p="$c_p   name              char(64) DEFAULT '' NOT NULL,"
+  c_p="$c_p   type              enum('FUNCTION','PROCEDURE') NOT NULL,"
+  c_p="$c_p   specific_name     char(64) DEFAULT '' NOT NULL,"
+  c_p="$c_p   language          enum('SQL') DEFAULT 'SQL' NOT NULL,"
+  c_p="$c_p   sql_data_access   enum('CONTAINS_SQL',"
+  c_p="$c_p			     'NO_SQL',"
+  c_p="$c_p			     'READS_SQL_DATA',"
+  c_p="$c_p			     'MODIFIES_SQL_DATA'"
+  c_p="$c_p                     ) DEFAULT 'CONTAINS_SQL' NOT NULL,"
+  c_p="$c_p   is_deterministic  enum('YES','NO') DEFAULT 'NO' NOT NULL,"
+  c_p="$c_p   security_type     enum('INVOKER','DEFINER') DEFAULT 'DEFINER' NOT NULL,"
+  c_p="$c_p   param_list        blob DEFAULT '' NOT NULL,"
+  c_p="$c_p   returns           char(64) DEFAULT '' NOT NULL,"
+  c_p="$c_p   body              longblob DEFAULT '' NOT NULL,"
+  c_p="$c_p   definer           char(77) collate utf8_bin DEFAULT '' NOT NULL,"
+  c_p="$c_p   created           timestamp,"
+  c_p="$c_p   modified          timestamp,"
+  c_p="$c_p   sql_mode          set("
+  c_p="$c_p                         'REAL_AS_FLOAT',"
+  c_p="$c_p                         'PIPES_AS_CONCAT',"
+  c_p="$c_p                         'ANSI_QUOTES',"
+  c_p="$c_p                         'IGNORE_SPACE',"
+  c_p="$c_p                         'NOT_USED',"
+  c_p="$c_p                         'ONLY_FULL_GROUP_BY',"
+  c_p="$c_p                         'NO_UNSIGNED_SUBTRACTION',"
+  c_p="$c_p                         'NO_DIR_IN_CREATE',"
+  c_p="$c_p                         'POSTGRESQL',"
+  c_p="$c_p                         'ORACLE',"
+  c_p="$c_p                         'MSSQL',"
+  c_p="$c_p                         'DB2',"
+  c_p="$c_p                         'MAXDB',"
+  c_p="$c_p                         'NO_KEY_OPTIONS',"
+  c_p="$c_p                         'NO_TABLE_OPTIONS',"
+  c_p="$c_p                         'NO_FIELD_OPTIONS',"
+  c_p="$c_p                         'MYSQL323',"
+  c_p="$c_p                         'MYSQL40',"
+  c_p="$c_p                         'ANSI',"
+  c_p="$c_p                         'NO_AUTO_VALUE_ON_ZERO',"
+  c_p="$c_p                         'NO_BACKSLASH_ESCAPES',"
+  c_p="$c_p                         'STRICT_TRANS_TABLES',"
+  c_p="$c_p                         'STRICT_ALL_TABLES',"
+  c_p="$c_p                         'NO_ZERO_IN_DATE',"
+  c_p="$c_p                         'NO_ZERO_DATE',"
+  c_p="$c_p                         'INVALID_DATES',"
+  c_p="$c_p                         'ERROR_FOR_DIVISION_BY_ZERO',"
+  c_p="$c_p                         'TRADITIONAL',"
+  c_p="$c_p                         'NO_AUTO_CREATE_USER',"
+  c_p="$c_p                         'HIGH_NOT_PRECEDENCE'"
+  c_p="$c_p                     ) DEFAULT '' NOT NULL,"
+  c_p="$c_p   comment           char(64) collate utf8_bin DEFAULT '' NOT NULL,"
+  c_p="$c_p   PRIMARY KEY (db,name,type)"
+  c_p="$c_p ) engine=MyISAM"
+  c_p="$c_p character set utf8"
+  c_p="$c_p comment='Stored Procedures';"
+fi
+
 cat << END_OF_DATA
 use mysql;
 set table_type=myisam;
@@ -660,5 +759,9 @@ $c_tztt
 $i_tztt
 $c_tzls
 $i_tzls
+
+$c_p
+$c_pp
+
 END_OF_DATA
 

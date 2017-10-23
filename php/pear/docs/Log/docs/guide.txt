@@ -8,8 +8,8 @@
 
 :Author:        Jon Parise
 :Contact:       jon@php.net
-:Date:          $Date: 2004/12/20 01:46:32 $
-:Revision:      $Revision: 1.15 $
+:Date:          $Date: 2005/09/19 04:24:15 $
+:Revision:      $Revision: 1.21 $
 
 .. contents:: Contents
 .. section-numbering::
@@ -325,6 +325,9 @@ Configuration
 |                   |           |               | appended to the log       |
 |                   |           |               | output.                   |
 +-------------------+-----------+---------------+---------------------------+
+| ``linebreak``     | String    | ``<br />\n``  | This string is used to    |
+|                   |           |               | represent a line break.   |
++-------------------+-----------+---------------+---------------------------+
 
 .. _error handling values: http://www.php.net/errorfunc
 
@@ -420,9 +423,19 @@ Configuration
 |                   |           |               | log file overwrite an     |
 |                   |           |               | existing one?             |
 +-------------------+-----------+---------------+---------------------------+
+| ``locking``       | Boolean   | False         | Should advisory file      |
+|                   |           |               | locking (using flock_) be |
+|                   |           |               | used?                     |
++-------------------+-----------+---------------+---------------------------+
 | ``mode``          | Integer   | 0644          | Octal representation of   |
 |                   |           |               | the log file's permissions|
 |                   |           |               | mode.                     |
++-------------------+-----------+---------------+---------------------------+
+| ``dirmode``       | Integer   | 0755          | Octal representation of   |
+|                   |           |               | the file permission mode  |
+|                   |           |               | that will be used when    |
+|                   |           |               | creating directories that |
+|                   |           |               | do not already exist.     |
 +-------------------+-----------+---------------+---------------------------+
 | ``eol``           | String    | OS default    | The end-on-line character |
 |                   |           |               | sequence.                 |
@@ -434,7 +447,11 @@ Configuration
 |                   |           | %H:%M:%S``    | (for strftime_).          |
 +-------------------+-----------+---------------+---------------------------+
 
+.. _flock: http://www.php.net/flock
 .. _strftime: http://www.php.net/strftime
+
+The file handler will only attempt to set the ``mode`` value if it was
+responsible for creating the file.
 
 Example
 ~~~~~~~
@@ -531,8 +548,10 @@ Configuration
 +-------------------+-----------+---------------+---------------------------+
 | Parameter         | Type      | Default       | Description               |
 +===================+===========+===============+===========================+
-| ``dsn``           | String    | '' `(empty)`  | A `Data Source Name`_.    |
+| ``dsn``           | Mixed     | '' `(empty)`  | A `Data Source Name`_.    |
 |                   |           |               | |required|                |
++-------------------+-----------+---------------+---------------------------+
+| ``options``       | Array     | ``persistent``| An array of `DB`_ options.|
 +-------------------+-----------+---------------+---------------------------+
 | ``db``            | Object    | NULL          | An existing `DB`_ object. |
 |                   |           |               | If specified, this object |

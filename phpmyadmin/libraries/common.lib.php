@@ -1,5 +1,5 @@
 <?php
-/* $Id: common.lib.php,v 2.151 2005/08/23 23:08:21 lem9 Exp $ */
+/* $Id: common.lib.php,v 2.151.2.1 2005/10/21 02:40:23 lem9 Exp $ */
 // vim: expandtab sw=4 ts=4 sts=4:
 
 /**
@@ -46,6 +46,10 @@
  *   release number
  * - other functions, respecting dependencies
  */
+
+// grab_globals.lib.php should really go before common.lib.php
+// TODO: remove direct calling from elsewhere
+require_once('./libraries/grab_globals.lib.php');
 
 /**
  * Minimum inclusion? (i.e. for the stylesheet builder)
@@ -843,7 +847,7 @@ function PMA_safe_db_list($only_db_check, $dbh, $dblist_cnt, $rs, $userlink, $cf
                 // with regular expressions.
                 while ($row = PMA_DBI_fetch_assoc($rs)) {
                     // loic1: all databases cases - part 1
-                    if (empty($row['Db']) || $row['Db'] == '%') {
+                    if ((0 == strlen($row['Db'])) || $row['Db'] == '%') {
                         $uva_mydbs['%'] = 1;
                         break;
                     }
@@ -1434,7 +1438,7 @@ if ($is_minimum_common == FALSE) {
     {
         // '0' is also empty for php :-(
         if ($do_it
-            && (!empty($a_name) || $a_name == '0') && $a_name != '*') {
+            && (0 < strlen($a_name)) && $a_name != '*') {
 
             if (is_array($a_name)) {
                  $result = array();
@@ -1594,7 +1598,7 @@ if (typeof(window.parent) != 'undefined'
         $message = PMA_sanitize($message);
 
         // Corrects the tooltip text via JS if required
-        if (!empty($GLOBALS['table']) && $cfg['ShowTooltip']) {
+        if ((0 < strlen($GLOBALS['table'])) && $cfg['ShowTooltip']) {
             $result = PMA_DBI_try_query('SHOW TABLE STATUS FROM ' . PMA_backquote($GLOBALS['db']) . ' LIKE \'' . PMA_sqlAddslashes($GLOBALS['table'], TRUE) . '\'');
             if ($result) {
                 $tbl_status = PMA_DBI_fetch_assoc($result);

@@ -199,11 +199,10 @@ copy_dir_files()
        print_debug "Creating directory '$arg'"
        mkdir $BASE/$arg
      fi
-    for i in *.c *.cpp *.h *.ih *.i *.ic *.asm *.def *.hpp *.dsp \
-             README INSTALL* LICENSE *.inc *.test *.result \
-	     *.pem Moscow_leap des_key_file *.dat *.000001 \
-	     *.require *.opt
-
+    for i in *.c *.cpp *.h *.ih *.i *.ic *.asm *.def *.hpp *.dsp *.dsw \
+             README INSTALL* LICENSE AUTHORS NEWS ChangeLog \
+             *.inc *.test *.result *.pem Moscow_leap des_key_file \
+             *.vcproj *.sln *.dat *.000001 *.require *.opt
     do
       if [ -f $i ]
       then
@@ -234,6 +233,7 @@ copy_dir_dirs() {
     find $arg -type d \
               -and -not -path \*SCCS\* \
               -and -not -path \*.deps\* \
+              -and -not -path \*.libs\* \
               -and -not -path \*autom4te.cache -print
     )|(
       while read v
@@ -249,8 +249,8 @@ copy_dir_dirs() {
 # Input directories to be copied
 #
 
-for i in client dbug extra heap include isam \
-         libmysql libmysqld merge myisam \
+for i in client dbug extra heap include \
+         libmysql libmysqld myisam \
          myisammrg mysys regex sql strings sql-common sql/examples \
          tools vio zlib
 do
@@ -266,7 +266,7 @@ make -C $SOURCE/ndb windoze
 # Input directories to be copied recursively
 #
 
-for i in bdb innobase ndb
+for i in bdb innobase ndb extra/yassl server-tools
 do
   copy_dir_dirs $i
 done
@@ -289,7 +289,7 @@ cd $SOURCE
 for i in COPYING ChangeLog README EXCEPTIONS-CLIENT\
          INSTALL-SOURCE INSTALL-WIN \
          INSTALL-WIN-SOURCE \
-         Docs/INSTALL-BINARY
+         Docs/INSTALL-BINARY Docs/manual.chm
 do
   print_debug "Copying file '$i'"
   if [ -f $i ]
@@ -297,6 +297,8 @@ do
     $CP $i $BASE/$i
   fi
 done
+
+cp extra/sql_state.h extra/mysqld_error.h $BASE/include
 
 #
 # support files
@@ -326,6 +328,8 @@ do
       $CP -R $i $BASE/$i
     fi
   fi
+  # But remove object files from destination
+  find $BASE/$i -type f -name \*.o | xargs rm -f
 done
 
 #
@@ -339,7 +343,9 @@ mv $BASE/sql/sql_yacc.cpp-new $BASE/sql/sql_yacc.cpp
 # Search the tree for plain text files and adapt the line end marker
 #
 find $BASE \( -name "*.dsp" -o -name "*.dsw" -o -name "*.cnf" -o -name "*.ini" \
-           -o -name COPYING -o -name ChangeLog -o -name EXCEPTIONS-CLIENT -o -name "INSTALL*" -o -name LICENSE -o -name "README*" \) -type f -print \
+           -o -name COPYING -o -name ChangeLog -o -name EXCEPTIONS-CLIENT \
+           -o -name "INSTALL*" -o -name LICENSE -o -name "README*" \
+           -o -name "*.vcproj" -o -name "*.sln" \) -type f -print \
 | while read v
   do
     unix_to_dos $v

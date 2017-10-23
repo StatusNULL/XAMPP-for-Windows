@@ -186,8 +186,11 @@ function htaccess($xauser, $xapasswd)
 	fclose($datei); */
 	
 	chdir($partwampp."\security"); // Fix by Wiedmann
-    $htpassrealm = "\"$htpasswdexe\" -c -m -b .\\xampp.users $xauser $xapasswd";
-	shell_exec("$htpassrealm");
+//  $htpassrealm = "\"$htpasswdexe\" -c -m -b .\\xampp.users $xauser $xapasswd"; // Fix by Wiemann
+//	shell_exec("$htpassrealm");
+    $htpassrealm = "start /b \"\" \"$htpasswdexe\" -c -m -b .\\xampp.users $xauser $xapasswd";
+	$handle = popen($htpassrealm, 'w');
+	pclose($handle);
 	chdir($curdir);
 	
 	$datei = fopen($xapasswdtxtdir,'w+');

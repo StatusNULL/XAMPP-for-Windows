@@ -150,7 +150,7 @@ function PMA_setDisplayMode(&$the_disp_mode, &$the_total)
         $the_total = $unlim_num_rows;
     }
     else if (($do_display['nav_bar'] == '1' || $do_display['sort_lnk'] == '1')
-             && (!empty($db) && !empty($table))) {
+             && ((0 < strlen($db)) && (0 < strlen($table)))) {
         $the_total   = PMA_countRecords($db, $table, TRUE);
     }
 
@@ -1809,7 +1809,7 @@ function PMA_displayTable(&$dt_result, &$the_disp_mode, $analyzed_sql)
     $tabs    = '(\'' . join('\',\'', $target) . '\')';
 
     if ($cfgRelation['displaywork']) {
-        if (empty($table)) {
+        if (0 == strlen($table)) {
             $exist_rel = FALSE;
         } else {
             $exist_rel = PMA_getForeigners($db, $table, '', 'both');

@@ -83,25 +83,25 @@ $cfg['Servers'][$i]['pmadb']         = 'phpmyadmin';          // Database used f
                                                     // (see scripts/create_tables.sql)
                                                     //   - leave blank for no support
                                                     //     DEFAULT: 'phpmyadmin'
-$cfg['Servers'][$i]['bookmarktable'] = 'PMA_bookmark';          // Bookmark table
+$cfg['Servers'][$i]['bookmarktable'] = 'pma_bookmark';          // Bookmark table
                                                     //   - leave blank for no bookmark support
                                                     //     DEFAULT: 'pma_bookmark'
-$cfg['Servers'][$i]['relation']      = 'PMA_relation';          // table to describe the relation between links (see doc)
+$cfg['Servers'][$i]['relation']      = 'pma_relation';          // table to describe the relation between links (see doc)
                                                     //   - leave blank for no relation-links support
                                                     //     DEFAULT: 'pma_relation'
-$cfg['Servers'][$i]['table_info']    = 'PMA_table_info';          // table to describe the display fields
+$cfg['Servers'][$i]['table_info']    = 'pma_table_info';          // table to describe the display fields
                                                     //   - leave blank for no display fields support
                                                     //     DEFAULT: 'pma_table_info'
-$cfg['Servers'][$i]['table_coords']  = 'PMA_table_coords';          // table to describe the tables position for the PDF schema
+$cfg['Servers'][$i]['table_coords']  = 'pma_table_coords';          // table to describe the tables position for the PDF schema
                                                     //   - leave blank for no PDF schema support
                                                     //     DEFAULT: 'pma_table_coords'
-$cfg['Servers'][$i]['pdf_pages']     = 'PMA_pdf_pages';          // table to describe pages of relationpdf
+$cfg['Servers'][$i]['pdf_pages']     = 'pma_pdf_pages';          // table to describe pages of relationpdf
                                                     //   - leave blank if you don't want to use this
                                                     //     DEFAULT: 'pma_pdf_pages'
-$cfg['Servers'][$i]['column_info']   = 'PMA_column_info';          // table to store column information
+$cfg['Servers'][$i]['column_info']   = 'pma_column_info';          // table to store column information
                                                     //   - leave blank for no column comments/mime types
                                                     //     DEFAULT: 'pma_column_info'
-$cfg['Servers'][$i]['history']       = 'PMA_history';          // table to store SQL history
+$cfg['Servers'][$i]['history']       = 'pma_history';          // table to store SQL history
                                                     //   - leave blank for no SQL query history
                                                     //     DEFAULT: 'pma_history'
 $cfg['Servers'][$i]['verbose_check'] = TRUE;        // set to FALSE if you know that your pma_* tables

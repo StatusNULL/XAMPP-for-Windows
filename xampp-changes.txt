@@ -1,15 +1,14 @@
-26 Sep 2005, XAMPP 1.4.16
-- Update MySQL 4.1.14 (wiedmann compilation)
-- Update PHP 5.0.5 (wiedmann compilation)
-- Update FileZilla FTP Server 0.9.10a 
-- Update phpMyAdmin 2.6.4-pl1
-- Update sendmail v16
-- Update PEAR (v1.4.1)
-- Update PECL
-- Update browscap.ini
-- Update php-switch.php (wiedmann modifcation)
-- Update apache_start.bat (wiedmann modifcation)
-- Update mysql_start.bat (wiedmann modifcation)
-- Update pear.bat (wiedmann modifcation)
-- Add pecl.bat (wiedmann modifcation)
-- Add Slovenian translation
+26 Oct 2005, XAMPP 1.5.0
+- UPDATE Apache 2.0.55 (wiedmann compilation)
+- UPDATE MySQL 5.0.15 (wiedmann compilation)
+- UPDATE PHP 4.4.1 (wiedmann compilation)
+- UPDATE OpenSSL 0.9.8a (wiedmann compilation)
+- UPDATE Mercury Mail Transport System v4.01b
+- UPDATE phpMyAdmin 2.6.4-pl3
+- UPDATE Norway lang file (from Ptomter)
+- UPDATE PEAR (v1.4.2)
+- ADD mod_bw 0.7 (wiedmann compilation)
+- ADD mod_auth_remote 0.1 (wiedmann compilation)
+- CLEAN BUG install.php (wiedmann)
+- CLEAN BUG securefunctions.php (wiedmann)
+- CLEAN BUG security-htdocs => index.php (wiedmann)

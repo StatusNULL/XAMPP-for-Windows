@@ -23,6 +23,29 @@ case "$1" in
       ;;
 esac
 
+usage () {
+        cat <<EOF
+Usage: $0 [OPTIONS]
+  --no-defaults              Don't read the system defaults file
+  --defaults-file=FILE       Use the specified defaults file
+  --defaults-extra-file=FILE Also use defaults from the specified file
+  --ledir=DIRECTORY          Look for mysqld in the specified directory
+  --log-error=FILE           Log errors to the specified log file
+  --open-files-limit=LIMIT   Limit the number of open files
+  --core-file-size=LIMIT     Limit core files to the specified size
+  --timezone=TZ              Set the system timezone
+  --mysqld=FILE              Use the specified file as mysqld
+  --mysqld-version=VERSION   Use "mysqld-VERSION" as mysqld
+  --nice=NICE                Set the scheduling priority of mysqld
+  --skip-kill-mysqld         Don't try to kill stray mysqld processes
+
+All other options are passed to the mysqld program.
+
+EOF
+        exit 1
+}
+
+
 parse_arguments() {
   # We only need to pass arguments through to the server if we don't
   # handle them here.  So, we collect unrecognized options (passed on
@@ -52,11 +75,7 @@ parse_arguments() {
 
       # mysqld_safe-specific options - must be set in my.cnf ([mysqld_safe])!
       --ledir=*)   ledir=`echo "$arg" | sed -e "s;--ledir=;;"` ;;
-      # err-log should be removed in 5.0
-      --err-log=*) err_log=`echo "$arg" | sed -e "s;--err-log=;;"` ;;
       --log-error=*) err_log=`echo "$arg" | sed -e "s;--log-error=;;"` ;;
-      # QQ The --open-files should be removed in 5.0
-      --open-files=*) open_files=`echo "$arg" | sed -e "s;--open-files=;;"` ;;
       --open-files-limit=*) open_files=`echo "$arg" | sed -e "s;--open-files-limit=;;"` ;;
       --core-file-size=*) core_file_size=`echo "$arg" | sed -e "s;--core-file-size=;;"` ;;
       --timezone=*) TZ=`echo "$arg" | sed -e "s;--timezone=;;"` ; export TZ; ;;
@@ -71,6 +90,9 @@ parse_arguments() {
 	fi
 	;;
       --nice=*) niceness=`echo "$arg" | sed -e "s;--nice=;;"` ;;
+      --help)
+        usage
+        ;;
       *)
         if test -n "$pick_args"
         then
@@ -84,30 +106,70 @@ parse_arguments() {
 }
 
 
+#
+# First, try to find BASEDIR and ledir (where mysqld is)
+# 
+
 MY_PWD=`pwd`
-# Check if we are starting this relative (for the binary release)
-if test -f ./share/mysql/english/errmsg.sys -a \
- -x ./bin/mysqld
+# Check for the directories we would expect from a binary release install
+if test -f ./share/mysql/english/errmsg.sys -a -x ./bin/mysqld
 then
   MY_BASEDIR_VERSION=$MY_PWD		# Where bin, share and data are
   ledir=$MY_BASEDIR_VERSION/bin		# Where mysqld is
-  DATADIR=$MY_BASEDIR_VERSION/data
-  if test -z "$defaults"
-  then
-    defaults="--defaults-extra-file=$MY_BASEDIR_VERSION/data/my.cnf"
-  fi
-# Check if this is a 'moved install directory'
+# Check for the directories we would expect from a source install
 elif test -f ./share/mysql/english/errmsg.sys -a \
  -x ./libexec/mysqld
 then
   MY_BASEDIR_VERSION=$MY_PWD		# Where libexec, share and var are
   ledir=$MY_BASEDIR_VERSION/libexec	# Where mysqld is
-  DATADIR=$MY_BASEDIR_VERSION/var
+# Since we didn't find anything, used the compiled-in defaults
 else
   MY_BASEDIR_VERSION=@prefix@
-  DATADIR=@localstatedir@
   ledir=@libexecdir@
 fi
+
+#
+# Second, try to find the data directory
+#
+
+# Try where the binary installs put it
+if test -d $MY_BASEDIR_VERSION/data/mysql
+then
+  DATADIR=$MY_BASEDIR_VERSION/data
+  if test -z "$defaults" -a -r "$DATADIR/my.cnf"
+  then
+    defaults="--defaults-extra-file=$DATADIR/my.cnf"
+  fi
+# Next try where the source installs put it
+elif test -d $MY_BASEDIR_VERSION/var/mysql
+then
+  DATADIR=$MY_BASEDIR_VERSION/var
+# Or just give up and use our compiled-in default
+else
+  DATADIR=@localstatedir@
+fi
+
+if test -z "$MYSQL_HOME"
+then 
+  if test -r "$MY_BASEDIR_VERSION/my.cnf" && test -r "$DATADIR/my.cnf"
+  then
+    echo "WARNING: Found two instances of my.cnf -"
+    echo "$MY_BASEDIR_VERSION/my.cnf and"
+    echo "$DATADIR/my.cnf"
+    echo "IGNORING $DATADIR/my.cnf"
+    echo
+    MYSQL_HOME=$MY_BASEDIR_VERSION
+  elif test -r "$DATADIR/my.cnf"
+  then
+    echo "WARNING: Found $DATADIR/my.cnf"
+    echo "Datadir is deprecated place for my.cnf, please move it to $MY_BASEDIR_VERSION"
+    echo
+    MYSQL_HOME=$DATADIR
+  else
+    MYSQL_HOME=$MY_BASEDIR_VERSION
+  fi
+fi
+export MYSQL_HOME
 
 user=@MYSQLD_USER@
 niceness=0
