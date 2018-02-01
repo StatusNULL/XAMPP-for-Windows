@@ -14,9 +14,6 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-/* $Id: SessionExample.java 1337746 2012-05-13 00:17:51Z kkolinko $
- *
- */
 
 import java.io.IOException;
 import java.io.PrintWriter;

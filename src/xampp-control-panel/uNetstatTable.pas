@@ -214,6 +214,8 @@ var
   i: integer;
   try_limit: integer;
   counter: integer;
+  localPTcpTable: PMIB_TCPTABLE_OWNER_PID;
+  auxPTcpTable: PMIB_TCPTABLE_OWNER_PID;
 begin
   if updating = 1 then
     exit;
@@ -226,12 +228,6 @@ begin
 
   updating := 1;
 
-  if pTcpTable <> nil then
-  begin
-    FreeMem(pTcpTable);
-    pTcpTable := nil;
-  end;
-
   //if (DLLProcPointer = nil) or (hLibModule < HINSTANCE_ERROR) then
   if (hLibModule < HINSTANCE_ERROR) then
   begin
@@ -243,29 +239,50 @@ begin
     try_limit := 10;
     counter := 0;
     dwSize := 0;
-    Res := GetExtendedTcpTable(pTcpTable, @dwSize, False, AF_INET, TCP_TABLE_OWNER_PID_ALL, 0);
+    Res := GetExtendedTcpTable(localPTcpTable, @dwSize, False, AF_INET, TCP_TABLE_OWNER_PID_ALL, 0);
     while ((Res = ERROR_INSUFFICIENT_BUFFER) and (counter < try_limit)) do
     begin
-      GetMem(pTcpTable, dwSize); // das API hat die "gewünschte" Grösse gesetzt
-      Res := GetExtendedTcpTable(pTcpTable, @dwSize, False, AF_INET, TCP_TABLE_OWNER_PID_ALL, 0);
+      GetMem(localPTcpTable, dwSize); // das API hat die "gewünschte" Grösse gesetzt
+      Res := GetExtendedTcpTable(localPTcpTable, @dwSize, False, AF_INET, TCP_TABLE_OWNER_PID_ALL, 0);
       inc(counter);
     end;
     if (Res = NO_ERROR) then
     begin
-      for i := 0 to pTcpTable.dwNumEntries - 1 do
+      for i := 0 to localPTcpTable.dwNumEntries - 1 do
       begin
-        pTcpTable.table[i].dwLocalPort := ((pTcpTable.table[i].dwLocalPort and $FF00) shr 8) or ((pTcpTable.table[i].dwLocalPort and $00FF) shl 8);
-        pTcpTable.table[i].dwRemotePort := ((pTcpTable.table[i].dwRemotePort and $FF00) shr 8) or ((pTcpTable.table[i].dwRemotePort and $00FF) shl 8);
+        localPTcpTable.table[i].dwLocalPort := ((localPTcpTable.table[i].dwLocalPort and $FF00) shr 8) or ((localPTcpTable.table[i].dwLocalPort and $00FF) shl 8);
+        localPTcpTable.table[i].dwRemotePort := ((localPTcpTable.table[i].dwRemotePort and $FF00) shr 8) or ((localPTcpTable.table[i].dwRemotePort and $00FF) shl 8);
       end;
+
+      auxPTcpTable := pTcpTable;
+      pTcpTable := localPTcpTable;
+
+      if auxPTcpTable <> nil then
+      begin
+        FreeMem(auxPTcpTable);
+        auxPTcpTable := nil;
+      end;
+
     end
     else if (Res = ERROR_NO_DATA) then
     begin
+      if pTcpTable <> nil then
+      begin
+        FreeMem(pTcpTable);
+        pTcpTable := nil;
+      end;
       exit;
     end
     else
     begin
-      fMain.AddLog('NetStatTable', Format('Problem loading NetStat TCP table: Returned %d',[Res]), ltError);
-      raiseLastOSError(); // Error-Handling
+      fMain.AddLog('NetStatTable', Format('NetStat TCP service stopped. Please restart the control panel. Returned %d',[Res]), ltError);
+      if pTcpTable <> nil then
+      begin
+        FreeMem(pTcpTable);
+        pTcpTable := nil;
+      end;
+      exit;
+      //raiseLastOSError(); // Error-Handling
     end;
   finally
     // If (pTcpTable <> Nil) Then FreeMem(pTcpTable);

@@ -6,27 +6,16 @@ function initTableSorter(tabid) {
         $table = $('#serverstatusqueriesdetails');
         opts = {
             sortList: [[3, 1]],
-            widgets: ['fast-zebra'],
             headers: {
                 1: { sorter: 'fancyNumber' },
                 2: { sorter: 'fancyNumber' }
             }
         };
         break;
-    case 'statustabs_allvars':
-        $table = $('#serverstatusvariables');
-        opts = {
-            sortList: [[0, 0]],
-            widgets: ['fast-zebra'],
-            headers: {
-                1: { sorter: 'withinSpanNumber' }
-            }
-        };
-        break;
     }
     $table.tablesorter(opts);
     $table.find('tr:first th')
-        .append('<img class="icon sortableIcon" src="themes/dot.gif" alt="">');
+        .append('<div class="sorticon"></div>');
 }
 
 $(function () {
@@ -76,24 +65,5 @@ $(function () {
             return (res && res.length >= 3) ? res[2] : 0;
         },
         type: "numeric"
-    });
-
-    // faster zebra widget: no row visibility check, faster css class switching, no cssChildRow check
-    $.tablesorter.addWidget({
-        id: "fast-zebra",
-        format: function (table) {
-            if (table.config.debug) {
-                var time = new Date();
-            }
-            $("tr:even", table.tBodies[0])
-                .removeClass(table.config.widgetZebra.css[0])
-                .addClass(table.config.widgetZebra.css[1]);
-            $("tr:odd", table.tBodies[0])
-                .removeClass(table.config.widgetZebra.css[1])
-                .addClass(table.config.widgetZebra.css[0]);
-            if (table.config.debug) {
-                $.tablesorter.benchmark("Applying Fast-Zebra widget", time);
-            }
-        }
     });
 });

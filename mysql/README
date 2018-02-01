@@ -1,56 +1,55 @@
-MySQL Server 5.5
+MariaDB is designed as a drop-in replacement of MySQL(R) with more
+features, new storage engines, fewer bugs, and better performance.
 
-This is a release of MySQL, a dual-license SQL database server.
-For the avoidance of doubt, this particular copy of the software 
-is released under the version 2 of the GNU General Public License. 
-MySQL is brought to you by Oracle.
+MariaDB is brought to you by the MariaDB Foundation.
+Please read the CREDITS file for details about the MariaDB Foundation,
+and who is developing MariaDB.
 
-Copyright (c) 2000, 2014, Oracle and/or its affiliates. All rights reserved.
+MariaDB is developed by many of the original developers of MySQL who
+now work for the MariadB Foundation and the MariaDB Corporation, and by many people in
+the community.
 
-License information can be found in the COPYING file.
+MySQL, which is the base of MariaDB, is a product and trademark of Oracle
+Corporation, Inc. For a list of developers and other contributors,
+see the Credits appendix.  You can also run 'SHOW authors' to get a
+list of active contributors.
 
-MySQL FOSS License Exception
-We want free and open source software applications under certain
-licenses to be able to use specified GPL-licensed MySQL client
-libraries despite the fact that not all such FOSS licenses are
-compatible with version 2 of the GNU General Public License.  
-Therefore there are special exceptions to the terms and conditions 
-of the GPLv2 as applied to these client libraries, which are 
-identified and described in more detail in the FOSS License 
-Exception at 
-<http://www.mysql.com/about/legal/licensing/foss-exception.html>.
+A description of the MariaDB project and a manual can be found at:
+http://mariadb.org/
+https://mariadb.com/kb/en/
+https://mariadb.com/kb/en/mariadb-vs-mysql-features/
+https://mariadb.com/kb/en/mariadb-versus-mysql-features/
+https://mariadb.com/kb/en/mariadb-versus-mysql-compatibility/
 
-This distribution may include materials developed by third
-parties. For license and attribution notices for these
-materials, please refer to the documentation that accompanies
-this distribution (see the "Licenses for Third-Party Components"
-appendix) or view the online documentation at 
-<http://dev.mysql.com/doc/>.
+As MariaDB is a full replacement of MySQL, the MySQL manual at
+http://dev.mysql.com/doc is generally applicable.
 
-GPLv2 Disclaimer
-For the avoidance of doubt, except that if any license choice
-other than GPL or LGPL is available it will apply instead, 
-Oracle elects to use only the General Public License version 2 
-(GPLv2) at this time for any software where a choice of GPL 
-license versions is made available with the language indicating 
-that GPLv2 or any later version may be used, or where a choice 
-of which version of the GPL is applied is otherwise unspecified.
+More help is available from the Maria Discuss mailing list
+https://launchpad.net/~maria-discuss
+and the #maria IRC channel on Freenode.
 
-For further information about MySQL or additional documentation, 
-see:
-- The latest information about MySQL: http://www.mysql.com
-- The current MySQL documentation: http://dev.mysql.com/doc
+***************************************************************************
 
-Some Reference Manual sections of special interest:
-- If you are migrating from an older version of MySQL, please 
-  read the "Upgrading from..." section.
-- To see what MySQL can do, take a look at the features section.
-- For installation instructions, see the Installing and Upgrading
-  chapter.
-- For the new features/bugfix history, see the MySQL Change History 
-  appendix.
+NOTE: 
 
-You can browse the MySQL Reference Manual online or download it 
-in any of several formats at the URL given earlier in this file.
-Source distributions include a local copy of the manual in the
-Docs directory.
+MariaDB is specifically available only under version 2 of the GNU
+General Public License (GPLv2). (I.e. Without the "any later version"
+clause.) This is inherited from MySQL. Please see the README file in
+the MySQL distribution for more information.
+
+License information can be found in the COPYING, COPYING.LESSER,
+and COPYING.thirdparty files.
+
+***************************************************************************
+
+IMPORTANT:
+
+Bug and/or error reports regarding MariaDB should be submitted at
+http://mariadb.org/jira
+
+Bugs in the MySQL code can also be submitted at http://bugs.mysql.com
+
+The code for MariaDB, including all revision history, can be found at:
+https://github.com/MariaDB/server
+
+***************************************************************************

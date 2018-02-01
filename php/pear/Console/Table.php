@@ -2,7 +2,7 @@
 /**
  * Utility for printing tables from commandline scripts.
  *
- * PHP versions 4 and 5
+ * PHP versions 5 and 7
  *
  * All rights reserved.
  *
@@ -142,16 +142,38 @@ class Console_Table
     var $_charset = 'utf-8';
 
     /**
-     * Border character.
+     * Border characters.
+     * Allowed keys:
+     * - intersection - intersection ("+")
+     * - horizontal - horizontal rule character ("-")
+     * - vertical - vertical rule character ("|")
      *
-     * @var string
+     * @var array
      */
-    var $_border = CONSOLE_TABLE_BORDER_ASCII;
+    var $_border = array(
+        'intersection' => '+',
+        'horizontal' => '-',
+        'vertical' => '|',
+    );
+
+    /**
+     * If borders are shown or not
+     * Allowed keys: top, right, bottom, left, inner: true and false
+     *
+     * @var array
+     */
+    var $_borderVisibility = array(
+        'top'    => true,
+        'right'  => true,
+        'bottom' => true,
+        'left'   => true,
+        'inner'  => true
+    );
 
     /**
      * Whether the data has ANSI colors.
      *
-     * @var boolean
+     * @var Console_Color2
      */
     var $_ansiColor = false;
 
@@ -169,16 +191,18 @@ class Console_Table
      *                         extension.
      * @param boolean $color   Whether the data contains ansi color codes.
      */
-    function Console_Table($align = CONSOLE_TABLE_ALIGN_LEFT,
-                           $border = CONSOLE_TABLE_BORDER_ASCII, $padding = 1,
-                           $charset = null, $color = false)
+    function __construct($align = CONSOLE_TABLE_ALIGN_LEFT,
+                         $border = CONSOLE_TABLE_BORDER_ASCII, $padding = 1,
+                         $charset = null, $color = false)
     {
         $this->_defaultAlign = $align;
-        $this->_border       = $border;
+        $this->setBorder($border);
         $this->_padding      = $padding;
-        $this->_ansiColor    = $color;
-        if ($this->_ansiColor) {
-            include_once 'Console/Color.php';
+        if ($color) {
+            if (!class_exists('Console_Color2')) {
+                include_once 'Console/Color2.php';
+            }
+            $this->_ansiColor = new Console_Color2();
         }
         if (!empty($charset)) {
             $this->setCharset($charset);
@@ -247,6 +271,60 @@ class Console_Table
         setlocale(LC_CTYPE, 'en_US');
         $this->_charset = strtolower($charset);
         setlocale(LC_CTYPE, $locale);
+    }
+
+    /**
+     * Set the table border settings
+     *
+     * Border definition modes:
+     * - CONSOLE_TABLE_BORDER_ASCII: Default border with +, - and |
+     * - array with keys "intersection", "horizontal" and "vertical"
+     * - single character string that sets all three of the array keys
+     *
+     * @param mixed $border Border definition
+     *
+     * @return void
+     * @see $_border
+     */
+    function setBorder($border)
+    {
+        if ($border === CONSOLE_TABLE_BORDER_ASCII) {
+            $intersection = '+';
+            $horizontal = '-';
+            $vertical = '|';
+        } else if (is_string($border)) {
+            $intersection = $horizontal = $vertical = $border;
+        } else if ($border == '') {
+            $intersection = $horizontal = $vertical = '';
+        } else {
+            extract($border);
+        }
+
+        $this->_border = array(
+            'intersection' => $intersection,
+            'horizontal' => $horizontal,
+            'vertical' => $vertical,
+        );
+    }
+
+    /**
+     * Set which borders shall be shown.
+     *
+     * @param array $visibility Visibility settings.
+     *                          Allowed keys: left, right, top, bottom, inner
+     *
+     * @return void
+     * @see    $_borderVisibility
+     */
+    function setBorderVisibility($visibility)
+    {
+        $this->_borderVisibility = array_merge(
+            $this->_borderVisibility,
+            array_intersect_key(
+                $visibility,
+                $this->_borderVisibility
+            )
+        );
     }
 
     /**
@@ -564,9 +642,7 @@ class Console_Table
             return '';
         }
 
-        $rule      = $this->_border == CONSOLE_TABLE_BORDER_ASCII
-            ? '|'
-            : $this->_border;
+        $vertical = $this->_border['vertical'];
         $separator = $this->_getSeparator();
 
         $return = array();
@@ -583,9 +659,13 @@ class Console_Table
             }
 
             if ($this->_data[$i] !== CONSOLE_TABLE_HORIZONTAL_RULE) {
-                $row_begin    = $rule . str_repeat(' ', $this->_padding);
-                $row_end      = str_repeat(' ', $this->_padding) . $rule;
-                $implode_char = str_repeat(' ', $this->_padding) . $rule
+                $row_begin = $this->_borderVisibility['left']
+                    ? $vertical . str_repeat(' ', $this->_padding)
+                    : '';
+                $row_end = $this->_borderVisibility['right']
+                    ? str_repeat(' ', $this->_padding) . $vertical
+                    : '';
+                $implode_char = str_repeat(' ', $this->_padding) . $vertical
                     . str_repeat(' ', $this->_padding);
                 $return[]     = $row_begin
                     . implode($implode_char, $this->_data[$i]) . $row_end;
@@ -595,14 +675,19 @@ class Console_Table
 
         }
 
-        $return = implode("\r\n", $return);
+        $return = implode(PHP_EOL, $return);
         if (!empty($separator)) {
-            $return = $separator . "\r\n" . $return . "\r\n" . $separator;
+            if ($this->_borderVisibility['inner']) {
+                $return = $separator . PHP_EOL . $return;
+            }
+            if ($this->_borderVisibility['bottom']) {
+                $return .= PHP_EOL . $separator;
+            }
         }
-        $return .= "\r\n";
+        $return .= PHP_EOL;
 
         if (!empty($this->_headers)) {
-            $return = $this->_getHeaderLine() .  "\r\n" . $return;
+            $return = $this->_getHeaderLine() .  PHP_EOL . $return;
         }
 
         return $return;
@@ -620,22 +705,22 @@ class Console_Table
             return;
         }
 
-        if ($this->_border == CONSOLE_TABLE_BORDER_ASCII) {
-            $rule = '-';
-            $sect = '+';
-        } else {
-            $rule = $sect = $this->_border;
-        }
+        $horizontal = $this->_border['horizontal'];
+        $intersection = $this->_border['intersection'];
 
         $return = array();
         foreach ($this->_cell_lengths as $cl) {
-            $return[] = str_repeat($rule, $cl);
+            $return[] = str_repeat($horizontal, $cl);
         }
 
-        $row_begin    = $sect . str_repeat($rule, $this->_padding);
-        $row_end      = str_repeat($rule, $this->_padding) . $sect;
-        $implode_char = str_repeat($rule, $this->_padding) . $sect
-            . str_repeat($rule, $this->_padding);
+        $row_begin = $this->_borderVisibility['left']
+            ? $intersection . str_repeat($horizontal, $this->_padding)
+            : '';
+        $row_end = $this->_borderVisibility['right']
+            ? str_repeat($horizontal, $this->_padding) . $intersection
+            : '';
+        $implode_char = str_repeat($horizontal, $this->_padding) . $intersection
+            . str_repeat($horizontal, $this->_padding);
 
         return $row_begin . implode($implode_char, $return) . $row_end;
     }
@@ -669,16 +754,18 @@ class Console_Table
             }
         }
 
-        $rule         = $this->_border == CONSOLE_TABLE_BORDER_ASCII
-            ? '|'
-            : $this->_border;
-        $row_begin    = $rule . str_repeat(' ', $this->_padding);
-        $row_end      = str_repeat(' ', $this->_padding) . $rule;
-        $implode_char = str_repeat(' ', $this->_padding) . $rule
+        $vertical = $this->_border['vertical'];
+        $row_begin = $this->_borderVisibility['left']
+            ? $vertical . str_repeat(' ', $this->_padding)
+            : '';
+        $row_end = $this->_borderVisibility['right']
+            ? str_repeat(' ', $this->_padding) . $vertical
+            : '';
+        $implode_char = str_repeat(' ', $this->_padding) . $vertical
             . str_repeat(' ', $this->_padding);
 
         $separator = $this->_getSeparator();
-        if (!empty($separator)) {
+        if (!empty($separator) && $this->_borderVisibility['top']) {
             $return[] = $separator;
         }
         for ($j = 0; $j < count($this->_headers); $j++) {
@@ -686,7 +773,7 @@ class Console_Table
                 . implode($implode_char, $this->_headers[$j]) . $row_end;
         }
 
-        return implode("\r\n", $return);
+        return implode(PHP_EOL, $return);
     }
 
     /**
@@ -719,8 +806,10 @@ class Console_Table
         }
 
         // Set default column alignments
-        for ($i = count($this->_col_align); $i < $this->_max_cols; $i++) {
-            $this->_col_align[$i] = $pad;
+        for ($i = 0; $i < $this->_max_cols; $i++) {
+            if (!isset($this->_col_align[$i])) {
+                $this->_col_align[$i] = $pad;
+            }
         }
     }
 
@@ -781,7 +870,7 @@ class Console_Table
 
         // Strip ANSI color codes if requested.
         if ($this->_ansiColor) {
-            $str = Console_Color::strip($str);
+            $str = $this->_ansiColor->strip($str);
         }
 
         // Cache expensive function_exists() calls.

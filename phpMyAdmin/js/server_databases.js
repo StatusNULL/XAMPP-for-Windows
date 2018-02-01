@@ -12,8 +12,9 @@
  * Unbind all event handlers before tearing down a page
  */
 AJAX.registerTeardown('server_databases.js', function () {
-    $("#dbStatsForm").die('submit');
-    $('#create_database_form.ajax').die('submit');
+    $(document).off('submit', "#dbStatsForm");
+    $(document).off('submit', '#create_database_form.ajax');
+    $('#filterText').unbind('keyup');
 });
 
 /**
@@ -27,7 +28,7 @@ AJAX.registerOnload('server_databases.js', function () {
     /**
      * Attach Event Handler for 'Drop Databases'
      */
-    $("#dbStatsForm").live('submit', function (event) {
+    $(document).on('submit', "#dbStatsForm", function (event) {
         event.preventDefault();
 
         var $form = $(this);
@@ -54,7 +55,7 @@ AJAX.registerOnload('server_databases.js', function () {
          * @var question    String containing the question to be asked for confirmation
          */
         var question = PMA_messages.strDropDatabaseStrongWarning + ' ' +
-            $.sprintf(PMA_messages.strDoYouReally, selected_dbs.join('<br />'));
+            PMA_sprintf(PMA_messages.strDoYouReally, selected_dbs.join('<br />'));
 
         $(this).PMA_confirm(
             question,
@@ -63,8 +64,11 @@ AJAX.registerOnload('server_databases.js', function () {
             function (url) {
                 PMA_ajaxShowMessage(PMA_messages.strProcessingRequest, false);
 
-                $.post(url, function (data) {
-                    if (data.success === true) {
+                var params = getJSConfirmCommonParam(this);
+                params.token = PMA_commonParams.get('token');
+
+                $.post(url, params, function (data) {
+                    if (typeof data !== 'undefined' && data.success === true) {
                         PMA_ajaxShowMessage(data.message);
 
                         var $rowsToRemove = $form.find('tr.removeMe');
@@ -74,7 +78,7 @@ AJAX.registerOnload('server_databases.js', function () {
 
                         $rowsToRemove.remove();
                         $form.find('tbody').PMA_sort_table('.name');
-                        if ($form.find('tbody').find('tr').length == 0) {
+                        if ($form.find('tbody').find('tr').length === 0) {
                             // user just dropped the last db on this page
                             PMA_commonActions.refreshMain();
                         }
@@ -91,7 +95,7 @@ AJAX.registerOnload('server_databases.js', function () {
     /**
      * Attach Ajax event handlers for 'Create Database'.
      */
-    $('#create_database_form.ajax').live('submit', function (event) {
+    $(document).on('submit', '#create_database_form.ajax', function (event) {
         event.preventDefault();
 
         var $form = $(this);
@@ -109,22 +113,71 @@ AJAX.registerOnload('server_databases.js', function () {
         PMA_prepareForAjaxRequest($form);
 
         $.post($form.attr('action'), $form.serialize(), function (data) {
-            if (data.success === true) {
+            if (typeof data !== 'undefined' && data.success === true) {
                 PMA_ajaxShowMessage(data.message);
-
-                //Append database's row to table
-                $("#tabledatabases")
-                .find('tbody')
-                .append(data.new_db_string)
-                .PMA_sort_table('.name');
 
                 var $databases_count_object = $('#databases_count');
                 var databases_count = parseInt($databases_count_object.text(), 10) + 1;
                 $databases_count_object.text(databases_count);
                 PMA_reloadNavigation();
+
+                // make ajax request to load db structure page - taken from ajax.js
+                var dbStruct_url = data.url_query;
+                dbStruct_url = dbStruct_url.replace(/amp;/ig, '');
+                var params = 'ajax_request=true&ajax_page_request=true';
+                if (! (history && history.pushState)) {
+                    params += PMA_MicroHistory.menus.getRequestParam();
+                }
+                $.get(dbStruct_url, params, AJAX.responseHandler);
             } else {
                 PMA_ajaxShowMessage(data.error, false);
             }
         }); // end $.post()
-    }); // end $().live()
+    }); // end $(document).on()
+
+    /* Don't show filter if number of databases are very few */
+    var databasesCount = $('#databases_count').html();
+    if(databasesCount <= 10) {
+        $('#tableFilter').hide();
+    }
+
+    var $filterField = $('#filterText');
+    /* Event handler for database filter */
+    $filterField.keyup(function (){
+       var textFilter = null, val = $(this).val();
+       if(val.length != 0) {
+           try {
+               textFilter = new RegExp(val.replace(/_/g, ' '), 'i');
+               $(this).removeClass('error');
+           } catch(e) {
+               if (e instanceof SyntaxError) {
+                   $(this).addClass('error');
+                   textFilter = null;
+               }
+           }
+       }
+       filterVariables(textFilter);
+    });
+
+    /* Trigger filtering of the list based on incoming database name */
+    if ($filterField.val()) {
+        $filterField.trigger('keyup').select();
+    }
+
+    /* Filters the rows by the user given regexp */
+    function filterVariables(textFilter) {
+        var $row, databasesCount = 0;
+        $('#tabledatabases').find('.db-row').each(function () {
+            $row = $(this);
+            if (textFilter === null ||
+                textFilter.exec($row.find('.name').text())
+               ) {
+                   $row.css('display', '');
+                   databasesCount += 1;
+               } else {
+                   $row.css('display', 'none');
+               }
+            $('#databases_count').html(databasesCount);
+        });
+    }
 }); // end $()

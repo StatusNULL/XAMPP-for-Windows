@@ -14,9 +14,6 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-/* $Id: CookieExample.java 1337730 2012-05-12 23:17:21Z kkolinko $
- *
- */
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -53,6 +50,7 @@ public class CookieExample extends HttpServlet {
         Cookie aCookie = null;
         if (cookieName != null && cookieValue != null) {
             aCookie = new Cookie(cookieName, cookieValue);
+            aCookie.setPath(request.getContextPath() + "/");
             response.addCookie(aCookie);
         }
 

@@ -83,7 +83,7 @@ if (PEAR::isError($args)) {
 
 // version
 if ($args->isDefined('V')) {
-    echo 'PHP_CompatInfo Extensions Support List build system version 1.9.0';
+    echo 'PHP_CompatInfo Extensions Support List build system version @package_version@';
     exit(0);
 }
 

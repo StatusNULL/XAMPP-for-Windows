@@ -393,7 +393,7 @@ class PHP_CompatInfo_Renderer_Html extends PHP_CompatInfo_Renderer
     {
         // default stylesheet is into package data directory
         if (!isset($css)) {
-            $css = 'C:\php\pear\data' . DIRECTORY_SEPARATOR
+            $css = '\php\pear\data' . DIRECTORY_SEPARATOR
                  . 'PHP_CompatInfo' . DIRECTORY_SEPARATOR
                  . 'pci.css';
         }

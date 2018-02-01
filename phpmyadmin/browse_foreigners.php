@@ -5,6 +5,7 @@
  *
  * @package PhpMyAdmin
  */
+use PMA\libraries\Response;
 
 require_once 'libraries/common.inc.php';
 require_once 'libraries/transformations.lib.php';
@@ -24,22 +25,21 @@ foreach ($request_params as $one_request_param) {
     }
 }
 
-PMA_Util::checkParameters(array('db', 'table', 'field'));
+PMA\libraries\Util::checkParameters(array('db', 'table', 'field'));
 
-$response = PMA_Response::getInstance();
+$response = Response::getInstance();
 $response->getFooter()->setMinimal();
 $header = $response->getHeader();
-$header->disableMenu();
+$header->disableMenuAndConsole();
 $header->setBodyId('body_browse_foreigners');
 
 /**
  * Displays the frame
  */
 
-$cfgRelation = PMA_getRelationsParam();
-$foreigners  = ($cfgRelation['relwork'] ? PMA_getForeigners($db, $table) : false);
+$foreigners  = PMA_getForeigners($db, $table);
 $foreign_limit = PMA_getForeignLimit(
-    isset($foreign_navig) ? $foreign_navig : null
+    isset($_REQUEST['foreign_showAll']) ? $_REQUEST['foreign_showAll'] : null
 );
 
 $foreignData = PMA_getForeignData(
@@ -47,13 +47,9 @@ $foreignData = PMA_getForeignData(
     isset($_REQUEST['foreign_filter'])
     ? $_REQUEST['foreign_filter']
     : '',
-    isset($foreign_limit) ? $foreign_limit : null
+    isset($foreign_limit) ? $foreign_limit : null,
+    true // for getting value in $foreignData['the_total']
 );
-
-
-$code = PMA_getJsScriptToHandleSelectRelationalFields();
-
-$header->getScripts()->addCode($code);
 
 // HTML output
 $html = PMA_getHtmlForRelationalFieldSelection(
@@ -63,4 +59,3 @@ $html = PMA_getHtmlForRelationalFieldSelection(
 );
 
 $response->addHtml($html);
-?>
